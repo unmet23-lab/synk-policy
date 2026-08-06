@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SYNK LAB</title>
+<!-- 상대 경로 — 커스텀 도메인 연결 전(unmet23-lab.github.io/synk-policy/)과
+     연결 후(synk.im/) 양쪽에서 같은 곳으로 간다. 절대 경로면 한쪽이 깨진다. -->
+<link rel="canonical" href="https://synk.im/privacy/">
+<meta http-equiv="refresh" content="0; url=privacy/">
+<style>
+  /* 색 = 방침 페이지와 같은 킷 값(navy 바탕 · cream 잉크 · 신호 1점 = coral).
+     다크 바탕이라 Coral 글자가 허용되는 쪽이다(철칙 ② 는 라이트 배경 금지). */
+  html{background:#0F1730;color:#F6F1E8;
+       font-family:"SUIT Variable","Inter Tight",system-ui,-apple-system,"Segoe UI",sans-serif}
+  body{margin:0;min-height:100vh;display:grid;place-items:center;padding:24px;text-align:center}
+  a{color:#FF6B5C;text-decoration-thickness:1px;text-underline-offset:3px}
+</style>
+</head>
+<body>
+  <p>SYNK LAB — <a href="privacy/">개인정보처리방침 / Privacy Policy</a></p>
+  <script>location.replace('privacy/');</script>
+</body>
+</html>
