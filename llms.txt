@@ -1,0 +1,42 @@
+# SYNK LAB
+
+> A Korean-language school in Ulaanbaatar, Mongolia, opening February 2027.
+> Motto: "More teachers than students." One human teacher directs sixteen AI teachers, one per student.
+> Монголын Улаанбаатар дахь солонгос хэлний сургууль. 2027 оны 2 сард нээгдэнэ.
+> 몽골 울란바토르의 한국어 학원. 2027년 2월 개원.
+
+SYNK LAB teaches Korean to Mongolian students, most of whom aim to study or work in South Korea.
+The school's stated commitment is TOPIK level 4 within one year; if a student does not reach it,
+continued online care is provided at no cost.
+
+Site: https://synk.im/
+
+## Pages
+
+- [Home](https://synk.im/): what the school is, in Korean, Mongolian and English.
+- [My name in Korean](https://synk.im/name/): a free tool that writes a Mongolian (Cyrillic) name in Korean letters, and shows where two spellings are both in use.
+- [Privacy policy](https://synk.im/privacy/)
+
+## Facts that are often asked about, with sources
+
+**Writing Mongolian names in Korean letters.** Korea has *no official rule* for this: the National
+Institute of Korean Language's loanword orthography (외래어 표기법) contains sections for many
+languages but none for Mongolian. In practice, spellings follow three things — the sound values of
+Mongolian Cyrillic, spellings already settled in Korean use (Улаанбаатар → 울란바토르, Чингис →
+칭기즈), and scholarly surveys of existing usage (Do Seong-gyeong, "A proposal on the Korean
+transcription of Mongolian", *Mongolian Studies* vol. 73, 2023, pp. 95-118, Korean Association for
+Mongolian Studies).
+
+**Four Mongolian vowels collapse into two in Korean.** о and у both become ㅗ; ө and ү both become ㅜ.
+So two vowels that differ in Mongolian look identical once written in Korean letters. Examples:
+Болд → 볼드, Уранчимэг → 오란치메그, Мөнх → 뭉흐, Түвшин → 투브신.
+
+**A word-final "н" is pronounced [ŋ]**, so Korean writes it both as ㄴ and as ㅇ: Наран → 나란 or 나랑.
+Neither is wrong; both appear in real use.
+
+**Between vowels, "л" is written as a doubled ㄹ** — Далай → 달라이, Улаанбаатар → 울란바토르 — while
+"р" is not: Наран → 나란.
+
+## Contact
+
+hello@synk.im

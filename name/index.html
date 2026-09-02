@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="mn">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Миний нэр солонгосоор — SYNK LAB</title>
+<meta name="description" content="Монгол нэрээ солонгос үсгээр хэрхэн бичихийг шууд харна. Монгол хэлний солонгос бичлэгийн албан ёсны дүрэм байхгүй — энэ хэрэгсэл юун дээр тулгуурласныг ил хэлнэ. SYNK LAB, Улаанбаатар.">
+<meta property="og:title" content="Миний нэр солонгосоор">
+<meta property="og:description" content="Монгол нэрээ солонгос үсгээр. SYNK LAB — багш нь сурагчаасаа олон сургууль.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://synk.im/name/">
+<link rel="canonical" href="https://synk.im/name/">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/sun-typeface/SUIT@2/fonts/variable/woff2/SUIT-Variable.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@300..800&display=swap">
+<style>
+  :root{
+    --paper:#FBF7F0; --ink:#2B2320; --stitch:#F0E3C8;
+    --oat:#EDE7DC; --stone:#C7BFB2; --ash:#8D857A; --deepwool:#575046;
+    --coral:#F96859; --coral-wash:#FEF0E9; --rim:#941F19;
+    --lapis:#3D6BC9;
+    --kr:'SUIT Variable','SUIT',system-ui,sans-serif;
+    --en:'Inter Tight',system-ui,sans-serif;
+    --mn-scale:1.04;
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    margin:0; background:var(--paper); color:var(--ink);
+    font-family:var(--kr); font-weight:500; letter-spacing:-0.02em;
+    line-height:1.72; -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility;
+  }
+  .en{font-family:var(--en); letter-spacing:-0.02em}
+  .mn{font-family:var(--en); font-size:calc(1em * var(--mn-scale)); letter-spacing:-0.015em}
+  .eng{font-family:var(--en); letter-spacing:-0.015em}
+  body[data-lang="ko"] .mn, body[data-lang="ko"] .eng{display:none}
+  body[data-lang="mn"] .ko, body[data-lang="mn"] .eng{display:none}
+  body[data-lang="en"] .ko, body[data-lang="en"] .mn{display:none}
+  body[data-lang="en"]{font-family:var(--en)}
+
+  .langbar{
+    position:sticky; top:0; z-index:9; background:rgba(251,247,240,.92);
+    backdrop-filter:blur(8px); border-bottom:1px solid var(--stitch);
+  }
+  .langbar .inner{max-width:720px; margin:0 auto; padding:10px 24px;
+    display:flex; justify-content:space-between; align-items:center; gap:6px}
+  .home{font-family:var(--en); font-size:15px; font-weight:700; letter-spacing:-0.03em;
+    color:var(--ink); text-decoration:none}
+  .home:hover{color:var(--coral)}
+  .langbtns{display:flex; gap:6px}
+  .langbtn{
+    font-family:var(--en); font-size:13px; font-weight:600; letter-spacing:-0.01em;
+    color:var(--deepwool); background:transparent; border:1px solid var(--stitch);
+    border-radius:99px; padding:5px 15px; cursor:pointer;
+    transition:background .14s ease, color .14s ease, border-color .14s ease;
+  }
+  .langbtn:hover{border-color:var(--stone)}
+  .langbtn[aria-pressed="true"]{background:var(--coral); border-color:var(--coral); color:#fff}
+  .langbtn:focus-visible, .btn:focus-visible, input:focus-visible, a:focus-visible{
+    outline:2px solid var(--coral); outline-offset:2px}
+
+  .wrap{max-width:720px; margin:0 auto; padding:0 24px}
+  section{padding:52px 0; border-bottom:1px solid var(--stitch)}
+  section:last-of-type{border-bottom:0}
+  h1{font-size:clamp(28px,6vw,40px); line-height:1.24; margin:0 0 14px;
+    font-weight:800; letter-spacing:-0.035em; text-wrap:balance}
+  h2{font-size:clamp(19px,4vw,23px); line-height:1.35; margin:0 0 12px;
+    font-weight:750; letter-spacing:-0.03em; text-wrap:balance}
+  h3{font-size:16px; margin:26px 0 8px; font-weight:750; letter-spacing:-0.025em}
+  p{margin:0 0 14px}
+  .lead{font-size:clamp(15px,3.4vw,17px); color:var(--deepwool)}
+  .fine{font-size:13.5px; color:var(--ash); line-height:1.68}
+
+  /* ── 입력 ── */
+  .box{background:#fff; border:1px solid var(--stitch); border-radius:18px;
+    padding:22px; box-shadow:0 1px 2px rgba(43,35,32,.04), 0 10px 28px -18px rgba(43,35,32,.22)}
+  label{display:block; font-size:13.5px; font-weight:700; color:var(--deepwool); margin-bottom:8px}
+  input[type=text]{
+    width:100%; font-family:var(--en); font-size:22px; font-weight:600; letter-spacing:-0.01em;
+    padding:14px 16px; border:1.5px solid var(--stitch); border-radius:12px;
+    background:var(--paper); color:var(--ink); transition:border-color .14s ease}
+  input[type=text]:focus{border-color:var(--coral); outline:none}
+  .chips{display:flex; flex-wrap:wrap; gap:7px; margin-top:12px}
+  .chip{font-family:var(--en); font-size:13px; font-weight:600; color:var(--deepwool);
+    background:var(--oat); border:1px solid var(--stitch); border-radius:99px;
+    padding:5px 13px; cursor:pointer; transition:background .14s ease, color .14s ease}
+  .chip:hover{background:var(--coral-wash); border-color:var(--coral); color:var(--rim)}
+
+  /* ── 결과 ── */
+  .out{margin-top:20px; padding-top:20px; border-top:1px solid var(--stitch)}
+  .out[hidden]{display:none}
+  .hangul{font-family:var(--kr); font-size:clamp(34px,9vw,52px); font-weight:800;
+    letter-spacing:-0.04em; line-height:1.2; color:var(--ink); word-break:keep-all}
+  .romanized{font-family:var(--en); font-size:15px; color:var(--ash); margin-top:4px}
+  .actions{display:flex; flex-wrap:wrap; gap:8px; margin-top:16px}
+  .btn{font-family:var(--en); font-size:14px; font-weight:650; letter-spacing:-0.01em;
+    border-radius:99px; padding:9px 18px; cursor:pointer; border:1px solid var(--stitch);
+    background:#fff; color:var(--deepwool); transition:background .14s ease, border-color .14s ease}
+  .btn:hover{border-color:var(--stone)}
+  .btn.primary{background:var(--coral); border-color:var(--coral); color:#fff}
+  .btn.primary:hover{background:var(--rim); border-color:var(--rim)}
+
+  .alt{margin-top:18px; padding:14px 16px; background:var(--coral-wash);
+    border:1px solid rgba(249,104,89,.3); border-radius:12px; font-size:14px}
+  .alt[hidden]{display:none}
+  .alt b{color:var(--rim)}
+  .altline{display:flex; flex-wrap:wrap; align-items:baseline; gap:8px; margin-top:6px}
+  .altline .k{font-family:var(--kr); font-size:20px; font-weight:750; letter-spacing:-0.03em}
+
+  /* ── 표 ── */
+  .tablescroll{overflow-x:auto; margin:16px 0; -webkit-overflow-scrolling:touch}
+  table{border-collapse:collapse; width:100%; font-size:14px; min-width:min(100%,420px)}
+  th{text-align:left; font-weight:700; color:var(--ash); font-size:12.5px;
+    letter-spacing:0.02em; padding:8px 12px; border-bottom:1px solid var(--stone); white-space:nowrap}
+  td{padding:8px 12px; border-bottom:1px solid var(--stitch); vertical-align:top}
+  tr:last-child td{border-bottom:0}
+  td.c{font-family:var(--en); font-weight:650; white-space:nowrap}
+  td.h{font-family:var(--kr); font-weight:700; white-space:nowrap}
+
+  .note{background:var(--oat); border-radius:14px; padding:16px 18px; font-size:14px;
+    line-height:1.68; margin:18px 0}
+  .note b{font-weight:750}
+  ul{margin:0 0 14px; padding-left:1.2em}
+  li{margin:5px 0}
+
+  .cta{background:var(--ink); color:var(--paper); border-radius:18px; padding:26px 24px; margin-top:8px}
+  .cta h2{color:var(--paper); margin-bottom:8px}
+  .cta p{color:#D8D0C6}
+  .cta a{color:#fff; font-weight:700; text-decoration:underline; text-underline-offset:3px}
+
+  footer{padding:36px 0 60px; font-size:13px; color:var(--ash)}
+  footer a{color:var(--deepwool)}
+
+  @media (prefers-reduced-motion:reduce){*{transition:none !important}}
+</style>
+</head>
+<body data-lang="mn">
+
+<div class="langbar"><div class="inner">
+  <a class="home" href="/">SYNK LAB</a>
+  <div class="langbtns">
+    <button class="langbtn" data-set="mn" aria-pressed="true">МН</button>
+    <button class="langbtn" data-set="ko" aria-pressed="false">한국어</button>
+    <button class="langbtn" data-set="en" aria-pressed="false">EN</button>
+  </div>
+</div></div>
+
+<div class="wrap">
+
+<section>
+  <h1>
+    <span class="mn">Миний нэр солонгосоор</span>
+    <span class="ko">내 이름, 한글로</span>
+    <span class="eng">My name in Korean</span>
+  </h1>
+  <p class="lead">
+    <span class="mn">Монгол нэрээ бичихэд солонгос үсгээр шууд харуулна. Хаана нь хоёр янзаар бичдэгийг бас хэлнэ.</span>
+    <span class="ko">몽골 이름을 넣으면 한글로 바로 보여 줍니다. 표기가 갈리는 자리도 함께 알려 줍니다.</span>
+    <span class="eng">Type a Mongolian name and see it written in Korean letters — including where two spellings are both in use.</span>
+  </p>
+
+  <div class="box">
+    <label for="src">
+      <span class="mn">Нэрээ кирилл үсгээр бичнэ үү</span>
+      <span class="ko">이름을 키릴 문자로 적어 주세요</span>
+      <span class="eng">Write the name in Cyrillic</span>
+    </label>
+    <input type="text" id="src" autocomplete="off" autocapitalize="off" spellcheck="false"
+           placeholder="Батбаяр" aria-describedby="outk">
+
+    <div class="chips" id="chips"></div>
+
+    <div class="out" id="out" hidden>
+      <div class="hangul" id="outk" aria-live="polite"></div>
+      <div class="romanized" id="outr"></div>
+      <div class="actions">
+        <button class="btn primary" id="copy">
+          <span class="mn">Хуулах</span><span class="ko">복사</span><span class="eng">Copy</span>
+        </button>
+      </div>
+      <div class="alt" id="alt" hidden></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2>
+    <span class="mn">Яагаад заримдаа хоёр янзаар бичдэг вэ</span>
+    <span class="ko">왜 어떤 글자는 두 가지로 쓰이나</span>
+    <span class="eng">Why some letters have two spellings</span>
+  </h2>
+
+  <div class="note">
+    <p style="margin-bottom:8px">
+      <span class="mn"><b>Монгол хэлний солонгос бичлэгт албан ёсны дүрэм алга.</b> Солонгосын үндэсний хэлний хүрээлэнгийн «Гадаад үгийн бичлэгийн дүрэм»-д монгол хэлний тусгай заалт байдаггүй.</span>
+      <span class="ko"><b>몽골어를 한글로 쓰는 공식 규정은 없습니다.</b> 국립국어원 외래어 표기법에 몽골어 세칙이 마련되어 있지 않습니다.</span>
+      <span class="eng"><b>There is no official rule for writing Mongolian in Korean letters.</b> Korea's loanword orthography has no section for Mongolian.</span>
+    </p>
+    <p style="margin:0">
+      <span class="mn">Тиймээс энэ хэрэгсэл гурван зүйл дээр тулгуурлав — ① монгол кирилл үсгийн дуудлага ② Солонгост аль хэдийн тогтсон бичлэг (Улаанбаатар, Чингис) ③ эрдэм шинжилгээний нэгтгэл (До Сон-Гён, 2023, «Монгол судлал» 73).</span>
+      <span class="ko">그래서 이 도구는 셋에 기대어 만들었습니다 — ① 몽골 키릴 자모의 소리값 ② 한국에서 이미 굳어진 표기(울란바토르·칭기즈) ③ 학술 정리(도성경, 2023, 『몽골학』 73집).</span>
+      <span class="eng">So this tool rests on three things: the sound values of Mongolian Cyrillic, spellings already settled in Korean (Ulaanbaatar, Chinggis), and a scholarly survey (Do Seong-gyeong, 2023, <i>Mongolian Studies</i> 73).</span>
+    </p>
+  </div>
+
+  <h3>
+    <span class="mn">Дөрвөн эгшиг хоёр болж нийлдэг</span>
+    <span class="ko">모음 넷이 둘로 합쳐집니다</span>
+    <span class="eng">Four vowels collapse into two</span>
+  </h3>
+  <p>
+    <span class="mn">Энэ бол солонгос хэл сурч байгаа монгол хүнд хамгийн их хэрэгтэй мэдлэг. Солонгос үсэгт <b>о ба у хоёулаа ㅗ</b>, <b>ө ба ү хоёулаа ㅜ</b> болдог — өөрөөр хэлбэл монголоор өөр дуудагддаг хоёр эгшиг солонгосоор ижил харагдана.</span>
+    <span class="ko">이게 한국어를 배우는 몽골 학생에게 가장 쓸모 있는 지식입니다. 한글에서는 <b>о 와 у 가 둘 다 ㅗ</b>, <b>ө 와 ү 가 둘 다 ㅜ</b>가 됩니다 — 몽골어에서 다른 두 소리가 한글에서는 같아집니다.</span>
+    <span class="eng">This is the most useful thing here for a Mongolian learning Korean: in Korean letters <b>о and у both become ㅗ</b>, and <b>ө and ү both become ㅜ</b> — two sounds that differ in Mongolian look identical in Korean.</span>
+  </p>
+
+  <div class="tablescroll">
+    <table>
+      <thead><tr>
+        <th><span class="mn">Кирилл</span><span class="ko">키릴</span><span class="eng">Cyrillic</span></th>
+        <th><span class="mn">Солонгос</span><span class="ko">한글</span><span class="eng">Korean</span></th>
+        <th><span class="mn">Жишээ</span><span class="ko">보기</span><span class="eng">Example</span></th>
+      </tr></thead>
+      <tbody>
+        <tr><td class="c">о</td><td class="h">ㅗ</td><td class="c">Болд → <span class="h">볼드</span></td></tr>
+        <tr><td class="c">у</td><td class="h">ㅗ</td><td class="c">Уранчимэг → <span class="h">오란치멕</span></td></tr>
+        <tr><td class="c">ө</td><td class="h">ㅜ</td><td class="c">Мөнх → <span class="h">뭉흐</span></td></tr>
+        <tr><td class="c">ү</td><td class="h">ㅜ</td><td class="c">Түвшин → <span class="h">투브신</span></td></tr>
+        <tr><td class="c">а</td><td class="h">ㅏ</td><td class="c">Ганбат → <span class="h">간바트</span></td></tr>
+        <tr><td class="c">э</td><td class="h">ㅔ</td><td class="c">Эрдэнэ → <span class="h">에르데네</span></td></tr>
+        <tr><td class="c">и · ы</td><td class="h">ㅣ</td><td class="c">Чимэд → <span class="h">치메드</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>
+    <span class="mn">Үгийн эцсийн «н»</span>
+    <span class="ko">낱말 끝의 「н」</span>
+    <span class="eng">Final “н”</span>
+  </h3>
+  <p>
+    <span class="mn">Монголоор үгийн эцсийн <b>н</b> нь [ŋ] дуудагддаг тул солонгосоор <b>ㄴ</b> ба <b>ㅇ</b> хоёулаа бичигддэг: Наран → <b>나란</b> эсвэл <b>나랑</b>. Энэ хэрэгсэл үндсэн хариултаа <b>ㄴ</b>-ээр өгөөд, нөгөө бичлэгийг доор нь харуулна.</span>
+    <span class="ko">몽골어에서 낱말 끝의 <b>н</b> 은 [ŋ] 으로 소리나서 한글로 <b>ㄴ</b> 과 <b>ㅇ</b> 이 둘 다 쓰입니다: Наран → <b>나란</b> 또는 <b>나랑</b>. 이 도구는 기본을 <b>ㄴ</b> 으로 주고, 다른 표기를 아래에 함께 보여 줍니다.</span>
+    <span class="eng">A final <b>н</b> is pronounced [ŋ], so Korean uses both <b>ㄴ</b> and <b>ㅇ</b>: Наран → <b>나란</b> or <b>나랑</b>. This tool answers with <b>ㄴ</b> and shows the other spelling below.</span>
+  </p>
+
+  <p class="fine">
+    <span class="mn">⚠ Энэ хуудсын монгол бичвэрийг мэргэжлийн хянагч хараагүй байгаа. Хянуулсны дараа шинэчилнэ.</span>
+    <span class="ko">⚠ 이 지면의 몽골어는 아직 감수를 받지 않았습니다. 감수가 끝나면 갱신합니다.</span>
+    <span class="eng">⚠ The Mongolian text here has not yet been reviewed by a native proofreader. It will be updated once it has.</span>
+  </p>
+</section>
+
+<section>
+  <div class="cta">
+    <h2>
+      <span class="mn">Энэ хэрэгслийг хийсэн газар 2027 оны 2 сард нээгдэнэ</span>
+      <span class="ko">이 도구를 만든 곳이 2027년 2월에 문을 엽니다</span>
+      <span class="eng">The people who built this open their doors in February 2027</span>
+    </h2>
+    <p style="margin-bottom:0">
+      <span class="mn">SYNK LAB — Улаанбаатар дахь солонгос хэлний сургууль. <b>Багш нь сурагчаасаа олон сургууль.</b> <a href="/">Дэлгэрэнгүй →</a></span>
+      <span class="ko">SYNK LAB — 울란바토르의 한국어 학원. <b>선생님이 학생보다 많은 학원.</b> <a href="/">자세히 →</a></span>
+      <span class="eng">SYNK LAB — a Korean-language school in Ulaanbaatar. <b>More teachers than students.</b> <a href="/">More →</a></span>
+    </p>
+  </div>
+</section>
+
+<footer class="wrap">
+  <span class="mn">© SYNK LAB · <a href="/">synk.im</a> · Улаанбаатар</span>
+  <span class="ko">© SYNK LAB · <a href="/">synk.im</a> · 울란바토르</span>
+  <span class="eng">© SYNK LAB · <a href="/">synk.im</a> · Ulaanbaatar</span>
+</footer>
+
+</div>
+
+<script>
+(function(){
+  'use strict';
+
+  /* ─────────────────────────────────────────────────────────────
+     몽골 키릴 → 한글 음역
+     자 = ① 몽골 키릴 자모 소리값 ② 한국에서 굳어진 표기 ③ 도성경(2023) 정리
+     흔들리는 자리(о·у·ө·у·어말 н)는 결과에 «다른 표기»로 함께 낸다.
+     ───────────────────────────────────────────────────────────── */
+
+  var CHO = ['ㄱ','ㄲ','ㄴ','ㄷ','ㄸ','ㄹ','ㅁ','ㅂ','ㅃ','ㅅ','ㅆ','ㅇ','ㅈ','ㅉ','ㅊ','ㅋ','ㅌ','ㅍ','ㅎ'];
+  var JUNG = ['ㅏ','ㅐ','ㅑ','ㅒ','ㅓ','ㅔ','ㅕ','ㅖ','ㅗ','ㅘ','ㅙ','ㅚ','ㅛ','ㅜ','ㅝ','ㅞ','ㅟ','ㅠ','ㅡ','ㅢ','ㅣ'];
+  var JONG = ['','ㄱ','ㄲ','ㄳ','ㄴ','ㄵ','ㄶ','ㄷ','ㄹ','ㄺ','ㄻ','ㄼ','ㄽ','ㄾ','ㄿ','ㅀ','ㅁ','ㅂ','ㅄ','ㅅ','ㅆ','ㅇ','ㅈ','ㅊ','ㅋ','ㅌ','ㅍ','ㅎ'];
+
+  function syl(cho, jung, jong){
+    var c = CHO.indexOf(cho), v = JUNG.indexOf(jung), t = JONG.indexOf(jong || '');
+    if (c < 0 || v < 0 || t < 0) return '';
+    return String.fromCharCode(0xAC00 + (c * 21 + v) * 28 + t);
+  }
+
+  // 자음 → [초성, 받침으로 쓸 때의 종성 또는 null, 홀로 설 때 붙일 모음]
+  var CONS = {
+    'б': ['ㅂ', null, 'ㅡ'], 'в': ['ㅂ', null, 'ㅡ'], 'г': ['ㄱ', 'ㄱ', 'ㅡ'],
+    'д': ['ㄷ', null, 'ㅡ'], 'ж': ['ㅈ', null, 'ㅡ'], 'з': ['ㅈ', null, 'ㅡ'],
+    'к': ['ㅋ', 'ㄱ', 'ㅡ'], 'л': ['ㄹ', 'ㄹ', 'ㅡ'], 'м': ['ㅁ', 'ㅁ', 'ㅡ'],
+    'н': ['ㄴ', 'ㄴ', 'ㅡ'], 'п': ['ㅍ', null, 'ㅡ'], 'р': ['ㄹ', null, 'ㅡ'],
+    'с': ['ㅅ', null, 'ㅡ'], 'т': ['ㅌ', null, 'ㅡ'], 'ф': ['ㅍ', null, 'ㅡ'],
+    'х': ['ㅎ', null, 'ㅡ'], 'ц': ['ㅊ', null, 'ㅡ'], 'ч': ['ㅊ', null, 'ㅣ'],
+    'ш': ['ㅅ', null, 'ㅣ'], 'щ': ['ㅅ', null, 'ㅣ']
+  };
+
+  // 모음 → [중성, 앞에 반모음 y 가 붙는가]
+  var VOW = {
+    'а': ['ㅏ', false], 'э': ['ㅔ', false], 'и': ['ㅣ', false], 'ы': ['ㅣ', false],
+    'о': ['ㅗ', false], 'у': ['ㅗ', false], 'ө': ['ㅜ', false], 'ү': ['ㅜ', false],
+    'е': ['ㅖ', true],  'ё': ['ㅛ', true],  'ю': ['ㅠ', true],  'я': ['ㅑ', true]
+  };
+
+  // 굳어진 표기 — 규칙보다 이것이 이긴다
+  var FIXED = {
+    'улаанбаатар': '울란바토르', 'монгол': '몽골', 'чингис': '칭기즈',
+    'дархан': '다르한', 'эрдэнэт': '에르데네트', 'мөнх': '뭉흐',
+    'цэцэг': '체첵'   // 어말 г 이 ㄱ 받침으로 굳은 자리 — 규칙(체체그)보다 이것이 이긴다
+  };
+
+  function isVowel(ch){ return Object.prototype.hasOwnProperty.call(VOW, ch); }
+  function isCons(ch){ return Object.prototype.hasOwnProperty.call(CONS, ch); }
+
+  // 이 자음이 받침으로 앉는가 — 앉지 않으면 「으」를 붙여 홀로 선다.
+  // 갈리는 자리 둘을 여기 모았다: 어말 н([ŋ]) · 어말 г(체첵 ↔ 체체그).
+  function coda(ch, atEnd, nx, opt){
+    var c = CONS[ch];
+    if (!c || !c[1]) return null;
+    if (ch === 'г' || ch === 'к'){
+      // ㄱ 받침은 «어말»에서만, 그것도 변이 판에서만 — 기본은 글자를 보존해 「그」로 적는다.
+      // (자음 앞 г 을 받침으로 앉히면 Мягмар 가 「막마르」가 된다)
+      return (atEnd && opt.gCoda) ? 'ㄱ' : null;
+    }
+    if (ch === 'н'){
+      if (nx === 'х' || nx === 'г' || nx === 'к') return 'ㅇ';  // 동화 — Мөнх → 뭉흐
+      if (atEnd && opt.ngFinal) return 'ㅇ';
+      return 'ㄴ';
+    }
+    return c[1];   // м · л
+  }
+
+  // 한 낱말을 옮긴다. opt = { ngFinal, gCoda } — 갈리는 자리를 켜고 끄는 손잡이
+  function word(w, opt){
+    var s = w.toLowerCase().replace(/[ъь]/g, '');
+    var out = '', i = 0, n = s.length;
+
+    while (i < n){
+      var ch = s[i];
+
+      if (!isCons(ch) && !isVowel(ch) && ch !== 'й'){ out += ch; i++; continue; }
+
+      var cho = 'ㅇ';
+      if (isCons(ch)){
+        // 뒤에 모음이 오면 초성, 아니면 받침이거나 홀로 선다
+        var nx = s[i+1];
+        var vowelNext = nx && isVowel(nx);
+        if (!vowelNext){
+          var c = CONS[ch];
+          var atEnd = (i === n - 1);
+          var jong = coda(ch, atEnd, nx, opt);
+          if (jong && out.length){
+            var last = out.charCodeAt(out.length - 1) - 0xAC00;
+            if (last >= 0 && last < 11172 && last % 28 === 0){
+              out = out.slice(0, -1) + String.fromCharCode(0xAC00 + last + JONG.indexOf(jong));
+              i++; continue;
+            }
+          }
+          out += syl(c[0], c[2], '');   // 홀로 서는 자음 — 「으」 또는 「이」를 붙인다
+          i++; continue;
+        }
+        cho = CONS[ch][0];
+        // 모음 사이 л 은 ㄹㄹ 로 적는다 — 달라이(Далай) · 울란바토르(Улаанбаатар) 가 그 증거.
+        // (р 은 겹치지 않는다: Наран → 나란)
+        if (ch === 'л' && out.length){
+          var prev = out.charCodeAt(out.length - 1) - 0xAC00;
+          if (prev >= 0 && prev < 11172 && prev % 28 === 0){
+            out = out.slice(0, -1) + String.fromCharCode(0xAC00 + prev + JONG.indexOf('ㄹ'));
+          }
+        }
+        i++;
+        ch = s[i];
+      }
+
+      // 여기부터는 모음 자리
+      if (ch === 'й'){ out += syl(cho, 'ㅣ', ''); i++; continue; }
+      if (!isVowel(ch)){ continue; }
+
+      // 자음 + 이중모음도 한글은 그대로 적는다(먀·뱌·겨) — 낮추면 Мягмар 가 「마그마르」가 된다
+      var jung = VOW[ch][0];
+      i++;
+
+      // 장모음은 한 소리로 줄인다 — 같은 글자 반복(аа·ээ·оо·өө·уу·үү)과
+      // 이중모음의 장음 짝(юу·яа·ёо·еэ), 그리고 ий 까지.
+      var LONG_PAIR = { 'ю':'у', 'я':'а', 'ё':'о', 'е':'э' };
+      while (i < n && (s[i] === ch || (ch === 'и' && s[i] === 'й') || LONG_PAIR[ch] === s[i])) i++;
+
+      // 받침 후보 — 다음 자음이 «뒤에 모음을 데리고 오지 않을» 때만 받침이 된다
+      // (이 검사가 빠지면 Эрдэнэ 가 「에르덴에」가 된다)
+      var jong = '';
+      if (i < n && isCons(s[i])){
+        var nx2 = s[i+1];
+        if (!(nx2 && isVowel(nx2))){
+          var got = coda(s[i], i === n - 1, nx2, opt);
+          if (got){ jong = got; i++; }
+        }
+      }
+      out += syl(cho, jung, jong);
+    }
+    return out;
+  }
+
+  // variant=false → 기본 판 · true → 갈리는 자리를 모두 켠 「다른 표기」 판
+  function convert(text, variant){
+    var opt = { ngFinal: !!variant, gCoda: !!variant };
+    return text.split(/(\s+|-)/).map(function(part){
+      if (/^\s+$/.test(part) || part === '-') return part;
+      var key = part.toLowerCase().replace(/[ъь]/g,'');
+      if (!variant && FIXED[key]) return FIXED[key];
+      if (!/[Ѐ-ӿ]/.test(part)) return part;
+      return word(part, opt);
+    }).join('');
+  }
+
+  /* ── 화면 ── */
+  var $src = document.getElementById('src');
+  var $out = document.getElementById('out');
+  var $outk = document.getElementById('outk');
+  var $outr = document.getElementById('outr');
+  var $alt = document.getElementById('alt');
+  var $copy = document.getElementById('copy');
+
+  var SAMPLES = ['Батбаяр','Оюунчимэг','Мөнх','Түвшин','Наран','Эрдэнэ','Цэцэг','Ганзориг'];
+  var $chips = document.getElementById('chips');
+  SAMPLES.forEach(function(s){
+    var b = document.createElement('button');
+    b.type = 'button'; b.className = 'chip'; b.textContent = s;
+    b.addEventListener('click', function(){ $src.value = s; render(); $src.focus(); });
+    $chips.appendChild(b);
+  });
+
+  var ALT_TEXT = {
+    mn: 'Энэ нэрийг <b>өөрөөр ч бичдэг</b> — үгийн эцсийн «н» нь [ŋ] дуудагддаг учраас:',
+    ko: '이 이름은 <b>다르게도 씁니다</b> — 낱말 끝의 「н」 이 [ŋ] 으로 소리나기 때문입니다:',
+    en: 'This name is <b>also written another way</b>, because a final “н” is pronounced [ŋ]:'
+  };
+
+  function render(){
+    var raw = $src.value.trim();
+    if (!raw){ $out.hidden = true; return; }
+    var main = convert(raw, false);
+    var ng   = convert(raw, true);
+    $out.hidden = false;
+    $outk.textContent = main;
+    $outr.textContent = raw;
+
+    if (ng && ng !== main){
+      var lang = document.body.getAttribute('data-lang') || 'mn';
+      $alt.innerHTML = '<span>' + ALT_TEXT[lang] + '</span>' +
+        '<div class="altline"><span class="k">' + ng + '</span></div>';
+      $alt.hidden = false;
+    } else {
+      $alt.hidden = true;
+    }
+  }
+
+  $src.addEventListener('input', render);
+
+  $copy.addEventListener('click', function(){
+    var t = $outk.textContent;
+    if (!t) return;
+    var done = function(){
+      var old = $copy.innerHTML;
+      $copy.textContent = '✓';
+      setTimeout(function(){ $copy.innerHTML = old; }, 1200);
+    };
+    if (navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(t).then(done, done);
+    } else {
+      var ta = document.createElement('textarea');
+      ta.value = t; document.body.appendChild(ta); ta.select();
+      try { document.execCommand('copy'); } catch(e){}
+      document.body.removeChild(ta); done();
+    }
+  });
+
+  /* ── 언어 ── */
+  var btns = document.querySelectorAll('.langbtn');
+  function setLang(l){
+    document.body.setAttribute('data-lang', l);
+    document.documentElement.setAttribute('lang', l);
+    btns.forEach(function(b){ b.setAttribute('aria-pressed', String(b.dataset.set === l)); });
+    try { localStorage.setItem('synk-lang', l); } catch(e){}
+    render();
+  }
+  btns.forEach(function(b){ b.addEventListener('click', function(){ setLang(b.dataset.set); }); });
+  try {
+    var saved = localStorage.getItem('synk-lang');
+    if (saved === 'ko' || saved === 'en' || saved === 'mn') setLang(saved);
+  } catch(e){}
+})();
+</script>
+</body>
+</html>
