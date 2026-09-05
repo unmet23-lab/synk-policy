@@ -100,6 +100,7 @@
   .btn:hover{border-color:var(--stone)}
   .btn.primary{background:var(--coral); border-color:var(--coral); color:#fff}
   .btn.primary:hover{background:var(--rim); border-color:var(--rim)}
+  .btn:disabled{opacity:.5; cursor:default}
 
   .alt{margin-top:18px; padding:14px 16px; background:var(--coral-wash);
     border:1px solid rgba(249,104,89,.3); border-radius:12px; font-size:14px}
@@ -107,6 +108,20 @@
   .alt b{color:var(--rim)}
   .altline{display:flex; flex-wrap:wrap; align-items:baseline; gap:8px; margin-top:6px}
   .altline .k{font-family:var(--kr); font-size:20px; font-weight:750; letter-spacing:-0.03em}
+
+  /* ── 명찰(펠트) ── */
+  .card{margin-top:22px}
+  .card[hidden]{display:none}
+  .card .pic{display:block; width:100%; max-width:400px; height:auto; border-radius:16px;
+    background:var(--paper); border:1px solid var(--stitch); aspect-ratio:4/5}
+  .card .pic.wait{opacity:.5}
+  .card .fine{margin-top:10px}
+
+  /* ── 가족에게 ── */
+  .family{margin-top:22px; padding:16px 18px; background:var(--oat); border-radius:14px}
+  .family[hidden]{display:none}
+  .family p{margin:0 0 4px; font-size:14.5px}
+  .family .fine{margin-top:8px}
 
   /* ── 표 ── */
   .tablescroll{overflow-x:auto; margin:16px 0; -webkit-overflow-scrolling:touch}
@@ -180,6 +195,40 @@
         </button>
       </div>
       <div class="alt" id="alt" hidden></div>
+
+      <!-- 펠트 명찰 — 이 화면 안에서만 그려지고 어디로도 보내지 않는다 -->
+      <div class="card" id="card" hidden>
+        <img class="pic wait" id="cardimg" alt="" width="1080" height="1350">
+        <div class="actions">
+          <button class="btn primary" id="save" disabled>
+            <span class="mn">Зураг хадгалах</span><span class="ko">그림으로 저장</span><span class="eng">Save as picture</span>
+          </button>
+        </div>
+        <p class="fine">
+          <span class="ko">그림은 이 화면 안에서만 만들어집니다. 저장한 그림을 스토리에 올릴 수 있습니다.</span>
+          <span class="eng">The picture is made right here in your browser and sent nowhere. Save it and post it to your story.</span>
+        </p>
+      </div>
+
+      <!-- 가족에게 — 링크에 이름이 실리지 않는다 -->
+      <div class="family" id="family" hidden>
+        <p><b><span class="mn">Гэр бүлд зориулсан нэг хуудас</span><span class="ko">가족을 위한 한 장</span><span class="eng">One page for the family</span></b></p>
+        <p class="ko">이 이름을 만든 곳이 어떤 곳인지, 짧은 영상 하나와 글 한 토막으로 보여 드리는 지면입니다.</p>
+        <p class="eng">One short film and one paragraph about the place that made this name.</p>
+        <div class="actions">
+          <button class="btn primary" id="fam">
+            <span class="mn">Гэр бүлдээ илгээх</span><span class="ko">가족에게 보내기</span><span class="eng">Send to family</span>
+          </button>
+          <button class="btn" id="famcopy">
+            <span class="mn">Холбоос хуулах</span><span class="ko">링크 복사</span><span class="eng">Copy link</span>
+          </button>
+        </div>
+        <p class="fine">
+          <span class="mn">Энэ холбоост нэр байхгүй.</span>
+          <span class="ko">이 링크에는 이름이 담기지 않습니다.</span>
+          <span class="eng">This link carries no name.</span>
+        </p>
+      </div>
     </div>
   </div>
 </section>
@@ -448,7 +497,7 @@
 
   function render(){
     var raw = $src.value.trim();
-    if (!raw){ $out.hidden = true; return; }
+    if (!raw){ $out.hidden = true; card.clear(); return; }
     var main = convert(raw, false);
     var ng   = convert(raw, true);
     $out.hidden = false;
@@ -463,17 +512,16 @@
     } else {
       $alt.hidden = true;
     }
+    card.schedule(main);
   }
 
   $src.addEventListener('input', render);
 
-  $copy.addEventListener('click', function(){
-    var t = $outk.textContent;
-    if (!t) return;
+  function copyText(t, $btn){
     var done = function(){
-      var old = $copy.innerHTML;
-      $copy.textContent = '✓';
-      setTimeout(function(){ $copy.innerHTML = old; }, 1200);
+      var old = $btn.innerHTML;
+      $btn.textContent = '✓';
+      setTimeout(function(){ $btn.innerHTML = old; }, 1200);
     };
     if (navigator.clipboard && navigator.clipboard.writeText){
       navigator.clipboard.writeText(t).then(done, done);
@@ -483,7 +531,185 @@
       try { document.execCommand('copy'); } catch(e){}
       document.body.removeChild(ta); done();
     }
+  }
+
+  $copy.addEventListener('click', function(){
+    var t = $outk.textContent;
+    if (t) copyText(t, $copy);
   });
+
+  /* ─────────────────────────────────────────────────────────────
+     펠트 명찰 — 이 화면 안에서만 그린다. 이름은 어디로도 보내지 않는다.
+     재료 = 공방에서 구운 펠트 명찰 틀(코랄) · 몽글 정본 누끼 · 먹색 펠트(글자 천) · 모래 펠트(바닥 결)
+     글자 = 브랜드 서체(SUIT 800)로 모양을 내고 먹색 펠트 천을 «오려» 붙인 꼴(굽지 않는다 · 돈 0)
+     ───────────────────────────────────────────────────────────── */
+  var card = (function(){
+    var W = 1080, H = 1350;
+    // 명찰 틀 안쪽 크림 네모 — 부품 픽셀에서 잰 비율(코랄 경계까지). 모서리가 둥글어 안쪽으로 9% 더 들어간다.
+    var INNER = { x: 0.249, y: 0.243, w: 0.499, h: 0.486 };
+    var SRC = { tag: 'assets/tag.webp', mascot: 'assets/monggeul.webp', ink: 'assets/ink_felt.webp', sand: 'assets/sand_felt.webp' };
+    var IMG = {}, loading = null, timer = null, blob = null, url = null, seq = 0;
+
+    var $card = document.getElementById('card');
+    var $img = document.getElementById('cardimg');
+    var $save = document.getElementById('save');
+    var $family = document.getElementById('family');
+
+    function load(){
+      if (loading) return loading;
+      var imgs = Object.keys(SRC).map(function(k){
+        return new Promise(function(res, rej){
+          var im = new Image();
+          im.onload = function(){ IMG[k] = im; res(); };
+          im.onerror = function(){ rej(new Error(k)); };
+          im.src = SRC[k];
+        });
+      });
+      var font = (document.fonts && document.fonts.load)
+        ? document.fonts.load('800 100px "SUIT Variable"').then(function(){ return document.fonts.ready; }).catch(function(){})
+        : Promise.resolve();
+      loading = Promise.all(imgs.concat([font]));
+      return loading;
+    }
+
+    function cover(g, im, x, y, w, h){
+      var s = Math.max(w / im.width, h / im.height);
+      var dw = im.width * s, dh = im.height * s;
+      g.drawImage(im, x + (w - dw) / 2, y + (h - dh) / 2, dw, dh);
+    }
+
+    function tile(im, k){
+      var c = document.createElement('canvas');
+      c.width = Math.max(1, Math.round(im.width * k)); c.height = Math.max(1, Math.round(im.height * k));
+      c.getContext('2d').drawImage(im, 0, 0, c.width, c.height);
+      return c;
+    }
+
+    // 긴 이름은 두 줄로 — 낱말 사이에서만 가르고, 두 줄 길이가 가장 비슷한 자리를 고른다
+    function splitLines(t){
+      t = t.trim();
+      var parts = t.split(/\s+/);
+      if (parts.length === 1 || t.length <= 6) return [t];
+      var best = null;
+      for (var i = 1; i < parts.length; i++){
+        var a = parts.slice(0, i).join(' '), b = parts.slice(i).join(' ');
+        var d = Math.abs(a.length - b.length);
+        if (!best || d < best.d) best = { a: a, b: b, d: d };
+      }
+      return [best.a, best.b];
+    }
+
+    function feltText(g, text, ax, ay, aw, ah){
+      var ls = splitLines(text);
+      var font = function(px){ return '800 ' + px + 'px "SUIT Variable","SUIT",system-ui,sans-serif'; };
+      var m = document.createElement('canvas'); m.width = W; m.height = H;
+      var mg = m.getContext('2d');
+      var size = Math.floor(ah / (ls.length === 1 ? 1.25 : 2.35));
+      mg.font = font(size);
+      var widest = Math.max.apply(null, ls.map(function(l){ return mg.measureText(l).width; }));
+      if (widest > aw){ size = Math.floor(size * aw / widest); mg.font = font(size); }
+      var lh = size * 1.14, total = lh * ls.length, y0 = ay + (ah - total) / 2 + lh / 2;
+      mg.textAlign = 'center'; mg.textBaseline = 'middle'; mg.fillStyle = '#000';
+      ls.forEach(function(l, i){ mg.fillText(l, ax + aw / 2, y0 + i * lh); });
+      // 글자 모양 안에 먹색 펠트 천을 채운다
+      mg.globalCompositeOperation = 'source-in';
+      mg.fillStyle = mg.createPattern(tile(IMG.ink, 0.6), 'repeat');
+      mg.fillRect(0, 0, W, H);
+      mg.globalCompositeOperation = 'source-over';
+      // 그림자(붙인 천의 두께) → 보풀(가장자리) → 본체
+      g.save(); g.shadowColor = 'rgba(43,35,32,.30)'; g.shadowBlur = 14; g.shadowOffsetY = 6; g.drawImage(m, 0, 0); g.restore();
+      g.save(); g.globalAlpha = 0.16;
+      [[2,0],[-2,0],[0,2],[0,-2],[1.5,1.5],[-1.5,-1.5],[1.5,-1.5],[-1.5,1.5]].forEach(function(o){ g.drawImage(m, o[0], o[1]); });
+      g.restore();
+      g.drawImage(m, 0, 0);
+    }
+
+    function draw(name){
+      var c = document.createElement('canvas'); c.width = W; c.height = H;
+      var g = c.getContext('2d');
+      // 바닥 — 양모 종이 + 모래 펠트 결
+      g.fillStyle = '#FBF7F0'; g.fillRect(0, 0, W, H);
+      g.globalAlpha = 0.30; cover(g, IMG.sand, 0, 0, W, H); g.globalAlpha = 1;
+      // 명찰 틀
+      var tw = 860, th = Math.round(tw * IMG.tag.height / IMG.tag.width);
+      var tx = (W - tw) / 2, ty = 150;
+      g.drawImage(IMG.tag, tx, ty, tw, th);
+      // 글자 자리 = 안쪽 크림 네모에서 9% 안으로
+      var ix = tx + tw * INNER.x, iy = ty + th * INNER.y, iw = tw * INNER.w, ih = th * INNER.h;
+      var pad = 0.09;
+      feltText(g, name, ix + iw * pad, iy + ih * pad, iw * (1 - 2 * pad), ih * (1 - 2 * pad));
+      // 몽글 — 명찰 오른쪽 아래 귀퉁이를 잡고 서 있다
+      var mw = 430, mh = Math.round(mw * IMG.mascot.height / IMG.mascot.width);
+      g.drawImage(IMG.mascot, W - mw - 30, H - mh - 40, mw, mh);
+      // 속삭임 — 작게, 옅게
+      g.font = '500 26px "Inter Tight",system-ui,sans-serif';
+      g.fillStyle = 'rgba(43,35,32,.55)'; g.textBaseline = 'alphabetic'; g.textAlign = 'left';
+      g.fillText('synk.im/name', 64, H - 64);
+      return c;
+    }
+
+    function show(name){
+      var my = ++seq;
+      $card.hidden = false; $family.hidden = false;
+      $img.classList.add('wait'); $save.disabled = true;
+      load().then(function(){
+        if (my !== seq) return;
+        var c = draw(name);
+        var finish = function(b){
+          if (my !== seq) return;
+          if (url) URL.revokeObjectURL(url);
+          blob = b; url = URL.createObjectURL(b);
+          $img.src = url; $img.alt = name;
+          $img.classList.remove('wait'); $save.disabled = !b;
+        };
+        if (c.toBlob) c.toBlob(finish, 'image/png');
+        else { var d = c.toDataURL('image/png'); fetch(d).then(function(r){ return r.blob(); }).then(finish); }
+      }).catch(function(){
+        // 재료를 못 받으면 명찰 없이 — 글자 결과는 그대로 산다
+        if (my !== seq) return;
+        $card.hidden = true;
+      });
+    }
+
+    function schedule(name){
+      clearTimeout(timer);
+      timer = setTimeout(function(){ show(name); }, 350);
+    }
+
+    function clear(){
+      clearTimeout(timer); seq++;
+      $card.hidden = true; $family.hidden = true; $save.disabled = true;
+      if (url){ URL.revokeObjectURL(url); url = null; } blob = null; $img.removeAttribute('src');
+    }
+
+    $save.addEventListener('click', function(){
+      if (!blob) return;
+      var file = null;
+      try { file = new File([blob], 'synk-name.png', { type: 'image/png' }); } catch(e){}
+      if (file && navigator.canShare && navigator.canShare({ files: [file] }) && navigator.share){
+        navigator.share({ files: [file], title: 'SYNK LAB' }).catch(function(){});
+        return;
+      }
+      var a = document.createElement('a');
+      a.href = url; a.download = 'synk-name.png';
+      document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    });
+
+    return { schedule: schedule, clear: clear };
+  })();
+
+  /* ── 가족에게 — 링크에 이름이 실리지 않는다 ── */
+  var FAMILY_URL = 'https://synk.im/name/family/';
+  var $fam = document.getElementById('fam');
+  var $famcopy = document.getElementById('famcopy');
+  $fam.addEventListener('click', function(){
+    if (navigator.share){
+      navigator.share({ title: 'SYNK LAB', url: FAMILY_URL }).catch(function(){});
+    } else {
+      copyText(FAMILY_URL, $fam);
+    }
+  });
+  $famcopy.addEventListener('click', function(){ copyText(FAMILY_URL, $famcopy); });
 
   /* ── 언어 ── */
   var btns = document.querySelectorAll('.langbtn');
