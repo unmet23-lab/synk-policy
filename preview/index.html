@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SYNK LAB — 질문하는 힘 · 스스로 하는 힘 · 마음을 끄는 힘</title>
+<meta name="description" content="SYNK LAB — 선생님이 학생보다 많은 학원. 울란바토르의 한국어 학원. AI 시대에 사람에게 끝까지 남는 세 가지를 한국어와 함께 기릅니다. 2027년 2월 개원.">
+<meta property="og:title" content="SYNK LAB">
+<meta property="og:description" content="AI 시대에 사람에게 끝까지 남는 세 가지 — 질문하는 힘, 스스로 하는 힘, 마음을 끄는 힘.">
+<meta property="og:type" content="website">
+<meta property="og:image" content="https://synk.im/name/assets/film_poster.jpg">
+<meta name="robots" content="noindex">
+<meta property="og:url" content="https://synk.im/">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/sun-typeface/SUIT@2/fonts/variable/woff2/SUIT-Variable.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@300..800&display=swap">
+<style>
+  :root{
+    --paper:#FBF7F0; --ink:#2B2320; --stitch:#F0E3C8;
+    --oat:#EDE7DC; --stone:#C7BFB2; --ash:#8D857A; --deepwool:#575046;
+    --coral:#F96859; --coral-wash:#FEF0E9; --rim:#941F19;
+    --lapis:#3D6BC9;
+    --kr:'SUIT Variable','SUIT',system-ui,sans-serif;
+    --en:'Inter Tight',system-ui,sans-serif;
+    --mn-scale:1.04;   /* 몽골어 광학 보정 — Inter Tight 소문자가 SUIT 한글의 0.679배라 같은 pt면 작아 보인다 */
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    margin:0; background:var(--paper); color:var(--ink);
+    font-family:var(--kr); font-weight:500; letter-spacing:-0.02em;
+    line-height:1.72; -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility;
+  }
+  .en{font-family:var(--en); letter-spacing:-0.02em}   /* 폰트만 바꾸는 자리(숫자·고유명) */
+
+  /* ── 언어 전환 — 세 벌이 같은 층에 선다 ───────── */
+  .mn{font-family:var(--en); font-size:calc(1em * var(--mn-scale)); letter-spacing:-0.015em}
+  .eng{font-family:var(--en); letter-spacing:-0.015em}
+  body[data-lang="ko"] .mn, body[data-lang="ko"] .eng{display:none}
+  body[data-lang="mn"] .ko, body[data-lang="mn"] .eng{display:none}
+  body[data-lang="en"] .ko, body[data-lang="en"] .mn{display:none}
+  body[data-lang="en"]{font-family:var(--en)}
+
+  .langbar{
+    position:sticky; top:0; z-index:9; background:rgba(251,247,240,.92);
+    backdrop-filter:blur(8px); border-bottom:1px solid var(--stitch);
+  }
+  .langbar .inner{max-width:720px; margin:0 auto; padding:10px 24px; display:flex; justify-content:flex-end; gap:6px}
+  .langbtn{
+    font-family:var(--en); font-size:13px; font-weight:600; letter-spacing:-0.01em;
+    color:var(--deepwool); background:transparent; border:1px solid var(--stitch);
+    border-radius:99px; padding:5px 15px; cursor:pointer;
+    transition:background .14s ease, color .14s ease, border-color .14s ease;
+  }
+  .langbtn:hover{border-color:var(--stone)}
+  .langbtn[aria-pressed="true"]{background:var(--coral); border-color:var(--coral); color:#fff}
+
+  .wrap{max-width:720px; margin:0 auto; padding:0 24px}
+  section{padding:60px 0; border-bottom:1px solid var(--stitch)}
+  section:last-of-type{border-bottom:0}
+
+  header{padding:56px 0}
+  .wordmark{width:132px; height:auto; display:block; margin-bottom:32px}
+  .lede{font-size:clamp(24px,5.2vw,35px); font-weight:800; line-height:1.42; letter-spacing:-0.035em; margin:0 0 18px}
+  .lede .three{color:var(--coral)}
+  .lede-sub{font-size:16.5px; color:var(--deepwool); margin:0 0 28px; max-width:36em}
+  .meta{display:flex; flex-wrap:wrap; gap:8px}
+  .chip{font-size:13.5px; font-weight:700; color:var(--deepwool); background:var(--oat); border-radius:99px; padding:5px 14px}
+  .chip.now{background:var(--coral-wash); color:var(--rim)}
+
+  h2{font-size:13px; font-weight:800; letter-spacing:0.06em; color:var(--ash); margin:0 0 20px}
+  .say{font-size:19px; font-weight:700; line-height:1.62; margin:0 0 14px; letter-spacing:-0.03em}
+  p{margin:0 0 14px; font-size:16.5px}
+  p:last-child{margin-bottom:0}
+  .quiet{color:var(--deepwool)}
+
+  .powers{display:grid; gap:14px; margin-top:24px}
+  .power{background:#fff; border:1px solid var(--stitch); border-radius:10px; padding:20px 22px}
+  .power h3{font-size:19px; font-weight:800; letter-spacing:-0.03em; margin:0 0 8px; display:flex; align-items:baseline; gap:10px}
+  .power h3 .n{font-family:var(--en); font-size:12px; font-weight:700; color:var(--coral); background:var(--coral-wash); border-radius:99px; padding:2px 9px; letter-spacing:0}
+  .power p{font-size:16px; margin:0}
+
+  .promise{background:var(--coral-wash); border-left:4px solid var(--coral); border-radius:0 10px 10px 0; padding:24px 26px}
+  .promise .big{font-size:21px; font-weight:800; letter-spacing:-0.035em; margin:0 0 12px; line-height:1.5}
+  .promise p{font-size:16px}
+  .promise .num{color:var(--rim)}
+
+  .cols{display:grid; gap:0; margin-top:20px}
+  .fact{display:grid; grid-template-columns:112px 1fr; gap:14px; padding:12px 0; border-bottom:1px solid var(--stitch); font-size:16px}
+  .fact:last-child{border-bottom:0}
+  .fact dt{color:var(--ash); font-size:14px; font-weight:700; padding-top:2px}
+  .fact dd{margin:0}
+  a{color:var(--lapis); text-decoration:none; border-bottom:1px solid rgba(61,107,201,.32)}
+  a:hover{border-bottom-color:var(--lapis)}
+
+  .callout{background:var(--oat); border-radius:10px; padding:20px 22px; margin-top:22px}
+  .callout h3{font-size:17px; font-weight:800; margin:0 0 8px; letter-spacing:-0.03em}
+  .callout p{font-size:15.5px}
+
+  footer{padding:36px 0 60px; font-size:14px; color:var(--ash)}
+  footer .row{display:flex; flex-wrap:wrap; gap:16px; align-items:center}
+  footer a{color:var(--ash); border-bottom-color:var(--stone)}
+
+  @media (max-width:520px){
+    .fact{grid-template-columns:1fr; gap:2px}
+    .fact dt{padding-top:6px}
+    section{padding:48px 0}
+  }
+
+  /* ── 첫 화면 영상(미리보기 판) ── */
+  .film{position:relative; border-radius:18px; overflow:hidden; background:var(--ink); margin:0 0 36px;
+    box-shadow:0 1px 2px rgba(43,35,32,.06), 0 22px 48px -28px rgba(43,35,32,.5)}
+  .film video{display:block; width:100%; height:auto; background:var(--ink)}
+  .film .snd{position:absolute; right:12px; bottom:12px; font-family:var(--en); font-size:12px; font-weight:700; letter-spacing:.02em;
+    color:#fff; background:rgba(43,35,32,.55); border:1px solid rgba(255,255,255,.35); border-radius:99px; padding:6px 12px; cursor:pointer;
+    backdrop-filter:blur(6px)}
+  .film .snd:hover{background:rgba(43,35,32,.75)}
+</style>
+</head>
+<body data-lang="ko">
+
+<nav class="langbar" aria-label="언어 / Хэл / Language">
+  <div class="inner">
+    <button class="langbtn" type="button" data-set="ko" aria-pressed="true">한국어</button>
+    <button class="langbtn" type="button" data-set="mn" aria-pressed="false">Монгол</button>
+    <button class="langbtn" type="button" data-set="en" aria-pressed="false">English</button>
+  </div>
+</nav>
+
+<div class="wrap">
+
+<header>
+  <div class="film">
+    <video id="film" autoplay muted loop playsinline preload="metadata" poster="/name/assets/film_poster.jpg" width="1920" height="1080">
+      <source src="/name/assets/synk_film_1080p.mp4" type="video/mp4">
+    </video>
+    <button class="snd" id="snd" type="button" aria-pressed="false"><span class="ko">소리 켜기</span><span class="mn">Дуу</span><span class="eng">Sound on</span></button>
+  </div>
+
+  <svg class="wordmark" viewBox="-8 -2 169 116" role="img" aria-label="SYNK">
+  <path d="M35.8 57.9 25.9 58.5Q25.5 56.6 23.8 55.3Q22.1 53.9 19.3 53.9Q16.7 53.9 15.0 55.0Q13.3 56.0 13.3 57.8Q13.3 59.2 14.4 60.2Q15.5 61.2 18.2 61.8L25.4 63.2Q31.1 64.3 33.9 66.9Q36.7 69.5 36.7 73.8Q36.7 77.7 34.5 80.6Q32.2 83.5 28.3 85.1Q24.4 86.8 19.3 86.8Q11.5 86.8 6.8 83.5Q2.2 80.2 1.4 74.6L12.1 74.1Q12.6 76.5 14.5 77.7Q16.3 78.9 19.3 78.9Q22.1 78.9 23.9 77.8Q25.7 76.7 25.7 75.0Q25.7 72.0 20.6 71.0L13.8 69.6Q8.1 68.5 5.3 65.6Q2.5 62.8 2.5 58.4Q2.5 54.6 4.5 51.9Q6.6 49.2 10.4 47.7Q14.1 46.2 19.1 46.2Q26.6 46.2 30.8 49.3Q35.1 52.5 35.8 57.9Z M44.0 100.7Q41.9 100.7 40.1 100.4Q38.3 100.1 37.1 99.6L39.6 91.5L39.9 91.6Q42.7 92.4 44.6 91.9Q46.6 91.5 47.6 88.8L48.2 87.1L34.1 46.7H45.6L53.7 75.6H54.1L62.3 46.7H73.8L58.6 90.3Q57.5 93.4 55.6 95.8Q53.7 98.1 50.9 99.4Q48.0 100.7 44.0 100.7Z M84.0 63.3V86.0H73.1V46.7H83.8V53.7H84.2Q85.5 50.2 88.4 48.2Q91.4 46.2 95.7 46.2Q99.8 46.2 102.9 48.0Q105.9 49.8 107.6 53.1Q109.3 56.4 109.3 61.0V86.0H98.4V62.9Q98.4 59.4 96.6 57.3Q94.7 55.2 91.4 55.2Q89.2 55.2 87.6 56.2Q85.9 57.2 84.9 59.0Q84.0 60.8 84.0 63.3Z" fill="#2B2320"/>
+  <path d="M117.3046875 86.0V33.6171875H126.55078125V62.48046875H127.21875L141.31640625 46.6953125H152.14453125L136.91339111328125 63.68389129638672L153.0234375 86.0H141.94921875L129.9180908203125 69.20931243896484L126.55078125 72.82667541503906V86.0Z" fill="#F96859"/>
+</svg>
+
+  <p class="lede">
+    <span class="ko">AI 시대에 사람에게 끝까지 남는 세 가지 —<br><span class="three">질문하는 힘, 스스로 하는 힘, 마음을 끄는 힘.</span></span>
+    <span class="mn">AI-ийн эрин үед хүнд эцсээ хүртэл үлдэх гурван зүйл —<br><span class="three">асуух хүч, өөрөө хийх хүч, сэтгэл татах хүч.</span></span>
+    <span class="eng">Three things that stay with a person in the age of AI —<br><span class="three">the power to ask, to act on your own, to win hearts.</span></span>
+  </p>
+  <p class="lede-sub">
+    <span class="ko">SYNK LAB은 울란바토르의 한국어 학원입니다. 이 세 가지를 한국어와 함께 기릅니다.</span>
+    <span class="mn">SYNK LAB бол Улаанбаатар дахь солонгос хэлний сургалтын төв. Эдгээр гурван хүчийг солонгос хэлтэй хамт хөгжүүлдэг.</span>
+    <span class="eng">SYNK LAB is a Korean-language school in Ulaanbaatar. We grow these three alongside the Korean language.</span>
+  </p>
+
+  <div class="meta">
+    <span class="chip now"><span class="ko">2027년 2월 개원</span><span class="mn">2027 оны 2 сард нээнэ</span><span class="eng">Opening February 2027</span></span>
+    <span class="chip"><span class="ko">울란바토르</span><span class="mn">Улаанбаатар</span><span class="eng">Ulaanbaatar</span></span>
+  </div>
+</header>
+
+<section>
+  <h2><span class="ko">왜 이 세 가지인가</span><span class="mn">ЯАГААД ЭНЭ ГУРАВ ВЭ</span><span class="eng">WHY THESE THREE</span></h2>
+  <p class="say">
+    <span class="ko">AI는 이제 답을 줍니다. 그러나 무엇을 물을지는 정해 주지 않습니다.</span>
+    <span class="mn">AI хариултыг өгнө. Гэвч юуг асуухыг тань зааж өгөхгүй.</span>
+    <span class="eng">AI now gives answers. But it does not decide what to ask.</span>
+  </p>
+  <p class="quiet">
+    <span class="ko">그래서 저희는 사람에게 끝까지 남는 힘을 세 가지로 봅니다. 이 셋은 강의로 전달되지 않습니다. 직접 몸으로 겪어야 자랍니다. 그래서 SYNK는 이 힘이 자랄 경험 자체를 설계합니다.</span>
+    <span class="mn">Тиймээс бид хүнд эцсээ хүртэл үлдэх хүчийг гурав гэж үздэг. Эдгээрийг хичээлээр дамжуулж болохгүй. Өөрөө биеэрээ туулж байж төлөвшдөг. Тийм учраас SYNK энэ хүч төлөвших туршлагыг өөрийг нь зохион байгуулдаг.</span>
+    <span class="eng">So we see three powers that stay with a person to the end. They cannot be handed over in a lecture — they grow only when they are lived. That is why SYNK designs the experiences in which they grow.</span>
+  </p>
+
+  <div class="powers">
+    <div class="power">
+      <h3><span class="n en">01</span> <span class="ko">질문하는 힘</span><span class="mn">Асуух хүч</span><span class="eng">The power to ask</span></h3>
+      <p>
+        <span class="ko">무엇이 진짜 문제인지 스스로 묻고 정의하는 힘. 시즌마다 “왜 배우는가”를 아이가 직접 정리하는 「나침반」 세션에서 자랍니다.</span>
+        <span class="mn">Юу нь жинхэнэ асуудал болохыг өөрөө асууж, тодорхойлдог хүч. Улирал бүрийн «Луужин» уулзалтад “Би яагаад сурдаг вэ” гэдгээ хүүхэд өөрөө бөглөж төлөвшдөг.</span>
+        <span class="eng">The power to ask, on your own, what the real problem is — and to define it. It grows in the “Compass” session, where each season a student writes out for themselves why they are learning.</span>
+      </p>
+    </div>
+    <div class="power">
+      <h3><span class="n en">02</span> <span class="ko">스스로 하는 힘</span><span class="mn">Өөрөө хийх хүч</span><span class="eng">The power to act on your own</span></h3>
+      <p>
+        <span class="ko">시키지 않아도 먼저 움직이고 끝까지 해내는 힘. 팀이 기획부터 완성까지 스스로 이끄는 「싱크 크루」 프로젝트에서 자랍니다.</span>
+        <span class="mn">Хэн ч хэлээгүй ч эхлээд хөдөлж, эцсийг хүртэл дуусгах хүч. Баг төлөвлөлтөөс дуустал өөрсдөө удирддаг «SYNK Кру» төслөөс төлөвшдөг.</span>
+        <span class="eng">The power to move first without being told, and to see it through. It grows in the “SYNK Crew” project, which a team leads themselves from planning to completion.</span>
+      </p>
+    </div>
+    <div class="power">
+      <h3><span class="n en">03</span> <span class="ko">마음을 끄는 힘</span><span class="mn">Сэтгэл татах хүч</span><span class="eng">The power to win hearts</span></h3>
+      <p>
+        <span class="ko">여럿의 생각을 하나로 모아 끝내 해내는 힘. 해냈다는 것이 자신감이 되고, 남의 마음을 읽는 눈과 나를 아는 눈이 함께 열립니다. 매일의 K-컬처 활동과 무대에서 자랍니다.</span>
+        <span class="mn">Олон хүний бодлыг нэгтгэж, эцэст нь хамтдаа дуусгадаг хүч. Дуусгасан гэдэг нь өөртөө итгэх итгэл болж, бусдын сэтгэлийг уншдаг нүд, өөрийгөө таньдаг нүд хоёр хамт нээгддэг. Энэ хүч өдөр бүр хийдэг K-соёлын үйл ажиллагаа, тайзан дээр төлөвшдөг.</span>
+        <span class="eng">The power to bring many minds together and see it through. Having done it becomes confidence, and two kinds of sight open at once — reading others, and knowing yourself. It grows in the daily K-culture activities and on stage.</span>
+      </p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2><span class="ko">어떻게 4급까지 가나</span><span class="mn">ЯАЖ 4-Р ТҮВШИНД ХҮРЭХ ВЭ</span><span class="eng">HOW WE GET TO LEVEL 4</span></h2>
+  <p class="say">
+    <span class="ko">4급은 말해 본 시간이 열어 줍니다.</span>
+    <span class="mn">4-р түвшинг ярьж өнгөрүүлсэн цаг нээдэг.</span>
+    <span class="eng">Level 4 is opened by the hours you have spent speaking.</span>
+  </p>
+  <p class="quiet">
+    <span class="ko">읽고 쓰는 것 위에, 듣고 말한 시간이 쌓여야 열리는 문입니다. 그래서 저희는 「오고 싶은 시간」부터 설계했습니다 — 아이가 오고 싶어 해야 시간이 쌓이니까요. K-POP 협동 활동은 아이가 스스로 오고 싶어 하는 시간이고, 그 안의 모든 조율을 한국어로 합니다. 즐거워서 계속한 시간이 그대로 실력이 됩니다.</span>
+    <span class="mn">Унших, бичихийн дээр сонсож ярьсан цаг хуримтлагдаж байж нээгддэг хаалга юм. Тиймээс бид «ирмээр байх цаг»-аас эхлэн зохион байгуулсан — хүүхэд ирэхийг хүсэж байж л цаг хуримтлагддаг. K-POP хамтын үйл ажиллагаа бол хүүхэд өөрөө ирэхийг хүсдэг цаг бөгөөд доторх бүх зохицуулалтыг солонгосоор хийдэг. Дуртай учраас үргэлжлүүлсэн цаг чинь шууд чадвар болно.</span>
+    <span class="eng">On top of reading and writing, it is a door that opens once listening and speaking have accumulated. So we designed the wanting-to-come first — a child has to want to come for the hours to add up. The K-POP collaborative work is time a child comes to on their own, and every bit of the coordination inside it happens in Korean. Time spent because it was fun becomes ability itself.</span>
+  </p>
+  <p class="quiet">
+    <span class="ko">그 시간이 정확한 한국어가 되려면 한 가지가 더 필요합니다. 그래서 저희는 구조를 하나 뒤집었습니다.</span>
+    <span class="mn">Тэр цаг зөв солонгос хэл болохын тулд бас нэг зүйл хэрэгтэй. Тиймээс бид бүтцийг нэг эргүүлсэн.</span>
+    <span class="eng">For those hours to become accurate Korean, one more thing is needed. So we inverted a structure.</span>
+  </p>
+  <p class="say">
+    <span class="ko">정원은 16명, 선생님은 17명입니다.</span>
+    <span class="mn">Элсэлтийн хязгаар 16, багш 17.</span>
+    <span class="eng">Sixteen students. Seventeen teachers.</span>
+  </p>
+  <p class="quiet">
+    <span class="ko">선생님 한 사람이 아이 열여섯 명 각자를 봅니다. 그 곁에 AI 열여섯이 함께 섭니다. 마음을 만나고 판단하는 것은 선생님이고, 기억하고 고르고 돌려주는 일은 그 AI 가 맡습니다. 그 AI 는 아이가 언제 집중이 오르고 무엇에서 자주 넘어지는지를 압니다. 그래서 그 아이만을 위한 학습을 줍니다. 지금 그 AI 열여섯을 짓고 있습니다.</span>
+    <span class="mn">Ангийн нэг багш арван зургаан хүүхэд тус бүрийг хардаг. Түүний хажууд арван зургаан AI хамт зогсоно. Хүүхэдтэй сэтгэлээр уулзаж, шийдвэр гаргадаг нь багш. Санаж, сонгож, буцааж өгдөг нь тэр AI. Тэр AI хүүхэд хэзээ анхаарлаа сайн төвлөрүүлдэг, юун дээр ихэвчлэн бүдэрдгийг мэддэг. Тиймээс зөвхөн тэр хүүхдэд зориулсан хичээлийг өгдөг. Одоо энэ арван зургаан AI-г бүтээж байна.</span>
+    <span class="eng">One teacher sees each of the sixteen children. Sixteen AIs stand alongside. The teacher meets them face to face and makes the judgments; the AIs remember, choose, and return the work. Those AIs know when a child’s focus rises and where they most often stumble, and give that child a course made only for them. We are building those sixteen AIs now.</span>
+  </p>
+  <p class="quiet">
+    <span class="ko">말 대신 숫자로 보여 드리겠습니다. 숙제는 매일 나가고, 아이가 무엇을 자주 틀리는지는 23가지로 나누어 봅니다. 그 결과는 매주 리포트로 갑니다. 시즌마다 「나침반」에서 아이가 왜 배우는지를 스스로 적습니다.</span>
+    <span class="mn">Үг биш тоогоор харуулъя. Гэрийн даалгавар өдөр бүр явдаг, хүүхэд юуг байнга алддагийг 23 төрлөөр ангилж хардаг. Үр дүнг долоо хоног бүр тайлангаар илгээнэ. Улирал бүр «Луужин»-д хүүхэд яагаад сурдгаа өөрөө бичдэг.</span>
+    <span class="eng">Let us show it in numbers rather than words. Homework goes out daily, and what a child gets wrong is sorted into 23 kinds. The results go home in a weekly report. Each season, in “Compass,” the child writes down for themselves why they are learning.</span>
+  </p>
+</section>
+
+<section>
+  <h2><span class="ko">저희가 거는 약속</span><span class="mn">БИДНИЙ АМЛАЛТ</span><span class="eng">OUR PROMISE</span></h2>
+  <div class="promise">
+    <p class="big">
+      <span class="ko">SYNK는 <span class="num">1년 과정 안에 TOPIK 4급 도달</span>을 기준으로 설계된 학원입니다.</span>
+      <span class="mn">SYNK бол <span class="num">1 жилийн хөтөлбөрийн дотор TOPIK 4-р түвшинд хүрэхийг</span> шалгуур болгон зохиогдсон сургалтын төв юм.</span>
+      <span class="eng">SYNK is designed around <span class="num">reaching TOPIK Level 4 within one year</span>.</span>
+    </p>
+    <p>
+      <span class="ko">6레벨 커리큘럼이 TOPIK 1~6급·CEFR A1~C2에 대응하고, 한 시즌 8주씩 여섯 레벨이면 약 11개월 — 「1년에 4급」은 구호가 아니라 이 시간표에서 나온 숫자입니다. 학생에 따라 5급까지도 함께 갑니다.</span>
+      <span class="mn">6 түвшний хөтөлбөр TOPIK 1~6, CEFR A1~C2-т тохирдог. Улирал бүр 8 долоо хоног, зургаан түвшин нийт ойролцоогоор 11 сар — «1 жилд 4-р түвшин» гэдэг нь уриа биш, энэ хуваариас гарсан тоо. Сурагчаас хамааран 5-р түвшин хүртэл ч хамт явна.</span>
+      <span class="eng">Six levels map to TOPIK 1–6 and CEFR A1–C2. Eight weeks per season across six levels comes to about eleven months — “Level 4 in a year” is not a slogan but a number that falls out of that timetable. For some students we go as far as Level 5.</span>
+    </p>
+    <p>
+      <span class="ko">그리고 약속만 드리지 않습니다. <b>성실히 함께했는데도 1년 안에 4급에 닿지 못하면, 수강이 끝난 뒤에도 저희가 출시하는 학습 앱의 온라인 수업으로 취득하는 날까지 비용 없이 케어를 이어갑니다.</b></span>
+      <span class="mn">Бид зөвхөн амлаад орхихгүй. <b>Хичээнгүйлэн хамт ажилласан хэрнээ 1 жилийн дотор 4-р түвшинд хүрээгүй бол, сургалт дууссаны дараа ч бидний гаргах сургалтын аппликейшны онлайн хичээлээр авах өдөр хүртэл төлбөргүй дэмжинэ.</b></span>
+      <span class="eng">And we do not stop at promising. <b>If a student works with us in earnest and still does not reach Level 4 within the year, we continue their care at no cost — through the online lessons of the learning app we are releasing — until the day they pass.</b></span>
+    </p>
+    <p class="quiet">
+      <span class="ko">지키지 못했을 때 내어드릴 것을 미리 정해 두는 것 — 저희가 생각하는 약속의 무게입니다.</span>
+      <span class="mn">Биелүүлж чадаагүй тохиолдолд юу хийхээ урьдчилан тогтоох нь — бидний бодлоор амлалтын жин юм.</span>
+      <span class="eng">Deciding in advance what we owe you if we fall short — that is what we think the weight of a promise is.</span>
+    </p>
+  </div>
+  <p class="quiet" style="margin-top:18px">
+    <span class="ko">그 1년 동안 출석과 숙제를 아이 혼자 짊어지게 두지도 않습니다. 레벨 승급은 기간이 아니라 도달로 정합니다 — 빨리 가는 아이는 빨리, 천천히 가는 아이는 단단하게, 끝은 같은 자리입니다.</span>
+    <span class="mn">Тэр 1 жилийн турш ирц, гэрийн даалгаврыг хүүхэд ганцаараа үүрэхийг зөвшөөрдөггүй. Түвшин ахих нь хугацаагаар биш, хүрсэн түвшингээр тогтдог — хурдан явах хүүхэд хурдан, удаан явах хүүхэд бат бөх, төгсгөл нь ижил газар.</span>
+    <span class="eng">Nor do we leave attendance and homework on the student alone for that year. Levels advance by arrival, not by calendar — the quick move quickly, the steady move solidly, and both end in the same place.</span>
+  </p>
+  <p class="quiet" style="margin-top:14px">
+    <span class="ko">그리고 그 경험이 겹겹이 쌓여, 어떤 스펙보다 오래 남는 <b>나만의 이야기</b>가 됩니다.</span>
+    <span class="mn">Тэр туршлага давхарлан хуримтлагдаж, ямар ч “спек”-ээс удаан үлдэх <b>өөрийн гэсэн түүх</b> болно.</span>
+    <span class="eng">And those experiences stack, layer on layer, into <b>a story of your own</b> — one that outlasts any line on a résumé.</span>
+  </p>
+</section>
+
+<section>
+  <h2><span class="ko">먼저 써 보실 수 있는 것</span><span class="mn">ОДООНООС АШИГЛАЖ БОЛОХ ЗҮЙЛ</span><span class="eng">SOMETHING YOU CAN USE NOW</span></h2>
+  <p>
+    <span class="ko">개원까지 기다리실 필요 없습니다. <b><a href="/name/">내 이름, 한글로</a></b> — 몽골 이름을 넣으면 한글로 바로 보여 드리고, 표기가 갈리는 자리도 함께 알려 드립니다. 가입도 결제도 없습니다.</span>
+    <span class="mn">Нээлтийг хүлээх шаардлагагүй. <b><a href="/name/">Миний нэр солонгосоор</a></b> — монгол нэрээ бичихэд солонгос үсгээр шууд харуулж, хаана нь хоёр янзаар бичдэгийг бас хэлнэ. Бүртгүүлэх ч, төлбөр ч шаардлагагүй.</span>
+    <span class="eng">No need to wait for the opening. <b><a href="/name/">My name in Korean</a></b> — type a Mongolian name and see it in Korean letters, including where two spellings are both in use. No sign-up, no payment.</span>
+  </p>
+</section>
+
+<section>
+  <h2><span class="ko">소식 받기</span><span class="mn">МЭДЭЭ АВАХ</span><span class="eng">GET THE LETTER</span></h2>
+  <p>
+    <span class="ko">교실이 지어지는 이야기를 격주에 한 통씩 편지로 보내 드립니다. 문 여는 날이 정해지면 이 편지로 가장 먼저 알려 드립니다. <b><a href="https://synklab.substack.com">편지 받기</a></b> — 이메일 주소만 있으면 됩니다.</span>
+    <span class="mn">Хоёр долоо хоног тутам нэг захидал илгээнэ. Нээлтийн мэдээг эндээс хамгийн түрүүнд авна. <b><a href="https://synklab.substack.com">Захидал авах</a></b> — зөвхөн имэйл хаяг хэрэгтэй.</span>
+    <span class="eng">Every two weeks we send one letter about how the school is being built. When the opening date is set, this letter tells you first. <b><a href="https://synklab.substack.com">Get the letter</a></b> — an email address is all you need.</span>
+  </p>
+</section>
+
+<section>
+  <h2><span class="ko">학원 정보</span><span class="mn">СУРГАЛТЫН ТӨВИЙН МЭДЭЭЛЭЛ</span><span class="eng">SCHOOL INFORMATION</span></h2>
+  <dl class="cols">
+    <div class="fact"><dt><span class="ko">개원</span><span class="mn">Нээлт</span><span class="eng">Opening</span></dt><dd><span class="ko">2027년 2월</span><span class="mn">2027 оны 2 сар</span><span class="eng">February 2027</span></dd></div>
+    <div class="fact"><dt><span class="ko">위치</span><span class="mn">Байршил</span><span class="eng">Location</span></dt><dd><span class="ko">몽골 울란바토르</span><span class="mn">Монгол, Улаанбаатар</span><span class="eng">Ulaanbaatar, Mongolia</span></dd></div>
+    <div class="fact"><dt><span class="ko">대상</span><span class="mn">Хэнд</span><span class="eng">For</span></dt><dd><span class="ko">한국어를 배우는 몽골 학생</span><span class="mn">Солонгос хэл сурч буй монгол сурагчид</span><span class="eng">Mongolian students learning Korean</span></dd></div>
+    <div class="fact"><dt><span class="ko">과정</span><span class="mn">Хөтөлбөр</span><span class="eng">Course</span></dt><dd><span class="ko">6레벨 · 시즌당 8주 (TOPIK 1~6급 · CEFR A1~C2 대응)</span><span class="mn">6 түвшин · улирал бүр 8 долоо хоног (TOPIK 1~6 · CEFR A1~C2)</span><span class="eng">Six levels · eight weeks per season (TOPIK 1–6 · CEFR A1–C2)</span></dd></div>
+    <div class="fact"><dt><span class="ko">운영</span><span class="mn">Үйл ажиллагаа</span><span class="eng">Operated by</span></dt><dd><span class="ko">SYNK · 사업자등록 <span class="en">697-65-00332</span> (대한민국 서울)</span><span class="mn">SYNK · Бүртгэлийн дугаар <span class="en">697-65-00332</span> (БНСУ, Сөүл)</span><span class="eng">SYNK · Business registration <span class="en">697-65-00332</span> (Seoul, Republic of Korea)</span></dd></div>
+    <div class="fact"><dt><span class="ko">연락</span><span class="mn">Холбоо барих</span><span class="eng">Contact</span></dt><dd><a href="mailto:hello@synk.im">hello@synk.im</a></dd></div>
+  </dl>
+
+  <div class="callout">
+    <h3><span class="ko">함께 만들 분을 찾고 있습니다</span><span class="mn">Хамтдаа бүтээх хүнийг хайж байна</span><span class="eng">We are looking for people to build this with us</span></h3>
+    <p>
+      <span class="ko">개원 멤버 <b>한국어 강사</b>와, 저희가 쓴 몽골어를 읽고 “학부모는 이렇게 말하지 않는다”고 짚어 주실 <b>몽골어 감수자</b>를 모십니다. 번역 자격증은 필요하지 않습니다.</span>
+      <span class="mn">Нээлтийн багийн <b>солонгос хэлний багш</b>, мөн бидний бичсэн монгол эхийг уншаад “эцэг эхчүүд ингэж ярихгүй” гэж хэлж өгөх <b>монгол хэлний хянагч</b> хайж байна. Орчуулгын диплом шаардлагагүй.</span>
+      <span class="eng">We are hiring <b>Korean-language teachers</b> for our opening team, and one <b>Mongolian-language reviewer</b> who will read what we have written and tell us “a parent would not say it this way.” No translation certificate is required.</span>
+    </p>
+    <p style="margin-bottom:0">
+      <span class="ko">관심 있으시면 <a href="mailto:hello@synk.im">hello@synk.im</a> 으로 편하게 연락 주세요. 공고 전문과 지원 방법을 바로 보내드리겠습니다.</span>
+      <span class="mn">Сонирхож байвал <a href="mailto:hello@synk.im">hello@synk.im</a> хаягаар чөлөөтэй холбогдоорой. Зарын бүрэн эх, өргөдөл гаргах журмыг шууд илгээнэ.</span>
+      <span class="eng">If this interests you, write to <a href="mailto:hello@synk.im">hello@synk.im</a>. We will send the full posting and how to apply right away.</span>
+    </p>
+  </div>
+</section>
+
+<footer>
+  <div class="row">
+    <span>© 2026 SYNK LAB</span>
+    <a href="/name/"><span class="ko">내 이름, 한글로</span><span class="mn">Миний нэр солонгосоор</span><span class="eng">My name in Korean</span></a>
+    <a href="https://synklab.substack.com"><span class="ko">편지 받기</span><span class="mn">Захидал авах</span><span class="eng">Get the letter</span></a>
+    <a href="/privacy/"><span class="ko">개인정보처리방침</span><span class="mn">Нууцлалын бодлого</span><span class="eng">Privacy Policy</span></a>
+  </div>
+</footer>
+
+</div>
+
+<script>
+(function () {
+  var body = document.body;
+  var btns = document.querySelectorAll('.langbtn');
+  var 아는말 = { ko: 1, mn: 1, en: 1 };
+  function set(lang) {
+    if (!아는말[lang]) lang = 'ko';
+    body.setAttribute('data-lang', lang);
+    document.documentElement.setAttribute('lang', lang);
+    btns.forEach(function (b) { b.setAttribute('aria-pressed', String(b.dataset.set === lang)); });
+    try { localStorage.setItem('synk-lang', lang); } catch (e) {}
+  }
+  btns.forEach(function (b) {
+    b.addEventListener('click', function () { set(b.dataset.set); });
+  });
+  // 되돌아온 사람은 지난번 고른 말로 연다. 처음이면 브라우저 말을 본다.
+  // 저장소가 막혀 있어도(사생활 보호 창) 한국어로 그냥 선다.
+  var saved = null;
+  try { saved = localStorage.getItem('synk-lang'); } catch (e) {}
+  if (saved && 아는말[saved]) { set(saved); return; }
+  var nav = (navigator.language || '').toLowerCase();
+  if (nav.indexOf('mn') === 0) set('mn');
+  else if (nav.indexOf('ko') !== 0 && nav) set('en');   // 한국어도 몽골어도 아니면 영어로 연다
+})();
+</script>
+</body>
+</html>
