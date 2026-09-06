@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>내 TOPIK, 지금 몇 급? — SYNK LAB</title>
+<meta name="description" content="우리 학원 기준으로 재는 한국어 급수 진단. 15분. 공식 TOPIK 시험 급수와는 다릅니다. SYNK LAB.">
+<meta name="robots" content="noindex">
+<meta property="og:title" content="내 TOPIK, 지금 몇 급?">
+<meta property="og:description" content="우리 학원 기준으로 재는 진단입니다. 15분. SYNK LAB.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://synk.im/diag/">
+<link rel="canonical" href="https://synk.im/diag/">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/sun-typeface/SUIT@2/fonts/variable/woff2/SUIT-Variable.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@300..800&display=swap">
+<style>
+  /* 킷 = 2027 「내일 꾸러미」 — 값은 synk.im/name 과 같은 벌(DESIGN.md · 신호는 코랄 하나 · 위계는 색이 아니라 밀도) */
+  :root{
+    --paper:#FBF7F0; --ink:#2B2320; --stitch:#F0E3C8;
+    --oat:#EDE7DC; --stone:#C7BFB2; --ash:#8D857A; --deepwool:#575046;
+    --coral:#F96859; --coral-wash:#FEF0E9; --rim:#941F19;
+    --meadow:#4C8C5A;
+    --kr:'SUIT Variable','SUIT',system-ui,sans-serif;
+    --en:'Inter Tight',system-ui,sans-serif;
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{margin:0; background:var(--paper); color:var(--ink); font-family:var(--kr); font-weight:500;
+    letter-spacing:-0.02em; line-height:1.72; -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility}
+  .en{font-family:var(--en)}
+  .langbar{position:sticky; top:0; z-index:9; background:rgba(251,247,240,.92); backdrop-filter:blur(8px); border-bottom:1px solid var(--stitch)}
+  .langbar .inner{max-width:720px; margin:0 auto; padding:10px 24px; display:flex; justify-content:space-between; align-items:center; gap:6px}
+  .home{font-family:var(--en); font-size:15px; font-weight:700; letter-spacing:-0.03em; color:var(--ink); text-decoration:none}
+  .home:hover{color:var(--coral)}
+  .step{font-family:var(--en); font-size:13px; color:var(--ash)}
+  .wrap{max-width:720px; margin:0 auto; padding:0 24px}
+  section{padding:44px 0 56px}
+  section[hidden]{display:none}
+  h1{font-size:clamp(28px,6vw,40px); line-height:1.24; margin:0 0 12px; font-weight:800; letter-spacing:-0.035em; text-wrap:balance}
+  h2{font-size:clamp(19px,4vw,23px); line-height:1.35; margin:0 0 10px; font-weight:750; letter-spacing:-0.03em; text-wrap:balance}
+  h3{font-size:15px; margin:22px 0 6px; font-weight:750; letter-spacing:-0.025em; color:var(--deepwool)}
+  p{margin:0 0 12px}
+  .lead{font-size:clamp(15px,3.4vw,17px); color:var(--deepwool)}
+  .fine{font-size:13.5px; color:var(--ash); line-height:1.68}
+  .mn{font-family:var(--en); color:var(--ash); font-size:14px}
+
+  .box{background:#fff; border:1px solid var(--stitch); border-radius:18px; padding:22px;
+    box-shadow:0 1px 2px rgba(43,35,32,.04), 0 10px 28px -18px rgba(43,35,32,.22)}
+  label{display:block; font-size:13.5px; font-weight:700; color:var(--deepwool); margin-bottom:8px}
+  input[type=text],input[type=email],input[type=tel],textarea{
+    width:100%; font-family:var(--kr); font-size:17px; font-weight:500; padding:12px 14px;
+    border:1.5px solid var(--stitch); border-radius:12px; background:var(--paper); color:var(--ink); transition:border-color .14s ease}
+  input:focus,textarea:focus{border-color:var(--coral); outline:none}
+  textarea{min-height:96px; resize:vertical; line-height:1.6}
+  .row{display:grid; grid-template-columns:1fr 1fr; gap:10px}
+  @media (max-width:520px){.row{grid-template-columns:1fr}}
+  .btn{font-family:var(--kr); font-size:15px; font-weight:700; letter-spacing:-0.01em; border-radius:99px; padding:11px 22px; cursor:pointer;
+    border:1px solid var(--stitch); background:#fff; color:var(--deepwool); transition:background .14s ease, border-color .14s ease}
+  .btn:hover{border-color:var(--stone)}
+  .btn.primary{background:var(--coral); border-color:var(--coral); color:#fff}
+  .btn.primary:hover{background:var(--rim); border-color:var(--rim)}
+  .btn:disabled{opacity:.5; cursor:default}
+  .actions{display:flex; flex-wrap:wrap; gap:8px; margin-top:16px; align-items:center}
+  .err{color:var(--rim); font-size:14px; margin-top:8px; min-height:1.4em}
+
+  /* 몽글 — 곁에서 같이 본다. 문제를 넘길 때 눈만 깜빡이고, 맞히면 눈웃음, 틀려도 표정 그대로(설계 §⑦ · 몸짓 0) */
+  .with{display:grid; grid-template-columns:1fr 132px; gap:18px; align-items:end}
+  @media (max-width:520px){.with{grid-template-columns:1fr 96px}}
+  .mongle{width:100%; aspect-ratio:1; position:relative}
+  .mongle img{position:absolute; inset:0; width:100%; height:100%; object-fit:contain; opacity:0; transition:opacity .08s linear}
+  .mongle img.on{opacity:1}
+
+  /* 봉우리 — 잰 급만 켠다. 안 잰 급은 흐리게 두고 숫자를 안 붙인다(§⑭-㉢ ①) */
+  .peaks{display:flex; gap:10px; align-items:flex-end; margin:14px 0 6px; height:64px}
+  .peak{width:34px; border-radius:8px 8px 3px 3px; background:var(--oat); border:1.5px solid var(--stitch); position:relative; opacity:.45}
+  .peak.lit{background:var(--coral); border-color:var(--coral); opacity:1}
+  .peak.next{background:transparent; border-color:var(--coral); opacity:1}
+  .peak span{position:absolute; bottom:-22px; left:0; right:0; text-align:center; font-family:var(--en); font-size:12px; color:var(--ash)}
+  .peak.lit span,.peak.next span{color:var(--deepwool); font-weight:700}
+  .peak.dim span{visibility:hidden}
+
+  /* 문항 */
+  .dots{display:flex; gap:6px; margin:0 0 14px}
+  .dot{width:10px; height:10px; border-radius:50%; background:var(--oat); border:1px solid var(--stitch)}
+  .dot.on{background:var(--coral); border-color:var(--coral)}
+  .q{font-size:clamp(20px,4.6vw,26px); font-weight:750; letter-spacing:-0.03em; line-height:1.5; margin:8px 0 18px; word-break:keep-all}
+  .q b{color:var(--coral); font-weight:800}
+  .opts{display:grid; gap:9px}
+  .opt{text-align:left; font-family:var(--kr); font-size:17px; font-weight:600; padding:13px 16px; border-radius:14px;
+    border:1.5px solid var(--stitch); background:#fff; color:var(--ink); cursor:pointer; transition:border-color .12s ease, background .12s ease}
+  .opt:hover{border-color:var(--stone)}
+  .opt.pick{border-color:var(--coral); background:var(--coral-wash)}
+  .opt:disabled{cursor:default}
+  .note{min-height:1.6em; margin-top:12px; font-size:15px; color:var(--deepwool)}
+  .note.ok{color:var(--meadow); font-weight:700}
+  .level{font-family:var(--en); font-size:13px; color:var(--ash); margin-bottom:4px}
+
+  /* 결과 */
+  .card{margin-top:14px}
+  .tags{display:flex; flex-wrap:wrap; gap:8px; margin:6px 0 10px}
+  .tag{font-size:14px; font-weight:700; color:var(--deepwool); background:var(--oat); border:1px solid var(--stitch); border-radius:99px; padding:4px 12px}
+  .tag.next{background:var(--coral-wash); border-color:rgba(249,104,89,.35); color:var(--rim)}
+  .quote{font-size:17px; font-weight:600; padding:12px 14px; border-left:3px solid var(--coral); background:#fff; border-radius:0 12px 12px 0; margin:6px 0 10px}
+  .code{font-family:var(--en); font-size:22px; font-weight:750; letter-spacing:.08em; color:var(--ink)}
+  .decline{margin-top:18px; padding:14px 16px; background:#fff; border:1px solid var(--stitch); border-radius:12px}
+  .decline[hidden]{display:none}
+  .decline label{font-weight:500; display:flex; gap:8px; align-items:center; margin:6px 0; font-size:15px; color:var(--ink)}
+  footer{padding:28px 0 48px; border-top:1px solid var(--stitch)}
+  a{color:var(--rim)}
+</style>
+</head>
+<body>
+<div class="langbar"><div class="inner">
+  <a class="home" href="/">SYNK LAB</a>
+  <span class="step en" id="stepline">15 min</span>
+</div></div>
+
+<main class="wrap">
+
+<!-- ⓪ 첫 화면 — 무엇으로 재는지 «먼저» 밝힌다(설계 §⑧) -->
+<section id="s-start">
+  <div class="with">
+    <div>
+      <h1>내 TOPIK, 지금 몇 급?</h1>
+      <p class="lead">우리 학원 기준으로 재는 진단입니다. 공식 TOPIK 시험 급수와는 다릅니다.</p>
+      <p class="mn">Үнэгүй түвшин тогтоох тест · SYNK LAB</p>
+    </div>
+    <div class="mongle" aria-hidden="true">
+      <img class="on" src="assets/monggeul_base.webp" alt="" data-face="base">
+      <img src="assets/monggeul_smile.webp" alt="" data-face="smile">
+      <img src="assets/monggeul_blink.webp" alt="" data-face="blink">
+    </div>
+  </div>
+  <p class="fine">15분쯤 걸려요. 3급 문제 여섯부터 시작해요. 여섯 중 다섯을 맞히면 4급 문제로 올라가요. 마지막에 한 문장을 써요. 결과는 바로 화면에 나와요.</p>
+  <div class="box">
+    <label for="email">결과를 받을 곳 — 이메일이나 전화, 하나면 돼요</label>
+    <div class="row">
+      <input type="email" id="email" placeholder="이메일" autocomplete="email" inputmode="email">
+      <input type="tel" id="phone" placeholder="전화번호" autocomplete="tel" inputmode="tel">
+    </div>
+    <p class="fine" style="margin:10px 0 0">이 연락처는 결과를 보내고, 등록할 때 오늘 결과를 잇는 데만 써요. <a href="/privacy/">개인정보 방침</a></p>
+    <div class="actions">
+      <button class="btn primary" id="btn-start">시작하기</button>
+      <span class="err" id="err-start" aria-live="polite"></span>
+    </div>
+  </div>
+</section>
+
+<!-- ① 문항 — 한 문항씩 · 고른 순간 맞았는지 돌아온다(설계 §⑦) -->
+<section id="s-quiz" hidden>
+  <div class="with">
+    <div>
+      <div class="level" id="level"></div>
+      <div class="dots" id="dots" aria-hidden="true"></div>
+      <div class="q" id="qtext"></div>
+    </div>
+    <div class="mongle" aria-hidden="true" id="mongle-quiz"></div>
+  </div>
+  <div class="opts" id="opts" role="group" aria-label="보기"></div>
+  <div class="note" id="note" aria-live="polite"></div>
+</section>
+
+<!-- ② 쓰기 한 문장 — 급수에 안 든다 · 비워도 된다(설계 §④-㉣) -->
+<section id="s-write" hidden>
+  <h2 id="wprompt"></h2>
+  <p class="fine">이 문장은 급수에 안 들어가요. 오늘 본 것을 돌려드리는 재료예요. 비워 두고 넘어가도 돼요.</p>
+  <div class="box">
+    <textarea id="wtext" maxlength="300" placeholder="한 문장을 써 보세요."></textarea>
+    <div class="actions">
+      <button class="btn primary" id="btn-write">보내기</button>
+      <button class="btn" id="btn-skip">비워 두고 넘어가기</button>
+      <span class="err" id="err-write" aria-live="polite"></span>
+    </div>
+  </div>
+</section>
+
+<!-- ③ 결과 — 문안은 급수진단 설계 §⑭ 그대로 -->
+<section id="s-result" hidden>
+  <div class="with">
+    <div>
+      <h2 id="r-place"></h2>
+      <p class="fine">우리 학원 기준이에요. 공식 TOPIK 시험 급수와는 달라요.</p>
+      <div class="peaks" id="peaks" aria-hidden="true"></div>
+      <p id="r-left" style="margin-top:26px"></p>
+    </div>
+    <div class="mongle" aria-hidden="true" id="mongle-result"></div>
+  </div>
+
+  <h3>오늘 본 것</h3>
+  <div id="r-seen"></div>
+  <div class="card" id="r-card"></div>
+
+  <h3>다음</h3>
+  <p><b>오늘 나온 「다음 자리」가 첫 주 숙제가 됩니다.</b></p>
+  <p>선생님이 그 자리를 기억하고 있고, 8주 뒤에 오늘과 같은 자를 다시 대 봅니다.<br>
+     반은 열여섯 명, 시즌은 8주, 수업료는 한 달 15만원입니다. 첫 2주 안에 그만두면 전액 돌려드립니다.</p>
+  <p>진단 코드 <span class="code" id="r-code"></span> <span class="fine">— 등록할 때 이 숫자를 알려 주세요.</span></p>
+  <div class="actions">
+    <a class="btn primary" id="btn-join" href="#">8주 함께하기</a>
+    <button class="btn" id="btn-no">지금은 안 할래요</button>
+  </div>
+  <div class="decline" id="decline" hidden>
+    <p>알겠어요. 결과는 이메일로 보내 드릴게요.</p>
+    <p style="margin-bottom:6px">괜찮으면 한 가지만 알려 주실 수 있어요?</p>
+    <label><input type="radio" name="why" value="수업료"> 수업료</label>
+    <label><input type="radio" name="why" value="시간"> 시간</label>
+    <label><input type="radio" name="why" value="지금은 아니에요"> 지금은 아니에요</label>
+    <label><input type="radio" name="why" value="다른 곳도 볼래요"> 다른 곳도 볼래요</label>
+    <label><input type="radio" name="why" value="직접"> 직접 쓰기 <input type="text" id="why-text" style="width:auto; flex:1; font-size:15px; padding:6px 10px"></label>
+    <div class="actions">
+      <button class="btn primary" id="btn-why-send">보내기</button>
+      <button class="btn" id="btn-why-close">그냥 닫기</button>
+    </div>
+  </div>
+</section>
+
+</main>
+<footer class="wrap">
+  <p class="fine">SYNK LAB · 우리 학원 기준의 진단이에요. 공식 TOPIK 시험 급수와는 달라요. 문의 <a href="mailto:hello@synk.im">hello@synk.im</a></p>
+</footer>
+
+<script>
+(function () {
+  'use strict';
+  /* 통로 — Apps Script 웹앱(ContentService JSON). 화면은 여기(정적 지면)뿐이고 정답은 통로로 안 온다(엔진_진단.js 머리말).
+   * POST 본문을 text/plain 으로 보내면 브라우저가 예비 요청(preflight)을 안 보내 웹앱이 그대로 받는다. */
+  var API = 'https://script.google.com/macros/s/AKfycbyErIaGA8TGxVMoVO3r5ou1RllX9l1-uMJx4p4CrG0/exec?p=%EC%A7%84%EB%8B%A8';
+  var $ = function (id) { return document.getElementById(id); };
+  var S = { 세션: null, 코드: null, 문항: null, 급: 3, n: 0, 답중: false, 쓰기지시문: '' };
+
+  function post(body) {
+    return fetch(API, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(body), redirect: 'follow' })
+      .then(function (r) { return r.json(); });
+  }
+  function get(q) {
+    return fetch(API + '&' + q, { method: 'GET', redirect: 'follow' }).then(function (r) { return r.json(); });
+  }
+  function show(id) {
+    ['s-start', 's-quiz', 's-write', 's-result'].forEach(function (s) { $(s).hidden = (s !== id); });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+  function key() { return 'k' + Date.now().toString(36) + Math.random().toString(36).slice(2, 7); }
+
+  /* 몽글 — 얼굴 셋을 같은 자리에 겹쳐 두고 한 장만 켠다. 깜빡임 150ms · 눈웃음 900ms · 틀려도 base 그대로 */
+  var faces = $('s-start').querySelector('.mongle');
+  function mountMongle(target) { target.innerHTML = ''; target.appendChild(faces); }
+  function face(name, ms) {
+    var imgs = faces.querySelectorAll('img');
+    imgs.forEach(function (im) { im.classList.toggle('on', im.dataset.face === name); });
+    if (ms) setTimeout(function () { imgs.forEach(function (im) { im.classList.toggle('on', im.dataset.face === 'base'); }); }, ms);
+  }
+  function blink() { face('blink', 150); }
+
+  /* ⓪ 시작 */
+  $('btn-start').addEventListener('click', function () {
+    var email = $('email').value.trim(), phone = $('phone').value.trim();
+    $('err-start').textContent = '';
+    if (!email && !phone) { $('err-start').textContent = '이메일이나 전화 중 하나를 적어 주세요.'; return; }
+    $('btn-start').disabled = true;
+    post({ op: 'start', role: '시작', email: email, phone: phone }).then(function (r) {
+      if (!r.ok) { $('err-start').textContent = r.error === 'contact-required' ? '이메일이나 전화 중 하나를 적어 주세요.' : '지금은 열리지 않아요. 잠시 뒤 다시 해 주세요.'; $('btn-start').disabled = false; return; }
+      S.세션 = r.세션번호; S.코드 = r.진단코드; S.문항 = r.문항; S.급 = r.시작급; S.n = 0; S.쓰기지시문 = r.쓰기지시문;
+      try { localStorage.setItem('synk-diag', JSON.stringify({ s: S.세션, c: S.코드 })); } catch (e) {}
+      try { history.replaceState(null, '', '?s=' + encodeURIComponent(S.세션)); } catch (e) {}
+      mountMongle($('mongle-quiz'));
+      show('s-quiz'); renderQ();
+    }).catch(function () { $('err-start').textContent = '연결이 안 됐어요. 잠시 뒤 다시 해 주세요.'; $('btn-start').disabled = false; });
+  });
+
+  /* ① 문항 */
+  function renderQ() {
+    var list = S.문항[S.급] || [];
+    var q = list[S.n];
+    if (!q) return;
+    $('level').textContent = S.급 + '급 자리 · ' + (S.n + 1) + ' / ' + list.length;
+    $('stepline').textContent = S.급 + '급 · ' + (S.n + 1) + '/' + list.length;
+    var dots = $('dots'); dots.innerHTML = '';
+    list.forEach(function (_, i) { var d = document.createElement('span'); d.className = 'dot' + (i < S.n ? ' on' : ''); dots.appendChild(d); });
+    $('qtext').innerHTML = String(q.문장).replace(/___/g, '<b>___</b>');
+    var opts = $('opts'); opts.innerHTML = '';
+    q.보기.forEach(function (o, i) {
+      var b = document.createElement('button'); b.className = 'opt'; b.type = 'button'; b.textContent = o;
+      b.addEventListener('click', function () { answer(i, b); });
+      opts.appendChild(b);
+    });
+    $('note').textContent = ''; $('note').className = 'note';
+    blink();
+  }
+  function answer(i, btn) {
+    if (S.답중) return;
+    S.답중 = true;
+    var all = $('opts').querySelectorAll('.opt');
+    all.forEach(function (b) { b.disabled = true; });
+    btn.classList.add('pick');
+    post({ op: 'answer', session: S.세션, level: S.급, n: S.n, answer: i, key: key() }).then(function (r) {
+      S.답중 = false;
+      if (!r.ok) { $('note').textContent = '잠깐 끊겼어요. 다시 골라 주세요.'; all.forEach(function (b) { b.disabled = false; }); btn.classList.remove('pick'); return; }
+      if (r.맞음) { face('smile', 900); $('note').textContent = '맞았어요.'; $('note').className = 'note ok'; }
+      else { $('note').textContent = '다음에 한 번 더 볼 자리예요.'; }
+      setTimeout(function () {
+        if (!r.급끝) { S.n += 1; renderQ(); return; }
+        if (r.다음급) { S.급 = r.다음급; S.n = 0; $('note').textContent = r.맞힌 + '개 맞았어요. ' + r.다음급 + '급으로 올라가요.'; setTimeout(renderQ, 900); return; }
+        toWrite();
+      }, r.맞음 ? 800 : 1000);
+    }).catch(function () { S.답중 = false; $('note').textContent = '연결이 안 됐어요. 다시 골라 주세요.'; all.forEach(function (b) { b.disabled = false; }); btn.classList.remove('pick'); });
+  }
+
+  /* ② 쓰기 */
+  function toWrite() {
+    $('wprompt').textContent = S.쓰기지시문 || '어제 뭘 했어요? 한 문장으로 써 보세요.';
+    $('stepline').textContent = '한 문장';
+    show('s-write');
+  }
+  function sendWrite(text) {
+    $('btn-write').disabled = true; $('btn-skip').disabled = true; $('err-write').textContent = '';
+    post({ op: 'write', session: S.세션, text: text }).then(function (r) {
+      if (!r.ok) { $('err-write').textContent = '잠깐 끊겼어요. 다시 눌러 주세요.'; $('btn-write').disabled = false; $('btn-skip').disabled = false; return; }
+      loadResult();
+    }).catch(function () { $('err-write').textContent = '연결이 안 됐어요. 다시 눌러 주세요.'; $('btn-write').disabled = false; $('btn-skip').disabled = false; });
+  }
+  $('btn-write').addEventListener('click', function () { sendWrite($('wtext').value.trim()); });
+  $('btn-skip').addEventListener('click', function () { sendWrite(''); });
+
+  /* ③ 결과 — 문안 = 설계 §⑭ */
+  function loadResult() {
+    get('op=result&session=' + encodeURIComponent(S.세션)).then(renderResult).catch(function () { $('r-place').textContent = '결과를 불러오지 못했어요. 잠시 뒤 다시 열어 주세요.'; show('s-result'); });
+  }
+  function renderResult(r) {
+    if (!r.ok) { $('r-place').textContent = '결과를 불러오지 못했어요.'; show('s-result'); return; }
+    S.코드 = r.진단코드; S.세션 = r.세션번호;
+    mountMongle($('mongle-result')); face('base');
+    $('stepline').textContent = '오늘 본 것';
+    var lv = r.표본급수;
+    if (r.미측 || lv == null) {
+      $('r-place').textContent = '오늘은 여기까지 봤어요. 다음에 더 볼 수 있어요.';
+      $('r-left').textContent = '';
+    } else {
+      $('r-place').textContent = lv + '급 자리예요.';
+      $('r-left').textContent = r.상한 ? '' : (lv + 1) + '급까지 한 칸 남았어요.';
+    }
+    var peaks = $('peaks'); peaks.innerHTML = '';
+    [1, 2, 3, 4, 5].forEach(function (g) {
+      var p = document.createElement('div');
+      var cls = 'peak';
+      if (lv != null && g <= lv) cls += ' lit'; else if (lv != null && g === lv + 1 && !r.상한) cls += ' next'; else cls += ' dim';
+      p.className = cls; p.style.height = (22 + g * 8) + 'px';
+      p.innerHTML = '<span>' + g + '</span>';
+      peaks.appendChild(p);
+    });
+    var seen = '';
+    if (r.맞힌문형 && r.맞힌문형.length) seen += '<div class="fine" style="margin-top:4px">맞힌 자리</div><div class="tags">' + r.맞힌문형.map(function (g) { return '<span class="tag">' + esc(g.이름) + '</span>'; }).join('') + '</div>';
+    if (r.다음문형 && r.다음문형.length) seen += '<div class="fine">다음 자리</div><div class="tags">' + r.다음문형.map(function (g) { return '<span class="tag next">' + esc(g.이름) + '</span>'; }).join('') + '</div>';
+    $('r-seen').innerHTML = seen;
+    var card = '';
+    if (r.쓰기 && r.쓰기.문장) {
+      card += '<div class="fine">쓴 문장</div><div class="quote">「' + esc(r.쓰기.문장) + '」</div>';
+      if (r.쓰기.상태 === '완료' && r.쓰기.카드) {
+        var t = r.쓰기.카드.태그 || [];
+        var clean = !t.length || (t.length === 1 && t[0] === '오류없음');
+        card += clean ? '<p>이 문장은 깨끗해요.</p>'
+          : '<p>여기 한 자리가 보여요. ' + esc(r.쓰기.카드.규칙 || '') + (r.쓰기.카드.교정문 ? '<br>이렇게 써요: 「' + esc(r.쓰기.카드.교정문) + '」' : '') + '</p>';
+      } else {
+        card += '<p>이 문장은 선생님이 곧 봐 드릴게요. 이메일로 보내 드려요.</p>';
+      }
+    }
+    $('r-card').innerHTML = card;
+    $('r-code').textContent = S.코드 || '';
+    $('btn-join').href = 'mailto:hello@synk.im?subject=' + encodeURIComponent('8주 함께하기 · 진단 코드 ' + (S.코드 || '')) + '&body=' + encodeURIComponent('진단 코드: ' + (S.코드 || '') + '\n연락처: ');
+    show('s-result');
+  }
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+
+  /* 「지금은 안 할래요」 — 먼저 보내 드리고 그다음 한 가지만 묻는다. 「그냥 닫기」가 있어야 통행료가 아니다(§⑭-㉣) */
+  $('btn-no').addEventListener('click', function () { $('decline').hidden = false; $('btn-no').disabled = true; post({ op: 'decline', session: S.세션, reason: '' }); });
+  $('btn-why-send').addEventListener('click', function () {
+    var v = ($('decline').querySelector('input[name=why]:checked') || {}).value || '';
+    if (v === '직접') v = $('why-text').value.trim();
+    post({ op: 'decline', session: S.세션, reason: v }).finally(function () { $('decline').innerHTML = '<p>고마워요. 결과는 이메일로 보내 드릴게요.</p>'; });
+  });
+  $('btn-why-close').addEventListener('click', function () { $('decline').hidden = true; });
+
+  /* 주소로 이어진다 — ?s=세션번호 로 열면 결과를 다시 보여 준다(브라우저를 바꿔도 · 설계 §⑨-2) */
+  var m = /[?&]s=([^&]+)/.exec(location.search);
+  if (m) { S.세션 = decodeURIComponent(m[1]); loadResult(); }
+})();
+</script>
+</body>
+</html>
