@@ -255,7 +255,7 @@
   'use strict';
   /* 통로 — Apps Script 웹앱(ContentService JSON). 화면은 여기(정적 지면)뿐이고 정답은 통로로 안 온다(엔진_진단.js 머리말).
    * POST 본문을 text/plain 으로 보내면 브라우저가 예비 요청(preflight)을 안 보내 웹앱이 그대로 받는다. */
-  var API = 'https://script.google.com/macros/s/AKfycbyErIaGA8TGxVMoVO3r5ou1RllX9l1-uMJx4p4CrG0/exec?p=%EC%A7%84%EB%8B%A8';
+  var API = 'https://script.google.com/macros/s/AKfycbz69uS1-ZNW51oOTDqniQW7Rqml8bzKHi8fRasyd1V-V8YwHisT9nSiZdCwJCrZzsfe/exec?p=%EC%A7%84%EB%8B%A8';   // 익명 웹앱 배포(v9.322 · 09-07) — 옛 @HEAD 배포는 로그인을 요구해 못 쓴다
   var $ = function (id) { return document.getElementById(id); };
   var S = { 세션: null, 코드: null, 문항: null, 급: 3, n: 0, 답중: false, 쓰기지시문: '' };
 
