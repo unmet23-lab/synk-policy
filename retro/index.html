@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>8주가 끝났습니다 — 우리가 알게 된 것 · SYNK LAB</title>
+<meta name="description" content="시즌이 끝난 뒤, 우리가 당신에 대해 무엇을 알게 됐는지 적어 드립니다. 그리고 한 가지만 여쭙습니다. SYNK LAB.">
+<meta name="robots" content="noindex">
+<meta property="og:title" content="8주가 끝났습니다 — 우리가 알게 된 것">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://synk.im/retro/">
+<link rel="canonical" href="https://synk.im/retro/">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/sun-typeface/SUIT@2/fonts/variable/woff2/SUIT-Variable.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@300..800&display=swap">
+<style>
+  /* 킷 = 2027 「내일 꾸러미」 — 값은 synk.im/diag 와 같은 벌(DESIGN.md · 신호는 코랄 하나 · 위계는 색이 아니라 밀도) */
+  :root{
+    --paper:#FBF7F0; --ink:#2B2320; --stitch:#F0E3C8;
+    --oat:#EDE7DC; --stone:#C7BFB2; --ash:#8D857A; --deepwool:#575046;
+    --coral:#F96859; --coral-wash:#FEF0E9; --rim:#941F19;
+    --meadow:#4C8C5A;
+    --kr:'SUIT Variable','SUIT',system-ui,sans-serif;
+    --en:'Inter Tight',system-ui,sans-serif;
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{margin:0; background:var(--paper); color:var(--ink); font-family:var(--kr); font-weight:500;
+    letter-spacing:-0.02em; line-height:1.72; -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility}
+  .en{font-family:var(--en)}
+  .langbar{position:sticky; top:0; z-index:9; background:rgba(251,247,240,.92); backdrop-filter:blur(8px); border-bottom:1px solid var(--stitch)}
+  .langbar .inner{max-width:720px; margin:0 auto; padding:10px 24px; display:flex; justify-content:space-between; align-items:center; gap:6px}
+  .home{font-family:var(--en); font-size:15px; font-weight:700; letter-spacing:-0.03em; color:var(--ink); text-decoration:none}
+  .home:hover{color:var(--coral)}
+  .step{font-family:var(--en); font-size:13px; color:var(--ash)}
+  .wrap{max-width:720px; margin:0 auto; padding:0 24px}
+  section{padding:44px 0 56px}
+  section[hidden]{display:none}
+  h1{font-size:clamp(28px,6vw,40px); line-height:1.24; margin:0 0 12px; font-weight:800; letter-spacing:-0.035em; text-wrap:balance}
+  h2{font-size:clamp(19px,4vw,23px); line-height:1.35; margin:0 0 10px; font-weight:750; letter-spacing:-0.03em; text-wrap:balance}
+  h3{font-size:15px; margin:22px 0 6px; font-weight:750; letter-spacing:-0.025em; color:var(--deepwool)}
+  p{margin:0 0 12px}
+  .lead{font-size:clamp(15px,3.4vw,17px); color:var(--deepwool)}
+  .fine{font-size:13.5px; color:var(--ash); line-height:1.68}
+  .box{background:#fff; border:1px solid var(--stitch); border-radius:18px; padding:22px;
+    box-shadow:0 1px 2px rgba(43,35,32,.04), 0 10px 28px -18px rgba(43,35,32,.22)}
+  label{display:block; font-size:13.5px; font-weight:700; color:var(--deepwool); margin-bottom:8px}
+  textarea{width:100%; font-family:var(--kr); font-size:17px; font-weight:500; padding:12px 14px;
+    border:1.5px solid var(--stitch); border-radius:12px; background:var(--paper); color:var(--ink); transition:border-color .14s ease;
+    min-height:96px; resize:vertical; line-height:1.6}
+  textarea:focus{border-color:var(--coral); outline:none}
+  .btn{font-family:var(--kr); font-size:15px; font-weight:700; letter-spacing:-0.01em; border-radius:99px; padding:11px 22px; cursor:pointer;
+    border:1px solid var(--stitch); background:#fff; color:var(--deepwool); transition:background .14s ease, border-color .14s ease}
+  .btn:hover{border-color:var(--stone)}
+  .btn.primary{background:var(--coral); border-color:var(--coral); color:#fff}
+  .btn.primary:hover{background:var(--rim); border-color:var(--rim)}
+  .btn.pick{border-color:var(--coral); background:var(--coral-wash); color:var(--rim)}
+  .btn:disabled{opacity:.5; cursor:default}
+  .actions{display:flex; flex-wrap:wrap; gap:8px; margin-top:16px; align-items:center}
+  .err{color:var(--rim); font-size:14px; margin-top:8px; min-height:1.4em}
+  /* 알게 된 것 — 층 셋. 칸 이름이 곧 제목이다(이해 대장 ㉠㉡㉢ · 브랜드 v2 ㉡-1 ⑥ ㉮) */
+  .layer{padding:14px 16px; border-left:3px solid var(--coral); background:#fff; border-radius:0 12px 12px 0; margin:0 0 12px}
+  .layer .name{font-weight:750; color:var(--deepwool); font-size:14px; letter-spacing:-0.02em; margin-bottom:4px}
+  .layer .text{font-size:17px; font-weight:600; line-height:1.6; word-break:keep-all}
+  .layer.empty{border-left-color:var(--stone)}
+  .layer.empty .text{color:var(--ash); font-weight:500}
+  .note{min-height:1.6em; margin-top:12px; font-size:15px; color:var(--deepwool)}
+  .note.ok{color:var(--meadow); font-weight:700}
+  footer{padding:28px 0 48px; border-top:1px solid var(--stitch)}
+  a{color:var(--rim)}
+</style>
+</head>
+<body>
+<div class="langbar"><div class="inner">
+  <a class="home" href="/">SYNK LAB</a>
+  <span class="step en" id="stepline">8 weeks</span>
+</div></div>
+
+<main class="wrap">
+
+<!-- ⓪ 열쇠가 없거나 틀리면 아무것도 안 보여 준다 -->
+<section id="s-none" hidden>
+  <h1>이 편지는 열쇠가 있어야 열려요</h1>
+  <p class="lead">메일로 받은 링크를 그대로 눌러 주세요. 링크가 없으면 SYNK LAB 에 말씀해 주세요.</p>
+</section>
+
+<!-- ① 편지 — 우리가 알게 된 것(층 셋) + 물음 하나 -->
+<section id="s-letter" hidden>
+  <h1 id="title">8주가 끝났습니다</h1>
+  <p class="lead" id="lead">우리가 당신에 대해 무엇을 알게 됐는지 적었습니다. 세 층입니다 — 실력, 사람, 삶.</p>
+  <div id="layers"></div>
+  <p class="fine">비어 있는 층은 비어 있다고 적었습니다. 지어내지 않습니다.</p>
+
+  <div class="box" id="ask">
+    <h2 id="question"></h2>
+    <p class="fine">「없다」도 답입니다. 그 답이 다음 시즌을 바꿉니다.</p>
+    <div class="actions">
+      <button class="btn" id="btn-yes">있다</button>
+      <button class="btn" id="btn-no">없다</button>
+    </div>
+    <div id="linewrap" style="margin-top:14px">
+      <label for="line">있다면 한 줄 — 무엇이었나요? (없다면 비워 두셔도 돼요)</label>
+      <textarea id="line" maxlength="200" placeholder="한 줄이면 돼요."></textarea>
+    </div>
+    <div class="actions">
+      <button class="btn primary" id="btn-send" disabled>보내기</button>
+    </div>
+    <div class="err" id="err"></div>
+  </div>
+
+  <div class="box" id="done" hidden>
+    <h2>고맙습니다</h2>
+    <p class="lead" id="done-text">답을 받았습니다. 다음 시즌에 다시 만나요.</p>
+  </div>
+</section>
+
+<footer class="wrap fine">SYNK LAB · 이 편지의 내용은 열쇠를 가진 사람만 봅니다 · 답은 학생 번호와 함께 남고, 밖으로 낼 때는 사람을 알아볼 것을 지웁니다</footer>
+</main>
+
+<script>
+  /* 통로 — Apps Script 웹앱(ContentService JSON · ?p=회고). 화면은 여기(정적 지면)뿐이고 편지 본문은 열쇠(t)로만 온다(엔진_운영배치.js 회고API_).
+   * POST 본문을 text/plain 으로 보내면 브라우저가 예비 요청(preflight)을 안 보내 웹앱이 그대로 받는다(diag 와 같은 꼴). */
+  var API = 'https://script.google.com/macros/s/AKfycbz69uS1-ZNW51oOTDqniQW7Rqml8bzKHi8fRasyd1V-V8YwHisT9nSiZdCwJCrZzsfe/exec?p=%ED%9A%8C%EA%B3%A0';
+  var T = (new URLSearchParams(location.search).get('t') || '').replace(/[^0-9a-f]/g, '').slice(0, 20);
+  var 답 = '';
+  function $(id) { return document.getElementById(id); }
+  function show(id) { ['s-none', 's-letter'].forEach(function (s) { $(s).hidden = (s !== id); }); }
+  function post(body) {
+    return fetch(API, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(body), redirect: 'follow' })
+      .then(function (r) { return r.json(); });
+  }
+  function get(q) { return fetch(API + '&' + q, { method: 'GET', redirect: 'follow' }).then(function (r) { return r.json(); }); }
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+
+  function render(d) {
+    if (d.무대 === 'Ⓑ') {
+      $('title').textContent = '8주 시즌이 끝났습니다';
+      $('lead').textContent = '우리가 아이에 대해 무엇을 알게 됐는지 적었습니다. 세 층입니다 — 실력, 사람, 삶.';
+    }
+    $('layers').innerHTML = (d.줄들 || []).map(function (l) {
+      var empty = /아직 적을 것이 없습니다/.test(l.글);
+      return '<div class="layer' + (empty ? ' empty' : '') + '"><div class="name">' + esc(l.이름 || l.칸) + '</div><div class="text">' + esc(l.글) + '</div></div>';
+    }).join('');
+    $('question').textContent = d.물음 || '';
+    if (d.답함) { $('ask').hidden = true; $('done').hidden = false; $('done-text').textContent = '이미 답을 받았습니다. 고맙습니다 — 다음 시즌에 다시 만나요.'; }
+    show('s-letter');
+  }
+
+  function pick(v) {
+    답 = v;
+    $('btn-yes').classList.toggle('pick', v === '있다');
+    $('btn-no').classList.toggle('pick', v === '없다');
+    $('btn-send').disabled = false;
+    $('err').textContent = '';
+  }
+  $('btn-yes').addEventListener('click', function () { pick('있다'); });
+  $('btn-no').addEventListener('click', function () { pick('없다'); });
+  $('btn-send').addEventListener('click', function () {
+    if (!답) return;
+    $('btn-send').disabled = true;
+    post({ op: 'answer', t: T, 답: 답, 한줄: $('line').value.trim() }).then(function (r) {
+      if (!r || !r.ok) { $('err').textContent = '보내지 못했어요. 잠시 뒤 다시 눌러 주세요.'; $('btn-send').disabled = false; return; }
+      $('ask').hidden = true; $('done').hidden = false;
+    }).catch(function () { $('err').textContent = '연결이 끊겼어요. 잠시 뒤 다시 눌러 주세요.'; $('btn-send').disabled = false; });
+  });
+
+  if (T.length !== 20) show('s-none');
+  else get('op=show&t=' + T).then(function (d) { if (d && d.ok) render(d); else show('s-none'); }).catch(function () { show('s-none'); });
+</script>
+</body>
+</html>
