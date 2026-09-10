@@ -43,3 +43,10 @@ dialog{color:var(--ink);border:0;background:var(--paper);width:min(720px,calc(10
 
 /* Reviewed guidance: provenance and readable source sections. */
 .answer-reviewed{color:var(--muted);font-size:12px;margin:12px 0 0}.document-answer{padding-block:22px;border-top:1px solid var(--line);scroll-margin-top:84px}.document-answer h3{font-size:19px;line-height:1.5;margin-bottom:14px}.document-answer p:last-child{margin-bottom:0}
+
+/* Full approved visions retain the existing composition with a calmer title scale. */
+.hero-copy h1[data-vision-headline]{font-size:clamp(42px,4.2vw,64px);line-height:1.24}
+.world-copy h3[data-vision-headline],.shift-heading h3[data-vision-headline]{font-size:clamp(36px,3.6vw,54px);line-height:1.28}
+.company-note-copy .world-links{gap:12px 24px}.company-note-copy .world-links .line-link{margin-top:0}
+@media(max-width:760px){.hero-copy h1[data-vision-headline]{font-size:42px}.world-copy h3[data-vision-headline],.shift-heading h3[data-vision-headline]{font-size:36px}}
+@media(max-width:360px){.hero-copy h1[data-vision-headline]{font-size:36px}.world-copy h3[data-vision-headline],.shift-heading h3[data-vision-headline]{font-size:32px}}

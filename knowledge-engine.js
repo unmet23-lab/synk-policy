@@ -4,7 +4,7 @@ const compact = value => normalize(value).replace(/\s/g,'');
 const normalizeQuery = value => normalize(value).replace(/시프트/g,'shift').replace(/펄스/g,'pulse').replace(/싱크/g,'synk').replace(/인공지능/g,'ai').replace(/케이\s*팝|케이팝|k\s*팝|k\s*pop|케이\s*컬처/g,'k컬처');
 const brandIds={lab:'lab-intro',shift:'shift-intro',pulse:'pulse-intro'};
 const generic=new Set(['synk','싱크','lab','랩','shift','시프트','pulse','펄스','어떤','무슨','누구','어디','현재','사람','준비','과정','사용','질문','답변','소개','방법','결과','만든','경험','ai']);
-function brandsIn(q){const out=['lab','shift','pulse'].filter(b=>new RegExp('(?:^|[^a-z])'+b+'(?:$|[^a-z])').test(q));if(/(?:^|\s)랩(?:은|이|에|의|도|에서는|$)/.test(q)&&!out.includes('lab'))out.push('lab');return out;}
+function brandsIn(q){const out=['lab','shift','pulse'].filter(b=>new RegExp('(?:^|[^a-z])'+b+'(?:$|[^a-z])').test(q));if(/(?:^|\s)랩(?=\s|은|이|에|의|도|에서|$)/.test(q)&&!out.includes('lab'))out.push('lab');return out;}
 function similarity(a,b){const grams=t=>{const c=compact(t);return new Set(Array.from({length:Math.max(0,c.length-1)},(_,i)=>c.slice(i,i+2)));};const A=grams(a),B=grams(b);if(!A.size||!B.size)return 0;let n=0;for(const x of A)if(B.has(x))n++;return 2*n/(A.size+B.size);}
 
 export function createKnowledgeEngine(data){
@@ -101,6 +101,14 @@ export function createKnowledgeEngine(data){
     if(/수강료|가격|요금|비용|환불|견적|계약조건|결제|모집|개강|언제|날짜|일정|신청|등록|이용조건|얼마/.test(c))return from([brand==='lab'?'lab-availability':'guide-availability'],'needs_confirmation');
     if(/답.*없으면.*(만들|알려)|새답변|생성형|챗봇|답변기준|출처|근거|공개문서|무엇을물어|뭐물어|어떻게이용|ai상담|실시간검색/.test(c))return from(['guide-ask']);
     if(/협업|협력|의뢰|함께일|연락|문의/.test(c))return from([brand==='pulse'?'pulse-collaboration':'guide-collaboration']);
+    // Public visions are future direction. Privacy, terms and factual limits above still take priority.
+    if(/비전|vision|지향하는미래|꿈꾸는미래|미래상|어떤미래|앞으로.*(?:되려|지향|꿈꾸)|만들고싶은미래/.test(c)){
+      if(brands.length===3||/(?:네|4개|모든|전체)(?:브랜드|회사)|세(?:가지)?(?:브랜드|사업)|각(?:브랜드|회사)|각각의비전|전체비전|전부.*비전|비전.*전부|비전.*모두|모두.*비전/.test(c))return from(['synk-visions']);
+      if(brands.length>1)return from(brands.map(key=>key+'-vision'));
+      if(brands.length&&/synk\s*(?:와|과|및)\s*(?:lab|shift|pulse|랩)/.test(q))return from(['synk-vision',...brands.map(key=>key+'-vision')]);
+      const visionBrand=brands[0]||(/synk/.test(c)?'synk':brand||'synk');
+      return from([visionBrand+'-vision']);
+    }
     if(brands.length>1){if(/차이|관계|다르|같|각각|구분|비교|브랜드|사업/.test(c))return from(['synk-brands']);return from(brands.map(b=>brandIds[b]));}
     if(/세(?:가지)?사업|세(?:가지)?브랜드|3개사업|사업구성|브랜드구성|사업구조/.test(c))return from(['synk-brands']);
     if(/차별|강점|차이점|더좋|왜선택|선택할때|다른곳/.test(c))return from(['synk-value']);
