@@ -43,6 +43,8 @@ AI를 다루는 실력과 사업을 판단하는 힘을 함께 키운다.
 - [Public company notes](https://synk.im/knowledge.json)
 - [My name in Korean](https://synk.im/name/)
 - [Privacy policy](https://synk.im/privacy/)
+- [Terms of use](https://synk.im/terms/)
+- [Data deletion instructions](https://synk.im/data-deletion/)
 
 ## Facts that are often asked about, with sources
 

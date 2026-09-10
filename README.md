@@ -8,4 +8,6 @@ Authoring source: C:/Users/q1212/Documents/SYNK-website. Build reads the current
 
 Privacy source: SYNK-appsscript docs/개인정보처리방침_초안_v1.md. The optional tools/privacy-policy-render.js renders only explicit public boundaries into source and published HTML. The current LAB Korean/English policy separates website questions from learning-service processing, includes actual providers and device/server deletion distinctions, and identifies the individual controller at hello@synk.im. Provider contracts, individual transfer notices and actual rights handling still need operational evidence; policy publication is not Meta verification.
 
+Meta public setup pages: `/terms/` gives the Korean/English public website and messaging terms, and `/data-deletion/` gives Korean/English deletion instructions for Messenger and Instagram consultation records. Both use the shared `/assets/legal.css` brand surface and link back to the privacy policy. Keep the three URLs consistent in the Meta app dashboard and update them together when the messaging scope changes.
+
 Preserve CNAME and existing student tool routes /name/, /diag/, /retro/ and /preview2/. The legacy preview footer also removes the retired registration number. Review TXT files, credentials and internal operational notes are never part of this public website.
