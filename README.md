@@ -2,7 +2,7 @@
 
 Production: https://synk.im/ — GitHub Pages, main branch root.
 
-Current corporate homepage source: SYNK-website commit 218dd759299a3253a55b2a7380517ff6d28c65a5 (2026-09-11). Six validated files in dist are mirrored here: index.html, app.js, knowledge-engine.js, knowledge.json, style.css and llms.txt. The current release has 62 reviewed answers and seven public documents, with all four approved visions and full subtexts. It preserves planner attribution and copyright and states that a new business registration is being prepared. Never restore the retired business number or address as current registration details.
+Current corporate homepage source: SYNK-website commit a0a45622750305991417317d3f924dcb8324d3c9 (2026-09-11). Six validated files in dist are mirrored here: index.html, app.js, knowledge-engine.js, knowledge.json, style.css and llms.txt. The current release has 62 reviewed answers and seven public documents, with all four approved visions and full subtexts. It preserves planner attribution and copyright and states that a new business registration is being prepared. Never restore the retired business number or address as current registration details.
 
 Authoring source: C:/Users/q1212/Documents/SYNK-website. Build reads the current SYNK-appsscript vision canon through sync-vision-content.mjs and verifies approved mascot sources. Review actual questions and desktop/mobile views before copying the six files. Update this source reference on the next release; older release worktrees are not the authoring source.
 
