@@ -1,0 +1,50 @@
+{
+  "recipe": "Current canonical mascot to existing 640px diagnostic and 1000px cropped name assets; WebP92/alpha100.",
+  "items": [
+    {
+      "file": "diag/assets/monggeul_base.webp",
+      "source": "docs/캐릭터/정본_4K/몽글_본체.png",
+      "sourceSha256": "6fd4e6b3946006d54d7059e60cc135b27874128bd8e7dfa6e6a62f1a1532f56c",
+      "sha256": "b90cc9cc262554b3269ab24f49691df0197a90454fbb35a023cdf3b44c627def",
+      "width": 640,
+      "height": 640,
+      "crop": null,
+      "stale": false
+    },
+    {
+      "file": "diag/assets/monggeul_blink.webp",
+      "source": "docs/캐릭터/정본_4K/몽글_눈감음.png",
+      "sourceSha256": "5b1c4840462dc87781241f0983a7aa5dba3b8a0498357427e99218fee7ab2c14",
+      "sha256": "6fda6f635b23903f02045075edb1d49127e42113649dc4f6832c5a4141688472",
+      "width": 640,
+      "height": 640,
+      "crop": null,
+      "stale": false
+    },
+    {
+      "file": "diag/assets/monggeul_smile.webp",
+      "source": "docs/캐릭터/정본_4K/몽글_눈웃음.png",
+      "sourceSha256": "7b1a8b9070d847a69b349c66f95d5c6fe824b4371b304f44ef4f2865b22f4a14",
+      "sha256": "4e5a12c0ca572e54f0f712a084716d880a47b0aea6813f6190cd2b3dabdf5fd1",
+      "width": 640,
+      "height": 640,
+      "crop": null,
+      "stale": false
+    },
+    {
+      "file": "name/assets/monggeul.webp",
+      "source": "docs/캐릭터/정본_4K/몽글_눈웃음.png",
+      "sourceSha256": "7b1a8b9070d847a69b349c66f95d5c6fe824b4371b304f44ef4f2865b22f4a14",
+      "sha256": "420d44905226cb50a1065c092b22cffa96fe490f878b4b4efa140d4cd65e758c",
+      "width": 1000,
+      "height": 978,
+      "crop": {
+        "left": 483,
+        "top": 405,
+        "width": 3132,
+        "height": 3062
+      },
+      "stale": false
+    }
+  ]
+}
