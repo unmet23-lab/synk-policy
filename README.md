@@ -2,7 +2,7 @@
 
 Production: https://synk.im/ — GitHub Pages, `main` branch root.
 
-The corporate homepage is authored and reviewed in `C:/Users/q1212/Documents/SYNK-website/dist`. The current homepage copies validated source `facae6a4b87ac4683a3ccd7ec818675a7ac325a8` (2026-09-11): centered brand headings and responsive layout, company registration/copyright footer, and planner attribution throughout the page and public answers. Future homepage releases must read the current source and update this reference after validation; `SYNK-home-release` is an old release worktree, not the authoring source.
+The corporate homepage is authored and reviewed in `C:/Users/q1212/Documents/SYNK-website/dist`. The current homepage copies validated source `8721cf74c3e7a89020b809e0f2e679bdf32b4a42` (2026-09-11): 49 reviewed public answers across six documents, visitor-oriented questions, privacy and internal-information boundaries, source dates, and direct materials/listening/contact links. Existing logo alignment, company registration/copyright footer and planner attribution are preserved. Future homepage releases must read the current source and update this reference after validation; `SYNK-home-release` is an old release worktree, not the authoring source.
 
 Preserve `CNAME`, `/privacy/`, `/name/`, `/diag/`, `/retro/`, and `/preview2/`. The privacy policy source remains SYNK-appsscript `docs/개인정보처리방침_게시용.html`.
 

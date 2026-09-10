@@ -40,3 +40,6 @@ dialog{color:var(--ink);border:0;background:var(--paper);width:min(720px,calc(10
 /* In this family panel SYNK appears once above the division names. */
 .brand-proof-divisions{align-items:center;gap:24px;padding-block:32px}.brand-proof-divisions .division-name{display:block;height:40px;width:auto;max-width:100%;overflow:hidden;flex:none}
 @media(max-width:600px){.brand-proof-divisions{gap:22px;padding-block:28px}.brand-proof-divisions .division-name{height:35px}}
+
+/* Reviewed guidance: provenance and readable source sections. */
+.answer-reviewed{color:var(--muted);font-size:12px;margin:12px 0 0}.document-answer{padding-block:22px;border-top:1px solid var(--line);scroll-margin-top:84px}.document-answer h3{font-size:19px;line-height:1.5;margin-bottom:14px}.document-answer p:last-child{margin-bottom:0}
