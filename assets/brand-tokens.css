@@ -1,0 +1,95 @@
+
+
+
+@font-face{font-family:'SYNK Bracket';src:local('Malgun Gothic'),local('Apple SD Gothic Neo'),local('Noto Sans KR'),local('Noto Sans CJK KR');unicode-range:U+300C-300D;}
+:root{
+  --synk-coral-soft:#FBB7A3;
+  --synk-coral-2:#FD9C87;
+  --synk-coral:#F96859;
+  --synk-coral-3:#AE322A;
+  --synk-coral-rim:#941F19;
+  --synk-coral-wash:#FEF0E9;
+  --synk-paper:#FBF7F0;
+  --synk-ink:#2B2320;
+  --synk-ink-deep:#080605;
+  --synk-stitch:#FBCAAB;
+  --synk-oat:#EDE7DC;
+  --synk-stone:#C7BFB2;
+  --synk-ash-wool:#8D857A;
+  --synk-deep-wool:#575046;
+  --synk-lapis-soft:#C5D6F5;
+  --synk-lapis:#3D6BC9;
+  --synk-lapis-deep:#24448C;
+  --synk-meadow-soft:#D3E8BE;
+  --synk-meadow:#7DB45A;
+  --synk-meadow-deep:#3F6B2E;
+  --synk-butter-soft:#FFEBB0;
+  --synk-butter:#F5C445;
+  --synk-butter-deep:#7E5A10;
+  --synk-pop-soft:#F8C7DE;
+  --synk-pop:#E05C97;
+  --synk-pop-deep:#99295D;
+  --synk-kc-hot-pink:#FF3E88;
+  --synk-kc-pink-2:#FF6BA8;
+  --synk-kc-sun:#FFD447;
+  --synk-kc-cool-blue:#4E7CFF;
+  --synk-chalk:#E4E4E7;
+  --synk-chalk-2:#EAEAEA;
+  --synk-chalk-3:#D1D2D4;
+  --synk-graphite:#08090C;
+  --synk-graphite-2:#1D1D1C;
+  --synk-graphite-3:#262626;
+  --synk-graphite-4:#373737;
+  --synk-ash:#8C8C8C;
+  --synk-ash-2:#666666;
+  --synk-lime:#C8FF3D;
+  --synk-lime-2:#B8E836;
+  --synk-emerald:#13724A;
+  --synk-indigo:#283158;
+  --synk-moss:#799459;
+  --synk-chestnut:#986D60;
+
+  --synk-바탕:#FBF7F0;
+  --synk-잉크:#2B2320;
+  --synk-발표물본문잉크:#2B2320;
+  --synk-보조잉크:#575046;
+  --synk-보조잉크2:#8D857A;
+  --synk-신호_면:#F96859;
+  --synk-신호_글자_대형:#AE322A;
+  --synk-신호_바닥:#FEF0E9;
+  --synk-알약:#FBB7A3;
+  --synk-성장수치:#AE322A;
+  --synk-실땀:#FBCAAB;
+  --synk-안내_면:#3D6BC9;
+  --synk-안내_글자:#24448C;
+  --synk-정답_면:#7DB45A;
+  --synk-정답_글자:#3F6B2E;
+  --synk-보상_면:#F5C445;
+  --synk-보상_글자:#7E5A10;
+  --synk-기념_면:#E05C97;
+  --synk-기념_글자:#99295D;
+  --synk-font:'SYNK Bracket','Inter Tight','SUIT Variable',system-ui,-apple-system,'Apple SD Gothic Neo','Malgun Gothic',sans-serif;
+  --synk-font-mono:'DM Mono',ui-monospace,SFMono-Regular,Consolas,monospace;
+  --synk-mn-scale:1.04;
+}
+
+[data-synk-theme="dark"]{
+  --synk-바탕:#080605;
+  --synk-카드:#2B2320;
+  --synk-잉크:#FBF7F0;
+  --synk-보조잉크:#EDE7DC;
+  --synk-보조잉크2:#C7BFB2;
+  --synk-실땀:#FBCAAB;
+  --synk-신호:#F96859;
+  --synk-신호_보조:#FD9C87;
+  --synk-눌림:#AE322A;
+  --synk-안내_면:#24448C;
+  --synk-안내_글자:#C5D6F5;
+  --synk-정답_면:#3F6B2E;
+  --synk-정답_글자:#D3E8BE;
+  --synk-성장:#D3E8BE;
+  --synk-보상_면:#7E5A10;
+  --synk-보상_글자:#FFEBB0;
+  --synk-기념_면:#99295D;
+  --synk-기념_글자:#F8C7DE;
+}

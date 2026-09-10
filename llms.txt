@@ -1,20 +1,17 @@
-# SYNK LAB
+# SYNK
 
-> A Korean-language school in Ulaanbaatar, Mongolia, opening February 2027.
-> Motto: "More teachers than students." One human teacher directs sixteen AI teachers, one per student.
-> Монголын Улаанбаатар дахь солонгос хэлний сургууль. 2027 оны 2 сард нээгдэнэ.
-> 몽골 울란바토르의 한국어 학원. 2027년 2월 개원.
+> SYNK creates experiences that help people learn, build, and enjoy.
+> LAB: Korean-language education for Mongolian learners, in preparation.
+> SHIFT: Yuho’s real process of building SYNK with AI, the choices and methods learned, and related education and support in preparation.
+> PULSE: music, video, characters, and stories to revisit.
 
-SYNK LAB teaches Korean to Mongolian students, most of whom aim to study or work in South Korea.
-The school's stated commitment is TOPIK level 4 within one year; if a student does not reach it,
-continued online care is provided at no cost.
-
-Site: https://synk.im/
+The Korean-language corporate homepage introduces the shared philosophy, each brand’s purpose and current scope, and SYNK’s own brand design. Public-document questions are answered locally from authored passages. It does not send questions to a server, accept applications, or conclude contracts. Planned services and confirmed availability are distinct; no course, qualification, institutional partnership, or outcome guarantee should be inferred.
 
 ## Pages
 
-- [Home](https://synk.im/): what the school is, in Korean, Mongolian and English.
-- [My name in Korean](https://synk.im/name/): a free tool that writes a Mongolian (Cyrillic) name in Korean letters, and shows where two spellings are both in use.
+- [Corporate homepage](https://synk.im/)
+- [Public company notes](https://synk.im/knowledge.json)
+- [My name in Korean](https://synk.im/name/)
 - [Privacy policy](https://synk.im/privacy/)
 
 ## Facts that are often asked about, with sources

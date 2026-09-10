@@ -1,9 +1,9 @@
-# synk-policy
+# SYNK public website
 
-SYNK LAB 공개 페이지 — **개인정보처리방침(한·영)** 을 `https://synk.im/privacy/` 로 서빙한다.
+Production: https://synk.im/ — GitHub Pages, `main` branch root.
 
-- 정본은 여기가 아니라 사내 저장소의 `docs/개인정보처리방침_게시용.html` 다.
-  방침 문구를 고칠 때는 **정본을 먼저 고치고** 이 repo 의 `privacy/index.html` 로 복사한다.
-- 이 한 장이 Meta 앱 검수 요구 2개를 동시에 낸다 — ①개인정보처리방침 URL ②비즈니스 인증용 웹사이트.
-  (상호·주소·사업자등록번호·연락처가 본문에 함께 실려 있다.)
-- `/` 로 들어오면 `/privacy/` 로 보낸다.
+The corporate homepage is authored and reviewed in `C:/Users/q1212/Documents/SYNK-website/dist`. This release copies the validated source at `6514f58918ab6530a2cc9eab4a611527fb6be32d`.
+
+Preserve `CNAME`, `/privacy/`, `/name/`, `/diag/`, `/retro/`, and `/preview2/`. The privacy policy source remains SYNK-appsscript `docs/개인정보처리방침_게시용.html`.
+
+The homepage is Korean and introduces SYNK, LAB, SHIFT, and PULSE. This replaces the former three-language LAB introduction as part of the requested synk.im corporate redesign. Existing student tools and the privacy policy keep their URLs and contents. GitHub Pages builds `main`.
