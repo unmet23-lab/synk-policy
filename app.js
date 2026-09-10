@@ -1,4 +1,4 @@
-import {createKnowledgeEngine} from './knowledge-engine.js?v=20260911-public-guide';
+import {createKnowledgeEngine} from './knowledge-engine.js?v=20260911-reviewed-v2';
 const $=s=>document.querySelector(s);
 const conversation=$('#questions'),form=$('#question-form'),input=$('#question'),send=$('#send'),messages=$('#messages'),dialog=$('#document-dialog');
 let engine=null,context={},busy=false,activeDoc=null,lastTrigger=null,toastTimer;
@@ -8,17 +8,17 @@ function element(tag,cls,text){const el=document.createElement(tag);if(cls)el.cl
 function toast(text){const el=$('#toast');el.textContent=text;el.hidden=false;clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.hidden=true,2400);}
 function syncInput(){input.style.height='auto';input.style.height=Math.min(input.scrollHeight,160)+'px';send.disabled=busy||!input.value.trim();}
 function paragraphs(parent,text){String(text).split(/\n\n/).forEach(p=>parent.append(element('p','',p)));}
-const pending=fetch('/knowledge.json?v=20260911-public-guide').then(r=>{if(!r.ok)throw new Error('자료를 불러오지 못했어요.');return r.json();}).then(data=>{
+const pending=fetch('/knowledge.json?v=20260911-reviewed-v2').then(r=>{if(!r.ok)throw new Error('자료를 불러오지 못했어요.');return r.json();}).then(data=>{
   engine=createKnowledgeEngine(data);return engine;
 }).catch(error=>{console.error('Public notes unavailable');$('#answer-note').textContent='공개 안내를 불러오지 못했어요. 질문을 보내 다시 시도해 주세요.';throw error;});
 // Keep the initial document load from producing an unhandled rejection when no one asks.
 pending.catch(()=>{});
 
-async function getEngine(){if(engine)return engine;try{return await pending;}catch{const r=await fetch('/knowledge.json?v=20260911-public-guide',{cache:'reload'});if(!r.ok)throw new Error('자료를 불러오지 못했어요. 잠시 뒤 다시 질문해 주세요.');engine=createKnowledgeEngine(await r.json());$('#answer-note').textContent=readyNote;return engine;}}
+async function getEngine(){if(engine)return engine;try{return await pending;}catch{const r=await fetch('/knowledge.json?v=20260911-reviewed-v2',{cache:'reload'});if(!r.ok)throw new Error('자료를 불러오지 못했어요. 잠시 뒤 다시 질문해 주세요.');engine=createKnowledgeEngine(await r.json());$('#answer-note').textContent=readyNote;return engine;}}
 function enterChat(){conversation.classList.add('is-chatting');$('#introduction').hidden=true;$('#chat-area').hidden=false;}
 function focusQuestion(){input.focus({preventScroll:true});conversation.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth',block:'start'});}
 function reset(){context={};messages.replaceChildren();conversation.classList.remove('is-chatting');$('#introduction').hidden=false;$('#chat-area').hidden=true;input.value='';syncInput();input.focus({preventScroll:true});}
-const actionLinks=new Set(['#worlds','#lab','#shift','#pulse','#work','#company-info','mailto:hello@synk.im','https://synk.im/name/','https://synk.im/privacy/','https://synk-field-notes.unmet23.chatgpt.site/자료실/index.html','https://synk-field-notes.unmet23.chatgpt.site/01-lab-youtube/index.html']);
+const actionLinks=new Set(['https://www.youtube.com/@synkkorean/live','https://www.youtube.com/@synkkorean','https://www.instagram.com/synk.mn/','https://t.me/synkmn','#worlds','#lab','#shift','#pulse','#work','#company-info','mailto:hello@synk.im','https://synk.im/name/','https://synk.im/privacy/#website-questions','https://synk.im/privacy/#ko','https://synk-field-notes.unmet23.chatgpt.site/자료실/index.html','https://synk-field-notes.unmet23.chatgpt.site/01-lab-youtube/index.html']);
 function appendAnswer(result){
   const article=element('article','message-assistant');article.dataset.status=result.status;
   const label=element('div','message-label');const mark=element('img','answer-wordmark');mark.src='/assets/brand-synk.webp?v=20260910-story';mark.alt='SYNK';mark.width=744;mark.height=360;label.append(mark,element('span','',result.status==='restricted'?'공개 범위 안내':result.status==='needs_confirmation'?'개별 확인 안내':'공개 자료 안내'));article.append(label);
@@ -30,7 +30,7 @@ function appendAnswer(result){
   result.sourceIds.forEach((id,i)=>{const doc=engine.docs.get(id);if(!doc)return;const button=element('button','source-button');button.type='button';button.dataset.doc=id;button.dataset.recordId=result.records.find(r=>r.sourceId===id)?.id||'';button.append(element('span','',String(i+1).padStart(2,'0')),document.createTextNode(doc.title.split(' — ')[0]+' · 근거 읽기 ↗'));sources.append(button);});
   const copy=element('button','copy-answer','답변 복사');copy.type='button';copy.addEventListener('click',async()=>{try{await navigator.clipboard.writeText(body.innerText);toast('답변을 복사했어요.');}catch{toast('복사를 사용할 수 없어요. 답변을 선택해 복사해 주세요.');}});sources.append(copy);article.append(sources);
   const actions=element('div','answer-actions');const used=new Set();
-  for(const record of result.records){if(!record.action||used.has(record.action.href)||!actionLinks.has(record.action.href))continue;used.add(record.action.href);const a=element('a','answer-action',record.action.label+' ↗');a.href=record.action.href;actions.append(a);}if(actions.childNodes.length)article.append(actions);
+  for(const record of result.records)for(const action of record.actions||(record.action?[record.action]:[])){if(used.has(action.href)||!actionLinks.has(action.href))continue;used.add(action.href);const a=element('a','answer-action',action.label+' ↗');a.href=action.href;actions.append(a);}if(actions.childNodes.length)article.append(actions);
   const related=element('div','related-questions');
   result.relatedIds.slice(0,2).forEach(id=>{const r=engine.records.get(id);if(!r)return;const b=element('button','',r.title);b.type='button';b.dataset.ask=r.questionExamples[0];related.append(b);});if(related.childNodes.length)article.append(related);
   messages.append(article);article.scrollIntoView({behavior:'instant',block:'nearest'});

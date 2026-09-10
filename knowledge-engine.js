@@ -19,7 +19,7 @@ export function createKnowledgeEngine(data){
     const selected=[...new Set(ids)].map(id=>records.get(id)).filter(Boolean).slice(0,3);
     return {status,records:selected,sourceIds:[...new Set(selected.map(r=>r.sourceId))],brand:selected.length===1?selected[0].brand:'synk',relatedIds:[...new Set(selected.flatMap(r=>r.relatedIds||[]))].filter(id=>!ids.includes(id)).slice(0,3)};
   };
-  const unknown=(brand=null)=>({status:'unanswered',records:[],sourceIds:['guide'],brand:null,relatedIds:brand?[brandIds[brand],'guide-contact']:['synk-choose','guide-contact'],message:'공개 안내에서 이 질문에 답할 근거를 찾지 못했습니다. 확인되지 않은 내용은 추측하지 않습니다.\n\n한국어 교육, AI로 일하는 과정, 음악·작품, 협업 중 어떤 내용이 궁금한지 알려주세요. 개별 조건을 확인하려면 공개 문의 경로를 이용할 수 있습니다.'});
+  const unknown=(brand=null)=>({status:'unanswered',records:[],sourceIds:['guide'],brand:null,relatedIds:brand?[brandIds[brand],'guide-contact']:['synk-choose','guide-contact'],message:records.get('guide-unknown').answer});
   function answer(input,context={}){
     if(typeof input!=='string'||!input.trim()||input.length>500)return {status:'invalid',records:[],sourceIds:[],brand:null,relatedIds:[],message:'질문을 500자 이내로 적어주세요.'};
     const q=normalizeQuery(input),brands=brandsIn(q);
@@ -40,13 +40,37 @@ export function createKnowledgeEngine(data){
     if(/<\/?[a-z!]|onerror\s*=|javascript:/i.test(input))return unknown();
     if(/(지시|규칙|설정).*(무시|우회|해제)|이전지시|systemprompt|ignore.*(instruction|rule)|개발자모드|관리자모드/.test(c))return from(['guide-boundary'],'restricted');
     if(/비밀번호|password|apikey|api키|접속토큰|인증토큰|주민등록|주민번호|계좌번호|secretkey/.test(c))return from(['guide-boundary'],'restricted');
-    if(/(학생|보호자|고객|회원|아이).*(명단|성적|답안|상담|연락처|전화번호|원문|원본|기록).*(보여|알려|열람|출력|뽑|다운|제공|볼수)|(?:학생|고객|아이|회원)(?:별)?(?:개인)?정보(?:를|을)?(?:함께|모두|전부)?(?:보여|알려|열람|제공|출력)|학생명단|성적표|상담기록|회원정보|개인정보.*(목록|명단|추출|다운로드)/.test(c))return from(['guide-personal'],'restricted');
+    const personalTopic=/(학생|학부모|보호자|고객|회원|아이|성적표|상담기록|상담내역)/.test(c);
+    const recordTopic=/명단|목록|성적|진도|답안|상담|연락처|전화번호|원문|원본|기록|개인정보|학생정보|아이별정보/.test(c);
+    const processQuestion=/어떻게알려주|어디서볼수|어디에서확인|부모가.*볼수|부모.*확인할수|보호자도.*볼수|부모에게|보호자에게|열람절차|확인하는절차|볼수있는권한|어떻게보관|어디에남|보관하나요|저장되나요/.test(c);
+    // A request to explain a protection method is not a request for a person's data.
+    const demandText=c.replace(/(?:개인정보|학생정보)(?:를)?보호(?:하는)?(?:방법|기준)(?:을)?보여(?:주세요|줘)/g,'개인정보보호방법').replace(/(?:부모|보호자)에게(?:도)?(?:어떤방식으로)?보여주나요/g,'보호자전달절차');
+    const directDemand=/보여|출력|추출|다운로드|여기로보내|보고싶|보기만|볼래|(?:내역|기록|성적표)(?:을|를)?주세요|(?:연락처|전화번호|성적|정보)(?:를|을|도)?(?:함께|같이|모두|전부|좀|먼저){0,2}(?:알려줘|알려주세요|열람|제공|부탁)/.test(demandText);
+    const privateList=personalTopic&&/명단|목록/.test(c)&&!/수집항목|어떤항목/.test(c);
+    if(privateList||(personalTopic&&recordTopic&&(directDemand||(!processQuestion&&/원문|원본|성적표|회원정보/.test(c)))))return from(['guide-personal'],'restricted');
     if(/사업시스템.*원문|(내부|비공개|비밀|미공개).*(시스템|구조|설계|운영|자료|문서|계약|전략|가격|프롬프트|도구|원가|코드|계획|매뉴얼)|운영매뉴얼|데이터베이스|소스코드|서버설정|시스템지시|저장소|엔진설계|전체지식.*(출력|덤프)/.test(c))return from(/synk.*하는일|synk.*어떤회사/.test(c)?['guide-boundary','synk-intro']:['guide-boundary'],'restricted');
+    if(processQuestion&&personalTopic&&/부모|보호자|아이/.test(c)&&!/보관|저장|어디에남/.test(c))return from(['lab-parent']);
+    if(/(?:상담|학습|학생).*기록|학생상담내용/.test(c)&&/남|저장|보관|삭제|열람|확인|처리/.test(c)&&!/이질문창|홈페이지|여기에/.test(c))return from(['guide-records']);
+    if(/상담.*(?:이질문창|홈페이지).*기록/.test(c))return from(['guide-privacy']);
+    if(/제가쓴내용.*지워|제정보.*삭제/.test(c))return from(['guide-personal']);
+    if(/상담/.test(c)&&/받|원해|원합|하고싶|가능|있나요|신청|무료/.test(c))return from(brand==='lab'?['guide-contact','lab-availability']:['guide-contact']);
+    if(/채용|구인공고|구인중|입사|강사모집|선생님모집/.test(c)||/(?:^|\s)구인(?:\s|$)/.test(q))return from(['guide-careers'],'needs_confirmation');
+    if(/다른(?:회사|학원|교육).*얼마나|다른학원보다|얼마나낫/.test(c))return from(['guide-evidence']);
+    if(/협력대학|협약맺은.*대학|언제만들었|언제만든회사/.test(c))return from(['guide-unpublished'],'needs_confirmation');
+    if(/카카오톡|카톡/.test(c)&&/문의|연락|상담/.test(c))return from(['guide-contact']);
+    if(/음악|노래|영상|곡/.test(c)&&/만들어줄|만들어주|제작해주|맞춤.*제작/.test(c))return from(['pulse-collaboration']);
+    if(/로고|광고|브랜딩/.test(c)&&/만들어줄|만들어주|제작해주|제작의뢰/.test(c))return from(['shift-scope']);
+    if(/shift/.test(c)&&/과정/.test(c)&&/협업/.test(c))return from(['shift-scope','guide-collaboration']);
+    if(/4급|사급|6개월.*케어/.test(c))return from(['lab-topik']);
+    if(/학원.*어디|울란바토르|몽골에서.*한국|한국에서.*몽골|주소가어디|수업장소|(?:lab|학원).*위치/.test(c))return from(['lab-location']);
+    if(!/[가-힣]/.test(input)&&(/[\u0400-\u04ff]/.test(input)||/[a-z]{2,}\s+[a-z]{2,}/i.test(input)))return from(['guide-language'],'language');
+    if(/라디오|klofi|24시간.*방송/.test(c)&&!/공부|학습|집중|저작권|허락|사용|상업|광고에|매장|가게/.test(c))return from(/감상영상|저영상|오늘밤제일환한|전곡/.test(c)?['pulse-listening','pulse-radio']:['pulse-radio']);
+    if(/유튜브채널|인스타그램|텔레그램|공개채널|sns채널/.test(c))return brands.includes('shift')?from(['guide-contact']):from(['guide-channels']);
     if(/(?:제|본인)(?:개인)?정보.*(삭제|수정|확인)/.test(c))return from(['guide-personal']);
     if(/개인정보|프라이버시|대화.*(저장|기록|남|전송)|질문.*(저장|기록|남|전송)|저장.*(대화|질문)|쿠키|보관기간|학생정보.*(다루|보호|처리)|(?:질문|대화|입력).*(외부ai|학습에|보내)/.test(c))return from(['guide-privacy']);
     if(/날씨|일기예보|주가|주식|코인|환율|대통령|선거|파스타|삼성|애플|주차장|카페메뉴|치료법|약물/.test(c))return unknown(brand);
     if(/^(안녕(?:하세요)?|하이|hello|hi|반가워(?:요)?)[!?.\s]*$/i.test(input.trim()))return from(['synk-choose'],'greeting');
-    if(/^(고마워(?:요)?|감사(?:합니다|해요)?|thanks|thank you)[!?.\s]*$/i.test(input.trim()))return {status:'courtesy',records:[],sourceIds:[],brand:null,relatedIds:['synk-choose'],message:'함께 살펴봐 주셔서 감사합니다. 더 궁금한 내용이 있으면 이어서 물어보세요.'};
+    if(/^(고마워(?:요)?|감사(?:합니다|해요)?|thanks|thank you)[!?.\s]*$/i.test(input.trim()))return {status:'courtesy',records:[],sourceIds:[],brand:null,relatedIds:['synk-choose'],message:records.get('guide-courtesy').answer};
     // Specific public facts, rights and contact intents precede general topics.
     if(/사업자등록번호|사업자번호|등록번호/.test(c))return from(/연락|문의/.test(c)?['synk-registration','guide-contact']:['synk-registration']);
     if(/상업|저작권|재배포|이용권|라이선스|복사해|광고에|영상에|유튜브에|매장|가게/.test(c)&&(/음악|곡|노래|작품|pulse|로고|캐릭터|몽글|까몽|마린/.test(c)||brand==='pulse'))return from(['pulse-rights']);
