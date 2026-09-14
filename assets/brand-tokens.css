@@ -1,95 +1,95 @@
-
-
-
+/* 자동 생성 — 손으로 고치지 말 것. 원천 = docs/디자인_토큰.json · 빌드 = node tools/토큰빌드.js */
+/* 조항(코랄 글자 금지·순백 금지 등)의 정본 = DESIGN.md·디자인_컨셉_정본_v1.md — 변수는 값만 나른다. */
+/* 낫표 「 」 교정 — 까닭은 docs/디자인_토큰.json 「서체.낫표교정_까닭」이 쥔다(유호 확정 08-31). */
 @font-face{font-family:'SYNK Bracket';src:local('Malgun Gothic'),local('Apple SD Gothic Neo'),local('Noto Sans KR'),local('Noto Sans CJK KR');unicode-range:U+300C-300D;}
 :root{
-  --synk-coral-soft:#FBB7A3;
-  --synk-coral-2:#FD9C87;
-  --synk-coral:#F96859;
-  --synk-coral-3:#AE322A;
-  --synk-coral-rim:#941F19;
-  --synk-coral-wash:#FEF0E9;
-  --synk-paper:#FBF7F0;
-  --synk-ink:#2B2320;
-  --synk-ink-deep:#080605;
-  --synk-stitch:#FBCAAB;
-  --synk-oat:#EDE7DC;
-  --synk-stone:#C7BFB2;
-  --synk-ash-wool:#8D857A;
-  --synk-deep-wool:#575046;
-  --synk-lapis-soft:#C5D6F5;
-  --synk-lapis:#3D6BC9;
-  --synk-lapis-deep:#24448C;
-  --synk-meadow-soft:#D3E8BE;
-  --synk-meadow:#7DB45A;
-  --synk-meadow-deep:#3F6B2E;
-  --synk-butter-soft:#FFEBB0;
-  --synk-butter:#F5C445;
-  --synk-butter-deep:#7E5A10;
-  --synk-pop-soft:#F8C7DE;
-  --synk-pop:#E05C97;
-  --synk-pop-deep:#99295D;
-  --synk-kc-hot-pink:#FF3E88;
-  --synk-kc-pink-2:#FF6BA8;
-  --synk-kc-sun:#FFD447;
-  --synk-kc-cool-blue:#4E7CFF;
-  --synk-chalk:#E4E4E7;
-  --synk-chalk-2:#EAEAEA;
-  --synk-chalk-3:#D1D2D4;
-  --synk-graphite:#08090C;
-  --synk-graphite-2:#1D1D1C;
-  --synk-graphite-3:#262626;
-  --synk-graphite-4:#373737;
-  --synk-ash:#8C8C8C;
-  --synk-ash-2:#666666;
-  --synk-lime:#C8FF3D;
-  --synk-lime-2:#B8E836;
-  --synk-emerald:#13724A;
-  --synk-indigo:#283158;
-  --synk-moss:#799459;
-  --synk-chestnut:#986D60;
-
-  --synk-바탕:#FBF7F0;
-  --synk-잉크:#2B2320;
-  --synk-발표물본문잉크:#2B2320;
-  --synk-보조잉크:#575046;
-  --synk-보조잉크2:#8D857A;
-  --synk-신호_면:#F96859;
-  --synk-신호_글자_대형:#AE322A;
-  --synk-신호_바닥:#FEF0E9;
-  --synk-알약:#FBB7A3;
-  --synk-성장수치:#AE322A;
-  --synk-실땀:#FBCAAB;
-  --synk-안내_면:#3D6BC9;
-  --synk-안내_글자:#24448C;
-  --synk-정답_면:#7DB45A;
-  --synk-정답_글자:#3F6B2E;
-  --synk-보상_면:#F5C445;
-  --synk-보상_글자:#7E5A10;
-  --synk-기념_면:#E05C97;
-  --synk-기념_글자:#99295D;
+  --synk-coral-soft:#FBB7A3; /* 코랄 램프 1(보풀 빛) — 알약·여린 면 */
+  --synk-coral-2:#FD9C87; /* 코랄 램프 2(윗면) — 신호 보조 */
+  --synk-coral:#F96859; /* 코랄 램프 3(몸통) · 브랜드 기본색 — 행동·신호의 면. ⚠종이 위 글자 금지(2.75) — 글자는 Ink 를 얹거나 Coral 3 */
+  --synk-coral-3:#AE322A; /* 코랄 램프 4(그늘) — 신호 글자(5.98)·오답 */
+  --synk-coral-rim:#941F19; /* 코랄 램프 5(바닥) — 렌더 그림자·깊은 강조 */
+  --synk-coral-wash:#FEF0E9; /* 신호 바닥 — 코랄이 앉는 여린 면(새 Paper 파생) */
+  --synk-paper:#FBF7F0; /* 바탕(라이트) — 양모 종이. 팬톤 2026 Cloud Dancer 자리 */
+  --synk-ink:#2B2320; /* 잉크(라이트) — 갈색이 밴 따뜻한 먹(Paper 위 14.42) · 다크에서는 «카드 면»(양모 밤 · 조항 ⓚ): 낮의 글자가 밤의 면이 된다 */
+  --synk-ink-deep:#080605; /* 바탕(다크) — 양모 밤의 바닥(조항 ⓚ · 유호 확정 08-20). Ink 의 그늘이자 Graphite 의 따뜻한 쌍둥이. 카드(Ink)가 여기서 ΔL* 12.8 로 뜬다(기각선 8.3) */
+  --synk-stitch:#FBCAAB; /* 실땀 — 모든 펠트 오브젝트의 테두리·구분선·자수 포인트(운용 규칙 ②). 🆕 2026-09-08 유호 확정 「4K 가 정본이야」로 값이 갈렸다. 정본_4K 몽글 밑단 실을 다시 재니 옛 크림빛 값과 16.1 만큼 떨어져 있었다(밝은 쪽 #FCD9BC · 어두운 쪽 #F7BD9A — 코랄 몸에서 튄 빛이 실에 얹혀 복숭아빛이 돈다). ⚠ 옛 값은 퇴역이다(tests/브랜드값.test.js 퇴역 목록 · 여기 적으면 그 검사가 문다) */
+  --synk-oat:#EDE7DC; /* 양모 회색 1 — 칩 바닥·가라앉은 면 */
+  --synk-stone:#C7BFB2; /* 양모 회색 2 — 비활성 테두리 */
+  --synk-ash-wool:#8D857A; /* 양모 회색 3 — 보조 글자·캡션 */
+  --synk-deep-wool:#575046; /* 양모 회색 4 — 보조 강조 */
+  --synk-lapis-soft:#C5D6F5; /* 청금석 1(보풀 빛) — 안내 칩 바닥 */
+  --synk-lapis:#3D6BC9; /* 청금석 2(몸통) · 2027 올해의 색 — 길잡이(안내·힌트)의 면. ⚠면 위 글자는 Paper(4.74 · Ink 는 3.04 미달) */
+  --synk-lapis-deep:#24448C; /* 청금석 3(그늘) — 링크·안내 글자(8.62) */
+  --synk-meadow-soft:#D3E8BE; /* 메도우 1(보풀 빛) — 정답 칩 바닥 */
+  --synk-meadow:#7DB45A; /* 메도우 2(몸통) — 자람(정답·성장)의 면. ⚠면 전용 — 종이 위 글자 금지(2.30) */
+  --synk-meadow-deep:#3F6B2E; /* 메도우 3(그늘) — 정답 글자(5.86) */
+  --synk-butter-soft:#FFEBB0; /* 버터 1(보풀 빛) — 보상 여린 면 */
+  --synk-butter:#F5C445; /* 버터 2(몸통) — 기쁨(별·보상)의 면 + Ink 글자(9.43) */
+  --synk-butter-deep:#7E5A10; /* 버터 3(그늘) — 보상 글자(5.86) */
+  --synk-pop-soft:#F8C7DE; /* 팝 핑크 1(보풀 빛) — 이벤트 칩 바닥 */
+  --synk-pop:#E05C97; /* 팝 핑크 2(몸통) — 특별함(기념·희귀)의 면. 면 위 Ink 글자(4.51) */
+  --synk-pop-deep:#99295D; /* 팝 핑크 3(그늘) — 기념 글자(6.95) */
+  --synk-kc-hot-pink:#FF3E88; /* Part 6 전용 — Pop 이 역할을 흡수하는지 후속 판정(조항 ⓙ 대가 ③) */
+  --synk-kc-pink-2:#FF6BA8; /* Part 6 전용 */
+  --synk-kc-sun:#FFD447; /* 모드 C 2도 잉크 — 글자 금지 */
+  --synk-kc-cool-blue:#4E7CFF; /* Part 6 전용 */
+  --synk-chalk:#E4E4E7; /* ⏳Loom 지면 층 전용 — 앱 다크는 「양모 밤」으로 이관 완료(조항 ⓚ · 08-20). 지면 층(tools/lib/loom.js 쓰는색)이 양모로 옮겨지면 그때 퇴역한다 — 잉크(다크 위) — 칠판 위의 분필 */
+  --synk-chalk-2:#EAEAEA; /* ⏳Loom 지면 층 전용 — 앱 다크는 「양모 밤」으로 이관 완료(조항 ⓚ · 08-20). 지면 층(tools/lib/loom.js 쓰는색)이 양모로 옮겨지면 그때 퇴역한다 — 다크 보조 */
+  --synk-chalk-3:#D1D2D4; /* ⏳Loom 지면 층 전용 — 앱 다크는 「양모 밤」으로 이관 완료(조항 ⓚ · 08-20). 지면 층(tools/lib/loom.js 쓰는색)이 양모로 옮겨지면 그때 퇴역한다 — 다크 보조 잉크 */
+  --synk-graphite:#08090C; /* ⏳Loom 지면 층 전용 — 앱 다크는 「양모 밤」으로 이관 완료(조항 ⓚ · 08-20). 지면 층(tools/lib/loom.js 쓰는색)이 양모로 옮겨지면 그때 퇴역한다 — 바탕(다크) */
+  --synk-graphite-2:#1D1D1C; /* ⏳Loom 지면 층 전용 — 앱 다크는 「양모 밤」으로 이관 완료(조항 ⓚ · 08-20). 지면 층(tools/lib/loom.js 쓰는색)이 양모로 옮겨지면 그때 퇴역한다 — 다크 면 */
+  --synk-graphite-3:#262626; /* ⏳Loom 지면 층 전용 — 앱 다크는 「양모 밤」으로 이관 완료(조항 ⓚ · 08-20). 지면 층(tools/lib/loom.js 쓰는색)이 양모로 옮겨지면 그때 퇴역한다 — 잉크(발표물 본문) */
+  --synk-graphite-4:#373737; /* ⏳Loom 지면 층 전용 — 앱 다크는 「양모 밤」으로 이관 완료(조항 ⓚ · 08-20). 지면 층(tools/lib/loom.js 쓰는색)이 양모로 옮겨지면 그때 퇴역한다 — 보조 잉크 */
+  --synk-ash:#8C8C8C; /* ⏳Loom 지면 층 전용 — 앱 다크는 「양모 밤」으로 이관 완료(조항 ⓚ · 08-20). 지면 층(tools/lib/loom.js 쓰는색)이 양모로 옮겨지면 그때 퇴역한다 — 다크 보조 잉크 2 */
+  --synk-ash-2:#666666; /* ⏳Loom 지면 층 전용 — 앱 다크는 「양모 밤」으로 이관 완료(조항 ⓚ · 08-20). 지면 층(tools/lib/loom.js 쓰는색)이 양모로 옮겨지면 그때 퇴역한다 — 보조 잉크 2 */
+  --synk-lime:#C8FF3D; /* ⏳Loom 지면 층 전용 — 앱 다크는 「양모 밤」으로 이관 완료(조항 ⓚ · 08-20). 지면 층(tools/lib/loom.js 쓰는색)이 양모로 옮겨지면 그때 퇴역한다 — 성장(다크) */
+  --synk-lime-2:#B8E836; /* ⏳Loom 지면 층 전용 — 앱 다크는 「양모 밤」으로 이관 완료(조항 ⓚ · 08-20). 지면 층(tools/lib/loom.js 쓰는색)이 양모로 옮겨지면 그때 퇴역한다 — 성장 보조 */
+  --synk-emerald:#13724A; /* ⏳Loom 지면 층 전용 — 앱 다크는 「양모 밤」으로 이관 완료(조항 ⓚ · 08-20). 지면 층(tools/lib/loom.js 쓰는색)이 양모로 옮겨지면 그때 퇴역한다 — 구 라이트 전용 녹색(조항 ⓖ 퇴역 — Meadow 가 승계) */
+  --synk-indigo:#283158; /* 마린의 투구 — 깊은 남색 면. 종이 위 글자 11.77 · 이 면 위 글자는 Paper(11.77) · ⚠Ink 글자 금지(1.22) */
+  --synk-moss:#799459; /* 까몽의 홍채 — 탁한 이끼 초록. ⚠면 전용 — 종이 위 글자 금지(3.18) · 이 면 위 Ink 글자 4.54 */
+  --synk-chestnut:#986D60; /* 까몽의 밝은 털 — 밤색. ⚠면 전용 — 종이 위 글자 금지(4.19) · 이 면 위 글자는 Paper 로 큰 글씨만(4.19) */
+  /* 시맨틱(라이트 기본) */
+  --synk-바탕:#FBF7F0; /* = Paper */
+  --synk-잉크:#2B2320; /* = Ink */
+  --synk-발표물본문잉크:#2B2320; /* = Ink */
+  --synk-보조잉크:#575046; /* = Deep Wool */
+  --synk-보조잉크2:#8D857A; /* = Ash Wool */
+  --synk-신호_면:#F96859; /* = Coral */
+  --synk-신호_글자_대형:#AE322A; /* = Coral 3 */
+  --synk-신호_바닥:#FEF0E9; /* = Coral Wash */
+  --synk-알약:#FBB7A3; /* = Coral Soft */
+  --synk-성장수치:#AE322A; /* = Coral 3 */
+  --synk-실땀:#FBCAAB; /* = Stitch */
+  --synk-안내_면:#3D6BC9; /* = Lapis */
+  --synk-안내_글자:#24448C; /* = Lapis Deep */
+  --synk-정답_면:#7DB45A; /* = Meadow */
+  --synk-정답_글자:#3F6B2E; /* = Meadow Deep */
+  --synk-보상_면:#F5C445; /* = Butter */
+  --synk-보상_글자:#7E5A10; /* = Butter Deep */
+  --synk-기념_면:#E05C97; /* = Pop */
+  --synk-기념_글자:#99295D; /* = Pop Deep */
   --synk-font:'SYNK Bracket','Inter Tight','SUIT Variable',system-ui,-apple-system,'Apple SD Gothic Neo','Malgun Gothic',sans-serif;
   --synk-font-mono:'DM Mono',ui-monospace,SFMono-Regular,Consolas,monospace;
   --synk-mn-scale:1.04;
 }
-
+/* 다크 — 앱·반전면. 근거 = 컨셉 정본 코랄 5단 다크 열 + Lime 운용 */
 [data-synk-theme="dark"]{
-  --synk-바탕:#080605;
-  --synk-카드:#2B2320;
-  --synk-잉크:#FBF7F0;
-  --synk-보조잉크:#EDE7DC;
-  --synk-보조잉크2:#C7BFB2;
-  --synk-실땀:#FBCAAB;
-  --synk-신호:#F96859;
-  --synk-신호_보조:#FD9C87;
-  --synk-눌림:#AE322A;
-  --synk-안내_면:#24448C;
-  --synk-안내_글자:#C5D6F5;
-  --synk-정답_면:#3F6B2E;
-  --synk-정답_글자:#D3E8BE;
-  --synk-성장:#D3E8BE;
-  --synk-보상_면:#7E5A10;
-  --synk-보상_글자:#FFEBB0;
-  --synk-기념_면:#99295D;
-  --synk-기념_글자:#F8C7DE;
+  --synk-바탕:#080605; /* = Ink Deep */
+  --synk-카드:#2B2320; /* = Ink */
+  --synk-잉크:#FBF7F0; /* = Paper */
+  --synk-보조잉크:#EDE7DC; /* = Oat */
+  --synk-보조잉크2:#C7BFB2; /* = Stone */
+  --synk-실땀:#FBCAAB; /* = Stitch */
+  --synk-신호:#F96859; /* = Coral */
+  --synk-신호_보조:#FD9C87; /* = Coral 2 */
+  --synk-눌림:#AE322A; /* = Coral 3 */
+  --synk-안내_면:#24448C; /* = Lapis Deep */
+  --synk-안내_글자:#C5D6F5; /* = Lapis Soft */
+  --synk-정답_면:#3F6B2E; /* = Meadow Deep */
+  --synk-정답_글자:#D3E8BE; /* = Meadow Soft */
+  --synk-성장:#D3E8BE; /* = Meadow Soft */
+  --synk-보상_면:#7E5A10; /* = Butter Deep */
+  --synk-보상_글자:#FFEBB0; /* = Butter Soft */
+  --synk-기념_면:#99295D; /* = Pop Deep */
+  --synk-기념_글자:#F8C7DE; /* = Pop Soft */
 }
