@@ -1,37 +1,71 @@
 # SYNK
 
-> SYNK develops personalized systems rooted in understanding each person's needs and possibilities, connecting advances in AI to learning, work, and culture.
-> LAB researches paths for learning and experience aligned with a person's life direction. Korean-language education for Mongolian learners is currently in preparation.
-> SHIFT connects individuals and organizations through institutional education, business consulting, branding and advertising, and study-abroad and employment pathways. Service availability and partnerships require individual confirmation. Its public AI company-building work demonstrates methods and judgment.
-> PULSE creates music, video, characters, and stories that deepen enjoyment, emotion, and shared memories. Appreciation of a work has value in itself.
+> 저마다의 삶을 온전히 누리는 미래. 기술이 빚어낸 무한한 가능성을 배움과 일, 그리고 문화로 연결합니다.
+> SYNK LAB — 최적의 성장 경로를 그려내는 러닝 내비게이터. 막연한 목표를 가장 선명하고 확신에 찬 여정으로 바꿉니다.
+> SYNK SHIFT — 가치를 발굴하고 최적의 무대를 큐레이션하는 브릿지. 잠들어 있는 역량이 비로소 온전한 빛을 발할 제자리를 찾습니다.
+> SYNK PULSE — 이해를 넘어 직감으로 체화되는 경험. 감각의 스위치를 켜는 짜릿한 자극으로, 세상을 마주하는 시선의 신선한 전환(Shift)을 선사합니다.
 
-The Korean-language corporate homepage introduces the shared philosophy, each brand’s purpose and current scope, and SYNK’s own brand design. Public-document questions are answered locally from authored passages. It does not send questions to a server, accept applications, or conclude contracts. Planned services and confirmed availability are distinct; no course, qualification, institutional partnership, or outcome guarantee should be inferred.
+회사의 비전과 핵심 철학, 브랜드별 역할과 현재 준비 범위를 함께 안내합니다. 공개 질문은 작성된 문장을 찾아 보여주며, 문의 접수·결제·계약 확정이나 성과 보장을 하지 않습니다.
 
-<!-- SYNK PUBLIC VISIONS START -->
-## 비전
+<!-- SYNK PUBLIC COPY START -->
+## 전사 비전
 
-### SYNK
+저마다의 삶을 온전히 누리는 미래.
 
-저마다의 삶을 온전히 누리는 미래를 만듭니다.
+기술이 빚어낸 무한한 가능성을 배움과 일, 그리고 문화로 연결합니다.
 
-AI가 넓힌 가능성을 배움과 일, 문화로 연결합니다.
+## 핵심 철학
 
-### SYNK LAB
+### 오직 한 사람을 향한 세공
 
-가고 싶은 방향에 집중할 수 있는 환경을 만듭니다.
+뻔한 정답을 강요하지 않습니다. 개인의 고유한 맥락을 해독하고, 경험의 궤적을 따라 함께 정교해지는 초개인화 시스템을 만듭니다.
 
-### SYNK SHIFT
+### 주도권을 뺏지 않는 기술의 여백
 
-개인과 조직의 성장이 서로의 기회가 되는 미래를 만듭니다.
+기술은 숨고, 사람은 빛나게. 기술이 덜어낸 시간의 자리는 온전히 일상의 영감과 여유를 위한 아름다운 여백으로 채웁니다.
 
-국경과 환경을 넘어, 개인은 역량을 펼칠 무대를 만나고 조직은 준비된 인재와 함께 성장하는 세상을 지향합니다.
+### 시작과 끝을 잇는 집요한 완성
 
-### SYNK PULSE
+단편적인 기능 구현에 머물지 않습니다. 첫 만남의 직관성부터 여정의 마지막 순간까지, 매끄러운 경험을 완성합니다.
 
-함께한 시간이, 각자의 이야기로 이어지는 문화를 만듭니다.
+### 타협하지 않는 데이터 무결성
 
-비전은 각 브랜드가 지향하는 미래이며, 현재 제공·준비 상태와 이용 조건은 공개 안내에서 따로 확인합니다.
-<!-- SYNK PUBLIC VISIONS END -->
+원본의 기록과 기술의 추정을 냉정하게 분리하며, 사람과 데이터 사이의 견고한 윤리적 경계를 고수합니다.
+
+### 숫자를 넘어 증명되는 변화
+
+데이터가 단순한 지표로 휘발되는 것을 경계합니다. 우리의 기술이 누군가의 삶에 닿아 실질적인 변화와 환원으로 이어질 때, 비로소 진정한 가치를 증명합니다.
+
+이 다섯 가지는 SYNK가 지향하는 설계 기준입니다. 각 브랜드의 현재 제공·준비 상태와 이용 조건은 아래 안내에서 확인할 수 있습니다.
+
+## 브랜드 유니버스
+
+### SYNK LAB — 원하는 방향을 향해 온전히 몰입하는 환경을 만듭니다.
+
+**최적의 성장 경로를 그려내는 러닝 내비게이터**
+
+막연한 목표를 가장 선명하고 확신에 찬 여정으로 바꿉니다.
+
+교육 과정·교재·학생 앱과 개원은 준비 중이며, 실제 제공 범위와 참여 조건은 별도로 안내합니다.
+
+### SYNK SHIFT — 개인의 가능성과 조직의 비전이 만나, 서로의 기회가 되는 세상을 엽니다.
+
+**가치를 발굴하고 최적의 무대를 큐레이션하는 브릿지**
+
+잠들어 있는 역량이 비로소 온전한 빛을 발할 제자리를 찾습니다.
+
+실제 제공 범위와 일정·계약·협약은 개별 확인이 필요합니다. 유학·취업 연계는 입학이나 취업을 보장하지 않습니다.
+
+### SYNK PULSE — 낯선 떨림이 일상의 새로운 리듬이 되는 문화.
+
+**이해를 넘어 직감으로 체화되는 경험**
+
+감각의 스위치를 켜는 짜릿한 자극으로, 세상을 마주하는 시선의 신선한 전환(Shift)을 선사합니다.
+
+작품의 감상 자체를 가치로 삼으며, 작품이 주는 감각은 예술적 여운을 뜻합니다. 학습·집중·치료 효과를 약속하지 않습니다.
+
+비전은 각 브랜드가 지향하는 미래이며, 현재 제공·준비 상태와 이용 조건은 사업 안내에서 확인할 수 있습니다.
+<!-- SYNK PUBLIC COPY END -->
 
 ## Pages
 
