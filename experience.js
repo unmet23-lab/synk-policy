@@ -2,7 +2,6 @@
 import {initLearningInteractions} from './interactions/learning.js?v=20260915-selected';
 import {initFeltInteractions} from './interactions/felt.js?v=20260915-selected';
 import {initScrollExperience} from './interactions/scroll.js?v=20260915-presence';
-import {initContextCursor} from './interactions/cursor.js?v=20260915-selected';
 import {initInitialReveal} from './interactions/reveal.js?v=20260915-presence';
 
 let gsap, ScrollTrigger;
@@ -46,7 +45,7 @@ function mount(){
   rememberLearningState();
   cleanups.splice(0).reverse().forEach(cleanup=>cleanup());
   const options={gsap,ScrollTrigger,reducedMotion:preference.matches,initialIndex:learningState.initialIndex};
-  for(const init of [initScrollExperience,initLearningInteractions,initFeltInteractions,initContextCursor]){
+  for(const init of [initScrollExperience,initLearningInteractions,initFeltInteractions]){
     try {const cleanup=init(options);if(typeof cleanup==='function')cleanups.push(cleanup);}
     catch(error){console.warn('SYNK enhancement unavailable:',init.name,error);}
   }

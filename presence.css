@@ -1,7 +1,6 @@
 /* A single, bounded first entrance. The page remains ordinary HTML without JS. */
 [data-enter] { translate: 0 var(--entry-y, 0px); }
 .entry-pending [data-enter] { opacity: 0; --entry-y: 12px; }
-.hero-meta [data-time-greeting] { min-block-size: 1.5em; }
 
 /* Ink outside / Paper inside stays visible on both light and dark surfaces.
    Keep outlines immediate, including programmatic step focus. */
@@ -47,10 +46,6 @@ body[data-page="practice"] .site-footer,
 body[data-page="listen"] .listen-copyright { padding-bottom: 80px; }
 @media (hover:hover) and (pointer:fine) {
   .sonic-toggle:hover { background: var(--synk-oat, #ece5d9); }
-}
-@media (max-width:760px) {
-  .hero-meta { flex-wrap: wrap; gap: 7px; }
-  .hero-meta [data-time-greeting] { display: block; flex-basis: 100%; font-size: 11px; }
 }
 @media (prefers-reduced-motion: reduce) {
   [data-enter], .entry-pending [data-enter] { opacity: 1 !important; translate: none !important; }

@@ -85,14 +85,6 @@ p { text-wrap: pretty; }
 .pulse-scene figcaption { z-index: 1; }
 .pulse-formats { border-color: color-mix(in srgb,var(--synk-ink) 20%,transparent); }
 
-/* Pointer hints supplement the permanent link/summary labels. */
-.context-cursor {
-  position: fixed; z-index: 60; pointer-events: none; width: 68px; height: 68px;
-  display: grid; place-items: center; border-radius: 50%; background: var(--synk-ink); color: var(--synk-paper);
-  font-size: 11px; line-height: 1.2; font-weight: 600; letter-spacing: -.01em;
-  opacity: 0; scale: .75; transition: opacity 140ms ease-out, scale 180ms ease-out;
-}
-.context-cursor.is-visible { opacity: 1; scale: 1; }
 @media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
   .shift-pillars > section { transition: transform 240ms var(--ease); }
   .shift-pillars > section:hover { transform: translateY(-4px); }
@@ -118,7 +110,4 @@ p { text-wrap: pretty; }
   .making-note > div { grid-column: 1 / -1; }
   .making-note > a { grid-column: 1 / -1; }
   .pulse-scene { max-height: 560px; }
-}
-@media (prefers-reduced-motion: reduce), (hover: none) {
-  .context-cursor { display: none; }
 }
