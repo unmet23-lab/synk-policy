@@ -5,13 +5,13 @@
 
 /* Ink outside / Paper inside stays visible on both light and dark surfaces.
    Keep outlines immediate, including programmatic step focus. */
-body[data-page] :is(a, button, input, textarea, select, summary, [tabindex]:not([tabindex="-1"])):focus-visible {
+body[data-page] :where(a, button, input, textarea, select, summary, [tabindex]:not([tabindex="-1"])):focus-visible {
   outline: 2px solid var(--synk-ink, #292320);
   outline-offset: 5px;
   box-shadow: 0 0 0 5px var(--synk-paper, #fbf7f0);
 }
 body[data-page] :is(.company-note, .site-footer, .request-card, dialog) :focus-visible,
-body[data-page="letter"] :is(a, button, input, textarea, select, summary, [tabindex]:not([tabindex="-1"])):focus-visible {
+body[data-page="letter"] :where(a, button, input, textarea, select, summary, [tabindex]:not([tabindex="-1"])):focus-visible {
   outline-color: var(--synk-stitch, #cdbba7);
   box-shadow: 0 0 0 5px var(--synk-ink-deep, #080605);
 }
@@ -56,7 +56,7 @@ body[data-page="listen"] .listen-copyright { padding-bottom: 80px; }
   [data-enter], .entry-pending [data-enter] { opacity: 1 !important; translate: none !important; }
 }
 @media (forced-colors: active) {
-  body[data-page] :focus-visible { outline: 2px solid Highlight; box-shadow:none; }
+  body[data-page] :focus-visible { outline: 2px solid Highlight !important; box-shadow:none !important; }
   .sonic-toggle { border:1px solid ButtonText; }
 }
 @media print {
