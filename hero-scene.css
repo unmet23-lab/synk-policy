@@ -1,0 +1,30 @@
+/* Give the hand-felted Seoul panorama room; keep the complete composition. */
+#top .introduction {
+  grid-template-columns: minmax(0, .88fr) minmax(0, 1.32fr);
+  gap: clamp(1.5rem, 2.5vw, 2.5rem);
+}
+#top .companions {
+  width: 100%;
+  max-width: none;
+  min-inline-size: 0;
+  padding: clamp(.375rem, .6vw, .625rem);
+  border-radius: clamp(1.25rem, 2.2vw, 2rem);
+  align-self: center;
+}
+#top .companions::before { content: none; }
+#top .companions-scene {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: clamp(.875rem, 1.6vw, 1.5rem);
+  mix-blend-mode: normal;
+}
+#top .companions figcaption { padding: 1rem .75rem .5rem; }
+@media (max-width:1099px) {
+  #top .introduction {
+    grid-template-columns: minmax(0, 1fr);
+    min-height: 0;
+    gap: clamp(1.5rem, 3vw, 2rem);
+  }
+  #top .companions { margin-top: 0; justify-self: stretch; }
+}
