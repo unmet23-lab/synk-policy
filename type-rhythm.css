@@ -1,0 +1,167 @@
+/* Homepage reading rhythm. Load after style, experience, LAB and selected work.
+   Local fluid values bridge the existing Loom spacing levels; the shared tokens,
+   font families, weights, palette, copy and structural grid breakpoints stay intact.
+   At a 16px root, principal endpoints are close to the current 390 / 1440px views. */
+#top {
+  --home-gutter: clamp(1.25rem, calc(.386rem + 4.571vw), 5rem);
+  --home-block: clamp(1.5rem, calc(1.125rem + 1.5625vw), 2.5rem);
+  --home-section: clamp(2.5rem, calc(2rem + 2.25vw), 4rem);
+  --home-chapter: clamp(4rem, calc(3.05rem + 3.85vw), 6.5rem);
+  --home-columns: clamp(1.5rem, calc(.57rem + 3.81vw), 4rem);
+  --home-card-inset: clamp(1.25rem, calc(1.1rem + .45vw), 1.5rem);
+  font-size: 1rem;
+}
+
+/* Keep Korean words together; very long unbroken text may still wrap to fit.
+   Unsupported text-wrap values fall back to the browser's ordinary wrapping. */
+#top :is(h1, h2, h3, h4),
+#top #lab.lab-bento :is(h3, h4) {
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+  text-wrap: balance;
+}
+#top :is(p, li, dd, blockquote, figcaption) {
+  word-break: keep-all;
+  overflow-wrap: break-word;
+  text-wrap: pretty;
+}
+#top :is(.hero-copy, .world-copy, .company-note-copy, .shift-heading,
+  .shift-mission, .section-intro, .contact-intro > div) { min-inline-size: 0; }
+#top :is(p, li, dd, blockquote) a,
+#top .contact-email {
+  min-inline-size: 0;
+  max-inline-size: 100%;
+  word-break: normal;
+  overflow-wrap: anywhere;
+}
+#top .contact-email { flex-wrap: wrap; }
+
+/* Main hierarchy. The #top prefix also wins over the old fixed-size media rules.
+   Rem bounds retain the visitor's root size; vw supplies only the interpolation. */
+#top .hero-copy h1 {
+  font-size: clamp(2.25rem, calc(1.6rem + 3.2vw), 5rem);
+  line-height: 1.2;
+}
+#top .hero-copy > p {
+  font-size: clamp(1rem, calc(.95rem + .21vw), 1.125rem);
+}
+#top .company-note h2 {
+  font-size: clamp(2.1875rem, calc(1.65rem + 2.4vw), 3.75rem);
+}
+#top .worlds-heading h2 {
+  font-size: clamp(2rem, calc(1.5rem + 2.1vw), 3.375rem);
+}
+#top .selected-work .section-intro h2 {
+  font-size: clamp(2rem, calc(1.75rem + 1.55vw), 3.125rem);
+}
+#top .world-copy h3 {
+  font-size: clamp(1.9375rem, calc(1.5625rem + 2.25vw), 3.625rem);
+}
+#top .shift-heading h3 {
+  font-size: clamp(2.25rem, calc(1.75rem + 2.35vw), 3.875rem);
+}
+#top .shift-mission h4 {
+  font-size: clamp(1.375rem, calc(1.2rem + .75vw), 1.875rem);
+}
+#top .shift-pillars h4 {
+  font-size: clamp(1.75rem, calc(1.5rem + 1.125vw), 2.5rem);
+}
+#top .selected-work .work-card h3 {
+  font-size: clamp(1.375rem, calc(1.2rem + .75vw), 1.875rem);
+}
+#top .selected-work :is(.work-card--practice, .work-card--radio) h3 {
+  font-size: clamp(1.375rem, calc(1.25rem + .5vw), 1.6875rem);
+}
+#top .principles h3 {
+  font-size: clamp(1.3125rem, calc(1.29rem + .1vw), 1.375rem);
+}
+#top .brand-story > summary strong {
+  font-size: clamp(1.25rem, calc(1.16rem + .4vw), 1.5rem);
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+  text-wrap: balance;
+}
+#top .brand-story-layout h3 {
+  font-size: clamp(1.75rem, calc(1.65rem + .4vw), 2rem);
+}
+#top .contact-intro h2 {
+  font-size: clamp(2.5rem, calc(2rem + 2.2vw), 4rem);
+}
+#top .contact-email {
+  font-size: clamp(1.5rem, calc(1.25rem + .98vw), 2.125rem);
+}
+#top .contact-options strong {
+  font-size: clamp(1.125rem, calc(1.125rem + .4vw), 1.5rem);
+}
+#top .faq-section h2 {
+  font-size: clamp(1.75rem, calc(1.7rem + .2vw), 1.875rem);
+}
+#top .question-intro h2 {
+  font-size: clamp(1.8125rem, calc(1.75rem + .3vw), 2rem);
+}
+#top :is(.company-note-copy, .contact-intro) p {
+  font-size: clamp(1rem, calc(.975rem + .1vw), 1.0625rem);
+}
+#top :is(.shift-pillars, .shift-mission) p {
+  font-size: clamp(.9375rem, calc(.91rem + .11vw), 1rem);
+}
+
+/* LAB has ID-based styles; retain that scope instead of using !important.
+   Small labels, curriculum numbers and interactive controls keep their own scale. */
+#top #lab.lab-bento { --lab-padding: var(--home-block); }
+#top #lab.lab-bento .lab-card--direction h3 {
+  font-size: clamp(2rem, calc(1.75rem + 1.4vw), 3rem);
+}
+#top #lab.lab-bento .lab-card__title {
+  font-size: clamp(1.5625rem, calc(1.4rem + .65vw), 2rem);
+}
+#top #lab.lab-bento .lab-card--scene figcaption p {
+  font-size: clamp(1.625rem, calc(1.45rem + .75vw), 2.125rem);
+}
+#top #lab.lab-bento .lab-tracker__panel blockquote {
+  font-size: clamp(1.1875rem, calc(1.08rem + .48vw), 1.5rem);
+}
+
+/* Major whitespace follows the same continuous rhythm. Small component spacing
+   and layout changes (columns, navigation, image composition) remain independent. */
+#top .shell {
+  width: min(calc(100% - var(--home-gutter) * 2), 82.5rem);
+}
+#top .introduction {
+  min-height: clamp(31.25rem, calc(22rem + 14vw), 40rem);
+  padding-block: 2.5rem var(--home-block);
+}
+#top .hero-actions { margin-top: var(--home-block); }
+#top .company-note,
+#top .company-note-inner,
+#top .contact-section,
+#top .faq-section { padding-block: var(--home-section); }
+#top :is(.company-note-inner, .pulse-layout, .brand-story-layout, .contact-intro) {
+  gap: var(--home-columns);
+}
+#top .principles { gap: var(--home-columns); }
+#top .worlds { padding-block: var(--home-chapter); }
+#top .worlds-heading { padding-bottom: var(--home-section); }
+#top .world-lab { padding-bottom: var(--home-section); }
+#top .world-shift {
+  margin-top: var(--home-chapter);
+  padding-block: 1.5rem var(--home-chapter);
+}
+#top .world-pulse { padding-top: var(--home-section); }
+#top .pulse-layout { padding-block: var(--home-block); }
+#top .shift-pillars > section,
+#top .shift-pillars > section + section {
+  padding: clamp(2rem, calc(1.8rem + .8vw), 2.5rem);
+}
+#top .making-note { padding: var(--home-block); }
+#top .selected-work { padding-block: var(--home-section) var(--home-chapter); }
+#top .selected-work .section-intro { margin-block: 1.5rem var(--home-block); }
+#top .selected-work .work-body { padding: var(--home-card-inset); }
+#top .work-design-note { padding-bottom: var(--home-section); }
+#top .contact-intro { padding-block: 2.5rem var(--home-section); }
+#top .questions-section { padding-bottom: var(--home-section); }
+
+/* A full-width printed sheet keeps the existing print layout contract. */
+@media print {
+  #top .shell { width: 100%; }
+}

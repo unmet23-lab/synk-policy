@@ -1,0 +1,118 @@
+/* Load after each detail page's own CSS. Existing fonts, color, artwork and behavior stay in that page. */
+body:is([data-page='practice'], [data-page='listen'], [data-page='letter']) {
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+}
+body:is([data-page='practice'], [data-page='listen'], [data-page='letter']) :is(h1, h2, h3, h4) {
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+  text-wrap: balance;
+}
+body:is([data-page='practice'], [data-page='listen'], [data-page='letter']) :is(p, li, dd, figcaption, blockquote, label, summary) {
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+  text-wrap: pretty;
+}
+body:is([data-page='practice'], [data-page='listen'], [data-page='letter']) :is(a, code) {
+  overflow-wrap: anywhere;
+}
+
+/* Practice: retain the article's 33–62px title and 48–72px section rhythm. */
+body[data-page='practice'] h1 { font-size: clamp(2.0625rem, 1.5rem + 2.75vw, 3.875rem); }
+body[data-page='practice'] h2 { font-size: clamp(1.8125rem, 1.6rem + 1vw, 2.5rem); }
+body[data-page='practice'] .step h3 { font-size: clamp(1.375rem, 1.35rem + .12vw, 1.4375rem); }
+body[data-page='practice'] .hero {
+  padding-block: clamp(2.875rem, 2.125rem + 3.75vw, 5.5rem) clamp(3rem, 2.425rem + 2.875vw, 5rem);
+  gap: clamp(2rem, 1.57rem + 2.15vw, 3.5rem);
+}
+body[data-page='practice'] .hero-description {
+  font-size: clamp(1rem, .965rem + .175vw, 1.125rem);
+  margin-top: clamp(1.375rem, 1.265rem + .55vw, 1.75rem);
+}
+body[data-page='practice'] .guide-section { padding-block: clamp(3rem, 2.57rem + 2.15vw, 4.5rem); }
+body[data-page='practice'] .section-heading {
+  gap: clamp(.875rem, .55rem + 1.625vw, 2rem);
+  margin-bottom: clamp(1.625rem, 1.515rem + .55vw, 2rem);
+}
+body[data-page='practice'] .request-layout { gap: clamp(1.5rem, .785rem + 3.575vw, 4rem); }
+body[data-page='practice'] .request-card-header {
+  flex-wrap: wrap;
+  padding: clamp(1rem, .925rem + .375vw, 1.25rem) clamp(1.25rem, 1.105rem + .725vw, 1.75rem);
+}
+body[data-page='practice'] .request-text {
+  padding: clamp(1.5rem, 1.355rem + .725vw, 2rem) clamp(1.375rem, 1.195rem + .9vw, 2rem);
+  font-size: clamp(.9375rem, .9rem + .1875vw, 1.0625rem);
+  white-space: pre-wrap;
+  word-break: normal;
+  overflow-wrap: anywhere;
+  text-wrap: wrap;
+}
+body[data-page='practice'] .blink-caption {
+  padding: clamp(1.25rem, 1.175rem + .375vw, 1.5rem) clamp(1.25rem, 1.07rem + .9vw, 1.875rem);
+}
+body[data-page='practice'] :is(.hero, .section-heading, .request-layout, .closing) > * { min-inline-size: 0; }
+
+/* Listen: interpolate the existing 40–66px heading and Loom 40–64px section spacing. */
+body[data-page='listen'] .listen-copy h1 { font-size: clamp(2.5rem, 2.035rem + 2.325vw, 4.125rem); }
+body[data-page='listen'] .listen-copy > p { font-size: clamp(1rem, .965rem + .175vw, 1.125rem); }
+body[data-page='listen'] .listen-copy p.listen-caption { font-size: .8125rem; }
+body[data-page='listen'] .listen-intro {
+  gap: clamp(2.5rem, 2.07rem + 2.15vw, 4rem);
+  padding-block: clamp(2.5rem, 2.07rem + 2.15vw, 4rem);
+}
+body[data-page='listen'] .listen-art { padding: clamp(1.5rem, 1.215rem + 1.425vw, 2.5rem); }
+body[data-page='listen'] .release-note {
+  gap: clamp(1.5rem, .785rem + 3.575vw, 4rem);
+  padding: clamp(1.5rem, 1.215rem + 1.425vw, 2.5rem);
+}
+body[data-page='listen'] .release-note h2 { font-size: clamp(1.75rem, 1.57rem + .9vw, 2.375rem); }
+body[data-page='listen'] .release-date { font-size: clamp(1.5rem, 1.465rem + .175vw, 1.625rem); }
+body[data-page='listen'] .listen-footer { padding-block: clamp(2.5rem, 2.07rem + 2.15vw, 4rem); }
+body[data-page='listen'] :is(.listen-intro, .release-note, .listen-footer) > * { min-inline-size: 0; }
+
+/* Letter: preserve the compact, dark writing room and its 33–52px introduction. */
+body[data-page='letter'] .intro {
+  padding-block: clamp(1.6875rem, 1.385rem + 1.515vw, 2.75rem) clamp(1.375rem, 1.265rem + .55vw, 1.75rem);
+  gap: clamp(1.25rem, 1.105rem + .725vw, 1.75rem);
+}
+body[data-page='letter'] .intro h1 { font-size: clamp(2.0625rem, 1.72rem + 1.7vw, 3.25rem); }
+body[data-page='letter'] :is(.section-heading h2, .situation h2) { font-size: clamp(1.4375rem, 1.4rem + .1875vw, 1.5625rem); }
+body[data-page='letter'] .reply-intro h2 { font-size: clamp(1.5625rem, 1.505rem + .2875vw, 1.75rem); }
+body[data-page='letter'] .guide-section { margin-block: clamp(1.875rem, 1.73rem + .725vw, 2.375rem) 2.125rem; }
+body[data-page='letter'] .professor-speech { padding: clamp(1.5rem, 1.425rem + .375vw, 1.75rem); }
+body[data-page='letter'] .professor-speech p:first-of-type { font-size: clamp(1.25rem, 1.215rem + .175vw, 1.375rem); }
+body[data-page='letter'] .sample-reply .professor-speech p:first-of-type { font-size: clamp(1.25rem, 1.23rem + .1vw, 1.3125rem); }
+body[data-page='letter'] .situation {
+  margin-top: clamp(1.75rem, 1.64rem + .55vw, 2.125rem);
+  padding-top: clamp(1.75rem, 1.675rem + .375vw, 2rem);
+}
+body[data-page='letter'] .strategies-section { margin-top: clamp(2rem, 1.855rem + .725vw, 2.5rem); }
+body[data-page='letter'] .selection {
+  padding: clamp(1.25rem, 1.14rem + .55vw, 1.625rem) clamp(1rem, .82rem + .9vw, 1.625rem);
+}
+body[data-page='letter'] .selection h3 { font-size: clamp(1.25rem, 1.215rem + .175vw, 1.375rem); }
+body[data-page='letter'] .writing-card {
+  padding: clamp(1.25rem, 1.105rem + .725vw, 1.75rem) clamp(1.0625rem, .865rem + .9875vw, 1.75rem);
+}
+body[data-page='letter'] .writing-card .primary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: .75rem;
+}
+body[data-page='letter'] .writing-card .primary span { margin-left: 0; flex: none; }
+body[data-page='letter'] .your-letter { padding: clamp(1.375rem, 1.3rem + .375vw, 1.625rem); }
+body[data-page='letter'] .footer {
+  margin-top: clamp(2.25rem, 2rem + 1.25vw, 3.125rem);
+  padding-block: clamp(1.4375rem, 1.345rem + .4625vw, 1.75rem) clamp(1.4375rem, 1.31rem + .6375vw, 1.875rem);
+}
+body[data-page='letter'] :is(.intro, .professor-row, .guides, .situation-row, .strategies, .selected-scene, .writing-layout, .writing-guide, .reply-layout) > * { min-inline-size: 0; }
+
+/* User text keeps its explicit newlines and spaces; only visual wrapping can change. */
+body[data-page='letter'] :is(.writing-card textarea, .letter-original) {
+  white-space: pre-wrap;
+  word-break: normal;
+  overflow-wrap: anywhere;
+  text-wrap: wrap;
+}
+body[data-page='letter'] .writing-card textarea { font-size: clamp(1.0625rem, 1.045rem + .0875vw, 1.125rem); }
