@@ -1,5 +1,5 @@
 {
-  "recipe": "Current canonical mascot to existing 640px diagnostic and 1000px cropped name assets; WebP92/alpha100.",
+  "recipe": "Current public mascot assets; existing diagnostic and name assets are retained.",
   "items": [
     {
       "file": "diag/assets/monggeul_base.webp",
@@ -37,6 +37,34 @@
         "height": 3062
       },
       "stale": false
+    },
+    {
+      "name": "mongle",
+      "file": "assets/mongle.webp",
+      "sha256": "9254de7e05f2701e8ab689656b04a8ec3db79b4d45e396a1e2eb864c31df57d0",
+      "width": 1000,
+      "height": 1000
+    },
+    {
+      "name": "kkamong",
+      "file": "assets/kkamong.webp",
+      "sha256": "5942c7c8418959eb384f981d191dcd6d60dc8ee5f5642c6942d526124ea52621",
+      "width": 1000,
+      "height": 1000
+    },
+    {
+      "name": "marin",
+      "file": "assets/marin.webp",
+      "sha256": "31869ed1b90ca87dc2ed3bc704d702cef9531d389614cd9aa602c08487b2ff0d",
+      "width": 1000,
+      "height": 1000
+    },
+    {
+      "name": "companions-scene",
+      "file": "assets/companions-scene.webp",
+      "sha256": "6660605af01da22b06968a8828dae5b16fedf290ae76fe8e14ab38752a1c144b",
+      "width": 1586,
+      "height": 992
     }
   ]
 }

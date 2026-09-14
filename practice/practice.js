@@ -1,4 +1,8 @@
 // The full guide and request remain available when this enhancement is unavailable.
+import('./blink-demo.js' + new URL(import.meta.url).search).then(module=>module.initBlinkDemo()).catch(()=>{
+  const status=document.querySelector('[data-blink-status]');
+  if(status)status.textContent='움직임을 불러오지 못해 원본을 보여드립니다.';
+});
 const button = document.querySelector('[data-copy-request]');
 const request = document.querySelector('#request-text');
 const feedback = document.querySelector('[data-copy-feedback]');

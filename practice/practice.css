@@ -49,6 +49,24 @@ h3{font-size:23px;line-height:1.4;font-weight:700;letter-spacing:-.04em}
 .comparison figcaption{padding:16px 4px 0;font-size:14px;color:var(--muted)}
 .comparison figcaption strong{display:block;font-size:17px;color:var(--ink);font-weight:650;margin-bottom:2px}
 .original-link{display:inline-flex;align-items:center;gap:8px;min-height:44px;margin-top:3px;font-size:12px}
+.blink-demo{background:var(--surface);border-radius:24px;overflow:hidden}
+.blink-stage{position:relative;max-width:650px;margin:0 auto;aspect-ratio:1;}
+.blink-stage img,.blink-stage canvas{display:block;width:100%;height:auto;aspect-ratio:1;object-fit:contain;padding:18px}
+.blink-stage .figure-tag{left:30px;top:24px}
+.blink-caption{border-top:1px solid var(--line);padding:24px 30px;display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap}
+.blink-caption strong{font-size:20px;letter-spacing:-.04em}
+.blink-caption p{font-size:13px;color:var(--muted);margin-top:5px;min-height:23px}
+.blink-controls{display:flex;flex-wrap:wrap;gap:8px}
+.blink-controls button{min-height:44px;border:1px solid #b6afa5;border-radius:100px;padding:10px 16px;background:transparent;color:var(--ink);font-size:13px;line-height:1.4;transition:background .16s,color .16s}
+.blink-controls button:hover,.blink-controls button[aria-pressed=true]{background:var(--ink);border-color:var(--ink);color:var(--paper)}
+.process-details{margin-top:28px;border-bottom:1px solid var(--line)}
+.process-details summary{cursor:pointer;list-style:none;display:flex;justify-content:space-between;align-items:center;gap:20px;min-height:64px;font-size:15px;font-weight:650}
+.process-details summary::-webkit-details-marker{display:none}
+.process-details summary span{font-size:22px;color:var(--blue);font-weight:400}
+.process-details[open] summary span{transform:rotate(45deg)}
+.process-details .comparison{max-width:740px;padding-top:8px;margin:0 auto}
+.process-note{font-size:13px;color:var(--muted);max-width:740px;margin:14px auto 28px}
+@media(max-width:640px){.blink-stage img,.blink-stage canvas{padding:6px}.blink-stage .figure-tag{top:16px;left:16px}.blink-caption{padding:20px;gap:16px}.blink-caption strong{font-size:19px}.blink-caption p{font-size:12px}.blink-controls{gap:7px}.blink-controls button{font-size:12px;padding:10px 12px}.process-details summary{font-size:14px}.process-note{font-size:12px}.blink-stage{margin-top:20px}}
 .comparison-note{display:grid;grid-template-columns:1fr 1fr;gap:28px;margin-top:28px;padding:28px 0 0;border-top:1px solid var(--line)}
 .comparison-note p{font-size:14px;color:var(--muted)}
 .comparison-note strong{font-weight:650;color:var(--ink)}

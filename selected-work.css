@@ -16,7 +16,6 @@
 .selected-work .work-visual img { mix-blend-mode: normal; max-width: 100%; width: 100%; transition: transform 350ms var(--ease); }
 .selected-work .letter-visual { aspect-ratio: 1672 / 941; }
 .selected-work .letter-visual img { height: 100%; object-fit: cover; }
-.experience-tag { position: absolute; top: var(--단); left: var(--단); background: var(--synk-paper); color: var(--synk-ink); padding: var(--틈) var(--참); border-radius: var(--틈); font-size: 12px; line-height: 1.5; }
 .visual-open { position: absolute; bottom: var(--단); right: var(--단); display: grid; place-items: center; width: 44px; height: 44px; border-radius: 50%; background: var(--synk-paper); font-size: 24px; }
 .selected-work .work-body { padding: var(--단); display: flex; flex-direction: column; flex: 1; min-width: 0; }
 .selected-work .work-meta { margin-top: 0; gap: var(--참); flex-wrap: wrap; }
@@ -59,7 +58,6 @@
   .selected-work .section-intro h2 { font-size: 34px; }
   .selected-work .section-intro p { font-size: 15px; }
   .selected-work .work-body { padding: var(--단); }
-  .experience-tag { top: var(--참); left: var(--참); font-size: 10px; padding: var(--틈); }
   .visual-open { bottom: var(--참); right: var(--참); width: 40px; height: 40px; }
   .selected-work :is(.work-card--practice,.work-card--radio) { grid-template-columns: minmax(0,1fr); }
   .selected-work :is(.practice-visual,.radio-visual) { height: 200px; }
