@@ -33,24 +33,7 @@ export function initScrollExperience({gsap,ScrollTrigger,reducedMotion=false}={}
       for(const object of document.querySelectorAll('.learning-scene > [data-felt],.pulse-scene > [data-felt]')){
         gsap.fromTo(object,{y:6},{y:-6,ease:'none',scrollTrigger:{trigger:object.parentElement,start:'top bottom',end:'bottom top',scrub:.6}});
       }
-      const heading=document.querySelector('#hero-title');
-      if(heading){
-        // Keep the original text nodes, spaces, emphasis and accessible name intact.
-        const walker=document.createTreeWalker(heading,NodeFilter.SHOW_TEXT);
-        const nodes=[];while(walker.nextNode())nodes.push(walker.currentNode);
-        for(const node of nodes){
-          const fragment=document.createDocumentFragment();
-          for(const word of node.textContent.split(/(\s+)/)){
-            if(!word)continue;
-            if(/^\s+$/.test(word))fragment.append(document.createTextNode(word));
-            else {const span=document.createElement('span');span.className='kinetic-word';span.textContent=word;fragment.append(span);}
-          }
-          node.replaceWith(fragment);
-        }
-        if(heading.getBoundingClientRect().bottom>0&&heading.getBoundingClientRect().top<innerHeight){
-          gsap.from(heading.querySelectorAll('.kinetic-word'),{y:16,opacity:.4,duration:.65,stagger:.055,ease:'power2.out',clearProps:'transform,opacity'});
-        }
-      }
+
     }
   });
   const refresh=()=>{cancelAnimationFrame(refreshFrame);refreshFrame=requestAnimationFrame(()=>{ScrollTrigger.refresh();refreshFrame=0;});};
@@ -77,7 +60,5 @@ export function initScrollExperience({gsap,ScrollTrigger,reducedMotion=false}={}
     document.querySelectorAll('[data-reveal]').forEach(target=>{
       gsap.killTweensOf(target);target.style.removeProperty('opacity');target.style.removeProperty('--reveal-y');target.removeAttribute('data-reveal');
     });
-    document.querySelectorAll('#hero-title .kinetic-word').forEach(span=>span.replaceWith(document.createTextNode(span.textContent)));
-    document.querySelector('#hero-title')?.normalize();
   };
 }

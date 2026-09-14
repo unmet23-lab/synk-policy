@@ -1,0 +1,65 @@
+/* A single, bounded first entrance. The page remains ordinary HTML without JS. */
+[data-enter] { translate: 0 var(--entry-y, 0px); }
+.entry-pending [data-enter] { opacity: 0; --entry-y: 12px; }
+.hero-meta [data-time-greeting] { min-block-size: 1.5em; }
+
+/* Ink outside / Paper inside stays visible on both light and dark surfaces.
+   Keep outlines immediate, including programmatic step focus. */
+body[data-page] :is(a, button, input, textarea, select, summary, [tabindex]:not([tabindex="-1"])):focus-visible {
+  outline: 2px solid var(--synk-ink, #292320);
+  outline-offset: 5px;
+  box-shadow: 0 0 0 5px var(--synk-paper, #fbf7f0);
+}
+body[data-page] :is(.company-note, .site-footer, .request-card, dialog) :focus-visible,
+body[data-page="letter"] :is(a, button, input, textarea, select, summary, [tabindex]:not([tabindex="-1"])):focus-visible {
+  outline-color: var(--synk-stitch, #cdbba7);
+  box-shadow: 0 0 0 5px var(--synk-ink-deep, #080605);
+}
+body[data-page] :is(.skip, .skip-link):focus-visible { z-index: 200; }
+
+.sonic-toggle {
+  position: fixed;
+  z-index: 40;
+  inset: auto max(16px, env(safe-area-inset-right)) max(16px, env(safe-area-inset-bottom)) auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-block-size: 44px;
+  min-inline-size: 44px;
+  padding: 9px 13px;
+  border: 1px solid color-mix(in srgb, var(--synk-ink, #292320) 18%, transparent);
+  border-radius: 100px;
+  background: var(--synk-paper, #fbf7f0);
+  color: var(--synk-ink, #292320);
+  box-shadow: 0 2px 12px color-mix(in srgb, var(--synk-ink, #292320) 7%, transparent);
+  font: 500 12px/1.4 SUIT, sans-serif;
+  letter-spacing: -.02em;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+.sonic-toggle svg { inline-size: 17px; block-size: 17px; flex-shrink: 0; }
+.sonic-toggle__label { display:none; }
+.sonic-toggle[aria-pressed="true"] { border-color: var(--synk-ink, #292320); }
+body[data-page="letter"] { padding-bottom: 64px; }
+body[data-page="home"] .footer,
+body[data-page="practice"] .site-footer,
+body[data-page="listen"] .listen-copyright { padding-bottom: 80px; }
+@media (hover:hover) and (pointer:fine) {
+  .sonic-toggle:hover { background: var(--synk-oat, #ece5d9); }
+}
+@media (max-width:760px) {
+  .hero-meta { flex-wrap: wrap; gap: 7px; }
+  .hero-meta [data-time-greeting] { display: block; flex-basis: 100%; font-size: 11px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-enter], .entry-pending [data-enter] { opacity: 1 !important; translate: none !important; }
+}
+@media (forced-colors: active) {
+  body[data-page] :focus-visible { outline: 2px solid Highlight; box-shadow:none; }
+  .sonic-toggle { border:1px solid ButtonText; }
+}
+@media print {
+  [data-enter], .entry-pending [data-enter] { opacity:1 !important; translate:none !important; }
+  .sonic-toggle { display:none; }
+}

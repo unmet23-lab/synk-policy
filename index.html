@@ -5,29 +5,56 @@
 <meta name="description" content="한계를 지우고, 삶의 본질에 집중하는 미래. 기술이 빚어낸 무한한 가능성을 배움과 일, 그리고 문화로 연결합니다.">
 <meta property="og:title" content="SYNK — 한계를 지우고, 삶의 본질에 집중하는 미래."><meta property="og:description" content="기술이 빚어낸 무한한 가능성을 배움과 일, 그리고 문화로 연결합니다."><meta property="og:type" content="website"><meta property="og:url" content="https://synk.im/">
 <link rel="canonical" href="https://synk.im/"><title>SYNK — 한계를 지우고, 삶의 본질에 집중하는 미래.</title>
-<meta property="og:image" content="https://synk.im/assets/companions-scene.webp?v=20260915-felt-smiles"><meta property="og:image:width" content="1586"><meta property="og:image:height" content="992"><meta property="og:image:alt" content="함께 모인 SYNK의 세 친구, 몽글·까몽·마린"><meta name="twitter:card" content="summary_large_image">
+<meta property="og:image" content="https://synk.im/assets/companions-scene.webp?v=20260915-calm-marin"><meta property="og:image:width" content="1586"><meta property="og:image:height" content="992"><meta property="og:image:alt" content="함께 모인 SYNK의 세 친구, 몽글·까몽·마린"><meta name="twitter:card" content="summary_large_image">
 <link rel="icon" type="image/svg+xml" href="/assets/synk-precision.svg?v=20260910-story"><link rel="preload" href="/assets/suit.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/assets/brand-tokens.css?v=20260914"><link rel="stylesheet" href="/assets/loom.css?v=20260914"><link rel="stylesheet" href="/style.css?v=2026-09-15-selected-experiences-copy-ec601a6fca"><script type="module" src="/app.js?v=2026-09-15-selected-experiences-copy-ec601a6fca"></script>
 <noscript><style>.menu-toggle{display:none!important}.header nav{display:flex!important}</style></noscript><link rel="stylesheet" href="/experience.css?v=20260915-felt"><link rel="stylesheet" href="/lab-bento.css?v=20260915-felt"><link rel="stylesheet" href="/felt-interactions.css?v=20260915-felt">
-<script type="module" src="/experience.js?v=20260915-felt"></script>
+<script type="module" src="/experience.js?v=20260915-presence"></script>
 <link rel="stylesheet" href="/selected-work.css?v=20260915-felt">
 <link rel="stylesheet" href="/felt-surfaces.css?v=20260915-felt">
-<link rel="stylesheet" href="/type-rhythm.css?v=20260915-micro">
-<link rel="stylesheet" href="/micro-finish.css?v=20260915-micro">
+
+<link rel="preload" href="/assets/companions-scene.webp?v=20260915-calm-marin" as="image" fetchpriority="high">
+<link rel="stylesheet" href="/type-rhythm.css?v=20260915-presence">
+<link rel="stylesheet" href="/micro-finish.css?v=20260915-presence">
+<link rel="stylesheet" href="/presence.css?v=20260915-presence">
+<script type="module" src="/finish.js?v=20260915-presence"></script>
+<script id="synk-entry-boot">// Tiny, parser-time enhancement. No JS or a failed module always leaves a readable page.
+(() => {
+  const root = document.documentElement;
+  const preference = matchMedia('(prefers-reduced-motion: reduce)');
+  if (preference.matches || (location.hash && location.hash !== '#top') ||
+      performance.getEntriesByType('navigation')[0]?.type === 'back_forward') return;
+  let timer;
+  const events = ['keydown', 'pointerdown', 'wheel', 'touchstart', 'pagehide'];
+  const finish = () => {
+    clearTimeout(timer);
+    root.classList.remove('entry-pending');
+    for (const type of events) window.removeEventListener(type, finish, true);
+    preference.removeEventListener('change', finish);
+    window.dispatchEvent(new Event('synk:entry-finish'));
+    window.synkEntry = null;
+  };
+  window.synkEntry = {finish};
+  root.classList.add('entry-pending');
+  for (const type of events) window.addEventListener(type, finish, {capture:true, passive:true});
+  preference.addEventListener('change', finish);
+  timer = setTimeout(finish, 1800);
+})();
+</script>
 </head>
 <body data-page="home">
 <a class="skip" href="#top">본문으로 바로 가기</a>
 <header class="header shell">
-<a class="wordmark" href="#top" aria-label="SYNK 처음으로"><img src="/assets/brand-synk.webp?v=20260910-story" alt="SYNK" width="744" height="360" fetchpriority="high"></a><p class="header-note">배움 · 일 · 문화</p>
-<button class="menu-toggle" type="button" aria-expanded="false" aria-controls="main-nav">메뉴 <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 8h16M4 16h16" stroke="currentColor" stroke-width="1.5"/></svg></button>
-<nav id="main-nav" aria-label="주요 메뉴"><a href="#philosophy">회사 소개</a><a href="#worlds">하는 일</a><a href="#work">직접 만나보기</a><a href="#contact" class="nav-contact">문의 <span aria-hidden="true">↗</span></a></nav>
+<a class="wordmark" data-enter="brand" href="#top" aria-label="SYNK 처음으로"><img src="/assets/brand-synk.webp?v=20260910-story" alt="SYNK" width="744" height="360" fetchpriority="high"></a><p class="header-note" data-enter="navigation">배움 · 일 · 문화</p>
+<button class="menu-toggle" data-enter="navigation" type="button" aria-expanded="false" aria-controls="main-nav">메뉴 <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 8h16M4 16h16" stroke="currentColor" stroke-width="1.5"/></svg></button>
+<nav id="main-nav" data-enter="navigation" aria-label="주요 메뉴"><a href="#philosophy">회사 소개</a><a href="#worlds">하는 일</a><a href="#work">직접 만나보기</a><a href="#contact" class="nav-contact">문의 <span aria-hidden="true">↗</span></a></nav>
 </header>
 <main id="top" tabindex="-1">
 <section class="hero shell" aria-labelledby="hero-title">
-<div class="hero-meta"><span class="eyebrow">SYNK — LEARNING, WORK & CULTURE</span><span class="edition">한 사람에서 시작되는 가능성</span></div>
+<div class="hero-meta" data-enter="copy"><span class="eyebrow">SYNK — LEARNING, WORK & CULTURE</span><span class="edition" data-time-greeting>한 사람에서 시작되는 가능성</span></div>
 <div id="hero-introduction" class="introduction">
-<div class="hero-copy"><h1 id="hero-title" data-vision-headline="synk">한계를 지우고, <span>삶의 본질에</span> 집중하는 미래.</h1><p data-vision-subtext="synk">기술이 빚어낸 무한한 가능성을 배움과 일, 그리고 문화로 연결합니다.</p><div class="hero-actions"><a class="primary-link" href="#worlds">SYNK가 하는 일 <span aria-hidden="true">↘</span></a><a class="quiet-link" href="#work">직접 만나보기 <span aria-hidden="true">↗</span></a></div></div>
-<figure class="companions"><img class="companions-scene" data-synk-mascot="companions" src="/assets/companions-scene.webp?v=20260915-felt-smiles" alt="포근한 펠트 바닥에 모인 세 친구. 눈웃음 짓는 몽글, 초록 눈의 까몽, 노란 꽃눈의 마린." width="1586" height="992" fetchpriority="high"><figcaption><span class="eyebrow">A LITTLE CLOSER, TO YOUR WORLD.</span><span>몽글 · 까몽 · 마린</span></figcaption></figure>
+<div class="hero-copy"><h1 id="hero-title" data-enter="copy" data-vision-headline="synk">한계를 지우고, <span>삶의 본질에</span> 집중하는 미래.</h1><p data-vision-subtext="synk" data-enter="copy">기술이 빚어낸 무한한 가능성을 배움과 일, 그리고 문화로 연결합니다.</p><div class="hero-actions" data-enter="actions"><a class="primary-link" href="#worlds">SYNK가 하는 일 <span aria-hidden="true">↘</span></a><a class="quiet-link" href="#work">직접 만나보기 <span aria-hidden="true">↗</span></a></div></div>
+<figure class="companions" data-enter="image"><img class="companions-scene" data-synk-mascot="companions" src="/assets/companions-scene.webp?v=20260915-calm-marin" alt="포근한 펠트 바닥에 모인 세 친구. 눈웃음 짓는 몽글, 초록 눈의 까몽, 차분한 반눈의 마린." width="1586" height="992" fetchpriority="high"><figcaption><span class="eyebrow">A LITTLE CLOSER, TO YOUR WORLD.</span><span>몽글 · 까몽 · 마린</span></figcaption></figure>
 </div>
 <nav class="world-directory" aria-label="사업 바로가기"><a href="#lab"><span class="directory-number" aria-hidden="true"></span><div><strong>배움과 경험</strong><span>SYNK LAB</span></div><span class="directory-arrow" aria-hidden="true">↘</span></a><a href="#shift"><span class="directory-number" aria-hidden="true"></span><div><strong>일과 기회</strong><span>SYNK SHIFT</span></div><span class="directory-arrow" aria-hidden="true">↘</span></a><a href="#pulse"><span class="directory-number" aria-hidden="true"></span><div><strong>음악과 이야기</strong><span>SYNK PULSE</span></div><span class="directory-arrow" aria-hidden="true">↘</span></a></nav>
 </section>
