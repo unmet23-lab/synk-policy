@@ -1,0 +1,71 @@
+/* A few complete experiences, close enough to discover and clear enough to choose. */
+.selected-work { padding-block: var(--장) var(--막); }
+.selected-work .section-kicker { padding-top: var(--단); border-top: 1px solid var(--line); }
+.selected-work .section-intro { margin-block: var(--단) var(--켜); }
+.selected-work .section-intro h2 { font-size: clamp(32px,3.4vw,50px); line-height: 1.25; }
+.selected-work .section-intro p { max-width: 370px; }
+.selected-grid { grid-template-columns: minmax(0,7fr) minmax(0,5fr); gap: var(--단); }
+.selected-work .work-card {
+  border-radius: var(--단); overflow: hidden; background: var(--synk-paper); color: var(--synk-ink);
+  box-shadow: 0 1px 3px rgba(43,35,32,.05), inset 0 0 0 1px rgba(43,35,32,.12);
+  transition: box-shadow 240ms var(--ease), transform 240ms var(--ease);
+}
+.selected-work .work-card:focus-visible { outline-offset: 6px; }
+.selected-work .work-card--letter { grid-row: span 2; }
+.selected-work .work-visual { position: relative; height: auto; min-width: 0; border-radius: 0; }
+.selected-work .work-visual img { mix-blend-mode: normal; max-width: 100%; width: 100%; transition: transform 350ms var(--ease); }
+.selected-work .letter-visual { aspect-ratio: 1672 / 941; }
+.selected-work .letter-visual img { height: 100%; object-fit: cover; }
+.experience-tag { position: absolute; top: var(--단); left: var(--단); background: var(--synk-paper); color: var(--synk-ink); padding: var(--틈) var(--참); border-radius: var(--틈); font-size: 12px; line-height: 1.5; }
+.visual-open { position: absolute; bottom: var(--단); right: var(--단); display: grid; place-items: center; width: 44px; height: 44px; border-radius: 50%; background: var(--synk-paper); font-size: 24px; }
+.selected-work .work-body { padding: var(--단); display: flex; flex-direction: column; flex: 1; min-width: 0; }
+.selected-work .work-meta { margin-top: 0; gap: var(--참); flex-wrap: wrap; }
+.selected-work .work-meta > span { font-size: 11px; color: var(--muted); }
+.selected-work .work-meta .work-format { font-size: 12px; }
+.selected-work .work-card h3 { font-size: clamp(22px,2.05vw,30px); margin-top: var(--참); line-height: 1.35; text-wrap: pretty; }
+.selected-work .work-body > p { margin-block: var(--참) var(--단); font-size: 15px; line-height: 1.8; color: var(--muted); }
+.selected-work .work-action { display: flex; align-items: center; justify-content: space-between; gap: var(--참); min-height: 44px; padding-block: var(--참) 0; border: 0; border-top: 1px solid var(--line); font-size: 14px; font-weight: 600; }
+.selected-work .work-action > span { font-size: 20px; }
+.selected-work :is(.work-card--practice,.work-card--radio) { display: grid; grid-template-columns: minmax(0,2fr) minmax(0,3fr); }
+.selected-work :is(.work-card--practice,.work-card--radio) h3 { font-size: clamp(22px,1.75vw,27px); }
+.selected-work :is(.work-card--practice,.work-card--radio) .work-body > p { font-size: 14px; }
+.selected-work .radio-visual img { padding: var(--칸); height: 100%; max-height: 280px; object-fit: contain; }
+.practice-visual { background: var(--synk-lapis-soft); padding: var(--칸); }
+.selected-work .practice-visual img { width: 100%; height: 100%; object-fit: contain; }
+.practice-label { position: absolute; bottom: var(--참); left: var(--참); right: var(--참); text-align: center; font-size: 11px; line-height: 1.5; color: var(--synk-lapis-deep); }
+.work-design-note { padding-bottom: var(--장); }
+.work-design-note .brand-story { margin-top: 0; }
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  .selected-work .work-card:hover { transform: translateY(-4px); box-shadow: 0 12px 30px rgba(43,35,32,.09), inset 0 0 0 1px rgba(43,35,32,.13); }
+  .selected-work .work-card:hover .work-action { text-decoration: none; }
+  .selected-work .work-card:active { transform: translateY(-1px); }
+}
+@media (max-width: 1100px) {
+  .selected-grid { grid-template-columns: minmax(0,1fr) minmax(0,1fr); }
+  .selected-work :is(.work-card--practice,.work-card--radio) { grid-template-columns: minmax(0,1fr) minmax(0,2fr); }
+  .selected-work .work-body { padding: var(--칸); }
+  .practice-visual { padding-inline: var(--틈); }
+}
+@media (max-width: 820px) {
+  .selected-grid { grid-template-columns: minmax(0,1fr); }
+  .selected-work .work-card--letter { grid-row: auto; }
+  .selected-work :is(.work-card--practice,.work-card--radio) { grid-template-columns: minmax(0,2fr) minmax(0,3fr); }
+  .selected-work .work-body { padding: var(--단); }
+  .practice-visual { padding: var(--단); }
+}
+@media (max-width: 480px) {
+  .selected-work { padding-block: var(--켜) var(--장); }
+  .selected-work .section-intro { gap: var(--칸); margin-bottom: var(--단); }
+  .selected-work .section-intro h2 { font-size: 34px; }
+  .selected-work .section-intro p { font-size: 15px; }
+  .selected-work .work-body { padding: var(--단); }
+  .experience-tag { top: var(--참); left: var(--참); font-size: 10px; padding: var(--틈); }
+  .visual-open { bottom: var(--참); right: var(--참); width: 40px; height: 40px; }
+  .selected-work :is(.work-card--practice,.work-card--radio) { grid-template-columns: minmax(0,1fr); }
+  .selected-work :is(.practice-visual,.radio-visual) { height: 200px; }
+  .selected-work .radio-visual img { width: auto; max-height: 190px; }
+  .practice-visual { padding: var(--단) var(--켜); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .selected-work .work-card:hover,.selected-work .work-card:active,.selected-work .work-card:hover .work-visual img { transform: none; }
+}

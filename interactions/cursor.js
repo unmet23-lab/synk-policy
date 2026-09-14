@@ -10,7 +10,7 @@ export function initContextCursor({gsap,reducedMotion=false}={}){
     if(reducedMotion||!fine.matches||event.pointerType!=='mouse'||document.querySelector('dialog[open]'))return hide();
     const next=event.target.closest?.('.work-card,.lab-volumes summary,[data-felt]');
     if(!next)return hide();
-    if(target!==next){target=next;ring.textContent=next.matches('[data-felt]')?'눌러보기':next.matches('summary')?'펼쳐보기':'Explore';}
+    if(target!==next){target=next;ring.textContent=next.matches('[data-felt]')?'눌러보기':next.matches('summary')?'펼쳐보기':next.dataset.cursorLabel||'Explore';}
     ring.style.left=Math.min(event.clientX+18,innerWidth-78)+'px';
     ring.style.top=Math.min(event.clientY+18,innerHeight-78)+'px';
     ring.classList.add('is-visible');

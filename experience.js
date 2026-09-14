@@ -1,8 +1,8 @@
 // Independent enhancements. The semantic page and native controls work without GSAP.
-import {initLearningInteractions} from './interactions/learning.js?v=20260915-highend';
-import {initFeltInteractions} from './interactions/felt.js?v=20260915-highend';
-import {initScrollExperience} from './interactions/scroll.js?v=20260915-highend';
-import {initContextCursor} from './interactions/cursor.js?v=20260915-highend';
+import {initLearningInteractions} from './interactions/learning.js?v=20260915-selected';
+import {initFeltInteractions} from './interactions/felt.js?v=20260915-selected';
+import {initScrollExperience} from './interactions/scroll.js?v=20260915-selected';
+import {initContextCursor} from './interactions/cursor.js?v=20260915-selected';
 
 let gsap, ScrollTrigger;
 const loadClassicScript=src=>new Promise((resolve,reject)=>{

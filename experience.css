@@ -8,6 +8,19 @@ p { text-wrap: pretty; }
 .hero-copy h1 .kinetic-word { display: inline-block; color: inherit; }
 .hero-copy h1 > span:not(.kinetic-word) { color: var(--synk-coral-3); }
 .hero-copy > p { line-height: 1.85; letter-spacing: -.025em; }
+/* Shared Oat felt makes a quiet home for the three friends; the image stays intact. */
+.companions {
+  position: relative; isolation: isolate; padding: var(--칸); border-radius: var(--켜);
+  background: var(--synk-oat) url('/assets/felt-oat.webp') repeat;
+  background-size: 240px 240px;
+  box-shadow: inset 0 1px 4px rgba(251,247,240,.8), inset 0 -2px 5px rgba(43,35,32,.06), 0 8px 28px rgba(43,35,32,.05);
+}
+.companions::before {
+  content: ''; position: absolute; inset: var(--틈); z-index: -1; border-radius: calc(var(--켜) - var(--틈));
+  background: var(--synk-paper); box-shadow: 0 0 9px 5px var(--synk-paper);
+}
+.companions-scene { border-radius: var(--단); }
+.companions figcaption { padding: var(--칸) var(--틈) var(--틈); }
 
 /* Opaque first; glass is an enhancement, kept off the reading surface of cards. */
 .header.shell {

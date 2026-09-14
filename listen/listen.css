@@ -1,0 +1,40 @@
+.listen-header { min-height: 96px; display: flex; justify-content: space-between; align-items: center; gap: var(--단); border-bottom: 1px solid var(--line); }
+.listen-back { display: inline-flex; align-items: center; gap: var(--참); min-height: 44px; font-size: 14px; }
+.listen-header img { width: 165px; height: auto; }
+.listen-intro { display: grid; grid-template-columns: 1fr 1fr; align-items: center; gap: var(--장); padding-block: var(--장); }
+.listen-art { display: flex; flex-direction: column; align-items: center; background: var(--synk-ink); color: var(--synk-paper); border-radius: var(--단); padding: var(--켜); }
+.listen-art img { width: 76%; height: 420px; object-fit: contain; }
+.listen-art .eyebrow { padding-top: var(--단); }
+.listen-copy h1 { font-size: clamp(40px,4.5vw,66px); line-height: 1.2; margin-block: var(--단); }
+.listen-copy > p { color: var(--muted); font-size: 18px; line-height: 1.85; }
+.listen-copy .primary-link { margin-top: var(--켜); }
+.listen-copy p.listen-caption { max-width: 370px; margin-top: var(--칸); font-size: 13px; }
+.release-note { display: grid; grid-template-columns: 1fr 1fr; align-items: start; gap: var(--장); background: var(--synk-oat); border-radius: var(--단); padding: var(--켜); }
+.release-note h2 { font-size: clamp(28px,2.6vw,38px); margin-top: var(--칸); line-height: 1.4; }
+.release-date { font-size: 26px; font-weight: 700; line-height: 1.6; }
+.release-date span { display: inline-block; font-size: 16px; font-weight: 500; margin-left: var(--틈); }
+.release-platforms { display: flex; flex-wrap: wrap; gap: var(--참); list-style: none; padding: 0; margin-block: var(--단); }
+.release-platforms li { border: 1px solid var(--line); padding: var(--틈) var(--참); border-radius: var(--틈); font-size: 14px; }
+.release-description { color: var(--muted); font-size: 15px; line-height: 1.85; }
+.listen-footer { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: var(--단); padding-block: var(--장); }
+.listen-footer p { color: var(--muted); }
+.listen-copyright { display: flex; flex-wrap: wrap; justify-content: space-between; gap: var(--칸); padding-block: var(--단); border-top: 1px solid var(--line); font-size: 12px; color: var(--muted); }
+.listen-copyright a { min-height: 44px; }
+@media(max-width: 760px) {
+  .listen-header { min-height: 80px; }
+  .listen-header img { width: 128px; }
+  .listen-intro { grid-template-columns: 1fr; gap: var(--켜); padding-block: var(--켜); }
+  .listen-copy { grid-row: 1; }
+  .listen-copy h1 { font-size: clamp(40px,7.5vw,56px); }
+  .listen-copy > p { font-size: 16px; }
+  .listen-art img { height: 320px; }
+  .release-note { grid-template-columns: 1fr; gap: var(--단); padding: var(--단); }
+  .release-date { font-size: 24px; }
+  .release-date span { display: block; margin-left: 0; }
+  .listen-footer { padding-block: var(--켜); }
+}
+@media(max-width: 360px) {
+  .listen-header img { width: 110px; }
+  .listen-back { font-size: 12px; }
+  .release-platforms { gap: var(--틈); }
+}
