@@ -23,6 +23,7 @@ export function initScrollExperience({gsap,ScrollTrigger,reducedMotion=false}={}
       // Only decorative movement; opacity never drops to zero and focus cancels reveals.
       const revealTargets=document.querySelectorAll('.world-heading,.worlds-heading,.lab-card,.shift-heading,.shift-mission,.shift-pillars > section,.making-note,.pulse-layout,.pulse-formats,.section-intro,.work-card,.company-note-inner,.principles');
       for(const target of revealTargets){
+        if(target.matches('.lab-card--curriculum,.lab-card--tracking'))continue;
         target.setAttribute('data-reveal','');
         triggers.push(ScrollTrigger.create({trigger:target,start:'top 92%',once:true,onEnter:()=>{
           if(completed.has(target))return;

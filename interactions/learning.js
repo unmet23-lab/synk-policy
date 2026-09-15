@@ -1,6 +1,6 @@
 /**
  * LAB's progressive enhancements.
- * - The curriculum uses native <details>; it works without this module.
+ * - The curriculum is fully readable without this module.
  * - Every example panel is initially visible. Only a complete tab controller hides panels.
  * - All changing states are illustrative, never student data or learning scores.
  * - GSAP is optional and only draws the explanatory path for pointer actions.
@@ -34,6 +34,7 @@ export function initLearningInteractions({ gsap, reducedMotion = false, initialI
 
   const cleanups = [];
   let currentTween = null;
+  let panelAnimation = null;
   let layoutFrame = 0;
   let disposed = false;
   const listen = (element, event, listener) => {
@@ -46,9 +47,6 @@ export function initLearningInteractions({ gsap, reducedMotion = false, initialI
       if (!disposed) document.dispatchEvent(new CustomEvent('synk:layout'));
     });
   };
-
-  // Native Enter/Space behavior and the no-JS reading path remain untouched.
-  for (const detail of root.querySelectorAll('.lab-volume details')) listen(detail, 'toggle', notifyLayout);
 
   const demo = root.querySelector('[data-learning-demo]');
   const tablist = demo?.querySelector('[data-learning-tabs]');
@@ -97,6 +95,8 @@ export function initLearningInteractions({ gsap, reducedMotion = false, initialI
         return;
       }
       selectedIndex = index;
+      panelAnimation?.cancel();
+      panelAnimation = null;
       tabs.forEach((tab, position) => {
         const selected = position === index;
         tab.setAttribute('aria-selected', String(selected));
@@ -112,6 +112,13 @@ export function initLearningInteractions({ gsap, reducedMotion = false, initialI
         if (value) status.textContent = value;
       });
       drawConnection(index, animate);
+      if (animate && !motionIsReduced(reducedMotion) && panels[index].animate) {
+        // The whole example is available immediately. No fake typing or AI progress.
+        try { panelAnimation = panels[index].animate(
+          [{opacity:.55,transform:'translateY(5px)'},{opacity:1,transform:'translateY(0)'}],
+          {duration:180,easing:'cubic-bezier(.2,0,0,1)'}
+        ); } catch { /* Static selection is already complete. */ }
+      }
       if (focus) tabs[index].focus({ preventScroll: true });
       notifyLayout();
     }
@@ -154,6 +161,7 @@ export function initLearningInteractions({ gsap, reducedMotion = false, initialI
     disposed = true;
     cancelAnimationFrame(layoutFrame);
     currentTween?.kill();
+    panelAnimation?.cancel();
     for (const restore of cleanups.reverse()) restore();
     activeInstances.delete(root);
   };
