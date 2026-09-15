@@ -99,7 +99,8 @@ SYNK LAB의 교재는 문법을 다루는 시냅스 코어 6권과 회화를 다
 
 - [Corporate homepage](https://synk.im/)
 - [Public company notes](https://synk.im/knowledge.json)
-- [My name in Korean](https://synk.im/name/)
+- [Korean email writing experience](https://synk.im/try/letter/)
+- [Web enquiry form](https://synk.im/#contact-web)
 - [Privacy policy](https://synk.im/privacy/)
 - [Terms](https://synk.im/terms/)
 - [Data deletion](https://synk.im/data-deletion/)
@@ -110,7 +111,7 @@ SYNK LAB의 교재는 문법을 다루는 시냅스 코어 6권과 회화를 다
 
 ## Public scope
 
-Current company and service information is maintained in the reviewed public notes above. The name experience has its own on-page guidance; it is not an official document translation service.
+Current company and service information is maintained in the reviewed public notes above. The letter-writing experience is a public self-review exercise, not an automated grading service. Web enquiries are submitted through a separate Google Form; the public question guide does not receive enquiries.
 
 ## Contact
 
