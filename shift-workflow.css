@@ -1,0 +1,51 @@
+/* SHIFT's process uses the existing paper, ink and lapis tokens. */
+.world-shift .shift-workflow {
+  margin-top: clamp(2.5rem,5vw,5rem);
+  padding: clamp(1.25rem,3.5vw,3.5rem);
+  border: 1px solid var(--line);
+  border-radius: 24px;
+  background: var(--paper);
+  color: var(--ink);
+}
+.shift-workflow__heading { display:grid; grid-template-columns:1fr 1fr; gap:clamp(1.5rem,4vw,4rem); align-items:end; }
+.world-shift .shift-workflow__heading h4 { font-size:clamp(1.625rem,2.6vw,2.5rem); line-height:1.35; margin-top:.75rem; color:var(--ink); }
+.shift-workflow__heading > p { font-size:clamp(.9375rem,1.1vw,1.0625rem); color:var(--muted); }
+.shift-workflow__guide { margin-top:2rem; color:var(--muted); font-size:.875rem; }
+.shift-workflow__steps { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); margin-block:1rem 2rem; }
+.shift-workflow__steps a { min-width:0; min-height:64px; padding:.875rem .625rem; display:flex; align-items:center; gap:.625rem; border-bottom:2px solid var(--line); font-size:clamp(.875rem,1.15vw,1rem); font-weight:700; word-break:keep-all; transition:none; }
+.shift-workflow__steps a:active { transform:none; }
+.shift-workflow__number { font:400 .6875rem/1.5 var(--synk-font-mono); font-variant-numeric:tabular-nums; color:var(--muted); }
+.shift-workflow__steps a[aria-selected="true"] { color:var(--synk-lapis-deep); border-color:var(--synk-lapis-deep); }
+.shift-workflow__steps a[aria-selected="true"] .shift-workflow__number { color:inherit; }
+.shift-workflow :focus-visible { outline:2px solid var(--synk-lapis-deep); outline-offset:5px; border-radius:3px; }
+.shift-workflow__panel { min-width:0; display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); align-items:start; gap:clamp(1.5rem,4vw,4rem); padding-block:1.5rem; }
+.shift-workflow__panel + .shift-workflow__panel { border-top:1px solid var(--line); }
+.shift-workflow__explanation h5 { font-size:clamp(1.25rem,1.8vw,1.65rem); font-weight:750; letter-spacing:-.035em; line-height:1.4; text-wrap:balance; margin:0 0 1rem; }
+.shift-workflow__explanation p { color:var(--muted); font-size:clamp(.9375rem,1.1vw,1.0625rem); }
+.shift-workflow__explanation .line-link { margin-top:1.25rem; }
+.shift-workflow__record { min-width:0; border:1px solid var(--line); border-radius:12px; padding:clamp(1rem,2vw,1.75rem); background:color-mix(in srgb,var(--ink) 3%,var(--paper)); }
+.shift-workflow__record-label { display:flex; justify-content:space-between; gap:.75rem; flex-wrap:wrap; padding-bottom:1rem; border-bottom:1px solid var(--line); color:var(--muted); font-size:.75rem; }
+.shift-workflow__record-label span:first-child { font:400 .6875rem/1.75 var(--synk-font-mono); color:var(--synk-lapis-deep); letter-spacing:.04em; }
+.shift-workflow__record dl { display:grid; gap:.875rem; margin-top:1rem; }
+.shift-workflow__record dl > div { display:grid; grid-template-columns:4.75rem minmax(0,1fr); gap:.75rem; font-size:.875rem; line-height:1.7; word-break:keep-all; overflow-wrap:anywhere; }
+.shift-workflow__record dt { color:var(--muted); }
+.shift-workflow__record dd { margin:0; }
+.shift-workflow__note { margin-top:1.5rem; padding-top:1.25rem; border-top:1px solid var(--line); color:var(--muted); font-size:.8125rem; }
+/* Stacked grid panels reserve the tallest state and keep following content still. */
+.shift-workflow[data-workflow-ready] .shift-workflow__panels { display:grid; }
+.shift-workflow[data-workflow-ready] .shift-workflow__panel { grid-area:1/1; border-top:0; }
+.shift-workflow[data-workflow-ready] .shift-workflow__panel[hidden] { display:grid!important; visibility:hidden; pointer-events:none; }
+@media (max-width:760px) {
+  .shift-workflow__heading,.shift-workflow__panel { grid-template-columns:minmax(0,1fr); }
+  .shift-workflow__steps a { flex-direction:column; align-items:flex-start; gap:.25rem; padding-inline:.375rem; font-size:.8125rem; }
+  .shift-workflow__record dl > div { grid-template-columns:4.25rem minmax(0,1fr); gap:.5rem; }
+}
+@media (prefers-reduced-motion:reduce) { .shift-workflow * { transition:none!important; animation:none!important; } }
+@media (forced-colors:active) {
+  .shift-workflow__steps a[aria-selected="true"] { border-color:Highlight; color:Highlight; }
+  .shift-workflow__record { background:Canvas; }
+}
+@media print {
+  .shift-workflow[data-workflow-ready] .shift-workflow__panels { display:block; }
+  .shift-workflow[data-workflow-ready] .shift-workflow__panel[hidden] { visibility:visible; }
+}

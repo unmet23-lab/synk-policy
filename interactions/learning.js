@@ -10,7 +10,7 @@ const activeInstances = new WeakMap();
 const exampleStates = [
   { original: '보존', correction: '대기', next: '미정' },
   { original: '보존', correction: '도착', next: '선택 전' },
-  { original: '보존', correction: '확인', next: '예정' },
+  { original: '보존', correction: '확인', next: '선택 전' },
 ];
 
 function motionIsReduced(preference) {
@@ -60,6 +60,26 @@ export function initLearningInteractions({ gsap, reducedMotion = false, initialI
     const nodes = [...demo.querySelectorAll('[data-learning-node]')];
     const statuses = [...demo.querySelectorAll('[data-learning-status]')];
     let selectedIndex = -1;
+    const records = demo.querySelector('[data-record-view]');
+    const choice = demo.querySelector('[data-next-choice]');
+    const instruction = demo.querySelector('[data-demo-instruction]');
+    if (instruction) { cleanups.push(snapshotAttributes(instruction,['hidden'])); instruction.hidden=false; }
+    let wantsPractice = demo.dataset.practiceChoice === 'yes';
+    function renderRecord() {
+      if (!records) return;
+      records.querySelector('[data-record-review]').textContent = selectedIndex > 0 ? '검수한 교정 답장 · 원문과 별도 기록' : '아직 연결되지 않음';
+      records.querySelector('[data-record-next]').textContent = selectedIndex === 2 && wantsPractice ? '다음 게임날에 다시 연습 · 선택 예시' : '학습자의 선택을 기다림';
+      const status = demo.querySelector('[data-learning-status="next"]');
+      if (selectedIndex === 2 && status) status.textContent = wantsPractice ? '연습 선택' : '선택 전';
+      choice?.querySelectorAll('[data-next]').forEach(button=>button.setAttribute('aria-pressed',String((button.dataset.next==='yes')===wantsPractice)));
+    }
+    if (records) { cleanups.push(snapshotAttributes(records,['hidden'])); records.hidden=false; }
+    if (choice) {
+      cleanups.push(snapshotAttributes(choice,['hidden'])); choice.hidden=false;
+      choice.querySelectorAll('[data-next]').forEach(button=>listen(button,'click',()=>{
+        wantsPractice=button.dataset.next==='yes'; demo.dataset.practiceChoice=wantsPractice?'yes':'later'; renderRecord();
+      }));
+    }
     cleanups.push(snapshotAttributes(tablist, ['role', 'hidden']));
     cleanups.push(snapshotAttributes(demo, ['data-learning-enhanced']));
     if (summary) cleanups.push(snapshotAttributes(summary, ['hidden']));
@@ -111,6 +131,7 @@ export function initLearningInteractions({ gsap, reducedMotion = false, initialI
         const value = exampleStates[index][status.dataset.learningStatus];
         if (value) status.textContent = value;
       });
+      renderRecord();
       drawConnection(index, animate);
       if (animate && !motionIsReduced(reducedMotion) && panels[index].animate) {
         // The whole example is available immediately. No fake typing or AI progress.
