@@ -107,7 +107,7 @@ export const experience = {
 };
 export const copy = {
   "home": {
-    "action": "도전 시작하기",
+    "action": "메일 쓰기 시작",
     "description": "어제 마감인 과제를 아파서 내지 못했습니다. 교수님께 정중하게 기한 연장을 부탁해보세요.",
     "format": "이메일",
     "title": "교수님께 기한 연장 메일 쓰기",

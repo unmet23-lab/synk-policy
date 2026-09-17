@@ -1,4 +1,4 @@
-import {experience,copy} from './data.js?v=3451fc9c64cd';
+import {experience,copy} from './data.js?v=57fdd14e3c12';
 const esc=value=>String(value??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
 const named=(value,name)=>esc(value.replaceAll('{name}',name));
 const image=(file,alt='',cls='scene-image')=>`<img class="${cls}" src="./assets/${file}.webp" alt="${esc(alt)}" width="1536" height="1024" loading="lazy">`;

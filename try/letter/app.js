@@ -1,6 +1,6 @@
-import {copy} from './data.js?v=3451fc9c64cd';
-import {createViews} from './views.js?v=3451fc9c64cd';
-import {createSession,updateDraft,beginReview,finishLetter} from './session.js?v=3451fc9c64cd';
+import {copy} from './data.js?v=57fdd14e3c12';
+import {createViews} from './views.js?v=57fdd14e3c12';
+import {createSession,updateDraft,beginReview,finishLetter} from './session.js?v=57fdd14e3c12';
 const main=document.querySelector('#experience'),notice=document.querySelector('#notice'),dialog=document.querySelector('#restart-dialog');
 const state=createSession(),views=createViews(state);
 let blinkTimer, blinkObserver;
