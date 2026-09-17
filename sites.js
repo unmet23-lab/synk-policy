@@ -27,9 +27,11 @@ document.addEventListener('click',event=>{
 },true);
 
 // Preserve shared-page bookmarks when visiting the new company homepage.
+if(location.pathname==='/shift/'&&['#shift-people','#contact-pathways'].includes(location.hash))location.replace('/path/'+(location.hash==='#shift-people'?'#path-journey':location.hash));
+if(location.pathname==='/shift/'&&location.hash==='#shift-business')location.replace('/shift/#shift-services');
 if(location.pathname==='/'){
  const hash=location.hash.slice(1);
- const brand=hash.startsWith('lab')||hash==='contact-lab'?'lab':hash.startsWith('shift')||['contact-business','contact-pathways','design-notes'].includes(hash)?'shift':hash.startsWith('pulse')||hash==='contact-pulse'?'pulse':null;
- if(brand)location.replace('/'+brand+'/'+(hash===brand?'':'#'+hash));
+ const brand=hash.startsWith('path')||hash==='contact-pathways'||hash==='shift-people'?'path':hash.startsWith('lab')||hash==='contact-lab'?'lab':hash.startsWith('shift')||['contact-business','contact-pathways','design-notes'].includes(hash)?'shift':hash.startsWith('pulse')||hash==='contact-pulse'?'pulse':null;
+ if(brand)location.replace('/'+brand+'/'+(hash===brand?'':'#'+(hash==='shift-people'?'path-journey':hash==='shift-business'?'shift-services':hash)));
  else if(hash==='work')location.replace('/#worlds');
 }

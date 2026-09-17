@@ -32,7 +32,7 @@ body[data-site] #top .companions{width:100%;max-width:1000px;justify-self:center
 body[data-site] #top .companions-scene{border-radius:24px}
 body[data-site] #top .companions figcaption{display:none}
 body[data-site="synk"] #worlds{scroll-margin-top:3rem}
-body[data-site] #top .world-directory{border:0;gap:1.5rem;padding-block:1rem 6rem}
+body[data-site] #top .world-directory{border:0;grid-template-columns:repeat(2,minmax(0,1fr));gap:1.5rem;padding-block:1rem 6rem}
 body[data-site] #top .world-directory>a,body[data-site] #top .world-directory>a:first-child{position:relative;display:block;padding:2.75rem 2rem 2.5rem;border:1px solid transparent;border-image:var(--thread-frame) 250 / 44px / 0 round;border-radius:0;background:#fff}
 body[data-site] #top .world-directory>a>div{display:block}
 body[data-site] #top .world-directory .directory-logo{display:block;width:auto;height:clamp(2.75rem,4.5vw,4rem);max-width:100%;object-fit:contain;object-position:left center;margin-bottom:1.75rem}
@@ -67,7 +67,7 @@ body[data-site] #top .suggestions{gap:.75rem;margin-top:1.5rem}
 body[data-site] #top .suggestions button{background:#fff;border-color:var(--line);border-radius:99px;padding:.625rem 1rem}
 body[data-site] #top .send:not(:disabled){background:var(--ink);color:#fff}
 body[data-site] #top .send:not(:disabled):hover{background:#4a4542}
-.site-family{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1.5rem}
+.site-family{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:1.5rem}
 body[data-site] .site-family{padding-block:2rem;border-top:20px solid transparent;border-image:var(--thread-frame) 250 / 32px 0 0 / 0 round}
 .site-family a{display:flex;justify-content:space-between;gap:.75rem;font-size:.85rem;padding:.8rem 0;text-decoration:none}
 .site-family a[aria-current]{font-weight:700}
@@ -256,4 +256,56 @@ body[data-site] #top .lab-personalization{grid-column:1/-1;padding-top:5rem}
 }
 @media(forced-colors:active){
   body[data-site] :is(.header.shell,.world-directory>a,.company-note,.principles>div,.contact-section,.questions-section,.contact-web,.question-desk,.site-family,.lab-card,.lab-volume,.shift-pillars>section,.making-note,.shift-workflow,.pulse-scene,.work-card,.lab-benefit,.lab-preference){border-image:none!important;border:1px solid CanvasText!important;background:Canvas!important;color:CanvasText!important}
+}
+
+/* Brand introductions: editorial reading rhythm, open space and real thread boundaries. */
+body[data-site] #top .story-purpose{padding-block:clamp(4rem,9vw,8rem);max-width:960px;text-align:center}
+.story-purpose>.small-label{display:block;margin-bottom:1.75rem}
+.story-purpose h2,.story-heading h2{font-size:clamp(2rem,4.1vw,3.6rem);line-height:1.23;letter-spacing:-.045em;font-weight:600;text-wrap:balance;word-break:keep-all}
+.story-purpose>p{max-width:710px;margin:2rem auto 0;font-size:1.125rem;line-height:1.95;word-break:keep-all;color:var(--muted)}
+body[data-site] #top .story-section{padding-block:clamp(4rem,8vw,7rem);border-top:24px solid transparent;border-image:var(--thread-frame) 250 / 32px 0 0 / 0 round;scroll-margin-top:5rem}
+.story-heading{display:grid;grid-template-columns:1fr 1fr;column-gap:5rem;align-items:end;margin-bottom:4rem}
+.story-heading>.small-label{grid-column:1/-1;display:block;margin-bottom:1.5rem}
+.story-heading>p{margin:0;color:var(--muted);font-size:1.0625rem;line-height:1.95;word-break:keep-all}
+.story-items{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:3.5rem 5rem}
+.story-items--three{grid-template-columns:repeat(3,minmax(0,1fr));gap:3rem}
+.story-items article{min-width:0}
+.story-index{font-family:var(--font-mono,monospace);font-size:.75rem;color:var(--muted);display:block;margin-bottom:1rem}
+.story-items h3{font-size:1.25rem;line-height:1.5;letter-spacing:-.025em;font-weight:600;word-break:keep-all;margin:0 0 1rem}
+.story-items p{font-size:1rem;line-height:1.9;color:var(--muted);word-break:keep-all;margin:0}
+.story-note{margin-top:3rem;max-width:900px;font-size:.8125rem;line-height:1.9;color:var(--muted);word-break:keep-all}
+.story-link{margin-top:2.5rem}
+body[data-site] #top .lab-personalization-wrap .lab-personalization{padding-block:2rem 5rem}
+body[data-site] #top .lab-curriculum-wrap,body[data-site] #top .lab-tracking-wrap{padding-block:2rem 5rem}
+body[data-site] #top .lab-curriculum-wrap .lab-card--curriculum{display:block}
+body[data-site] #top .lab-tracking-wrap .lab-card--tracking{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:3rem}
+body[data-site] #top .brand-proof{padding-block:3rem 6rem}
+body[data-site] #top .world-shift{padding-bottom:0}
+body[data-site] #top .world-shift .shift-heading{margin-bottom:0}
+.path-hero{padding-block:clamp(4rem,8vw,7rem);text-align:center}
+.path-hero>.stage-label{display:block;margin-bottom:2rem;text-align:center}
+.path-hero h1{font-size:clamp(2.6rem,5vw,4.5rem);font-weight:650;letter-spacing:-.045em;line-height:1.23;word-break:keep-all}
+.path-hero>p{max-width:690px;margin:2rem auto;font-size:1.125rem;line-height:1.9;color:var(--muted);word-break:keep-all}
+.path-hero .world-links{justify-content:center;gap:2rem;margin-top:2rem}
+[data-site="shift"] #shift>.world-body{max-width:720px}
+[data-site="shift"] #shift>.world-links{margin-top:2.5rem}
+.path-route{display:flex;align-items:center;justify-content:space-evenly;gap:1.5rem;max-width:900px;margin:5rem auto 0;padding:3rem 2rem;border:1px solid transparent;border-image:var(--felt-frame) 250 fill / 68px / 0 round;font-size:1.25rem;font-weight:600}
+.path-route [aria-hidden]{font-weight:400;color:#526956}
+body[data-site] #top .atlas-applications{grid-template-columns:repeat(2,minmax(0,1fr))}
+@media(max-width:820px){
+ .story-heading{grid-template-columns:1fr;gap:1.5rem;margin-bottom:3rem}
+ .story-heading>.small-label{margin-bottom:0}
+ .story-items--three{grid-template-columns:1fr}
+ body[data-site] #top .lab-tracking-wrap .lab-card--tracking{grid-template-columns:1fr}
+ .path-route{font-size:1rem;gap:.75rem;padding:2.5rem 1.5rem}
+}
+@media(max-width:560px){
+ .story-purpose h2,.story-heading h2{font-size:2rem}
+ .story-purpose>p,.story-heading>p{font-size:1rem}
+ .story-items{grid-template-columns:1fr;gap:2.75rem}
+ .story-items h3{font-size:1.2rem}
+ .story-note{font-size:.8rem}
+ .path-route{flex-direction:column;gap:1.5rem;border-image-width:56px}
+ .path-route [aria-hidden]{transform:rotate(90deg)}
+ body[data-site] #top .atlas-applications{grid-template-columns:1fr}
 }

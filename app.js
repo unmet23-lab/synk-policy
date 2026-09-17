@@ -1,10 +1,10 @@
-import {createKnowledgeEngine} from './knowledge-engine.js?v=dd700b0821';
-import {appendPublicActions} from './public-actions.js?v=dd700b0821';
+import {createKnowledgeEngine} from './knowledge-engine.js?v=98d1d3ce2a';
+import {appendPublicActions} from './public-actions.js?v=98d1d3ce2a';
 const $=s=>document.querySelector(s);
 const conversation=$('#questions'),form=$('#question-form'),input=$('#question'),send=$('#send'),messages=$('#messages'),dialog=$('#document-dialog');
 let engine=null,context={},busy=false,activeDoc=null,lastTrigger=null,toastTimer;
 const readyNote=$('#answer-note').textContent;
-const names={company:'SYNK',lab:'SYNK LAB',shift:'SYNK SHIFT',pulse:'SYNK PULSE',philosophy:'SYNK',vision:'SYNK',guide:'SYNK'};
+const names={company:'SYNK',lab:'SYNK LAB',shift:'SYNK SHIFT',pulse:'SYNK PULSE',path:'SYNK PATH',philosophy:'SYNK',vision:'SYNK',guide:'SYNK'};
 const menuToggle=$('.menu-toggle'),mainNav=$('#main-nav'),header=$('.header');
 function closeMenu({focus=false}={}){header.classList.remove('menu-open');menuToggle.setAttribute('aria-expanded','false');if(focus)menuToggle.focus();}
 menuToggle.addEventListener('click',()=>{const open=menuToggle.getAttribute('aria-expanded')!=='true';menuToggle.setAttribute('aria-expanded',String(open));header.classList.toggle('menu-open',open);});
@@ -16,13 +16,13 @@ function element(tag,cls,text){const el=document.createElement(tag);if(cls)el.cl
 function toast(text){const el=$('#toast');el.textContent=text;el.hidden=false;clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.hidden=true,2400);}
 function syncInput(){input.style.height='auto';input.style.height=Math.min(input.scrollHeight,160)+'px';send.disabled=busy||!input.value.trim();}
 function paragraphs(parent,text){String(text).split(/\n\n/).forEach(p=>parent.append(element('p','',p)));}
-const pending=fetch('/knowledge.json?v=2026-09-15-selected-experiences-copy-0806113690').then(r=>{if(!r.ok)throw new Error('자료를 불러오지 못했어요.');return r.json();}).then(data=>{
+const pending=fetch('/knowledge.json?v=2026-09-15-selected-experiences-copy-3836b85ed5').then(r=>{if(!r.ok)throw new Error('자료를 불러오지 못했어요.');return r.json();}).then(data=>{
   engine=createKnowledgeEngine(data);return engine;
 }).catch(error=>{console.error('Public notes unavailable');$('#answer-note').textContent='공개 안내를 불러오지 못했어요. 질문을 보내 다시 시도해 주세요.';throw error;});
 // Keep the initial document load from producing an unhandled rejection when no one asks.
 pending.catch(()=>{});
 
-async function getEngine(){if(engine)return engine;try{return await pending;}catch{const r=await fetch('/knowledge.json?v=2026-09-15-selected-experiences-copy-0806113690',{cache:'reload'});if(!r.ok)throw new Error('자료를 불러오지 못했어요. 잠시 뒤 다시 질문해 주세요.');engine=createKnowledgeEngine(await r.json());$('#answer-note').textContent=readyNote;return engine;}}
+async function getEngine(){if(engine)return engine;try{return await pending;}catch{const r=await fetch('/knowledge.json?v=2026-09-15-selected-experiences-copy-3836b85ed5',{cache:'reload'});if(!r.ok)throw new Error('자료를 불러오지 못했어요. 잠시 뒤 다시 질문해 주세요.');engine=createKnowledgeEngine(await r.json());$('#answer-note').textContent=readyNote;return engine;}}
 function enterChat(){conversation.classList.add('is-chatting');$('#introduction').hidden=true;$('#chat-area').hidden=false;}
 function focusQuestion(){input.focus({preventScroll:true});conversation.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth',block:'start'});}
 function reset(){context={};messages.replaceChildren();conversation.classList.remove('is-chatting');$('#introduction').hidden=false;$('#chat-area').hidden=true;input.value='';syncInput();input.focus({preventScroll:true});}
@@ -70,7 +70,7 @@ async function openDoc(id,trigger){
       if(record.id===trigger?.dataset.recordId)target=section;
     }
     $('#document-related').replaceChildren();
-    for(const related of ['company','lab','shift','pulse','vision']){
+    for(const related of ['company','lab','shift','pulse','path','vision']){
       if(related===id)continue;const b=element('button','',(related==='vision'?'브랜드 소개':names[related])+' ↗');b.type='button';b.dataset.doc=related;$('#document-related').append(b);
     }
     if(!dialog.open)dialog.showModal();dialog.scrollTop=0;$('#close-document').focus({preventScroll:true});
@@ -85,7 +85,7 @@ document.addEventListener('click',event=>{const q=event.target.closest('[data-as
 $('#reset').addEventListener('click',reset);$('#close-document').addEventListener('click',closeDoc);
 dialog.addEventListener('click',event=>{if(event.target===dialog){const r=dialog.getBoundingClientRect();if(event.clientX<r.left||event.clientX>r.right||event.clientY<r.top||event.clientY>r.bottom)closeDoc();}});
 dialog.addEventListener('cancel',()=>{queueMicrotask(()=>lastTrigger?.focus?.({preventScroll:true}));});
-$('#ask-about-document').addEventListener('click',()=>{const id=activeDoc;closeDoc();const questions={company:'SYNK는 어떤 회사인가요?',lab:'LAB에서는 어떻게 배우나요?',shift:'SHIFT는 어떤 일을 하나요?',pulse:'PULSE는 어떤 작품을 만드나요?',philosophy:'SYNK의 철학은 무엇인가요?',vision:'브랜드 소개를 모두 알려 주세요',guide:'무엇을 물어볼 수 있나요?'};void ask(questions[id]||questions.company);});
+$('#ask-about-document').addEventListener('click',()=>{const id=activeDoc;closeDoc();const questions={company:'SYNK는 어떤 회사인가요?',lab:'LAB에서는 어떻게 배우나요?',shift:'SHIFT는 어떤 일을 하나요?',pulse:'PULSE는 어떤 작품을 만드나요?',path:'PATH는 어떤 곳인가요?',philosophy:'SYNK의 철학은 무엇인가요?',vision:'브랜드 소개를 모두 알려 주세요',guide:'무엇을 물어볼 수 있나요?'};void ask(questions[id]||questions.company);});
 syncInput();
 
 // Optional browser-native agent access uses the exact same visible question flow.
