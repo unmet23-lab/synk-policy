@@ -25,10 +25,10 @@ export async function initInitialReveal(gsap) {
     gsap.set(targets, {opacity:0, '--entry-y':'12px'});
     document.documentElement.classList.remove('entry-pending');
     timeline = gsap.timeline({defaults:{duration:.52, ease:'power2.out'}, onComplete:entry.finish});
-    const reveal = (name, at, stagger=0) => timeline.to(
-      targets.filter(target => target.dataset.enter === name),
-      {opacity:1, '--entry-y':'0px', stagger}, at
-    );
+    const reveal = (name, at, stagger=0) => {
+      const group=targets.filter(target=>target.dataset.enter===name);
+      if(group.length)timeline.to(group,{opacity:1,'--entry-y':'0px',stagger},at);
+    };
     reveal('brand', 0);
     reveal('navigation', .1);
     reveal('copy', .3, .09);

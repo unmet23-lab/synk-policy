@@ -12,10 +12,12 @@ export function initScrollExperience({gsap,ScrollTrigger,reducedMotion=false}={}
     if(current===id)return;
     current=id;
     worlds.dataset.world=id;
-    gsap.to(worlds,{backgroundColor:themes[id]||color('paper'),duration:reducedMotion?0:.6,ease:'power2.out',overwrite:'auto'});
+    // Standalone sites keep their neutral canvas while retaining reading and reveal behavior.
+    if(!document.body.dataset.site)gsap.to(worlds,{backgroundColor:themes[id]||color('paper'),duration:reducedMotion?0:.6,ease:'power2.out',overwrite:'auto'});
   };
   const context=gsap.context(()=>{
     for(const id of Object.keys(themes)){
+      if(!document.getElementById(id))continue;
       triggers.push(ScrollTrigger.create({trigger:'#'+id,start:'top 55%',end:'bottom 55%',onEnter:()=>select(id),onEnterBack:()=>select(id)}));
     }
     triggers.push(ScrollTrigger.create({trigger:worlds,start:'top bottom',end:'bottom top',onLeave:()=>select(''),onLeaveBack:()=>select('')}));

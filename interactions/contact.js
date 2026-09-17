@@ -12,7 +12,9 @@ panel?.addEventListener('toggle',()=>{if(panel.open)openForm();});
 // Answers add links after page load. Delegation also reopens a closed panel when
 // the address already has this hash and no new hashchange will be emitted.
 document.addEventListener('click',event=>{
- if(event.target.closest('a[href="#contact-web"],.contact-options a'))openForm();
+ const link=event.target.closest('a');if(!link)return;
+ const url=new URL(link.href,location.href);
+ if(url.origin===location.origin&&url.pathname===location.pathname&&url.hash==='#contact-web')openForm();
 });
 if(location.hash==='#contact-web')openForm();
 window.addEventListener('hashchange',()=>{if(location.hash==='#contact-web')openForm();});

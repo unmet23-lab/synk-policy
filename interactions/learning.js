@@ -67,8 +67,8 @@ export function initLearningInteractions({ gsap, reducedMotion = false, initialI
     let wantsPractice = demo.dataset.practiceChoice === 'yes';
     function renderRecord() {
       if (!records) return;
-      records.querySelector('[data-record-review]').textContent = selectedIndex > 0 ? '검수한 교정 답장 · 원문과 별도 기록' : '아직 연결되지 않음';
-      records.querySelector('[data-record-next]').textContent = selectedIndex === 2 && wantsPractice ? '다음 게임날에 다시 연습 · 선택 예시' : '학습자의 선택을 기다림';
+      records.querySelector('[data-record-review]').textContent = selectedIndex > 0 ? '검수한 교정 답장 · 처음 쓴 문장과 따로 저장' : '아직 답장을 받지 않음';
+      records.querySelector('[data-record-next]').textContent = selectedIndex === 2 && wantsPractice ? '다음 게임에서 다시 연습 · 선택 예시' : '아직 선택하지 않음';
       const status = demo.querySelector('[data-learning-status="next"]');
       if (selectedIndex === 2 && status) status.textContent = wantsPractice ? '연습 선택' : '선택 전';
       choice?.querySelectorAll('[data-next]').forEach(button=>button.setAttribute('aria-pressed',String((button.dataset.next==='yes')===wantsPractice)));

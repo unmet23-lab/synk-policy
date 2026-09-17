@@ -1,5 +1,5 @@
-import {createKnowledgeEngine} from './knowledge-engine.js?v=751969f94c';
-import {appendPublicActions} from './public-actions.js?v=751969f94c';
+import {createKnowledgeEngine} from './knowledge-engine.js?v=dd700b0821';
+import {appendPublicActions} from './public-actions.js?v=dd700b0821';
 const $=s=>document.querySelector(s);
 const conversation=$('#questions'),form=$('#question-form'),input=$('#question'),send=$('#send'),messages=$('#messages'),dialog=$('#document-dialog');
 let engine=null,context={},busy=false,activeDoc=null,lastTrigger=null,toastTimer;
@@ -8,7 +8,7 @@ const names={company:'SYNK',lab:'SYNK LAB',shift:'SYNK SHIFT',pulse:'SYNK PULSE'
 const menuToggle=$('.menu-toggle'),mainNav=$('#main-nav'),header=$('.header');
 function closeMenu({focus=false}={}){header.classList.remove('menu-open');menuToggle.setAttribute('aria-expanded','false');if(focus)menuToggle.focus();}
 menuToggle.addEventListener('click',()=>{const open=menuToggle.getAttribute('aria-expanded')!=='true';menuToggle.setAttribute('aria-expanded',String(open));header.classList.toggle('menu-open',open);});
-mainNav.addEventListener('click',event=>{const link=event.target.closest('a');if(!link)return;closeMenu();const target=$(link.getAttribute('href'));if(target){target.setAttribute('tabindex','-1');target.focus({preventScroll:true});}});
+mainNav.addEventListener('click',event=>{const link=event.target.closest('a');if(!link)return;closeMenu();const url=new URL(link.href,location.href);if(url.origin!==location.origin||url.pathname!==location.pathname)return;const target=document.getElementById(url.hash.slice(1));if(target){target.setAttribute('tabindex','-1');target.focus({preventScroll:true});}});
 document.addEventListener('keydown',event=>{if(event.key==='Escape'&&header.classList.contains('menu-open'))closeMenu({focus:true});});
 matchMedia('(max-width: 560px)').addEventListener('change',()=>closeMenu());
 $('#copy-email').addEventListener('click',async()=>{try{await navigator.clipboard.writeText('hello@synk.im');toast('이메일 주소를 복사했어요.');}catch{toast('hello@synk.im 주소를 선택해 복사해 주세요.');}});
@@ -16,25 +16,25 @@ function element(tag,cls,text){const el=document.createElement(tag);if(cls)el.cl
 function toast(text){const el=$('#toast');el.textContent=text;el.hidden=false;clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.hidden=true,2400);}
 function syncInput(){input.style.height='auto';input.style.height=Math.min(input.scrollHeight,160)+'px';send.disabled=busy||!input.value.trim();}
 function paragraphs(parent,text){String(text).split(/\n\n/).forEach(p=>parent.append(element('p','',p)));}
-const pending=fetch('/knowledge.json?v=2026-09-15-selected-experiences-copy-07b413ec1a').then(r=>{if(!r.ok)throw new Error('자료를 불러오지 못했어요.');return r.json();}).then(data=>{
+const pending=fetch('/knowledge.json?v=2026-09-15-selected-experiences-copy-0806113690').then(r=>{if(!r.ok)throw new Error('자료를 불러오지 못했어요.');return r.json();}).then(data=>{
   engine=createKnowledgeEngine(data);return engine;
 }).catch(error=>{console.error('Public notes unavailable');$('#answer-note').textContent='공개 안내를 불러오지 못했어요. 질문을 보내 다시 시도해 주세요.';throw error;});
 // Keep the initial document load from producing an unhandled rejection when no one asks.
 pending.catch(()=>{});
 
-async function getEngine(){if(engine)return engine;try{return await pending;}catch{const r=await fetch('/knowledge.json?v=2026-09-15-selected-experiences-copy-07b413ec1a',{cache:'reload'});if(!r.ok)throw new Error('자료를 불러오지 못했어요. 잠시 뒤 다시 질문해 주세요.');engine=createKnowledgeEngine(await r.json());$('#answer-note').textContent=readyNote;return engine;}}
+async function getEngine(){if(engine)return engine;try{return await pending;}catch{const r=await fetch('/knowledge.json?v=2026-09-15-selected-experiences-copy-0806113690',{cache:'reload'});if(!r.ok)throw new Error('자료를 불러오지 못했어요. 잠시 뒤 다시 질문해 주세요.');engine=createKnowledgeEngine(await r.json());$('#answer-note').textContent=readyNote;return engine;}}
 function enterChat(){conversation.classList.add('is-chatting');$('#introduction').hidden=true;$('#chat-area').hidden=false;}
 function focusQuestion(){input.focus({preventScroll:true});conversation.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth',block:'start'});}
 function reset(){context={};messages.replaceChildren();conversation.classList.remove('is-chatting');$('#introduction').hidden=false;$('#chat-area').hidden=true;input.value='';syncInput();input.focus({preventScroll:true});}
 function appendAnswer(result){
   const article=element('article','message-assistant');article.dataset.status=result.status;
-  const label=element('div','message-label');const mark=element('img','answer-wordmark');mark.src='/assets/brand-synk.webp?v=20260910-story';mark.alt='SYNK';mark.width=744;mark.height=360;label.append(mark,element('span','',result.status==='restricted'?'공개 범위 안내':result.status==='needs_confirmation'?'개별 확인 안내':'공개 자료 안내'));article.append(label);
+  const label=element('div','message-label');const mark=element('img','answer-wordmark');mark.src='/assets/brand-synk.webp?v=20260910-story';mark.alt='SYNK';mark.width=744;mark.height=360;label.append(mark,element('span','',result.status==='restricted'?'공개 가능한 내용':result.status==='needs_confirmation'?'문의가 필요한 내용':'SYNK 안내'));article.append(label);
   const body=element('div','answer-text');
   if(result.message)paragraphs(body,result.message);
   for(const record of result.records){if(result.records.length>1)body.append(element('h3','',record.title));paragraphs(body,record.answer);}
   article.append(body);const dates=[...new Set(result.records.map(r=>r.reviewedAt).filter(Boolean))];if(dates.length)article.append(element('p','answer-reviewed','공개 자료 확인 · '+dates.sort().at(-1)));
   const sources=element('div','answer-sources');
-  result.sourceIds.forEach((id,i)=>{const doc=engine.docs.get(id);if(!doc)return;const button=element('button','source-button');button.type='button';button.dataset.doc=id;button.dataset.recordId=result.records.find(r=>r.sourceId===id)?.id||'';button.append(element('span','',String(i+1).padStart(2,'0')),document.createTextNode(doc.title.split(' — ')[0]+' · 근거 읽기 ↗'));sources.append(button);});
+  result.sourceIds.forEach((id,i)=>{const doc=engine.docs.get(id);if(!doc)return;const button=element('button','source-button');button.type='button';button.dataset.doc=id;button.dataset.recordId=result.records.find(r=>r.sourceId===id)?.id||'';button.append(element('span','',String(i+1).padStart(2,'0')),document.createTextNode(doc.title.split(' — ')[0]+' · 자세히 보기 ↗'));sources.append(button);});
   const copy=element('button','copy-answer','답변 복사');copy.type='button';copy.addEventListener('click',async()=>{try{await navigator.clipboard.writeText(body.innerText);toast('답변을 복사했어요.');}catch{toast('복사를 사용할 수 없어요. 답변을 선택해 복사해 주세요.');}});sources.append(copy);article.append(sources);
   appendPublicActions(article,result.records);
   const related=element('div','related-questions');
@@ -71,7 +71,7 @@ async function openDoc(id,trigger){
     }
     $('#document-related').replaceChildren();
     for(const related of ['company','lab','shift','pulse','vision']){
-      if(related===id)continue;const b=element('button','',(related==='vision'?'네 브랜드의 비전':names[related])+' ↗');b.type='button';b.dataset.doc=related;$('#document-related').append(b);
+      if(related===id)continue;const b=element('button','',(related==='vision'?'브랜드 소개':names[related])+' ↗');b.type='button';b.dataset.doc=related;$('#document-related').append(b);
     }
     if(!dialog.open)dialog.showModal();dialog.scrollTop=0;$('#close-document').focus({preventScroll:true});
     if(target)target.scrollIntoView({behavior:'instant',block:'start'});
@@ -85,7 +85,7 @@ document.addEventListener('click',event=>{const q=event.target.closest('[data-as
 $('#reset').addEventListener('click',reset);$('#close-document').addEventListener('click',closeDoc);
 dialog.addEventListener('click',event=>{if(event.target===dialog){const r=dialog.getBoundingClientRect();if(event.clientX<r.left||event.clientX>r.right||event.clientY<r.top||event.clientY>r.bottom)closeDoc();}});
 dialog.addEventListener('cancel',()=>{queueMicrotask(()=>lastTrigger?.focus?.({preventScroll:true}));});
-$('#ask-about-document').addEventListener('click',()=>{const id=activeDoc;closeDoc();const questions={company:'SYNK는 어떤 회사인가요?',lab:'LAB에서는 어떻게 배우나요?',shift:'SHIFT는 어떤 일을 하나요?',pulse:'PULSE는 어떤 작품을 만드나요?',philosophy:'SYNK의 철학은 무엇인가요?',vision:'네 브랜드의 비전을 모두 알려 주세요',guide:'무엇을 물어볼 수 있나요?'};void ask(questions[id]||questions.company);});
+$('#ask-about-document').addEventListener('click',()=>{const id=activeDoc;closeDoc();const questions={company:'SYNK는 어떤 회사인가요?',lab:'LAB에서는 어떻게 배우나요?',shift:'SHIFT는 어떤 일을 하나요?',pulse:'PULSE는 어떤 작품을 만드나요?',philosophy:'SYNK의 철학은 무엇인가요?',vision:'브랜드 소개를 모두 알려 주세요',guide:'무엇을 물어볼 수 있나요?'};void ask(questions[id]||questions.company);});
 syncInput();
 
 // Optional browser-native agent access uses the exact same visible question flow.
