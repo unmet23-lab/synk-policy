@@ -1,3 +1,10 @@
+// Keep anchor destinations below the shared, sticky navigation.
+const siteHeader=document.querySelector('.site-header-wrap');
+if(siteHeader){
+ const sizeHeader=()=>{if(!siteHeader.querySelector('.menu-open'))document.documentElement.style.setProperty('--site-header-height',Math.ceil(siteHeader.getBoundingClientRect().height)+'px');};
+ sizeHeader();new ResizeObserver(sizeHeader).observe(siteHeader);
+}
+
 // Show one visual explanation at a time. The full content remains available without JavaScript.
 document.querySelectorAll('[data-scene-explorer]').forEach(explorer=>{
  const nav=explorer.querySelector('[data-scene-nav]');
