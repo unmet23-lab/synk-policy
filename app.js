@@ -1,5 +1,5 @@
-import {createKnowledgeEngine} from './knowledge-engine.js?v=8c788366c5';
-import {appendPublicActions} from './public-actions.js?v=8c788366c5';
+import {createKnowledgeEngine} from './knowledge-engine.js?v=318013f16b';
+import {appendPublicActions} from './public-actions.js?v=318013f16b';
 const $=s=>document.querySelector(s);
 const conversation=$('#questions'),form=$('#question-form'),input=$('#question'),send=$('#send'),messages=$('#messages'),dialog=$('#document-dialog');
 let engine=null,context={},busy=false,activeDoc=null,lastTrigger=null,toastTimer;
@@ -23,8 +23,9 @@ const pending=fetch('/knowledge.json?v=2026-09-15-selected-experiences-copy-495a
 pending.catch(()=>{});
 
 async function getEngine(){if(engine)return engine;try{return await pending;}catch{const r=await fetch('/knowledge.json?v=2026-09-15-selected-experiences-copy-495a9a4b3e',{cache:'reload'});if(!r.ok)throw new Error('자료를 불러오지 못했어요. 잠시 뒤 다시 질문해 주세요.');engine=createKnowledgeEngine(await r.json());$('#answer-note').textContent=readyNote;return engine;}}
-function enterChat(){conversation.classList.add('is-chatting');$('#introduction').hidden=true;$('#chat-area').hidden=false;}
-function focusQuestion(){input.focus({preventScroll:true});conversation.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth',block:'start'});}
+function showAnswers(){document.dispatchEvent(new Event('synk:show-answers'));}
+function enterChat(){showAnswers();conversation.classList.add('is-chatting');$('#introduction').hidden=true;$('#chat-area').hidden=false;}
+function focusQuestion(){showAnswers();input.focus({preventScroll:true});(conversation.closest('.help-frame')||conversation).scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth',block:'start'});}
 function reset(){context={};messages.replaceChildren();conversation.classList.remove('is-chatting');$('#introduction').hidden=false;$('#chat-area').hidden=true;input.value='';syncInput();input.focus({preventScroll:true});}
 function appendAnswer(result){
   const article=element('article','message-assistant');article.dataset.status=result.status;

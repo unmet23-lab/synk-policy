@@ -67,6 +67,35 @@ body[data-site] #top .suggestions{gap:.75rem;margin-top:1.5rem}
 body[data-site] #top .suggestions button{background:#fff;border-color:var(--line);border-radius:99px;padding:.625rem 1rem}
 body[data-site] #top .send:not(:disabled){background:var(--ink);color:#fff}
 body[data-site] #top .send:not(:disabled):hover{background:#4a4542}
+/* Questions and contact share one quiet frame. Only the chosen task is visible. */
+body[data-site] #top .help-section{padding-block:clamp(4rem,8vw,7rem);border-top:20px solid transparent;border-image:var(--thread-frame) 250 / 32px 0 0 / 0 round}
+.help-heading{margin-bottom:2.5rem}
+.help-heading h2{font-size:clamp(2rem,3.4vw,3rem);font-weight:600;line-height:1.3;margin:0 0 1.25rem;word-break:keep-all}
+.help-heading p{color:var(--muted);font-size:1.0625rem;line-height:1.8;word-break:keep-all}
+.help-frame{border:1px solid transparent;border-image:var(--thread-frame) 250 / 48px / 0 round;padding:clamp(1.5rem,4vw,3rem)}
+.help-tabs{display:flex;gap:.625rem;flex-wrap:wrap;margin-bottom:2.5rem}
+.help-tabs[hidden],body[data-site] #top .help-panel[hidden]{display:none!important}
+.help-tabs button{background:transparent;color:var(--muted);border:0;border-radius:99px;padding:.85rem 1.25rem;font:inherit;font-size:.9375rem;min-height:44px;cursor:pointer}
+.help-tabs button[aria-selected="true"]{background:var(--ink);color:#fff}
+.help-tabs button:focus-visible{outline:2px solid var(--ink);outline-offset:4px}
+body[data-site] #top .help-panel{width:100%;max-width:none;margin:0;padding:0;border:0;min-height:0;scroll-margin-top:2rem}
+.help-panel-intro{margin-bottom:1.75rem}
+.help-panel-intro h3{font-size:1.25rem;margin:0 0 1rem}
+.help-panel-intro p,.help-form-note{color:var(--muted);font-size:1rem;line-height:1.85;max-width:760px;word-break:keep-all}
+.help-enhanced .help-panel-intro h3{display:none}
+body[data-site] #top .help-frame .question-desk{border:0;background:#f8f8f7;border-radius:18px;padding:.5rem}
+body[data-site] #top .help-frame #question{font-size:1.125rem}
+.help-frame .desk-bottom{gap:1rem;flex-wrap:wrap}
+.help-frame .desk-bottom p{flex:1 1 260px}
+.help-frame .chat-heading h2{font-size:1.4rem}
+body[data-site] #top .help-enquiry .email-row{display:flex;align-items:center;gap:1.5rem;flex-wrap:wrap;margin:1.5rem 0}
+body[data-site] #top .help-enquiry .contact-email{font-size:clamp(1.5rem,3vw,2rem);line-height:1.5}
+.help-form-note{margin:1.5rem 0 1rem}
+.help-frame .contact-web-panel{padding:0}
+.help-frame .contact-web-panel summary{padding:1.25rem 0;min-height:44px}
+.help-privacy{display:inline-block;margin-top:1.5rem;font-size:.8125rem;text-underline-offset:.25em}
+.help-anchor{display:block;scroll-margin-top:2rem}
+@media(max-width:560px){.help-frame{padding:1.75rem 1.125rem;border-image-width:34px}.help-tabs{gap:.25rem;margin-bottom:1.75rem}.help-tabs button{padding:.75rem .7rem;font-size:.8125rem}.help-heading p{font-size:1rem}.help-frame .desk-bottom{padding:1rem .5rem}.help-frame .desk-bottom p{flex:0 1 auto}.help-frame .chat-heading{flex-wrap:wrap;gap:1rem}}
 .site-family{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:1.5rem}
 body[data-site] .site-family{padding-block:2rem;border-top:20px solid transparent;border-image:var(--thread-frame) 250 / 32px 0 0 / 0 round}
 .site-family a{display:flex;justify-content:space-between;gap:.75rem;font-size:.85rem;padding:.8rem 0;text-decoration:none}
