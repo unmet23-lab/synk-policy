@@ -69,7 +69,9 @@ body[data-site] #top .companions-scene{border-radius:24px}
 body[data-site] #top .companions figcaption{display:none}
 body[data-site="synk"] #worlds{scroll-margin-top:3rem}
 body[data-site] #top .world-directory{border:0;grid-template-columns:repeat(2,minmax(0,1fr));gap:1.5rem;padding-block:1rem 6rem}
-body[data-site] #top .world-directory>a,body[data-site] #top .world-directory>a:first-child{position:relative;display:grid;place-items:center;min-height:220px;padding:2.5rem 3rem;border:1px solid transparent;border-image:var(--thread-frame) 250 / 34px / 0 round;border-radius:0;background:#fff}
+body[data-site] #top .world-directory>a,body[data-site] #top .world-directory>a:first-child{position:relative;isolation:isolate;display:grid;place-items:center;min-height:220px;padding:2.5rem 3rem;border:1px solid transparent;border-image:var(--thread-frame) 250 / 34px / 0 round;border-radius:0;background:#fff}
+body[data-site] #top .world-directory>a::before{content:'';position:absolute;z-index:-1;pointer-events:none;inset:16px;border-radius:20px;background:radial-gradient(ellipse 72% 42% at 50% 108%,var(--brand-color),transparent 78%);opacity:.16;transition:opacity .45s ease}
+body[data-site] #top .world-directory>a:is(:hover,:focus-visible,:active)::before{opacity:.64}
 body[data-site] #top .world-directory>a>div{display:grid;grid-template-rows:88px auto;justify-items:center;align-items:center;gap:1rem;width:100%}
 body[data-site] #top .world-directory .directory-logo{display:block;width:auto;height:72px;max-width:100%;object-fit:contain;object-position:center;margin:0}
 body[data-site] #top .world-directory>a[href="/path/"] .directory-logo{height:80.6px}
@@ -380,6 +382,7 @@ body[data-site] #top .lab-personalization{grid-column:1/-1;padding-top:5rem}
 }
 @media(forced-colors:active){
   body[data-site] :is(.header.shell,.world-directory>a,.company-note,.principles>div,.contact-section,.questions-section,.contact-web,.question-desk,.site-family,.lab-card,.lab-volume,.shift-pillars>section,.making-note,.shift-workflow,.pulse-scene,.work-card,.lab-benefit,.lab-try){border-image:none!important;border:1px solid CanvasText!important;background:Canvas!important;color:CanvasText!important}
+  body[data-site] #top .world-directory>a::before{display:none}
 }
 
 /* Brand introductions: editorial reading rhythm, open space and real thread boundaries. */
@@ -521,7 +524,6 @@ body[data-site] .primary-link:hover,body[data-site] #top .send:not(:disabled):ho
 body[data-site] :focus-visible{outline-color:var(--brand-ink)}
 body[data-site] #top :is(.small-label,.story-index,.lab-step,.stage-label){color:var(--brand-ink)}
 body[data-site] #top .world-directory .directory-arrow,.site-family>a span,body[data-site] #top .line-link,body[data-site] #top .quiet-link{color:var(--brand-ink)}
-body[data-site] #top .world-directory>a:hover{background:var(--brand-wash)}
 body[data-site] #top .suggestions button:hover,body[data-site] #top .suggestions button:focus-visible{background:transparent;color:var(--brand-ink);border-color:var(--brand-ink)}
 body[data-site] .header nav .nav-contact,body[data-site] .header nav a:hover{color:var(--brand-ink)}
 body[data-site] #top .lab-benefit summary,body[data-site] #top .lab-try-guide li[aria-current]::before,body[data-site] #top .lab-patent-note a{color:var(--brand-ink)}
