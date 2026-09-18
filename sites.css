@@ -693,10 +693,10 @@ body[data-site] .carousel-header .site-wordmark,body[data-site] .carousel-header
 .brand-carousel{grid-column:2;grid-row:1;display:grid;grid-template-columns:44px 280px 44px;gap:0 12px;align-items:center;justify-content:center;isolation:isolate}
 .brand-carousel-track{position:relative;width:280px;height:64px;overflow:hidden;border-radius:32px;touch-action:pan-y;user-select:none;background:linear-gradient(180deg,#ffffffc0,#ffffff95),var(--nav-wash) url('/assets/felt-paper.webp') center/180px;background-blend-mode:normal,multiply;box-shadow:inset 0 1px 2px #fff,0 3px 0 #d7d3cb,0 5px 9px #29221b15;transition:background-color .25s}
 .brand-carousel-track::after{content:'';position:absolute;pointer-events:none;inset:auto 20% -14px;height:24px;background:var(--nav-color);filter:blur(16px);opacity:.24;z-index:-1}
-.brand-slide{position:absolute;inset:0;display:grid;grid-template-columns:40px minmax(0,1fr) 40px;align-items:center;gap:0;padding:10px 14px;text-decoration:none;opacity:1;transform:translateX(calc(var(--offset)*110%));transition:transform .38s cubic-bezier(.22,.75,.25,1),opacity .16s;will-change:auto}
+.brand-slide{position:absolute;inset:0;display:flex;justify-content:center;align-items:center;gap:18px;padding:12px 24px;text-decoration:none;opacity:1;transform:translateX(calc(var(--offset)*110%));transition:transform .38s cubic-bezier(.22,.75,.25,1),opacity .16s;will-change:auto}
 .brand-slide img{display:block;object-fit:contain;pointer-events:none}
-.brand-slide .brand-slide-logo{grid-column:2;grid-row:1;justify-self:center;height:38px;width:auto;max-width:100%}
-.brand-slide .brand-slide-icon{grid-column:3;grid-row:1;justify-self:end;width:34px;height:34px}
+.brand-slide .brand-slide-logo{flex:0 1 auto;height:34px;width:auto;min-width:0;max-width:calc(100% - 50px)}
+.brand-slide .brand-slide-icon{order:-1;flex:0 0 32px;width:32px;height:32px}
 .brand-slide[aria-hidden="true"]{pointer-events:none;opacity:0}
 .brand-step{display:grid;place-items:center;width:44px;height:44px;padding:0;border:0;border-radius:50%;color:var(--nav-ink);cursor:pointer}
 .brand-step[hidden]{visibility:hidden;display:grid}
@@ -760,9 +760,9 @@ body[data-site] #top .atlas-map-controls button[aria-selected="true"]{background
  .brand-current{display:none}
  .brand-carousel{grid-column:1;grid-template-columns:44px minmax(0,260px) 44px;gap:0 8px;width:100%;min-width:0}
  .brand-carousel-track{width:100%;height:54px}
- .brand-slide{grid-template-columns:30px minmax(0,1fr) 30px;padding:8px 10px}
- .brand-slide .brand-slide-logo{height:32px}
- .brand-slide .brand-slide-icon{width:26px;height:26px}
+ .brand-slide{gap:14px;padding:10px 16px}
+ .brand-slide .brand-slide-logo{height:28px;max-width:calc(100% - 40px)}
+ .brand-slide .brand-slide-icon{flex-basis:26px;width:26px;height:26px}
  .brand-position{height:15px}
  .brand-menu{gap:0 16px;min-height:44px}
  body[data-site] .carousel-header #main-nav .brand-menu a{font-size:.75rem;min-width:auto;min-height:36px;justify-content:center;white-space:nowrap;padding:0 2px}
