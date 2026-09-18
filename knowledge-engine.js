@@ -73,7 +73,9 @@ export function createKnowledgeEngine(data){
     if(/음악|노래|영상|곡/.test(c)&&/만들어줄|만들어주|제작해주|맞춤.*제작/.test(c))return from(['pulse-collaboration']);
     if(/로고|브랜딩/.test(c)&&/만들어줄|만들어주|제작해주|제작의뢰/.test(c))return from(['shift-scope']);
     if(/shift/.test(c)&&/과정/.test(c)&&/협업/.test(c))return from(['shift-scope','guide-collaboration']);
-    if(/4급|사급|6개월.*케어/.test(c))return from(['lab-topik']);
+    if(/(?:4급|사급).*(?:미달|못따|못받|불합격)|6개월.*(?:케어|지원)/.test(c))return from(['lab-year']);
+    if(/4급|사급/.test(c)&&/커리큘럼|과정구성|과정내용|수업내용|1년/.test(c))return from(['lab-year']);
+    if(/4급|사급/.test(c))return from(['lab-topik']);
     if(/학원.*어디|울란바토르|첫(?:오프라인)?거점|어느(?:도시|지역).*개원|주소가어디|수업장소|(?:lab|학원).*위치/.test(c))return from(['lab-location']);
     if(!/[가-힣]/.test(input)&&(/[\u0400-\u04ff]/.test(input)||/[a-z]{2,}\s+[a-z]{2,}/i.test(input)))return from(['guide-language'],'language');
     if(/라디오|klofi|24시간.*방송/.test(c)&&!/공부|학습|집중|저작권|허락|사용|상업|광고에|매장|가게/.test(c))return from(/감상영상|저영상|오늘밤제일환한|전곡/.test(c)?['pulse-listening','pulse-radio']:['pulse-radio']);

@@ -316,6 +316,24 @@ body[data-site] #top .story-section{padding-block:clamp(4rem,8vw,7rem);border-to
 .story-items p{font-size:1rem;line-height:1.9;color:var(--muted);word-break:keep-all;margin:0}
 .story-note{margin-top:3rem;max-width:900px;font-size:.8125rem;line-height:1.9;color:var(--muted);word-break:keep-all}
 .story-link{margin-top:2.5rem}
+.story-comparison{margin:0 0 3.5rem;min-width:0}
+.story-comparison table{width:100%;table-layout:fixed;border-collapse:collapse;text-align:left;font-size:1rem;line-height:1.8;word-break:keep-all;overflow-wrap:anywhere}
+.story-comparison caption{text-align:left;font-weight:600;font-size:1.25rem;margin-bottom:1.5rem}
+.story-comparison th,.story-comparison td{padding:1.5rem 1.25rem;vertical-align:top;font-weight:400}
+.story-comparison thead th{color:var(--brand-ink);font-weight:600}
+.story-comparison th:first-child{width:30%;padding-left:0}
+.story-comparison th:last-child,.story-comparison td:last-child{background:var(--brand-wash)}
+.story-details{margin-top:3.5rem}
+.story-details details{border-top:12px solid transparent;border-image:var(--thread-frame) 250 / 10px 0 0 / 0 round}
+.story-details summary{display:flex;align-items:center;justify-content:space-between;gap:1.5rem;min-height:80px;padding:1.5rem 0;cursor:pointer;list-style:none;font-size:1.125rem;font-weight:600;word-break:keep-all;line-height:1.6}
+.story-details summary::-webkit-details-marker{display:none}
+.story-details summary span{flex-shrink:0;color:var(--brand-ink)}
+.story-details details[open]>summary span{transform:rotate(45deg)}
+.story-detail-body{padding:0 0 2rem;max-width:840px;font-size:1rem;line-height:1.95;color:var(--muted);word-break:keep-all}
+.story-detail-body p{margin:0}
+.story-sources{list-style:none;padding:0;margin:1.25rem 0 0;display:flex;flex-wrap:wrap;gap:.5rem 1.5rem;font-size:.8125rem;line-height:1.8}
+.story-sources a{color:var(--brand-ink);display:inline-block;padding:.5rem 0;text-decoration:underline;text-underline-offset:.25em}
+@media(max-width:560px){.story-comparison table{font-size:.8rem;line-height:1.7}.story-comparison th,.story-comparison td{padding:1rem .5rem}.story-comparison th:first-child{width:31%}.story-details summary{font-size:1rem}.story-detail-body{font-size:.9375rem}.story-sources{font-size:.75rem}}
 body[data-site] #top .lab-personalization-wrap .lab-personalization{padding-block:2rem 5rem}
 body[data-site] #top .lab-curriculum-wrap,body[data-site] #top .lab-tracking-wrap{padding-block:2rem 5rem}
 body[data-site] #top .lab-curriculum-wrap .lab-card--curriculum{display:block}
