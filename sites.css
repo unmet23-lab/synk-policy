@@ -523,3 +523,4 @@ body[data-site] #top .lab-detail .lab-card{transform:none}
 body[data-site] #top .brand-process .shift-workflow__heading h4{font-size:clamp(1.625rem,2.6vw,2.5rem);line-height:1.35;margin-top:.75rem}
 
 body[data-site="shift"] #shift>.world-links{width:min(calc(100% - 3rem),1120px);margin-inline:auto}
+body[data-site="shift"] #design-notes .brand-story-layout>div>p+p{margin-top:1rem}
