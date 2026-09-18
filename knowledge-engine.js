@@ -32,12 +32,14 @@ export function createKnowledgeEngine(data){
     const advertisingEducation=/광고/.test(c)&&(/제작법|만드는법|만드는방법|배우|배워|배울|가르치|가르쳐/.test(c)||/광고(?:강의|강좌|수업|교육|연수)|광고.*(?:제작|만들기).*(?:강의|강좌|수업|교육|연수)/.test(c));
     const advertisingService=/광고/.test(c)&&!advertisingEducation;
     const organizationService=/기관|기업|조직|직원|임직원|팀/.test(c)&&(/교육|강의|연수|컨설팅|브랜딩/.test(c)||advertisingEducation);
-    const pathwayDirection=!brands.includes('lab')&&((/유학/.test(c)&&/취업/.test(c))||(/유학|취업|대학/.test(c)&&/연계|연결|알선|상담/.test(c)));
+    const languageStudy=(/영어/.test(c)&&/배우|배워|학습|공부|수업|회화|선생|교사|강사|교육/.test(c))||/원어민(?:회화|선생|교사|강사)|한국인(?:선생|교사|강사)|한국어회화/.test(c);
+    const pathwayDirection=!brands.includes('lab')&&!languageStudy&&((/유학/.test(c)&&/취업/.test(c))||(/유학|취업|대학/.test(c)&&/연계|연결|알선|상담/.test(c)));
     if(!brand){
       if(advertisingEducation)brand='shift';
       else if(advertisingService)brand='pulse';
       else if(pathwayDirection)brand='path';
       else if(organizationService)brand='shift';
+      else if(languageStudy)brand='lab';
       else if(/아이|학부모|보호자|부모|학생|한국어|외국인|학원|유학|k컬처|말하기|토픽|topik/.test(c))brand='lab';
       else if(/음악|라디오|노래|곡명|작품|감상|가게|매장|캐릭터/.test(c))brand='pulse';
       else if(followup&&brandIds[context?.brand])brand=context.brand;
@@ -73,9 +75,9 @@ export function createKnowledgeEngine(data){
     if(/음악|노래|영상|곡/.test(c)&&/만들어줄|만들어주|제작해주|맞춤.*제작/.test(c))return from(['pulse-collaboration']);
     if(/로고|브랜딩/.test(c)&&/만들어줄|만들어주|제작해주|제작의뢰/.test(c))return from(['shift-scope']);
     if(/shift/.test(c)&&/과정/.test(c)&&/협업/.test(c))return from(['shift-scope','guide-collaboration']);
-    if(/(?:4급|사급).*(?:미달|못따|못받|불합격)|6개월.*(?:케어|지원)/.test(c))return from(['lab-year']);
-    if(/4급|사급/.test(c)&&/커리큘럼|과정구성|과정내용|수업내용|1년/.test(c))return from(['lab-year']);
-    if(/4급|사급/.test(c))return from(['lab-topik']);
+    if(!languageStudy&&/(?:4급|사급).*(?:미달|못따|못받|불합격)|6개월.*(?:케어|지원)/.test(c))return from(['lab-year']);
+    if(!languageStudy&&/4급|사급/.test(c)&&/커리큘럼|과정구성|과정내용|수업내용|1년/.test(c))return from(['lab-year']);
+    if(!languageStudy&&/4급|사급/.test(c))return from(['lab-topik']);
     if(/학원.*어디|울란바토르|첫(?:오프라인)?거점|어느(?:도시|지역).*개원|주소가어디|수업장소|(?:lab|학원).*위치/.test(c))return from(['lab-location']);
     if(!/[가-힣]/.test(input)&&(/[\u0400-\u04ff]/.test(input)||/[a-z]{2,}\s+[a-z]{2,}/i.test(input)))return from(['guide-language'],'language');
     if(/라디오|klofi|24시간.*방송/.test(c)&&!/공부|학습|집중|저작권|허락|사용|상업|광고에|매장|가게/.test(c))return from(/감상영상|저영상|오늘밤제일환한|전곡/.test(c)?['pulse-listening','pulse-radio']:['pulse-radio']);
@@ -109,17 +111,19 @@ export function createKnowledgeEngine(data){
     if(/교수님.*(?:편지|체험)|synkworld|싱크월드/.test(c))return from(['lab-start']);
     if(brand==='pulse'&&/곡명|대표작|제목|전곡|실시간|스트리밍|생방송/.test(c))return from(['pulse-listening']);
     if(/교재제목|교재이름|강사이름|학교이름|모델이름|모델명|언어모델|책추천/.test(c))return unknown(brand);
-    if(/topik|토픽|합격|급수/.test(c)&&brand==='lab')return from(['lab-topik']);
+    if(languageStudy&&/(?:선생님?|교사|강사)(?:의)?(?:이름|성함)/.test(c))return unknown(brand);
+    if(!languageStudy&&/topik|토픽|합격|급수/.test(c)&&brand==='lab')return from(['lab-topik']);
     if((brand==='pulse'||/음악|작품/.test(c))&&/공부|학습|효과|집중력|치유/.test(c))return from(['pulse-not-study']);
     if(/보장|성과|시간절감|성공/.test(c))return pathwayService?from(['path-support'],'needs_confirmation'):from([brand==='shift'?'shift-results':'guide-evidence']);
     if(/자료/.test(c)&&/가입|무료|댓글|다운|어디/.test(c))return from(['shift-materials']);
-    if(/수강료|가격|요금|비용|환불|견적|계약조건|결제|모집|개강|언제|날짜|일정|신청|등록|이용조건|얼마/.test(c)||((advertisingService||advertisingEducation)&&/무료/.test(c))){
+    if(/수강료|가격|요금|비용|환불|견적|계약조건|결제|모집|개강|언제|날짜|일정|신청|등록|이용조건|얼마/.test(c)||((advertisingService||advertisingEducation||languageStudy)&&/무료/.test(c))){
       if(pathwayService&&!/수강료|가격|요금|비용|환불|견적|계약조건|결제|이용조건|얼마/.test(c))return from(['path-support'],'needs_confirmation');
       return from([brand==='lab'?'lab-availability':'guide-availability'],'needs_confirmation');
     }
     // Privacy, unpublished facts, evidence and commercial conditions above retain priority.
     const publicDirection=/비전|vision|철학|가치관|중요하게|중요히|믿음|지향/.test(c);
     if(!publicDirection){
+      if(languageStudy&&brand==='lab')return from([/topik|토픽|급수|4급|유학|대학|적응|취업|결과물|포트폴리오/.test(c)?'lab-language-use':'lab-languages']);
       if(/vr|가상현실|직업체험/.test(c))return from(['lab-vr']);
       if(brand==='path'&&/차별|차이|왜|선택|유학원/.test(c))return from(['path-why']);
       if(brand==='path'&&/개인화|관리|기록|성향/.test(c))return from(['path-personal']);
