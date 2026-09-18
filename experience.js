@@ -1,5 +1,5 @@
 // Independent enhancements. The semantic page and native controls work without GSAP.
-import {initLearningInteractions} from './interactions/learning.js?v=af4d82a6e495';
+import {initLearningInteractions} from './interactions/learning.js?v=e41b2347e027';
 import {initCurriculumNarrative} from './interactions/curriculum.js?v=db9dda0d05d2';
 import {initFeltInteractions} from './interactions/felt.js?v=8b2ce7e3bff0';
 import {initScrollExperience} from './interactions/scroll.js?v=aaa280e1826b';

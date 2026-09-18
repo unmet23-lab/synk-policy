@@ -68,3 +68,14 @@ if(location.pathname==='/'){
  if(brand)location.replace('/'+brand+'/'+(hash===brand?'':'#'+(hash==='shift-people'?'path-journey':hash==='shift-business'?'shift-services':hash)));
  else if(hash==='work')location.replace('/#worlds');
 }
+// Opening a saved or answer-linked section also reveals its enclosing detail panels.
+function revealLinkedDetails(hash=location.hash){
+ let id;try{id=decodeURIComponent(hash.slice(1));}catch{return;}
+ const target=document.getElementById(id);if(!target)return;
+ let node=target.parentElement,opened=false;
+ while(node){if(node.tagName==='DETAILS'&&!node.open){node.open=true;opened=true;}node=node.parentElement;}
+ if(opened)document.dispatchEvent(new CustomEvent('synk:layout'));
+}
+revealLinkedDetails();
+window.addEventListener('hashchange',()=>revealLinkedDetails());
+document.addEventListener('click',event=>{const link=event.target.closest('a[href]');if(!link)return;const target=new URL(link.href,location.href);if(target.origin===location.origin&&target.pathname===location.pathname)revealLinkedDetails(target.hash);},true);

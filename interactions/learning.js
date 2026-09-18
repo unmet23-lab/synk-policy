@@ -28,7 +28,7 @@ function snapshotAttributes(element, names) {
 }
 
 export function initLearningInteractions({ gsap, reducedMotion = false, initialIndex = 0 } = {}) {
-  const root = document.querySelector('#lab.lab-bento');
+  const root = document.querySelector('body[data-site="lab"]') || document.querySelector('#lab.lab-bento');
   if (!root) return () => {};
   activeInstances.get(root)?.();
 

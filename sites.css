@@ -1,13 +1,18 @@
-/* Shared finish for SYNK / LAB / SHIFT / PULSE.
+/* Shared finish for SYNK / LAB / SHIFT / PULSE / PATH.
    Thread and felt borders use generated photographs, sliced so the material does not stretch. */
 body[data-site]{
   --paper:#fff;--line:rgba(43,35,32,.14);
+  --brand-color:#575046;--brand-ink:#2b2320;--brand-wash:#f8f8f7;
   --thread-frame:url('/assets/thread-frame-20260918.webp');
   --felt-frame:url('/assets/felt-frame-20260918.webp');
   --felt-ink-frame:url('/assets/felt-ink-frame-20260918.webp');
   background:#fff;font-weight:400;
 }
-body[data-site] ::selection{background:#e6e6e6;color:var(--ink)}
+body[data-site="lab"],.world-directory>a[href="/lab/"],.site-family>a[href="/lab/"]{--brand-color:#f96859;--brand-ink:#ae322a;--brand-wash:#fef0e9;--thread-frame:url('/assets/thread-lab-20260918.webp')}
+body[data-site="shift"],.world-directory>a[href="/shift/"],.site-family>a[href="/shift/"]{--brand-color:#3d6bc9;--brand-ink:#24448c;--brand-wash:#f0f4fc;--thread-frame:url('/assets/thread-shift-20260918.webp')}
+body[data-site="pulse"],.world-directory>a[href="/pulse/"],.site-family>a[href="/pulse/"]{--brand-color:#99295d;--brand-ink:#99295d;--brand-wash:#fcf1f6;--thread-frame:url('/assets/thread-pulse-20260918.webp')}
+body[data-site="path"],.world-directory>a[href="/path/"],.site-family>a[href="/path/"]{--brand-color:#526956;--brand-ink:#3b503e;--brand-wash:#f0f5f0;--thread-frame:url('/assets/thread-path-20260918.webp')}
+body[data-site] ::selection{background:var(--brand-wash);color:var(--brand-ink)}
 body[data-site] .shell{max-width:1120px}
 .site-wordmark{flex:none}
 body[data-site] .header.shell{position:relative;top:auto;width:min(calc(100% - 3rem),1120px);min-height:100px;padding:0 0 12px;border:0;border-bottom:16px solid transparent;border-image:var(--thread-frame) 250 / 0 0 34px / 0 round;border-radius:0;background:#fff;box-shadow:none;backdrop-filter:none;-webkit-backdrop-filter:none}
@@ -315,7 +320,7 @@ body[data-site] #top .lab-personalization-wrap .lab-personalization{padding-bloc
 body[data-site] #top .lab-curriculum-wrap,body[data-site] #top .lab-tracking-wrap{padding-block:2rem 5rem}
 body[data-site] #top .lab-curriculum-wrap .lab-card--curriculum{display:block}
 body[data-site] #top .lab-tracking-wrap .lab-card--tracking{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:3rem}
-body[data-site] #top .brand-proof{padding-block:3rem 6rem}
+body[data-site] #top .brand-process{padding-block:3rem 6rem}
 body[data-site] #top .world-shift{padding-bottom:0}
 body[data-site] #top .world-shift .shift-heading{margin-bottom:0}
 .path-hero{padding-block:clamp(4rem,8vw,7rem);text-align:center}
@@ -345,3 +350,50 @@ body[data-site] #top .atlas-applications{grid-template-columns:repeat(2,minmax(0
  .path-route [aria-hidden]{transform:rotate(90deg)}
  body[data-site] #top .atlas-applications{grid-template-columns:1fr}
 }
+/* Brand colour follows the visitor from the directory into controls and real thread borders. */
+body[data-site] .primary-link,body[data-site] #top .send:not(:disabled),body[data-site] .help-tabs button[aria-selected="true"]{background:var(--brand-ink);color:#fff}
+body[data-site] .primary-link:hover,body[data-site] #top .send:not(:disabled):hover{background:var(--brand-ink);filter:brightness(.92)}
+body[data-site] :focus-visible{outline-color:var(--brand-ink)}
+body[data-site] #top :is(.small-label,.story-index,.lab-step,.stage-label){color:var(--brand-ink)}
+body[data-site] #top .world-directory .directory-arrow,.site-family>a span,body[data-site] #top .line-link,body[data-site] #top .quiet-link{color:var(--brand-ink)}
+body[data-site] #top .world-directory>a:hover{background:var(--brand-wash)}
+body[data-site] #top .help-frame .question-desk{background:var(--brand-wash)}
+body[data-site] #top .suggestions button:hover,body[data-site] #top .suggestions button:focus-visible{background:var(--brand-wash);color:var(--brand-ink);border-color:var(--brand-ink)}
+body[data-site] .header nav .nav-contact,body[data-site] .header nav a:hover{color:var(--brand-ink)}
+body[data-site] #top .lab-benefit summary,body[data-site] #top .lab-try-guide li[aria-current]::before,body[data-site] #top .lab-patent-note a{color:var(--brand-ink)}
+body[data-site] #top .lab-try-guide li[aria-current] strong{color:var(--brand-ink)}
+body[data-site] #top .lab-curriculum-wrap .lab-card--curriculum{background:#fff;border:1px solid transparent;border-image:var(--thread-frame) 250 / 48px / 0 round;padding:clamp(2rem,5vw,4rem);border-radius:0;box-shadow:none}
+body[data-site] #top .lab-curriculum-wrap .lab-card__status{color:var(--brand-ink);background:var(--brand-wash)}
+body[data-site] #top .lab-curriculum-wrap .lab-volume{background:#fff;border:0;border-top:16px solid transparent;border-image:var(--thread-frame) 250 / 26px 0 0 / 0 round;border-radius:0;box-shadow:none}
+body[data-site] #top .lab-curriculum-wrap .lab-talks li{background:var(--brand-wash);border:0;border-radius:12px}
+body[data-site] #top .roadmap-nav a[aria-current]{background:var(--brand-ink);border-color:var(--brand-ink);color:#fff}
+body[data-site] #top .roadmap-context{background:var(--brand-wash);border:0}
+.lab-feedback-preview{margin-top:2rem;border-block:16px solid transparent;border-image:var(--thread-frame) 250 / 26px 0 / 0 round;padding-block:1rem}
+.lab-feedback-preview>summary{display:flex;align-items:center;justify-content:space-between;min-height:56px;gap:1rem;cursor:pointer;list-style:none;color:var(--brand-ink);font-size:1rem;font-weight:600}
+.lab-feedback-preview>summary::-webkit-details-marker{display:none}
+.lab-feedback-preview[open]>summary>span{transform:rotate(45deg)}
+body[data-site] #top .lab-feedback-preview .lab-tracking-wrap{padding:2rem 0 0}
+body[data-site] #top .lab-feedback-preview .lab-card--tracking{background:none;--world-ink:var(--synk-paper);--world-muted:var(--synk-stone);border:1px solid transparent;border-image:var(--felt-ink-frame) 250 fill / 68px / 0 round;border-radius:0;padding:clamp(2rem,4vw,4rem);color:var(--synk-paper);box-shadow:none}
+
+
+body[data-site] #top .brand-process .shift-workflow{background:#fff;border:1px solid transparent;border-image:var(--thread-frame) 250 / 48px / 0 round;border-radius:0;padding:clamp(1.5rem,4vw,3.5rem)}
+body[data-site] #top .shift-workflow__steps [aria-selected="true"]{background:var(--brand-ink);color:#fff;border-color:var(--brand-ink)}
+body[data-site] #top .shift-workflow__steps [aria-selected="true"] .shift-workflow__number{color:#fff}
+body[data-site] #top .shift-workflow__panel{background:#fff}
+body[data-site] #top .shift-workflow__record{color:var(--ink)}
+body[data-site] #top .practice-link{display:inline-flex;margin-top:2rem}
+body[data-site] #top .world-pulse .pulse-scene{border-image:var(--thread-frame) 250 / 48px / 0 round;background:#fff;color:var(--brand-ink)}
+body[data-site] #top .world-pulse .pulse-scene figcaption p{color:var(--brand-ink)}
+body[data-site] #top .world-pulse .pulse-scene .eyebrow{display:none}
+body[data-site] #top .path-route{border-image:var(--thread-frame) 250 / 48px / 0 round;background:#fff;color:var(--brand-ink)}
+.section-alias{display:block;scroll-margin-top:5rem}
+@media(max-width:560px){body[data-site] #top .lab-curriculum-wrap .lab-card--curriculum{padding:2rem 1.5rem;border-image-width:36px}body[data-site] #top .brand-process .shift-workflow{padding:2rem 1.25rem;border-image-width:36px}}
+@media(forced-colors:active){body[data-site] :is(.primary-link,.help-tabs button[aria-selected="true"]){background:Highlight;color:HighlightText}body[data-site] #top :is(.story-section,.help-frame,.lab-feedback-preview,.path-route){border-image:none;border-color:CanvasText}body[data-site] #top :is(.small-label,.story-index,.lab-step,.stage-label,.line-link,.quiet-link){color:CanvasText}}
+
+body[data-site] #top .lab-feedback-preview .small-label{color:var(--synk-stone)}
+body[data-site] #top .lab-feedback-preview .lab-tracker__tabs button[aria-selected="true"]{background:var(--brand-ink);color:#fff}
+body[data-site] #top .lab-detail .lab-card::after{display:none}
+body[data-site] #top .lab-detail .lab-card{transform:none}
+body[data-site] #top .brand-process .shift-workflow__heading h4{font-size:clamp(1.625rem,2.6vw,2.5rem);line-height:1.35;margin-top:.75rem}
+
+body[data-site="shift"] #shift>.world-links{width:min(calc(100% - 3rem),1120px);margin-inline:auto}

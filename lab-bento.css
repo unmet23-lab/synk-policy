@@ -2,19 +2,19 @@
    Load after global theme styles. Fixed card colors preserve contrast in every world. */
 
 /* 1. Layout — source order is also the reading order on mobile. */
-#lab.lab-bento {
+:is(#lab.lab-bento,.lab-detail) {
   --lab-radius: var(--단);
   --lab-padding: var(--켜);
   --lab-card-line: color-mix(in srgb, var(--synk-ink) 12%, transparent);
 }
-#lab.lab-bento .lab-bento__grid {
+:is(#lab.lab-bento,.lab-detail) .lab-bento__grid {
   display: grid;
   grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
   align-items: stretch;
   gap: var(--칸);
   padding-block: var(--단);
 }
-#lab.lab-bento .lab-card {
+:is(#lab.lab-bento,.lab-detail) .lab-card {
   min-width: 0;
   position: relative;
   isolation: isolate;
@@ -29,7 +29,7 @@
   box-shadow: inset 0 0 0 1px var(--lab-card-line);
 }
 /* A shadow layer fades in without animating an expensive box-shadow. */
-#lab.lab-bento .lab-card::after {
+:is(#lab.lab-bento,.lab-detail) .lab-card::after {
   content: "";
   position: absolute;
   inset: 0;
@@ -39,7 +39,7 @@
   opacity: 0;
   pointer-events: none;
 }
-#lab.lab-bento .lab-card__meta {
+:is(#lab.lab-bento,.lab-detail) .lab-card__meta {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -48,19 +48,19 @@
   margin-bottom: var(--단);
   color: var(--synk-deep-wool);
 }
-#lab.lab-bento .lab-card__status {
+:is(#lab.lab-bento,.lab-detail) .lab-card__status {
   font-size: 12px;
   line-height: 1.6;
   letter-spacing: -.01em;
 }
-#lab.lab-bento .lab-card__title {
+:is(#lab.lab-bento,.lab-detail) .lab-card__title {
   font-size: clamp(24px, 2.2vw, 32px);
   line-height: 1.4;
   letter-spacing: -.035em;
   font-weight: 750;
   text-wrap: balance;
 }
-#lab.lab-bento .lab-card__description {
+:is(#lab.lab-bento,.lab-detail) .lab-card__description {
   margin-top: var(--참);
   color: var(--synk-deep-wool);
   font-size: 14px;
@@ -68,35 +68,35 @@
 }
 
 /* 2. Existing vision / philosophy / links — IDs and data attributes retained. */
-#lab.lab-bento .lab-card--direction { background: var(--synk-oat); }
-#lab.lab-bento .lab-card--direction { display: flex; flex-direction: column; }
-#lab.lab-bento .lab-card--curriculum { display: flex; flex-direction: column; }
-#lab.lab-bento .lab-card--direction h3 {
+:is(#lab.lab-bento,.lab-detail) .lab-card--direction { background: var(--synk-oat); }
+:is(#lab.lab-bento,.lab-detail) .lab-card--direction { display: flex; flex-direction: column; }
+:is(#lab.lab-bento,.lab-detail) .lab-card--curriculum { display: flex; flex-direction: column; }
+:is(#lab.lab-bento,.lab-detail) .lab-card--direction h3 {
   font-size: clamp(32px, 3.25vw, 48px);
   line-height: 1.34;
   letter-spacing: -.045em;
   text-wrap: balance;
 }
-#lab.lab-bento .lab-card--direction .mission {
+:is(#lab.lab-bento,.lab-detail) .lab-card--direction .mission {
   margin-top: var(--단);
   padding-top: var(--단);
   max-width: none;
 }
-#lab.lab-bento .lab-card--direction .mission h4 {
+:is(#lab.lab-bento,.lab-detail) .lab-card--direction .mission h4 {
   margin-top: var(--틈);
   font-size: 19px;
   letter-spacing: -.025em;
   line-height: 1.5;
 }
-#lab.lab-bento .lab-card--direction .mission p {
+:is(#lab.lab-bento,.lab-detail) .lab-card--direction .mission p {
   font-size: 14px;
   line-height: 1.85;
   margin-top: var(--참);
 }
-#lab.lab-bento .lab-card--direction .world-links { margin-top: auto; padding-top: var(--단); }
+:is(#lab.lab-bento,.lab-detail) .lab-card--direction .world-links { margin-top: auto; padding-top: var(--단); }
 
 /* 3. Approved felt object. Its button/surface pair is enhanced by the felt module. */
-#lab.lab-bento .lab-card--scene {
+:is(#lab.lab-bento,.lab-detail) .lab-card--scene {
   aspect-ratio: auto;
   max-width: none;
   display: flex;
@@ -106,7 +106,7 @@
   overflow: hidden;
   min-height: 360px;
 }
-#lab.lab-bento .lab-card--scene > [data-felt] {
+:is(#lab.lab-bento,.lab-detail) .lab-card--scene > [data-felt] {
   position: static;
   width: min(100%, 350px);
   align-self: center;
@@ -116,24 +116,24 @@
   background: transparent;
   border-radius: var(--칸);
 }
-#lab.lab-bento .lab-card--scene [data-felt-surface] {
+:is(#lab.lab-bento,.lab-detail) .lab-card--scene [data-felt-surface] {
   position: static;
   width: 100%;
   height: auto;
   mix-blend-mode: multiply;
 }
-#lab.lab-bento .lab-card--scene figcaption {
+:is(#lab.lab-bento,.lab-detail) .lab-card--scene figcaption {
   position: static;
   margin-top: auto;
 }
-#lab.lab-bento .lab-card--scene figcaption p {
+:is(#lab.lab-bento,.lab-detail) .lab-card--scene figcaption p {
   margin-block: var(--참);
   font-size: clamp(26px, 2.4vw, 34px);
   line-height: 1.4;
 }
 
 /* 4. Curriculum — real volume names; stages are targets, never outcomes. */
-#lab.lab-bento .lab-curriculum__heading {
+:is(#lab.lab-bento,.lab-detail) .lab-curriculum__heading {
   display: flex;
   align-items: baseline;
   justify-content: space-between;
@@ -142,11 +142,11 @@
   margin-top: var(--단);
   margin-bottom: var(--칸);
 }
-#lab.lab-bento .lab-curriculum__heading strong { font-size: 15px; font-weight: 700; }
-#lab.lab-bento .lab-curriculum__heading span { color: var(--synk-deep-wool); font-size: 12px; }
-#lab.lab-bento .lab-curriculum__heading .lab-curriculum__count { margin-left: var(--숨); color: var(--synk-coral-3); }
-#lab.lab-bento .lab-curriculum__instruction { margin: calc(-1 * var(--틈)) 0 var(--칸); font-size: 12px; line-height: 1.7; color: var(--synk-deep-wool); }
-#lab.lab-bento .lab-volumes {
+:is(#lab.lab-bento,.lab-detail) .lab-curriculum__heading strong { font-size: 15px; font-weight: 700; }
+:is(#lab.lab-bento,.lab-detail) .lab-curriculum__heading span { color: var(--synk-deep-wool); font-size: 12px; }
+:is(#lab.lab-bento,.lab-detail) .lab-curriculum__heading .lab-curriculum__count { margin-left: var(--숨); color: var(--synk-coral-3); }
+:is(#lab.lab-bento,.lab-detail) .lab-curriculum__instruction { margin: calc(-1 * var(--틈)) 0 var(--칸); font-size: 12px; line-height: 1.7; color: var(--synk-deep-wool); }
+:is(#lab.lab-bento,.lab-detail) .lab-volumes {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: var(--틈);
@@ -154,32 +154,32 @@
   padding: 0;
   list-style: none;
 }
-#lab.lab-bento .lab-volume {
+:is(#lab.lab-bento,.lab-detail) .lab-volume {
   border-radius: var(--틈);
   border-top: 2px solid var(--synk-stitch);
   background: color-mix(in srgb, var(--synk-oat) 65%, var(--synk-paper));
   min-width: 0;
   box-shadow: inset 3px 0 color-mix(in srgb, var(--synk-stitch) 45%, transparent);
 }
-#lab.lab-bento .lab-volume details { height: 100%; }
-#lab.lab-bento .lab-volume summary { display: flex; flex-direction: column; gap: var(--틈); padding: var(--칸); min-height: 124px; list-style: none; border-radius: var(--틈); cursor: pointer; }
-#lab.lab-bento .lab-volume summary::-webkit-details-marker { display: none; }
-#lab.lab-bento .lab-volume summary:focus-visible { outline: 2px solid var(--synk-coral-3); outline-offset: 2px; }
-#lab.lab-bento .lab-volume:has(details[open]) { background: var(--synk-oat); box-shadow: inset 3px 0 var(--synk-coral-3); }
-#lab.lab-bento .lab-volume details[open] .lab-volume__number { color: var(--synk-coral-3); }
-#lab.lab-bento .lab-volume details[open] .lab-volume__cue > span { transform: rotate(45deg); }
-#lab.lab-bento .lab-volume__cue { display: flex; align-items: center; justify-content: space-between; gap: var(--틈); width: 100%; color: var(--synk-deep-wool); font-size: 11px; line-height: 1.5; }
-#lab.lab-bento .lab-volume__cue > span { font-size: 18px; line-height: 1; }
-#lab.lab-bento .lab-volume__body { padding: 0 var(--칸) var(--칸); }
-#lab.lab-bento .lab-volume__body p { border-top: 1px solid var(--lab-card-line); padding-top: var(--참); color: var(--synk-deep-wool); font-size: 12px; line-height: 1.7; }
-#lab.lab-bento .lab-volume__body strong { color: var(--synk-ink); font-weight: 650; }
-#lab.lab-bento .lab-volume__number {
+:is(#lab.lab-bento,.lab-detail) .lab-volume details { height: 100%; }
+:is(#lab.lab-bento,.lab-detail) .lab-volume summary { display: flex; flex-direction: column; gap: var(--틈); padding: var(--칸); min-height: 124px; list-style: none; border-radius: var(--틈); cursor: pointer; }
+:is(#lab.lab-bento,.lab-detail) .lab-volume summary::-webkit-details-marker { display: none; }
+:is(#lab.lab-bento,.lab-detail) .lab-volume summary:focus-visible { outline: 2px solid var(--synk-coral-3); outline-offset: 2px; }
+:is(#lab.lab-bento,.lab-detail) .lab-volume:has(details[open]) { background: var(--synk-oat); box-shadow: inset 3px 0 var(--synk-coral-3); }
+:is(#lab.lab-bento,.lab-detail) .lab-volume details[open] .lab-volume__number { color: var(--synk-coral-3); }
+:is(#lab.lab-bento,.lab-detail) .lab-volume details[open] .lab-volume__cue > span { transform: rotate(45deg); }
+:is(#lab.lab-bento,.lab-detail) .lab-volume__cue { display: flex; align-items: center; justify-content: space-between; gap: var(--틈); width: 100%; color: var(--synk-deep-wool); font-size: 11px; line-height: 1.5; }
+:is(#lab.lab-bento,.lab-detail) .lab-volume__cue > span { font-size: 18px; line-height: 1; }
+:is(#lab.lab-bento,.lab-detail) .lab-volume__body { padding: 0 var(--칸) var(--칸); }
+:is(#lab.lab-bento,.lab-detail) .lab-volume__body p { border-top: 1px solid var(--lab-card-line); padding-top: var(--참); color: var(--synk-deep-wool); font-size: 12px; line-height: 1.7; }
+:is(#lab.lab-bento,.lab-detail) .lab-volume__body strong { color: var(--synk-ink); font-weight: 650; }
+:is(#lab.lab-bento,.lab-detail) .lab-volume__number {
   font: 400 28px/1.1 var(--synk-font-mono);
   letter-spacing: -.05em;
   color: var(--synk-deep-wool);
 }
-#lab.lab-bento .lab-volume__level { font-size: 13px; font-weight: 700; line-height: 1.5; }
-#lab.lab-bento .lab-talks {
+:is(#lab.lab-bento,.lab-detail) .lab-volume__level { font-size: 13px; font-weight: 700; line-height: 1.5; }
+:is(#lab.lab-bento,.lab-detail) .lab-talks {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: var(--틈);
@@ -187,7 +187,7 @@
   padding: 0;
   list-style: none;
 }
-#lab.lab-bento .lab-talks li {
+:is(#lab.lab-bento,.lab-detail) .lab-talks li {
   display: flex;
   justify-content: space-between;
   align-items: baseline;
@@ -198,11 +198,11 @@
   border-radius: var(--틈);
   font-size: 13px;
 }
-#lab.lab-bento .lab-talks span { color: var(--synk-deep-wool); font-size: 12px; }
-#lab.lab-bento .lab-curriculum__note { color: var(--synk-deep-wool); font-size: 12px; line-height: 1.75; margin-top: auto; padding-top: var(--칸); }
+:is(#lab.lab-bento,.lab-detail) .lab-talks span { color: var(--synk-deep-wool); font-size: 12px; }
+:is(#lab.lab-bento,.lab-detail) .lab-curriculum__note { color: var(--synk-deep-wool); font-size: 12px; line-height: 1.75; margin-top: auto; padding-top: var(--칸); }
 
 /* 5. App record illustration. All panels remain readable if JavaScript fails. */
-#lab.lab-bento .lab-card--tracking {
+:is(#lab.lab-bento,.lab-detail) .lab-card--tracking {
   background: var(--synk-ink-deep);
   color: var(--synk-paper);
   --world-ink: var(--synk-paper);
@@ -212,16 +212,16 @@
   flex-direction: column;
   --lab-card-line: color-mix(in srgb, var(--synk-stitch) 20%, transparent);
 }
-#lab.lab-bento .lab-card--tracking .lab-card__meta,
-#lab.lab-bento .lab-card--tracking .lab-card__description { color: var(--synk-stone); }
-#lab.lab-bento .lab-card--tracking .lab-card__status {
+:is(#lab.lab-bento,.lab-detail) .lab-card--tracking .lab-card__meta,
+:is(#lab.lab-bento,.lab-detail) .lab-card--tracking .lab-card__description { color: var(--synk-stone); }
+:is(#lab.lab-bento,.lab-detail) .lab-card--tracking .lab-card__status {
   padding: var(--숨) var(--틈);
   border: 1px solid var(--lab-card-line);
   border-radius: var(--틈);
   color: var(--synk-oat);
 }
-#lab.lab-bento .lab-tracker { margin-top: var(--단); }
-#lab.lab-bento .lab-tracker__caption {
+:is(#lab.lab-bento,.lab-detail) .lab-tracker { margin-top: var(--단); }
+:is(#lab.lab-bento,.lab-detail) .lab-tracker__caption {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -230,108 +230,108 @@
   font-size: 13px;
   color: var(--synk-oat);
 }
-#lab.lab-bento .lab-tracker__caption span { color: var(--synk-stone); font-size: 11px; }
-#lab.lab-bento .lab-tracker__situation { margin-block: var(--칸) var(--단); padding-left: var(--참); border-left: 2px solid var(--synk-stitch); }
-#lab.lab-bento .lab-tracker__situation .small-label { color: var(--synk-stone); font-size: 11px; }
-#lab.lab-bento .lab-tracker__situation p { color: var(--synk-paper); font-size: 14px; line-height: 1.7; margin-top: var(--숨); }
-#lab.lab-bento .lab-tracker__summary {
+:is(#lab.lab-bento,.lab-detail) .lab-tracker__caption span { color: var(--synk-stone); font-size: 11px; }
+:is(#lab.lab-bento,.lab-detail) .lab-tracker__situation { margin-block: var(--칸) var(--단); padding-left: var(--참); border-left: 2px solid var(--synk-stitch); }
+:is(#lab.lab-bento,.lab-detail) .lab-tracker__situation .small-label { color: var(--synk-stone); font-size: 11px; }
+:is(#lab.lab-bento,.lab-detail) .lab-tracker__situation p { color: var(--synk-paper); font-size: 14px; line-height: 1.7; margin-top: var(--숨); }
+:is(#lab.lab-bento,.lab-detail) .lab-tracker__summary {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: var(--틈);
   margin-bottom: var(--칸);
 }
-#lab.lab-bento .lab-tracker__summary[hidden] { display: none; }
-#lab.lab-bento .lab-tracker__summary > div {
+:is(#lab.lab-bento,.lab-detail) .lab-tracker__summary[hidden] { display: none; }
+:is(#lab.lab-bento,.lab-detail) .lab-tracker__summary > div {
   padding: var(--참);
   background: var(--synk-ink);
   border-radius: var(--틈);
   box-shadow: inset 0 1px var(--lab-card-line);
 }
-#lab.lab-bento .lab-tracker__summary dt { color: var(--synk-stone); font-size: 11px; line-height: 1.7; }
-#lab.lab-bento .lab-tracker__summary dd { color: var(--synk-paper); font-size: 20px; font-weight: 650; line-height: 1.5; margin-top: var(--숨); }
-#lab.lab-bento .lab-tracker__journey { display: none; position: relative; }
-#lab.lab-bento [data-learning-enhanced] .lab-tracker__journey { display: block; }
-#lab.lab-bento .lab-tracker__journey svg { display: block; width: 100%; height: 36px; overflow: visible; }
-#lab.lab-bento .lab-tracker__journey path { fill: none; stroke-width: 1.5; vector-effect: non-scaling-stroke; }
-#lab.lab-bento .lab-tracker__rail { stroke: var(--synk-deep-wool); }
-#lab.lab-bento .lab-tracker__line { stroke: var(--synk-stitch); stroke-dasharray: 1; stroke-dashoffset: 1; }
-#lab.lab-bento [data-learning-node] { position: absolute; top: 50%; width: 10px; height: 10px; border: 1.5px solid var(--synk-stone); border-radius: 50%; background: var(--synk-ink-deep); transform: translate(-50%, -50%); }
-#lab.lab-bento [data-learning-node]:nth-of-type(1) { left: calc(100% / 6); }
-#lab.lab-bento [data-learning-node]:nth-of-type(2) { left: 50%; }
-#lab.lab-bento [data-learning-node]:nth-of-type(3) { left: calc(100% * 5 / 6); }
-#lab.lab-bento [data-learning-node].is-current { background: var(--synk-stitch); border-color: var(--synk-stitch); }
-#lab.lab-bento [data-learning-node].is-complete { background: var(--synk-stone); }
-#lab.lab-bento .lab-tracker__tabs { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--숨); margin-bottom: var(--칸); }
-#lab.lab-bento .lab-tracker__tabs[hidden] { display: none; }
-#lab.lab-bento .lab-tracker__tabs button { display: flex; align-items: center; justify-content: center; min-width: 0; min-height: 44px; padding: var(--틈) var(--숨); border-radius: var(--틈); border: 1px solid transparent; font-size: 12px; line-height: 1.5; color: var(--synk-stone); background: transparent; }
-#lab.lab-bento .lab-tracker__tabs button[aria-selected="true"] { color: var(--synk-paper); background: var(--synk-ink); border-color: var(--lab-card-line); }
-#lab.lab-bento .lab-tracker__tabs button:focus-visible { outline-color: var(--synk-stitch); outline-offset: 2px; }
-#lab.lab-bento .lab-tracker__panels { display: grid; gap: var(--틈); }
-#lab.lab-bento .lab-tracker__panel { padding: var(--단); background: var(--synk-ink); border-radius: var(--칸); color: var(--synk-paper); min-width: 0; }
-#lab.lab-bento [data-learning-enhanced] .lab-tracker__panel { min-height: 246px; }
-#lab.lab-bento .lab-tracker__panel[hidden] { display: none; }
-#lab.lab-bento .lab-tracker__panel:focus-visible { outline-color: var(--synk-stitch); outline-offset: 3px; }
-#lab.lab-bento .lab-tracker__panel h5 { margin: 0; font-size: 12px; font-weight: 500; line-height: 1.7; color: var(--synk-stone); }
-#lab.lab-bento .lab-tracker__panel blockquote { margin: var(--참) 0 var(--단); padding: 0; border: 0; color: var(--synk-paper); font-size: clamp(19px, 1.8vw, 24px); font-weight: 600; letter-spacing: -.03em; line-height: 1.6; word-break: keep-all; text-wrap: pretty; }
-#lab.lab-bento .lab-tracker__explanation { font-size: 13px; line-height: 1.8; color: var(--synk-stone); }
-#lab.lab-bento .lab-tracker__explanation strong { color: var(--synk-stitch); font-weight: 600; }
-#lab.lab-bento .lab-tracker__seal { display: inline-block; margin-top: var(--칸); font-size: 11px; line-height: 1.7; color: var(--synk-stitch); }
-#lab.lab-bento .lab-tracker__footnote { margin-top: var(--칸); font-size: 12px; line-height: 1.75; color: var(--synk-stone); }
+:is(#lab.lab-bento,.lab-detail) .lab-tracker__summary dt { color: var(--synk-stone); font-size: 11px; line-height: 1.7; }
+:is(#lab.lab-bento,.lab-detail) .lab-tracker__summary dd { color: var(--synk-paper); font-size: 20px; font-weight: 650; line-height: 1.5; margin-top: var(--숨); }
+:is(#lab.lab-bento,.lab-detail) .lab-tracker__journey { display: none; position: relative; }
+:is(#lab.lab-bento,.lab-detail) [data-learning-enhanced] .lab-tracker__journey { display: block; }
+:is(#lab.lab-bento,.lab-detail) .lab-tracker__journey svg { display: block; width: 100%; height: 36px; overflow: visible; }
+:is(#lab.lab-bento,.lab-detail) .lab-tracker__journey path { fill: none; stroke-width: 1.5; vector-effect: non-scaling-stroke; }
+:is(#lab.lab-bento,.lab-detail) .lab-tracker__rail { stroke: var(--synk-deep-wool); }
+:is(#lab.lab-bento,.lab-detail) .lab-tracker__line { stroke: var(--synk-stitch); stroke-dasharray: 1; stroke-dashoffset: 1; }
+:is(#lab.lab-bento,.lab-detail) [data-learning-node] { position: absolute; top: 50%; width: 10px; height: 10px; border: 1.5px solid var(--synk-stone); border-radius: 50%; background: var(--synk-ink-deep); transform: translate(-50%, -50%); }
+:is(#lab.lab-bento,.lab-detail) [data-learning-node]:nth-of-type(1) { left: calc(100% / 6); }
+:is(#lab.lab-bento,.lab-detail) [data-learning-node]:nth-of-type(2) { left: 50%; }
+:is(#lab.lab-bento,.lab-detail) [data-learning-node]:nth-of-type(3) { left: calc(100% * 5 / 6); }
+:is(#lab.lab-bento,.lab-detail) [data-learning-node].is-current { background: var(--synk-stitch); border-color: var(--synk-stitch); }
+:is(#lab.lab-bento,.lab-detail) [data-learning-node].is-complete { background: var(--synk-stone); }
+:is(#lab.lab-bento,.lab-detail) .lab-tracker__tabs { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--숨); margin-bottom: var(--칸); }
+:is(#lab.lab-bento,.lab-detail) .lab-tracker__tabs[hidden] { display: none; }
+:is(#lab.lab-bento,.lab-detail) .lab-tracker__tabs button { display: flex; align-items: center; justify-content: center; min-width: 0; min-height: 44px; padding: var(--틈) var(--숨); border-radius: var(--틈); border: 1px solid transparent; font-size: 12px; line-height: 1.5; color: var(--synk-stone); background: transparent; }
+:is(#lab.lab-bento,.lab-detail) .lab-tracker__tabs button[aria-selected="true"] { color: var(--synk-paper); background: var(--synk-ink); border-color: var(--lab-card-line); }
+:is(#lab.lab-bento,.lab-detail) .lab-tracker__tabs button:focus-visible { outline-color: var(--synk-stitch); outline-offset: 2px; }
+:is(#lab.lab-bento,.lab-detail) .lab-tracker__panels { display: grid; gap: var(--틈); }
+:is(#lab.lab-bento,.lab-detail) .lab-tracker__panel { padding: var(--단); background: var(--synk-ink); border-radius: var(--칸); color: var(--synk-paper); min-width: 0; }
+:is(#lab.lab-bento,.lab-detail) [data-learning-enhanced] .lab-tracker__panel { min-height: 246px; }
+:is(#lab.lab-bento,.lab-detail) .lab-tracker__panel[hidden] { display: none; }
+:is(#lab.lab-bento,.lab-detail) .lab-tracker__panel:focus-visible { outline-color: var(--synk-stitch); outline-offset: 3px; }
+:is(#lab.lab-bento,.lab-detail) .lab-tracker__panel h5 { margin: 0; font-size: 12px; font-weight: 500; line-height: 1.7; color: var(--synk-stone); }
+:is(#lab.lab-bento,.lab-detail) .lab-tracker__panel blockquote { margin: var(--참) 0 var(--단); padding: 0; border: 0; color: var(--synk-paper); font-size: clamp(19px, 1.8vw, 24px); font-weight: 600; letter-spacing: -.03em; line-height: 1.6; word-break: keep-all; text-wrap: pretty; }
+:is(#lab.lab-bento,.lab-detail) .lab-tracker__explanation { font-size: 13px; line-height: 1.8; color: var(--synk-stone); }
+:is(#lab.lab-bento,.lab-detail) .lab-tracker__explanation strong { color: var(--synk-stitch); font-weight: 600; }
+:is(#lab.lab-bento,.lab-detail) .lab-tracker__seal { display: inline-block; margin-top: var(--칸); font-size: 11px; line-height: 1.7; color: var(--synk-stitch); }
+:is(#lab.lab-bento,.lab-detail) .lab-tracker__footnote { margin-top: var(--칸); font-size: 12px; line-height: 1.75; color: var(--synk-stone); }
 
 /* 6. Scope/status note preserves the original current-application content. */
-#lab.lab-bento .current-application { margin-top: var(--틈); }
+:is(#lab.lab-bento,.lab-detail) .current-application { margin-top: var(--틈); }
 
 /* 7. Interaction — scrolling and object motion belong to the shared modules. */
 @media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
-  #lab.lab-bento .lab-card { transition: transform 240ms var(--ease); }
-  #lab.lab-bento .lab-card::after { transition: opacity 240ms var(--ease); }
-  #lab.lab-bento .lab-card:hover { transform: translateY(-4px); }
-  #lab.lab-bento .lab-card:hover::after { opacity: 1; }
+  :is(#lab.lab-bento,.lab-detail) .lab-card { transition: transform 240ms var(--ease); }
+  :is(#lab.lab-bento,.lab-detail) .lab-card::after { transition: opacity 240ms var(--ease); }
+  :is(#lab.lab-bento,.lab-detail) .lab-card:hover { transform: translateY(-4px); }
+  :is(#lab.lab-bento,.lab-detail) .lab-card:hover::after { opacity: 1; }
 }
 @media (hover: hover) and (pointer: fine) {
-  #lab.lab-bento .lab-card--curriculum:hover .lab-volume__number { color: var(--synk-coral-3); }
-  #lab.lab-bento .lab-volume summary:hover .lab-volume__cue { color: var(--synk-coral-3); }
-  #lab.lab-bento .lab-tracker__tabs button:hover { color: var(--synk-paper); border-color: var(--lab-card-line); }
+  :is(#lab.lab-bento,.lab-detail) .lab-card--curriculum:hover .lab-volume__number { color: var(--synk-coral-3); }
+  :is(#lab.lab-bento,.lab-detail) .lab-volume summary:hover .lab-volume__cue { color: var(--synk-coral-3); }
+  :is(#lab.lab-bento,.lab-detail) .lab-tracker__tabs button:hover { color: var(--synk-paper); border-color: var(--lab-card-line); }
 }
 /* Keyboard feedback is static. Cards themselves are not made focusable. */
-#lab.lab-bento .lab-card:focus-within { box-shadow: inset 0 0 0 2px var(--synk-coral-3); }
-#lab.lab-bento .lab-card--tracking:focus-within { box-shadow: inset 0 0 0 2px var(--synk-stitch); }
-#lab.lab-bento .lab-card:has(:focus-visible) { transform: none; }
+:is(#lab.lab-bento,.lab-detail) .lab-card:focus-within { box-shadow: inset 0 0 0 2px var(--synk-coral-3); }
+:is(#lab.lab-bento,.lab-detail) .lab-card--tracking:focus-within { box-shadow: inset 0 0 0 2px var(--synk-stitch); }
+:is(#lab.lab-bento,.lab-detail) .lab-card:has(:focus-visible) { transform: none; }
 @media (prefers-reduced-motion: reduce) {
-  #lab.lab-bento .lab-card,
-  #lab.lab-bento .lab-card::after { transform: none; transition: none; }
+  :is(#lab.lab-bento,.lab-detail) .lab-card,
+  :is(#lab.lab-bento,.lab-detail) .lab-card::after { transform: none; transition: none; }
 }
 
 /* 8. Responsive — no fixed heights; retain reading order and all content. */
 @media (max-width: 1100px) {
-  #lab.lab-bento { --lab-padding: var(--단); }
-  #lab.lab-bento .lab-card--direction h3 { font-size: 36px; }
+  :is(#lab.lab-bento,.lab-detail) { --lab-padding: var(--단); }
+  :is(#lab.lab-bento,.lab-detail) .lab-card--direction h3 { font-size: 36px; }
 }
 @media (max-width: 820px) {
-  #lab.lab-bento .lab-bento__grid { grid-template-columns: minmax(0, 1fr); }
-  #lab.lab-bento .lab-card--scene { min-height: 0; display: grid; grid-template-columns: 1fr 1fr; align-items: center; gap: var(--칸); }
-  #lab.lab-bento .lab-card--scene > [data-felt] { width: 100%; margin: 0; }
-  #lab.lab-bento .lab-card--scene figcaption { margin: 0; }
-  #lab.lab-bento .lab-card--scene figcaption p { font-size: 28px; }
+  :is(#lab.lab-bento,.lab-detail) .lab-bento__grid { grid-template-columns: minmax(0, 1fr); }
+  :is(#lab.lab-bento,.lab-detail) .lab-card--scene { min-height: 0; display: grid; grid-template-columns: 1fr 1fr; align-items: center; gap: var(--칸); }
+  :is(#lab.lab-bento,.lab-detail) .lab-card--scene > [data-felt] { width: 100%; margin: 0; }
+  :is(#lab.lab-bento,.lab-detail) .lab-card--scene figcaption { margin: 0; }
+  :is(#lab.lab-bento,.lab-detail) .lab-card--scene figcaption p { font-size: 28px; }
 }
 @media (max-width: 560px) {
-  #lab.lab-bento { --lab-padding: var(--단); }
-  #lab.lab-bento .lab-card--direction h3 { font-size: 32px; }
-  #lab.lab-bento .lab-card__title { font-size: 25px; }
-  #lab.lab-bento .lab-card--scene { grid-template-columns: minmax(0, 1fr); }
-  #lab.lab-bento .lab-card--scene > [data-felt] { width: 85%; justify-self: center; }
-  #lab.lab-bento .lab-volumes { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  #lab.lab-bento .lab-talks { grid-template-columns: minmax(0, 1fr); }
-  #lab.lab-bento .lab-volume summary { padding: var(--참); }
-  #lab.lab-bento .lab-volume__body { padding-inline: var(--참); }
-  #lab.lab-bento .lab-tracker__panel { padding: var(--칸); }
-  #lab.lab-bento [data-learning-enhanced] .lab-tracker__panel { min-height: 272px; }
-  #lab.lab-bento .lab-card__meta { margin-bottom: var(--칸); }
+  :is(#lab.lab-bento,.lab-detail) { --lab-padding: var(--단); }
+  :is(#lab.lab-bento,.lab-detail) .lab-card--direction h3 { font-size: 32px; }
+  :is(#lab.lab-bento,.lab-detail) .lab-card__title { font-size: 25px; }
+  :is(#lab.lab-bento,.lab-detail) .lab-card--scene { grid-template-columns: minmax(0, 1fr); }
+  :is(#lab.lab-bento,.lab-detail) .lab-card--scene > [data-felt] { width: 85%; justify-self: center; }
+  :is(#lab.lab-bento,.lab-detail) .lab-volumes { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  :is(#lab.lab-bento,.lab-detail) .lab-talks { grid-template-columns: minmax(0, 1fr); }
+  :is(#lab.lab-bento,.lab-detail) .lab-volume summary { padding: var(--참); }
+  :is(#lab.lab-bento,.lab-detail) .lab-volume__body { padding-inline: var(--참); }
+  :is(#lab.lab-bento,.lab-detail) .lab-tracker__panel { padding: var(--칸); }
+  :is(#lab.lab-bento,.lab-detail) [data-learning-enhanced] .lab-tracker__panel { min-height: 272px; }
+  :is(#lab.lab-bento,.lab-detail) .lab-card__meta { margin-bottom: var(--칸); }
 }
 @media print {
-  #lab.lab-bento .lab-card { break-inside: avoid; transform: none; }
-  #lab.lab-bento .lab-card::after { display: none; }
-  #lab.lab-bento .lab-tracker__tabs,
-  #lab.lab-bento .lab-tracker__journey { display: none; }
-  #lab.lab-bento .lab-tracker__panel[hidden] { display: block !important; }
+  :is(#lab.lab-bento,.lab-detail) .lab-card { break-inside: avoid; transform: none; }
+  :is(#lab.lab-bento,.lab-detail) .lab-card::after { display: none; }
+  :is(#lab.lab-bento,.lab-detail) .lab-tracker__tabs,
+  :is(#lab.lab-bento,.lab-detail) .lab-tracker__journey { display: none; }
+  :is(#lab.lab-bento,.lab-detail) .lab-tracker__panel[hidden] { display: block !important; }
 }
