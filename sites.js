@@ -1,5 +1,5 @@
-import {initOrbConversation} from './orb-conversation.js?v=f8dcd21b08d7';
-import {initGlassControls} from './glass-controls.js?v=f8dcd21b08d7';
+import {initOrbConversation} from './orb-conversation.js?v=f08e492c196c';
+import {initGlassControls} from './glass-controls.js?v=f08e492c196c';
 initGlassControls();
 // A deliberate brand preview: swiping selects; following a link navigates.
 const brandDeck=document.querySelector('[data-brand-deck]');
@@ -80,6 +80,41 @@ document.querySelectorAll('[data-scene-explorer]').forEach(explorer=>{
  // Bookmarks and answer links can target an individual scene as well as its section.
  function revealScene(){let id;try{id=decodeURIComponent(location.hash.slice(1));}catch{return;}const target=document.getElementById(id);const panel=panels.findIndex(p=>target&&p.contains(target));if(panel>=0)show(panel);}
  revealScene();window.addEventListener('hashchange',revealScene);
+});
+
+// Unfold scene explanations in 200ms, retaining native details and keyboard behaviour.
+const disclosureMotion=matchMedia('(prefers-reduced-motion: reduce)');
+document.querySelectorAll('details.visual-scene-detail').forEach(detail=>{
+ const summary=detail.querySelector(':scope > summary'),body=detail.querySelector(':scope > p');
+ if(!summary||!body||typeof detail.animate!=='function')return;
+ let motion=null,fade=null,expanded=detail.open;
+ function finish(){
+  detail.open=expanded;
+  motion?.cancel();fade?.cancel();motion=fade=null;
+  detail.style.removeProperty('overflow');
+  document.dispatchEvent(new CustomEvent('synk:layout'));
+ }
+ summary.addEventListener('click',event=>{
+  if(event.defaultPrevented)return;
+  if(disclosureMotion.matches){if(motion)finish();return;}
+  event.preventDefault();
+  const from=detail.getBoundingClientRect().height;
+  const opacity=detail.open?Number(getComputedStyle(body).opacity):0;
+  expanded=!(motion?expanded:detail.open);
+  motion?.cancel();fade?.cancel();
+  // Keep the content laid out until collapse completes; reversing starts at its current height.
+  detail.open=true;
+  detail.style.overflow='clip';
+  const style=getComputedStyle(detail);
+  const closed=summary.getBoundingClientRect().height+parseFloat(style.paddingTop)+parseFloat(style.paddingBottom)+parseFloat(style.borderTopWidth)+parseFloat(style.borderBottomWidth);
+  const to=expanded?detail.getBoundingClientRect().height:closed;
+  const timing={duration:200,easing:'cubic-bezier(.22,1,.36,1)',fill:'both'};
+  motion=detail.animate([{height:from+'px'},{height:to+'px'}],timing);
+  fade=body.animate([{opacity},{opacity:expanded?1:0}],timing);
+  motion.onfinish=finish;
+ });
+ disclosureMotion.addEventListener('change',()=>{if(motion&&disclosureMotion.matches)finish();});
+ window.addEventListener('resize',()=>{if(motion)finish();});
 });
 
 // One help area, with distinct public answers and actual enquiries. Without JS both remain readable.
