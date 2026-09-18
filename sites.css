@@ -641,6 +641,7 @@ body[data-site="shift"] #design-notes .brand-story-layout>div>p+p{margin-top:1re
 .is-interactive .visual-scene+.visual-scene{margin-top:0}
 .visual-scene-art{margin:0;min-width:0;align-self:start}
 .visual-scene-art img{display:block;width:100%;height:auto;aspect-ratio:1;object-fit:contain;mix-blend-mode:multiply}
+.visual-scene-art--landscape img{aspect-ratio:auto;mix-blend-mode:normal}
 .visual-scene-copy{min-width:0;max-width:540px}
 .visual-scene-number{display:block;font-family:'DM Mono',monospace;font-size:.6875rem;line-height:1.6;letter-spacing:.06em;color:var(--brand-ink);margin-bottom:1rem}
 .visual-scene h3{font-size:clamp(1.5rem,2.6vw,2.125rem);line-height:1.4;letter-spacing:-.035em;word-break:keep-all;font-weight:600;margin:0 0 1.25rem}
