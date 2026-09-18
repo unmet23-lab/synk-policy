@@ -33,6 +33,7 @@ export function createKnowledgeEngine(data){
     const advertisingService=/광고/.test(c)&&!advertisingEducation;
     const organizationService=/기관|기업|조직|직원|임직원|팀/.test(c)&&(/교육|강의|연수|컨설팅|브랜딩/.test(c)||advertisingEducation);
     const languageStudy=(/영어/.test(c)&&/배우|배워|학습|공부|수업|회화|선생|교사|강사|교육/.test(c))||/원어민(?:회화|선생|교사|강사)|한국인(?:선생|교사|강사)|한국어회화/.test(c);
+    const classFormat=!languageStudy&&/90분|30분|그룹별발화|그룹발화|소그룹발화|발화시간/.test(c)&&/수업|발화|그룹/.test(c);
     const learnerCompetency=/창의|협동|협업|배려|수용성|가치관|자기이해|자기주도|리더십|크루|나침반|ai시대.*역량/.test(c)&&/학생|학습|교육|수업|배우|기르|키우|문화활동|크루|나침반/.test(c);
     const pathwayDirection=!brands.includes('lab')&&!languageStudy&&((/유학/.test(c)&&/취업/.test(c))||(/유학|취업|대학/.test(c)&&/연계|연결|알선|상담/.test(c)));
     if(!brand){
@@ -41,6 +42,7 @@ export function createKnowledgeEngine(data){
       else if(pathwayDirection)brand='path';
       else if(organizationService)brand='shift';
       else if(languageStudy)brand='lab';
+      else if(classFormat)brand='lab';
       else if(learnerCompetency)brand='lab';
       else if(/아이|학부모|보호자|부모|학생|한국어|외국인|학원|유학|k컬처|말하기|토픽|topik/.test(c))brand='lab';
       else if(/음악|라디오|노래|곡명|작품|감상|가게|매장|캐릭터/.test(c))brand='pulse';
@@ -123,6 +125,7 @@ export function createKnowledgeEngine(data){
       return from([brand==='lab'?'lab-availability':'guide-availability'],'needs_confirmation');
     }
     // Privacy, unpublished facts, evidence and commercial conditions above retain priority.
+    if(brand==='lab'&&classFormat)return from(['lab-class']);
     if(brand==='lab'&&learnerCompetency)return from([/크루|나침반|문화활동|문화프로젝트|포트폴리오/.test(c)?'lab-ai-practice':'lab-ai']);
     const publicDirection=/비전|vision|철학|가치관|중요하게|중요히|믿음|지향/.test(c);
     if(!publicDirection){
