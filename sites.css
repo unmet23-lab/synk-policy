@@ -994,50 +994,77 @@ body[data-site] #top .orb-help .messages{height:auto;max-height:none;overflow:vi
 @media(max-width:560px){.orb-help:not(.is-open) .orb-motion{left:auto;right:0}.orb-help [data-contact-frame] iframe{height:1590px}}
 @media(forced-colors:active){.orb-surface{border:2px solid ButtonText}.orb-canvas{opacity:0}.orb-invite{background:ButtonFace;color:ButtonText}.orb-help .suggestions button,.orb-help .question-desk{border:1px solid ButtonText!important}.orb-help .message-user{border:1px solid CanvasText}}
 
-/* Clear cast glass around the original felt artwork. The face, inner bevel,
-   polished rim and contact shadow have separate optical roles. */
+/* Sunlit cast glass. A clear face sits above a curved, cool glass wall.
+   The directional reflection and transmitted light stay away from the text. */
 body[data-site] :is(.brand-carousel-track,.site-family a[aria-current],.site-family a:hover,.site-family a:focus-visible,.felt-control,#top .quiet-link,#top .visual-scene-nav button,#top .learning-choices button,#top .help-tabs button,#top .atlas-map-controls button,#top .suggestions button){
  --glass-color:var(--brand-ink,#5a666b);
- --glass-x:30%;--glass-y:10%;--glass-edge:3px;
- --glass-face:linear-gradient(160deg,#ffffffb8 0%,#ffffff36 35%,#e3e9eb26 67%,#ffffff80 100%);
- --glass-shadow:inset 0 1px 1px #fffffffa,inset 1px 0 1px #fff9,inset -1px 0 1px #65757d29,inset 0 -2px 2px #60717a26,0 1px 0 #fff,0 3px 0 -1px #b4bfc74d,0 5px 0 -2px #fff,0 7px 8px -5px #35434e52,0 14px 24px -12px #35434e38;
+ --glass-x:24%;--glass-y:6%;--glass-edge:4px;
+ --glass-face:
+  radial-gradient(ellipse at 83% 112%,#aecfe77d 0%,#dae7f026 40%,#fff0 65%),
+  linear-gradient(122deg,#fff0 5%,#ffffffd9 6%,#ffffff9c 31%,#8eacc34a 31.5%,#a4b5c121 34%,#fff0 52%),
+  linear-gradient(175deg,#ffffff80 0%,#c2d0dd3d 37%,#91a5b84a 78%,#f3faff99 100%);
+ --glass-shadow:
+  inset 0 1px 1px #fff,inset 1px 0 2px #fff,
+  inset -1px -2px 2px #60758780,inset 0 -5px 7px -5px #49667dcc,
+  0 1px 0 #fff,1px 2px 0 -1px #8599ab8c,1px 3px 0 -1px #fff,
+  2px 6px 7px -4px #283d5261,5px 12px 19px -10px #47617759,
+  9px 19px 26px -17px #57738445;
  position:relative;isolation:isolate;
- border:1px solid #a0adb65e;border-image:none;
- background-color:#ffffff24;background-image:var(--glass-face);
+ border:1px solid #8ca2b273;border-image:none;
+ background-color:#edf3f521;background-image:var(--glass-face);
  background-size:100% 100%;background-blend-mode:normal;
- -webkit-backdrop-filter:blur(12px) saturate(1.18);backdrop-filter:blur(12px) saturate(1.18);
+ -webkit-backdrop-filter:blur(8px) saturate(1.2);backdrop-filter:blur(8px) saturate(1.2);
  box-shadow:var(--glass-shadow);color:var(--ink);
  text-shadow:0 1px 0 #ffffffd9;
  transition:transform .18s ease,box-shadow .22s ease,border-color .22s ease,background-color .22s ease;
 }
 
-/* A curved glass wall: fine specular boundaries, a darker inner reflection,
-   and restrained spectral dispersion confined to the perimeter. */
+/* The bevel has unequal light/dark arcs: a constant white outline reads as
+   plastic. Spectral dispersion is confined to the two illuminated corners. */
 body[data-site] :is(.brand-carousel-track,.site-family a[aria-current],.site-family a:hover,.site-family a:focus-visible,.felt-control,#top .quiet-link,#top .visual-scene-nav button,#top .learning-choices button,#top .help-tabs button,#top .atlas-map-controls button,#top .suggestions button)::before{
- content:'';position:absolute;pointer-events:none;z-index:2;inset:2px;
+ content:'';position:absolute;pointer-events:none;z-index:2;inset:1px;
  border-radius:inherit;padding:var(--glass-edge);
- background:radial-gradient(ellipse at var(--glass-x) var(--glass-y),#fff 0%,#ffffff9c 16%,#ffffff00 52%),conic-gradient(from 125deg at 50% 50%,#ffffffc7,#b3c2ca80 12%,#ffffffee 24%,#e9c8a859 27%,#c8d6ed66 30%,#ffffffcc 38%,#8396a45e 50%,#ffffffeb 65%,#bcdada70 70%,#d8cbed66 73%,#ffffffed 80%,#ffffffc7);
+ background:
+  radial-gradient(ellipse at var(--glass-x) var(--glass-y),#fff 0%,#ffffffcc 18%,#fff0 48%),
+  conic-gradient(from 95deg at 50% 50%,#53738aab 0deg,#d8f1fb 23deg,#fff 50deg,#9db4c433 69deg,#668cb799 91deg,#e4d2f0b8 111deg,#ffebbacf 130deg,#fff 139deg,#6f8ea58c 160deg,#f7ffff 180deg,#fff 213deg,#7d929e94 247deg,#aec9e4ad 283deg,#fff 316deg,#e0f5ff 340deg,#53738aab);
  -webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);
  -webkit-mask-composite:xor;mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);mask-composite:exclude;
+ filter:blur(.25px);
 }
 body[data-site] :is(.brand-carousel-track,.site-family a[aria-current],.site-family a:hover,.site-family a:focus-visible,.felt-control,#top .quiet-link,#top .visual-scene-nav button,#top .learning-choices button,#top .help-tabs button,#top .atlas-map-controls button)::after{
- content:'';position:absolute;pointer-events:none;z-index:2;inset:6px;height:auto;width:auto;
- border:1px solid #ffffff99;border-radius:inherit;
- background:radial-gradient(ellipse at var(--glass-x) var(--glass-y),#ffffff80 0%,#ffffff00 48%),linear-gradient(125deg,#fff0 25%,#ffffff24 39%,#ffffff00 51%);
- box-shadow:inset 0 1px 3px #4c667514,inset 0 -1px 2px #ffffffcc,0 1px 1px #3c53640f;
- opacity:.42;filter:none;
+ content:'';position:absolute;pointer-events:none;z-index:2;inset:5px;height:auto;width:auto;
+ border:1px solid transparent;border-radius:inherit;
+ background:
+  radial-gradient(ellipse 42% 18% at var(--glass-x) 0%,#fff 10%,#ffffff00 100%),
+  linear-gradient(122deg,#fff0 30%,#ffffff85 30.4%,#fff0 31.2%),
+  radial-gradient(ellipse 44% 14% at 76% 100%,#b3d9ec9c 0%,#ffffff00 100%);
+ box-shadow:none;
+ opacity:.82;filter:none;
+}
+/* Focused light lands behind the capsule, while the object keeps its original
+   dimensions and hit area. This is not a glowing border around the header. */
+body[data-site] .brand-carousel{position:relative}
+body[data-site] .brand-carousel::before{
+ content:'';position:absolute;pointer-events:none;z-index:-1;grid-column:2;grid-row:1;
+ inset:-10px -14px -24px;
+ background:
+  radial-gradient(ellipse 13% 11% at 18% 78%,#ecc99180 0%,#f4dfbd30 40%,#fff0 100%),
+  radial-gradient(ellipse 24% 10% at 72% 82%,#81bad860 0%,#a6c9e426 46%,#fff0 100%),
+  radial-gradient(ellipse 42% 12% at 54% 75%,#fff 0%,#ffffffba 30%,#fff0 100%);
+ filter:blur(3px);
 }
 body[data-site] .brand-carousel-track{
- --glass-color:var(--nav-ink);--glass-edge:4px;
- background-color:color-mix(in srgb,var(--nav-color) 3%,#ffffff24);
+ --glass-color:var(--nav-ink);--glass-edge:5px;
+ background-color:color-mix(in srgb,var(--nav-color) 5%,#eef4f626);
  overflow:hidden;
 }
+body[data-site] .brand-carousel-track::after{inset:7px 6px 8px}
 body[data-site] .brand-slide{z-index:1}
 body[data-site] .brand-slide img{
- filter:drop-shadow(0 1px 0 #ffffffd9) drop-shadow(0 2px 1px #2c3b4524);
+ filter:drop-shadow(0 1px 0 #ffffffd9) drop-shadow(1px 2px 1px #2c3b4540);
 }
-body[data-site] .felt-control{--glass-color:var(--nav-ink);--glass-edge:2px}
-body[data-site] .felt-control::after{inset:4px}
+body[data-site] .felt-control{--glass-color:var(--nav-ink);--glass-edge:4px}
+body[data-site] .felt-control::after{inset:6px}
 body[data-site] #top :is(.quiet-link,.visual-scene-nav button,.help-tabs button,.atlas-map-controls button,.suggestions button){--glass-edge:2px}
 body[data-site] #top .learning-choices button{
  --glass-edge:3px;border-radius:20px;padding:1.25rem 1.5rem;gap:.5rem;
@@ -1061,7 +1088,7 @@ body[data-site] #top .suggestions button:hover,body[data-site] #top .suggestions
 }
 @media(hover:hover){
  body[data-site] :is(.felt-control,#top .quiet-link,#top .visual-scene-nav button,#top .learning-choices button,#top .help-tabs button,#top .atlas-map-controls button,#top .suggestions button):hover{
-  transform:translateY(-1px);border-color:#8b9da88a;box-shadow:var(--glass-shadow),0 6px 16px -12px var(--glass-color);
+  transform:translateY(-1px);border-color:#7e97a9a6;box-shadow:var(--glass-shadow),0 6px 16px -12px var(--glass-color);
  }
 }
 body[data-site] :is(.felt-control,#top .quiet-link,#top .visual-scene-nav button,#top .learning-choices button,#top .help-tabs button,#top .atlas-map-controls button,#top .suggestions button):active{
@@ -1071,7 +1098,8 @@ body[data-site] :is(.brand-carousel-track,.site-family a[aria-current],.site-fam
  outline:2px solid var(--glass-color);outline-offset:5px;
 }
 @media(max-width:650px){
- body[data-site] .brand-carousel-track{--glass-edge:3px}
+ body[data-site] .brand-carousel-track{--glass-edge:5px}
+ body[data-site] .brand-carousel-track::after{inset:6px 5px 7px}
  body[data-site] #top .learning-choices button{padding:1rem .75rem;border-radius:16px}
 }
 @media(max-width:480px){
@@ -1084,6 +1112,7 @@ body[data-site] :is(.brand-carousel-track,.site-family a[aria-current],.site-fam
  body[data-site] :is(.brand-carousel-track,.site-family a[aria-current],.site-family a:hover,.site-family a:focus-visible,.felt-control,#top .quiet-link,#top .visual-scene-nav button,#top .learning-choices button,#top .help-tabs button,#top .atlas-map-controls button,#top .suggestions button){transition:none}
 }
 @media(forced-colors:active){
+ body[data-site] .brand-carousel::before{display:none}
  body[data-site] :is(.brand-carousel-track,.site-family a[aria-current],.site-family a:hover,.site-family a:focus-visible,.felt-control,#top .quiet-link,#top .visual-scene-nav button,#top .learning-choices button,#top .help-tabs button,#top .atlas-map-controls button,#top .suggestions button){background:Canvas!important;color:CanvasText!important;box-shadow:none!important;text-shadow:none;backdrop-filter:none;-webkit-backdrop-filter:none;border:1px solid CanvasText!important}
  body[data-site] :is(.brand-carousel-track,.site-family a[aria-current],.site-family a:hover,.site-family a:focus-visible,.felt-control,#top .quiet-link,#top .visual-scene-nav button,#top .learning-choices button,#top .help-tabs button,#top .atlas-map-controls button,#top .suggestions button)::before,
  body[data-site] :is(.brand-carousel-track,.site-family a[aria-current],.site-family a:hover,.site-family a:focus-visible,.felt-control,#top .quiet-link,#top .visual-scene-nav button,#top .learning-choices button,#top .help-tabs button,#top .atlas-map-controls button)::after{display:none}
