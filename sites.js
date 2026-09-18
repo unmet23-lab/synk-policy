@@ -1,3 +1,26 @@
+// Show one visual explanation at a time. The full content remains available without JavaScript.
+document.querySelectorAll('[data-scene-explorer]').forEach(explorer=>{
+ const nav=explorer.querySelector('[data-scene-nav]');
+ const tabs=[...nav.querySelectorAll('[data-scene-choice]')];
+ const panels=[...explorer.querySelectorAll('[data-scene-panel]')];
+ if(!tabs.length||tabs.length!==panels.length)return;
+ function show(index,{focus=false}={}){
+  tabs.forEach((tab,i)=>{const selected=i===index;tab.setAttribute('aria-selected',String(selected));tab.tabIndex=selected?0:-1;panels[i].hidden=!selected;if(selected&&focus)tab.focus({preventScroll:true});});
+  explorer.dataset.sceneIndex=String(index);
+ }
+ nav.hidden=false;nav.setAttribute('role','tablist');
+ tabs.forEach((tab,index)=>{
+  tab.setAttribute('role','tab');tab.setAttribute('aria-controls',panels[index].id);
+  panels[index].setAttribute('role','tabpanel');panels[index].setAttribute('aria-labelledby',tab.id);
+  tab.addEventListener('click',()=>show(index));
+  tab.addEventListener('keydown',event=>{let next;if(event.key==='ArrowRight')next=(index+1)%tabs.length;else if(event.key==='ArrowLeft')next=(index+tabs.length-1)%tabs.length;else if(event.key==='Home')next=0;else if(event.key==='End')next=tabs.length-1;else return;event.preventDefault();show(next,{focus:true});});
+ });
+ explorer.classList.add('is-interactive');show(0);
+ // Bookmarks and answer links can target an individual scene as well as its section.
+ function revealScene(){let id;try{id=decodeURIComponent(location.hash.slice(1));}catch{return;}const target=document.getElementById(id);const panel=panels.findIndex(p=>target&&p.contains(target));if(panel>=0)show(panel);}
+ revealScene();window.addEventListener('hashchange',revealScene);
+});
+
 // One help area, with distinct public answers and actual enquiries. Without JS both remain readable.
 const helpTabs=document.querySelector('[data-help-tabs]');
 if(helpTabs){
