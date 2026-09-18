@@ -407,7 +407,7 @@
         "synk-stage"
       ],
       "action": {
-        "label": "세 사업 살펴보기",
+        "label": "브랜드 살펴보기",
         "href": "/#worlds"
       },
       "reviewedAt": "2026-09-18"
@@ -477,7 +477,7 @@
     },
     {
       "id": "synk-brands",
-      "title": "LAB·SHIFT·PULSE는 어떻게 다른가요?",
+      "title": "LAB·SHIFT·PULSE·PATH는 어떻게 다른가요?",
       "brand": "synk",
       "keywords": [
         "세사업",
@@ -487,22 +487,26 @@
         "구조",
         "lab",
         "shift",
-        "pulse"
+        "pulse",
+        "path",
+        "네브랜드"
       ],
       "questionExamples": [
         "LAB, SHIFT, PULSE는 어떻게 달라요?",
         "세 브랜드의 관계가 궁금해요",
-        "사업 구성을 알려 주세요"
+        "사업 구성을 알려 주세요",
+        "네 브랜드는 어떻게 다른가요?"
       ],
       "answer": "LAB은 한국어 교육·교재·상황형 게임·개인화 학습 앱을 준비하는 에듀테크 브랜드입니다.\n\nSHIFT는 기업·기관의 AI 강의와 컨설팅, 기업 브랜딩에 집중합니다.\n\nPULSE는 온라인 콘텐츠와 캐릭터·음악·이야기의 IP 사업을 중심으로 하며 광고 협업도 다룹니다.\n\nPATH는 외국인의 유학·진로·취업 준비와 교육기관·기업 연결을 위한 지원을 준비합니다.\n\n각 브랜드는 SYNK 안에서 서로 다른 역할을 맡습니다. 별도 법인이나 이미 운영 중인 사업의 수를 뜻하지 않습니다.",
       "sourceId": "company",
       "relatedIds": [
         "lab-intro",
         "shift-intro",
-        "pulse-intro"
+        "pulse-intro",
+        "path-intro"
       ],
       "action": {
-        "label": "세 사업 살펴보기",
+        "label": "브랜드 살펴보기",
         "href": "/#worlds"
       },
       "reviewedAt": "2026-09-18"
