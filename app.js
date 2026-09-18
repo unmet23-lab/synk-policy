@@ -1,5 +1,5 @@
-import {createKnowledgeEngine} from './knowledge-engine.js?v=13077cdf99';
-import {appendPublicActions} from './public-actions.js?v=13077cdf99';
+import {createKnowledgeEngine} from './knowledge-engine.js?v=7a144fc26e';
+import {appendPublicActions} from './public-actions.js?v=7a144fc26e';
 const $=s=>document.querySelector(s);
 const conversation=$('#questions'),form=$('#question-form'),input=$('#question'),send=$('#send'),messages=$('#messages'),dialog=$('#document-dialog');
 let engine=null,context={},busy=false,activeDoc=null,lastTrigger=null,toastTimer;
@@ -10,7 +10,7 @@ function closeMenu({focus=false}={}){header.classList.remove('menu-open');menuTo
 menuToggle.addEventListener('click',()=>{const open=menuToggle.getAttribute('aria-expanded')!=='true';menuToggle.setAttribute('aria-expanded',String(open));header.classList.toggle('menu-open',open);});
 mainNav.addEventListener('click',event=>{const link=event.target.closest('a');if(!link)return;closeMenu();const url=new URL(link.href,location.href);if(url.origin!==location.origin||url.pathname!==location.pathname)return;const target=document.getElementById(url.hash.slice(1));if(target){target.setAttribute('tabindex','-1');target.focus({preventScroll:true});}});
 document.addEventListener('keydown',event=>{if(event.key==='Escape'&&header.classList.contains('menu-open'))closeMenu({focus:true});});
-matchMedia('(max-width: 560px)').addEventListener('change',()=>closeMenu());
+matchMedia(document.body.dataset.site?'(max-width: 900px)':'(max-width: 560px)').addEventListener('change',()=>closeMenu());
 $('#copy-email').addEventListener('click',async()=>{try{await navigator.clipboard.writeText('hello@synk.im');toast('이메일 주소를 복사했어요.');}catch{toast('hello@synk.im 주소를 선택해 복사해 주세요.');}});
 function element(tag,cls,text){const el=document.createElement(tag);if(cls)el.className=cls;if(text!==undefined)el.textContent=text;return el;}
 function toast(text){const el=$('#toast');el.textContent=text;el.hidden=false;clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.hidden=true,2400);}
