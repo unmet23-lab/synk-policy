@@ -1,13 +1,13 @@
-import {createKnowledgeEngine} from './knowledge-engine.js?v=1367994d4e';
-import {appendPublicActions} from './public-actions.js?v=1367994d4e';
+import {createKnowledgeEngine} from './knowledge-engine.js?v=b00066cedd';
+import {appendPublicActions} from './public-actions.js?v=b00066cedd';
 const $=s=>document.querySelector(s);
 const conversation=$('#questions'),form=$('#question-form'),input=$('#question'),send=$('#send'),messages=$('#messages'),dialog=$('#document-dialog');
 let engine=null,context={},busy=false,activeDoc=null,lastTrigger=null,toastTimer;
 const readyNote=$('#answer-note').textContent;
 const names={company:'SYNK',lab:'SYNK LAB',shift:'SYNK SHIFT',pulse:'SYNK PULSE',path:'SYNK PATH',philosophy:'SYNK',vision:'SYNK',guide:'SYNK'};
 const menuToggle=$('.menu-toggle'),mainNav=$('#main-nav'),header=$('.header');
-function closeMenu({focus=false}={}){header.classList.remove('menu-open');menuToggle.setAttribute('aria-expanded','false');if(focus)menuToggle.focus();}
-menuToggle.addEventListener('click',()=>{const open=menuToggle.getAttribute('aria-expanded')!=='true';menuToggle.setAttribute('aria-expanded',String(open));header.classList.toggle('menu-open',open);});
+function closeMenu({focus=false}={}){header.classList.remove('menu-open');menuToggle?.setAttribute('aria-expanded','false');if(focus)menuToggle?.focus();}
+menuToggle?.addEventListener('click',()=>{const open=menuToggle.getAttribute('aria-expanded')!=='true';menuToggle.setAttribute('aria-expanded',String(open));header.classList.toggle('menu-open',open);});
 mainNav.addEventListener('click',event=>{const link=event.target.closest('a');if(!link)return;closeMenu();const url=new URL(link.href,location.href);if(url.origin!==location.origin||url.pathname!==location.pathname)return;const target=document.getElementById(url.hash.slice(1));if(target){target.setAttribute('tabindex','-1');target.focus({preventScroll:true});}});
 document.addEventListener('keydown',event=>{if(event.key==='Escape'&&header.classList.contains('menu-open'))closeMenu({focus:true});});
 matchMedia(document.body.dataset.site?'(max-width: 900px)':'(max-width: 560px)').addEventListener('change',()=>closeMenu());

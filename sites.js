@@ -1,3 +1,50 @@
+// A deliberate brand preview: swiping selects; following a link navigates.
+const brandDeck=document.querySelector('[data-brand-deck]');
+if(brandDeck){
+ const track=brandDeck.querySelector('.brand-carousel-track');
+ const slides=[...brandDeck.querySelectorAll('[data-brand-slide]')];
+ const panels=[...brandDeck.querySelectorAll('[data-brand-menu]')];
+ const positions=[...brandDeck.querySelectorAll('[data-position]')];
+ const reduced=matchMedia('(prefers-reduced-motion: reduce)');
+ let selected=slides.findIndex(slide=>slide.dataset.brandSlide===brandDeck.dataset.selectedBrand),timer,wheelTotal=0,wheelTime=0,wheelLock=0,pointer=null,suppressClick=false;
+ const status=brandDeck.querySelector('[data-brand-status]');
+ function choose(index,announce=true){
+  selected=(index+slides.length)%slides.length;
+  clearTimeout(timer);
+  const brand=slides[selected].dataset.brandSlide;
+  brandDeck.dataset.selectedBrand=brand;
+  panels.forEach(panel=>{panel.hidden=true;panel.classList.remove('is-revealed');});
+  slides.forEach((slide,i)=>{
+   let offset=i-selected;if(offset>2)offset-=slides.length;if(offset< -2)offset+=slides.length;
+   slide.style.setProperty('--offset',offset);
+   slide.tabIndex=i===selected?0:-1;slide.setAttribute('aria-hidden',String(i!==selected));
+   positions[i].classList.toggle('is-selected',i===selected);
+  });
+  const reveal=()=>{panels[selected].hidden=false;panels[selected].classList.add('is-revealed');if(announce)status.textContent=slides[selected].querySelector('img').alt+' 선택. 아래 메뉴나 브랜드 이름으로 이동할 수 있습니다.';};
+  if(reduced.matches)reveal();else timer=setTimeout(reveal,200);
+ }
+ brandDeck.querySelectorAll('[data-brand-step]').forEach(button=>{button.hidden=false;button.addEventListener('click',()=>choose(selected+Number(button.dataset.brandStep)));});
+ track.addEventListener('keydown',event=>{
+  let next;if(event.key==='ArrowRight')next=selected+1;else if(event.key==='ArrowLeft')next=selected-1;else if(event.key==='Home')next=0;else if(event.key==='End')next=slides.length-1;else if(event.key==='Enter'&&event.target===track){slides[selected].click();return;}else return;
+  event.preventDefault();track.focus({preventScroll:true});choose(next);
+ });
+ track.addEventListener('wheel',event=>{
+  const horizontal=Math.abs(event.deltaX)>Math.abs(event.deltaY),delta=horizontal?event.deltaX:event.shiftKey?event.deltaY:0;
+  if(!delta)return;event.preventDefault();const now=performance.now();if(now<wheelLock)return;
+  if(now-wheelTime>160)wheelTotal=0;wheelTime=now;wheelTotal+=delta*(event.deltaMode===1?16:1);
+  if(Math.abs(wheelTotal)>=35){choose(selected+Math.sign(wheelTotal));wheelTotal=0;wheelLock=now+450;}
+ },{passive:false});
+ track.addEventListener('pointerdown',event=>{if(event.button!==0)return;pointer={id:event.pointerId,x:event.clientX,y:event.clientY,moved:false};suppressClick=false;});
+ track.addEventListener('pointermove',event=>{if(!pointer||pointer.id!==event.pointerId)return;const x=event.clientX-pointer.x,y=event.clientY-pointer.y;if(Math.abs(x)>12&&Math.abs(x)>Math.abs(y)){pointer.moved=true;track.setPointerCapture(event.pointerId);}});
+ track.addEventListener('pointerup',event=>{if(!pointer||pointer.id!==event.pointerId)return;const dx=event.clientX-pointer.x,dy=event.clientY-pointer.y;suppressClick=pointer.moved;if(Math.abs(dx)>35&&Math.abs(dx)>Math.abs(dy))choose(selected+(dx<0?1:-1));pointer=null;});
+ track.addEventListener('pointercancel',()=>{pointer=null;});
+ track.addEventListener('lostpointercapture',()=>{pointer=null;});
+ track.addEventListener('dragstart',event=>event.preventDefault());
+ track.addEventListener('click',event=>{if(suppressClick){event.preventDefault();suppressClick=false;}});
+ reduced.addEventListener('change',()=>choose(selected,false));
+ choose(selected,false);
+}
+
 // Keep anchor destinations below the shared, sticky navigation.
 const siteHeader=document.querySelector('.site-header-wrap');
 if(siteHeader){

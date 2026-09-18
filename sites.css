@@ -613,7 +613,7 @@ body[data-site="shift"] #design-notes .brand-story-layout>div>p+p{margin-top:1re
 .atlas-map-controls{display:flex;flex-wrap:wrap;gap:.5rem}
 .atlas-map-controls button{font-family:'Inter Tight',sans-serif;font-size:.8125rem;min-height:44px;min-width:64px;border:1px solid var(--line);border-radius:99px;background:#fff;color:var(--muted);padding:.5rem .875rem}
 .atlas-map-controls button[aria-selected="true"]{background:var(--ink);border-color:var(--ink);color:#fff}
-.atlas-explorer.is-interactive .atlas-map-controls button{position:absolute;left:var(--x);top:var(--y);transform:translate(-50%,-50%)}
+.atlas-explorer.is-interactive .atlas-map-controls button{position:static;transform:none}
 .atlas-role-panels article{padding:2rem 0}
 .atlas-role-panels h3{font-family:'Inter Tight',sans-serif;font-size:2.75rem;line-height:1.25;font-weight:550;margin:0 0 1rem}
 .atlas-role-panels h4{font-size:1.25rem;font-weight:550;line-height:1.6;margin:0 0 1rem}
@@ -670,3 +670,99 @@ body[data-site] #top .pulse-object-visual>img{width:100%;height:auto;max-height:
  .class-time>div{border:1px solid CanvasText;background:Canvas!important;color:CanvasText!important}
  .scene-draft:focus{outline:2px solid Highlight!important}
 }
+
+/* Event-driven depth and glow. Texture is the existing Loom material tile. */
+.brand-navigation{--nav-color:#575046;--nav-ink:#2b2320;--nav-wash:#f6f4f0}
+.brand-navigation[data-selected-brand="lab"]{--nav-color:#f96859;--nav-ink:#ae322a;--nav-wash:#fef0e9}
+.brand-navigation[data-selected-brand="shift"]{--nav-color:#3d6bc9;--nav-ink:#24448c;--nav-wash:#f0f4fc}
+.brand-navigation[data-selected-brand="pulse"]{--nav-color:#99295d;--nav-ink:#99295d;--nav-wash:#fcf1f6}
+.brand-navigation[data-selected-brand="path"]{--nav-color:#526956;--nav-ink:#3b503e;--nav-wash:#f0f5f0}
+body[data-site] .header.carousel-header{grid-template-columns:minmax(80px,1fr) auto minmax(80px,1fr);column-gap:1rem;padding:14px 0 8px}
+body[data-site] .carousel-header .site-wordmark,body[data-site] .carousel-header .site-wordmark img{height:38px}
+.brand-carousel{display:grid;grid-template-columns:44px 240px 44px;gap:0 12px;align-items:center;justify-content:center;isolation:isolate}
+.brand-carousel-track{position:relative;width:240px;height:62px;overflow:hidden;border-radius:32px;touch-action:pan-y;user-select:none;background:linear-gradient(180deg,#ffffffc0,#ffffff95),var(--nav-wash) url('/assets/felt-paper.webp') center/180px;background-blend-mode:normal,multiply;box-shadow:inset 0 1px 2px #fff,0 3px 0 #d7d3cb,0 5px 9px #29221b15;transition:background-color .25s}
+.brand-carousel-track::after{content:'';position:absolute;pointer-events:none;inset:auto 20% -14px;height:24px;background:var(--nav-color);filter:blur(16px);opacity:.24;z-index:-1}
+.brand-slide{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;gap:12px;padding:10px 24px;text-decoration:none;transform:translateX(calc(var(--offset)*110%));transition:transform .38s cubic-bezier(.22,.75,.25,1);will-change:auto}
+.brand-slide img{display:block;height:38px;width:auto;max-width:155px;object-fit:contain;pointer-events:none}
+.brand-slide span{font-size:17px;color:var(--nav-ink);font-weight:450}
+.brand-slide[aria-hidden="true"]{pointer-events:none}
+.brand-step{display:grid;place-items:center;width:44px;height:44px;padding:0;border:0;border-radius:50%;color:var(--nav-ink);cursor:pointer}
+.brand-step[hidden]{visibility:hidden;display:grid}
+.brand-step svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.brand-position{grid-column:2;display:flex;justify-content:center;gap:6px;height:17px;align-items:end;padding-bottom:2px}
+.brand-position i{width:4px;height:4px;border-radius:50%;background:#c9c5bf;transition:width .25s,background-color .25s}
+.brand-position i.is-selected{width:14px;border-radius:4px;background:var(--nav-ink)}
+.brand-current{justify-self:end;font-size:.75rem;color:var(--muted)}
+body[data-site] .carousel-header #main-nav{display:block;grid-column:1/-1;grid-row:auto;min-height:44px;height:auto;max-height:none;overflow:visible;margin:4px 0 0;padding:0;width:100%;background:none;box-shadow:none}
+.brand-menu{display:flex;justify-content:center;align-items:center;flex-wrap:wrap;gap:.25rem 1.75rem}
+.brand-menu[hidden]{display:none!important}
+body[data-site] .carousel-header #main-nav .brand-menu a{min-height:44px;font-size:.875rem;padding:0 .25rem;white-space:normal;color:var(--nav-ink);font-weight:450;line-height:1.5;text-align:center}
+.brand-menu.is-revealed a{animation:brand-menu-arrive .32s both cubic-bezier(.2,.7,.3,1);animation-delay:calc(var(--order)*45ms)}
+@keyframes brand-menu-arrive{from{opacity:0;transform:translateY(-9px)}to{opacity:1;transform:translateY(0)}}
+body[data-site] .carousel-header :is(a,button,.brand-carousel-track):focus-visible{outline:2px solid var(--nav-ink);outline-offset:4px;border-radius:22px}
+.brand-fallback{display:flex;gap:1rem;flex-wrap:wrap}
+
+/* Buttons have a raised, softly upholstered face and a short physical press. */
+.felt-control,body[data-site] #top :is(.primary-link,.send,.help-tabs button,.atlas-map-controls button){background-color:#f5f2eb;background-image:linear-gradient(180deg,#ffffffc0,#ffffff95),url('/assets/felt-paper.webp');background-size:auto,150px;background-blend-mode:normal,multiply;border:1px solid #fff9;border-image:none;border-radius:999px;box-shadow:inset 0 1px 1px #fff,0 3px 0 #d1cdc4,0 5px 9px #30281819;color:var(--ink);transition:transform .15s,box-shadow .15s,background-color .2s;text-decoration:none}
+body[data-site] #top .primary-link.primary-link,body[data-site] #top .send:not(:disabled){background-color:var(--brand-ink);background-image:linear-gradient(180deg,#ffffff24,#00000000 65%,#00000016),url('/assets/felt-paper.webp');background-blend-mode:normal,multiply;color:#fff;border-color:#ffffff24;box-shadow:inset 0 1px 1px #ffffff40,0 3px 0 color-mix(in srgb,var(--brand-ink),#000 30%),0 5px 10px #30281822}
+body[data-site] #top .primary-link{min-height:50px;padding:14px 26px;line-height:1.5;gap:14px}
+.felt-control:hover,body[data-site] #top :is(.primary-link,.send:not(:disabled),.help-tabs button,.atlas-map-controls button):hover{transform:translateY(-1px);text-decoration:none}
+.felt-control:active,body[data-site] #top :is(.primary-link,.send:not(:disabled),.help-tabs button,.atlas-map-controls button):active{transform:translateY(3px);box-shadow:inset 0 2px 5px #29211a27,0 0 0 #0000}
+body[data-site] #top .send:disabled{box-shadow:inset 0 1px 2px #0000000b;background-color:#f3f2ef;color:#817b73;transform:none;border-color:#e7e4de;cursor:not-allowed}
+body[data-site] #top .help-tabs button{border-radius:22px;min-height:100px;padding:1rem;text-align:left}
+body[data-site] #top .help-tabs button[aria-selected="true"]{color:var(--brand-ink);background-color:var(--brand-wash);border-color:color-mix(in srgb,var(--brand-color),white 65%);box-shadow:inset 0 2px 5px #29211a1a,0 1px 0 #fff;transform:translateY(2px)}
+body[data-site] #top :is(.primary-link,.help-tabs button,.atlas-map-controls button):focus-visible{outline:2px solid var(--brand-ink);outline-offset:5px}
+
+/* The light sits behind the lower edge of the input, never behind the text. */
+body[data-site] #top .question-desk{position:relative;isolation:isolate;overflow:hidden;border:1px solid #e5e1dc;border-radius:26px;padding:26px 26px 30px;background:#fdfcfb;box-shadow:inset 0 1px 0 #fff,0 8px 24px #32281e08;transition:border-color .2s,box-shadow .2s}
+body[data-site] #top .question-desk::before{content:'';z-index:-1;position:absolute;pointer-events:none;left:8%;right:8%;bottom:-28px;height:84px;opacity:.18;filter:blur(17px);background:radial-gradient(ellipse at 20% 90%,#7cb9bf 0,transparent 54%),radial-gradient(ellipse at 53% 100%,var(--brand-color) 0,transparent 58%),radial-gradient(ellipse at 82% 90%,#d9ad78 0,transparent 50%);transform:translateY(18px) scaleX(.9);transition:opacity .5s,transform .7s}
+body[data-site] #top .question-desk:focus-within{outline:none;border-color:color-mix(in srgb,var(--brand-color),white 55%);box-shadow:0 9px 26px #32281e09}
+body[data-site] #top .question-desk:focus-within::before{opacity:.65;transform:translateY(0) scaleX(1);animation:question-light 1.8s ease-in-out 1}
+body[data-site] #top .question-desk:has([aria-busy="true"])::before{opacity:.8;animation:question-light 1.4s ease-in-out infinite}
+@keyframes question-light{0%,100%{transform:translateX(0) translateY(0) scaleX(1)}50%{transform:translateX(3%) translateY(-5px) scaleX(1.06)}}
+body[data-site] #top #question-form{align-items:center;gap:20px}
+body[data-site] #top .question-label{font-size:1.125rem;font-weight:550}
+body[data-site] #top .question-entry{padding:0;border:0}
+body[data-site] #top #question{background:transparent;min-height:86px;padding:0;resize:vertical}
+body[data-site] #top .send{height:48px;min-width:120px;font-size:.875rem}
+
+/* Names belong to the embroidered objects; controls sit outside the photograph. */
+.atlas-explorer-layout{display:block}
+.atlas-engine-map{width:100%;max-width:1000px;margin-inline:auto}
+.atlas-engine-map>img{width:100%;height:auto}
+.atlas-map-controls{justify-content:center;gap:12px;margin:28px 0 0}
+.atlas-explorer.is-interactive .atlas-map-controls button{position:static;transform:none}
+body[data-site] #top .atlas-map-controls button{padding:12px 20px;min-width:84px;min-height:44px;font-size:.9375rem}
+body[data-site] #top .atlas-map-controls button[aria-selected="true"]{background-color:var(--engine-wash,#eeeae3);color:var(--engine-ink,#2b2320);border-color:var(--engine-ink,#2b2320);box-shadow:inset 0 2px 4px #29211a1a,0 1px 0 #fff}
+.atlas-role-panels{max-width:800px;margin:24px auto 0;min-height:170px}
+.atlas-role-panels article{display:grid;grid-template-columns:190px minmax(0,1fr);gap:0 32px;padding:28px 0}
+.atlas-role-panels article[hidden]{display:none}
+.atlas-role-panels .visual-scene-number{grid-column:1;grid-row:1;font-size:.75rem}
+.atlas-role-panels h3{grid-column:1;grid-row:2/4;font-size:2rem;margin-top:12px}
+.atlas-role-panels h4{grid-column:2;grid-row:1/3;margin:0 0 12px}
+.atlas-role-panels p{grid-column:2;grid-row:3;margin:0;font-size:1rem}
+@media(max-width:650px){
+ body[data-site] .header.carousel-header{grid-template-columns:1fr;padding-block:12px 6px;gap:0}
+ body[data-site] .carousel-header .site-wordmark{display:none}
+ .brand-current{display:none}
+ .brand-carousel{grid-template-columns:44px minmax(150px,230px) 44px;gap:0 8px;width:100%}
+ .brand-carousel-track{width:100%;height:54px}
+ .brand-slide{padding:8px 14px;gap:10px}
+ .brand-slide img{height:32px;max-width:145px}
+ .brand-position{height:15px}
+ .brand-menu{gap:0 16px;min-height:44px}
+ body[data-site] .carousel-header #main-nav .brand-menu a{font-size:.75rem;min-width:auto;min-height:36px;justify-content:center;white-space:nowrap;padding:0 2px}
+ body[data-site] .carousel-header #main-nav{min-height:72px;display:flex;align-items:center;justify-content:center;margin:0}
+ .brand-menu{max-width:100%;justify-content:center;align-content:center}
+ body[data-site] #top .question-desk{padding:22px 18px 25px;border-radius:22px}
+ body[data-site] #top #question-form{grid-template-columns:1fr;gap:16px}
+ body[data-site] #top .send{justify-self:end}
+ .atlas-map-controls{gap:10px;margin-top:16px}
+ body[data-site] #top .atlas-map-controls button{min-width:65px;padding:10px 14px;font-size:.8125rem}
+ .atlas-role-panels article{display:block;padding:12px 0}
+ .atlas-role-panels h3{font-size:1.75rem;margin:10px 0}
+ .atlas-role-panels h4{font-size:1rem;margin-bottom:10px}
+ .atlas-role-panels{min-height:225px}
+}
+@media(prefers-reduced-motion:reduce){.brand-slide,.brand-position i,.felt-control,body[data-site] #top :is(.primary-link,.send,.help-tabs button,.atlas-map-controls button){transition:none}.brand-menu.is-revealed a{animation:none}body[data-site] #top .question-desk::before{animation:none!important;transition:none}}
+@media(forced-colors:active){.brand-carousel-track,.felt-control,body[data-site] #top :is(.primary-link,.send,.help-tabs button,.atlas-map-controls button,.question-desk){background:Canvas!important;color:CanvasText!important;border:1px solid CanvasText!important;box-shadow:none!important}.brand-carousel-track::after,.question-desk::before{display:none}.brand-position i{background:CanvasText}.brand-position i.is-selected{background:Highlight}}
