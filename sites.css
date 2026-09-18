@@ -853,7 +853,9 @@ body[data-site] #top .send{height:48px;min-width:120px;font-size:.875rem}
 .atlas-explorer-layout{display:block}
 .atlas-engine-map{width:100%;max-width:1000px;margin-inline:auto}
 .atlas-engine-map>img{width:100%;height:auto}
-.atlas-map-controls{justify-content:center;gap:12px;margin:28px 0 0}
+.atlas-engine-map>.visual-explainer-guide{margin:24px 0 12px;text-align:center}
+.atlas-explorer:not(.is-interactive) .visual-explainer-guide{display:none}
+.atlas-map-controls{justify-content:center;gap:12px;margin:0}
 .atlas-explorer.is-interactive .atlas-map-controls button{position:static;transform:none}
 body[data-site] #top .atlas-map-controls button{padding:12px 20px;min-width:84px;min-height:44px;font-size:.9375rem}
 body[data-site] #top .atlas-map-controls button[aria-selected="true"]{background-color:var(--engine-wash,#eeeae3);color:var(--engine-ink,#2b2320);border-color:var(--engine-ink,#2b2320);box-shadow:inset 0 2px 4px #29211a1a,0 1px 0 #fff}
@@ -881,7 +883,8 @@ body[data-site] #top .atlas-map-controls button[aria-selected="true"]{background
  body[data-site] #top .question-desk{padding:22px 18px 25px;border-radius:22px}
  body[data-site] #top #question-form{grid-template-columns:1fr;gap:16px}
  body[data-site] #top .send{justify-self:end}
- .atlas-map-controls{gap:10px;margin-top:16px}
+ .atlas-engine-map>.visual-explainer-guide{margin-top:20px}
+ .atlas-map-controls{gap:10px;margin-top:0}
  body[data-site] #top .atlas-map-controls button{min-width:65px;padding:10px 14px;font-size:.8125rem}
  .atlas-role-panels article{display:block;padding:12px 0}
  .atlas-role-panels h3{font-size:1.75rem;margin:10px 0}
