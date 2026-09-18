@@ -974,3 +974,277 @@ body[data-site] #top .orb-help .messages{height:auto;max-height:none;overflow:vi
 @media(prefers-reduced-motion:reduce){.orb-help *, .orb-help *::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
 @media(max-width:560px){.orb-help:not(.is-open) .orb-motion{left:auto;right:0}.orb-help [data-contact-frame] iframe{height:1590px}}
 @media(forced-colors:active){.orb-surface{border:2px solid ButtonText}.orb-canvas{opacity:0}.orb-invite{background:ButtonFace;color:ButtonText}.orb-help .suggestions button,.orb-help .question-desk{border:1px solid ButtonText!important}.orb-help .message-user{border:1px solid CanvasText}}
+
+/* Clear cast glass around the original felt artwork. The face, inner bevel,
+   polished rim and contact shadow have separate optical roles. */
+body[data-site] :is(.brand-carousel-track,.site-family a[aria-current],.site-family a:hover,.site-family a:focus-visible,.felt-control,#top .quiet-link,#top .visual-scene-nav button,#top .learning-choices button,#top .help-tabs button,#top .atlas-map-controls button,#top .suggestions button){
+ --glass-color:var(--brand-ink,#5a666b);
+ --glass-x:30%;--glass-y:10%;--glass-edge:3px;
+ --glass-face:linear-gradient(160deg,#ffffffb8 0%,#ffffff36 35%,#e3e9eb26 67%,#ffffff80 100%);
+ --glass-shadow:inset 0 1px 1px #fffffffa,inset 1px 0 1px #fff9,inset -1px 0 1px #65757d29,inset 0 -2px 2px #60717a26,0 1px 0 #fff,0 3px 0 -1px #b4bfc74d,0 5px 0 -2px #fff,0 7px 8px -5px #35434e52,0 14px 24px -12px #35434e38;
+ position:relative;isolation:isolate;
+ border:1px solid #a0adb65e;border-image:none;
+ background-color:#ffffff24;background-image:var(--glass-face);
+ background-size:100% 100%;background-blend-mode:normal;
+ -webkit-backdrop-filter:blur(12px) saturate(1.18);backdrop-filter:blur(12px) saturate(1.18);
+ box-shadow:var(--glass-shadow);color:var(--ink);
+ text-shadow:0 1px 0 #ffffffd9;
+ transition:transform .18s ease,box-shadow .22s ease,border-color .22s ease,background-color .22s ease;
+}
+
+/* A curved glass wall: fine specular boundaries, a darker inner reflection,
+   and restrained spectral dispersion confined to the perimeter. */
+body[data-site] :is(.brand-carousel-track,.site-family a[aria-current],.site-family a:hover,.site-family a:focus-visible,.felt-control,#top .quiet-link,#top .visual-scene-nav button,#top .learning-choices button,#top .help-tabs button,#top .atlas-map-controls button,#top .suggestions button)::before{
+ content:'';position:absolute;pointer-events:none;z-index:2;inset:2px;
+ border-radius:inherit;padding:var(--glass-edge);
+ background:radial-gradient(ellipse at var(--glass-x) var(--glass-y),#fff 0%,#ffffff9c 16%,#ffffff00 52%),conic-gradient(from 125deg at 50% 50%,#ffffffc7,#b3c2ca80 12%,#ffffffee 24%,#e9c8a859 27%,#c8d6ed66 30%,#ffffffcc 38%,#8396a45e 50%,#ffffffeb 65%,#bcdada70 70%,#d8cbed66 73%,#ffffffed 80%,#ffffffc7);
+ -webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);
+ -webkit-mask-composite:xor;mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);mask-composite:exclude;
+}
+body[data-site] :is(.brand-carousel-track,.site-family a[aria-current],.site-family a:hover,.site-family a:focus-visible,.felt-control,#top .quiet-link,#top .visual-scene-nav button,#top .learning-choices button,#top .help-tabs button,#top .atlas-map-controls button)::after{
+ content:'';position:absolute;pointer-events:none;z-index:2;inset:6px;height:auto;width:auto;
+ border:1px solid #ffffff99;border-radius:inherit;
+ background:radial-gradient(ellipse at var(--glass-x) var(--glass-y),#ffffff80 0%,#ffffff00 48%),linear-gradient(125deg,#fff0 25%,#ffffff24 39%,#ffffff00 51%);
+ box-shadow:inset 0 1px 3px #4c667514,inset 0 -1px 2px #ffffffcc,0 1px 1px #3c53640f;
+ opacity:.42;filter:none;
+}
+body[data-site] .brand-carousel-track{
+ --glass-color:var(--nav-ink);--glass-edge:4px;
+ background-color:color-mix(in srgb,var(--nav-color) 3%,#ffffff24);
+ overflow:hidden;
+}
+body[data-site] .brand-slide{z-index:1}
+body[data-site] .brand-slide img{
+ filter:drop-shadow(0 1px 0 #ffffffd9) drop-shadow(0 2px 1px #2c3b4524);
+}
+body[data-site] .felt-control{--glass-color:var(--nav-ink);--glass-edge:2px}
+body[data-site] .felt-control::after{inset:4px}
+body[data-site] #top :is(.quiet-link,.visual-scene-nav button,.help-tabs button,.atlas-map-controls button,.suggestions button){--glass-edge:2px}
+body[data-site] #top .learning-choices button{
+ --glass-edge:3px;border-radius:20px;padding:1.25rem 1.5rem;gap:.5rem;
+}
+body[data-site] #top .learning-choices button>strong{position:relative;z-index:3;color:var(--ink);font-weight:650}
+body[data-site] #top .learning-choices button>span{position:relative;z-index:3;color:#5e5952}
+
+/* Selection adds a tint inside the clear object, with the polished edge still
+   visible. The darkest text is kept above the very soft face reflection. */
+body[data-site] #top :is(.learning-choices,.visual-scene-nav,.help-tabs,.atlas-map-controls) button[aria-selected="true"]{
+ --glass-color:var(--engine-ink,var(--brand-ink));
+ background-color:color-mix(in srgb,var(--glass-color) 9%,#ffffff66);
+ background-image:var(--glass-face);background-size:100% 100%;background-blend-mode:normal;
+ border-color:color-mix(in srgb,var(--glass-color) 48%,#e1e7e9);
+ box-shadow:var(--glass-shadow),inset 0 -3px 6px -4px var(--glass-color);
+ color:var(--glass-color);transform:none;
+}
+body[data-site] #top .learning-choices button[aria-selected="true"] strong{color:var(--glass-color)}
+body[data-site] #top .suggestions button:hover,body[data-site] #top .suggestions button:focus-visible{
+ background-image:var(--glass-face);background-size:100% 100%;background-color:#ffffff66;
+}
+@media(hover:hover){
+ body[data-site] :is(.felt-control,#top .quiet-link,#top .visual-scene-nav button,#top .learning-choices button,#top .help-tabs button,#top .atlas-map-controls button,#top .suggestions button):hover{
+  transform:translateY(-1px);border-color:#8b9da88a;box-shadow:var(--glass-shadow),0 6px 16px -12px var(--glass-color);
+ }
+}
+body[data-site] :is(.felt-control,#top .quiet-link,#top .visual-scene-nav button,#top .learning-choices button,#top .help-tabs button,#top .atlas-map-controls button,#top .suggestions button):active{
+ transform:translateY(2px);box-shadow:inset 0 1px 3px #52637029,inset 0 -1px 1px #fff,0 2px 5px #3447511f;
+}
+body[data-site] :is(.brand-carousel-track,.site-family a[aria-current],.site-family a:hover,.site-family a:focus-visible,.felt-control,#top .quiet-link,#top .visual-scene-nav button,#top .learning-choices button,#top .help-tabs button,#top .atlas-map-controls button,#top .suggestions button):focus-visible{
+ outline:2px solid var(--glass-color);outline-offset:5px;
+}
+@media(max-width:650px){
+ body[data-site] .brand-carousel-track{--glass-edge:3px}
+ body[data-site] #top .learning-choices button{padding:1rem .75rem;border-radius:16px}
+}
+@media(max-width:480px){
+ body[data-site] #top .learning-choices button{padding:1rem .625rem;min-height:108px}
+}
+@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){
+ body[data-site] :is(.brand-carousel-track,.site-family a[aria-current],.site-family a:hover,.site-family a:focus-visible,.felt-control,#top .quiet-link,#top .visual-scene-nav button,#top .learning-choices button,#top .help-tabs button,#top .atlas-map-controls button,#top .suggestions button){background-color:#f3f6f5}
+}
+@media(prefers-reduced-motion:reduce){
+ body[data-site] :is(.brand-carousel-track,.site-family a[aria-current],.site-family a:hover,.site-family a:focus-visible,.felt-control,#top .quiet-link,#top .visual-scene-nav button,#top .learning-choices button,#top .help-tabs button,#top .atlas-map-controls button,#top .suggestions button){transition:none}
+}
+@media(forced-colors:active){
+ body[data-site] :is(.brand-carousel-track,.site-family a[aria-current],.site-family a:hover,.site-family a:focus-visible,.felt-control,#top .quiet-link,#top .visual-scene-nav button,#top .learning-choices button,#top .help-tabs button,#top .atlas-map-controls button,#top .suggestions button){background:Canvas!important;color:CanvasText!important;box-shadow:none!important;text-shadow:none;backdrop-filter:none;-webkit-backdrop-filter:none;border:1px solid CanvasText!important}
+ body[data-site] :is(.brand-carousel-track,.site-family a[aria-current],.site-family a:hover,.site-family a:focus-visible,.felt-control,#top .quiet-link,#top .visual-scene-nav button,#top .learning-choices button,#top .help-tabs button,#top .atlas-map-controls button,#top .suggestions button)::before,
+ body[data-site] :is(.brand-carousel-track,.site-family a[aria-current],.site-family a:hover,.site-family a:focus-visible,.felt-control,#top .quiet-link,#top .visual-scene-nav button,#top .learning-choices button,#top .help-tabs button,#top .atlas-map-controls button)::after{display:none}
+ body[data-site] #top :is(.learning-choices,.visual-scene-nav,.help-tabs,.atlas-map-controls) button[aria-selected="true"]{background:Highlight!important;color:HighlightText!important;forced-color-adjust:none}
+ body[data-site] #top .learning-choices button>span,body[data-site] #top .learning-choices button>strong{color:inherit}
+}
+
+/* A self-contained conversation space, distinct from the editorial page. */
+body[data-site] #top .orb-help{
+ --ink:#f0f2f5;--muted:#a3acb8;--brand-ink:#bfd9eb;--brand-color:#a1c9e2;--brand-wash:#243039;
+ --orb-scroll-margin:calc(var(--site-header-height,148px) + 20px);
+ margin-block:44px 40px;padding-block:0;
+}
+.orb-chamber{
+ position:relative;isolation:isolate;display:grid;grid-template-columns:minmax(0,1fr);gap:0;
+ padding:60px 64px 28px;border-radius:36px;border:1px solid #333a44;
+ background:radial-gradient(ellipse at 25% 30%,#27394a35,transparent 54%),linear-gradient(125deg,#141a21,#101419 55%,#151a20);
+ box-shadow:inset 0 1px 0 #ffffff15,0 22px 55px -35px #17263166;
+ color:var(--ink);
+}
+.orb-chamber::before{content:'';position:absolute;pointer-events:none;inset:0;border-radius:inherit;background:radial-gradient(ellipse at 17% 0,#bcdaee0d,transparent 52%);z-index:-1}
+.orb-presence{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);align-items:center;gap:36px;min-width:0}
+.orb-heading{padding-bottom:18px}
+.orb-eyebrow{display:flex;align-items:center;gap:12px;color:#a3aebc;font-family:'Inter Tight',sans-serif;font-size:10px;line-height:1.5;font-weight:500;letter-spacing:.14em}
+.orb-eyebrow i{width:3px;height:3px;border-radius:50%;background:#91bbc5}
+body[data-site] #top .orb-heading h2{font-size:clamp(2.5rem,4.8vw,4rem);line-height:1.18;font-weight:520;letter-spacing:-.055em;color:#eef1f4;margin:32px 0 20px;word-break:keep-all}
+.orb-lead{font-size:.9375rem;color:#a3acb8;line-height:1.7;margin:0}
+.orb-chamber .orb-stage{min-height:368px;scroll-margin-top:var(--orb-scroll-margin);transition:none}
+.orb-chamber .orb-launch{width:352px;height:auto;aspect-ratio:1;transition:none;max-width:100%;flex:none;color:#ecf4f8;outline-offset:5px}
+.orb-chamber .orb-launch::before{content:'';position:absolute;pointer-events:none;inset:12%;border-radius:50%;background:#789dbc;filter:blur(38px);opacity:.13;transition:opacity .4s}
+.orb-chamber .orb-launch::after{inset:auto 18% 4%;height:5%;background:radial-gradient(ellipse,#77c1d880,transparent 70%);filter:blur(12px);opacity:.65;transform:scaleX(1.3);transition:opacity .3s}
+.orb-chamber .orb-surface{inset:8%;box-shadow:inset 0 0 8px #c8e9ff7d,0 4px 35px #6185ac24;transition:transform .5s cubic-bezier(.2,.8,.2,1),filter .5s}
+.orb-chamber .orb-surface.orb-rendered{inset:0;box-shadow:none}
+.orb-chamber .orb-launch:hover .orb-surface,.orb-chamber .orb-launch:focus-visible .orb-surface{transform:translateY(-7px) scale(1.025);filter:brightness(1.12)}
+.orb-chamber .orb-launch:hover::before{opacity:.22}
+.orb-chamber .orb-launch:active .orb-surface{transform:translateY(1px) scale(.98);transition-duration:.15s}
+.orb-chamber .orb-invite{left:50%;bottom:0;transform:translateX(-50%);width:max-content;height:38px;padding:0 17px;gap:14px;display:flex;align-items:center;border:1px solid #c8dcea33;border-radius:20px;background:linear-gradient(150deg,#ffffff15,#ffffff03);box-shadow:inset 0 1px #ffffff24,0 3px 8px #0003;backdrop-filter:blur(10px);color:#e2eaf0;font-size:.75rem;letter-spacing:.01em}
+.orb-invite svg{width:16px;height:16px}
+.orb-chamber .orb-motion{left:auto;right:0;bottom:8px;border:1px solid #adc5d72b;background:#ffffff05;border-radius:50%;color:#9dabb9;width:34px;height:34px;opacity:1}
+.orb-chamber .orb-motion svg{width:18px;height:18px}
+.orb-chamber .orb-motion:hover{color:#fff;border-color:#afced960}
+.orb-chamber .orb-switch{margin:32px 0 0;justify-content:flex-end;gap:24px}
+.orb-chamber .orb-switch button{font-size:.75rem;line-height:1.5;color:#a3adbb;padding:6px 0}
+.orb-chamber .orb-switch button:hover{color:#e3f1f6}
+.orb-chamber .orb-close{width:34px;height:34px;min-height:34px;display:grid;place-items:center;top:-28px;right:-28px;border:1px solid #ffffff1a;border-radius:50%;background:#ffffff04;color:#b2bfcc;padding:0}
+.orb-chamber .orb-close span{margin:0;font-size:23px;line-height:1}
+.orb-chamber .orb-close:hover{color:#fff;background:#ffffff10}
+body[data-site] #top .orb-help :is(button,a,textarea):focus-visible{outline:2px solid #bddde9;outline-offset:5px}
+.orb-help.is-open .orb-chamber{grid-template-columns:minmax(240px,.8fr) minmax(0,1.5fr);column-gap:48px;align-items:start}
+.orb-help.is-open .orb-presence{display:flex;flex-direction:column;align-items:stretch;gap:12px;position:sticky;top:calc(var(--site-header-height,148px) + 24px)}
+body[data-site] #top .orb-help.is-open .orb-heading h2{font-size:clamp(2rem,3.2vw,2.75rem);margin-top:25px}
+.orb-help.is-open .orb-lead{display:none}
+.orb-help.is-open .orb-chamber .orb-stage{min-height:276px}
+.orb-help.is-open .orb-chamber .orb-launch{width:280px;height:auto}
+.orb-help.is-open .orb-chamber .orb-motion{right:12px;left:auto;bottom:0}
+.orb-help.is-open .orb-chamber .orb-invite{display:none}
+.orb-help.is-open .orb-switch{grid-column:2}
+.orb-help .orb-workspace{width:100%;min-width:0;margin:0}
+.orb-help .orb-introduction{text-align:left;margin:0 0 20px}
+body[data-site] #top .orb-introduction h3{font-size:1.1875rem;font-weight:500;line-height:1.5;color:#e2e8ed;letter-spacing:-.025em;margin:0}
+body[data-site] #top .orb-help #questions{padding:0;border:0;background:none;scroll-margin-top:var(--orb-scroll-margin)}
+
+/* Dark clear glass: the edge catches light; the readable face stays quiet. */
+body[data-site] #top .orb-help .question-desk{border:1px solid #8da5b43b;border-radius:20px;background:linear-gradient(130deg,#a7cce411,#ffffff04);box-shadow:inset 0 1px 0 #e4f3ff24,inset 0 -1px #c3d8ec0d,0 5px 0 -3px #8298a61a,0 10px 24px -12px #0009;overflow:hidden}
+body[data-site] #top .orb-help .question-desk::before{height:50px;bottom:-32px;opacity:.25;background:radial-gradient(ellipse,#a3d9e2,transparent 70%);transform:none;animation:none!important}
+body[data-site] #top .orb-help .question-desk:focus-within{border-color:#a2c1d180;box-shadow:inset 0 1px #cceaff33,0 0 0 3px #a9d2df08,0 10px 30px -18px #4ea3c733}
+body[data-site] #top .orb-help #question-form{padding:18px;grid-template-columns:minmax(0,1fr) 40px;gap:12px;min-height:110px}
+body[data-site] #top .orb-help #question{font-size:.9375rem;color:#edf1f5;caret-color:#b6ecf2;line-height:1.65;padding:4px 0;min-height:64px;text-shadow:none}
+body[data-site] #top .orb-help #question::placeholder{color:#95a2b2;opacity:1}
+body[data-site] #top .orb-help .send{width:40px;height:40px;min-width:40px;min-height:40px;padding:10px;border:1px solid #e6f6ff6b;background:linear-gradient(155deg,#d9f3fb,#9aafba);color:#12252e;box-shadow:inset 0 1px #fff,0 3px 8px #0004;border-radius:50%;margin:0}
+body[data-site] #top .orb-help .send:disabled{border-color:#ffffff1f;background:#ffffff0a;color:#7e8a96;box-shadow:inset 0 1px #ffffff0f;opacity:1}
+body[data-site] #top .orb-help .desk-bottom{justify-content:flex-end;margin-top:10px}
+.orb-help .desk-bottom button{color:#9ca7b7;font-size:.625rem}
+.orb-help .orb-faq-label{font-size:.6875rem;color:#9facbb;text-align:left;line-height:1.5;letter-spacing:.015em;margin:28px 0 12px}
+body[data-site] #top .orb-help .suggestions{gap:10px;grid-template-columns:repeat(2,minmax(0,1fr))}
+body[data-site] #top .orb-help .suggestions button{
+ display:grid;grid-template-columns:28px minmax(0,1fr);gap:10px;align-items:center;position:relative;
+ padding:16px 14px;min-height:92px;border-radius:15px;border:1px solid #a6bdce24;
+ background:linear-gradient(145deg,#c4d9ef0a,#ffffff02 60%,#afcfe509);
+ box-shadow:inset 0 1px 0 #d9efff14,inset 0 -1px 1px #ffffff07,0 4px 0 -2px #0002,0 9px 15px -10px #0008;
+ color:#dde6ed;line-height:1.5;font-size:.8125rem;text-align:left;text-shadow:none;word-break:keep-all;
+ transition:border-color .25s,background-color .25s,transform .25s,box-shadow .25s;
+}
+body[data-site] #top .orb-help .suggestions button::before{inset:2px;padding:1px;opacity:.25;background:linear-gradient(125deg,#d9edff,#ffffff00 30%,#ffffff00 60%,#a0bbc84d);border-radius:inherit}
+body[data-site] #top .orb-help .suggestions button::after{display:none}
+.faq-icon{width:28px;height:28px;object-fit:contain;filter:drop-shadow(0 2px 2px #0007)}
+.faq-copy{display:flex;flex-direction:column;gap:5px;min-width:0}
+.faq-topic{font-size:.625rem;font-weight:400;color:#94a5b8;letter-spacing:.015em}
+.faq-question{font-weight:500;line-height:1.5;color:#e4e9ee}
+.faq-arrow{position:absolute;right:10px;top:9px;width:12px;height:12px;color:#a9c4d1;opacity:0;transform:translate(-2px,2px);transition:opacity .2s,transform .2s}
+body[data-site] #top .orb-help .suggestions button:hover{background-color:#b0d9e80a;border-color:#accddd57;box-shadow:inset 0 1px #d6eeff2b,0 9px 22px -12px #000;transform:translateY(-2px)}
+.orb-help .suggestions button:is(:hover,:focus-visible) .faq-arrow{opacity:1;transform:none}
+.orb-help.is-open .suggestions button{animation:orb-unfold .45s cubic-bezier(.16,.7,.2,1) both;animation-delay:calc(.1s + var(--faq-order,0)*.2s)}
+
+/* Replies, citations and contact keep the same reading surface. */
+.orb-help .chat-heading{margin:0 0 1.25rem}
+.orb-help .chat-heading h2,.orb-help #reset{color:#a3afbd;font-size:.75rem}
+.orb-help .message-user{background:linear-gradient(140deg,#a8c8d717,#ffffff06);border:1px solid #b3c7d526;box-shadow:inset 0 1px #fff1;color:#eaf0f4;font-size:.875rem;padding:10px 16px;margin-top:0}
+.orb-help .message-label{color:#8eacbf;font-size:.6875rem}
+.orb-help .answer-wordmark{filter:grayscale(1) brightness(0) invert(1);opacity:.8}
+.orb-help .answer-text :is(p,li){color:#d8e0e7;font-size:.9375rem;line-height:1.9}
+.orb-help .answer-text h3{color:#f0f4f6}
+.orb-help :is(.source-button,.copy-answer,.orb-history>summary){color:#a3b1c0}
+.orb-help .answer-more summary,.orb-help .related-questions button{color:#bddeea}
+.orb-help .answer-sources{gap:8px 16px;padding-block:8px;border-top:1px solid #c1d2df15}
+.orb-help .help-panel-intro h3{color:#edf3f7}
+.orb-help .help-panel-intro p,.orb-help .help-form-note,.orb-help .help-privacy{color:#a5b1c0}
+.orb-help .help-enquiry{padding-top:0!important}
+body[data-site] #top .orb-help .help-enquiry .contact-email{color:#c2e6ef;font-size:1.25rem}
+.orb-help .contact-web-panel,.orb-help .email-row{border-color:#b5c6d122}
+.orb-help .contact-web-panel summary{color:#d4e3ec}
+body[data-site] #top .orb-help .public-answer-actions a{color:#d5e8f1}
+.orb-help:not(.orb-ready) .orb-stage{display:none}
+.orb-help:not(.orb-ready) .orb-presence{display:block;margin-bottom:2rem}
+.orb-help:not(.orb-ready) .orb-workspace{max-width:800px}
+.orb-help:not(.orb-ready) :is(.question-desk,.desk-bottom,.orb-faq-label,.suggestions,.orb-introduction){display:none}
+.orb-help .noscript{background:#ffffff08;color:#b8c5d0;border:1px solid #ffffff20;border-radius:12px;padding:16px;margin:0 0 24px;font-size:.875rem}
+
+@media(max-width:1050px){
+ .orb-chamber{padding:44px 36px 22px}
+ .orb-help.is-open .orb-chamber{column-gap:30px;grid-template-columns:minmax(200px,.7fr) minmax(0,1.4fr)}
+ .orb-help.is-open .orb-chamber .orb-launch{width:232px;height:auto}
+ .orb-help.is-open .orb-chamber .orb-stage{min-height:250px}
+ .orb-chamber .orb-launch{width:300px;height:auto}
+ .orb-chamber .orb-stage{min-height:320px}
+ body[data-site] #top .orb-help .suggestions button{padding:14px 12px;grid-template-columns:24px minmax(0,1fr);gap:8px}
+ .faq-icon{width:24px;height:24px}
+}
+@media(max-width:800px){
+ .orb-help.is-open .orb-chamber{grid-template-columns:1fr}
+ .orb-help.is-open .orb-presence{position:static;display:grid;grid-template-columns:minmax(0,1fr) 180px;gap:20px;align-items:center;margin-bottom:28px}
+ .orb-help.is-open .orb-chamber .orb-stage{min-height:180px}
+ .orb-help.is-open .orb-chamber .orb-launch{width:180px;height:auto}
+ .orb-help.is-open .orb-chamber .orb-motion{right:0;bottom:0}
+ .orb-help.is-open .orb-switch{grid-column:1}
+ .orb-chamber .orb-close{top:-28px;right:-12px}
+ .orb-eyebrow{font-size:9px;gap:8px;letter-spacing:.09em}
+}
+@media(max-width:560px){
+ body[data-site] #top .orb-help{width:calc(100% - 24px);margin-block:32px}
+ .orb-chamber{padding:32px 24px 18px;border-radius:28px}
+ .orb-presence{grid-template-columns:1fr;gap:14px;text-align:center}
+ .orb-eyebrow{justify-content:center}
+ body[data-site] #top .orb-heading h2{font-size:2.5rem;margin:24px 0 14px}
+ .orb-heading{padding:0}
+ .orb-lead{font-size:.8125rem}
+ .orb-chamber .orb-launch{width:280px;height:auto}
+ .orb-chamber .orb-stage{min-height:300px}
+ .orb-chamber .orb-switch{justify-content:center;margin-top:22px}
+ .orb-help.is-open .orb-presence{grid-template-columns:1fr 108px;gap:6px;text-align:left;margin:0 0 24px}
+ .orb-help.is-open .orb-eyebrow{justify-content:flex-start;font-size:8px;gap:6px;letter-spacing:.055em;flex-wrap:wrap}
+ body[data-site] #top .orb-help.is-open .orb-heading h2{font-size:1.75rem;margin:18px 0 0}
+ .orb-help.is-open .orb-chamber .orb-stage{min-height:135px}
+ .orb-help.is-open .orb-chamber .orb-launch{width:118px;height:auto}
+ .orb-help.is-open .orb-chamber .orb-motion{width:44px;height:44px;min-height:44px;right:-5px;bottom:-12px;padding:12px}
+ .orb-chamber .orb-close{top:-7px;right:-5px;width:44px;height:44px;min-height:44px}
+ .orb-help .orb-introduction{padding-right:32px;margin-bottom:16px}
+ body[data-site] #top .orb-introduction h3{font-size:1rem;line-height:28px}
+ body[data-site] #top .orb-help #question-form{padding:14px;min-height:108px}
+ body[data-site] #top .orb-help #question{font-size:1rem;min-height:64px}
+ body[data-site] #top .orb-help .suggestions{grid-template-columns:1fr;gap:9px}
+ body[data-site] #top .orb-help .suggestions button{min-height:70px;grid-template-columns:28px minmax(0,1fr);padding:12px 16px;gap:14px;border-radius:14px}
+ .faq-icon{width:28px;height:28px}
+ .faq-copy{gap:3px}.faq-question{font-size:.8125rem}.faq-arrow{opacity:.6;top:calc(50% - 7px);right:12px}
+ .orb-help .orb-faq-label{margin-top:20px}
+ .orb-help .answer-text :is(p,li){font-size:.875rem}
+}
+@media(prefers-reduced-motion:reduce){.orb-chamber *,.orb-chamber *::before,.orb-chamber *::after{animation:none!important;transition:none!important}.orb-chamber .orb-launch:is(:hover,:focus-visible) .orb-surface{transform:none}}
+@media(forced-colors:active){
+ .orb-chamber{background:Canvas;color:CanvasText;border:1px solid CanvasText;box-shadow:none}
+ .orb-chamber::before,.orb-launch::before,.orb-launch::after{display:none}
+ .orb-chamber :is(h2,h3,p,span,a,button,textarea){color:CanvasText!important}
+ .orb-chamber :is(.suggestions button,.question-desk,.orb-invite,.message-user){background:Canvas!important;border:1px solid CanvasText!important;box-shadow:none!important}
+ .orb-chamber .orb-surface{background:Canvas;border:2px solid ButtonText;inset:12%}
+}
+
+@media(max-width:360px){
+ .orb-chamber{padding-inline:18px}
+ .orb-help.is-open .orb-presence{grid-template-columns:minmax(0,1fr) 90px;gap:4px}
+ body[data-site] #top .orb-help.is-open .orb-heading h2{font-size:1.5rem;letter-spacing:-.05em}
+ .orb-help.is-open .orb-chamber .orb-launch{width:90px}
+ .orb-help.is-open .orb-chamber .orb-stage{min-height:124px}
+}

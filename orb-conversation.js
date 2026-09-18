@@ -17,21 +17,30 @@ function mountOrb(button){
    if(r>1.025){gl_FragColor=vec4(0.);return;}
    float z=sqrt(max(0.,1.-dot(p,p))); vec3 n=normalize(vec3(p,z));
    float t=time*.12;
-   vec3 pos=vec3(p,z*.8); pos.x+=pointer.x*.1;pos.y+=pointer.y*.1;
+   // Refraction compresses the light toward the far edge of a solid sphere.
+   vec2 lens=p/(.72+.28*z);
+   vec3 pos=vec3(lens,z*.8); pos.x+=pointer.x*.1;pos.y+=pointer.y*.1;
    float swirl=fbm(pos*2.6+vec3(t,-t*.6,t*.3));
    float clouds=fbm(pos*4.+swirl*2.+vec3(-t,t*.5,0));
-   float arc=p.y+.43*sin(p.x*2.7+t)+.32*(clouds-.5);
-   float ribbon=exp(-abs(arc)*7.);
-   float filament=pow(.5+.5*sin(arc*110.+clouds*10.),8.)*ribbon;
-   float inner=exp(-abs(p.x-.32*sin(p.y*3.-t*1.3)+.12*(swirl-.5))*14.);
-   vec3 base=mix(vec3(.026,.038,.075),vec3(.15,.18,.27),clouds);
-   vec3 tint=mix(vec3(.20,.38,.76),accent,.36);
+   float arc=lens.y+.43*sin(lens.x*2.7+t)+.24*(clouds-.5);
+   float ribbon=exp(-abs(arc)*10.);
+   float filament=pow(.5+.5*sin(arc*95.+clouds*8.),10.)*ribbon;
+   float inner=exp(-abs(lens.x-.32*sin(lens.y*3.-t*1.3)+.12*(swirl-.5))*17.);
+   vec3 base=mix(vec3(.018,.028,.048),vec3(.10,.14,.21),clouds);
+   vec3 tint=mix(vec3(.18,.43,.78),accent,.24);
    vec3 pearl=mix(vec3(.67,.85,.96),vec3(.86,.69,.83),sin(t+p.x*2.)*.5+.5);
-   vec3 color=base+tint*ribbon*(.80+energy*.3)+pearl*filament*.32+vec3(.34,.38,.70)*inner*.35;
-   float rim=pow(1.-z,3.);
+   vec3 color=base+tint*ribbon*(.62+energy*.3)+pearl*filament*.27+vec3(.24,.38,.66)*inner*.20;
+   float rim=pow(1.-z,4.);
    float light=max(0.,dot(n,normalize(vec3(-.6,.8,1.2))));
-   color+=pearl*pow(light,28.)*.55+pearl*rim*.43;
-   color+=vec3(.70,.85,.95)*pow(max(0.,dot(n,normalize(vec3(.7,-.8,.4)))),20.)*.26;
+   color+=pearl*pow(light,20.)*.24+pearl*rim*.42;
+   // Narrow studio reflections sit on the shell, independently of the core.
+   float softbox=exp(-pow((p.x+.35-pointer.x*.03)/.31,2.)-pow((p.y-.65)/.075,2.));
+   color+=vec3(.83,.93,1.)*softbox*.65;
+   float crescent=exp(-pow((r-.956)/.017,2.))*smoothstep(-.3,.8,p.y-p.x);
+   color+=vec3(.76,.89,.96)*crescent*.42;
+   float caustic=exp(-pow((r-.91)/.022,2.))*smoothstep(.2,.95,p.x-p.y);
+   color+=vec3(.34,.65,.82)*caustic*.35;
+   color+=vec3(.70,.85,.95)*pow(max(0.,dot(n,normalize(vec3(.7,-.8,.4)))),26.)*.20;
    float veins=pow(noise(pos*95.+vec3(t)),19.)*.14;
    color+=veins*ribbon;
    color*=.68+.32*z;
@@ -61,6 +70,8 @@ function mountOrb(button){
  const resize=new ResizeObserver(wake);resize.observe(button);
  button.addEventListener('pointermove',e=>{if(reduced.matches)return;const r=button.getBoundingClientRect();tx=(e.clientX-r.left)/r.width*2-1;ty=1-(e.clientY-r.top)/r.height*2;targetEnergy=.7;wake();});
  button.addEventListener('pointerleave',()=>{tx=ty=targetEnergy=0;wake();});
+ button.addEventListener('focus',()=>{targetEnergy=.55;wake();});
+ button.addEventListener('blur',()=>{targetEnergy=0;wake();});
  document.addEventListener('synk:orb-state',e=>{targetEnergy=e.detail==='busy'?1:e.detail==='typing'?.5:0;wake();});
  motion.hidden=false;motion.addEventListener('click',()=>{paused=!paused;motion.setAttribute('aria-pressed',String(paused));motion.setAttribute('aria-label',paused?'구체 움직임 재생':'구체 움직임 멈추기');motion.querySelector('path').setAttribute('d',paused?'M9 6l9 6-9 6Z':'M9 7v10M15 7v10');last=0;wake();});
  document.addEventListener('visibilitychange',()=>{last=0;wake();});reduced.addEventListener('change',()=>{last=0;wake();});
@@ -80,7 +91,7 @@ export function initOrbConversation(){
   workspace.hidden=false;root.classList.add('is-open');root.dataset.mode=mode;launch.setAttribute('aria-expanded','true');launch.setAttribute('aria-label','질문 입력창으로 이동');close.hidden=false;
   panels.forEach(panel=>panel.hidden=panel.id!==mode);switches.forEach(button=>button.hidden=button.dataset.orbMode===mode);
   if(remember){const url=new URL(location.href);url.hash=mode==='questions'?'questions':'contact-web';history.replaceState(null,'',url);}
-  if(focus){if(mode==='questions')input.focus({preventScroll:true});else{const title=root.querySelector('#enquiry-title');title.tabIndex=-1;title.focus({preventScroll:true});}root.querySelector('.orb-stage').scrollIntoView({block:'start',behavior:'instant'});}
+  if(focus){if(mode==='questions')input.focus({preventScroll:true});else{const title=root.querySelector('#enquiry-title');title.tabIndex=-1;title.focus({preventScroll:true});}root.scrollIntoView({block:'start',behavior:'instant'});}
  }
  function collapse(){workspace.hidden=true;root.classList.remove('is-open');launch.setAttribute('aria-expanded','false');launch.setAttribute('aria-label','무엇이든 물어보세요. 질문창 열기');switches.forEach(button=>button.hidden=button.dataset.orbMode==='questions');const url=new URL(location.href);url.hash='';history.replaceState(null,'',url);launch.focus({preventScroll:true});}
  function modeForHash(hash){if(['#questions','#question'].includes(hash))return 'questions';if(hash.startsWith('#contact-'))return 'contact-web';return null;}
@@ -89,13 +100,13 @@ export function initOrbConversation(){
  root.addEventListener('keydown',e=>{if(e.key==='Escape'&&root.classList.contains('is-open')&&!document.querySelector('dialog[open]')){e.preventDefault();collapse();}});
  document.addEventListener('synk:show-answers',()=>open('questions'));
  input.addEventListener('input',()=>document.dispatchEvent(new CustomEvent('synk:orb-state',{detail:input.value?'typing':'idle'})));
- document.addEventListener('click',event=>{const link=event.target.closest('a[href]');if(!link)return;const url=new URL(link.href,location.href);if(url.origin===location.origin&&url.pathname===location.pathname){const mode=modeForHash(url.hash);if(mode)open(mode);} },true);
- window.addEventListener('hashchange',()=>{const mode=modeForHash(location.hash);if(mode)open(mode);});
+ document.addEventListener('click',event=>{const link=event.target.closest('a[href]');if(!link||event.metaKey||event.ctrlKey||event.shiftKey||event.altKey)return;const url=new URL(link.href,location.href);if(url.origin===location.origin&&url.pathname===location.pathname){const mode=modeForHash(url.hash);if(mode){event.preventDefault();open(mode,{focus:true,remember:true});}} },true);
+ window.addEventListener('hashchange',()=>{const mode=modeForHash(location.hash);if(mode){open(mode);requestAnimationFrame(()=>root.scrollIntoView({block:'start',behavior:'instant'}));}});
  root.classList.add('orb-ready');workspace.hidden=true;const initial=modeForHash(location.hash);
  if(initial){
   open(initial);let interacted=false;
   root.addEventListener('pointerdown',()=>interacted=true,{once:true});root.addEventListener('keydown',()=>interacted=true,{once:true});
-  const align=()=>requestAnimationFrame(()=>{if(!interacted)root.querySelector('.orb-stage').scrollIntoView({block:'start',behavior:'instant'});});
+  const align=()=>requestAnimationFrame(()=>{if(!interacted)root.scrollIntoView({block:'start',behavior:'instant'});});
   if(document.readyState==='complete')align();else window.addEventListener('load',align,{once:true});
   root.querySelector('.orb-stage').addEventListener('transitionend',event=>{if(event.propertyName==='min-height')align();},{once:true});
  }

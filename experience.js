@@ -55,7 +55,7 @@ function mount(){
 mount();
 Promise.allSettled([document.fonts?.ready,document.readyState==='complete'?Promise.resolve():new Promise(resolve=>addEventListener('load',resolve,{once:true}))]).then(()=>requestAnimationFrame(()=>requestAnimationFrame(()=>{
   if(!visitorActed&&initialFragment&&initialFragment!=='#top'&&location.hash===initialFragment){
-    try {document.getElementById(decodeURIComponent(initialFragment.slice(1)))?.scrollIntoView({behavior:'instant',block:'start'});} catch { /* Ignore malformed fragments. */ }
+    try {const target=document.getElementById(decodeURIComponent(initialFragment.slice(1)));(target?.closest('.orb-help')||target)?.scrollIntoView({behavior:'instant',block:'start'});} catch { /* Ignore malformed fragments. */ }
   }
   for(const type of ['pointerdown','keydown','wheel','touchstart'])removeEventListener(type,markVisitor);
 })));
