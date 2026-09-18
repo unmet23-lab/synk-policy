@@ -668,6 +668,8 @@ body[data-site="shift"] #design-notes .brand-story-layout>div>p+p{margin-top:1re
 .scene-check input{width:18px;height:18px;accent-color:var(--brand-ink);flex:none}
 .scene-check>p,.scene-scope{font-size:.8125rem;line-height:1.8;color:var(--muted);word-break:keep-all}
 .scene-scope{margin:1rem 0 0;max-width:720px}
+.visual-explainer--practice .visual-scene-copy{max-width:none;width:100%}
+.visual-explainer--practice .scene-draft{min-height:168px}
 .class-time{display:grid;grid-template-columns:2fr 1fr;gap:1rem;max-width:760px;margin-bottom:.875rem}
 .class-time>div{padding:1.25rem 1.5rem;background:#f7f7f5;border-radius:12px}
 .class-time>div:last-child{background:var(--brand-wash);color:var(--brand-ink)}
@@ -704,6 +706,22 @@ body[data-site] #top .pulse-object-visual>img{width:100%;height:auto;max-height:
  .story-feature>.visual-explainer.is-interactive .visual-scene-copy{grid-column:1;grid-row:5;max-width:none}
  .story-feature>.visual-explainer.is-interactive .visual-scene h3{font-size:1.5rem}
  .story-feature>.visual-explainer.is-interactive>.scene-scope{grid-column:1/-1;margin-top:2rem}
+ /* The practice content uses both columns after the introduction and object. */
+ .story-feature>.visual-explainer--practice.is-interactive .visual-scene-art{grid-row:1/5;width:100%;max-width:440px;justify-self:center;align-self:center;margin-top:0}
+ .story-feature>.visual-explainer--practice.is-interactive .visual-scene-copy{grid-column:1/-1;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.05fr);grid-template-rows:min-content min-content min-content 1fr;column-gap:4rem;align-items:start;margin-top:1.5rem}
+ .visual-explainer--practice .visual-scene-copy>.visual-scene-number{grid-column:1;grid-row:1}
+ .visual-explainer--practice .visual-scene-copy>h3{grid-column:1;grid-row:2}
+ .visual-explainer--practice .visual-scene-copy>.visual-scene-summary{grid-column:1;grid-row:3;max-width:28em}
+ .visual-explainer--practice .visual-scene-copy>.visual-scene-detail{grid-column:1;grid-row:4;align-self:start}
+ .visual-explainer--practice .visual-scene-copy>.visual-scene-example{grid-column:2;grid-row:1/5;margin-top:0;min-width:0}
+ .visual-explainer--practice .visual-scene-example h4{font-size:1.125rem;line-height:1.65}
+ .story-feature>.visual-explainer--practice.is-interactive>.scene-scope{grid-column:2;max-width:none;margin-top:1.25rem}
+}
+@media(min-width:801px) and (max-width:999px){
+ .visual-explainer--practice .visual-scene{grid-template-columns:1fr;gap:1.75rem}
+ .visual-explainer--practice .visual-scene-art{width:100%;max-width:340px;justify-self:center}
+ .visual-explainer--practice .visual-scene-copy{max-width:680px;justify-self:center}
+ .visual-explainer--practice>.scene-scope{max-width:680px;margin-inline:auto}
 }
 @media(max-width:800px){
  .visual-scene{grid-template-columns:1fr;gap:1.75rem}
