@@ -295,6 +295,8 @@ body[data-site] #top .lab-personalization{grid-column:1/-1;padding-top:5rem}
 .atlas-applications a{display:block;min-width:0;padding:.5rem}
 .atlas-applications strong{display:flex;justify-content:space-between;align-items:center;font-size:1.5rem;font-weight:600;gap:1rem;margin-bottom:1rem}
 .atlas-applications strong span{font-size:1rem}
+.atlas-applications .application-embroidery{display:block;width:auto;height:48px;max-width:calc(100% - 36px);object-fit:contain;object-position:left center}
+.atlas-applications a:focus-visible{outline:2px solid var(--brand-ink);outline-offset:8px;border-radius:2px}
 .atlas-applications p{font-size:.9375rem;line-height:1.85;color:var(--muted)}
 .atlas-scope{font-size:.75rem;color:var(--muted);line-height:1.8;margin:1.75rem auto 0;max-width:740px;text-align:center}
 
@@ -307,6 +309,7 @@ body[data-site] #top .lab-personalization{grid-column:1/-1;padding-top:5rem}
   .atlas-applications,.atlas-flow{grid-template-columns:1fr;gap:2rem}
   .atlas-flow{margin-block:3rem}
   .atlas-applications{padding:2.5rem}
+  .atlas-applications .application-embroidery{height:36px}
 }
 @media(max-width:760px){
   body[data-site] #top .introduction{gap:2.5rem;padding-block:3.5rem 2.5rem}
