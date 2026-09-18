@@ -1,8 +1,16 @@
-import {copy} from './data.js?v=57fdd14e3c12';
-import {createViews} from './views.js?v=57fdd14e3c12';
-import {createSession,updateDraft,beginReview,finishLetter} from './session.js?v=57fdd14e3c12';
+import {copy} from './data.js?v=89eff8764bb1';
+import {createViews} from './views.js?v=89eff8764bb1';
+import {createSession,updateDraft,beginReview,finishLetter} from './session.js?v=89eff8764bb1';
 const main=document.querySelector('#experience'),notice=document.querySelector('#notice'),dialog=document.querySelector('#restart-dialog');
 const state=createSession(),views=createViews(state);
+const embedded=window.parent!==window&&new URLSearchParams(location.search).get('embed')==='lab';
+if(embedded)document.documentElement.classList.add('lab-embedded');
+function notifyHost(focus=false){
+ if(!embedded)return;
+ parent.postMessage({type:'synk:letter-view',stage:state.stage,height:Math.ceil(document.body.getBoundingClientRect().height)+2,focus},location.origin);
+}
+const resizeObserver=embedded?new ResizeObserver(()=>notifyHost()):null;
+resizeObserver?.observe(document.body);
 let blinkTimer, blinkObserver;
 const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
 function stopBlink() {
@@ -31,7 +39,9 @@ function render(focusSelector){
  stopBlink();
  const screens={story:views.story,write:views.writing,review:views.review,done:views.done};
  main.innerHTML=views.intro()+screens[state.stage]();observeRooms();
+ if(embedded)main.querySelectorAll('.letter-original').forEach(element=>element.tabIndex=0);
  if(focusSelector){const el=main.querySelector(focusSelector);el?.focus({preventScroll:true});el?.scrollIntoView({block:'start',behavior:'instant'});}
+ requestAnimationFrame(()=>notifyHost(focusSelector==='h1'));
 }
 function reset(){Object.assign(state,createSession());render('h1');notice.textContent='';}
 function refreshHints(selector){
@@ -75,6 +85,6 @@ document.querySelector('#restart-cancel').addEventListener('click',()=>dialog.cl
 document.querySelector('#restart-confirm').addEventListener('click',()=>{dialog.close();reset();});
 document.addEventListener('visibilitychange',()=>document.hidden?stopBlink():startBlink());
 reduced.addEventListener('change',startBlink);
-window.addEventListener('pagehide',()=>{stopBlink();blinkObserver?.disconnect();});
-window.addEventListener('pageshow',observeRooms);
+window.addEventListener('pagehide',()=>{stopBlink();blinkObserver?.disconnect();resizeObserver?.disconnect();});
+window.addEventListener('pageshow',()=>{observeRooms();resizeObserver?.observe(document.body);notifyHost();});
 render();

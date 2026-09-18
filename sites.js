@@ -26,17 +26,22 @@ if(helpTabs){
  document.addEventListener('synk:show-answers',()=>showHelp('questions',{remember:true}));
 }
 
-// A public illustration of explicitly chosen explanation order, not a learner diagnosis.
-const explanation=document.querySelector('[data-explanation]');
-if(explanation){
-  const controls=[...document.querySelectorAll('[data-explanation-order]')];
-  controls.forEach(button=>button.addEventListener('click',()=>{
-    const selected=button.dataset.explanationOrder;
-    const first=explanation.querySelector(`[data-explanation-part="${selected}"]`);
-    if(!first)return;
-    explanation.prepend(first);
-    controls.forEach(control=>control.setAttribute('aria-pressed',String(control===button)));
-  }));
+// The existing letter workshop runs locally in its own document. Only layout and stage are shared.
+const letterFrame=document.querySelector('[data-letter-embed]');
+if(letterFrame){
+ const status=document.querySelector('[data-letter-status]');
+ status.hidden=false;
+ let ready=false;
+ const slowLoad=setTimeout(()=>{if(!ready)status.textContent='화면이 나타나지 않으면 아래 ‘새 창에서 체험하기’를 이용해 주세요.';},12000);
+ window.addEventListener('message',event=>{
+  const data=event.data;
+  if(event.origin!==location.origin||event.source!==letterFrame.contentWindow||data?.type!=='synk:letter-view')return;
+  if(!['story','write','review','done'].includes(data.stage)||!Number.isFinite(data.height)||data.height<100||data.height>20000)return;
+  ready=true;clearTimeout(slowLoad);status.hidden=true;
+  letterFrame.height=String(Math.ceil(data.height));
+  document.querySelectorAll('[data-letter-stage]').forEach(item=>{if(item.dataset.letterStage.split(' ').includes(data.stage))item.setAttribute('aria-current','step');else item.removeAttribute('aria-current');});
+  if(data.focus)letterFrame.scrollIntoView({block:'start',behavior:'instant'});
+ });
 }
 
 // Open a curriculum disclosure before the browser measures a fragment destination.

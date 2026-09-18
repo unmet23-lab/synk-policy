@@ -169,17 +169,28 @@ body[data-site] #top .lab-personalization{grid-column:1/-1;padding-top:5rem}
 .lab-benefit details[open] summary>span{transform:rotate(45deg)}
 .lab-benefit ul{list-style:none;margin:1rem 0 0;padding:0}
 .lab-benefit li{font-size:.875rem;line-height:1.9;color:var(--muted);padding-bottom:1rem;word-break:keep-all}
-.lab-preference{display:grid;grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr);gap:4rem;align-items:center;margin-top:4rem;padding:clamp(2.5rem,5vw,4.5rem);border:1px solid transparent;border-image:var(--felt-frame) 250 fill / 68px / 0 round}
-.lab-preference h3{font-size:clamp(1.8rem,3vw,2.65rem);font-weight:600;line-height:1.35;letter-spacing:-.035em;margin:1.25rem 0}
-.lab-preference p{font-size:1rem;line-height:1.85;color:var(--muted);word-break:keep-all}
-.lab-preference .lab-example-note{font-size:.75rem;line-height:1.8;margin-top:1.5rem}
-.lab-preference-options{display:flex;gap:.5rem;margin-bottom:2rem}
-.lab-preference-options button{min-height:44px;padding:.625rem 1.125rem;border:1px solid rgba(43,35,32,.15);border-radius:99px;background:#fff;font-size:.875rem}
-.lab-preference-options button[aria-pressed="true"]{background:var(--ink);color:#fff;border-color:var(--ink)}
-.lab-explanation{display:grid;gap:1.75rem;min-height:220px}
-.lab-explanation>div{padding-left:1.25rem;border-left:2px solid rgba(43,35,32,.18)}
-.lab-explanation span{font-size:.75rem;color:var(--muted)}
-.lab-explanation p{font-size:1.15rem;font-weight:500;line-height:1.7;color:var(--ink);margin-top:.625rem}
+.lab-try{margin-top:4rem;padding-top:3rem;border-top:20px solid transparent;border-image:var(--thread-frame) 250 / 36px 0 0 / 0 round;scroll-margin-top:3rem}
+.lab-try-heading{max-width:690px;margin-bottom:3rem}
+.lab-try-heading h3{font-size:clamp(1.8rem,3.3vw,2.8rem);font-weight:600;line-height:1.35;letter-spacing:-.035em;margin:1.25rem 0}
+.lab-try-heading>p{font-size:1rem;line-height:1.9;color:var(--muted);word-break:keep-all}
+.lab-try-layout{display:grid;grid-template-columns:minmax(0,.65fr) minmax(0,1.6fr);gap:clamp(2rem,4vw,4rem);align-items:start}
+.lab-try-guide{position:sticky;top:5rem;padding-top:1rem}
+.lab-try-guide ol{list-style:none;margin:0;padding:0;counter-reset:try-step}
+.lab-try-guide li{position:relative;padding:0 0 2.25rem 2rem;counter-increment:try-step}
+.lab-try-guide li::before{content:counter(try-step);position:absolute;left:0;top:0;color:var(--muted);font-family:var(--mono);font-size:.8rem}
+.lab-try-guide li[aria-current]::before{color:var(--ink);text-decoration:underline;text-underline-offset:.5rem}
+.lab-try-guide strong{font-size:1rem;font-weight:600;line-height:1.6;word-break:keep-all}
+.lab-try-guide li p{font-size:.875rem;line-height:1.9;color:var(--muted);margin-top:.75rem;word-break:keep-all}
+.lab-try-guide .lab-try-scope{font-size:.8125rem;line-height:1.9;color:var(--muted);word-break:keep-all}
+.lab-try-screen{min-width:0}
+.lab-try-screen iframe{display:block;width:100%;border:0;border-radius:20px;background:#080605;scroll-margin-top:2rem}
+.lab-try-status{font-size:.875rem;line-height:1.8;margin-top:1rem}
+.lab-try-status[hidden]{display:none}
+.lab-try-footer{display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:1rem;padding:1.25rem 0}
+.lab-try-footer p{font-size:.75rem;line-height:1.8;color:var(--muted);max-width:390px}
+.lab-try-footer a{font-size:.8125rem;text-underline-offset:.25em;text-decoration:underline;min-height:44px;display:inline-flex;align-items:center}
+@media(max-width:1000px){.lab-try-layout{grid-template-columns:1fr;gap:2rem}.lab-try-guide{position:static;padding:0}.lab-try-guide ol{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1.5rem}.lab-try-guide li{padding-left:0;padding-top:1.75rem;padding-bottom:1rem}.lab-try-guide li::before{top:0}.lab-try-guide .lab-try-scope{max-width:620px}}
+@media(max-width:560px){.lab-try{margin-top:2rem;padding-top:2rem}.lab-try-heading{margin-bottom:2rem}.lab-try-guide ol{grid-template-columns:1fr;gap:.75rem}.lab-try-guide li{padding:0 0 .75rem 1.75rem}.lab-try-guide li p{margin-top:.25rem}.lab-try-screen iframe{border-radius:14px}}
 .lab-patent{text-align:center;padding:4.5rem 0 1rem}
 .lab-patent h3{font-size:clamp(1.25rem,2.5vw,1.75rem);font-weight:600;margin-top:1rem;line-height:1.4}
 .lab-patent p{font-size:1rem;color:var(--muted);margin-top:.75rem}
@@ -228,7 +239,6 @@ body[data-site] #top .lab-personalization{grid-column:1/-1;padding-top:5rem}
   .lab-benefits{grid-template-columns:1fr;gap:1.5rem}
   .lab-benefit{padding-top:1.5rem}
   .lab-benefit h3{font-size:1.75rem}
-  .lab-preference{grid-template-columns:1fr;gap:2.5rem}
   .atlas-engine-list,.atlas-evolution{grid-template-columns:1fr;gap:1.5rem}
   .atlas-evolution{margin-top:4rem}
   .atlas-applications,.atlas-flow{grid-template-columns:1fr;gap:2rem}
@@ -257,7 +267,6 @@ body[data-site] #top .lab-personalization{grid-column:1/-1;padding-top:5rem}
   body[data-site] #top #lab.lab-bento .lab-card--direction{padding-right:0}
   body[data-site] #top .lab-personalization{padding-top:3rem}
   .lab-overview-heading{margin-bottom:3rem}
-  .lab-preference{margin-top:2rem}
   .lab-explanation{min-height:260px}
   .site-family{grid-template-columns:repeat(2,minmax(0,1fr));gap:0 1.5rem}
   .site-family a{font-size:.8125rem}
@@ -278,13 +287,11 @@ body[data-site] #top .lab-personalization{grid-column:1/-1;padding-top:5rem}
   body[data-site] #top .question-desk{padding:.5rem}
   body[data-site] #top :is(.shift-pillars>section,.world-shift .shift-workflow){padding:2.5rem 1.75rem}
   body[data-site] #top #lab.lab-bento :is(.lab-card--curriculum,.lab-card--tracking){padding:2.5rem 1.75rem}
-  .lab-preference{padding:2.75rem 1.75rem;border-image-width:56px}
-  .lab-preference-options button{padding-inline:.875rem}
   .lab-overview-heading>p{font-size:1rem}
   .lab-patent{padding-top:3.5rem}
 }
 @media(forced-colors:active){
-  body[data-site] :is(.header.shell,.world-directory>a,.company-note,.principles>div,.contact-section,.questions-section,.contact-web,.question-desk,.site-family,.lab-card,.lab-volume,.shift-pillars>section,.making-note,.shift-workflow,.pulse-scene,.work-card,.lab-benefit,.lab-preference){border-image:none!important;border:1px solid CanvasText!important;background:Canvas!important;color:CanvasText!important}
+  body[data-site] :is(.header.shell,.world-directory>a,.company-note,.principles>div,.contact-section,.questions-section,.contact-web,.question-desk,.site-family,.lab-card,.lab-volume,.shift-pillars>section,.making-note,.shift-workflow,.pulse-scene,.work-card,.lab-benefit,.lab-try){border-image:none!important;border:1px solid CanvasText!important;background:Canvas!important;color:CanvasText!important}
 }
 
 /* Brand introductions: editorial reading rhythm, open space and real thread boundaries. */

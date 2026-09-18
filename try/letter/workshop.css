@@ -20,3 +20,36 @@
 @media(prefers-reduced-motion:no-preference){.hint-answer{animation:hint-in 180ms ease-out}@keyframes hint-in{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}}
 
 .task-reminder{margin-bottom:22px;padding:10px 0;border-block:1px solid #fbf7f020}.task-reminder summary{font-size:14px;color:var(--synk-stone);padding-block:4px;min-height:36px}.task-reminder .clues{margin:12px 0 6px}
+
+/* Inline LAB placement reuses the same game, assets and draft session. */
+.lab-embedded{scroll-padding-top:12px;overflow:hidden}
+.lab-embedded body{min-height:0;background-image:none}
+.lab-embedded .header,.lab-embedded .footer,.lab-embedded .experience-label,.lab-embedded .skip{display:none}
+.lab-embedded #experience{width:100%;padding:28px;max-width:none}
+.lab-embedded body[data-page='letter'] .intro{padding:0 0 20px}
+.lab-embedded body[data-page='letter'] .intro h1{font-size:clamp(1.5rem,3.6vw,2rem);margin-block:6px 10px}
+.lab-embedded .intro .subtitle{font-size:14px}
+.lab-embedded .intro .eyebrow{display:none}
+.lab-embedded .steps{margin-bottom:24px}
+.lab-embedded .professor-row{grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr);gap:22px}
+.lab-embedded .story-brief .situation-copy h2{font-size:1.25rem}
+.lab-embedded .story-brief .situation-copy>p{font-size:.9375rem}
+.lab-embedded .guide-section{margin-bottom:0!important}
+.lab-embedded .section-heading p{font-size:.875rem}
+.lab-embedded #experience>.actions a{display:none}
+.lab-embedded body[data-page='letter'] .writing-card{padding:22px}
+.lab-embedded .writing-card textarea{min-height:260px}
+.lab-embedded .done-art{display:none}
+.lab-embedded .done-layout{grid-template-columns:1fr}
+.lab-embedded .letter-original{max-height:30rem;overflow:auto}
+@media(max-width:560px){
+ .lab-embedded #experience{padding:20px 16px}
+ .lab-embedded .professor-row{grid-template-columns:1fr;gap:20px}
+ .lab-embedded .professor-row .room{max-width:420px;margin-inline:auto}
+ .lab-embedded .guides{gap:6px}
+ .lab-embedded .guide{padding:10px 4px;min-height:132px}
+ .lab-embedded .guide img{width:58px;height:58px}
+ .lab-embedded .guide .guide-note{font-size:11px}
+ .lab-embedded body[data-page='letter'] .writing-card{padding:16px}
+ .lab-embedded .writing-card textarea{font-size:16px}
+}
