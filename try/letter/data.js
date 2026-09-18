@@ -120,23 +120,23 @@ export const copy = {
     "stages": {
       "done": {
         "step": "완성",
-        "subtitle": "처음과 어떻게 달라졌을까요?",
-        "title": "완성 및 비교"
+        "subtitle": "완성한 메일을 읽고, 수정한 부분이 있다면 처음 글과 비교해 보세요.",
+        "title": "완성한 메일 확인하기"
       },
       "review": {
         "step": "다듬기",
-        "subtitle": "내가 쓴 글을 점검합니다.",
+        "subtitle": "내용과 높임말을 확인하고, 고치고 싶은 부분을 수정하세요.",
         "title": "다시 읽고 다듬기"
       },
       "story": {
         "step": "상황",
-        "subtitle": "나는 대학생, 어떤 일이 일어났나요?",
-        "title": "상황 파악"
+        "subtitle": "과제를 제때 내지 못한 대학생의 입장에서 메일을 써 보세요.",
+        "title": "교수님께 기한 연장 메일 쓰기"
       },
       "write": {
         "step": "쓰기",
-        "subtitle": "직접 글을 써보세요.",
-        "title": "메일 작성"
+        "subtitle": "과제를 못 낸 이유와 부탁할 내용을 직접 쓰세요. 막히면 힌트를 열어 보세요.",
+        "title": "메일 쓰기"
       }
     },
     "title": "과제 연장 부탁하기"
@@ -183,22 +183,22 @@ export const copy = {
     "restartConfirm": "다시 시작",
     "labHome": "SYNK LAB으로",
     "stepsLabel": "진행 단계",
-    "backToWriting": "초안 단계로 돌아가기",
-    "changesLabel": "무엇이 달라졌나요?",
+    "backToWriting": "메일 쓰기로 돌아가기",
+    "changesLabel": "처음 쓴 글과 비교하기",
     "continueEditing": "더 수정하기",
-    "doneDescription": "내가 쓴 처음 글과 완성한 글을 비교해 보고, 필요하다면 내려받아 보세요.",
-    "doneTitle": "수고하셨습니다.",
+    "doneDescription": "메일을 더 고치거나 파일로 내려받을 수 있습니다. 실제로 전송되지는 않습니다.",
+    "doneTitle": "메일 쓰기를 마쳤습니다.",
     "download": "내 글 내려받기",
     "finish": "글쓰기 마무리",
     "finishNote": "글을 다 고쳤다면 결과를 비교해 보세요.",
-    "guideDescription": "상황과 단서를 읽고, 세 명의 친구 중 한 명을 골라 메일을 작성해 보세요.",
-    "guideTitle": "함께할 친구 선택",
+    "guideDescription": "글을 쓰다가 도움이 필요할 때 힌트를 줄 친구를 고르세요.",
+    "guideTitle": "함께 쓸 친구 고르기",
     "hintBack": "다른 힌트 선택",
-    "hintClosed": "막막할 때만 열어보세요.",
+    "hintClosed": "어떻게 써야 할지 막힐 때 힌트를 열어 보세요.",
     "hintLess": "힌트 닫기",
     "hintMore": "조금 더 구체적인 힌트 보기",
     "hintOpen": "힌트 보기",
-    "hintsDescription": "막막할 때는 아래의 힌트를 확인해 보세요.",
+    "hintsDescription": "도움이 필요한 부분을 고르세요.",
     "hintsTitle": "도움이 필요할 때",
     "initialLabel": "처음 쓴 글",
     "letterLabel": "메일 내용",
@@ -206,17 +206,17 @@ export const copy = {
     "noChanges": "처음 쓴 글과 같습니다.",
     "placeholder": "여기에 메일 내용을 작성하세요.",
     "privacy": "입력한 내용은 서버로 전송되지 않으며, 새로고침하면 지워집니다.",
-    "reviewAction": "글 다듬으러 가기",
-    "reviewDescription": "아래 질문들에 스스로 답해보며 글을 고쳐보세요. 자동 교정은 되지 않습니다.",
-    "reviewNote": "글을 수정하면 체크 표시가 풀리니 다시 확인해 보세요.",
+    "reviewAction": "내 글 점검하기",
+    "reviewDescription": "점검 항목을 읽고 내 글과 비교하세요. 필요한 부분은 직접 고칩니다.",
+    "reviewNote": "글을 수정하면 점검 표시가 해제됩니다. 수정한 내용을 다시 확인하세요. 체크하지 않아도 마칠 수 있습니다.",
     "reviewPlaceholder": "초안을 읽고 더 나은 표현으로 고쳐보세요.",
-    "reviewTitle": "내 글 돌아보기",
+    "reviewTitle": "점검할 내용",
     "revisionLabel": "다듬은 글",
     "savedLabel": "완성한 글",
     "start": "메일 쓰기",
     "startNote": "시간 제한은 없습니다. 편안하게 시작하세요.",
     "toneRule": "교수님께 보내는 글이므로 예의 바른 높임말을 사용해야 합니다.",
-    "backToStrategies": "함께할 친구 선택"
+    "backToStrategies": "함께 쓸 친구 고르기"
   },
   "footer": {
     "privacy": [
@@ -229,18 +229,18 @@ export const copy = {
   "checks": [
     {
       "id": "purpose",
-      "label": "과제를 못 낸 이유와 연장 요청이 잘 드러나나요?",
-      "question": "내가 원하는 내용이 한 번에 명확히 전달되나요?"
+      "label": "과제를 못 낸 이유와 부탁할 내용이 들어 있나요?",
+      "question": "교수님이 상황과 요청을 이해할 수 있는지 확인하세요."
     },
     {
       "id": "tone",
-      "label": "교수님 입장에서 읽어도 표현이 충분히 정중한가요?",
-      "question": "높임말을 사용하여 예의 바르게 마음을 전했나요?"
+      "label": "교수님께 맞는 정중한 높임말을 썼나요?",
+      "question": "메일의 첫인사부터 끝맺음까지 다시 읽어 보세요."
     },
     {
       "id": "clarity",
-      "label": "며칠을 더 주어야 하는지 정확한 숫자가 들어있나요?",
-      "question": "연장을 부탁하는 구체적인 기간이 읽는 사람에게 잘 전달되나요?"
+      "label": "기한을 얼마나 늘려 달라는지 분명한가요?",
+      "question": "상황에 나온 요청 기간과 내가 쓴 내용을 비교하세요."
     }
   ]
 };

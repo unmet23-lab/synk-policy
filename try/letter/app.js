@@ -1,7 +1,7 @@
-import {copy} from './data.js?v=e16032eea501';
-import {createViews} from './views.js?v=e16032eea501';
-import {createSession,updateDraft,beginReview,finishLetter} from './session.js?v=e16032eea501';
-import {createAtlasUI} from './atlas-ui.js?v=e16032eea501';
+import {copy} from './data.js?v=8b9ef8254860';
+import {createViews} from './views.js?v=8b9ef8254860';
+import {createSession,updateDraft,beginReview,finishLetter} from './session.js?v=8b9ef8254860';
+import {createAtlasUI} from './atlas-ui.js?v=8b9ef8254860';
 const main=document.querySelector('#experience'),notice=document.querySelector('#notice'),dialog=document.querySelector('#restart-dialog');
 const state=createSession(),views=createViews(state);
 let atlasStorage=null;try{atlasStorage=window.localStorage;}catch{}
@@ -43,7 +43,7 @@ function render(focusSelector){
  state.atlas.open=main.querySelector('#atlas-settings')?.open??state.atlas.open;
  state.atlas.refresh();
  const screens={story:views.story,write:views.writing,review:views.review,done:views.done};
- main.innerHTML=views.intro()+state.atlas.panel()+screens[state.stage]();observeRooms();
+ main.innerHTML=views.intro()+(state.stage==='story'?'':state.atlas.panel())+screens[state.stage]();observeRooms();
  main.querySelector('#atlas-settings')?.addEventListener('toggle',event=>{if(event.target.isConnected)state.atlas.open=event.target.open;});
  if(embedded)main.querySelectorAll('.letter-original').forEach(element=>element.tabIndex=0);
  if(focusSelector){const el=main.querySelector(focusSelector);el?.focus({preventScroll:true});el?.scrollIntoView({block:'start',behavior:'instant'});}
