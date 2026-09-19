@@ -1,7 +1,6 @@
 // Local procedural light; no microphone, remote renderer, or recorded input.
 function mountOrb(button){
  const canvas=button.querySelector('canvas'),surface=button.querySelector('.orb-surface');
- const motion=button.parentElement.querySelector('.orb-motion');
  const reduced=matchMedia('(prefers-reduced-motion: reduce)');
  const gl=canvas.getContext('webgl',{alpha:true,antialias:false,premultipliedAlpha:false,powerPreference:'low-power'});
  if(!gl)return;
@@ -54,10 +53,10 @@ function mountOrb(button){
  const u={time:gl.getUniformLocation(program,'time'),pointer:gl.getUniformLocation(program,'pointer'),accent:gl.getUniformLocation(program,'accent'),energy:gl.getUniformLocation(program,'energy')};
  const palettes={synk:[.48,.38,.72],lab:[.86,.27,.21],shift:[.20,.40,.86],pulse:[.65,.19,.48],path:[.30,.55,.43]};
  gl.uniform3fv(u.accent,palettes[document.body.dataset.site]||palettes.synk);
- let frame=0,visible=false,paused=false,last=0,clock=0,x=0,y=0,tx=0,ty=0,energy=0,targetEnergy=0,lost=false;
+ let frame=0,visible=false,last=0,clock=0,x=0,y=0,tx=0,ty=0,energy=0,targetEnergy=0,lost=false;
  function draw(now){
   frame=0;if(lost)return;
-  const moving=visible&&!document.hidden&&!paused&&!reduced.matches;
+  const moving=visible&&!document.hidden&&!reduced.matches;
   if(moving&&last)clock+=Math.min(now-last,70)/1000;
   last=now;x+=(tx-x)*.07;y+=(ty-y)*.07;energy+=(targetEnergy-energy)*.08;
   const size=Math.min(640,Math.ceil(button.clientWidth*Math.min(devicePixelRatio||1,2)));
@@ -73,9 +72,8 @@ function mountOrb(button){
  button.addEventListener('focus',()=>{targetEnergy=.55;wake();});
  button.addEventListener('blur',()=>{targetEnergy=0;wake();});
  document.addEventListener('synk:orb-state',e=>{targetEnergy=e.detail==='busy'?1:e.detail==='typing'?.5:0;wake();});
- motion.hidden=false;motion.addEventListener('click',()=>{paused=!paused;motion.setAttribute('aria-pressed',String(paused));motion.setAttribute('aria-label',paused?'구체 움직임 재생':'구체 움직임 멈추기');motion.querySelector('path').setAttribute('d',paused?'M9 6l9 6-9 6Z':'M9 7v10M15 7v10');last=0;wake();});
  document.addEventListener('visibilitychange',()=>{last=0;wake();});reduced.addEventListener('change',()=>{last=0;wake();});
- canvas.addEventListener('webglcontextlost',e=>{e.preventDefault();lost=true;cancelAnimationFrame(frame);surface.classList.remove('orb-rendered');motion.hidden=true;});
+ canvas.addEventListener('webglcontextlost',e=>{e.preventDefault();lost=true;cancelAnimationFrame(frame);surface.classList.remove('orb-rendered');});
  window.addEventListener('pagehide',()=>{cancelAnimationFrame(frame);frame=0;last=0;});
  window.addEventListener('pageshow',wake);
  surface.classList.add('orb-rendered');wake();
