@@ -452,6 +452,8 @@ body[data-site] #top .story-section{padding-block:clamp(3.5rem,6vw,5rem);border:
 .story-visual{margin:0;min-width:0}
 .story-visual img{display:block;width:100%;height:auto;mix-blend-mode:multiply}
 .story-visual figcaption{font-size:.875rem;color:var(--muted);line-height:1.6;text-align:center;margin-top:1rem}
+#path-personal .story-introduction{align-items:start}
+#path-personal .story-visual{width:min(100%,460px);justify-self:end}
 .story-items{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:3.5rem 5rem}
 .story-items--three{grid-template-columns:repeat(3,minmax(0,1fr));gap:3rem}
 .story-items article{min-width:0}
