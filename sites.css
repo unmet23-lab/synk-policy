@@ -572,7 +572,8 @@ body[data-site] #top .brand-process{padding-block:3rem 6rem}
  .shift-hero-details>p{font-size:1rem}
  .shift-hero .world-links{margin-top:1.5rem}
 }
-.path-hero{display:grid;grid-template-columns:1.1fr 1fr;gap:3.5rem;align-items:center;padding-block:clamp(4rem,8vw,7rem)}
+.path-hero{display:grid;grid-template-columns:1.1fr 1fr;gap:3.5rem;align-items:center;padding-block:clamp(4rem,8vw,7rem) clamp(2rem,3vw,3rem)}
+body[data-site="path"] #top #path-purpose{padding-top:clamp(1rem,2vw,2rem)}
 .path-hero .stage-label{display:block;margin-bottom:1.75rem;line-height:1.7;text-align:left}
 .path-hero h1{font-size:clamp(2.25rem,3.8vw,3.7rem);font-weight:650;letter-spacing:-.045em;line-height:1.23;word-break:keep-all}
 .path-hero-copy>p{margin:1.75rem 0 0;font-size:1.0625rem;line-height:1.9;color:var(--muted);word-break:keep-all}
