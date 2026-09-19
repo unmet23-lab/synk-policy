@@ -1,3 +1,7 @@
+/* Preserve the authored palette when a mobile browser offers automatic darkening.
+   Forced-colors accessibility remains controlled by the visitor's system. */
+:root{color-scheme:only light;background-color:#fff}
+
 /* An illustrated example explains the whole Atlas experience, not one engine. */
 .atlas-learning-demo{margin-top:3rem;padding:3.5rem 0}
 .learning-demo-intro{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:3rem;align-items:center;margin-bottom:2.25rem}
@@ -682,10 +686,13 @@ body[data-site="shift"] #design-notes .brand-story-layout>div>p+p{margin-top:1re
 .visual-explainer--practice .visual-scene-copy{max-width:none;width:100%}
 .visual-explainer--practice .scene-draft{min-height:168px}
 .class-time{display:grid;grid-template-columns:2fr 1fr;gap:1rem;max-width:760px;margin-bottom:.875rem}
-.class-time>div{padding:1.25rem 1.5rem;background:#f7f7f5;border-radius:12px}
-.class-time>div:last-child{background:var(--brand-wash);color:var(--brand-ink)}
+.class-time>div{display:grid;grid-template-rows:1fr auto;gap:.875rem;padding:1.25rem 1.5rem 2rem;border-radius:20px}
+body[data-site] #top .class-time>div:last-child{color:var(--brand-ink)}
+.class-time>div>span,.class-time>div>strong{position:relative;z-index:3}
+.class-time>div::after{content:'';position:absolute;pointer-events:none;left:1.5rem;right:1.5rem;bottom:.875rem;height:0;border:0 solid transparent;border-bottom-width:5px;border-image:url('/assets/thread-frame-20260918.webp') 250 / 0 0 7px / 0 round}
+.class-time>div:last-child::after{border-image-source:url('/assets/thread-lab-20260918.webp')}
 .class-time span{display:block;font-size:.8125rem;line-height:1.5}
-.class-time strong{display:block;font-family:'Inter Tight',sans-serif;font-size:2.5rem;line-height:1.1;font-weight:550;margin-top:.875rem}
+.class-time strong{display:block;font-family:'Inter Tight',sans-serif;font-size:2.5rem;line-height:1.1;font-weight:550;margin:0}
 .class-time strong small{font-family:var(--synk-font);font-size:.875rem;font-weight:400;margin-left:.375rem}
 .class-time-note{font-size:.75rem;line-height:1.8;color:var(--muted);margin-bottom:2.5rem}
 .atlas-explorer-layout{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(0,1fr);gap:3.5rem;align-items:center}
@@ -779,14 +786,16 @@ body[data-site] #top .pulse-object-visual>img{width:100%;height:auto;max-height:
  .visual-scene-summary{font-size:1rem}
  .visual-scene-example{margin-top:1.5rem}
  .class-time{gap:.625rem}
- .class-time>div{padding:1rem .875rem}
+ .class-time>div{padding:1rem .875rem 1.875rem}
+ .class-time>div::after{left:.875rem;right:.875rem}
  .class-time span{font-size:.75rem;word-break:keep-all}
  .class-time strong{font-size:2rem}
 }
 @media(forced-colors:active){
  .visual-scene-nav button[aria-selected="true"],.question-entry:focus-within{border-color:Highlight}
  .atlas-map-controls button[aria-selected="true"]{background:Highlight;color:HighlightText}
- .class-time>div{border:1px solid CanvasText;background:Canvas!important;color:CanvasText!important}
+ body[data-site] #top .class-time>div{border:1px solid CanvasText!important;background:Canvas!important;color:CanvasText!important;box-shadow:none!important;backdrop-filter:none;-webkit-backdrop-filter:none}
+ body[data-site] #top .class-time>div::before,.class-time>div::after{display:none}
  .scene-draft:focus{outline:2px solid Highlight!important}
 }
 
@@ -1030,7 +1039,7 @@ body[data-site] #top .orb-help .messages{height:auto;max-height:none;overflow:vi
 
 /* Sunlit cast glass. A clear face sits above a curved, cool glass wall.
    The directional reflection and transmitted light stay away from the text. */
-body[data-site] :is(.brand-carousel-track,.site-family a[aria-current],.site-family a:hover,.site-family a:focus-visible,.felt-control,#top .quiet-link,#top .story-continuation[data-destination],#top .visual-scene-nav button,#top .learning-choices button,#top .help-tabs button,#top .atlas-map-controls button,#top .suggestions button,#top .shift-workflow__steps a,#top .shift-workflow__artifact){
+body[data-site] :is(.brand-carousel-track,.site-family a[aria-current],.site-family a:hover,.site-family a:focus-visible,.felt-control,#top .quiet-link,#top .story-continuation[data-destination],#top .visual-scene-nav button,#top .learning-choices button,#top .help-tabs button,#top .atlas-map-controls button,#top .suggestions button,#top .shift-workflow__steps a,#top .shift-workflow__artifact,#top .class-time>div){
  --glass-color:var(--brand-ink,#5a666b);
  --glass-x:24%;--glass-y:6%;--glass-edge:4px;
  --glass-face:
@@ -1055,7 +1064,7 @@ body[data-site] :is(.brand-carousel-track,.site-family a[aria-current],.site-fam
 
 /* The bevel has unequal light/dark arcs: a constant white outline reads as
    plastic. Spectral dispersion is confined to the two illuminated corners. */
-body[data-site] :is(.brand-carousel-track,.site-family a[aria-current],.site-family a:hover,.site-family a:focus-visible,.felt-control,#top .quiet-link,#top .story-continuation[data-destination],#top .visual-scene-nav button,#top .learning-choices button,#top .help-tabs button,#top .atlas-map-controls button,#top .suggestions button,#top .shift-workflow__steps a,#top .shift-workflow__artifact)::before{
+body[data-site] :is(.brand-carousel-track,.site-family a[aria-current],.site-family a:hover,.site-family a:focus-visible,.felt-control,#top .quiet-link,#top .story-continuation[data-destination],#top .visual-scene-nav button,#top .learning-choices button,#top .help-tabs button,#top .atlas-map-controls button,#top .suggestions button,#top .shift-workflow__steps a,#top .shift-workflow__artifact,#top .class-time>div)::before{
  content:'';position:absolute;pointer-events:none;z-index:2;inset:1px;
  border-radius:inherit;padding:var(--glass-edge);
  background:
