@@ -484,6 +484,25 @@ body[data-site] #top .story-section{padding-block:clamp(3.5rem,6vw,5rem);border:
 @media(max-width:560px){.story-continuation{grid-template-columns:56px minmax(0,1fr) 20px;column-gap:1rem;padding:1rem 0 1.5rem;margin-top:2rem}.continuation-icon{width:56px;height:56px}.continuation-title{font-size:1rem;line-height:1.65}.continuation-brand{font-size:.6875rem;margin-bottom:.375rem}.continuation-arrow{width:20px;height:20px}}
 @media(prefers-reduced-motion:reduce){.continuation-arrow{transition:none}.story-continuation:hover .continuation-arrow{transform:none}}
 @media(forced-colors:active){.story-continuation{color:LinkText}.continuation-title{color:LinkText;text-decoration:underline}.story-continuation:focus-visible{outline-color:Highlight}}
+
+/* Cross-brand links are a single, compact object; the arrow belongs to the
+   label instead of the far edge of an otherwise empty row. */
+.story-continuation[data-destination]{grid-template-columns:52px minmax(0,1fr) 20px;column-gap:1rem;width:fit-content;min-width:0;max-width:100%;padding:1rem 1.25rem 1rem 1rem;border-radius:24px}
+.story-continuation[data-destination]>*{position:relative;z-index:3}
+.story-continuation[data-destination] .continuation-icon{width:52px;height:52px;filter:drop-shadow(0 2px 1px #25333e1a)}
+.story-continuation[data-destination] .continuation-brand{margin-bottom:.25rem;color:var(--brand-ink);font-size:.6875rem;line-height:1.4;letter-spacing:.07em}
+.story-continuation[data-destination] .continuation-title{font-size:1.125rem;font-weight:600;line-height:1.4}
+.story-continuation[data-destination] .continuation-arrow{width:20px;height:20px;margin-left:.25rem;color:var(--brand-ink)}
+.story-continuation[data-destination]:hover .continuation-title{text-decoration:none}
+.story-continuation[data-destination]:focus-visible{border-radius:24px}
+@media(max-width:560px){
+ .story-continuation[data-destination]{grid-template-columns:44px minmax(0,1fr) 20px;column-gap:.75rem;padding:.875rem 1.125rem .875rem .875rem;border-radius:22px}
+ .story-continuation[data-destination] .continuation-icon{width:44px;height:44px}
+ .story-continuation[data-destination] .continuation-title{font-size:1rem}
+ .story-continuation[data-destination]:focus-visible{border-radius:22px}
+}
+@media(prefers-reduced-motion:reduce){.story-continuation[data-destination]:hover .continuation-arrow{transform:none}}
+@media(forced-colors:active){.story-continuation[data-destination] :is(.continuation-brand,.continuation-arrow){color:LinkText}.story-continuation[data-destination] .continuation-icon{filter:none}}
 .story-comparison{margin:1rem 0 1.5rem;min-width:0}
 .story-comparison table{width:100%;table-layout:fixed;border-collapse:collapse;text-align:left;font-size:1rem;line-height:1.8;word-break:keep-all;overflow-wrap:anywhere}
 .story-comparison caption{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap}
@@ -996,7 +1015,7 @@ body[data-site] #top .orb-help .messages{height:auto;max-height:none;overflow:vi
 
 /* Sunlit cast glass. A clear face sits above a curved, cool glass wall.
    The directional reflection and transmitted light stay away from the text. */
-body[data-site] :is(.brand-carousel-track,.site-family a[aria-current],.site-family a:hover,.site-family a:focus-visible,.felt-control,#top .quiet-link,#top .visual-scene-nav button,#top .learning-choices button,#top .help-tabs button,#top .atlas-map-controls button,#top .suggestions button){
+body[data-site] :is(.brand-carousel-track,.site-family a[aria-current],.site-family a:hover,.site-family a:focus-visible,.felt-control,#top .quiet-link,#top .story-continuation[data-destination],#top .visual-scene-nav button,#top .learning-choices button,#top .help-tabs button,#top .atlas-map-controls button,#top .suggestions button){
  --glass-color:var(--brand-ink,#5a666b);
  --glass-x:24%;--glass-y:6%;--glass-edge:4px;
  --glass-face:
@@ -1021,7 +1040,7 @@ body[data-site] :is(.brand-carousel-track,.site-family a[aria-current],.site-fam
 
 /* The bevel has unequal light/dark arcs: a constant white outline reads as
    plastic. Spectral dispersion is confined to the two illuminated corners. */
-body[data-site] :is(.brand-carousel-track,.site-family a[aria-current],.site-family a:hover,.site-family a:focus-visible,.felt-control,#top .quiet-link,#top .visual-scene-nav button,#top .learning-choices button,#top .help-tabs button,#top .atlas-map-controls button,#top .suggestions button)::before{
+body[data-site] :is(.brand-carousel-track,.site-family a[aria-current],.site-family a:hover,.site-family a:focus-visible,.felt-control,#top .quiet-link,#top .story-continuation[data-destination],#top .visual-scene-nav button,#top .learning-choices button,#top .help-tabs button,#top .atlas-map-controls button,#top .suggestions button)::before{
  content:'';position:absolute;pointer-events:none;z-index:2;inset:1px;
  border-radius:inherit;padding:var(--glass-edge);
  background:
@@ -1031,7 +1050,7 @@ body[data-site] :is(.brand-carousel-track,.site-family a[aria-current],.site-fam
  -webkit-mask-composite:xor;mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);mask-composite:exclude;
  filter:blur(.25px);
 }
-body[data-site] :is(.brand-carousel-track,.site-family a[aria-current],.site-family a:hover,.site-family a:focus-visible,.felt-control,#top .quiet-link,#top .visual-scene-nav button,#top .learning-choices button,#top .help-tabs button,#top .atlas-map-controls button)::after{
+body[data-site] :is(.brand-carousel-track,.site-family a[aria-current],.site-family a:hover,.site-family a:focus-visible,.felt-control,#top .quiet-link,#top .story-continuation[data-destination],#top .visual-scene-nav button,#top .learning-choices button,#top .help-tabs button,#top .atlas-map-controls button)::after{
  content:'';position:absolute;pointer-events:none;z-index:2;inset:5px;height:auto;width:auto;
  border:1px solid transparent;border-radius:inherit;
  background:
@@ -1065,7 +1084,7 @@ body[data-site] .brand-slide img{
 }
 body[data-site] .felt-control{--glass-color:var(--nav-ink);--glass-edge:4px}
 body[data-site] .felt-control::after{inset:6px}
-body[data-site] #top :is(.quiet-link,.visual-scene-nav button,.help-tabs button,.atlas-map-controls button,.suggestions button){--glass-edge:2px}
+body[data-site] #top :is(.quiet-link,.story-continuation[data-destination],.visual-scene-nav button,.help-tabs button,.atlas-map-controls button,.suggestions button){--glass-edge:2px}
 body[data-site] #top .learning-choices button{
  --glass-edge:3px;border-radius:20px;padding:1.25rem 1.5rem;gap:.5rem;
 }
@@ -1087,14 +1106,14 @@ body[data-site] #top .suggestions button:hover,body[data-site] #top .suggestions
  background-image:var(--glass-face);background-size:100% 100%;background-color:#ffffff66;
 }
 @media(hover:hover){
- body[data-site] :is(.felt-control,#top .quiet-link,#top .visual-scene-nav button,#top .learning-choices button,#top .help-tabs button,#top .atlas-map-controls button,#top .suggestions button):hover{
+ body[data-site] :is(.felt-control,#top .quiet-link,#top .story-continuation[data-destination],#top .visual-scene-nav button,#top .learning-choices button,#top .help-tabs button,#top .atlas-map-controls button,#top .suggestions button):hover{
   transform:translateY(-1px);border-color:#7e97a9a6;box-shadow:var(--glass-shadow),0 6px 16px -12px var(--glass-color);
  }
 }
-body[data-site] :is(.felt-control,#top .quiet-link,#top .visual-scene-nav button,#top .learning-choices button,#top .help-tabs button,#top .atlas-map-controls button,#top .suggestions button):active{
+body[data-site] :is(.felt-control,#top .quiet-link,#top .story-continuation[data-destination],#top .visual-scene-nav button,#top .learning-choices button,#top .help-tabs button,#top .atlas-map-controls button,#top .suggestions button):active{
  transform:translateY(2px);box-shadow:inset 0 1px 3px #52637029,inset 0 -1px 1px #fff,0 2px 5px #3447511f;
 }
-body[data-site] :is(.brand-carousel-track,.site-family a[aria-current],.site-family a:hover,.site-family a:focus-visible,.felt-control,#top .quiet-link,#top .visual-scene-nav button,#top .learning-choices button,#top .help-tabs button,#top .atlas-map-controls button,#top .suggestions button):focus-visible{
+body[data-site] :is(.brand-carousel-track,.site-family a[aria-current],.site-family a:hover,.site-family a:focus-visible,.felt-control,#top .quiet-link,#top .story-continuation[data-destination],#top .visual-scene-nav button,#top .learning-choices button,#top .help-tabs button,#top .atlas-map-controls button,#top .suggestions button):focus-visible{
  outline:2px solid var(--glass-color);outline-offset:5px;
 }
 @media(max-width:650px){
@@ -1106,16 +1125,16 @@ body[data-site] :is(.brand-carousel-track,.site-family a[aria-current],.site-fam
  body[data-site] #top .learning-choices button{padding:1rem .625rem;min-height:108px}
 }
 @supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){
- body[data-site] :is(.brand-carousel-track,.site-family a[aria-current],.site-family a:hover,.site-family a:focus-visible,.felt-control,#top .quiet-link,#top .visual-scene-nav button,#top .learning-choices button,#top .help-tabs button,#top .atlas-map-controls button,#top .suggestions button){background-color:#f3f6f5}
+ body[data-site] :is(.brand-carousel-track,.site-family a[aria-current],.site-family a:hover,.site-family a:focus-visible,.felt-control,#top .quiet-link,#top .story-continuation[data-destination],#top .visual-scene-nav button,#top .learning-choices button,#top .help-tabs button,#top .atlas-map-controls button,#top .suggestions button){background-color:#f3f6f5}
 }
 @media(prefers-reduced-motion:reduce){
- body[data-site] :is(.brand-carousel-track,.site-family a[aria-current],.site-family a:hover,.site-family a:focus-visible,.felt-control,#top .quiet-link,#top .visual-scene-nav button,#top .learning-choices button,#top .help-tabs button,#top .atlas-map-controls button,#top .suggestions button){transition:none}
+ body[data-site] :is(.brand-carousel-track,.site-family a[aria-current],.site-family a:hover,.site-family a:focus-visible,.felt-control,#top .quiet-link,#top .story-continuation[data-destination],#top .visual-scene-nav button,#top .learning-choices button,#top .help-tabs button,#top .atlas-map-controls button,#top .suggestions button){transition:none}
 }
 @media(forced-colors:active){
  body[data-site] .brand-carousel::before{display:none}
- body[data-site] :is(.brand-carousel-track,.site-family a[aria-current],.site-family a:hover,.site-family a:focus-visible,.felt-control,#top .quiet-link,#top .visual-scene-nav button,#top .learning-choices button,#top .help-tabs button,#top .atlas-map-controls button,#top .suggestions button){background:Canvas!important;color:CanvasText!important;box-shadow:none!important;text-shadow:none;backdrop-filter:none;-webkit-backdrop-filter:none;border:1px solid CanvasText!important}
- body[data-site] :is(.brand-carousel-track,.site-family a[aria-current],.site-family a:hover,.site-family a:focus-visible,.felt-control,#top .quiet-link,#top .visual-scene-nav button,#top .learning-choices button,#top .help-tabs button,#top .atlas-map-controls button,#top .suggestions button)::before,
- body[data-site] :is(.brand-carousel-track,.site-family a[aria-current],.site-family a:hover,.site-family a:focus-visible,.felt-control,#top .quiet-link,#top .visual-scene-nav button,#top .learning-choices button,#top .help-tabs button,#top .atlas-map-controls button)::after{display:none}
+ body[data-site] :is(.brand-carousel-track,.site-family a[aria-current],.site-family a:hover,.site-family a:focus-visible,.felt-control,#top .quiet-link,#top .story-continuation[data-destination],#top .visual-scene-nav button,#top .learning-choices button,#top .help-tabs button,#top .atlas-map-controls button,#top .suggestions button){background:Canvas!important;color:CanvasText!important;box-shadow:none!important;text-shadow:none;backdrop-filter:none;-webkit-backdrop-filter:none;border:1px solid CanvasText!important}
+ body[data-site] :is(.brand-carousel-track,.site-family a[aria-current],.site-family a:hover,.site-family a:focus-visible,.felt-control,#top .quiet-link,#top .story-continuation[data-destination],#top .visual-scene-nav button,#top .learning-choices button,#top .help-tabs button,#top .atlas-map-controls button,#top .suggestions button)::before,
+ body[data-site] :is(.brand-carousel-track,.site-family a[aria-current],.site-family a:hover,.site-family a:focus-visible,.felt-control,#top .quiet-link,#top .story-continuation[data-destination],#top .visual-scene-nav button,#top .learning-choices button,#top .help-tabs button,#top .atlas-map-controls button)::after{display:none}
  body[data-site] #top :is(.learning-choices,.visual-scene-nav,.help-tabs,.atlas-map-controls) button[aria-selected="true"]{background:Highlight!important;color:HighlightText!important;forced-color-adjust:none}
  body[data-site] #top .learning-choices button>span,body[data-site] #top .learning-choices button>strong{color:inherit}
 }
