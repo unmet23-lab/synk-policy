@@ -1030,7 +1030,7 @@ body[data-site] #top .orb-help .messages{height:auto;max-height:none;overflow:vi
 
 /* Sunlit cast glass. A clear face sits above a curved, cool glass wall.
    The directional reflection and transmitted light stay away from the text. */
-body[data-site] :is(.brand-carousel-track,.site-family a[aria-current],.site-family a:hover,.site-family a:focus-visible,.felt-control,#top .quiet-link,#top .story-continuation[data-destination],#top .visual-scene-nav button,#top .learning-choices button,#top .help-tabs button,#top .atlas-map-controls button,#top .suggestions button,#top .shift-workflow__steps a){
+body[data-site] :is(.brand-carousel-track,.site-family a[aria-current],.site-family a:hover,.site-family a:focus-visible,.felt-control,#top .quiet-link,#top .story-continuation[data-destination],#top .visual-scene-nav button,#top .learning-choices button,#top .help-tabs button,#top .atlas-map-controls button,#top .suggestions button,#top .shift-workflow__steps a,#top .shift-workflow__artifact){
  --glass-color:var(--brand-ink,#5a666b);
  --glass-x:24%;--glass-y:6%;--glass-edge:4px;
  --glass-face:
@@ -1055,7 +1055,7 @@ body[data-site] :is(.brand-carousel-track,.site-family a[aria-current],.site-fam
 
 /* The bevel has unequal light/dark arcs: a constant white outline reads as
    plastic. Spectral dispersion is confined to the two illuminated corners. */
-body[data-site] :is(.brand-carousel-track,.site-family a[aria-current],.site-family a:hover,.site-family a:focus-visible,.felt-control,#top .quiet-link,#top .story-continuation[data-destination],#top .visual-scene-nav button,#top .learning-choices button,#top .help-tabs button,#top .atlas-map-controls button,#top .suggestions button,#top .shift-workflow__steps a)::before{
+body[data-site] :is(.brand-carousel-track,.site-family a[aria-current],.site-family a:hover,.site-family a:focus-visible,.felt-control,#top .quiet-link,#top .story-continuation[data-destination],#top .visual-scene-nav button,#top .learning-choices button,#top .help-tabs button,#top .atlas-map-controls button,#top .suggestions button,#top .shift-workflow__steps a,#top .shift-workflow__artifact)::before{
  content:'';position:absolute;pointer-events:none;z-index:2;inset:1px;
  border-radius:inherit;padding:var(--glass-edge);
  background:

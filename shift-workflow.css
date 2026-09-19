@@ -73,3 +73,70 @@ body[data-site] #top .shift-workflow__note{font-size:.75rem;line-height:1.8;colo
 
 
 body[data-site] #top .shift-workflow__heading .eyebrow{font-family:inherit;letter-spacing:0;font-size:.875rem;color:var(--brand-ink)}
+/* A shared glass frame gives each material a clear heading and working area. */
+body[data-site] #top .shift-workflow__panel{align-items:start;gap:clamp(2rem,4.5vw,4.5rem)}
+body[data-site] #top .shift-workflow__explanation{padding-top:1.5rem}
+body[data-site] #top .shift-workflow .shift-workflow__artifact{
+ --glass-edge:3px;--glass-x:19%;--glass-y:0%;
+ min-width:0;border-radius:28px;padding:1.5rem;margin:0;
+ box-shadow:var(--glass-shadow),0 22px 45px -35px #304b7959;
+ text-shadow:none;
+}
+.shift-workflow__artifact>*{position:relative;z-index:3}
+.shift-workflow__artifact-heading{display:flex;align-items:center;gap:.875rem;border-bottom:1px solid #b9c9d85c;padding-bottom:1rem;margin-bottom:1rem}
+.shift-workflow__artifact-index{font:400 .8125rem/1 var(--synk-font-mono);color:var(--brand-ink);letter-spacing:.02em;flex:none}
+body[data-site] #top .shift-workflow__artifact-heading :is(h4,label){font-size:1.125rem;font-weight:700;line-height:1.5;letter-spacing:-.025em;margin:0;color:var(--ink)}
+body[data-site] #top .shift-workflow__stage{width:min(100%,250px);margin:0 auto .5rem}
+.shift-workflow__facts{display:grid;grid-template-columns:1fr 1.2fr;gap:1rem;margin:.5rem 0 1.5rem}
+.shift-workflow__facts>div{min-width:0}
+.shift-workflow__facts dt{font-size:.75rem;line-height:1.7;color:var(--muted)}
+.shift-workflow__facts dd{font-size:.9375rem;line-height:1.6;font-weight:650;letter-spacing:-.02em;margin:.25rem 0 0;color:var(--ink)}
+.shift-workflow__facts>div:first-child dd{color:var(--brand-ink)}
+body[data-site] #top .shift-workflow .quiet-link{font-size:.875rem}
+body[data-site] #top .shift-workflow__request textarea{border:1px solid #abbdd266;box-shadow:inset 0 2px 6px #344d6610;background:#ffffffdb;border-radius:12px;padding:1rem;font-size:.9375rem;line-height:1.9;min-height:295px}
+body[data-site] #top .shift-workflow__request-footer{align-items:center;justify-content:space-between;gap:1rem;margin-top:1.25rem}
+body[data-site] #top .shift-workflow__request-footer p{font-size:.8125rem;line-height:1.7}
+body[data-site] #top .shift-workflow [data-copy-request]{color:var(--brand-ink);font-weight:650;gap:.5rem;white-space:nowrap}
+.shift-workflow__comparison .shift-workflow__artifact-heading{grid-column:1/-1;margin-bottom:0}
+.shift-workflow__comparison figure{display:flex;flex-direction:column}
+.shift-workflow__comparison img{background:#fff;border-radius:12px;margin-top:auto}
+.shift-workflow__comparison figcaption{order:-1;margin:0 0 .75rem}
+body[data-site] #top .shift-workflow__comparison figcaption strong{font-size:.9375rem}
+body[data-site] #top .shift-workflow__comparison figcaption span{font-size:.75rem}
+body[data-site] #top .shift-workflow__comparison-note{grid-column:1/-1;margin:.25rem 0 0;font-size:.875rem;line-height:1.8;color:var(--muted)}
+.shift-workflow__comparison-note strong{display:block;font-weight:650;color:var(--brand-ink);margin-bottom:.25rem}
+body[data-site] #top .shift-workflow__revision blockquote{font-size:1.125rem;line-height:1.9;margin:1.5rem 0 2rem;word-break:keep-all}
+.shift-workflow__revision blockquote strong{font-weight:700;color:var(--brand-ink)}
+body[data-site] #top .shift-workflow__revision dl{gap:1rem;margin:0}
+body[data-site] #top .shift-workflow__revision dl>div{grid-template-columns:3rem 1fr;align-items:baseline;gap:.75rem;font-size:.9375rem;line-height:1.7}
+body[data-site] #top .shift-workflow__revision dt{font-size:.75rem;font-weight:650;color:var(--brand-ink)}
+body[data-site] #top .shift-workflow__revision dd{font-weight:550}
+@media(max-width:1000px) and (min-width:761px){
+ body[data-site] #top .shift-workflow .shift-workflow__artifact{padding:1.25rem}
+ .shift-workflow__controls{gap:.5rem}
+ body[data-site] #top .shift-workflow__request-footer{flex-direction:column;align-items:stretch}
+ body[data-site] #top .shift-workflow__request-footer button{justify-content:center}
+}
+@media(max-width:760px){
+ body[data-site] #top .shift-workflow__explanation{padding-top:0}
+ body[data-site] #top .shift-workflow .shift-workflow__artifact{padding:1.25rem;border-radius:24px}
+ body[data-site] #top .shift-workflow__artifact-heading :is(h4,label){font-size:1rem}
+ body[data-site] #top .shift-workflow__request textarea{font-size:1rem;min-height:335px}
+ body[data-site] #top .shift-workflow__request-footer{align-items:stretch;gap:1rem}
+ body[data-site] #top .shift-workflow__request-footer button{justify-content:center}
+ body[data-site] #top .shift-workflow__revision blockquote{font-size:1rem;margin:1rem 0 1.5rem}
+ .shift-workflow__comparison{gap:1rem .5rem}
+ .shift-workflow__facts{gap:.75rem}
+ .shift-workflow__facts dd{font-size:.875rem}
+}
+@media(max-width:360px){
+ body[data-site] #top .shift-workflow .shift-workflow__artifact{padding:1rem}
+ body[data-site] #top .shift-workflow__revision dl>div{grid-template-columns:1fr;gap:.125rem}
+ body[data-site] #top .shift-workflow__comparison figcaption strong{font-size:.875rem}
+}
+@media(forced-colors:active){
+ body[data-site] #top .shift-workflow[data-shift-workflow] .shift-workflow__artifact{background:Canvas;color:CanvasText;border:1px solid CanvasText;box-shadow:none;backdrop-filter:none}
+ .shift-workflow__artifact::before{display:none}
+ .shift-workflow__artifact-heading{border-color:CanvasText}
+ body[data-site] #top .shift-workflow__request textarea{background:Canvas;color:CanvasText;border:1px solid CanvasText;box-shadow:none}
+}
