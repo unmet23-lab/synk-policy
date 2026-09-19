@@ -1,5 +1,5 @@
-import {initOrbConversation} from './orb-conversation.js?v=158782323b2a';
-import {initGlassControls} from './glass-controls.js?v=158782323b2a';
+import {initOrbConversation} from './orb-conversation.js?v=50eac3790ff7';
+import {initGlassControls} from './glass-controls.js?v=50eac3790ff7';
 initGlassControls();
 // A deliberate brand preview: swiping selects; following a link navigates.
 const brandDeck=document.querySelector('[data-brand-deck]');

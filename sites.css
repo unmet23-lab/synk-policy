@@ -744,6 +744,29 @@ body[data-site] #top .pulse-object-visual>img{width:100%;height:auto;max-height:
  .visual-explainer--practice .visual-scene-copy{max-width:680px;justify-self:center}
  .visual-explainer--practice>.scene-scope{max-width:680px;margin-inline:auto}
 }
+/* PULSE's landscape scenes accompany the selected explanation, rather than
+   ending beside the introduction before the reader reaches the details. */
+@media(min-width:1000px){
+ #top #pulse-ip .story-feature:has(>.visual-explainer.is-interactive){display:block}
+ #top #pulse-ip .story-introduction{margin-bottom:2rem}
+ #top #pulse-ip .story-heading{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.05fr);column-gap:4rem;max-width:none}
+ #top #pulse-ip .story-heading>.small-label{grid-column:1/-1;margin-bottom:1rem}
+ #top #pulse-ip .story-heading>h2{grid-column:1;margin:0}
+ #top #pulse-ip .story-heading>p{grid-column:2;align-self:center;margin:0;max-width:none}
+ #top #pulse-ip .visual-explainer.is-interactive,
+ #top #pulse-ip .is-interactive .visual-scene-panels{display:block;margin-top:0}
+ #top #pulse-ip .is-interactive>.visual-explainer-guide{margin-bottom:.875rem}
+ #top #pulse-ip .is-interactive>.visual-scene-nav{margin-bottom:2.25rem}
+ #top #pulse-ip .is-interactive .visual-scene{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.05fr);gap:4rem;align-items:start;padding:0}
+ #top #pulse-ip .is-interactive .visual-scene-copy{grid-column:1;grid-row:1;max-width:none}
+ #top #pulse-ip .is-interactive .visual-scene-art{grid-column:2;grid-row:1;align-self:start;position:sticky;top:calc(var(--site-header-height,132px) + 24px);margin:0}
+ #top #pulse-ip .visual-scene-art img{max-height:calc(100svh - var(--site-header-height,132px) - 48px);object-fit:contain}
+ #top #pulse-ip .visual-scene-example{margin-top:1.5rem}
+ #top #pulse-ip .visual-scene-example ol li{padding:.375rem 0}
+}
+@media(min-width:1000px) and (max-height:700px){
+ #top #pulse-ip .is-interactive .visual-scene-art{position:static}
+}
 @media(max-width:800px){
  .visual-scene{grid-template-columns:1fr;gap:1.75rem}
  .visual-scene-art{width:100%;max-width:420px;justify-self:center}
