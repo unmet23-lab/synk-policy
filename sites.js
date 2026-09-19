@@ -1,5 +1,5 @@
-import {initOrbConversation} from './orb-conversation.js?v=218ff03c4f2d';
-import {initGlassControls} from './glass-controls.js?v=218ff03c4f2d';
+import {initOrbConversation} from './orb-conversation.js?v=2f6b2352b0ef';
+import {initGlassControls} from './glass-controls.js?v=2f6b2352b0ef';
 initGlassControls();
 // A deliberate brand preview: swiping selects; following a link navigates.
 const brandDeck=document.querySelector('[data-brand-deck]');
@@ -77,6 +77,14 @@ document.querySelectorAll('[data-scene-explorer]').forEach(explorer=>{
   tab.addEventListener('keydown',event=>{let next;if(event.key==='ArrowRight')next=(index+1)%tabs.length;else if(event.key==='ArrowLeft')next=(index+tabs.length-1)%tabs.length;else if(event.key==='Home')next=0;else if(event.key==='End')next=tabs.length-1;else return;event.preventDefault();show(next,{focus:true});});
  });
  explorer.classList.add('is-interactive');show(0);
+ // Prepare alternative goal artwork shortly before the visitor reaches its tabs.
+ if(explorer.hasAttribute('data-prefetch-scenes')){
+  const warmImages=()=>explorer.querySelectorAll('img[loading="lazy"]').forEach(image=>{image.loading='eager';});
+  if('IntersectionObserver' in window){
+   const observer=new IntersectionObserver(entries=>{if(entries.some(entry=>entry.isIntersecting)){warmImages();observer.disconnect();}},{rootMargin:'300px'});
+   observer.observe(explorer);
+  }else warmImages();
+ }
  // Bookmarks and answer links can target an individual scene as well as its section.
  function revealScene(){let id;try{id=decodeURIComponent(location.hash.slice(1));}catch{return;}const target=document.getElementById(id);const panel=panels.findIndex(p=>target&&p.contains(target));if(panel>=0)show(panel);}
  revealScene();window.addEventListener('hashchange',revealScene);
