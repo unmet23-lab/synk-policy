@@ -1,4 +1,7 @@
 /* Writing, requested hints, self-review. Existing approved art and type are preserved. */
+.letter-howto{margin:28px 0 36px;padding:24px;border:1px solid #fbf7f028;border-radius:18px;background:linear-gradient(135deg,#fbf7f00b,#fbf7f003);box-shadow:inset 0 1px #fbf7f012}
+.letter-howto h2{font-size:18px;font-weight:600}.letter-howto ol{list-style:none;padding:0;margin:20px 0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px}.letter-howto li{display:flex;align-items:flex-start;gap:12px;min-width:0}.howto-number{flex-shrink:0;white-space:nowrap;color:var(--synk-stitch);font-size:13px;line-height:1.8;font-variant-numeric:tabular-nums}.letter-howto h3{font-size:15px;line-height:1.6}.letter-howto li p{font-size:13px;line-height:1.75;color:var(--synk-stone);margin-top:6px}.letter-howto .howto-note{border-top:1px solid #fbf7f020;padding-top:16px;font-size:13px;line-height:1.75;color:var(--synk-stone)}
+@media(max-width:650px){.letter-howto{padding:20px;margin:24px 0}.letter-howto ol{grid-template-columns:1fr;gap:18px}.letter-howto li p{font-size:14px}.letter-howto h3{font-size:16px}}
 .start-panel{display:flex;align-items:center;justify-content:space-between;gap:24px;margin-top:20px;padding:20px 24px;background:var(--synk-ink);border-radius:18px}
 .start-panel .friend-line,.start-panel .actions{margin:0}.start-panel .actions{flex-shrink:0;flex-direction:column;align-items:flex-end;gap:8px}
 .tone-rule{display:flex;align-items:center;gap:10px;font-size:14px;color:var(--synk-stitch);padding-top:20px}.tone-rule>span{border:1px solid currentColor;border-radius:6px;flex-shrink:0;padding:0 6px;font-size:11px}
@@ -20,6 +23,8 @@
 @media(prefers-reduced-motion:no-preference){.hint-answer{animation:hint-in 180ms ease-out}@keyframes hint-in{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}}
 
 .task-reminder{margin-bottom:22px;padding:10px 0;border-block:1px solid #fbf7f020}.task-reminder summary{font-size:14px;color:var(--synk-stone);padding-block:4px;min-height:36px}.task-reminder .clues{margin:12px 0 6px}
+@media(max-width:820px){.hints-panel .hint-heading{display:block}.hints-panel .hint-heading h3{font-size:16px}.hints-panel .hint-heading p{font-size:14px;line-height:1.65}}
+@media(forced-colors:active){.letter-howto{background:Canvas;border-color:CanvasText;box-shadow:none}.letter-howto .howto-note{border-color:CanvasText}}
 
 /* Inline LAB placement reuses the same game, assets and draft session. */
 .lab-embedded{scroll-padding-top:12px;overflow:hidden}
