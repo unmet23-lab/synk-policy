@@ -2,15 +2,17 @@ import {createScene,stepScene} from './loom-scene.js';
 const {composeEyeOnly}=await import('./eye-composite.js'+new URL(import.meta.url).search);
 
 const image=src=>new Promise((resolve,reject)=>{const img=new Image();img.onload=()=>resolve(img);img.onerror=()=>reject(new Error('Image unavailable'));img.src=src;});
-export async function initBlinkDemo() {
-  const region=document.querySelector('[data-blink-demo]');if(!region)return;
+export async function initBlinkDemo(region=document.querySelector('[data-blink-demo]')) {
+  if(!region||region.dataset.initializing)return;
+  region.dataset.initializing='true';
   const canvas=region.querySelector('canvas'),fallback=region.querySelector('[data-blink-fallback]');
   const controls=region.querySelector('[data-blink-controls]');
   const replay=region.querySelector('[data-blink-replay]'),hold=region.querySelector('[data-blink-hold]');
   const motion=region.querySelector('[data-blink-motion]'),status=region.querySelector('[data-blink-status]');
   try {
-    const manifest=await fetch('./blink-manifest.json'+new URL(import.meta.url).search).then(response=>{if(!response.ok)throw new Error('Manifest unavailable');return response.json();});
-    const [base,closed]=await Promise.all([image(manifest.base),image(manifest.closed)]);
+    const manifestURL=new URL('./blink-manifest.json'+new URL(import.meta.url).search,import.meta.url);
+    const manifest=await fetch(manifestURL).then(response=>{if(!response.ok)throw new Error('Manifest unavailable');return response.json();});
+    const [base,closed]=await Promise.all([image(new URL(manifest.base,manifestURL)),image(new URL(manifest.closed,manifestURL))]);
     const frames=composeEyeOnly(base,closed,manifest);
     canvas.width=frames.open.width;canvas.height=frames.open.height;
     const ctx=canvas.getContext('2d');
@@ -20,18 +22,19 @@ export async function initBlinkDemo() {
     state.nextBlink=.65;
     const draw=value=>{if(lastClosed===value)return;ctx.putImageData(value?frames.closed:frames.open,0,0);lastClosed=value;canvas.dataset.frame=value?'closed':'open';};
     const refresh=()=>{
-      motion.textContent=running?'자동 깜빡임 멈추기':'자동 깜빡임 켜기';motion.setAttribute('aria-pressed',String(running));
-      hold.textContent=held?'눈 뜨기':'눈감음 멈춰 보기';hold.setAttribute('aria-pressed',String(held));
-      status.textContent=held?'눈감음 정지 화면':running?'마감한 눈 깜빡임을 보고 있어요.':'정지 화면 · 버튼으로 표정을 살펴보세요.';
+      motion.textContent=running?'자동 재생 끄기':'자동 재생 켜기';motion.setAttribute('aria-pressed',String(running));
+      hold.textContent=held?'눈 뜬 모습':'눈 감은 모습';hold.setAttribute('aria-pressed',String(held));
+      status.textContent=held?'눈을 감은 정지 화면입니다.':running?'눈 깜빡임을 재생하고 있습니다.':'정지 화면입니다. 버튼으로 표정을 바꿔 보세요.';
     };
     const tick=timestamp=>{
       raf=0;
-      const frozen=!running||held||!visible||document.hidden||pageHidden;
+      const frozen=!running||held||!visible||document.hidden||pageHidden||!!region.closest('[hidden]');
       const pose=stepScene(state,last?(timestamp-last)/1000:0,{paused:frozen});last=timestamp;
       if(!held)draw(pose.blink>.47);
       if(!frozen)raf=requestAnimationFrame(tick);
     };
-    const wake=()=>{if(raf)cancelAnimationFrame(raf);raf=0;last=0;if(running&&!held&&visible&&!document.hidden&&!pageHidden)raf=requestAnimationFrame(tick);};
+    const wake=()=>{if(raf)cancelAnimationFrame(raf);raf=0;last=0;if(running&&!held&&visible&&!document.hidden&&!pageHidden&&!region.closest('[hidden]'))raf=requestAnimationFrame(tick);};
+    region.addEventListener('previewvisibilitychange',wake);
     const setRest=()=>{state.blinkStart=-100;draw(false);};
     replay.addEventListener('click',()=>{
       held=false;

@@ -1,23 +1,6 @@
-// The full guide and request remain available when this enhancement is unavailable.
-import('./blink-demo.js' + new URL(import.meta.url).search).then(module=>module.initBlinkDemo()).catch(()=>{
-  const status=document.querySelector('[data-blink-status]');
-  if(status)status.textContent='움직임을 불러오지 못해 원본을 보여드립니다.';
+const version = new URL(import.meta.url).search;
+import('./copy-request.js' + version).then(module => module.initRequestEditors());
+import('./blink-demo.js' + version).then(module => module.initBlinkDemo()).catch(() => {
+  const status = document.querySelector('[data-blink-status]');
+  if (status) status.textContent = '움직임을 불러오지 못해 원본을 보여드립니다.';
 });
-const button = document.querySelector('[data-copy-request]');
-const request = document.querySelector('#request-text');
-const feedback = document.querySelector('[data-copy-feedback]');
-if (button && request && feedback && navigator.clipboard?.writeText) {
-  button.hidden = false;
-  button.addEventListener('click', async () => {
-    button.disabled = true;
-    try {
-      await navigator.clipboard.writeText(request.textContent.trim());
-      feedback.textContent = '요청문을 복사했습니다. 이미지에 맞게 바꿔 사용해 보세요.';
-    } catch {
-      feedback.textContent = '자동 복사를 사용할 수 없습니다. 위 요청문을 직접 선택해 복사해 주세요.';
-      request.focus({ preventScroll: true });
-    } finally {
-      button.disabled = false;
-    }
-  });
-}

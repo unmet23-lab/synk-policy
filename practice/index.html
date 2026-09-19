@@ -3,18 +3,18 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="바꿀 곳과 남길 것을 나누고, 실제 결과를 비교하며 다음 요청을 구체화합니다.">
+  <meta name="description" content="실제 눈 깜빡임을 재생하고 원본과 중간 결과를 비교하세요. 요청문을 내 이미지에 맞게 고쳐 복사할 수 있습니다.">
   <meta name="theme-color" content="#faf7f1">
-  <title>AI 캐릭터 영상, 먼저 고정할 세 가지 | SYNK SHIFT</title>
+  <title>캐릭터의 눈만 움직이려면, AI에 어떻게 요청할까요? | SYNK SHIFT</title>
   <link rel="canonical" href="https://synk.im/practice/">
   <meta property="og:type" content="article">
-  <meta property="og:title" content="AI 캐릭터 영상, 먼저 고정할 세 가지">
-  <meta property="og:description" content="바꿀 곳과 남길 것을 나누고, 실제 결과를 비교하며 다음 요청을 구체화합니다.">
+  <meta property="og:title" content="캐릭터의 눈만 움직이려면, AI에 어떻게 요청할까요?">
+  <meta property="og:description" content="실제 눈 깜빡임을 재생하고 원본과 중간 결과를 비교하세요. 요청문을 내 이미지에 맞게 고쳐 복사할 수 있습니다.">
   <meta property="og:url" content="https://synk.im/practice/">
   <meta property="og:image" content="https://synk.im/practice/assets/mongle-original.png">
   <link rel="preload" href="/assets/suit.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="./practice.css?v=793aec969ba8">
-  <script type="module" src="./practice.js?v=793aec969ba8"></script>
+  <link rel="stylesheet" href="./practice.css?v=c2405aab0dad">
+  <script type="module" src="./practice.js?v=c2405aab0dad"></script>
 <link rel="stylesheet" href="/detail-finish.css?v=f22b1067ea77">
 <link rel="stylesheet" href="/micro-finish.css?v=b5bba46eda28">
 <link rel="stylesheet" href="/presence.css?v=93ed36da1772">
@@ -23,53 +23,53 @@
   <a class="skip-link" href="#guide">본문으로 바로 가기</a>
   <header class="site-header">
     <a class="brand" href="/shift/" aria-label="SYNK SHIFT 소개로"><img src="/assets/brand-shift.webp" alt="SYNK SHIFT" width="344" height="100"></a>
-    <a class="back-link" href="/shift/#work"><span aria-hidden="true">←</span> SHIFT로 돌아가기</a>
+    <a class="back-link" href="/shift/#shift-workflow-title"><span aria-hidden="true">←</span> SHIFT로 돌아가기</a>
   </header>
   <main id="guide">
     <article aria-labelledby="guide-title">
       <header class="hero">
         <div>
-          <p class="eyebrow">SYNK SHIFT <span>제작 가이드 01</span></p>
-          <h1 id="guide-title">AI 캐릭터 영상,<br>먼저 고정할 세 가지</h1>
-          <p class="hero-description">‘귀엽게 움직여 줘’라고만 요청하기보다, 비교할 원본과 바꿀 범위를 함께 정해 보세요. 무엇을 바꿀지와 무엇을 남길지 적는 방법을 SYNK의 캐릭터 제작 사례로 설명합니다.</p>
-          <nav class="hero-links" aria-label="가이드 바로 가기"><a class="text-link" href="#comparison">실제 비교 보기 <span aria-hidden="true">↗</span></a><a class="text-link" href="#request">요청문 가져가기 <span aria-hidden="true">↗</span></a></nav>
+          <p class="eyebrow">SYNK SHIFT <span>캐릭터 제작 예시</span></p>
+          <h1 id="guide-title">캐릭터의 눈만 움직이려면,<br>AI에 어떻게 요청할까요?</h1>
+          <p class="hero-description">몽글의 몸과 털은 유지하면서 눈만 깜빡이게 만든 사례입니다. 움직임을 직접 확인하고, 내 이미지에 맞는 요청문과 수정 방법을 가져가세요.</p>
+          <nav class="hero-links" aria-label="가이드 바로 가기"><a class="text-link" href="#comparison">눈 깜빡임 재생하기 <span aria-hidden="true">↗</span></a><a class="text-link" href="#request">요청문 편집·복사하기 <span aria-hidden="true">↗</span></a></nav>
         </div>
-        <figure class="hero-visual"><img src="./assets/mongle-original.webp" alt="검은 두 눈을 뜬 붉은 펠트 캐릭터 몽글의 공통 바탕 합성" width="960" height="960" fetchpriority="high"><figcaption><b>몽글 · 원본으로 삼은 공통 바탕</b><span>자체 제작 실물</span></figcaption></figure>
+        <figure class="hero-visual"><img src="./assets/mongle-original.webp" alt="검은 두 눈을 뜬 붉은 펠트 캐릭터 몽글" width="960" height="960" fetchpriority="high"><figcaption><b>몽글 · 작업에 사용한 원본</b><span>SYNK 캐릭터</span></figcaption></figure>
       </header>
       <section class="guide-section" aria-labelledby="boundaries-title">
-        <div class="section-heading"><div><p class="section-label">01 — Set the boundaries</p><h2 id="boundaries-title">움직일 것보다 먼저,<br>지킬 것을 정합니다</h2></div><p class="section-intro">결과를 보고 ‘뭔가 달라졌다’고 느낄 때, 다시 확인할 기준을 만드는 일입니다. 다음 세 가지를 함께 적어 보세요.</p></div>
-        <ol class="steps"><li class="step"><span class="step-number" aria-hidden="true">01</span><h3>원본을 함께 보냅니다</h3><p>기준으로 삼을 이미지 한 장을 정합니다. 같은 캐릭터인지 판단할 수 있도록, 비교할 원본을 결과와 함께 남깁니다.</p><blockquote>이 이미지를 기준으로 작업해 주세요.</blockquote></li>
-<li class="step"><span class="step-number" aria-hidden="true">02</span><h3>바꿀 곳을 좁힙니다</h3><p>눈 주변처럼 이번에 바꿀 영역을 구체적으로 적습니다. 표정 하나를 바꿀 때 몸 전체가 새로 만들어지지 않도록 범위를 나눕니다.</p><blockquote>이번에는 눈 주변만 움직이게 해 주세요.</blockquote></li>
-<li class="step"><span class="step-number" aria-hidden="true">03</span><h3>유지할 것을 적습니다</h3><p>털, 몸의 형태, 색, 조명과 배경 중 지킬 것을 적습니다. 글자가 읽히는 상태와 움직임이 끝난 뒤의 정지도 함께 요청합니다.</p><blockquote>털, 몸의 형태, 색, 조명과 배경은 보존해 주세요.</blockquote></li></ol>
+        <div class="section-heading"><div><p class="section-label">01 — Set the boundaries</p><h2 id="boundaries-title">AI에 요청하기 전에<br>세 가지를 정하세요</h2></div><p class="section-intro">내 이미지와 원하는 동작을 준비하세요. 바꿀 부분과 그대로 둘 부분을 구분해서 적으면, 결과를 받았을 때 무엇을 확인할지도 분명해집니다.</p></div>
+        <ol class="steps"><li class="step"><span class="step-number" aria-hidden="true">01</span><h3>원본 이미지 한 장</h3><p>어떤 모습을 유지할지 알 수 있도록 기준 이미지를 함께 첨부하세요. 결과를 받은 뒤에도 이 이미지와 비교합니다.</p><blockquote>첨부한 캐릭터 이미지로 작업해 주세요.</blockquote></li>
+<li class="step"><span class="step-number" aria-hidden="true">02</span><h3>이번에 바꿀 부분</h3><p>표정, 동작, 배경 중 이번에 바꿀 부분을 정하세요. 이 예시에서는 캐릭터 전체가 아니라 두 눈의 깜빡임만 요청합니다.</p><blockquote>몸은 가만히 두고 두 눈만 한 번 깜빡이게 해 주세요.</blockquote></li>
+<li class="step"><span class="step-number" aria-hidden="true">03</span><h3>그대로 둘 부분</h3><p>몸의 모양, 털, 색, 조명과 배경처럼 유지할 항목을 적으세요. 결과에서도 이 부분이 달라지지 않았는지 확인합니다.</p><blockquote>몸의 모양과 털, 색, 조명, 배경은 그대로 유지해 주세요.</blockquote></li></ol>
       </section>
       <section class="guide-section" id="comparison" aria-labelledby="comparison-title">
-        <div class="section-heading"><div><p class="section-label">02 — Look at the result</p><h2 id="comparison-title">원본을 지키며,<br>깜빡임을 마감합니다</h2></div><p class="section-intro">원본에 눈을 붙인 중간 결과에서, 눈 주변의 연결을 한 번 더 다듬었습니다. 몸과 털은 같은 바탕에 두고, 이번에 개선한 깜빡임을 직접 살펴보세요.</p></div>
+        <div class="section-heading"><div><p class="section-label">02 — Look at the result</p><h2 id="comparison-title">눈을 감은 순간을<br>멈춰서 살펴보세요</h2></div><p class="section-intro">몸과 털을 유지하면서 눈 주변의 경계를 다듬은 결과입니다. 재생하거나 눈을 감은 순간에 멈춰 보세요. 아래에서 원본과 수정 전 중간 결과도 비교할 수 있습니다.</p></div>
         <figure class="blink-demo" data-blink-demo>
-          <div class="blink-stage"><span class="figure-tag">이번에 다듬은 깜빡임</span><img data-blink-fallback src="./assets/mongle-original.webp" alt="몽글의 원본. 움직임이 준비되면 같은 자리에서 눈을 깜빡입니다." width="960" height="960" loading="lazy"><canvas hidden width="960" height="960" role="img" aria-label="몸과 털의 바탕을 유지하며 눈만 깜빡이는 몽글"></canvas></div>
-          <figcaption class="blink-caption"><div><strong>같은 몽글, 작은 깜빡임.</strong><p data-blink-status aria-live="polite">원본 이미지 · 움직임을 불러오면 같은 자리에서 시작합니다.</p></div><div class="blink-controls" data-blink-controls hidden><button type="button" data-blink-replay>다시 깜빡이기</button><button type="button" data-blink-hold aria-pressed="false">눈감음 멈춰 보기</button><button type="button" data-blink-motion aria-pressed="true">자동 깜빡임 멈추기</button></div></figcaption>
+          <div class="blink-stage"><span class="figure-tag">다듬은 결과</span><img data-blink-fallback src="./assets/mongle-original.webp" alt="몽글의 원본. 움직임이 준비되면 같은 자리에서 눈을 깜빡입니다." width="960" height="960" loading="lazy"><canvas hidden width="960" height="960" role="img" aria-label="몸과 털의 바탕을 유지하며 눈만 깜빡이는 몽글"></canvas></div>
+          <figcaption class="blink-caption"><div><strong>눈만 움직이는 몽글</strong><p data-blink-status aria-live="polite">원본 이미지 · 움직임을 불러오면 같은 자리에서 시작합니다.</p></div><div class="blink-controls" data-blink-controls hidden><button type="button" data-blink-replay>다시 재생</button><button type="button" data-blink-hold aria-pressed="false">눈 감은 모습</button><button type="button" data-blink-motion aria-pressed="true">자동 재생 끄기</button></div></figcaption>
         </figure>
-        <details class="process-details"><summary>원본과 중간 결과도 살펴보기 <span aria-hidden="true">＋</span></summary><div class="comparison">
-          <figure><div class="comparison-image"><span class="figure-tag">기준 이미지</span><img src="./assets/mongle-original.webp" alt="두 눈을 뜬 몽글의 공통 바탕 합성" width="960" height="960" loading="lazy"></div><figcaption><strong>공통 바탕 합성</strong>비교의 기준으로 남긴 이미지<br><a href="./assets/mongle-original.png" class="original-link">원본 PNG 열기 <span aria-hidden="true">↗</span></a></figcaption></figure>
-          <figure><div class="comparison-image"><span class="figure-tag">눈 주변 합성</span><img src="./assets/mongle-eye-composite.webp" alt="눈을 감은 몽글. 눈 안쪽의 털 질감과 타원 경계에 차이가 남아 있다" width="960" height="960" loading="lazy"></div><figcaption><strong>눈감음 합성</strong>눈 안쪽의 질감과 경계는 마감 확인 필요<br><a href="./assets/mongle-eye-composite.png" class="original-link">원본 PNG 열기 <span aria-hidden="true">↗</span></a></figcaption></figure>
-        </div><p class="process-note">원본과 당시의 중간 합성입니다. 중간 결과에 남았던 둥근 경계와 질감 차이를 위 시연과 비교해 보세요.</p></details>
+        <details class="process-details"><summary>원본과 수정 전 중간 결과 비교하기 <span aria-hidden="true">＋</span></summary><div class="comparison">
+          <figure><div class="comparison-image"><span class="figure-tag">기준 이미지</span><img src="./assets/mongle-original.webp" alt="두 눈을 뜬 원본 몽글" width="960" height="960" loading="lazy"></div><figcaption><strong>원본</strong>작업에 사용한 기준 이미지<br><a href="./assets/mongle-original.png" class="original-link">원본 PNG 열기 <span aria-hidden="true">↗</span></a></figcaption></figure>
+          <figure><div class="comparison-image"><span class="figure-tag">눈 주변 합성</span><img src="./assets/mongle-eye-composite.webp" alt="눈을 감은 몽글. 눈 안쪽의 털 질감과 타원 경계에 차이가 남아 있다" width="960" height="960" loading="lazy"></div><figcaption><strong>수정 전 중간 결과</strong>눈 주변에 둥근 경계와 질감 차이가 남아 있습니다.<br><a href="./assets/mongle-eye-composite.png" class="original-link">원본 PNG 열기 <span aria-hidden="true">↗</span></a></figcaption></figure>
+        </div><p class="process-note">오른쪽 중간 결과의 눈 주변을 보세요. 둥근 경계와 털 질감의 차이를 위의 다듬은 결과와 비교할 수 있습니다.</p></details>
       </section>
       <section class="guide-section" id="request" aria-labelledby="request-title">
-        <div class="request-layout"><div><p class="section-label">03 — Make it your own</p><h2 id="request-title">내 이미지에 맞춰<br>고쳐 쓸 요청문</h2><p class="request-help">원본 이미지를 함께 보내고, ‘눈 주변’과 보존할 항목을 자신의 작업에 맞게 바꿔 보세요.<small>이 가이드를 위해 새로 정리한 예시입니다. 당시 AI에 입력한 문장을 인용한 것이 아니며, 결과를 보장하는 명령어도 아닙니다.</small></p></div><div><div class="request-card"><div class="request-card-header"><span>YOUR NEXT REQUEST</span><button class="copy-button" type="button" data-copy-request aria-describedby="copy-feedback" hidden><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><rect x="7" y="7" width="10" height="11" rx="1.5"/><path d="M4 13H3V3h10v1"/></svg>요청문 복사</button></div><pre class="request-text" id="request-text" tabindex="0">이 이미지를 기준으로 작업해 주세요.
-털, 몸의 형태, 색, 조명과 배경은 보존해 주세요.
-이번에는 눈 주변만 움직이게 해 주세요.
-읽어야 할 글자는 움직이지 않게 해 주세요.
-움직임이 끝나면 자연스럽게 정지하게 해 주세요.
-결과는 원본과 같은 크기, 같은 배경에서 비교할 수 있게 보여 주세요.</pre><p class="request-caption">새 요청 예시 · 원본과 목적에 맞게 수정해 사용하세요.</p></div><p class="copy-feedback" id="copy-feedback" data-copy-feedback role="status" aria-live="polite"></p></div></div>
+        <div class="request-layout"><div><p class="section-label">03 — Make it your own</p><h2 id="request-title">예문을 고쳐서<br>내 작업에 사용하세요</h2><p class="request-help">예문에서 움직일 부분과 유지할 항목을 바꾼 뒤 복사하세요. 사용할 AI에 원본 이미지와 함께 보내면 됩니다.<small>따라 써볼 수 있도록 새로 정리한 예문입니다. 실제 제작 당시의 요청문 인용은 아닙니다.</small></p></div><div data-request-editor><div class="request-card"><div class="request-card-header"><label for="request-text">직접 고쳐 쓸 요청문</label><button class="copy-button" type="button" data-copy-request aria-describedby="copy-feedback" hidden><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><rect x="7" y="7" width="10" height="11" rx="1.5"/><path d="M4 13H3V3h10v1"/></svg>요청문 복사</button></div><textarea class="request-text" id="request-text" data-request-text rows="9" spellcheck="false" aria-describedby="request-help">첨부한 캐릭터 이미지를 기준으로 작업해 주세요.
+몸은 가만히 두고 두 눈만 자연스럽게 한 번 깜빡이게 해 주세요.
+몸의 모양과 털, 색, 조명, 배경은 그대로 유지해 주세요.
+눈을 감았을 때 눈 주변에 경계가 생기지 않도록 털의 질감과 색을 맞춰 주세요.
+깜빡임이 끝나면 처음 눈을 뜬 모습으로 돌아오게 해 주세요.
+원본과 같은 크기로 보여 주고, 눈을 감은 정지 화면도 함께 보여 주세요.</textarea><p class="request-caption" id="request-help">여기서는 문장만 편집합니다. 이미지를 생성하거나 입력 내용을 전송·저장하지 않습니다.</p></div><p class="copy-feedback" id="copy-feedback" data-copy-feedback role="status" aria-live="polite"></p></div></div>
       </section>
       <section class="guide-section" aria-labelledby="checks-title">
-        <div class="section-heading"><div><p class="section-label">04 — Review once more</p><h2 id="checks-title">만든 다음에는,<br>세 곳을 다시 봅니다</h2></div><p class="section-intro">정지 이미지로 알 수 있는 것과, 직접 재생해야 알 수 있는 것을 나눕니다. 확인한 차이를 다음 요청에 더해 보세요.</p></div>
-        <ol class="check-list"><li><h3>같은 크기에서</h3><p>바뀐 눈뿐 아니라 주변의 털과 몸의 윤곽, 색이 이어지는지 살핍니다. 한쪽을 작게 줄이면 차이가 가려질 수 있습니다.</p></li>
-<li><h3>문장을 읽으며</h3><p>실제 움직임을 재생하면서 안내 문장을 끝까지 읽어 봅니다. 배경과 캐릭터가 글자를 읽는 데 방해되지 않는지 확인합니다.</p></li>
-<li><h3>끝나는 순간까지</h3><p>시작 장면에서 멈추지 않고, 움직임이 잦아들어 다시 머무는 순간까지 봅니다. 끝에서 갑자기 원래 자리로 튀지 않는지도 확인합니다.</p></li></ol>
+        <div class="section-heading"><div><p class="section-label">04 — Review once more</p><h2 id="checks-title">결과를 받으면<br>세 가지를 확인하세요</h2></div><p class="section-intro">잘못된 부분을 찾았다면 원본과 결과를 함께 첨부하고, 문제 위치와 원하는 수정을 적으세요. 아래 예시처럼 요청할 수 있습니다.</p></div>
+        <ol class="check-list"><li><h3>눈 주변과 몸의 모습</h3><p>원본과 결과를 같은 크기로 놓고 보세요. 눈 주위에 둥근 경계가 생겼거나 몸의 윤곽·털·색이 달라졌다면 그 부분을 짚어 다시 요청하세요.</p></li>
+<li><h3>눈을 뜨고 감는 순간</h3><p>정지 화면이 괜찮아도 재생할 때 눈이 갑자기 튀어 보일 수 있습니다. 여러 번 재생하고 눈을 감은 순간도 멈춰 확인하세요.</p></li>
+<li><h3>실제로 사용할 화면</h3><p>홈페이지나 영상에 넣을 크기로 확인하세요. 움직임이 글을 읽는 데 방해되지 않는지, 반복할 때 어색하게 끊기지 않는지 봅니다.</p></li></ol><div class="revision-example"><h3>수정 요청 예시</h3><blockquote>눈을 감았을 때 눈 주변에 둥근 경계가 보여요. 경계가 주변 털과 이어지도록 질감과 색을 맞춰 주세요. 몸의 모양과 색, 배경은 그대로 두세요.</blockquote></div>
       </section>
-      <aside class="closing" aria-label="자료 출처와 사용 안내"><p><strong>실제 제작에서 가져온 기준</strong>2026년 9월 14일의 캐릭터 제작 기록에서 시작해, 이번 가이드에서는 눈 주변의 연결과 실제 깜빡임을 더 다듬었습니다. 원본과 중간 결과도 함께 남겼습니다.</p><p><strong>내 작업에 적용해 보세요</strong>도구에 따라 별도 합성·편집이 필요할 수 있습니다. 요청문을 고쳐 자신의 이미지에 적용해 보세요. SYNK 캐릭터 이미지의 사용은 별도 문의해 주세요.</p></aside>
+      <aside class="closing" aria-label="자료 출처와 사용 안내"><p><strong>어떤 자료인가요?</strong>2026년 9월 14일 SYNK의 캐릭터 제작에서 사용한 원본과 중간 결과입니다. 이를 바탕으로 눈 주변을 다듬고 웹에서 재생할 수 있게 구현했습니다. AI 요청 한 번으로 완성된 결과는 아닙니다.</p><p><strong>내 이미지로 해보려면</strong>이미지나 영상을 다루는 AI에 내 이미지와 고친 요청문을 보내세요. 도구에 따라 추가 편집이나 웹 구현이 필요합니다. SYNK 캐릭터를 작품이나 사업에 사용하려면 별도로 문의해 주세요.</p></aside>
     </article>
   </main>
-  <footer class="site-footer"><div><p class="footer-brand">SYNK SHIFT</p><p class="footer-vision">기업과 기관을 위한 AI 교육과 브랜딩</p></div><a href="/shift/">SHIFT의 방향 살펴보기 <span aria-hidden="true">↗</span></a></footer>
+  <footer class="site-footer"><div><p class="footer-brand">SYNK SHIFT</p><p class="footer-vision">기업과 기관을 위한 AI 교육과 브랜딩</p></div><a href="/shift/">SHIFT 살펴보기 <span aria-hidden="true">↗</span></a></footer>
 </body>
 </html>

@@ -3,7 +3,7 @@
 export function initGlassControls(){
  const fine=matchMedia('(hover: hover) and (pointer: fine)');
  const reduced=matchMedia('(prefers-reduced-motion: reduce)');
- const selector='.brand-carousel-track,.felt-control,.learning-choices button,.visual-scene-nav button,.atlas-map-controls button,.quiet-link,.story-continuation[data-destination]';
+ const selector='.brand-carousel-track,.felt-control,.learning-choices button,.visual-scene-nav button,.atlas-map-controls button,.quiet-link,.story-continuation[data-destination],.shift-workflow__steps a';
  let active=null,frame=0,point=null;
  function reset(){
   if(frame)cancelAnimationFrame(frame);

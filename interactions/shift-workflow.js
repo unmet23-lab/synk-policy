@@ -15,6 +15,7 @@
         panels[position].hidden = !selected;
       });
       workflow.dataset.workflowStep = String(index + 1);
+      workflow.querySelector('[data-blink-demo]')?.dispatchEvent(new Event('previewvisibilitychange'));
       if (focus) tabs[index].focus({ preventScroll: true });
     };
 
@@ -48,5 +49,20 @@
     workflow.dataset.workflowReady = '';
     const requested = panels.findIndex((panel) => `#${panel.id}` === location.hash);
     select(requested < 0 ? 0 : requested);
+    window.addEventListener('hashchange', () => {
+      const destination = panels.findIndex(panel => `#${panel.id}` === location.hash);
+      if (destination >= 0) select(destination);
+    });
+    const version = new URL(import.meta.url).search;
+    import('/practice/copy-request.js' + version).then(module => module.initRequestEditors(workflow));
+    const observer = new IntersectionObserver(entries => {
+      if (!entries.some(entry => entry.isIntersecting)) return;
+      observer.disconnect();
+      import('/practice/blink-demo.js' + version).then(module => module.initBlinkDemo(workflow.querySelector('[data-blink-demo]'))).catch(() => {
+        const status = workflow.querySelector('[data-blink-status]');
+        if (status) status.textContent = '움직임을 불러오지 못해 원본을 보여드립니다.';
+      });
+    }, {rootMargin: '120px'});
+    observer.observe(workflow);
   });
 })();
