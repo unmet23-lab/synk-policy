@@ -1,6 +1,5 @@
-/* Preserve the authored palette when a mobile browser offers automatic darkening.
-   Forced-colors accessibility remains controlled by the visitor's system. */
-:root{color-scheme:only light;background-color:#fff}
+/* The shared early head style owns browser color-scheme negotiation. */
+:root{background-color:#fff}
 
 /* An illustrated example explains the whole Atlas experience, not one engine. */
 .atlas-learning-demo{margin-top:3rem;padding:3.5rem 0}

@@ -1,12 +1,21 @@
 <!DOCTYPE html><html lang="ko"><head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="color-scheme" content="only light"><meta name="theme-color" content="#ffffff">
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="color-scheme" content="light dark"><style id="synk-color-scheme">/* Samsung Internet can recolor light-only pages, including logo bitmaps.
+   Declare an authored scheme for both preferences, while deliberately retaining
+   SYNK's white canvas, felt assets and glass palette in either preference.
+   This head style precedes external CSS; html:root outranks the legacy :root.
+   System forced-colors remains available and is not opted out. */
+html:root{color-scheme:light dark;background-color:#fff;color:#2b2320}
+@media(prefers-color-scheme:dark){html:root{color-scheme:dark}}
+/* Native editing surfaces keep the same light appearance as their containers. */
+:where(button,input,select,textarea){color-scheme:only light}
+</style><meta name="theme-color" content="#ffffff">
 <title>양유호 · 창업자 소개 — SYNK</title><meta name="description" content="건축과 심리학, 퍼포먼스와 교육 현장의 경험을 연결해 SYNK를 만드는 양유호. 창업의 이유와 사람을 위한 기술에 대한 생각을 소개합니다."><link rel="canonical" href="https://synk.im/founder/">
 <meta property="og:type" content="profile"><meta property="og:title" content="양유호 · 창업자 소개 — SYNK"><meta property="og:description" content="건축과 심리학, 퍼포먼스와 교육 현장의 경험을 연결해 SYNK를 만드는 양유호. 창업의 이유와 사람을 위한 기술에 대한 생각을 소개합니다."><meta property="og:url" content="https://synk.im/founder/"><meta property="og:image" content="https://synk.im/assets/yuho-founder-20260919.png"><meta property="og:image:alt" content="검정 배경의 SYNK 창업자 양유호 프로필 사진"><meta name="twitter:card" content="summary_large_image">
 <link rel="icon" type="image/png" sizes="16x16" href="/assets/favicon-synk-20260919-16.png">
 <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon-synk-20260919-32.png">
 <link rel="icon" type="image/png" sizes="48x48" href="/assets/favicon-synk-20260919-48.png">
 <link rel="icon" type="image/svg+xml" sizes="any" media="(prefers-color-scheme: dark)" href="/assets/favicon-synk-dark-20260919.svg">
-<link rel="preload" href="/assets/suit.woff2" as="font" type="font/woff2" crossorigin=""><link rel="stylesheet" href="/founder.css?v=ba7481822991">
+<link rel="preload" href="/assets/suit.woff2" as="font" type="font/woff2" crossorigin=""><link rel="stylesheet" href="/founder.css?v=3016fd7a2be7">
 <link rel="alternate" hreflang="ko" href="https://synk.im/founder/"><link rel="alternate" hreflang="en" href="https://synk.im/en/founder/"><link rel="alternate" hreflang="x-default" href="https://synk.im/founder/"><script type="module" src="/language-switch.js?v=499577e2c693"></script></head><body class="founder-page"><a class="skip" href="#main">본문으로 바로 가기</a>
 <header class="founder-header wrap"><a class="founder-logo" href="/" aria-label="SYNK 홈페이지"><img src="/assets/brand-synk.webp?v=20260910-story" alt="SYNK" width="744" height="360"></a><nav aria-label="창업자 소개 목차"><a href="#story">창업 이야기</a><a href="#direction">만드는 것</a><a href="#background">경력</a><a href="/en/founder/" lang="en" hreflang="en" data-language-switch="" aria-label="English">EN</a></nav></header>
 <main id="main">
@@ -17,11 +26,5 @@
 <section id="background" class="founder-background wrap founder-section" aria-labelledby="background-title"><div class="section-label"><span class="index">04</span><p>BACKGROUND</p></div><div class="section-content"><h2 id="background-title"><span>SYNK를 만드는</span><span>관점의 바탕.</span></h2><p class="section-intro">공간과 사람을 공부한 경험, 무대와 창작 프로젝트, 교육기관 운영을 SYNK의 기획과 제작에 연결합니다.</p><div class="career-groups"><section class="career-group"><h3>교육 · 운영</h3><ol class="career-list"><li><time datetime="2026">2026</time><div><strong>몽골 Skyline Edu 전 부원장</strong><span>교육 현장의 상담·수업 운영·온라인 홍보</span></div></li></ol></section><section class="career-group"><h3>퍼포먼스 · 프로젝트</h3><ol class="career-list"><li><time datetime="2023">2023</time><div><strong>RCA · Royal College of Art</strong><span>영국 왕립예술대학 졸업 프로젝트 · 메인 퍼포머</span></div></li><li><time datetime="2023">2023</time><div><strong>드라마 「보라! 데보라」</strong><span>메인 퍼포머</span></div></li><li><time datetime="2014">2014</time><div><strong>LOEN Entertainment</strong><span>연습생</span></div></li></ol></section><section class="career-group"><h3>수상</h3><ol class="career-list"><li><time datetime="2019">2019</time><div><strong>Fine Art Photography Awards</strong><span>Open Theme 부문 · Winner</span></div></li><li><time datetime="2017">2017</time><div><strong>MK Challenge · 매일경제 주최</strong><span>프로젝트 리더 · 준우승</span></div></li></ol></section><section class="career-group"><h3>학력</h3><ul class="education-list"><li>호원대학교 건축학과</li><li>중앙대 심리학과</li></ul></section></div></div></section>
 <section class="founder-closing wrap" aria-labelledby="closing-title"><p class="eyebrow">THE COMPANY I AM BUILDING</p><h2 id="closing-title"><span>다음 선택에 도움이 되는 회사.</span><span>그 기준으로 만들겠습니다.</span></h2><p>사용자가 제안을 이해하고, 직접 선택하고, 자기 일과 생활에 쓸 수 있는지까지 확인하겠습니다. 각자가 원하는 삶을 만들어 가며 다른 사람에게도 도움이 되는 것. SYNK가 기술로 넓히고 싶은 가능성입니다.</p><a class="founder-jump" href="/">SYNK 살펴보기 <svg class="arrow" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"></path></svg></a></section>
 </main><footer class="founder-footer wrap"><a class="founder-logo" href="/" aria-label="SYNK 홈페이지"><img src="/assets/brand-synk.webp?v=20260910-story" alt="SYNK" width="744" height="360"></a><nav aria-label="회사 안내"><a href="/founder/" aria-current="page">창업자 소개</a><a href="https://synk.im/privacy/#website-questions">개인정보처리방침</a><a href="https://synk.im/terms/">이용약관</a><a href="https://synk.im/data-deletion/">데이터 삭제</a></nav><p>© 2026 SYNK. All rights reserved.</p></footer>
-
-
-
-
-
-
 
 </body></html>

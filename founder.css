@@ -5,7 +5,6 @@
 @font-face{font-family:'SYNK Bracket';src:local('Malgun Gothic'),local('Apple SD Gothic Neo'),local('Noto Sans KR'),local('Noto Sans CJK KR');unicode-range:U+300C-300D}
 
 :root{
-  color-scheme:only light;
   background:#fff;
   --founder-ink:#2b2320;
   --founder-muted:#655f59;
