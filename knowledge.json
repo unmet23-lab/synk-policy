@@ -343,8 +343,8 @@
         "이 질문창은 입사지원서를 받지 않습니다. 개인정보가 담긴 이력서를 보내기 전에, 관심 분야에서 채용 중인지 먼저 확인해 주세요.",
         "현재 확인한 SYNK LAB의 공개 채널은 YouTube @synkkorean, Instagram @synk.mn, Telegram @synkmn입니다. 채널별 공개 내용과 현재 상태는 각 페이지에서 확인할 수 있습니다.",
         "K-LOFI 24 라디오는 YouTube의 라이브 주소에서 열 수 있습니다. 상담과 협업 문의는 hello@synk.im으로 보내주세요.",
-        "This guide answers questions in Korean. An English overview is available from the EN link at the top of the page. For enquiries in another language, please email hello@synk.im.",
-        "이 질문창은 한국어로 답변합니다. 영어 소개는 상단의 EN 링크에서 볼 수 있습니다. 다른 언어로 문의하려면 hello@synk.im으로 이메일을 보내주세요.",
+        "For English pages and answers, select EN at the top. Each brand has an English page with the same current content and design. You can also email enquiries in English to hello@synk.im.",
+        "상단 EN을 누르면 현재 브랜드의 영어 페이지로 이동합니다. 영어판에서도 같은 구성과 최신 내용을 볼 수 있고, 영어로 질문해 공개 안내를 읽을 수 있습니다. 이 한국어 질문창은 한국어로 답변합니다. 다른 언어의 문의는 hello@synk.im으로 보내주세요.",
         "공개 자료에서 이 질문에 맞는 답을 찾지 못했습니다.",
         "한국어 교육, 기관·기업 서비스, 유학·취업 지원, AI 제작 가이드, 음악과 작품 중 어떤 내용이 궁금한지 조금 더 알려주세요. 개별 상담은 문의 양식이나 이메일을 이용해 주세요.",
         "감사합니다. 더 궁금한 점이 있으면 언제든 물어보세요."
@@ -2321,7 +2321,7 @@
       "sourceId": "guide",
       "brand": "synk",
       "title": "다른 언어로도 안내받을 수 있나요?",
-      "answer": "This guide answers questions in Korean. An English overview is available from the EN link at the top of the page. For enquiries in another language, please email hello@synk.im.\n\n이 질문창은 한국어로 답변합니다. 영어 소개는 상단의 EN 링크에서 볼 수 있습니다. 다른 언어로 문의하려면 hello@synk.im으로 이메일을 보내주세요.",
+      "answer": "For English pages and answers, select EN at the top. Each brand has an English page with the same current content and design. You can also email enquiries in English to hello@synk.im.\n\n상단 EN을 누르면 현재 브랜드의 영어 페이지로 이동합니다. 영어판에서도 같은 구성과 최신 내용을 볼 수 있고, 영어로 질문해 공개 안내를 읽을 수 있습니다. 이 한국어 질문창은 한국어로 답변합니다. 다른 언어의 문의는 hello@synk.im으로 보내주세요.",
       "questionExamples": [
         "다른 언어로도 안내받을 수 있나요?",
         "Can I ask in English?"
@@ -2334,7 +2334,7 @@
       "relatedIds": [
         "guide-contact"
       ],
-      "reviewedAt": "2026-09-15",
+      "reviewedAt": "2026-09-19",
       "action": {
         "label": "웹 문의하기",
         "href": "/#contact-web"
