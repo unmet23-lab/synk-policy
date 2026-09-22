@@ -58,24 +58,26 @@
 .synk-portal{
   --portal-x:28%;--portal-y:20%;
   position:relative;isolation:isolate;display:inline-flex;align-items:center;justify-content:center;
-  flex-shrink:0;gap:13px;min-height:50px;padding:6px 15px 6px 12px;border-radius:16px;
-  text-decoration:none;color:#e2e8ed;border:1px solid #c8d9e51f;
-  background:linear-gradient(145deg,#ffffff09,transparent 45%),linear-gradient(180deg,#10141ad9,#040609ee);
-  -webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);
-  box-shadow:inset 0 1px 0 #f1f6ff12,inset 0 -1px 0 #a8c8de0b,0 2px 3px #0009,0 9px 22px #0004;
-  transition:border-color .45s,box-shadow .45s;
+  flex-shrink:0;gap:9px;min-height:52px;padding:7px 17px 7px 13px;border-radius:13px;
+  text-decoration:none;color:#e2e8ed;border:1px solid transparent;
+  background:transparent;box-shadow:none;
+  transition:border-color .5s,box-shadow .5s;
   -webkit-tap-highlight-color:transparent;
 }
 .synk-portal::before{
-  content:'';position:absolute;inset:1px;z-index:-1;border-radius:inherit;pointer-events:none;
-  background:radial-gradient(ellipse 110px 70px at var(--portal-x) var(--portal-y),#d6e7ff12,transparent 80%);
-  opacity:.25;transition:opacity .5s;
+  content:'';position:absolute;inset:0;z-index:-1;border-radius:inherit;pointer-events:none;
+  background:radial-gradient(ellipse 120px 75px at var(--portal-x) var(--portal-y),#d6e7ff1c,transparent 85%),
+    linear-gradient(118deg,transparent 14%,#eff7ff04 24%,#eff7ff18 25%,#dceeff0a 36%,transparent 37%,transparent 72%,#c1d6eb07 73%,transparent 89%),
+    linear-gradient(165deg,#242b33d9,#10161beb 52%,#070b10f5);
+  box-shadow:inset 0 1px 0 #f3f8ff24,inset 0 -3px 2px #000b,inset 0 -1px 0 #b8d3e846;
+  opacity:0;transition:opacity .5s cubic-bezier(.2,.7,.2,1);
 }
 .synk-portal::after{
   content:'';position:absolute;inset:0;z-index:-1;border-radius:inherit;padding:1px;pointer-events:none;
-  background:linear-gradient(125deg,#d8e8f23d 0%,#e6f3ff0c 23%,transparent 47%,#a7bbcb18 82%,#f3f8ff28);
+  background:linear-gradient(125deg,#eff7ff9c 0%,#d7eaff36 21%,#a7c0d00a 46%,#a7bbcb30 77%,#f3f8ff70);
   -webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);
   -webkit-mask-composite:xor;mask-composite:exclude;
+  opacity:0;transition:opacity .5s;
 }
 .portal-rim{
   position:absolute;inset:0;border-radius:inherit;padding:1px;pointer-events:none;opacity:0;
@@ -85,9 +87,9 @@
   -webkit-mask-composite:xor;mask-composite:exclude;
   transition:opacity .5s;
 }
-.portal-thread{position:relative;display:block;flex-shrink:0;width:92px;height:36px}
+.portal-thread{position:relative;display:block;flex-shrink:0;width:92px;height:36px;margin-right:15px}
 .portal-embroidery,.portal-thread-light{display:block;width:100%;height:100%;object-fit:contain}
-.portal-embroidery{filter:drop-shadow(0 2px 2px #000b)}
+.portal-embroidery{filter:drop-shadow(0 3px 2px #000c)}
 /* A second exposure of the original fibers preserves their texture and alpha. */
 .portal-thread-light{
   position:absolute;inset:0;pointer-events:none;filter:brightness(1.4) saturate(.8);opacity:0;
@@ -101,8 +103,8 @@
 .portal-arrow{display:grid;place-items:center;flex-shrink:0;width:14px;height:18px;color:#a8b5c1;transition:color .35s}
 .portal-arrow svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:1.35;stroke-linecap:round;stroke-linejoin:round;transition:transform .4s cubic-bezier(.2,.8,.2,1)}
 .synk-portal:focus-visible{outline:2px solid #edf7ff;outline-offset:5px}
-.synk-portal:is(.is-lit,:focus-visible){border-color:#d5e4f039;box-shadow:inset 0 1px 0 #f1f6ff1a,inset 0 -1px 0 #a8c8de12,0 2px 3px #0009,0 9px 22px #0004}
-.synk-portal:is(.is-lit,:focus-visible)::before{opacity:1}
+.synk-portal:is(.is-lit,:focus-visible,:active){border-color:#d5e4f01a;box-shadow:0 2px 0 #000b,0 5px 7px #0008,0 12px 30px #0005}
+.synk-portal:is(.is-lit,:focus-visible,:active)::before,.synk-portal:is(.is-lit,:focus-visible,:active)::after{opacity:1}
 .synk-portal:is(.is-lit,:focus-visible) .portal-rim{opacity:.65}
 .synk-portal:is(.is-lit,:focus-visible) .portal-thread-light{opacity:.55}
 .synk-portal:is(.is-lit,:focus-visible) .portal-label{color:#f1f5fa}
@@ -114,8 +116,8 @@
 .observatory{transition:opacity .36s cubic-bezier(.4,0,.2,1)}
 .portal-departing .observatory{opacity:0}
 @media(max-width:760px){
-  .synk-portal{min-height:46px;padding:5px 12px 5px 10px;gap:10px;border-radius:14px}
-  .portal-thread{width:84px;height:33px}
+  .synk-portal{min-height:46px;padding:5px 12px 5px 10px;gap:8px;border-radius:12px}
+  .portal-thread{width:84px;height:33px;margin-right:11px}
   .signature>.mono,.signature-divider{display:none}
 }
 @media(prefers-reduced-motion:reduce){
@@ -2449,9 +2451,10 @@ void main(){
     cancelAnimationFrame(frame); frame = 0; previous = 0;
   }
   function track(event) {
-    if (!fine.matches || reduced.matches || forced.matches || event.pointerType === 'touch') return;
-    const rect = portal.getBoundingClientRect();
+    if (!fine.matches || forced.matches || event.pointerType === 'touch') return;
     portal.classList.add('is-lit');
+    if (reduced.matches) return;
+    const rect = portal.getBoundingClientRect();
     aim(Math.max(0, Math.min(1, (event.clientX - rect.left) / rect.width)),
       Math.max(0, Math.min(1, (event.clientY - rect.top) / rect.height)));
   }
