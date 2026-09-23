@@ -191,7 +191,7 @@
         <div id="explore-panel">
           <p class="panel-index mono" id="panel-index">01 — 08 / CONNECTED SYSTEM</p>
           <div id="engine-detail" aria-live="polite" aria-atomic="true">
-            <h3 id="detail-title">목표에 따라 달라지는 배움</h3>
+            <h3 id="detail-title">목표에 따라 달라지는 경험</h3>
             <p id="detail-description">각 엔진의 역할을 연결해 목표에 맞는 배울 내용과<br>안내·표현 방식을 설계합니다.</p>
           </div>
           <div class="related" id="related"><button type="button" class="text-action" id="start-exploring">Core부터 살펴보기 <span aria-hidden="true">↗</span></button></div>
@@ -2320,7 +2320,7 @@ void main(){
       $('stage-caption').textContent=engine.name.toUpperCase()+' / CONNECTED TO ATLAS';
     } else {
       $('panel-index').textContent='01 — 08 / CONNECTED SYSTEM';
-      $('detail-title').textContent='목표에 따라 달라지는 배움';
+      $('detail-title').textContent='목표에 따라 달라지는 경험';
       $('detail-description').replaceChildren(document.createTextNode('각 엔진의 역할을 연결해 목표에 맞는 배울 내용과'),document.createElement('br'),document.createTextNode('안내·표현 방식을 설계합니다.'));
       const start=create('button','Core부터 살펴보기 ↗','text-action');start.type='button';start.addEventListener('click',()=>selectEngine('core'));$('related').append(start);
       $('stage-caption').textContent='EIGHT ENGINES. ONE ATLAS';
