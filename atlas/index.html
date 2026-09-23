@@ -172,13 +172,13 @@
       <div class="intro">
         <p class="eyebrow mono"><span></span> CONNECTED, AROUND YOU.</p>
         <h1>Atlas</h1>
-        <h2>당신을 위해 설계된<br>개인화 엔진, Atlas.</h2>
-        <p class="intro-copy">여덟 엔진이 목표와 지금의 상황에 맞춰<br>배울 내용과 도움의 방식을 설계합니다.</p>
+        <h2>여덟 엔진이 모여<br>당신을 위한 Atlas가 됩니다</h2>
+        <p class="intro-copy">목표와 상황에 맞는 배움과 도움을<br>설계하는 개인화 시스템입니다.</p>
       </div>
 
       <div class="visual-stage" id="visual-stage">
         <canvas id="constellation" role="img" aria-label="중앙에서 빛이 흐르는 Atlas 광원과 Core, Strata, Loom, Vellum, Trail, Prism, Temper, Reed를 잇는 은백색 입체 연결망. 엔진에 포인터를 올리거나 아래 버튼으로 키보드 초점을 옮기면 해당 브랜드색이 연결을 따라 번집니다. 클릭하거나 터치하면 선택이 고정되고 선택한 관계에만 스티치가 나타납니다. 기능 점이나 이름에 포인터를 올리면 점이 살짝 움직이고, 연결된 주변 점과 선이 탄력 있게 따라옵니다."></canvas>
-        <div class="stage-caption"><span class="hairline"></span><span class="mono" id="stage-caption">EIGHT ENGINES. BUILT AROUND YOU.</span></div>
+        <div class="stage-caption"><span class="hairline"></span><span class="mono" id="stage-caption">EIGHT ENGINES. ONE ATLAS</span></div>
         <div class="graph-tools" role="group" aria-label="연결망 조작">
           <button type="button" id="zoom-out" aria-label="축소" title="축소">−</button>
           <button type="button" id="reset-view" aria-label="시점과 선택 초기화" title="시점과 선택 초기화"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 3H3v5M16 3h5v5M21 16v5h-5M8 21H3v-5"/></svg></button>
@@ -217,7 +217,7 @@
   <dialog id="about-dialog" aria-labelledby="about-title">
     <button type="button" id="about-close" aria-label="설명 닫기">×</button>
     <p class="eyebrow mono">BEHIND THE CONNECTIONS</p>
-    <h2 id="about-title">여덟 개의 능력.<br>하나의 Atlas.</h2>
+    <h2 id="about-title">여덟 엔진이 모여<br>하나의 Atlas</h2>
     <p>Atlas는 Core·Strata·Loom·Vellum·Trail·Prism·Temper·Reed의 능력을 연결해 목표와 상황에 맞는 배움과 도움을 설계하는 중심입니다.</p>
     <p>이 화면은 현재 엔진 설계에서 중요한 관계를 골라 표현한 시각화입니다. 중앙에서 빛이 흐르는 광원은 Atlas를 나타냅니다. 평소에는 은백색으로 이어지며, 엔진에 포인터를 올리거나 키보드 초점을 옮기면 해당 브랜드색이 연결을 따라 번졌다가 벗어나면 돌아옵니다. 클릭하거나 터치하면 선택이 고정되고, 선택한 관계에만 스티치가 나타납니다. 기능 점이나 이름에 포인터를 올리면 점이 살짝 움직이고, 연결된 주변 점과 선이 탄력 있게 따라옵니다. 점의 수와 움직임은 실제 이용자 수나 실시간 처리량을 뜻하지 않습니다. 작은 점은 주변 개념을 표현하는 시각 요소입니다.</p>
     <p>화면 가장자리의 옅은 연결은 공간의 깊이를 표현하며 별도 엔진이나 데이터를 뜻하지 않습니다. Strata는 설계·준비 단계이며, 전체 연결의 라이브 운영을 나타내지 않습니다.</p>
@@ -2323,7 +2323,7 @@ void main(){
       $('detail-title').textContent='목표에 따라 달라지는 배움';
       $('detail-description').replaceChildren(document.createTextNode('각 엔진의 역할을 연결해 목표에 맞는 배울 내용과'),document.createElement('br'),document.createTextNode('안내·표현 방식을 설계합니다.'));
       const start=create('button','Core부터 살펴보기 ↗','text-action');start.type='button';start.addEventListener('click',()=>selectEngine('core'));$('related').append(start);
-      $('stage-caption').textContent='EIGHT ENGINES. BUILT AROUND YOU.';
+      $('stage-caption').textContent='EIGHT ENGINES. ONE ATLAS';
     }
     updateDock();flash();
     if(restoreFocus&&id)$('engine-nav').querySelector(`[data-engine="${id}"]`)?.focus({preventScroll:true});
