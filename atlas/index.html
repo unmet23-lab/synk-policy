@@ -148,8 +148,8 @@
 @media(max-width:480px){.signature-detail{display:none}}
 @media(forced-colors:active){.portal-dock .synk-portal{background:Canvas;border-color:LinkText}}
 </style>
-</head>
-<body>
+<script>(function(){try{const raw=sessionStorage.getItem('synk-atlas-handoff');sessionStorage.removeItem('synk-atlas-handoff');if(!raw)return;const v=JSON.parse(raw);if(Date.now()-v.time>8000||![v.x,v.y,v.size].every(Number.isFinite)||v.size<20||v.size>1000)return;const root=document.documentElement;root.dataset.atlasArrival='pending';root.style.setProperty('--arrival-x',v.x+'px');root.style.setProperty('--arrival-y',v.y+'px');root.style.setProperty('--arrival-size',v.size+'px');setTimeout(()=>root.removeAttribute('data-atlas-arrival'),3000)}catch{}})();</script><link rel="stylesheet" href="/atlas-portal-arrival.css?v=9510290894a5"><script defer src="/atlas-portal-arrival.js?v=9510290894a5"></script></head>
+<body><div class="atlas-arrival" aria-hidden="true"><div class="atlas-arrival-orb"></div></div>
   <a class="skip-link" href="#engine-nav">엔진 선택으로 건너뛰기</a>
   <main class="observatory" id="observatory">
     <header class="masthead">
