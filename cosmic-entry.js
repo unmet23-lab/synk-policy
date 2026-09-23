@@ -24,7 +24,8 @@ if(portal&&planet){
     overlay.style.setProperty('--planet-dx',`${centerX-size/2-rect.left}px`);
     overlay.style.setProperty('--planet-dy',`${centerY-size/2-rect.top}px`);
     overlay.style.setProperty('--planet-scale',`${size/rect.width}`);
-    overlay.innerHTML='<div class="cosmic-transition-orb"></div><div class="cosmic-transition-planet"></div>';
+    overlay.style.setProperty('--planet-image-transform',getComputedStyle(planet.querySelector('img')).transform);
+    overlay.innerHTML='<div class="cosmic-transition-orb"></div><div class="cosmic-transition-planet"><img src="/assets/cosmic-planet-20260923.webp" alt=""></div>';
     document.body.append(overlay);
     requestAnimationFrame(()=>requestAnimationFrame(()=>overlay.classList.add('is-traveling')));
     setTimeout(()=>location.assign(portal.href),1180);
