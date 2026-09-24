@@ -1,7 +1,7 @@
 /* The opening scene occupies its own view; hash links show the existing company page. */
 html:not([data-entry-view]) .cosmic-entry,html[data-entry-view="company"] .cosmic-entry{display:none}
 html[data-entry-view="intro"] body[data-site="synk"]{background:#02050b}
-html[data-entry-view="intro"] body[data-site="synk"] > :not(.cosmic-entry):not(.cosmic-transition){display:none!important}
+html[data-entry-view="intro"] body[data-site="synk"] > :not(.cosmic-entry):not(.cosmic-transition):not(.cosmic-atlas-frame){display:none!important}
 
 .cosmic-entry{position:relative;isolation:isolate;overflow:hidden;min-height:max(690px,100svh);background:#02050b;color:#f8fbff}
 .cosmic-stars{position:absolute;inset:0;z-index:-2;background:#02050b url('/assets/cosmic-stars-20260923.webp') center center/cover no-repeat}
@@ -29,6 +29,10 @@ html[data-entry-view="intro"] body[data-site="synk"] > :not(.cosmic-entry):not(.
 .cosmic-brands-link{border:1px solid #ffffff60;background:#ffffff0d;backdrop-filter:blur(8px)}
 .cosmic-brands-link:hover{background:#ffffff26}
 
+.cosmic-atlas-frame{position:fixed;inset:0;z-index:900;width:100%;height:100%;border:0;opacity:0;pointer-events:none;background:#02050b}
+html[data-cosmic-atlas="active"],html[data-cosmic-atlas="active"] body{overflow:hidden}
+html[data-cosmic-atlas="active"] .cosmic-atlas-frame{opacity:1;pointer-events:auto}
+
 .cosmic-transition{position:fixed;inset:0;z-index:1000;overflow:hidden;background:#02050b;color:#fff;pointer-events:none}
 .cosmic-transition::before{content:'';position:absolute;inset:0;background:url('/assets/cosmic-stars-20260923.webp') center/cover no-repeat;opacity:1;transition:opacity 1.25s ease .1s}
 .cosmic-transition-sphere{position:absolute;left:var(--planet-left);top:var(--planet-top);width:var(--planet-size);height:var(--planet-size);transform-origin:0 0;transition:transform 1.45s cubic-bezier(.55,0,.18,1);will-change:transform}
@@ -41,6 +45,7 @@ html[data-entry-view="intro"] body[data-site="synk"] > :not(.cosmic-entry):not(.
 .cosmic-transition.is-traveling .cosmic-transition-sphere{transform:translate(var(--planet-dx),var(--planet-dy)) scale(var(--planet-scale))}
 .cosmic-transition.is-traveling .cosmic-transition-planet{opacity:0;transition-delay:.88s}
 .cosmic-transition.is-traveling .cosmic-transition-orb{opacity:1;transition-delay:.82s}
+.cosmic-transition.is-completing{opacity:0;transition:opacity .42s ease}
 
 @media(max-width:760px){
  .cosmic-entry{min-height:max(660px,100svh)}

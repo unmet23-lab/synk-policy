@@ -2414,7 +2414,7 @@ void main(){
   document.fonts.ready.then(()=>{if(graph&&!graph.destroyed){graph.labelSprites.clear();graph.requestDraw();}});
   window.addEventListener('blur',clearPreview);
   window.addEventListener('pagehide',event=>{if(!event.persisted)graph?.destroy();});
-  window.atlasPreview={getState:()=>({...state,scenario:state.scenario?.id||null}),getSummary:()=>graph?.getSummary(),getHubPositions:()=>graph?.getHubPositions(),getFeaturePositions:()=>graph?.getFeaturePositions()};
+  window.atlasPreview={setPreloadPaused:value=>graph?.setPaused(Boolean(value)),getState:()=>({...state,scenario:state.scenario?.id||null}),getSummary:()=>graph?.getSummary(),getHubPositions:()=>graph?.getHubPositions(),getFeaturePositions:()=>graph?.getFeaturePositions()};
 })();
 </script>
   <script>(() => {
