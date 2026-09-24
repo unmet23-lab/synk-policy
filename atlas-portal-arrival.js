@@ -22,11 +22,15 @@
     overlay.style.setProperty('--arrival-dy',`${y-initialY}px`);
     overlay.style.setProperty('--arrival-scale',String(size/initialSize));
     root.dataset.atlasArrival='revealing';
-    setTimeout(cleanup,650);
+    setTimeout(cleanup,480);
   };
-  Promise.all([
-    new Promise(resolve=>setTimeout(resolve,480)),
-    Promise.race([document.fonts.ready,new Promise(resolve=>setTimeout(resolve,1000))])
-  ]).then(()=>requestAnimationFrame(()=>requestAnimationFrame(reveal)));
+  const revealWhenReady=()=>{
+    if(started)return;
+    let rendered=false;
+    try{rendered=(window.atlasPreview?.getSummary?.()?.frames||0)>=2;}catch{}
+    if(rendered&&document.fonts.status==='loaded')requestAnimationFrame(reveal);
+    else requestAnimationFrame(revealWhenReady);
+  };
+  requestAnimationFrame(revealWhenReady);
   setTimeout(reveal,1500);
 })();
