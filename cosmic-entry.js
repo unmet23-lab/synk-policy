@@ -21,7 +21,7 @@ function showAtlas(push=true){
   document.title='Atlas | SYNK';
   if(push){
     const heading=frame.contentDocument.querySelector('h1');
-    if(heading){heading.tabIndex=-1;heading.focus({preventScroll:true});}
+    if(heading){heading.tabIndex=-1;heading.style.outline='none';heading.focus({preventScroll:true});}
   }
   return true;
 }
