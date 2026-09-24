@@ -4,7 +4,7 @@ const entry=document.querySelector('[data-cosmic-entry]');
 const portal=document.querySelector('[data-cosmic-atlas]');
 const planet=document.querySelector('[data-cosmic-planet]');
 const clamp=(value,min,max)=>Math.min(max,Math.max(min,value));
-const setView=view=>{root.dataset.entryView=view;};
+const setView=view=>{root.dataset.entryView=view;if(view==='company')document.dispatchEvent(new Event('synk:company-view'));};
 const isAtlasPath=()=>location.pathname.replace(/\/$/,'')==='/atlas';
 let frame,ready=false,resolveReady;
 const readyPromise=new Promise(resolve=>{resolveReady=resolve;});
