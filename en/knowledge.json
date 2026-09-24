@@ -1,6 +1,6 @@
 {
-  "version": "2026-09-15-selected-experiences-copy-51a335af98-en-8c5ffd6a266a-lab-123aa0f3e4a2",
-  "updatedAt": "2026-09-19",
+  "version": "2026-09-15-selected-experiences-copy-17f2ca5ffe-en-70bb14115ae3",
+  "updatedAt": "2026-09-23",
   "docs": [
     {
       "id": "company",
@@ -34,8 +34,14 @@
         "Start with the email writing demo, AI production guides, and K-LOFI information. These examples alone do not establish results for customers or students, or prove that SYNK is better than another company.",
         "We are currently preparing a new business registration. Once it is complete, we will provide the actual registration details.",
         "The “© 2026 SYNK. All rights reserved.” notice in the footer is SYNK’s copyright notice. Please check separately which uses of individual works, logos, and characters are permitted.",
-        "On this website, we refer to the person building SYNK as its creator. The creator sets the company’s direction and decides which tasks to delegate to AI and which results to review personally.",
-        "SHIFT content shares the actual production process and the reasons for revisions.",
+        "SYNK’s founder is Yuho Yang. He is building SYNK by connecting experience in architecture, psychology, performance, and education.",
+        "Finding a reason to learn, making your own choices, and creating something together. I want technology to make more room for these experiences. That is why I am building SYNK.",
+        "The creator introduced on this website and in SHIFT content is the founder. He sets the company’s direction, decides which tasks to delegate to AI and which results to review personally, and shares the actual production process and the reasons for revisions.",
+        "Founder Yuho Yang’s education: Department of Architecture, Howon University · Department of Psychology, Chung-Ang University. In his words: “I bring my studies of spaces and people, stage and creative projects, and experience running an educational institution into the planning and making of SYNK.”",
+        "Education · Operations — 2026 Former Deputy Director, Skyline Edu, Mongolia (Student advising, class operations, and online promotion)",
+        "Performance · Projects — 2023 RCA · Royal College of Art (Royal College of Art graduate project · Main Performer), 2023 TV series “Bora! Deborah” · Netflix (Appearance in the opening sequence of Episode 1), 2014 LOEN Entertainment (Performer)",
+        "Awards — 2019 Fine Art Photography Awards (Open Theme category · Winner), 2017 MK Challenge · Hosted by Maeil Business Newspaper (Project Leader · Runner-up)",
+        "Studying architecture and psychology, performing on stage, and working in education in Mongolia have each given me a different perspective: an eye for structure, an interest in how people think and act, and experience creating something with others. At SYNK, I bring these perspectives together to design support around each person's goals and circumstances.",
         "Atlas is SYNK's core technology for finding the learning and support each person needs, based on their goals and experience. Eight engines share the work: understanding the person, choosing what to learn and in what order, explaining it, and reviewing the results.",
         "A student may first prepare for university admission, then need help with presentations or job interviews while studying in Korea. We are developing Atlas to adjust tasks and explanations using the learner's new goals and recent work.",
         "Core — Choosing the next learning step. Looks at what a learner wants to achieve and where they are struggling, then identifies the next task and the support they need.",
@@ -60,7 +66,7 @@
         "We are developing personalized learning features with LAB as the main focus. SHIFT, PULSE, and PATH use the engines needed for their services.\nThe descriptions above include features in development and Strata, which is planned for a future addition.",
         "Strata is planned as a future addition."
       ],
-      "updatedAt": "2026-09-19"
+      "updatedAt": "2026-09-23"
     },
     {
       "id": "lab",
@@ -211,7 +217,7 @@
         "How are the 30 minutes used? — This is group activity time within the 90-minute class. It is not an extra 30 minutes or 30 minutes of solo speaking per student. Learners practice speaking, listening, asking questions, and coordinating, while the teacher checks that the conversation is not dominated by a few students. Task difficulty and support are adjusted to the learners’ levels, while the group speaking time remains fixed.",
         "These are operating guidelines for the regular classes currently in preparation. Cooperation, consideration, and judgment are skills we aim to develop, not measured improvement results."
       ],
-      "updatedAt": "2026-09-19"
+      "updatedAt": "2026-09-23"
     },
     {
       "id": "shift",
@@ -257,7 +263,7 @@
         "Review and hand over — We check the result in the environment where it will be used. Within the agreed scope, we hand over the finished work, source files, usage guidance, and a list of any further work needed.",
         "The scope, schedule, and deliverables for training, consulting, and branding are agreed individually. The examples below are SYNK's own work."
       ],
-      "updatedAt": "2026-09-19"
+      "updatedAt": "2026-09-23"
     },
     {
       "id": "pulse",
@@ -293,7 +299,7 @@
         "Company branding with SHIFT — SHIFT handles company presentation and visual identity work. PULSE focuses on creative production and advertising collaborations.",
         "We distinguish published work from services in preparation. Contact us to confirm the scope and schedule for production, licensing, or advertising collaborations."
       ],
-      "updatedAt": "2026-09-19"
+      "updatedAt": "2026-09-23"
     },
     {
       "id": "philosophy",
@@ -312,7 +318,7 @@
         "When students change their goals or preferences, their education should be able to reflect that. We record what students say, what teachers observe, and what AI infers as distinct types of information.",
         "We distinguish between what is planned, what has been built, what is actually in use, and what has demonstrated results."
       ],
-      "updatedAt": "2026-09-19"
+      "updatedAt": "2026-09-23"
     },
     {
       "id": "guide",
@@ -368,7 +374,7 @@
         "SYNK PATH supports international learners preparing for study, daily life, and work in Korea. We plan together from school selection, Korean learning, and interviews through to careers after graduation. We are preparing a service that uses LAB’s Korean education and VR practice to let learners experience situations they will face in Korea, then organize their preparation into a portfolio.",
         "These visions describe the future each brand is working toward. Each brand’s service information explains what is available, what is in preparation, and the terms of use."
       ],
-      "updatedAt": "2026-09-19"
+      "updatedAt": "2026-09-23"
     },
     {
       "id": "path",
@@ -393,7 +399,7 @@
         "Help schools and employers understand applicants — Materials selected by the student can show their motivation, learning process, and role in projects. PATH is preparing connections with schools and employers by reviewing students' career goals and institutions' admission or recruitment requirements. Institutions can use this fuller picture to make selection and support decisions.",
         "We share only materials the student has reviewed and agreed to share. Learning records are not sent automatically, and VR practice results are not presented as work experience or accredited qualifications."
       ],
-      "updatedAt": "2026-09-19"
+      "updatedAt": "2026-09-23"
     }
   ],
   "records": [
@@ -428,7 +434,7 @@
         "label": "Explore our brands",
         "href": "/en/#worlds"
       },
-      "reviewedAt": "2026-09-19",
+      "reviewedAt": "2026-09-23",
       "aliases": [
         "SYNK는 어떤 회사인가요?",
         "싱크가 하는 일을 알려 주세요",
@@ -465,7 +471,7 @@
         "label": "Explore all four brands",
         "href": "/en/#worlds"
       },
-      "reviewedAt": "2026-09-19",
+      "reviewedAt": "2026-09-23",
       "aliases": [
         "SYNK의 비전은 무엇인가요?",
         "싱크가 지향하는 미래는 무엇인가요?",
@@ -502,7 +508,7 @@
         "label": "Explore each brand",
         "href": "/en/#worlds"
       },
-      "reviewedAt": "2026-09-19",
+      "reviewedAt": "2026-09-23",
       "aliases": [
         "네 브랜드의 비전을 모두 알려 주세요",
         "SYNK LAB SHIFT PULSE의 비전은 무엇인가요?",
@@ -543,7 +549,7 @@
         "label": "Explore our brands",
         "href": "/en/#worlds"
       },
-      "reviewedAt": "2026-09-19",
+      "reviewedAt": "2026-09-23",
       "aliases": [
         "LAB, SHIFT, PULSE는 어떻게 달라요?",
         "세 브랜드의 관계가 궁금해요",
@@ -578,7 +584,7 @@
         "shift-scope",
         "pulse-listening"
       ],
-      "reviewedAt": "2026-09-19",
+      "reviewedAt": "2026-09-23",
       "aliases": [
         "지금 운영 중인가요?",
         "현재 어떤 단계인가요?",
@@ -616,7 +622,7 @@
         "label": "Choose a brand",
         "href": "/en/#worlds"
       },
-      "reviewedAt": "2026-09-19",
+      "reviewedAt": "2026-09-23",
       "aliases": [
         "어디부터 보면 좋을까요?",
         "저에게 맞는 사업은 어디인가요?",
@@ -653,7 +659,7 @@
         "label": "Explore LAB",
         "href": "/en/lab/"
       },
-      "reviewedAt": "2026-09-19",
+      "reviewedAt": "2026-09-23",
       "aliases": [
         "SYNK LAB을 소개해 주세요",
         "LAB은 어떤 교육을 하나요?",
@@ -689,7 +695,7 @@
         "label": "Explore SYNK LAB",
         "href": "/en/lab/"
       },
-      "reviewedAt": "2026-09-19",
+      "reviewedAt": "2026-09-23",
       "aliases": [
         "LAB의 비전은 무엇인가요?",
         "랩이 지향하는 미래가 궁금해요",
@@ -819,7 +825,7 @@
         "label": "Explore each book’s learning goals",
         "href": "/en/lab/"
       },
-      "reviewedAt": "2026-09-19",
+      "reviewedAt": "2026-09-23",
       "aliases": [
         "시냅스 교재는 어떻게 구성되어 있나요?",
         "LAB 교재는 몇 권인가요?",
@@ -867,7 +873,7 @@
         "label": "Explore the sample learning record",
         "href": "/en/lab/"
       },
-      "reviewedAt": "2026-09-19",
+      "reviewedAt": "2026-09-23",
       "aliases": [
         "한국어 편지 게임의 학습 기록은 어떻게 이어지나요?",
         "한국어 편지 게임은 어떻게 진행되나요?",
@@ -912,7 +918,7 @@
         "label": "Explore games and personalized learning",
         "href": "/en/lab/#lab-personalization"
       },
-      "reviewedAt": "2026-09-19",
+      "reviewedAt": "2026-09-23",
       "aliases": [
         "LAB의 게임과 개인화 학습은 어떻게 연결되나요?",
         "LAB은 성향을 어떻게 파악하나요?",
@@ -947,7 +953,7 @@
         "lab-game-demo",
         "lab-learning"
       ],
-      "reviewedAt": "2026-09-19",
+      "reviewedAt": "2026-09-23",
       "aliases": [
         "학생마다 다른 점은 어떻게 보나요?",
         "학생을 이해한다는 게 무슨 뜻인가요?",
@@ -1046,7 +1052,7 @@
         "label": "Explore SHIFT",
         "href": "/en/shift/"
       },
-      "reviewedAt": "2026-09-19",
+      "reviewedAt": "2026-09-23",
       "aliases": [
         "SYNK SHIFT를 소개해 주세요",
         "SHIFT는 어떤 일을 하나요?",
@@ -1083,7 +1089,7 @@
         "label": "Explore SYNK SHIFT",
         "href": "/en/shift/"
       },
-      "reviewedAt": "2026-09-19",
+      "reviewedAt": "2026-09-23",
       "aliases": [
         "SHIFT의 비전은 무엇인가요?",
         "시프트가 꿈꾸는 미래는 무엇인가요?",
@@ -1123,7 +1129,7 @@
         "label": "Explore SHIFT",
         "href": "/en/shift/"
       },
-      "reviewedAt": "2026-09-19",
+      "reviewedAt": "2026-09-23",
       "aliases": [
         "SHIFT는 누구에게 맞나요?",
         "혼자 사업을 준비하는 사람도 대상인가요?",
@@ -1164,7 +1170,7 @@
         "label": "Read Creating with AI While Preserving the Original (Korean)",
         "href": "/practice/"
       },
-      "reviewedAt": "2026-09-19",
+      "reviewedAt": "2026-09-23",
       "aliases": [
         "SHIFT 수업은 무엇이 남도록 설계하나요?",
         "배운 방법을 제 일에 쓸 수 있나요?",
@@ -1196,7 +1202,7 @@
         "shift-making",
         "philosophy-people"
       ],
-      "reviewedAt": "2026-09-19",
+      "reviewedAt": "2026-09-23",
       "aliases": [
         "AI 활용도 가르치나요?",
         "SHIFT는 AI 도구를 어떻게 다루나요?",
@@ -1245,7 +1251,7 @@
         "label": "See the actual logo revision",
         "href": "/en/shift/#design-notes"
       },
-      "reviewedAt": "2026-09-19",
+      "reviewedAt": "2026-09-23",
       "aliases": [
         "직접 만든 과정을 왜 보여 주나요?",
         "SHIFT의 제작 이야기는 무엇을 담나요?",
@@ -1290,7 +1296,7 @@
         "label": "Explore PULSE",
         "href": "/en/pulse/"
       },
-      "reviewedAt": "2026-09-19",
+      "reviewedAt": "2026-09-23",
       "aliases": [
         "SYNK PULSE를 소개해 주세요",
         "PULSE는 무엇을 만드나요?",
@@ -1326,7 +1332,7 @@
         "label": "Explore SYNK PULSE",
         "href": "/en/pulse/"
       },
-      "reviewedAt": "2026-09-19",
+      "reviewedAt": "2026-09-23",
       "aliases": [
         "PULSE의 비전은 무엇인가요?",
         "펄스가 지향하는 미래는 무엇인가요?",
@@ -1486,7 +1492,7 @@
         "philosophy-people",
         "synk-brands"
       ],
-      "reviewedAt": "2026-09-19",
+      "reviewedAt": "2026-09-23",
       "category": "philosophy",
       "aliases": [
         "SYNK의 철학이 궁금해요",
@@ -1524,7 +1530,7 @@
         "shift-services",
         "path-support"
       ],
-      "reviewedAt": "2026-09-19",
+      "reviewedAt": "2026-09-23",
       "aliases": [
         "SYNK의 품질 기준은 무엇인가요?",
         "어떤 상태를 완성이라고 보나요?",
@@ -1763,7 +1769,7 @@
         "label": "Business & institutional inquiries",
         "href": "/en/shift/#contact-business"
       },
-      "reviewedAt": "2026-09-19",
+      "reviewedAt": "2026-09-23",
       "aliases": [
         "SHIFT가 준비하는 다른 사업은 무엇인가요?",
         "SHIFT의 다른 사업 방향도 궁금해요"
@@ -1794,7 +1800,7 @@
         "href": "/en/founder/"
       },
       "answer": "Korean learning, AI for business, music and stories. SYNK builds personalized systems. We develop technology that understands each person’s goals and circumstances and provides the support they need.\n\nOn SHIFT, the founder shares the process of building a company with AI and the decisions made along the way. We publish the approaches tried, failures, and reasons for revisions so others can draw on them in their own work.\n\nWe look beyond the first assessment and take later experiences and choices into account. When goals change or new difficulties arise, learning content and support change too.",
-      "reviewedAt": "2026-09-19",
+      "reviewedAt": "2026-09-23",
       "aliases": [
         "기획자는 어떤 회사를 만들고 싶나요?",
         "기획자가 추구하는 것은 무엇인가요?"
@@ -1870,32 +1876,78 @@
       "sourceId": "company",
       "brand": "synk",
       "title": "Who is building SYNK?",
-      "answer": "On this website, we refer to the person building SYNK as its creator. The creator sets the company’s direction and decides which tasks to delegate to AI and which results to review personally.\n\nSHIFT content shares the actual production process and the reasons for revisions.",
+      "answer": "SYNK’s founder is Yuho Yang. He is building SYNK by connecting experience in architecture, psychology, performance, and education.\n\nFinding a reason to learn, making your own choices, and creating something together. I want technology to make more room for these experiences. That is why I am building SYNK.\n\nThe creator introduced on this website and in SHIFT content is the founder. He sets the company’s direction, decides which tasks to delegate to AI and which results to review personally, and shares the actual production process and the reasons for revisions.",
       "questionExamples": [
         "Who is building SYNK?",
         "What is the founder’s name?",
         "Who leads SYNK?",
-        "What does the creator do?"
+        "What does the creator do?",
+        "Who is the founder of SYNK?",
+        "Who is Yuho Yang?"
       ],
       "keywords": [
         "creator",
         "founder name",
-        "person behind SYNK"
+        "person behind SYNK",
+        "founder",
+        "Yuho Yang",
+        "CEO"
       ],
       "relatedIds": [
+        "synk-founder-background",
         "synk-founder",
         "shift-making"
       ],
       "action": {
-        "label": "See planning and revision examples",
-        "href": "/en/shift/#work"
+        "label": "Meet the founder",
+        "href": "/en/founder/"
       },
-      "reviewedAt": "2026-09-14",
+      "reviewedAt": "2026-09-23",
       "aliases": [
         "SYNK를 만드는 사람은 누구인가요?",
         "대표 이름이 뭐예요?",
         "대표가 누구야?",
-        "기획자는 어떤 역할인가요?"
+        "기획자는 어떤 역할인가요?",
+        "창업자는 누구인가요?",
+        "대표님 이름이 뭐예요?"
+      ]
+    },
+    {
+      "id": "synk-founder-background",
+      "questionExamples": [
+        "What experience does the founder bring?",
+        "Where did the founder study?",
+        "What is the founder’s background?",
+        "What awards has the founder received?"
+      ],
+      "title": "What experience does the founder bring?",
+      "brand": "synk",
+      "sourceId": "company",
+      "keywords": [
+        "founder",
+        "education",
+        "background",
+        "career",
+        "awards",
+        "university",
+        "Yuho Yang"
+      ],
+      "answer": "Founder Yuho Yang’s education: Department of Architecture, Howon University · Department of Psychology, Chung-Ang University. In his words: “I bring my studies of spaces and people, stage and creative projects, and experience running an educational institution into the planning and making of SYNK.”\n\nEducation · Operations — 2026 Former Deputy Director, Skyline Edu, Mongolia (Student advising, class operations, and online promotion)\n\nPerformance · Projects — 2023 RCA · Royal College of Art (Royal College of Art graduate project · Main Performer), 2023 TV series “Bora! Deborah” · Netflix (Appearance in the opening sequence of Episode 1), 2014 LOEN Entertainment (Performer)\n\nAwards — 2019 Fine Art Photography Awards (Open Theme category · Winner), 2017 MK Challenge · Hosted by Maeil Business Newspaper (Project Leader · Runner-up)\n\nStudying architecture and psychology, performing on stage, and working in education in Mongolia have each given me a different perspective: an eye for structure, an interest in how people think and act, and experience creating something with others. At SYNK, I bring these perspectives together to design support around each person's goals and circumstances.",
+      "relatedIds": [
+        "synk-planner",
+        "synk-founder",
+        "synk-intro"
+      ],
+      "action": {
+        "label": "Meet the founder",
+        "href": "/en/founder/"
+      },
+      "reviewedAt": "2026-09-23",
+      "aliases": [
+        "창업자는 어떤 경험을 해 왔나요?",
+        "창업자 학력이 궁금해요",
+        "대표는 어느 학교를 나왔어요?",
+        "창업자 경력을 알려 주세요"
       ]
     },
     {
@@ -2095,7 +2147,7 @@
         "label": "Explore in detail",
         "href": "/en/lab/#lab-topik"
       },
-      "reviewedAt": "2026-09-19",
+      "reviewedAt": "2026-09-23",
       "category": "service",
       "aliases": [
         "LAB은 왜 4급을 목표로 하나요?",
@@ -2235,7 +2287,7 @@
         "label": "Business & institutional inquiries",
         "href": "/en/shift/#contact-business"
       },
-      "reviewedAt": "2026-09-19",
+      "reviewedAt": "2026-09-23",
       "aliases": [
         "SHIFT는 AI 강의만 하는 곳인가요?",
         "AI 교육이나 실습을 신청할 수 있나요?",
@@ -2268,7 +2320,7 @@
         "label": "See an actual revision",
         "href": "/en/shift/#work"
       },
-      "reviewedAt": "2026-09-19",
+      "reviewedAt": "2026-09-23",
       "aliases": [
         "SHIFT 방법을 쓰면 같은 사업 성과를 얻나요?",
         "AI만 쓰면 사업이 성공하나요?"
@@ -2781,7 +2833,7 @@
         "label": "Explore the details",
         "href": "/en/shift/#shift-services"
       },
-      "reviewedAt": "2026-09-19",
+      "reviewedAt": "2026-09-23",
       "aliases": [
         "SHIFT는 어떤 서비스를 제공하나요?",
         "기업 AI 교육과 브랜딩을 함께 제공하나요?",
@@ -2826,7 +2878,7 @@
         "label": "Study & career inquiries",
         "href": "/en/path/#contact-pathways"
       },
-      "reviewedAt": "2026-09-19",
+      "reviewedAt": "2026-09-23",
       "aliases": [
         "SHIFT는 유학과 취업을 어떻게 연결하려 하나요?",
         "SHIFT는 유학과 취업도 연결하나요?",
@@ -2861,7 +2913,7 @@
         "label": "Explore SYNK LAB",
         "href": "/en/lab/"
       },
-      "reviewedAt": "2026-09-19",
+      "reviewedAt": "2026-09-23",
       "aliases": [
         "SYNK LAB의 철학은 무엇인가요?",
         "LAB의 철학이 궁금해요",
@@ -2895,7 +2947,7 @@
         "label": "Explore SYNK SHIFT",
         "href": "/en/shift/"
       },
-      "reviewedAt": "2026-09-19",
+      "reviewedAt": "2026-09-23",
       "aliases": [
         "SYNK SHIFT의 철학은 무엇인가요?",
         "SHIFT의 철학이 궁금해요",
@@ -2929,7 +2981,7 @@
         "label": "Explore SYNK PULSE",
         "href": "/en/pulse/"
       },
-      "reviewedAt": "2026-09-19",
+      "reviewedAt": "2026-09-23",
       "aliases": [
         "SYNK PULSE의 철학은 무엇인가요?",
         "PULSE의 철학이 궁금해요",
@@ -2962,7 +3014,7 @@
         "label": "Explore PATH",
         "href": "/en/path/"
       },
-      "reviewedAt": "2026-09-19",
+      "reviewedAt": "2026-09-23",
       "aliases": [
         "PATH는 어떤 곳인가요?",
         "What is PATH?"
@@ -2996,7 +3048,7 @@
         "label": "Explore SYNK PATH",
         "href": "/en/path/"
       },
-      "reviewedAt": "2026-09-19",
+      "reviewedAt": "2026-09-23",
       "aliases": [
         "PATH의 비전은 무엇인가요?",
         "패스가 지향하는 미래는 무엇인가요?"
@@ -3027,7 +3079,7 @@
         "label": "Explore PATH",
         "href": "/en/path/"
       },
-      "reviewedAt": "2026-09-19",
+      "reviewedAt": "2026-09-23",
       "aliases": [
         "PATH의 철학은 무엇인가요?"
       ]
@@ -3062,7 +3114,7 @@
         "label": "Explore in detail",
         "href": "/en/lab/#lab-method"
       },
-      "reviewedAt": "2026-09-19",
+      "reviewedAt": "2026-09-23",
       "aliases": [
         "LAB의 교육 방식은 어떻게 다른가요?",
         "LAB은 왜 에듀테크 기업인가요?"
@@ -3095,7 +3147,7 @@
         "label": "Explore in detail",
         "href": "/en/lab/#lab-provides"
       },
-      "reviewedAt": "2026-09-19",
+      "reviewedAt": "2026-09-23",
       "aliases": [
         "LAB에서 학생에게 무엇을 제공하나요?"
       ]
@@ -3132,7 +3184,7 @@
         "label": "Explore in detail",
         "href": "/en/lab/#lab-vr"
       },
-      "reviewedAt": "2026-09-19",
+      "reviewedAt": "2026-09-23",
       "aliases": [
         "LAB은 VR로 어떻게 취업을 준비하나요?",
         "VR 면접과 직업체험은 지금 이용할 수 있나요?",
@@ -3167,7 +3219,7 @@
         "label": "Explore the details",
         "href": "/en/shift/#shift-delivery"
       },
-      "reviewedAt": "2026-09-19",
+      "reviewedAt": "2026-09-23",
       "aliases": [
         "SHIFT는 교육과 컨설팅을 어떻게 진행하나요?"
       ]
@@ -3197,7 +3249,7 @@
         "label": "Explore the details",
         "href": "/en/pulse/#pulse-content"
       },
-      "reviewedAt": "2026-09-19",
+      "reviewedAt": "2026-09-23",
       "aliases": [
         "PULSE의 온라인 콘텐츠는 무엇인가요?"
       ]
@@ -3230,7 +3282,7 @@
         "label": "Explore the details",
         "href": "/en/pulse/#pulse-ip"
       },
-      "reviewedAt": "2026-09-19",
+      "reviewedAt": "2026-09-23",
       "aliases": [
         "PULSE의 IP 사업은 무엇인가요?",
         "PULSE는 캐릭터 사업도 하나요?",
@@ -3262,7 +3314,7 @@
         "label": "Explore the details",
         "href": "/en/pulse/#pulse-advertising"
       },
-      "reviewedAt": "2026-09-19",
+      "reviewedAt": "2026-09-23",
       "aliases": [
         "PULSE의 광고 사업은 무엇인가요?"
       ]
@@ -3295,7 +3347,7 @@
         "label": "Explore the details",
         "href": "/en/path/#path-personal"
       },
-      "reviewedAt": "2026-09-19",
+      "reviewedAt": "2026-09-23",
       "aliases": [
         "PATH에서는 유학 계획을 어떻게 세우나요?",
         "PATH의 개인화 지원은 어떻게 다른가요?",
@@ -3332,7 +3384,7 @@
         "label": "Explore the details",
         "href": "/en/path/#path-journey"
       },
-      "reviewedAt": "2026-09-19",
+      "reviewedAt": "2026-09-23",
       "aliases": [
         "PATH의 VR 교육에서는 무엇을 연습하나요?",
         "PATH는 유학부터 취업까지 어떻게 지원하나요?",
@@ -3369,7 +3421,7 @@
         "label": "Explore the details",
         "href": "/en/path/#path-why"
       },
-      "reviewedAt": "2026-09-19",
+      "reviewedAt": "2026-09-23",
       "aliases": [
         "PATH의 포트폴리오에는 무엇을 담나요?",
         "왜 SYNK PATH를 선택하나요?",
@@ -3418,7 +3470,7 @@
         "label": "Explore in detail",
         "href": "/en/lab/#lab-year"
       },
-      "reviewedAt": "2026-09-19",
+      "reviewedAt": "2026-09-23",
       "aliases": [
         "LAB의 1년 과정은 어떻게 구성되나요?",
         "LAB의 4급 커리큘럼은 어떻게 구성되나요?",
@@ -3466,7 +3518,7 @@
         "label": "Explore in detail",
         "href": "/en/lab/#lab-ai"
       },
-      "reviewedAt": "2026-09-19",
+      "reviewedAt": "2026-09-23",
       "aliases": [
         "LAB은 AI 시대에 필요한 역량을 어떻게 기르나요?",
         "LAB의 리더십 교육은 어떤 내용인가요?",
@@ -3512,7 +3564,7 @@
         "label": "Explore in detail",
         "href": "/en/lab/#lab-languages"
       },
-      "reviewedAt": "2026-09-19",
+      "reviewedAt": "2026-09-23",
       "aliases": [
         "LAB의 영어와 한국인 원어민 회화 수업은 어떻게 진행하나요?",
         "한국인 원어민 선생님과 무엇을 배우나요?",
@@ -3556,7 +3608,7 @@
         "label": "Explore in detail",
         "href": "/en/lab/#lab-language-use"
       },
-      "reviewedAt": "2026-09-19",
+      "reviewedAt": "2026-09-23",
       "aliases": [
         "영어와 한국어 회화는 유학과 취업 준비에 어떻게 연결되나요?",
         "영어와 원어민 회화가 TOPIK에도 도움이 되나요?",
@@ -3598,7 +3650,7 @@
         "label": "Explore in detail",
         "href": "/en/lab/#lab-ai-practice"
       },
-      "reviewedAt": "2026-09-19",
+      "reviewedAt": "2026-09-23",
       "aliases": [
         "LAB의 나침반과 크루 프로젝트는 어떻게 연결되나요?",
         "문화활동으로 협동과 배려를 어떻게 배우나요?",
@@ -3639,7 +3691,7 @@
         "label": "Explore in detail",
         "href": "/en/lab/#lab-class"
       },
-      "reviewedAt": "2026-09-19",
+      "reviewedAt": "2026-09-23",
       "aliases": [
         "LAB의 90분 수업은 어떻게 진행하나요?",
         "그룹별 발화 30분에는 무엇을 하나요?",
@@ -3684,7 +3736,7 @@
         "label": "Explore Atlas",
         "href": "/en/#atlas"
       },
-      "reviewedAt": "2026-09-19",
+      "reviewedAt": "2026-09-23",
       "aliases": [
         "SYNK 아틀라스는 어떻게 작동하나요?",
         "아틀라스의 여덟 엔진은 어떤 역할을 하나요?",
@@ -3716,7 +3768,7 @@
         "label": "Explore the eight engines",
         "href": "/en/#atlas"
       },
-      "reviewedAt": "2026-09-19",
+      "reviewedAt": "2026-09-23",
       "aliases": [
         "Core은 어떤 역할을 하나요?",
         "코어 엔진이 뭐예요?"
@@ -3746,7 +3798,7 @@
         "label": "Explore the eight engines",
         "href": "/en/#atlas"
       },
-      "reviewedAt": "2026-09-19",
+      "reviewedAt": "2026-09-23",
       "aliases": [
         "Loom은 어떤 역할을 하나요?",
         "룸 엔진이 뭐예요?"
@@ -3776,7 +3828,7 @@
         "label": "Explore the eight engines",
         "href": "/en/#atlas"
       },
-      "reviewedAt": "2026-09-19",
+      "reviewedAt": "2026-09-23",
       "aliases": [
         "Vellum은 어떤 역할을 하나요?",
         "벨룸 엔진이 뭐예요?"
@@ -3806,7 +3858,7 @@
         "label": "Explore the eight engines",
         "href": "/en/#atlas"
       },
-      "reviewedAt": "2026-09-19",
+      "reviewedAt": "2026-09-23",
       "aliases": [
         "Trail은 어떤 역할을 하나요?",
         "트레일 엔진이 뭐예요?"
@@ -3836,7 +3888,7 @@
         "label": "Explore the eight engines",
         "href": "/en/#atlas"
       },
-      "reviewedAt": "2026-09-19",
+      "reviewedAt": "2026-09-23",
       "aliases": [
         "Prism은 어떤 역할을 하나요?",
         "프리즘 엔진이 뭐예요?"
@@ -3866,7 +3918,7 @@
         "label": "Explore the eight engines",
         "href": "/en/#atlas"
       },
-      "reviewedAt": "2026-09-19",
+      "reviewedAt": "2026-09-23",
       "aliases": [
         "Temper은 어떤 역할을 하나요?",
         "템퍼 엔진이 뭐예요?"
@@ -3896,7 +3948,7 @@
         "label": "Explore the eight engines",
         "href": "/en/#atlas"
       },
-      "reviewedAt": "2026-09-19",
+      "reviewedAt": "2026-09-23",
       "aliases": [
         "Reed은 어떤 역할을 하나요?",
         "리드 엔진이 뭐예요?"
@@ -3926,7 +3978,7 @@
         "label": "Explore the eight engines",
         "href": "/en/#atlas"
       },
-      "reviewedAt": "2026-09-19",
+      "reviewedAt": "2026-09-23",
       "aliases": [
         "Strata은 어떤 역할을 하나요?",
         "스트라타 엔진이 뭐예요?"

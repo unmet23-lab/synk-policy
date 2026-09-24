@@ -1,5 +1,5 @@
-import {createKnowledgeEngine} from './knowledge-engine.js?v=90c3c70f27';
-import {appendPublicActions} from './public-actions.js?v=90c3c70f27';
+import {createKnowledgeEngine} from './knowledge-engine.js?v=4ee8278a4f';
+import {appendPublicActions} from './public-actions.js?v=4ee8278a4f';
 const $=s=>document.querySelector(s);
 const conversation=$('#questions'),form=$('#question-form'),input=$('#question'),send=$('#send'),messages=$('#messages'),dialog=$('#document-dialog');
 const initialContext=()=>({brand:['lab','shift','pulse','path'].includes(document.body.dataset.site)?document.body.dataset.site:'synk'});
@@ -20,7 +20,7 @@ function paragraphs(parent,text){String(text).split(/\n\n/).forEach(p=>parent.ap
 let pending=null;
 function startKnowledge(){
  if(pending)return pending;
- pending=fetch('/knowledge.json?v=eb695009a640').then(r=>{if(!r.ok)throw new Error('자료를 불러오지 못했어요.');return r.json();}).then(data=>{
+ pending=fetch('/knowledge.json?v=457789da4cb7').then(r=>{if(!r.ok)throw new Error('자료를 불러오지 못했어요.');return r.json();}).then(data=>{
   engine=createKnowledgeEngine(data);return engine;
 }).catch(error=>{console.error('Public notes unavailable');$('#answer-note').textContent='공개 안내를 불러오지 못했어요. 질문을 보내 다시 시도해 주세요.';throw error;});
 // A background failure should not become an unhandled rejection before anyone asks.
@@ -30,7 +30,7 @@ function startKnowledge(){
 if(document.body.dataset.site!=='synk'||document.documentElement.dataset.entryView!=='intro')startKnowledge();
 else document.addEventListener('synk:company-view',startKnowledge,{once:true});
 
-async function getEngine(){if(engine)return engine;try{return await startKnowledge();}catch{const r=await fetch('/knowledge.json?v=eb695009a640',{cache:'reload'});if(!r.ok)throw new Error('자료를 불러오지 못했어요. 잠시 뒤 다시 질문해 주세요.');engine=createKnowledgeEngine(await r.json());$('#answer-note').textContent=readyNote;return engine;}}
+async function getEngine(){if(engine)return engine;try{return await startKnowledge();}catch{const r=await fetch('/knowledge.json?v=457789da4cb7',{cache:'reload'});if(!r.ok)throw new Error('자료를 불러오지 못했어요. 잠시 뒤 다시 질문해 주세요.');engine=createKnowledgeEngine(await r.json());$('#answer-note').textContent=readyNote;return engine;}}
 function showAnswers(){document.dispatchEvent(new Event('synk:show-answers'));}
 function enterChat(){showAnswers();conversation.classList.add('is-chatting');$('#introduction').hidden=true;$('#chat-area').hidden=false;}
 function focusQuestion(){showAnswers();input.focus({preventScroll:true});if(!conversation.closest('.orb-help'))(conversation.closest('.help-frame')||conversation).scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth',block:'start'});}
@@ -42,9 +42,12 @@ function appendAnswer(result){
   if(result.message)paragraphs(body,result.message);
   for(const record of result.records){
     if(result.records.length>1)body.append(element('h3','',record.title));
-    const parts=record.answer.split(/\n\n/);
+    const parts=record.answer.split(/\n\n/),focus=result.focus?.[record.id];
     paragraphs(body,parts[0]);
-    if(parts.length>1){const more=element('details','answer-more');more.open=!!result.expanded;more.append(element('summary','','자세히 보기'));const extended=element('div','');parts.slice(1).forEach(p=>paragraphs(extended,p));more.append(extended);body.append(more);}
+    // Keep the reviewed passage closest to the question visible; the rest stays in its original order.
+    if(focus>0&&focus<parts.length)paragraphs(body,parts[focus]);
+    const rest=parts.filter((_,i)=>i>0&&i!==focus);
+    if(rest.length){const more=element('details','answer-more');more.open=!!result.expanded;more.append(element('summary','','자세히 보기'));const extended=element('div','');rest.forEach(p=>paragraphs(extended,p));more.append(extended);body.append(more);}
   }
   article.append(body);const dates=[...new Set(result.records.map(r=>r.reviewedAt).filter(Boolean))];if(dates.length)article.append(element('p','answer-reviewed','공개 자료 확인 · '+dates.sort().at(-1)));
   const sources=element('div','answer-sources');

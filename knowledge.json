@@ -1,6 +1,6 @@
 {
-  "version": "2026-09-15-selected-experiences-copy-51a335af98-lab-688c660c8c26",
-  "updatedAt": "2026-09-19",
+  "version": "2026-09-15-selected-experiences-copy-17f2ca5ffe",
+  "updatedAt": "2026-09-23",
   "docs": [
     {
       "id": "company",
@@ -34,8 +34,14 @@
         "메일 쓰기 체험과 AI 제작 가이드, K-LOFI 안내를 먼저 살펴보세요. 이 예시만으로 고객·학생의 효과가 입증되거나 다른 회사보다 우수하다고 말하지는 않습니다.",
         "현재 신규 사업자등록을 준비하고 있습니다. 등록이 완료되면 실제 등록 정보로 안내하겠습니다.",
         "하단의 © 2026 SYNK. All rights reserved.는 SYNK의 저작권 표기입니다. 작품·로고·캐릭터의 개별 이용 가능 범위는 따로 확인해 주세요.",
-        "이 홈페이지에서는 SYNK를 만드는 사람을 기획자로 소개합니다. 기획자는 회사의 방향을 정하고, AI에 맡길 일과 직접 확인할 일을 결정합니다.",
-        "SHIFT 콘텐츠에서는 실제 제작 과정과 수정한 이유를 공개합니다.",
+        "SYNK 창업자는 양유호입니다. 건축과 심리학, 퍼포먼스와 교육 현장의 경험을 연결해 SYNK를 만들고 있습니다.",
+        "배우는 이유를 찾고, 자기 생각으로 선택하고, 함께 무언가를 완성하는 경험. 기술이 그 시간을 더 많이 만들어 주기를 바랍니다. 저는 그 생각으로 SYNK를 만들고 있습니다.",
+        "홈페이지와 SHIFT 콘텐츠에서 소개하는 기획자가 창업자입니다. 회사의 방향을 정하고, AI에 맡길 일과 직접 확인할 일을 결정하며, 실제 제작 과정과 수정한 이유를 공개합니다.",
+        "창업자 양유호의 학력은 호원대학교 건축학과 · 중앙대학교 심리학과입니다. 공간과 사람을 공부한 경험, 무대와 창작 프로젝트, 교육기관 운영을 SYNK의 기획과 제작에 연결합니다.",
+        "교육 · 운영 — 2026 몽골 Skyline Edu 전 부원장 (교육 현장의 상담·수업 운영·온라인 홍보)",
+        "퍼포먼스 · 프로젝트 — 2023 RCA · Royal College of Art (영국 왕립예술대학 졸업 프로젝트 · 메인 퍼포머), 2023 드라마 「보라! 데보라」 · 넷플릭스 (1화 오프닝 시퀀스 출연), 2014 LOEN Entertainment (퍼포머)",
+        "수상 — 2019 Fine Art Photography Awards (Open Theme 부문 · Winner), 2017 MK Challenge · 매일경제 주최 (프로젝트 리더 · 준우승)",
+        "건축과 심리학을 공부하고, 무대에서 표현하고, 몽골의 교육 현장에서 일한 경험은 서로 다른 관점을 남겼습니다. 구조를 살피는 시선, 사람의 생각과 행동에 대한 관심, 함께 호흡하며 결과를 만드는 경험입니다. SYNK에서는 이 관점들을 연결해 한 사람의 목표와 상황에 맞는 도움을 설계하고 있습니다.",
         "아틀라스는 한 사람의 목표와 경험을 바탕으로 필요한 학습과 도움을 찾는 SYNK의 핵심 기술입니다. 사람을 이해하는 일부터 배울 내용과 순서를 정하고, 설명하고, 결과를 확인하는 일까지 여덟 엔진이 역할을 나눕니다.",
         "처음에는 대학 입학을 준비하던 학생도, 유학 중에는 발표나 취업 면접이 더 중요해질 수 있습니다. 아틀라스는 새로 정한 목표와 최근의 학습 결과를 함께 살펴 과제와 설명 방식을 조정하도록 개발하고 있습니다.",
         "Core — 지금 필요한 학습 판단. 무엇을 배우려는지, 어디에서 어려움을 겪는지 살펴 다음 과제와 도움의 방향을 정합니다.",
@@ -60,7 +66,7 @@
         "LAB을 중심으로 개인화 학습 기능을 개발하고 있습니다. SHIFT·PULSE·PATH는 각 서비스에 필요한 엔진을 활용합니다.\n위 설명에는 추가 예정인 Strata와 개발 중인 기능이 포함됩니다.",
         "Strata는 추가 예정인 엔진입니다."
       ],
-      "updatedAt": "2026-09-19"
+      "updatedAt": "2026-09-23"
     },
     {
       "id": "lab",
@@ -211,7 +217,7 @@
         "30분은 어떻게 사용하는 시간인가요? — 90분 수업 안에 포함된 그룹 활동 시간입니다. 별도로 더해지는 30분이나 학생 한 명이 혼자 말하는 30분을 뜻하지 않습니다. 학생들이 말하기·듣기·질문·조율을 함께 하도록 구성하고, 교사는 대화가 일부 학생에게만 쏠리지 않는지 살핍니다. 과제의 난도와 도움은 학생 수준에 맞춰 조정하되 그룹별 발화 시간은 고정으로 확보합니다.",
         "현재 준비 중인 정규 수업의 운영 기준입니다. 협동·배려·판단력은 수업에서 기르고자 하는 역량이며, 향상 정도를 측정한 결과는 아닙니다."
       ],
-      "updatedAt": "2026-09-19"
+      "updatedAt": "2026-09-23"
     },
     {
       "id": "shift",
@@ -257,7 +263,7 @@
         "최종 확인과 전달 — 실제로 사용할 환경에서 결과를 확인합니다. 합의한 범위에 따라 결과물과 원본, 사용 방법, 추가로 필요한 작업을 정리해 전달합니다.",
         "교육·컨설팅·브랜딩의 범위와 일정, 납품물은 개별 협의합니다. 아래 제작 사례는 SYNK의 자체 작업입니다."
       ],
-      "updatedAt": "2026-09-19"
+      "updatedAt": "2026-09-23"
     },
     {
       "id": "pulse",
@@ -293,7 +299,7 @@
         "기업 브랜딩은 SHIFT에서 — 회사 소개와 시각 디자인 전반을 정비하는 작업은 SHIFT가, 작품 중심의 제작과 광고 협업은 PULSE가 맡습니다.",
         "현재 공개된 작품과 준비 중인 사업은 구분해 안내합니다. 제작·이용·광고 협업의 범위와 일정은 문의로 확인해 주세요."
       ],
-      "updatedAt": "2026-09-19"
+      "updatedAt": "2026-09-23"
     },
     {
       "id": "philosophy",
@@ -312,7 +318,7 @@
         "학생이 자신의 목표와 선호를 바꾸면 교육에도 반영할 수 있어야 합니다. 학생이 한 말, 교사가 관찰한 내용, AI가 추정한 내용은 구분해 기록합니다.",
         "계획 중인 것, 만들어진 것, 실제로 쓰이고 있는 것, 효과가 확인된 것을 구분해 안내합니다."
       ],
-      "updatedAt": "2026-09-19"
+      "updatedAt": "2026-09-23"
     },
     {
       "id": "guide",
@@ -368,7 +374,7 @@
         "SYNK PATH는 한국 유학을 준비하는 외국인을 위한 학업·생활·취업 지원 브랜드입니다. 학교 선택과 한국어 학습, 면접 준비부터 졸업 후 진로까지 함께 계획합니다. LAB의 한국어 교육과 VR 연습으로 한국에서 마주할 상황을 미리 경험하고, 준비한 내용을 포트폴리오로 정리하는 서비스를 준비하고 있습니다.",
         "비전은 각 브랜드가 지향하는 미래입니다. 현재 제공·준비 상태와 이용 조건은 각 사업 안내에서 확인할 수 있습니다."
       ],
-      "updatedAt": "2026-09-19"
+      "updatedAt": "2026-09-23"
     },
     {
       "id": "path",
@@ -393,7 +399,7 @@
         "학교와 기업은 지원자를 더 자세히 알 수 있습니다 — 학생이 선택한 자료를 통해 지원 동기와 학습 과정, 프로젝트에서 맡은 역할을 살펴볼 수 있습니다. PATH는 학생의 희망 진로와 기관의 모집 조건을 확인해 학교·기업과의 연결을 준비합니다. 기관은 학생을 이해한 뒤 선발과 필요한 지원을 판단할 수 있습니다.",
         "포트폴리오는 학생이 직접 확인하고 동의한 자료만 공유합니다. 학습 기록을 자동으로 전달하지 않으며, VR 연습 결과를 경력이나 공인 자격으로 표시하지 않습니다."
       ],
-      "updatedAt": "2026-09-19"
+      "updatedAt": "2026-09-23"
     }
   ],
   "records": [
@@ -428,7 +434,7 @@
         "label": "브랜드 살펴보기",
         "href": "/#worlds"
       },
-      "reviewedAt": "2026-09-19"
+      "reviewedAt": "2026-09-23"
     },
     {
       "id": "synk-vision",
@@ -459,7 +465,7 @@
         "label": "네 브랜드 살펴보기",
         "href": "/#worlds"
       },
-      "reviewedAt": "2026-09-19"
+      "reviewedAt": "2026-09-23"
     },
     {
       "id": "synk-visions",
@@ -491,7 +497,7 @@
         "label": "각 브랜드 살펴보기",
         "href": "/#worlds"
       },
-      "reviewedAt": "2026-09-19"
+      "reviewedAt": "2026-09-23"
     },
     {
       "id": "synk-brands",
@@ -527,7 +533,7 @@
         "label": "브랜드 살펴보기",
         "href": "/#worlds"
       },
-      "reviewedAt": "2026-09-19"
+      "reviewedAt": "2026-09-23"
     },
     {
       "id": "synk-stage",
@@ -556,7 +562,7 @@
         "shift-scope",
         "pulse-listening"
       ],
-      "reviewedAt": "2026-09-19"
+      "reviewedAt": "2026-09-23"
     },
     {
       "id": "synk-choose",
@@ -589,7 +595,7 @@
         "label": "관심 사업 고르기",
         "href": "/#worlds"
       },
-      "reviewedAt": "2026-09-19"
+      "reviewedAt": "2026-09-23"
     },
     {
       "id": "lab-intro",
@@ -621,7 +627,7 @@
         "label": "LAB 살펴보기",
         "href": "/lab/"
       },
-      "reviewedAt": "2026-09-19"
+      "reviewedAt": "2026-09-23"
     },
     {
       "id": "lab-vision",
@@ -652,7 +658,7 @@
         "label": "SYNK LAB 살펴보기",
         "href": "/lab/"
       },
-      "reviewedAt": "2026-09-19"
+      "reviewedAt": "2026-09-23"
     },
     {
       "id": "lab-audience",
@@ -764,7 +770,7 @@
         "label": "권별 학습 목표 살펴보기",
         "href": "/lab/"
       },
-      "reviewedAt": "2026-09-19"
+      "reviewedAt": "2026-09-23"
     },
     {
       "id": "lab-game-demo",
@@ -802,7 +808,7 @@
         "label": "학습 기록 예시 살펴보기",
         "href": "/lab/"
       },
-      "reviewedAt": "2026-09-19"
+      "reviewedAt": "2026-09-23"
     },
     {
       "id": "lab-personalization",
@@ -838,7 +844,7 @@
         "label": "게임과 개인화 학습 살펴보기",
         "href": "/lab/#lab-personalization"
       },
-      "reviewedAt": "2026-09-19"
+      "reviewedAt": "2026-09-23"
     },
     {
       "id": "lab-personal",
@@ -866,7 +872,7 @@
         "lab-game-demo",
         "lab-learning"
       ],
-      "reviewedAt": "2026-09-19"
+      "reviewedAt": "2026-09-23"
     },
     {
       "id": "lab-culture",
@@ -944,7 +950,7 @@
         "label": "SHIFT 살펴보기",
         "href": "/shift/"
       },
-      "reviewedAt": "2026-09-19"
+      "reviewedAt": "2026-09-23"
     },
     {
       "id": "shift-vision",
@@ -975,7 +981,7 @@
         "label": "SYNK SHIFT 살펴보기",
         "href": "/shift/"
       },
-      "reviewedAt": "2026-09-19"
+      "reviewedAt": "2026-09-23"
     },
     {
       "id": "shift-audience",
@@ -1010,7 +1016,7 @@
         "label": "SHIFT 살펴보기",
         "href": "/shift/"
       },
-      "reviewedAt": "2026-09-19"
+      "reviewedAt": "2026-09-23"
     },
     {
       "id": "shift-takeaway",
@@ -1044,7 +1050,7 @@
         "label": "원본을 지키는 AI 제작법 읽기",
         "href": "/practice/"
       },
-      "reviewedAt": "2026-09-19"
+      "reviewedAt": "2026-09-23"
     },
     {
       "id": "shift-ai",
@@ -1071,7 +1077,7 @@
         "shift-making",
         "philosophy-people"
       ],
-      "reviewedAt": "2026-09-19"
+      "reviewedAt": "2026-09-23"
     },
     {
       "id": "shift-making",
@@ -1115,7 +1121,7 @@
         "label": "실제 로고 수정 사례 보기",
         "href": "/shift/#design-notes"
       },
-      "reviewedAt": "2026-09-19"
+      "reviewedAt": "2026-09-23"
     },
     {
       "id": "pulse-intro",
@@ -1149,7 +1155,7 @@
         "label": "PULSE 살펴보기",
         "href": "/pulse/"
       },
-      "reviewedAt": "2026-09-19"
+      "reviewedAt": "2026-09-23"
     },
     {
       "id": "pulse-vision",
@@ -1180,7 +1186,7 @@
         "label": "SYNK PULSE 살펴보기",
         "href": "/pulse/"
       },
-      "reviewedAt": "2026-09-19"
+      "reviewedAt": "2026-09-23"
     },
     {
       "id": "pulse-listening",
@@ -1316,7 +1322,7 @@
         "philosophy-people",
         "synk-brands"
       ],
-      "reviewedAt": "2026-09-19",
+      "reviewedAt": "2026-09-23",
       "category": "philosophy"
     },
     {
@@ -1346,7 +1352,7 @@
         "shift-services",
         "path-support"
       ],
-      "reviewedAt": "2026-09-19"
+      "reviewedAt": "2026-09-23"
     },
     {
       "id": "philosophy-people",
@@ -1549,7 +1555,7 @@
         "label": "기관·기업 문의",
         "href": "/shift/#contact-business"
       },
-      "reviewedAt": "2026-09-19"
+      "reviewedAt": "2026-09-23"
     },
     {
       "id": "synk-founder",
@@ -1576,7 +1582,7 @@
         "href": "/founder/"
       },
       "answer": "한국어 교육, AI 비즈니스, 음악과 이야기. SYNK는 개인화 시스템을 만드는 기업입니다. 한 사람의 목표와 상황을 이해하고, 그에 맞는 도움을 제공하는 시스템을 개발합니다.\n\nSHIFT에서는 기획자가 AI와 함께 회사를 만드는 과정과 그때의 판단을 소개합니다. 시도한 방법과 실패, 수정한 이유를 공개해 다른 사람도 자신의 일에 참고할 수 있게 합니다.\n\n처음 확인한 정보에 머물지 않고, 이후의 경험과 선택을 반영합니다. 목표가 바뀌거나 새로운 어려움이 생기면 학습 내용과 지원 방법도 조정합니다.",
-      "reviewedAt": "2026-09-19"
+      "reviewedAt": "2026-09-23"
     },
     {
       "id": "synk-value",
@@ -1637,27 +1643,67 @@
       "sourceId": "company",
       "brand": "synk",
       "title": "SYNK를 만드는 사람은 누구인가요?",
-      "answer": "이 홈페이지에서는 SYNK를 만드는 사람을 기획자로 소개합니다. 기획자는 회사의 방향을 정하고, AI에 맡길 일과 직접 확인할 일을 결정합니다.\n\nSHIFT 콘텐츠에서는 실제 제작 과정과 수정한 이유를 공개합니다.",
+      "answer": "SYNK 창업자는 양유호입니다. 건축과 심리학, 퍼포먼스와 교육 현장의 경험을 연결해 SYNK를 만들고 있습니다.\n\n배우는 이유를 찾고, 자기 생각으로 선택하고, 함께 무언가를 완성하는 경험. 기술이 그 시간을 더 많이 만들어 주기를 바랍니다. 저는 그 생각으로 SYNK를 만들고 있습니다.\n\n홈페이지와 SHIFT 콘텐츠에서 소개하는 기획자가 창업자입니다. 회사의 방향을 정하고, AI에 맡길 일과 직접 확인할 일을 결정하며, 실제 제작 과정과 수정한 이유를 공개합니다.",
       "questionExamples": [
         "SYNK를 만드는 사람은 누구인가요?",
         "대표 이름이 뭐예요?",
         "대표가 누구야?",
-        "기획자는 어떤 역할인가요?"
+        "기획자는 어떤 역할인가요?",
+        "창업자는 누구인가요?",
+        "대표님 이름이 뭐예요?"
       ],
       "keywords": [
         "기획자",
         "대표이름",
-        "만드는사람"
+        "만드는사람",
+        "창업자",
+        "대표",
+        "양유호"
       ],
       "relatedIds": [
+        "synk-founder-background",
         "synk-founder",
         "shift-making"
       ],
       "action": {
-        "label": "기획과 수정 사례 보기",
-        "href": "/shift/#work"
+        "label": "창업자 소개 보기",
+        "href": "/founder/"
       },
-      "reviewedAt": "2026-09-14"
+      "reviewedAt": "2026-09-23"
+    },
+    {
+      "id": "synk-founder-background",
+      "questionExamples": [
+        "창업자는 어떤 경험을 해 왔나요?",
+        "창업자 학력이 궁금해요",
+        "대표는 어느 학교를 나왔어요?",
+        "창업자 경력을 알려 주세요"
+      ],
+      "title": "창업자는 어떤 경험을 해 왔나요?",
+      "brand": "synk",
+      "sourceId": "company",
+      "keywords": [
+        "창업자",
+        "학력",
+        "경력",
+        "이력",
+        "학교",
+        "전공",
+        "수상",
+        "경험",
+        "양유호"
+      ],
+      "answer": "창업자 양유호의 학력은 호원대학교 건축학과 · 중앙대학교 심리학과입니다. 공간과 사람을 공부한 경험, 무대와 창작 프로젝트, 교육기관 운영을 SYNK의 기획과 제작에 연결합니다.\n\n교육 · 운영 — 2026 몽골 Skyline Edu 전 부원장 (교육 현장의 상담·수업 운영·온라인 홍보)\n\n퍼포먼스 · 프로젝트 — 2023 RCA · Royal College of Art (영국 왕립예술대학 졸업 프로젝트 · 메인 퍼포머), 2023 드라마 「보라! 데보라」 · 넷플릭스 (1화 오프닝 시퀀스 출연), 2014 LOEN Entertainment (퍼포머)\n\n수상 — 2019 Fine Art Photography Awards (Open Theme 부문 · Winner), 2017 MK Challenge · 매일경제 주최 (프로젝트 리더 · 준우승)\n\n건축과 심리학을 공부하고, 무대에서 표현하고, 몽골의 교육 현장에서 일한 경험은 서로 다른 관점을 남겼습니다. 구조를 살피는 시선, 사람의 생각과 행동에 대한 관심, 함께 호흡하며 결과를 만드는 경험입니다. SYNK에서는 이 관점들을 연결해 한 사람의 목표와 상황에 맞는 도움을 설계하고 있습니다.",
+      "relatedIds": [
+        "synk-planner",
+        "synk-founder",
+        "synk-intro"
+      ],
+      "action": {
+        "label": "창업자 소개 보기",
+        "href": "/founder/"
+      },
+      "reviewedAt": "2026-09-23"
     },
     {
       "id": "lab-explore",
@@ -1830,7 +1876,7 @@
         "label": "자세히 살펴보기",
         "href": "/lab/#lab-topik"
       },
-      "reviewedAt": "2026-09-19",
+      "reviewedAt": "2026-09-23",
       "category": "service"
     },
     {
@@ -1946,7 +1992,7 @@
         "label": "기관·기업 문의",
         "href": "/shift/#contact-business"
       },
-      "reviewedAt": "2026-09-19"
+      "reviewedAt": "2026-09-23"
     },
     {
       "id": "shift-results",
@@ -1974,7 +2020,7 @@
         "label": "실제 수정 사례 보기",
         "href": "/shift/#work"
       },
-      "reviewedAt": "2026-09-19"
+      "reviewedAt": "2026-09-23"
     },
     {
       "id": "shift-publicity",
@@ -2407,7 +2453,7 @@
         "label": "자세히 살펴보기",
         "href": "/shift/#shift-services"
       },
-      "reviewedAt": "2026-09-19"
+      "reviewedAt": "2026-09-23"
     },
     {
       "id": "path-support",
@@ -2442,7 +2488,7 @@
         "label": "유학·취업 문의",
         "href": "/path/#contact-pathways"
       },
-      "reviewedAt": "2026-09-19"
+      "reviewedAt": "2026-09-23"
     },
     {
       "id": "lab-philosophy",
@@ -2471,7 +2517,7 @@
         "label": "SYNK LAB 살펴보기",
         "href": "/lab/"
       },
-      "reviewedAt": "2026-09-19"
+      "reviewedAt": "2026-09-23"
     },
     {
       "id": "shift-philosophy",
@@ -2500,7 +2546,7 @@
         "label": "SYNK SHIFT 살펴보기",
         "href": "/shift/"
       },
-      "reviewedAt": "2026-09-19"
+      "reviewedAt": "2026-09-23"
     },
     {
       "id": "pulse-philosophy",
@@ -2529,7 +2575,7 @@
         "label": "SYNK PULSE 살펴보기",
         "href": "/pulse/"
       },
-      "reviewedAt": "2026-09-19"
+      "reviewedAt": "2026-09-23"
     },
     {
       "id": "path-intro",
@@ -2557,7 +2603,7 @@
         "label": "PATH 살펴보기",
         "href": "/path/"
       },
-      "reviewedAt": "2026-09-19"
+      "reviewedAt": "2026-09-23"
     },
     {
       "id": "path-vision",
@@ -2587,7 +2633,7 @@
         "label": "SYNK PATH 살펴보기",
         "href": "/path/"
       },
-      "reviewedAt": "2026-09-19"
+      "reviewedAt": "2026-09-23"
     },
     {
       "id": "path-philosophy",
@@ -2614,7 +2660,7 @@
         "label": "PATH 살펴보기",
         "href": "/path/"
       },
-      "reviewedAt": "2026-09-19"
+      "reviewedAt": "2026-09-23"
     },
     {
       "id": "lab-method",
@@ -2646,7 +2692,7 @@
         "label": "자세히 살펴보기",
         "href": "/lab/#lab-method"
       },
-      "reviewedAt": "2026-09-19"
+      "reviewedAt": "2026-09-23"
     },
     {
       "id": "lab-provides",
@@ -2675,7 +2721,7 @@
         "label": "자세히 살펴보기",
         "href": "/lab/#lab-provides"
       },
-      "reviewedAt": "2026-09-19"
+      "reviewedAt": "2026-09-23"
     },
     {
       "id": "lab-vr",
@@ -2709,7 +2755,7 @@
         "label": "자세히 살펴보기",
         "href": "/lab/#lab-vr"
       },
-      "reviewedAt": "2026-09-19"
+      "reviewedAt": "2026-09-23"
     },
     {
       "id": "shift-delivery",
@@ -2737,7 +2783,7 @@
         "label": "자세히 살펴보기",
         "href": "/shift/#shift-delivery"
       },
-      "reviewedAt": "2026-09-19"
+      "reviewedAt": "2026-09-23"
     },
     {
       "id": "pulse-content",
@@ -2764,7 +2810,7 @@
         "label": "자세히 살펴보기",
         "href": "/pulse/#pulse-content"
       },
-      "reviewedAt": "2026-09-19"
+      "reviewedAt": "2026-09-23"
     },
     {
       "id": "pulse-ip",
@@ -2794,7 +2840,7 @@
         "label": "자세히 살펴보기",
         "href": "/pulse/#pulse-ip"
       },
-      "reviewedAt": "2026-09-19"
+      "reviewedAt": "2026-09-23"
     },
     {
       "id": "pulse-advertising",
@@ -2821,7 +2867,7 @@
         "label": "자세히 살펴보기",
         "href": "/pulse/#pulse-advertising"
       },
-      "reviewedAt": "2026-09-19"
+      "reviewedAt": "2026-09-23"
     },
     {
       "id": "path-personal",
@@ -2851,7 +2897,7 @@
         "label": "자세히 살펴보기",
         "href": "/path/#path-personal"
       },
-      "reviewedAt": "2026-09-19"
+      "reviewedAt": "2026-09-23"
     },
     {
       "id": "path-journey",
@@ -2883,7 +2929,7 @@
         "label": "자세히 살펴보기",
         "href": "/path/#path-journey"
       },
-      "reviewedAt": "2026-09-19"
+      "reviewedAt": "2026-09-23"
     },
     {
       "id": "path-why",
@@ -2915,7 +2961,7 @@
         "label": "자세히 살펴보기",
         "href": "/path/#path-why"
       },
-      "reviewedAt": "2026-09-19"
+      "reviewedAt": "2026-09-23"
     },
     {
       "id": "lab-year",
@@ -2958,7 +3004,7 @@
         "label": "자세히 살펴보기",
         "href": "/lab/#lab-year"
       },
-      "reviewedAt": "2026-09-19"
+      "reviewedAt": "2026-09-23"
     },
     {
       "id": "lab-ai",
@@ -2998,7 +3044,7 @@
         "label": "자세히 살펴보기",
         "href": "/lab/#lab-ai"
       },
-      "reviewedAt": "2026-09-19"
+      "reviewedAt": "2026-09-23"
     },
     {
       "id": "lab-languages",
@@ -3038,7 +3084,7 @@
         "label": "자세히 살펴보기",
         "href": "/lab/#lab-languages"
       },
-      "reviewedAt": "2026-09-19"
+      "reviewedAt": "2026-09-23"
     },
     {
       "id": "lab-language-use",
@@ -3076,7 +3122,7 @@
         "label": "자세히 살펴보기",
         "href": "/lab/#lab-language-use"
       },
-      "reviewedAt": "2026-09-19"
+      "reviewedAt": "2026-09-23"
     },
     {
       "id": "lab-ai-practice",
@@ -3112,7 +3158,7 @@
         "label": "자세히 살펴보기",
         "href": "/lab/#lab-ai-practice"
       },
-      "reviewedAt": "2026-09-19"
+      "reviewedAt": "2026-09-23"
     },
     {
       "id": "lab-class",
@@ -3148,7 +3194,7 @@
         "label": "자세히 살펴보기",
         "href": "/lab/#lab-class"
       },
-      "reviewedAt": "2026-09-19"
+      "reviewedAt": "2026-09-23"
     },
     {
       "id": "synk-atlas",
@@ -3187,7 +3233,7 @@
         "label": "아틀라스 살펴보기",
         "href": "/#atlas"
       },
-      "reviewedAt": "2026-09-19"
+      "reviewedAt": "2026-09-23"
     },
     {
       "id": "atlas-core",
@@ -3213,7 +3259,7 @@
         "label": "여덟 엔진 살펴보기",
         "href": "/#atlas"
       },
-      "reviewedAt": "2026-09-19"
+      "reviewedAt": "2026-09-23"
     },
     {
       "id": "atlas-loom",
@@ -3239,7 +3285,7 @@
         "label": "여덟 엔진 살펴보기",
         "href": "/#atlas"
       },
-      "reviewedAt": "2026-09-19"
+      "reviewedAt": "2026-09-23"
     },
     {
       "id": "atlas-vellum",
@@ -3265,7 +3311,7 @@
         "label": "여덟 엔진 살펴보기",
         "href": "/#atlas"
       },
-      "reviewedAt": "2026-09-19"
+      "reviewedAt": "2026-09-23"
     },
     {
       "id": "atlas-trail",
@@ -3291,7 +3337,7 @@
         "label": "여덟 엔진 살펴보기",
         "href": "/#atlas"
       },
-      "reviewedAt": "2026-09-19"
+      "reviewedAt": "2026-09-23"
     },
     {
       "id": "atlas-prism",
@@ -3317,7 +3363,7 @@
         "label": "여덟 엔진 살펴보기",
         "href": "/#atlas"
       },
-      "reviewedAt": "2026-09-19"
+      "reviewedAt": "2026-09-23"
     },
     {
       "id": "atlas-temper",
@@ -3343,7 +3389,7 @@
         "label": "여덟 엔진 살펴보기",
         "href": "/#atlas"
       },
-      "reviewedAt": "2026-09-19"
+      "reviewedAt": "2026-09-23"
     },
     {
       "id": "atlas-reed",
@@ -3369,7 +3415,7 @@
         "label": "여덟 엔진 살펴보기",
         "href": "/#atlas"
       },
-      "reviewedAt": "2026-09-19"
+      "reviewedAt": "2026-09-23"
     },
     {
       "id": "atlas-strata",
@@ -3395,7 +3441,7 @@
         "label": "여덟 엔진 살펴보기",
         "href": "/#atlas"
       },
-      "reviewedAt": "2026-09-19"
+      "reviewedAt": "2026-09-23"
     }
   ],
   "visions": {

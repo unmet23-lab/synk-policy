@@ -1,5 +1,5 @@
-import {createKnowledgeEngine} from '/en/knowledge-engine.js?v=e98afdd971b5';
-import {appendPublicActions} from '/public-actions.js?v=90c3c70f27';
+import {createKnowledgeEngine} from '/en/knowledge-engine.js?v=1b57969889d9';
+import {appendPublicActions} from '/public-actions.js?v=4ee8278a4f';
 const $=s=>document.querySelector(s);
 const conversation=$('#questions'),form=$('#question-form'),input=$('#question'),send=$('#send'),messages=$('#messages'),dialog=$('#document-dialog');
 const initialContext=()=>({brand:['lab','shift','pulse','path'].includes(document.body.dataset.site)?document.body.dataset.site:'synk'});
@@ -20,7 +20,7 @@ function paragraphs(parent,text){String(text).split(/\n\n/).forEach(p=>parent.ap
 let pending=null;
 function startKnowledge(){
  if(pending)return pending;
- pending=fetch('/en/knowledge.json?v=01b8c06d83c2').then(r=>{if(!r.ok)throw new Error("Public information could not be loaded.");return r.json();}).then(data=>{
+ pending=fetch('/en/knowledge.json?v=1b57969889d9').then(r=>{if(!r.ok)throw new Error("Public information could not be loaded.");return r.json();}).then(data=>{
   engine=createKnowledgeEngine(data);return engine;
 }).catch(error=>{console.error('Public notes unavailable');$('#answer-note').textContent="Public information could not be loaded. Send a question to try again.";throw error;});
 // A background failure should not become an unhandled rejection before anyone asks.
@@ -30,7 +30,7 @@ function startKnowledge(){
 if(document.body.dataset.site!=='synk'||document.documentElement.dataset.entryView!=='intro')startKnowledge();
 else document.addEventListener('synk:company-view',startKnowledge,{once:true});
 
-async function getEngine(){if(engine)return engine;try{return await startKnowledge();}catch{const r=await fetch('/en/knowledge.json?v=01b8c06d83c2',{cache:'reload'});if(!r.ok)throw new Error("Public information could not be loaded. Please try again shortly.");engine=createKnowledgeEngine(await r.json());$('#answer-note').textContent=readyNote;return engine;}}
+async function getEngine(){if(engine)return engine;try{return await startKnowledge();}catch{const r=await fetch('/en/knowledge.json?v=1b57969889d9',{cache:'reload'});if(!r.ok)throw new Error("Public information could not be loaded. Please try again shortly.");engine=createKnowledgeEngine(await r.json());$('#answer-note').textContent=readyNote;return engine;}}
 function showAnswers(){document.dispatchEvent(new Event('synk:show-answers'));}
 function enterChat(){showAnswers();conversation.classList.add('is-chatting');$('#introduction').hidden=true;$('#chat-area').hidden=false;}
 function focusQuestion(){showAnswers();input.focus({preventScroll:true});if(!conversation.closest('.orb-help'))(conversation.closest('.help-frame')||conversation).scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth',block:'start'});}
@@ -42,9 +42,12 @@ function appendAnswer(result){
   if(result.message)paragraphs(body,result.message);
   for(const record of result.records){
     if(result.records.length>1)body.append(element('h3','',record.title));
-    const parts=record.answer.split(/\n\n/);
+    const parts=record.answer.split(/\n\n/),focus=result.focus?.[record.id];
     paragraphs(body,parts[0]);
-    if(parts.length>1){const more=element('details','answer-more');more.open=!!result.expanded;more.append(element('summary','',"Read more"));const extended=element('div','');parts.slice(1).forEach(p=>paragraphs(extended,p));more.append(extended);body.append(more);}
+    // Keep the reviewed passage closest to the question visible; the rest stays in its original order.
+    if(focus>0&&focus<parts.length)paragraphs(body,parts[focus]);
+    const rest=parts.filter((_,i)=>i>0&&i!==focus);
+    if(rest.length){const more=element('details','answer-more');more.open=!!result.expanded;more.append(element('summary','',"Read more"));const extended=element('div','');rest.forEach(p=>paragraphs(extended,p));more.append(extended);body.append(more);}
   }
   article.append(body);const dates=[...new Set(result.records.map(r=>r.reviewedAt).filter(Boolean))];if(dates.length)article.append(element('p','answer-reviewed',"Public information reviewed · "+dates.sort().at(-1)));
   const sources=element('div','answer-sources');
