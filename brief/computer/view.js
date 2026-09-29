@@ -22,9 +22,18 @@
   }
   const reasonLi = x => `<li>${esc(x.t)}${badge(x.src)}</li>`;
 
+  // 첫 화면: 승인 펠트 노트북 위에 펠트 스티커를 붙인 콜라주(v3 리디자인).
   function hero() {
-    return '<img src="assets/laptop-felt.webp" width="320" height="320" alt="">';
+    return '<div class="collage"><span class="spark"></span><img class="main" src="assets/laptop-felt.webp" width="320" height="320" alt=""><img class="stk s1" src="assets/sticker-time.webp" alt=""><img class="stk s2" src="assets/sticker-search.webp" alt=""><img class="stk s3" src="assets/sticker-check.webp" alt=""></div>';
   }
+  // 제목에서 한 구절을 손그림 형광펜으로 강조한다. 없으면 그대로 둔다.
+  function marked(title, marks) {
+    const t = esc(title);
+    for (const m of marks) { const e = esc(m); const i = t.indexOf(e); if (m && i >= 0) return `${t.slice(0, i)}<span class="hl">${e}</span>${t.slice(i + e.length)}`; }
+    return t;
+  }
+  const sticker = (name, r) => `<img class="stk" src="assets/sticker-${name}.webp" alt=""${r ? ` style="--r:${r}deg"` : ''}>`;
+  const head = (no, title, stk, r) => `<h2><span class="no">${String(no).padStart(2, '0')}</span>${esc(title)}${stk ? sticker(stk, r) : ''}</h2>`;
 
   // 책상(램) 한 장: 올린 물건이 책상보다 크면 넘친 만큼을 서랍(SSD) 줄로 보여 준다.
   function desk(blocks, deskGB) {
@@ -136,11 +145,11 @@
     return lines.join('\n');
   }
 
-  function tipCards(rec, content, layout) {
+  function tipCards(rec, content, layout, h2) {
     const tips = content.TIPS || {};
     const ids = rec.tips.filter(id => tips[id]);
     if (!ids.length) return '';
-    return `<section class="block"><h2>나에게 필요한 팁</h2><p class="sub">추천에 들어간 부품마다 무엇인지, 왜 필요하고 왜 비싼지, 신경 쓰지 않아도 되는 건 무엇인지 골라 드렸어요.</p><div class="tipcards">${ids.map((id, i) => {
+    return `<section class="block">${h2}<p class="sub">추천에 들어간 부품마다 무엇인지, 왜 필요하고 왜 비싼지, 신경 쓰지 않아도 되는 건 무엇인지 골라 드렸어요.</p><div class="tipcards">${ids.map((id, i) => {
       const t = tips[id];
       const open = layout === 'deep' || (layout === 'guided' && i === 0);
       return `<details class="tipcard"${open ? ' open' : ''}><summary>${esc(t.title)}</summary><div class="tipbody">${t.body.map(p => `<p>${esc(p)}</p>`).join('')}<p class="tipsrc">${[...new Set(t.src)].map(badge).join(' ')}</p></div></details>`;
@@ -159,6 +168,8 @@
       ...rec.os.conflicts.map(x => `<div class="warn">${esc(x.t)}${badge(x.src)}</div>`),
       rec.budget.warn ? '<div class="warn"><b>예산보다 높은 조건일 가능성이 커요.</b> 고른 작업에 맞추면 보통 고가 장비예요. 아래 ‘돈 아끼는 방법’을 먼저 보세요.</div>' : '',
     ].join('');
+    let n = 0;
+    const H = (title, stk, r) => head(++n, title, stk, r);
 
     const f = rec.form;
     const formTitle = f.pick === 'desktop' ? `데스크톱을 추천해요 · ${rec.product}` : `노트북을 추천해요 · ${rec.product}`;
@@ -176,26 +187,28 @@
       `<div class="spec"><p class="k">NPU(‘AI PC’)</p><p class="v small">${esc(rec.npu.title)}</p>${npuExtra}</div>`,
     ].join('');
 
-    const money = quick ? '' : `<section class="block"><h2>돈 쓰는 순서</h2><p class="sub">같은 돈이면 여기에 먼저 쓰세요.</p><ol class="money">${rec.money.map(reasonLi).join('')}</ol></section>`;
+    const money = quick ? '' : `<section class="block">${H('돈 쓰는 순서', 'adapt', -6)}<p class="sub">같은 돈이면 여기에 먼저 쓰세요.</p><ol class="money">${rec.money.map(reasonLi).join('')}</ol></section>`;
 
     const deskList = [...new Set([8, 16, 32, 64, rec.ram.value, rec.ram.roomy])].sort((a, b) => a - b);
-    const deskSection = quick ? '' : `<section class="block"><h2>램을 책상으로 보면</h2><p class="sub">고른 작업을 한꺼번에 펼쳤을 때예요. 용량을 눌러 8GB 책상과 비교해 보세요.</p><div class="desk-card"><p class="big">약 ${fmt(rec.used)}GB <small>→ 가성비 ${rec.ram.value}GB</small></p><div data-tiers data-list="${deskList.join(',')}">${tiersInner(rec, root.SynkComputerRules, rec.ram.value, deskList)}</div>${legend(rec.blocks)}<p class="cap">그림의 GB는 이해를 돕는 대략값이에요. 추천 용량은 공식 사양과 SYNK 판단으로 정했어요.</p></div></section>`;
+    const tipsHtml = tipCards(rec, content, layout, H('나에게 필요한 팁', 'search', 7));
+    const currentHead = rec.current ? H('지금 컴퓨터는?', 'time', 6) : '';
+    const deskSection = quick ? '' : `<section class="block">${H('램을 책상으로 보면')}<p class="sub">고른 작업을 한꺼번에 펼쳤을 때예요. 용량을 눌러 8GB 책상과 비교해 보세요.</p><div class="desk-card"><p class="big">약 ${fmt(rec.used)}GB <small>→ 가성비 ${rec.ram.value}GB</small></p><div data-tiers data-list="${deskList.join(',')}">${tiersInner(rec, root.SynkComputerRules, rec.ram.value, deskList)}</div>${legend(rec.blocks)}<p class="cap">그림의 GB는 이해를 돕는 대략값이에요. 추천 용량은 공식 사양과 SYNK 판단으로 정했어요.</p></div></section>`;
 
     const cur = rec.current;
-    const currentSection = !cur ? '' : `<section class="block"><h2>지금 컴퓨터는?</h2><span class="verdict ${cur.verdict}">${VERDICT[cur.verdict]}</span><ul class="why">${cur.reasons.map(reasonLi).join('')}</ul>${cur.can.length ? `<h3 style="font-size:17px;margin:18px 0 8px">지금 컴퓨터로 할 수 있는 일</h3><ul class="why">${cur.can.map(c => `<li><b>${CAN[c.level][0]}</b> ${esc(c.label)} · ${CAN[c.level][1]}</li>`).join('')}</ul>` : ''}${quick ? '' : `<h3 style="font-size:17px;margin:18px 0 8px">해 볼 것</h3><ul class="why">${cur.actions.map(reasonLi).join('')}</ul>`}</section>`;
+    const currentSection = !cur ? '' : `<section class="block">${currentHead}<span class="verdict ${cur.verdict}">${VERDICT[cur.verdict]}</span><ul class="why">${cur.reasons.map(reasonLi).join('')}</ul>${cur.can.length ? `<h3 style="font-size:17px;margin:18px 0 8px">지금 컴퓨터로 할 수 있는 일</h3><ul class="why">${cur.can.map(c => `<li><b>${CAN[c.level][0]}</b> ${esc(c.label)} · ${CAN[c.level][1]}</li>`).join('')}</ul>` : ''}${quick ? '' : `<h3 style="font-size:17px;margin:18px 0 8px">해 볼 것</h3><ul class="why">${cur.actions.map(reasonLi).join('')}</ul>`}</section>`;
 
-    const take = `<section class="block"><h2>가져가기</h2><p class="sub">결과가 담긴 프롬프트를 AI에 붙여 넣으면, 오늘 살 수 있는 모델을 가성비 순서로 찾아 줘요.</p><div class="copybox"><label for="t-prompt">AI에게 붙여 넣을 프롬프트</label><textarea id="t-prompt" readonly spellcheck="false">${esc(rec.prompt)}</textarea><div class="row"><button type="button" class="btn primary" data-action="copy:prompt">프롬프트 복사</button><span class="status" role="status"></span></div></div><div class="copybox"><label for="t-store">매장·상담에서 이렇게 말하세요</label><textarea id="t-store" readonly spellcheck="false" style="min-height:120px">${esc(rec.store)}</textarea><div class="row"><button type="button" class="btn soft" data-action="copy:store">문장 복사</button><span class="status" role="status"></span></div></div></section>`;
+    const take = `<section class="block">${H('가져가기', 'envelope', 8)}<p class="sub">결과가 담긴 프롬프트를 AI에 붙여 넣으면, 오늘 살 수 있는 모델을 가성비 순서로 찾아 줘요.</p><div class="copybox main"><label for="t-prompt">AI에게 붙여 넣을 프롬프트</label><textarea id="t-prompt" readonly spellcheck="false">${esc(rec.prompt)}</textarea><div class="row"><button type="button" class="btn primary" data-action="copy:prompt">프롬프트 복사</button><span class="status" role="status"></span></div></div><div class="copybox"><label for="t-store">매장·상담에서 이렇게 말하세요</label><textarea id="t-store" readonly spellcheck="false" style="min-height:120px">${esc(rec.store)}</textarea><div class="row"><button type="button" class="btn soft" data-action="copy:store">문장 복사</button><span class="status" role="status"></span></div></div></section>`;
 
-    const checklist = quick ? '' : `<section class="block"><h2>매장에서 확인할 것</h2><p class="sub">체크한 내용은 이 기기에 남아요.</p><ul class="checks">${rec.checklist.map(c => `<li><label><input type="checkbox" data-check="${esc(c.id)}"${checks[c.id] ? ' checked' : ''}><span><b>${esc(c.t)}</b><small>${esc(c.d)}</small></span></label></li>`).join('')}</ul></section>`;
+    const checklist = quick ? '' : `<section class="block">${H('매장에서 확인할 것', 'check', -8)}<p class="sub">체크한 내용은 이 기기에 남아요.</p><ul class="checks">${rec.checklist.map(c => `<li><label><input type="checkbox" data-check="${esc(c.id)}"${checks[c.id] ? ' checked' : ''}><span><b>${esc(c.t)}</b><small>${esc(c.d)}</small></span></label></li>`).join('')}</ul></section>`;
 
-    const moneySave = (deep || rec.budget.warn || rec.budget.tight) && (rec.budget.alternatives.length || rec.budget.tips.length) ? `<section class="block"><h2>돈 아끼는 방법</h2><ul class="why">${[...rec.budget.tips, ...rec.budget.alternatives].map(reasonLi).join('')}</ul></section>` : '';
+    const moneySave = (deep || rec.budget.warn || rec.budget.tight) && (rec.budget.alternatives.length || rec.budget.tips.length) ? `<section class="block">${H('돈 아끼는 방법')}<ul class="why">${[...rec.budget.tips, ...rec.budget.alternatives].map(reasonLi).join('')}</ul></section>` : '';
 
-    const explainer = deep ? `<section class="block"><h2>램 용량별로 할 수 있는 일</h2><p class="sub">웹 AI는 서버가 계산하니 램은 탭만큼만 필요해요. 내 컴퓨터에 설치한 AI는 모델 전체를 메모리에 올려야 해서, 모델 크기만큼 더 필요해요.</p><div class="desk-card"><div data-tiers data-list="${TIER_LIST.join(',')}">${tiersInner(rec, root.SynkComputerRules, 16, TIER_LIST)}</div></div></section>` : '';
+    const explainer = deep ? `<section class="block">${H('램 용량별로 할 수 있는 일', 'book', 5)}<p class="sub">웹 AI는 서버가 계산하니 램은 탭만큼만 필요해요. 내 컴퓨터에 설치한 AI는 모델 전체를 메모리에 올려야 해서, 모델 크기만큼 더 필요해요.</p><div class="desk-card"><div data-tiers data-list="${TIER_LIST.join(',')}">${tiersInner(rec, root.SynkComputerRules, 16, TIER_LIST)}</div></div></section>` : '';
 
-    const saveRow = `<section class="block"><h2>저장하고 다시 보기</h2><div class="take"><button type="button" class="btn soft" data-action="share">내 결과 링크 복사</button><button type="button" class="btn soft" data-action="copy:all">결과 전체 복사</button><button type="button" class="btn soft" data-action="print">PDF로 저장·인쇄</button><a class="btn soft" href="${esc(content.guidePdf)}" target="_blank" rel="noopener">설명서 PDF 받기</a><span class="status" role="status" style="flex-basis:100%"></span></div><p class="hint">인스타그램 안에서 열었다면 오른쪽 위 메뉴에서 ‘외부 브라우저로 열기’를 누르면 저장이 더 잘 돼요.</p></section>`;
+    const saveRow = `<section class="block">${H('저장하고 다시 보기')}<div class="take"><button type="button" class="btn soft" data-action="share">내 결과 링크 복사</button><button type="button" class="btn soft" data-action="copy:all">결과 전체 복사</button><button type="button" class="btn soft" data-action="print">PDF로 저장·인쇄</button><a class="btn soft" href="${esc(content.guidePdf)}" target="_blank" rel="noopener">설명서 PDF 받기</a><span class="status" role="status" style="flex-basis:100%"></span></div><p class="hint">인스타그램 안에서 열었다면 오른쪽 위 메뉴에서 ‘외부 브라우저로 열기’를 누르면 저장이 더 잘 돼요.</p></section>`;
 
     const fbMsg = { helpful: '고마워요. 다음에도 이렇게 보여 드릴게요.', too_much: '알겠어요. 다음에 이 기기에서 열면 간단히 보여 드릴게요.', want_more: '알겠어요. 다음에 이 기기에서 열면 자세히 보여 드릴게요.', not_fit: '알려 주셔서 고마워요. 어떤 점이 안 맞았는지 synkbrief 댓글이나 DM으로 알려 주시면 다음 버전에 반영할게요.' };
-    const fb = `<section class="block"><h2>이 추천, 도움이 됐나요?</h2><div class="fb" role="group" aria-label="추천에 대한 반응">${[['helpful', '도움이 됐어요'], ['too_much', '너무 많아요'], ['want_more', '더 자세히 알고 싶어요'], ['not_fit', '나와 안 맞아요']].map(([id, t]) => `<button type="button" class="glass chip" aria-pressed="${feedbackGiven === id}" data-action="feedback:${id}"${feedbackGiven ? ' disabled' : ''}>${t}</button>`).join('')}</div><p class="fbnote">${feedbackGiven ? esc(fbMsg[feedbackGiven]) : '답은 이 기기에만 저장되고, 다음에 이 도구를 열 때 보여 주는 분량에 반영돼요.'}</p></section>`;
+    const fb = `<section class="block">${H('이 추천, 도움이 됐나요?')}<div class="fb" role="group" aria-label="추천에 대한 반응">${[['helpful', '도움이 됐어요'], ['too_much', '너무 많아요'], ['want_more', '더 자세히 알고 싶어요'], ['not_fit', '나와 안 맞아요']].map(([id, t]) => `<button type="button" class="glass chip" aria-pressed="${feedbackGiven === id}" data-action="feedback:${id}"${feedbackGiven ? ' disabled' : ''}>${t}</button>`).join('')}</div><p class="fbnote">${feedbackGiven ? esc(fbMsg[feedbackGiven]) : '답은 이 기기에만 저장되고, 다음에 이 도구를 열 때 보여 주는 분량에 반영돼요.'}</p></section>`;
 
     const used = new Set(['trendforce']);
     const tipBank = content.TIPS || {};
@@ -205,9 +218,9 @@
     const sourcesBox = `<details class="sources"${deep ? ' open' : ''}><summary>출처와 기준 (${esc(content.checked)} 확인)</summary><ul>${srcList.map(([, s]) => `<li><span class="src ${esc(s.kind)}">${KIND_TEXT[s.kind]}</span> ${s.url ? `<a href="${esc(s.url)}" target="_blank" rel="noopener">${esc(s.label)}</a>` : esc(s.label)}</li>`).join('')}</ul><p style="font-size:14px;color:var(--muted)">제품 순위나 오늘 가격을 알려 주는 서비스가 아니에요. 공식 사양과 SYNK 판단으로 필요한 사양을 가성비 기준으로 계산해요. 가격은 프롬프트로 AI에게 오늘 기준으로 확인하세요.</p></details>`;
 
     const editable = content.steps.filter(s => !s.when || s.when(ctx.answers)).map(s => `<button type="button" class="glass chip" data-action="edit:${esc(s.id)}">${esc(s.short || s.eyebrow || s.title)}</button>`).join('');
-    const edit = `<section class="block no-print"><h2>답 바꿔 보기</h2><p class="sub">하나만 바꿔도 결과가 다시 계산돼요.</p><div class="take">${editable}</div></section>`;
+    const edit = `<section class="block no-print">${H('답 바꿔 보기')}<p class="sub">하나만 바꿔도 결과가 다시 계산돼요.</p><div class="take">${editable}</div></section>`;
 
-    const html = `<article class="result"><header class="r-top"><p class="eyebrow">${esc(content.series)} · 나의 가성비 추천</p><h1 id="q" tabindex="-1">${esc(rec.headline.title)}</h1><p>${esc(rec.headline.sub)}</p>${because ? `<p class="because">${esc(because)}</p>` : ''}</header><div class="layout"><span>보기</span><div class="seg" role="radiogroup" aria-label="결과 분량">${seg}</div></div>${warns}${formBox}<div class="specs">${specs}</div>${money}${tipCards(rec, content, layout)}${currentSection}${deskSection}${take}${checklist}${moneySave}${explainer}${saveRow}${fb}${edit}${sourcesBox}<div class="nav no-print"><button type="button" class="btn ghost" data-action="restart">처음부터 다시</button></div></article>`;
+    const html = `<article class="result"><header class="r-top${rec.budget.warn || rec.os.conflicts.length ? '' : ' cheer'}"><p class="rec"><span class="stamp">${esc(content.checked.replace(/-/g, '.'))} 기준</span><span>${esc(content.series)} · 나의 가성비 추천</span></p><h1 id="q" tabindex="-1">${marked(rec.headline.title, [`램 ${rec.ram.value}GB`, '시작해도 돼요', '느린 원인부터'])}</h1><p>${esc(rec.headline.sub)}</p>${because ? `<p class="because">${esc(because)}</p>` : ''}<figure class="shot" aria-hidden="true"><img src="assets/laptop-felt.webp" alt=""></figure></header><div class="layout"><span>보기</span><div class="seg" role="radiogroup" aria-label="결과 분량">${seg}</div></div>${warns}${formBox}<div class="specs">${specs}</div>${money}${tipsHtml}${currentSection}${deskSection}${take}${checklist}${moneySave}${explainer}${saveRow}${fb}${edit}${sourcesBox}<div class="nav no-print"><button type="button" class="btn ghost" data-action="restart">처음부터 다시</button></div><div class="dock no-print" role="group" aria-label="바로 쓰기"><button type="button" class="btn primary" data-proxy="copy:prompt">프롬프트 복사</button><button type="button" class="btn soft" data-proxy="share">내 결과 링크</button></div></article>`;
     return { html, texts: { prompt: rec.prompt, store: rec.store, all: summaryText(rec, content) } };
   }
 
