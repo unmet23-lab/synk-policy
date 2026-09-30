@@ -1,5 +1,5 @@
 {
-  "version": "2026-09-15-selected-experiences-copy-26d6f024e7-en-3a8fa1f491e6",
+  "version": "rhythm-47d28f1cb32f",
   "updatedAt": "2026-10-01",
   "docs": [
     {
@@ -86,21 +86,22 @@
         "The learning goals for each Synapse Core book are:\nBook 1 · TOPIK Level 1 — Read Hangul and introduce yourself.\nBook 2 · TOPIK Level 2 — Build basic sentence patterns for everyday conversation.\nBook 3 · TOPIK Levels 2–3 — Talk naturally about familiar everyday situations.\nBook 4 · TOPIK Level 3 — Share your opinion and explain your reasons.\nBook 5 · TOPIK Levels 3–4 — Explain your views on social issues.\nBook 6 · TOPIK Levels 4–5 — Discuss specialist and abstract topics.",
         "Synapse Talk Book 1 covers beginner conversation and connects with Core Books 1–2. Book 2 covers intermediate conversation and connects with Core Books 3–5. The conversation books cover material through TOPIK Level 4.",
         "The levels indicate each book’s learning goals, not a guarantee of passing. The manuscripts are complete, but final review and publication are still in preparation. Publication dates and access details will be announced separately.",
-        "The correction reply screen on this website illustrates a learning app in development. It does not show actual student records or learning outcomes.",
-        "In this situation, you ask your professor for an assignment extension. The original sentence, “3일만 더 주세요.” (Please give me just three more days), stays unchanged, and the corrected sentence is recorded separately.",
-        "The sample correction is “제출 기한을 3일만 더 연장해 주시면 감사하겠습니다.” (I would appreciate it if you could extend the deadline by just three days). Replies are reviewed by a person and may take several days to arrive.",
-        "If you choose to practice again after reading the reply, you try a new task in the next game. Select Original, Correction reply, and Next practice to explore this process. In the email-writing experience currently available, you write and revise your own text without automatic correction.",
+        "Words in Rhythm is a reading-focused prototype: play music while choosing the meaning of short Korean sentences. Use the D, F, J, and K keys or the four on-screen buttons.",
+        "Practise finding times, places, and changed information; understanding cause and effect, contrast, and purpose; recognising paraphrases; and reading conditions such as “instead of” and negation accurately. The game is designed to practise foundations of TOPIK reading.",
+        "There are three original tracks, three rhythm difficulties, combos, and hold notes. Each song includes five meaning decisions, with regular notes kept out of the reading interval. Answer positions change each round.",
+        "Timing and Korean answers are checked separately. After a song, review explanations and try new sentence variations. Website captures show actual test play, not student learning outcomes.",
+        "Long passages, inference, listening, speaking, writing, and student accounts are not included. Learning gains and TOPIK score changes have not been tested with learners. Records stay within the open page and disappear on refresh.",
         "Use Korean learned from textbooks in games. LAB is developing an app that adjusts subsequent tasks and feedback using students’ answers and the areas where they needed help.",
-        "Practice Korean you will use. We turn situations that require Korean—such as writing a request email to a professor—into games. Students choose expressions that fit the situation, then write and revise their own sentences.",
+        "Practise Korean for real situations. We create games where understanding Korean drives the action, such as choosing a sentence’s meaning while playing a rhythm track. The current public activity focuses on short-sentence reading and meaning decisions.",
         "We create games with clear roles and goals, based on grammar from Synapse Core and conversations from Synapse Talk. Scenes and characters help students understand the situation and take part themselves.",
-        "In the website’s email-writing experience, you write first and can ask for hints if you get stuck. Compare your first and revised drafts to see what changed.",
+        "In Words in Rhythm, read a sentence and choose an answer from four lanes. Check timing and Korean answers separately, then try a new sentence after the song.",
         "We are developing a way to record sentences written and answers chosen in games, so they can inform later practice and feedback.",
         "Find a way of learning that suits you. We first ask why students are learning Korean and how they prefer to study. We consider their answers, revisions, and teacher observations together to understand their strengths and difficulties.",
         "At the start, we ask about learning goals, the preferred order of explanations, when hints are needed, and how students want to receive feedback.",
         "We distinguish what students tell us, actual learning records, and AI inferences. We do not judge personality or ability from a single choice or favorite character.",
         "We are preparing settings that can change as goals or study preferences change. Students will be able to correct anything the app has misunderstood.",
         "Tasks adapt to your learning record. We are developing an app that adjusts task topics, hints, and feedback to learners’ goals and records. It is designed to revisit difficult expressions and check whether students can use them without help.",
-        "We are preparing an approach that shows examples first to students who prefer them, and grammar explanations first to those who want the rule. On this website, you can write your own text, choose the hints you need, and compare your revision with your first draft.",
+        "We are preparing an app that adapts examples, grammar explanations, hints, and feedback to the learner. In the current public rhythm game, choose a song and rhythm difficulty, then view explanations and practise with new sentences.",
         "We record first drafts, revisions, and hint use separately. The design lets teachers review AI summaries alongside the student’s actual circumstances and arrange further practice of difficult expressions in a new task.",
         "We are developing an app that brings together mascot guidance, today’s task, feedback, and learning records. Practice informs the next task and its feedback.",
         "Preparing a Korean patent application. Application planned for 2028.",
@@ -120,8 +121,8 @@
         "Has research directly compared exercise and language learning? — A 2007 study by Winter and colleagues compared new vocabulary learning among 27 healthy participants after intense running, low-intensity running, and rest. We refer to it as experimental evidence that exercise conditions can affect vocabulary learning. LAB does not use it as proof of K-POP class outcomes or to claim the same improvement rate for every learner.",
         "You can explore LAB even if you have not decided to study abroad. You can start by exploring a subject that interests you, life in Korea, or something you would like to do in Korean.",
         "We are preparing education that helps learners find the information they need and choose their own direction. Check each program’s information for eligibility and participation requirements.",
-        "You can try writing an email to a professor on this website. Read the situation, choose one of three companions for help, and write your own request email. This is part of SYNK WORLD’s functionality. Your message is not sent to a real professor.",
-        "If you are new to Korean, start by looking at the situation guide and hints. Please contact us separately about the starting level and eligibility for regular classes. Tell us your learning goals and current level.",
+        "You can play Words in Rhythm on the website. This reading-focused prototype combines music with short Korean sentences and meaning choices. Choose your song and rhythm difficulty.",
+        "If you are new to Korean, learn Hangul and basic vocabulary before starting with an easy track. Please enquire about course entry levels and availability, sharing your learning goal and current level.",
         "Adults are also among LAB’s intended learners. LAB is preparing education for everyone who wants to learn Korean. Available programs, levels, and class formats will be announced for each program.",
         "This does not mean regular online classes are currently running. Share your learning goals and available times through the contact form or hello@synk.im to check preparation status and participation requirements.",
         "We are preparing classes in which teachers understand students and determine their learning direction. AI assists with tasks such as organizing records and materials.",
@@ -854,30 +855,29 @@
     },
     {
       "id": "lab-game-demo",
-      "title": "How do learning records connect in the Korean letter-writing game?",
+      "title": "What Korean skills does the rhythm game practise?",
       "brand": "lab",
       "category": "learning",
       "keywords": [
-        "letter-writing game",
-        "games",
-        "learning records",
-        "original text",
-        "correction reply",
-        "next practice",
-        "game day",
-        "example",
-        "several days"
+        "rhythm",
+        "words in rhythm",
+        "game",
+        "TOPIK",
+        "reading",
+        "meaning",
+        "grammar",
+        "learning",
+        "review",
+        "combo"
       ],
       "questionExamples": [
-        "How do learning records connect in the Korean letter-writing game?",
-        "How does the Korean letter-writing game work?",
-        "How do the original text and correction reply connect in LAB’s game?",
-        "Does the website show real learning records?",
-        "Does the game’s correction reply arrive immediately?",
-        "What happens after a correction in the letter-writing game?",
-        "Explain the Korean letter-writing game example"
+        "What Korean skills does the rhythm game practise?",
+        "How do I play Words in Rhythm?",
+        "What learning skills does the rhythm game target?",
+        "Does this help with TOPIK reading?",
+        "Does my rhythm score show my Korean level?"
       ],
-      "answer": "The correction reply screen on this website illustrates a learning app in development. It does not show actual student records or learning outcomes.\n\nIn this situation, you ask your professor for an assignment extension. The original sentence, “3일만 더 주세요.” (Please give me just three more days), stays unchanged, and the corrected sentence is recorded separately.\n\nThe sample correction is “제출 기한을 3일만 더 연장해 주시면 감사하겠습니다.” (I would appreciate it if you could extend the deadline by just three days). Replies are reviewed by a person and may take several days to arrive.\n\nIf you choose to practice again after reading the reply, you try a new task in the next game. Select Original, Correction reply, and Next practice to explore this process. In the email-writing experience currently available, you write and revise your own text without automatic correction.",
+      "answer": "Words in Rhythm is a reading-focused prototype: play music while choosing the meaning of short Korean sentences. Use the D, F, J, and K keys or the four on-screen buttons.\n\nPractise finding times, places, and changed information; understanding cause and effect, contrast, and purpose; recognising paraphrases; and reading conditions such as “instead of” and negation accurately. The game is designed to practise foundations of TOPIK reading.\n\nThere are three original tracks, three rhythm difficulties, combos, and hold notes. Each song includes five meaning decisions, with regular notes kept out of the reading interval. Answer positions change each round.\n\nTiming and Korean answers are checked separately. After a song, review explanations and try new sentence variations. Website captures show actual test play, not student learning outcomes.\n\nLong passages, inference, listening, speaking, writing, and student accounts are not included. Learning gains and TOPIK score changes have not been tested with learners. Records stay within the open page and disappear on refresh.",
       "sourceId": "lab",
       "relatedIds": [
         "lab-curriculum",
@@ -885,18 +885,17 @@
         "lab-personal"
       ],
       "action": {
-        "label": "Explore the sample learning record",
-        "href": "/en/lab/"
+        "label": "Play Words in Rhythm (Korean)",
+        "href": "/try/rhythm/"
       },
-      "reviewedAt": "2026-09-23",
+      "reviewedAt": "2026-10-01",
       "aliases": [
-        "한국어 편지 게임의 학습 기록은 어떻게 이어지나요?",
-        "한국어 편지 게임은 어떻게 진행되나요?",
-        "LAB 게임의 원문과 교정 답장은 어떻게 이어지나요?",
-        "홈페이지의 학습 기록 화면은 실제 기록인가요?",
-        "게임의 교정 답장은 바로 오나요?",
-        "편지 게임에서 교정 뒤에는 무엇을 하나요?",
-        "한국어 편지 게임 예시를 설명해 주세요"
+        "리듬 게임은 어떤 한국어를 연습하나요?",
+        "말의 리듬은 어떻게 플레이하나요?",
+        "리듬 게임의 학습 효과는 무엇인가요?",
+        "TOPIK 읽기에도 도움이 되나요?",
+        "리듬 게임의 점수는 한국어 실력인가요?",
+        "What Korean skills does the rhythm game practise?"
       ]
     },
     {
@@ -923,7 +922,7 @@
         "Is LAB preparing a patent application for its personalization technology?",
         "When is the personalization patent application planned?"
       ],
-      "answer": "Use Korean learned from textbooks in games. LAB is developing an app that adjusts subsequent tasks and feedback using students’ answers and the areas where they needed help.\n\nPractice Korean you will use. We turn situations that require Korean—such as writing a request email to a professor—into games. Students choose expressions that fit the situation, then write and revise their own sentences.\n\nWe create games with clear roles and goals, based on grammar from Synapse Core and conversations from Synapse Talk. Scenes and characters help students understand the situation and take part themselves.\n\nIn the website’s email-writing experience, you write first and can ask for hints if you get stuck. Compare your first and revised drafts to see what changed.\n\nWe are developing a way to record sentences written and answers chosen in games, so they can inform later practice and feedback.\n\nFind a way of learning that suits you. We first ask why students are learning Korean and how they prefer to study. We consider their answers, revisions, and teacher observations together to understand their strengths and difficulties.\n\nAt the start, we ask about learning goals, the preferred order of explanations, when hints are needed, and how students want to receive feedback.\n\nWe distinguish what students tell us, actual learning records, and AI inferences. We do not judge personality or ability from a single choice or favorite character.\n\nWe are preparing settings that can change as goals or study preferences change. Students will be able to correct anything the app has misunderstood.\n\nTasks adapt to your learning record. We are developing an app that adjusts task topics, hints, and feedback to learners’ goals and records. It is designed to revisit difficult expressions and check whether students can use them without help.\n\nWe are preparing an approach that shows examples first to students who prefer them, and grammar explanations first to those who want the rule. On this website, you can write your own text, choose the hints you need, and compare your revision with your first draft.\n\nWe record first drafts, revisions, and hint use separately. The design lets teachers review AI summaries alongside the student’s actual circumstances and arrange further practice of difficult expressions in a new task.\n\nWe are developing an app that brings together mascot guidance, today’s task, feedback, and learning records. Practice informs the next task and its feedback.\n\nPreparing a Korean patent application. Application planned for 2028.",
+      "answer": "Use Korean learned from textbooks in games. LAB is developing an app that adjusts subsequent tasks and feedback using students’ answers and the areas where they needed help.\n\nPractise Korean for real situations. We create games where understanding Korean drives the action, such as choosing a sentence’s meaning while playing a rhythm track. The current public activity focuses on short-sentence reading and meaning decisions.\n\nWe create games with clear roles and goals, based on grammar from Synapse Core and conversations from Synapse Talk. Scenes and characters help students understand the situation and take part themselves.\n\nIn Words in Rhythm, read a sentence and choose an answer from four lanes. Check timing and Korean answers separately, then try a new sentence after the song.\n\nWe are developing a way to record sentences written and answers chosen in games, so they can inform later practice and feedback.\n\nFind a way of learning that suits you. We first ask why students are learning Korean and how they prefer to study. We consider their answers, revisions, and teacher observations together to understand their strengths and difficulties.\n\nAt the start, we ask about learning goals, the preferred order of explanations, when hints are needed, and how students want to receive feedback.\n\nWe distinguish what students tell us, actual learning records, and AI inferences. We do not judge personality or ability from a single choice or favorite character.\n\nWe are preparing settings that can change as goals or study preferences change. Students will be able to correct anything the app has misunderstood.\n\nTasks adapt to your learning record. We are developing an app that adjusts task topics, hints, and feedback to learners’ goals and records. It is designed to revisit difficult expressions and check whether students can use them without help.\n\nWe are preparing an app that adapts examples, grammar explanations, hints, and feedback to the learner. In the current public rhythm game, choose a song and rhythm difficulty, then view explanations and practise with new sentences.\n\nWe record first drafts, revisions, and hint use separately. The design lets teachers review AI summaries alongside the student’s actual circumstances and arrange further practice of difficult expressions in a new task.\n\nWe are developing an app that brings together mascot guidance, today’s task, feedback, and learning records. Practice informs the next task and its feedback.\n\nPreparing a Korean patent application. Application planned for 2028.",
       "relatedIds": [
         "lab-personal",
         "lab-game-demo",
@@ -933,7 +932,7 @@
         "label": "Explore games and personalized learning",
         "href": "/en/lab/#lab-personalization"
       },
-      "reviewedAt": "2026-09-23",
+      "reviewedAt": "2026-10-01",
       "aliases": [
         "LAB의 게임과 개인화 학습은 어떻게 연결되나요?",
         "LAB은 성향을 어떻게 파악하나요?",
@@ -2001,35 +2000,34 @@
       "sourceId": "lab",
       "brand": "lab",
       "title": "Where should I start if I am new to Korean?",
-      "answer": "You can try writing an email to a professor on this website. Read the situation, choose one of three companions for help, and write your own request email. This is part of SYNK WORLD’s functionality. Your message is not sent to a real professor.\n\nIf you are new to Korean, start by looking at the situation guide and hints. Please contact us separately about the starting level and eligibility for regular classes. Tell us your learning goals and current level.",
+      "answer": "You can play Words in Rhythm on the website. This reading-focused prototype combines music with short Korean sentences and meaning choices. Choose your song and rhythm difficulty.\n\nIf you are new to Korean, learn Hangul and basic vocabulary before starting with an easy track. Please enquire about course entry levels and availability, sharing your learning goal and current level.",
       "questionExamples": [
         "Where should I start if I am new to Korean?",
-        "I would like to try learning Korean",
-        "I am a Korean beginner. Where should I start?",
-        "Where can I try writing a letter to a professor?"
+        "I want to try learning Korean",
+        "Where can a Korean beginner start?",
+        "Where can I play the rhythm game?"
       ],
       "keywords": [
         "Korean",
         "beginner",
-        "new to learning",
-        "professor",
-        "letter-writing experience",
-        "SYNK WORLD"
+        "start",
+        "rhythm game",
+        "words in rhythm"
       ],
       "relatedIds": [
         "lab-learning",
         "lab-availability"
       ],
       "action": {
-        "label": "Try writing a letter to a professor (Korean)",
-        "href": "/try/letter/"
+        "label": "Play Words in Rhythm (Korean)",
+        "href": "/try/rhythm/"
       },
-      "reviewedAt": "2026-09-17",
+      "reviewedAt": "2026-10-01",
       "aliases": [
         "한국어를 처음 배우는데 어디서 시작하면 되나요?",
         "한국어를 배워보고 싶어요",
         "한국어 초보인데 어디서 시작하면 되나요?",
-        "교수님께 편지 쓰기는 어디서 해요?"
+        "리듬 게임은 어디서 해요?"
       ]
     },
     {
