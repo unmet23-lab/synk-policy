@@ -10,11 +10,14 @@
     if(started)return;
     started=true;
     const rect=canvas.getBoundingClientRect();
-    const clamp=(value,min,max)=>Math.min(max,Math.max(min,value));
-    const radius=rect.width<520?clamp(rect.width*.125,39,50):clamp(Math.min(rect.width,rect.height)*.132,68,92);
+    // The drawn sphere is the measure; the fallback is Atlas on a plain round orbit.
+    let drawn=null;
+    try{drawn=window.atlasPreview?.getSummary?.();}catch{}
+    const ratio=drawn?.width?rect.width/drawn.width:1,center=drawn?.cinematic?.nucleusCenter;
+    const radius=drawn?.cinematic?.nucleusRadius>0?drawn.cinematic.nucleusRadius*ratio:Math.min(rect.width*.13,rect.height*.12);
     const size=radius*2;
-    const x=rect.left+rect.width*.5-radius;
-    const y=rect.top+rect.height*.493-radius;
+    const x=rect.left+(center?center.x*ratio:rect.width*.5)-radius;
+    const y=rect.top+(center?center.y*ratio:rect.height*.493)-radius;
     const initialX=parseFloat(root.style.getPropertyValue('--arrival-x'))||x;
     const initialY=parseFloat(root.style.getPropertyValue('--arrival-y'))||y;
     const initialSize=parseFloat(root.style.getPropertyValue('--arrival-size'))||size;

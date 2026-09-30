@@ -1,82 +1,97 @@
-// Local procedural light; no microphone, remote renderer, or recorded input.
+// A still sphere of ink printed with grains of light, the same material as the Atlas map.
+// The light rests at the upper left and turns toward the pointer while it moves over the sphere.
+// Nothing moves on its own; no microphone, remote renderer or recorded input.
+// Its two inks come from CSS (color = the dark grains, caret-color = the lit ones), so on a colour
+// field it is printed in a deep tone of that colour.
+const GRID=64;let grainCache=null;
+function random(seed){return function(){seed|=0;seed=seed+0x6D2B79F5|0;let t=Math.imul(seed^seed>>>15,1|seed);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+// An even order for the grains: each next grain goes to the emptiest place (same seed as the Atlas map).
+function grainOrder(){
+ if(grainCache)return grainCache;
+ const count=GRID*GRID,rnd=random(862104),crowd=new Float32Array(count),taken=new Uint8Array(count);
+ const reach=9,span=reach*2+1,near=new Float32Array(span*span);
+ for(let y=-reach;y<=reach;y++)for(let x=-reach;x<=reach;x++)near[(y+reach)*span+x+reach]=Math.exp(-(x*x+y*y)/7.22);
+ for(let i=0;i<count;i++)crowd[i]=rnd()*1e-4;
+ const rowLeast=new Float32Array(GRID),rowPlace=new Int32Array(GRID);
+ const recount=row=>{let place=-1,least=Infinity;for(let i=row*GRID,end=i+GRID;i<end;i++)if(!taken[i]&&crowd[i]<least){least=crowd[i];place=i;}rowLeast[row]=least;rowPlace[row]=place;};
+ for(let row=0;row<GRID;row++)recount(row);
+ const order=new Float32Array(count);
+ for(let step=0;step<count;step++){
+  let py=0;for(let row=1;row<GRID;row++)if(rowLeast[row]<rowLeast[py])py=row;
+  const place=rowPlace[py],px=place%GRID;taken[place]=1;order[place]=(step+.5)/count;
+  for(let y=-reach;y<=reach;y++){const row=(py+y+GRID)%GRID,line=(y+reach)*span+reach;for(let x=-reach;x<=reach;x++)crowd[row*GRID+(px+x+GRID)%GRID]+=near[line+x];recount(row);}
+ }
+ return grainCache=order;
+}
+const LIGHT={angle:-Math.PI*2*.108,lift:.56,fall:2.4,gain:.9,floor:.02,rim:.06};
+const FALL=new Float32Array(1025);for(let i=0;i<=1024;i++)FALL[i]=Math.pow(i/1024,LIGHT.fall)*LIGHT.gain;
+// Any CSS colour to [r,g,b,a] through a one-pixel canvas.
+let probe=null;
+function rgba(value,fallback){
+ probe??=Object.assign(document.createElement('canvas'),{width:1,height:1}).getContext('2d',{willReadFrequently:true});
+ probe.clearRect(0,0,1,1);probe.fillStyle=fallback;probe.fillStyle=value||fallback;probe.fillRect(0,0,1,1);
+ return Array.from(probe.getImageData(0,0,1,1).data);
+}
 function mountOrb(button){
  const canvas=button.querySelector('canvas'),surface=button.querySelector('.orb-surface');
- const reduced=matchMedia('(prefers-reduced-motion: reduce)');
- const gl=canvas.getContext('webgl',{alpha:true,antialias:false,premultipliedAlpha:false,powerPreference:'low-power'});
- if(!gl)return;
- const vertex='attribute vec2 position; varying vec2 uv; void main(){uv=position;gl_Position=vec4(position,0.,1.);}';
- const fragment=`precision highp float;
- varying vec2 uv; uniform float time; uniform vec2 pointer; uniform vec3 accent; uniform float energy;
- float hash(vec3 p){p=fract(p*.3183099+.1);p*=17.;return fract(p.x*p.y*p.z*(p.x+p.y+p.z));}
- float noise(vec3 p){vec3 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);return mix(mix(mix(hash(i),hash(i+vec3(1,0,0)),f.x),mix(hash(i+vec3(0,1,0)),hash(i+vec3(1,1,0)),f.x),f.y),mix(mix(hash(i+vec3(0,0,1)),hash(i+vec3(1,0,1)),f.x),mix(hash(i+vec3(0,1,1)),hash(i+vec3(1,1,1)),f.x),f.y),f.z);}
- float fbm(vec3 p){float n=0.,a=.55;for(int i=0;i<4;i++){n+=a*noise(p);p=p*2.03+vec3(1.7,9.2,2.8);a*=.48;}return n;}
- void main(){
-   vec2 p=uv*1.19; p-=pointer*.025;
-   float r=length(p), edge=1.-smoothstep(.985,1.005,r);
-   if(r>1.025){gl_FragColor=vec4(0.);return;}
-   float z=sqrt(max(0.,1.-dot(p,p))); vec3 n=normalize(vec3(p,z));
-   float t=time*.12;
-   // Refraction compresses the light toward the far edge of a solid sphere.
-   vec2 lens=p/(.72+.28*z);
-   vec3 pos=vec3(lens,z*.8); pos.x+=pointer.x*.1;pos.y+=pointer.y*.1;
-   float swirl=fbm(pos*2.6+vec3(t,-t*.6,t*.3));
-   float clouds=fbm(pos*4.+swirl*2.+vec3(-t,t*.5,0));
-   float arc=lens.y+.43*sin(lens.x*2.7+t)+.24*(clouds-.5);
-   float ribbon=exp(-abs(arc)*10.);
-   float filament=pow(.5+.5*sin(arc*95.+clouds*8.),10.)*ribbon;
-   float inner=exp(-abs(lens.x-.32*sin(lens.y*3.-t*1.3)+.12*(swirl-.5))*17.);
-   vec3 base=mix(vec3(.018,.028,.048),vec3(.10,.14,.21),clouds);
-   vec3 tint=mix(vec3(.18,.43,.78),accent,.24);
-   vec3 pearl=mix(vec3(.67,.85,.96),vec3(.86,.69,.83),sin(t+p.x*2.)*.5+.5);
-   vec3 color=base+tint*ribbon*(.62+energy*.3)+pearl*filament*.27+vec3(.24,.38,.66)*inner*.20;
-   float rim=pow(1.-z,4.);
-   float light=max(0.,dot(n,normalize(vec3(-.6,.8,1.2))));
-   color+=pearl*pow(light,20.)*.24+pearl*rim*.42;
-   // Narrow studio reflections sit on the shell, independently of the core.
-   float softbox=exp(-pow((p.x+.35-pointer.x*.03)/.31,2.)-pow((p.y-.65)/.075,2.));
-   color+=vec3(.83,.93,1.)*softbox*.65;
-   float crescent=exp(-pow((r-.956)/.017,2.))*smoothstep(-.3,.8,p.y-p.x);
-   color+=vec3(.76,.89,.96)*crescent*.42;
-   float caustic=exp(-pow((r-.91)/.022,2.))*smoothstep(.2,.95,p.x-p.y);
-   color+=vec3(.34,.65,.82)*caustic*.35;
-   color+=vec3(.70,.85,.95)*pow(max(0.,dot(n,normalize(vec3(.7,-.8,.4)))),26.)*.20;
-   float veins=pow(noise(pos*95.+vec3(t)),19.)*.14;
-   color+=veins*ribbon;
-   color*=.68+.32*z;
-   gl_FragColor=vec4(color,edge);
- }`;
- function shader(type,source){const s=gl.createShader(type);gl.shaderSource(s,source);gl.compileShader(s);if(!gl.getShaderParameter(s,gl.COMPILE_STATUS)){gl.deleteShader(s);throw Error('Orb shader unavailable');}return s;}
- let program;
- try{program=gl.createProgram();const v=shader(gl.VERTEX_SHADER,vertex),f=shader(gl.FRAGMENT_SHADER,fragment);gl.attachShader(program,v);gl.attachShader(program,f);gl.linkProgram(program);gl.deleteShader(v);gl.deleteShader(f);if(!gl.getProgramParameter(program,gl.LINK_STATUS))throw Error('Orb unavailable');}catch{return;}
- gl.useProgram(program);const buffer=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,buffer);gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,1,-1,-1,1,-1,1,1,-1,1,1]),gl.STATIC_DRAW);
- const position=gl.getAttribLocation(program,'position');gl.enableVertexAttribArray(position);gl.vertexAttribPointer(position,2,gl.FLOAT,false,0,0);
- const u={time:gl.getUniformLocation(program,'time'),pointer:gl.getUniformLocation(program,'pointer'),accent:gl.getUniformLocation(program,'accent'),energy:gl.getUniformLocation(program,'energy')};
- const palettes={synk:[.48,.38,.72],lab:[.86,.27,.21],shift:[.20,.40,.86],pulse:[.65,.19,.48],path:[.30,.55,.43]};
- gl.uniform3fv(u.accent,palettes[document.body.dataset.site]||palettes.synk);
- let frame=0,visible=false,last=0,clock=0,x=0,y=0,tx=0,ty=0,energy=0,targetEnergy=0,lost=false;
- function draw(now){
-  frame=0;if(lost)return;
-  const moving=visible&&!document.hidden&&!reduced.matches;
-  if(moving&&last)clock+=Math.min(now-last,70)/1000;
-  last=now;x+=(tx-x)*.07;y+=(ty-y)*.07;energy+=(targetEnergy-energy)*.08;
-  const size=Math.min(640,Math.ceil(button.clientWidth*Math.min(devicePixelRatio||1,2)));
-  if(canvas.width!==size){canvas.width=canvas.height=size;gl.viewport(0,0,size,size);}
-  gl.uniform1f(u.time,clock);gl.uniform2f(u.pointer,x,y);gl.uniform1f(u.energy,energy);gl.drawArrays(gl.TRIANGLES,0,6);
-  if(moving)frame=requestAnimationFrame(draw);
+ const ctx=canvas?.getContext('2d');if(!ctx||!surface)return;
+ const reduced=matchMedia('(prefers-reduced-motion: reduce)'),fine=matchMedia('(hover: hover) and (pointer: fine)');
+ let angle=LIGHT.angle,lift=LIGHT.lift,frame=0,drawn='',shape=null;
+ // Everything that depends only on the size is worked out once: where each device pixel sits on the
+ // sphere, how much of it the edge covers, and the grain it is compared with.
+ function measure(size,dpr){
+  const cell=Math.max(1,Math.round(dpr*.62)),radius=size/2-dpr,middle=size/2,grain=grainOrder(),outer=(1+1.5/radius)**2;
+  const index=[],cx=[],cy=[],cz=[],rim=[],threshold=[],cover=[];
+  for(let py=0;py<size;py++){
+   const y=(py+.5-middle)/radius,gy=Math.floor(py/cell),sy=((gy+.5)*cell-middle)/radius,row=(gy%GRID)*GRID;
+   for(let px=0;px<size;px++){
+    const x=(px+.5-middle)/radius,reach=x*x+y*y;if(reach>outer)continue;
+    const edge=Math.round(Math.min(1,Math.max(0,(1-Math.sqrt(reach))*radius+.5))*255);if(!edge)continue;
+    const gx=Math.floor(px/cell),sx=((gx+.5)*cell-middle)/radius,z=Math.sqrt(Math.max(0,1-sx*sx-sy*sy));
+    index.push((py*size+px)*4);cx.push(sx);cy.push(sy);cz.push(z);rim.push(LIGHT.floor+Math.pow(1-z,5)*LIGHT.rim);threshold.push(grain[row+gx%GRID]);cover.push(edge);
+   }
+  }
+  return {size,index:Int32Array.from(index),cx:Float32Array.from(cx),cy:Float32Array.from(cy),cz:Float32Array.from(cz),rim:Float32Array.from(rim),threshold:Float32Array.from(threshold),cover:Uint8Array.from(cover)};
  }
- function wake(){if(!frame&&!lost)frame=requestAnimationFrame(draw);}
- const observer=new IntersectionObserver(([entry])=>{visible=entry.isIntersecting;last=0;wake();},{rootMargin:'60px'});observer.observe(button);
- const resize=new ResizeObserver(wake);resize.observe(button);
- button.addEventListener('pointermove',e=>{if(reduced.matches)return;const r=button.getBoundingClientRect();tx=(e.clientX-r.left)/r.width*2-1;ty=1-(e.clientY-r.top)/r.height*2;targetEnergy=.7;wake();});
- button.addEventListener('pointerleave',()=>{tx=ty=targetEnergy=0;wake();});
- button.addEventListener('focus',()=>{targetEnergy=.55;wake();});
- button.addEventListener('blur',()=>{targetEnergy=0;wake();});
- document.addEventListener('synk:orb-state',e=>{targetEnergy=e.detail==='busy'?1:e.detail==='typing'?.5:0;wake();});
- document.addEventListener('visibilitychange',()=>{last=0;wake();});reduced.addEventListener('change',()=>{last=0;wake();});
- canvas.addEventListener('webglcontextlost',e=>{e.preventDefault();lost=true;cancelAnimationFrame(frame);surface.classList.remove('orb-rendered');});
- window.addEventListener('pagehide',()=>{cancelAnimationFrame(frame);frame=0;last=0;});
- window.addEventListener('pageshow',wake);
- surface.classList.add('orb-rendered');wake();
+ function paint(){
+  frame=0;
+  if(!near)return;
+  const dpr=Math.min(Math.max(devicePixelRatio||1,1),3),width=surface.getBoundingClientRect().width;if(!width)return;
+  const style=getComputedStyle(surface),inks=style.color+'/'+style.caretColor;
+  const size=Math.round(width*dpr),key=size+'|'+dpr+'|'+angle.toFixed(2)+'|'+lift.toFixed(2)+'|'+inks;
+  if(key===drawn)return;drawn=key;
+  if(!shape||shape.size!==size||shape.dpr!==dpr){shape=measure(size,dpr);shape.dpr=dpr;canvas.width=canvas.height=size;}
+  // A hair over the exact quotient so the browser never draws the bitmap a pixel short (grains stay sharp).
+  const css=(size+.004)/dpr+'px';if(canvas.style.width!==css){canvas.style.width=canvas.style.height=css;}
+  const image=ctx.createImageData(size,size),data=image.data,side=Math.sqrt(1-lift*lift),lx=Math.sin(angle)*side,ly=-Math.cos(angle)*side;
+  const {index,cx,cy,cz,rim,threshold,cover}=shape;
+  const dark=rgba(style.color,'#0a0a0a'),light=rgba(style.caretColor,'#fff');
+  for(let k=0;k<index.length;k++){
+   const facing=Math.max(0,Math.min(1,cx[k]*lx+cy[k]*ly+cz[k]*lift)),lit=rim[k]+FALL[(facing*1024)|0]>threshold[k],i=index[k],ink=lit?light:dark;
+   data[i]=ink[0];data[i+1]=ink[1];data[i+2]=ink[2];data[i+3]=cover[k]*ink[3]/255;
+  }
+  ctx.putImageData(image,0,0);
+  surface.classList.add('orb-rendered');
+ }
+ const request=()=>{if(!frame)frame=requestAnimationFrame(paint);};
+ // The sphere sits at the foot of the page: it is worked out only when it comes within reach.
+ let near=!('IntersectionObserver' in window);
+ if(!near)new IntersectionObserver(entries=>{near=entries.some(entry=>entry.isIntersecting);if(near)request();},{rootMargin:'800px 0px'}).observe(surface);
+ new ResizeObserver(request).observe(surface);
+ button.addEventListener('pointermove',event=>{
+  if(reduced.matches||!fine.matches||event.pointerType==='touch')return;
+  const r=surface.getBoundingClientRect(),dx=(event.clientX-r.left)/r.width*2-1,dy=(event.clientY-r.top)/r.height*2-1,d=Math.min(1,Math.hypot(dx,dy));
+  // Straight on at the centre, raking toward the rim.
+  angle=Math.round(Math.atan2(dx,-dy)*60)/60;lift=Math.round((.92-.5*d)*50)/50;request();
+ });
+ button.addEventListener('pointerleave',()=>{angle=LIGHT.angle;lift=LIGHT.lift;request();});
+ window.addEventListener('pageshow',request);
+ // A density query matches one value only, so it is renewed after every change.
+ let density=null;
+ const watch=()=>{density?.removeEventListener?.('change',changed);density=matchMedia('(resolution: '+(devicePixelRatio||1)+'dppx)');density.addEventListener?.('change',changed);};
+ const changed=()=>{watch();request();};
+ watch();
+ request();
 }
 
 export function initOrbConversation(){

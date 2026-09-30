@@ -1,0 +1,264 @@
+/* Atlas · minimal. Same language as the five homepages (src/sites-refresh.css):
+   white paper, black type, heavy/light headings, small labels with hairlines, soft gray panels.
+   The orbit map is drawn in the ink of the type, and engines carry no colour. Nothing moves on its own. */
+@font-face{font-family:'Inter Tight';font-weight:700;font-display:swap;src:url(/assets/inter-tight-bold.ttf) format('truetype')}
+:root{
+  color-scheme:light;
+  --paper:#fff;--ink:#0a0a0a;--ink-2:#363636;--ink-3:#6a6a6a;--line:#e7e7e7;--soft:#f4f4f5;
+  --suit:'SUIT Variable',sans-serif;--latin:'Inter Tight','SUIT Variable',sans-serif;--mono:'DM Mono',ui-monospace,monospace;
+  --gutter:40px;--max:1280px;--bar:64px;
+  --pad-x:max(var(--gutter),calc((100% - var(--max)) / 2));
+}
+*,*::before,*::after{box-sizing:border-box}
+html{background:var(--paper);scroll-behavior:auto;scroll-padding-top:calc(var(--bar) + 16px)}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--suit);font-weight:500;-webkit-font-smoothing:antialiased;overflow-x:clip}
+img{max-width:100%}
+button{font:inherit;color:inherit;cursor:pointer;border:0;background:none;padding:0;margin:0}
+button,a{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+button:disabled{cursor:default;opacity:.4}
+[hidden]{display:none!important}
+.mono{font-family:var(--mono);font-weight:400}
+:focus-visible{outline:3px solid var(--ink);outline-offset:3px}
+.skip-link{position:fixed;top:-100px;left:16px;z-index:60;padding:12px 16px;border-radius:10px;background:var(--ink);color:var(--paper);font-weight:700;text-decoration:none}
+.skip-link:focus{top:10px}
+.no-script{padding:24px;font-size:16px;line-height:1.7}
+.observatory{position:relative;isolation:isolate;min-height:100svh;background:var(--paper);overflow:clip;transition:opacity .3s ease}
+.portal-departing .observatory{opacity:0}
+
+/* ── Bar ── */
+.masthead{position:sticky;top:0;z-index:30;display:flex;align-items:center;gap:28px;height:var(--bar);padding:0 var(--pad-x);background:rgba(255,255,255,.92);border-bottom:1px solid var(--line);-webkit-backdrop-filter:saturate(1.4) blur(14px);backdrop-filter:saturate(1.4) blur(14px)}
+.signature{display:flex;align-items:center;gap:12px;flex:none}
+.signature-logo{display:block;width:auto;height:30px}
+.signature-detail{font-size:11px;letter-spacing:.22em;color:var(--ink-3)}
+.section-nav{display:flex;align-items:center;gap:2px}
+.section-nav a{display:flex;align-items:center;height:38px;padding:0 13px;border-radius:999px;color:var(--ink-2);font:600 14.5px/1 var(--suit);letter-spacing:-.02em;text-decoration:none;white-space:nowrap}
+.section-nav a:hover{background:var(--soft);color:var(--ink)}
+.portal-dock{display:flex;align-items:center;margin-left:auto;flex:none}
+.synk-portal{display:inline-flex;align-items:center;gap:8px;height:38px;padding:0 16px;border-radius:999px;background:var(--ink);color:var(--paper);text-decoration:none;transition:background-color .16s ease}
+.synk-portal:hover{background:#2b2b2b}
+.portal-rim,.portal-thread,.portal-thread-light{display:none}
+.portal-label{font:700 14px/1 var(--suit);letter-spacing:-.02em;white-space:nowrap}
+.portal-arrow{display:grid;place-items:center;flex:none;width:14px;height:14px}
+.portal-arrow svg{width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+
+/* ── Studio: cover and engines left, the orbit map pinned right ── */
+.workspace{position:relative;display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);grid-template-rows:auto 1fr;column-gap:56px;padding:48px var(--pad-x) 120px}
+.intro{grid-column:1;grid-row:1;min-width:0}
+.intro-heading{container-type:inline-size}
+.intro h1{margin:0 0 0 -.04em;font:800 clamp(84px,30cqi,232px)/.8 var(--latin);letter-spacing:-.055em;text-transform:uppercase;color:var(--ink);white-space:nowrap}
+.eyebrow{display:flex;align-items:center;gap:18px;margin:30px 0 0;font:600 14px/1.4 var(--suit);letter-spacing:-.01em;color:var(--ink-2)}
+.eyebrow::after{content:'';flex:1;height:1px;background:currentColor;opacity:.45}
+.intro-statement{margin-top:40px}
+.intro h2{margin:0;font:300 40px/1.25 var(--suit);letter-spacing:-.045em;color:var(--ink);word-break:keep-all}
+.intro h2::first-line{font-weight:800}
+.intro-copy{margin:18px 0 0;font:500 17px/1.75 var(--suit);letter-spacing:-.02em;color:var(--ink-2);word-break:keep-all}
+
+.visual-stage{position:sticky;z-index:2;top:calc(var(--bar) + 24px);grid-column:2;grid-row:1/3;align-self:start;height:clamp(520px,calc(100svh - var(--bar) - 48px),880px);isolation:isolate;overflow:hidden;border-radius:28px;background:var(--soft);color:var(--ink);container-type:size}
+#constellation{display:block;width:100%;height:100%;touch-action:pan-y}
+.stage-caption{position:absolute;z-index:3;left:28px;top:26px;margin:0;font-size:10px;line-height:1.3;letter-spacing:.1em;color:var(--ink-3);pointer-events:none}
+.stage-hint{position:absolute;z-index:3;right:28px;bottom:30px;margin:0;font:500 11.5px/1 var(--suit);color:var(--ink-3);pointer-events:none;transition:opacity .2s ease}
+.observatory[data-detail=true] .stage-hint,.observatory[data-preview=true] .stage-hint{opacity:0}
+/* A low stage shows the map alone; the map leaves no corner free for words there. */
+@container (max-height:339.98px){.stage-caption,.stage-hint{display:none}}
+
+/* ── Engines ── */
+.engine-explorer{grid-column:1;grid-row:2;align-self:start;min-width:0;margin-top:64px;container-type:inline-size;scroll-margin-top:calc(var(--bar) + 20px)}
+.explorer-head{display:flex;align-items:center;gap:16px;margin:0 0 16px}
+.explorer-title{flex:1;display:flex;align-items:center;gap:18px;margin:0;font:600 14px/1.4 var(--suit);letter-spacing:-.01em;color:var(--ink-2)}
+.explorer-title::after{content:'';flex:1;height:1px;background:currentColor;opacity:.45}
+.view-tabs{display:flex;gap:2px;padding:4px;border-radius:999px;background:var(--soft)}
+.view-tabs button{height:32px;padding:0 14px;border-radius:999px;color:var(--ink-3);font:600 13px/1 var(--suit);letter-spacing:-.01em;transition:color .16s ease}
+.view-tabs button:hover{color:var(--ink)}
+.view-tabs button[aria-pressed=true]{background:var(--paper);color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.08),0 0 0 1px rgba(0,0,0,.04)}
+.engine-dock{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));margin:0;padding:0;border-top:1px solid var(--ink)}
+.engine-button{position:relative;display:flex;flex-direction:column;align-items:flex-start;min-width:0;padding:16px 12px 18px 0;border-bottom:1px solid var(--line);color:var(--ink);text-align:left}
+.engine-button .ordinal{display:block;font-size:11px;line-height:1;letter-spacing:.1em;color:var(--ink-3)}
+.engine-button strong{display:block;margin-top:10px;font:700 19px/1.1 var(--latin);letter-spacing:-.02em;overflow-wrap:anywhere}
+.engine-button small{display:block;margin-top:5px;font:600 12.5px/1.4 var(--suit);letter-spacing:-.02em;color:var(--ink-3);word-break:keep-all}
+.engine-button:hover strong,.engine-button.is-preview strong{text-decoration:underline;text-decoration-thickness:1.5px;text-underline-offset:4px}
+.engine-button.is-related .ordinal,.engine-button[aria-pressed=true] .ordinal{color:var(--ink)}
+.engine-button[aria-pressed=true]::before{content:'';position:absolute;left:0;right:12px;top:-1px;height:2px;background:var(--ink)}
+.engine-button[aria-pressed=true] small{color:var(--ink-2)}
+
+.inspector{position:relative;min-width:0;min-height:300px;margin-top:28px;padding:28px 30px 30px;border-radius:24px;background:var(--soft)}
+.panel-index{margin:0 0 16px;font:400 11px/1.4 var(--mono);letter-spacing:.14em;color:var(--ink-3)}
+.inspector h3{margin:0 0 10px;font:800 22px/1.4 var(--suit);letter-spacing:-.035em;word-break:keep-all}
+.inspector h3 .engine-name{display:block;margin:0 0 8px;font:700 clamp(40px,11cqi,56px)/1 var(--latin);letter-spacing:-.045em}
+#detail-description{margin:0;font:500 15.5px/1.75 var(--suit);letter-spacing:-.02em;color:var(--ink-2);word-break:keep-all}
+.concepts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px 20px;margin:18px 0 0;padding:16px 0 0;list-style:none;border-top:1px solid rgba(0,0,0,.1)}
+.concepts li{position:relative;min-width:0;padding-left:15px;font:600 13.5px/1.45 var(--suit);letter-spacing:-.02em;color:var(--ink-2);word-break:keep-all}
+.concepts li::before{content:'';position:absolute;left:0;top:.7em;width:7px;height:1px;background:var(--ink-3)}
+/* Roomy stages print the same five lines on the map; the list then stays for screen readers only. */
+.observatory[data-legend=map] .concepts{position:absolute;width:1px;height:1px;margin:-1px;padding:0;border:0;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+.related{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:20px}
+.related-caption{width:100%;margin-bottom:2px;font:700 12.5px/1.4 var(--suit);letter-spacing:-.02em;color:var(--ink-3)}
+.related button[data-engine]{display:inline-flex;align-items:center;height:34px;padding:0 14px;border-radius:999px;background:var(--paper);color:var(--ink);font:700 13.5px/1 var(--latin);box-shadow:0 0 0 1px rgba(0,0,0,.06);transition:box-shadow .16s ease}
+.related button[data-engine]:hover,.related button.is-preview{box-shadow:0 0 0 1.5px var(--ink)}
+.text-action,.glass-action{display:inline-flex;align-items:center;gap:10px;min-height:46px;padding:0 20px;border-radius:999px;background:var(--ink);color:var(--paper);font:700 14.5px/1 var(--suit);letter-spacing:-.02em;transition:background-color .16s ease}
+.text-action:hover,.glass-action:hover{background:#2b2b2b}
+.arrow-icon{display:inline-block;flex:none;width:16px;height:16px;background:currentColor;-webkit-mask:url('/assets/arrow-up-right.svg') center/contain no-repeat;mask:url('/assets/arrow-up-right.svg') center/contain no-repeat}
+.inspector[data-engine=strata]::after{content:'설계·준비 중';position:absolute;top:24px;right:26px;padding:7px 11px;border-radius:999px;background:var(--paper);box-shadow:0 0 0 1px var(--line);color:var(--ink-2);font:700 12px/1 var(--suit)}
+.story-heading{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}
+.story-heading .panel-index{margin:0}
+#story-back{height:32px;padding:0 14px;border-radius:999px;background:var(--paper);box-shadow:0 0 0 1px var(--line);font:700 12.5px/1 var(--suit)}
+#scenario-picker{border-top:1px solid var(--ink)}
+.scenario-card{display:flex;align-items:center;justify-content:space-between;gap:14px;width:100%;padding:18px 2px 18px 0;border-bottom:1px solid rgba(0,0,0,.08);text-align:left}
+.scenario-card strong{display:block;font:800 16px/1.4 var(--suit);letter-spacing:-.03em}
+.scenario-card small{display:block;margin-top:4px;font:600 12.5px/1.4 var(--suit);color:var(--ink-3)}
+.scenario-card>span:last-child{font:500 18px/1 var(--latin)}
+.scenario-card:hover strong{text-decoration:underline;text-decoration-thickness:1.5px;text-underline-offset:4px}
+.story-name{margin:0 0 14px;font:800 17px/1.35 var(--suit);letter-spacing:-.03em}
+.story-progress{display:flex;gap:6px;margin-bottom:18px}
+.story-progress button{position:relative;flex:1;height:20px}
+.story-progress button::before{content:'';position:absolute;left:0;right:0;top:9px;height:2px;background:rgba(0,0,0,.12)}
+.story-progress button.past::before{background:var(--ink);opacity:.4}
+.story-progress button[aria-current=step]::before{background:var(--ink)}
+.story-step-label{display:block;margin-bottom:8px;font:400 11px/1.4 var(--mono);letter-spacing:.14em;color:var(--ink-3)}
+#story-step h3{margin:0 0 8px;font:800 24px/1.3 var(--suit);letter-spacing:-.04em}
+#story-step p{margin:0;font:500 15.5px/1.7 var(--suit);letter-spacing:-.02em;color:var(--ink-2);word-break:keep-all}
+.glass-action{margin-top:22px}
+
+/* ── Sections ── */
+.personalization,.applications{padding:120px var(--pad-x) 0;scroll-margin-top:var(--bar)}
+.section-heading{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr);column-gap:64px;align-items:end}
+.section-index{grid-column:1/-1;display:flex;align-items:center;gap:18px;max-width:560px;margin:0 0 20px;font-size:12px;line-height:1.4;letter-spacing:.14em;color:var(--ink-3)}
+.section-index::after{content:'';flex:1;height:1px;background:currentColor;opacity:.45}
+.section-heading h2{margin:0;font:300 clamp(40px,4.4vw,64px)/1.14 var(--suit);letter-spacing:-.05em;color:var(--ink);word-break:keep-all}
+.section-heading h2::first-line{font-weight:900}
+.section-lead{margin:0 0 6px;font:500 17px/1.78 var(--suit);letter-spacing:-.02em;color:var(--ink-2);word-break:keep-all}
+.system-flow{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));margin:64px 0 0;padding:0;list-style:none;border-top:1px solid var(--ink)}
+.system-flow li{display:flex;flex-direction:column;min-width:0;padding:28px 28px 8px 0}
+.system-flow li+li{padding-left:28px;border-left:1px solid var(--line)}
+.flow-icon{display:block;width:56px;height:56px;object-fit:contain;margin:0 0 20px}
+.flow-number{font-size:11px;letter-spacing:.14em;color:var(--ink-3)}
+.system-flow h3{margin:10px 0 0;font:900 clamp(44px,4.2vw,60px)/1 var(--suit);letter-spacing:-.06em}
+.flow-detail p{margin:18px 0 0;font:500 15.5px/1.75 var(--suit);letter-spacing:-.02em;color:var(--ink-2);word-break:keep-all}
+.flow-engines{display:block;margin-top:14px;font:600 13px/1.4 var(--latin);letter-spacing:.01em;color:var(--ink-3)}
+.flow-result{margin-top:20px;font:700 14px/1.4 var(--suit);letter-spacing:-.02em;color:var(--ink)}
+.flow-result::before{content:'→ ';font-family:var(--latin)}
+.scope-note{margin:28px 0 0;font:500 13px/1.7 var(--suit);letter-spacing:-.01em;color:var(--ink-3);word-break:keep-all}
+.application-list{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:24px;margin-top:56px}
+.application-link{position:relative;display:flex;flex-direction:column;min-width:0;color:var(--ink);text-decoration:none}
+.application-art{display:block;aspect-ratio:1;border-radius:24px;overflow:hidden;background:var(--soft);transition:background-color .16s ease}
+.application-art img{display:block;width:100%;height:100%;padding:12%;object-fit:contain;mix-blend-mode:multiply}
+.application-link:hover .application-art{background:#ececed}
+.application-name{margin-top:20px;font:700 40px/1 var(--latin);letter-spacing:-.04em}
+.application-link:hover .application-name{text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:6px}
+.application-copy{display:block;margin-top:12px}
+.application-copy strong{display:block;font:800 15.5px/1.45 var(--suit);letter-spacing:-.03em}
+.application-copy>span{display:block;margin-top:4px;font:500 14px/1.6 var(--suit);letter-spacing:-.02em;color:var(--ink-3);word-break:keep-all}
+.application-link .arrow-icon{position:absolute;top:16px;right:16px;width:22px;height:22px;color:var(--ink)}
+.application-link:focus-visible{outline:3px solid var(--ink);outline-offset:5px;border-radius:24px}
+
+/* ── Footer and dialog ── */
+.colophon{display:flex;align-items:center;justify-content:space-between;gap:24px;margin:120px var(--pad-x) 0;padding:36px 0 56px;border-top:1px solid var(--line)}
+.colophon p{display:flex;align-items:center;gap:16px;margin:0;font:700 15px/1.5 var(--suit);letter-spacing:-.03em}
+.colophon .mono{font-size:11px;letter-spacing:.2em;color:var(--ink-3);font-weight:400}
+.footer-dot{display:none}
+#about-open{display:inline-flex;align-items:center;gap:8px;min-height:40px;border-bottom:1.5px solid var(--ink);font:700 14.5px/1 var(--suit);letter-spacing:-.02em}
+dialog{max-width:560px;width:calc(100% - 32px);padding:32px;border:0;border-radius:24px;background:var(--paper);color:var(--ink);box-shadow:0 30px 80px rgba(0,0,0,.25)}
+dialog::backdrop{background:rgba(0,0,0,.4)}
+dialog .eyebrow{display:block;margin:0;font:400 11px/1.4 var(--mono);letter-spacing:.2em;color:var(--ink-3)}
+dialog .eyebrow::after{display:none}
+dialog>h2{margin:10px 0 14px;font:900 28px/1.25 var(--suit);letter-spacing:-.05em}
+dialog>p:not(.eyebrow){margin:0 0 12px;font:500 15px/1.75 var(--suit);letter-spacing:-.02em;color:var(--ink-2);word-break:keep-all}
+#about-close{display:block;min-width:96px;height:44px;margin:22px 0 0 auto;padding:0 22px;border-radius:999px;background:var(--ink);color:var(--paper);font:700 14px/1 var(--suit)}
+
+/* ── Wide and short screens ── */
+@media(min-width:1600px){.intro h2{font-size:46px}.intro-copy{font-size:18px}}
+@media(min-width:1100px) and (max-height:820px){
+  .workspace{padding-top:32px}
+  .intro h1{font-size:clamp(80px,26cqi,190px)}
+  .eyebrow{margin-top:24px}
+  .intro-statement{margin-top:28px}
+  .intro h2{font-size:34px}
+  .intro-copy{margin-top:12px;font-size:16px}
+  .visual-stage{top:calc(var(--bar) + 16px);height:clamp(480px,calc(100svh - var(--bar) - 32px),880px)}
+  .engine-explorer{margin-top:48px}
+}
+
+/* ── Tablets: cover, pinned orbit map, then engines ── */
+@media(max-width:1099px){
+  :root{--gutter:28px}
+  .workspace{grid-template-columns:minmax(0,1fr);grid-template-rows:none;padding:36px var(--pad-x) 96px}
+  .intro,.engine-explorer{grid-column:1;grid-row:auto}
+  .intro{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);column-gap:40px;align-items:end}
+  .intro-statement{margin-top:0}
+  .intro h2{font-size:32px}
+  .intro-copy{font-size:16px}
+  .visual-stage{top:calc(var(--bar) + 12px);grid-column:1;grid-row:auto;height:max(260px,min(64vw,600px,calc(100svh - var(--bar) - 300px)));margin-top:40px;box-shadow:0 0 0 24px var(--paper),0 32px 20px 8px var(--paper)}
+  .engine-explorer{margin-top:52px}
+  .section-heading{grid-template-columns:minmax(0,1fr)}
+  .section-lead{margin-top:20px}
+  .system-flow{grid-template-columns:minmax(0,1fr)}
+  .system-flow li,.system-flow li+li{padding:26px 0 24px;border-left:0;border-bottom:1px solid var(--line)}
+  .application-list{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+
+/* ── Phones ── */
+@media(max-width:760px){
+  :root{--gutter:20px;--bar:58px}
+  .masthead{gap:12px}
+  .section-nav{display:none}
+  .signature-logo{height:26px}
+  .synk-portal{height:36px;padding:0 14px}
+  .portal-label{font-size:13.5px}
+  .workspace{padding:28px var(--pad-x) 72px}
+  .intro{display:block}
+  .intro h1{font-size:30cqi}
+  .eyebrow{margin-top:22px}
+  .intro-statement{margin-top:28px}
+  .intro h2{font-size:27px;line-height:1.3}
+  .intro-copy{margin-top:12px;font-size:15px;line-height:1.7}
+  .visual-stage{top:calc(var(--bar) + 10px);height:max(260px,min(98vw,52svh));margin-top:32px;border-radius:20px;box-shadow:0 0 0 20px var(--paper),0 28px 18px 8px var(--paper)}
+  .stage-caption{left:20px;top:20px;font-size:9.5px}
+  .stage-hint{right:20px;bottom:24px;font-size:11px}
+  .engine-explorer{margin-top:44px}
+  .view-tabs button{padding:0 12px}
+  .engine-button{padding:14px 8px 16px 0}
+  .engine-button strong{margin-top:8px;font-size:15px}
+  .engine-button small{font-size:11px}
+  .inspector{min-height:280px;margin-top:20px;padding:22px 20px 24px;border-radius:20px}
+  .inspector h3{font-size:19px}
+  .inspector h3 .engine-name{font-size:40px}
+  .inspector[data-engine=strata]::after{top:18px;right:18px}
+  #detail-description,#story-step p{font-size:14.5px}
+  .concepts{gap:8px 14px}
+  .concepts li{font-size:13px}
+  .personalization,.applications{padding-top:84px}
+  .section-heading h2{font-size:34px}
+  .section-lead{font-size:15px}
+  .system-flow{margin-top:40px}
+  .application-list{gap:16px;margin-top:36px}
+  .application-art{border-radius:18px}
+  .application-name{margin-top:14px;font-size:28px}
+  .application-copy strong{font-size:14px}
+  .application-copy>span{font-size:13px}
+  .application-link .arrow-icon{top:12px;right:12px;width:18px;height:18px}
+  .colophon{flex-direction:column;align-items:flex-start;margin-top:84px;padding:28px 0 44px}
+  .colophon p{flex-direction:column;align-items:flex-start;gap:8px}
+  dialog{padding:24px 22px 22px}
+  dialog>h2{font-size:25px}
+}
+@media(max-width:370px){
+  :root{--gutter:16px}
+  .signature-detail{display:none}
+  .intro h2{font-size:24px}
+  .engine-button strong{font-size:13.5px}
+  .engine-button small{font-size:10px}
+  .inspector{padding:20px 16px 22px}
+  .section-heading h2{font-size:30px}
+  .application-name{font-size:24px}
+}
+
+@media(prefers-reduced-motion:reduce){
+  .observatory,.observatory *{transition:none!important;animation:none!important}
+  .portal-departing .observatory{opacity:1}
+}
+@media(forced-colors:active){
+  .observatory,.inspector,.application-art,dialog{background:Canvas;color:CanvasText}
+  .engine-button,.view-tabs button,.related button[data-engine],.scenario-card,.text-action,.glass-action,.synk-portal,#about-open,#about-close,#story-back{border:1px solid ButtonText}
+  .engine-button[aria-pressed=true],.view-tabs button[aria-pressed=true]{outline:3px solid Highlight}
+  .visual-stage{forced-color-adjust:none;background:#f4f4f5;color:#0a0a0a}
+  .arrow-icon{background:LinkText;forced-color-adjust:none}
+}

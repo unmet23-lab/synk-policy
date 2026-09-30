@@ -3,224 +3,117 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="color-scheme" content="dark">
-  <meta name="description" content="Atlas는 여덟 엔진을 연결해 목표와 상황에 맞는 배움과 도움을 설계합니다. SYNK Atlas 연결 시각화.">
-  <title>Atlas — 당신을 위한 개인화 엔진 · SYNK</title>
+  <meta name="color-scheme" content="light">
+  <meta name="description" content="SYNK는 Atlas를 기반으로 개인화 시스템을 만듭니다. 개인의 목표와 상황을 이해하고, 필요한 배움과 도움을 연결하는 여덟 엔진.">
+  <title>Atlas · SYNK의 초개인화 엔진</title>
   <link rel="icon" type="image/png" sizes="16x16" href="/assets/favicon-synk-20260919-16.png">
 <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon-synk-20260919-32.png">
 <link rel="icon" type="image/png" sizes="48x48" href="/assets/favicon-synk-20260919-48.png">
 <link rel="icon" type="image/svg+xml" sizes="any" media="(prefers-color-scheme: dark)" href="/assets/favicon-synk-dark-20260919.svg">
 <link rel="canonical" href="https://synk.im/atlas/">
   <style data-synk-폰트="SUIT">@font-face{font-family:'SUIT Variable';font-weight:100 900;font-display:swap;src:url(/assets/suit.woff2) format('woff2-variations');}</style><style>@font-face{font-family:'Inter Tight';font-weight:500;font-display:swap;src:url(/assets/atlas-04a8f56b61c7.ttf) format('truetype')}@font-face{font-family:'DM Mono';font-weight:400;font-display:swap;src:url(/assets/atlas-55b4c98f123d.ttf) format('truetype')}</style>
-  <style>:root{color-scheme:dark;--paper:#eef3f6;--muted:#9eaebd;--faint:#697b8b;--edge:rgba(191,214,233,.13);--ice:#b9d8f2;--black:#000;--suit:'SUIT Variable',sans-serif;--latin:'Inter Tight',var(--suit);--mono:'DM Mono',monospace}*{box-sizing:border-box}html{background:var(--black);scroll-behavior:smooth}body{margin:0;color:var(--paper);font-family:var(--suit);font-weight:500;-webkit-font-smoothing:antialiased}button,a{-webkit-tap-highlight-color:transparent}button{font:inherit;color:inherit;cursor:pointer}button{border:0;background:none}button:focus-visible,a:focus-visible{outline:2px solid #bddfff;outline-offset:6px}button:disabled{cursor:default;opacity:.4}button, a{touch-action:manipulation}[hidden]{display:none!important}.mono{font-family:var(--mono);font-weight:400}.skip-link{position:fixed;top:-100px;left:20px;padding:14px;z-index:50;background:#eef3f6;color:#000}.skip-link:focus{top:12px}.observatory{position:relative;isolation:isolate;width:100%;min-height:100svh;padding:0 4.4%;overflow:hidden;background:radial-gradient(ellipse at 69% 39%,rgba(64,91,122,.12),transparent 49%),radial-gradient(ellipse at 2% 0%,rgba(115,137,153,.08),transparent 40%),#000}.observatory:before{content:'';position:absolute;z-index:-1;inset:0;opacity:.027;pointer-events:none;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 160 160' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.94' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' opacity='.6' filter='url(%23n)'/%3E%3C/svg%3E")}.masthead{height:103px;display:flex;align-items:center;justify-content:space-between;gap:24px;position:relative;z-index:4}.signature{display:flex;align-items:center;gap:21px}.signature img{width:77px;height:36px;object-fit:contain;opacity:.9}.signature-divider{width:1px;height:17px;background:#48505a}.signature>.mono{font-size:10px;letter-spacing:1.5px;color:#9ba5b0}.view-switch{display:flex;gap:4px;padding:5px;border:1px solid rgba(187,208,229,.13);border-radius:30px;background:linear-gradient(145deg,rgba(215,232,249,.035),rgba(133,162,199,.012));box-shadow:inset 0 1px 0 rgba(231,243,255,.035),0 4px 16px rgba(0,0,0,.15);backdrop-filter:blur(14px)}.view-switch button{border-radius:22px;min-height:36px;padding:8px 19px;font-size:12px;color:#909ca9;transition:color .25s,background .25s,box-shadow .25s}.view-switch button[aria-pressed=true]{color:#e5edf5;background:linear-gradient(150deg,rgba(192,215,241,.13),rgba(118,151,187,.055));box-shadow:inset 0 1px 0 rgba(213,234,255,.16),0 3px 8px #0006}.view-switch button span{margin-left:12px;color:#b6c6d4}.workspace{height:calc(100svh - 251px);min-height:660px;max-height:1000px;position:relative}.intro{position:relative;z-index:2;padding-top:59px;pointer-events:none;width:37%}.eyebrow{font-size:9px;letter-spacing:1.45px;line-height:1.8;color:#a2b5c7;margin:0 0 25px;display:flex;align-items:center;gap:10px;white-space:nowrap}.eyebrow>span{width:5px;height:5px;border-radius:50%;background:#b9d8f2;box-shadow:0 0 12px #82c2f266}.intro h1{font-family:var(--latin);font-weight:500;font-size:clamp(92px,8.25vw,143px);letter-spacing:-.075em;line-height:1.04;margin:0 0 23px -6px;white-space:nowrap;background:linear-gradient(125deg,#fff 5%,#dce7ee 50%,#91a2b0 95%);-webkit-background-clip:text;background-clip:text;color:transparent}.title-period{color:#a9c8dd}.intro h2{font-size:clamp(21px,1.8vw,28px);font-weight:500;line-height:1.65;letter-spacing:-.045em;margin:0 0 18px}.intro-copy{font-size:13px;line-height:1.9;letter-spacing:-.018em;margin:0;color:#9babb8}.visual-stage{position:absolute;left:26%;right:-5%;top:-21px;bottom:44px;isolation:isolate}#constellation{width:100%;height:100%;display:block;touch-action:pan-y;cursor:grab}#constellation:active{cursor:grabbing}.stage-caption{position:absolute;top:18px;right:8%;display:flex;gap:11px;align-items:center;pointer-events:none;opacity:.7}.stage-caption>.mono{font-size:8px;letter-spacing:1.3px;color:#8a9eb2}.hairline{height:1px;width:26px;background:linear-gradient(90deg,transparent,#7a92a8)}.graph-tools{position:absolute;bottom:3px;right:6.6%;display:flex;align-items:center;padding:5px;border:1px solid rgba(167,193,216,.14);border-radius:12px;background:linear-gradient(135deg,#bccfe50e,#52657f05);box-shadow:inset 0 1px 0 #deefff0c,0 5px 16px #0006;backdrop-filter:blur(16px)}.graph-tools button{display:grid;place-items:center;width:33px;height:33px;line-height:1;font-family:var(--latin);font-size:21px;font-weight:400;border-radius:7px;color:#9bafbf;transition:background .2s,color .2s}.graph-tools button:hover{background:#bfd7ec12;color:#f1f8ff}.graph-tools svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:1.3;stroke-linecap:round;stroke-linejoin:round}.inspector{position:absolute;left:0;top:427px;width:300px;z-index:3;padding:21px 2px 0 0;border-top:1px solid #bad6ed24}.panel-index{font-size:8px;letter-spacing:1.2px;color:#94a9ba;line-height:1.7;margin:0 0 13px}.inspector h3{font-size:19px;line-height:1.4;font-weight:500;letter-spacing:-.035em;margin:0 0 9px}.inspector h3 .engine-name{font-family:var(--latin);font-size:25px;letter-spacing:-.045em;display:block;margin-bottom:8px}.inspector p:not(.panel-index):not(.story-name){font-size:12px;line-height:1.8;letter-spacing:-.015em;color:#9eafbd;margin:0}.related{display:flex;flex-wrap:wrap;gap:7px;margin-top:16px;align-items:center}.related-caption{font-size:10px;color:#7f91a2;width:100%;margin-bottom:2px}.related button:not(.text-action){font-family:var(--latin);font-size:10px;font-weight:500;min-height:30px;padding:6px 11px;border:1px solid #9ab8ce26;border-radius:20px;color:#c0cfdb;background:linear-gradient(125deg,#b9d5eb0c,#8aa6c005);transition:background .2s,border-color .2s}.related button:hover{background:#a2c3df1c;border-color:#bfdfff4d}.text-action{font-size:11px;color:#d4e5f3;padding:5px 0;display:flex;align-items:center;gap:35px}.text-action span{font-size:16px}.gesture-hint{position:absolute;bottom:29px;left:45%;font-size:10px;display:flex;gap:9px;align-items:center;color:#8699aa;letter-spacing:.01em;margin:0;pointer-events:none}.gesture-hint svg{width:15px;height:15px;stroke:#95adbf;stroke-width:.8;fill:none}.engine-dock{position:relative;display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:4px;padding:15px 0 15px;border-top:1px solid var(--edge);z-index:5}.engine-button{min-height:65px;text-align:left;position:relative;display:grid;grid-template-columns:20px 1fr;grid-template-rows:23px 18px;gap:2px 6px;padding:8px 11px;border:1px solid transparent;border-radius:10px;transition:background .3s,border-color .3s,box-shadow .3s}.engine-button .ordinal{grid-row:1/3;align-self:start;padding-top:4px;font-size:8px;color:#778a9d}.engine-button strong{font-family:var(--latin);font-size:18px;font-weight:500;letter-spacing:-.03em;color:#a2b1be}.engine-button small{font-size:10px;color:#778c9e;white-space:nowrap}.engine-button:hover{background:#a4cae809}.engine-button[aria-pressed=true]{border-color:#c0def329;background:linear-gradient(140deg,#c3dfff14,#7c9bb708);box-shadow:inset 0 1px 0 #cfeaff14,0 9px 19px #0005}.engine-button[aria-pressed=true] strong{color:#e9f5ff}.engine-button[aria-pressed=true] .ordinal{color:#c4e3fb}.engine-button[aria-pressed=true] small{color:#a7c3d9}.engine-button.is-related strong{color:#cbd9e5}.colophon{display:flex;align-items:center;gap:18px;justify-content:space-between;min-height:51px;border-top:1px solid #7c9bb710;color:#728697;font-size:9px;position:relative;z-index:5}.colophon p{display:flex;align-items:center;gap:12px;margin:0}.colophon .mono{font-size:8px;letter-spacing:.9px;color:#92a5b6}.footer-dot{color:#627584}.colophon button{font-size:9px;color:#9aafbf;padding:10px 5px}.colophon button:hover{color:#e8f3fc}.colophon button span{margin-left:8px}.edition{margin-left:auto}.story-heading{display:flex;justify-content:space-between;align-items:baseline;gap:8px}.story-heading>button{font-size:10px;color:#b2c7d8;white-space:nowrap}.scenario-card{width:100%;text-align:left;display:flex;align-items:center;justify-content:space-between;min-height:52px;border-bottom:1px solid #b8d6ec17;padding:10px 0;gap:18px}.scenario-card span:first-child{display:flex;flex-direction:column;gap:5px}.scenario-card strong{font-size:13px;font-weight:500;color:#d9e6ef;letter-spacing:-.015em}.scenario-card small{font-size:10px;color:#859eaf}.scenario-card>span:last-child{color:#88a4b8;font-size:16px;transition:transform .2s}.scenario-card:hover>span:last-child{transform:translateX(4px);color:#d9efff}.story-name{font-size:12px;color:#c0d5e5;margin:0 0 13px}.story-progress{display:flex;align-items:center;gap:5px;margin-bottom:16px}.story-progress button{height:20px;flex:1;padding:8px 0;position:relative}.story-progress button:before{content:'';display:block;height:2px;border-radius:1px;background:#657f954d;transition:background .3s,box-shadow .3s}.story-progress button[aria-current=step]:before{background:#d4ebfb;box-shadow:0 0 8px #a6d9ff66}.story-progress button.past:before{background:#7caccd}.story-step-label{font-family:var(--latin);color:#bfd7eb;font-size:11px;margin-bottom:9px;display:block}.glass-action{padding:10px 15px;margin-top:17px;min-height:37px;display:flex;align-items:center;gap:40px;font-size:11px;border-radius:22px;border:1px solid #c3dcf139;background:linear-gradient(150deg,#cde7fa17,#7897b90a);box-shadow:inset 0 1px 0 #e2f3ff1f,0 7px 18px #0006;color:#dceefc}.glass-action:hover{background:linear-gradient(150deg,#cde7fa24,#7897b919)}.inspector.flash #engine-detail,.inspector.flash #story-step{animation:detail-appear .35s ease-out}@keyframes detail-appear{from{opacity:.1;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}dialog{color:#dce7ef;max-width:540px;width:calc(100% - 32px);padding:40px;background:linear-gradient(135deg,#18212afa,#0b1016fa);border:1px solid #bddefb29;border-radius:22px;box-shadow:0 32px 120px #000;backdrop-filter:blur(20px)}dialog::backdrop{background:#000b;backdrop-filter:blur(7px)}dialog>h2{font-size:30px;line-height:1.5;font-weight:500;letter-spacing:-.04em;margin:0 0 22px}dialog>p:not(.eyebrow){color:#a6b9c8;font-size:13px;line-height:1.9}#about-close{position:absolute;right:15px;top:12px;font-size:26px;color:#b7cbd9;min-width:38px;min-height:38px}.no-script{padding:25px;font-size:16px;line-height:1.7}.inspector[data-engine=strata]:after{content:'설계·준비 중';display:block;font-size:9px;color:#8598a8;margin-top:12px}
-@media(min-width:1700px){.observatory{padding:0 5.5%}.workspace{min-height:760px}.intro{padding-top:90px}.inspector{top:495px;width:335px}.inspector h3{font-size:22px}.inspector p:not(.panel-index):not(.story-name){font-size:14px}.visual-stage{left:25%;right:-4%;bottom:25px}.engine-button{min-height:76px;padding:13px 16px}.engine-button strong{font-size:21px}.engine-button small{font-size:11px}.workspace{height:calc(100svh - 274px)}}
-@media(max-width:1100px) and (min-width:761px){.observatory{padding:0 3.4%}.intro{width:38%;padding-top:56px}.intro h1{font-size:96px}.intro h2{font-size:21px}.intro-copy{font-size:12px}.visual-stage{left:29%;right:-7%;top:10px;bottom:65px}.inspector{width:264px;top:405px}.engine-button{padding:8px 5px;grid-template-columns:15px 1fr;gap:2px 3px}.engine-button strong{font-size:16px}.engine-button small{font-size:9px}.gesture-hint{left:40%}.signature>.mono{font-size:9px;letter-spacing:.9px}}
-@media(max-width:760px){.observatory{padding:0 23px;background:radial-gradient(ellipse at 50% 42%,#334e7519,transparent 52%),#000}.masthead{height:81px;gap:12px}.signature{gap:12px}.signature img{width:61px;height:28px}.signature>.mono{font-size:8px;letter-spacing:.7px;max-width:90px;line-height:1.7}.signature-divider{height:20px}.view-switch{gap:1px;padding:3px}.view-switch button{padding:7px 11px;font-size:10px;min-height:33px}.view-switch button span{display:none}.workspace{min-height:0;height:auto;max-height:none;display:flex;flex-direction:column}.intro{width:100%;padding-top:25px;pointer-events:auto}.eyebrow{font-size:8px;margin-bottom:16px;letter-spacing:1.1px}.intro h1{font-size:87px;line-height:1;margin-left:-3px;margin-bottom:20px}.intro h2{font-size:20px;line-height:1.6;margin-bottom:12px}.intro-copy{font-size:12px;line-height:1.7}.visual-stage{position:relative;left:auto;right:auto;top:auto;bottom:auto;width:calc(100% + 46px);margin-left:-23px;height:440px;margin-top:-4px}.stage-caption{top:20px;right:25px}.stage-caption>.mono{font-size:6px;letter-spacing:.7px}.hairline{width:18px}.graph-tools{right:24px;bottom:13px;border-radius:10px}.graph-tools button{width:31px;height:32px}.gesture-hint{position:static;order:2;justify-content:flex-start;margin:0 0 24px;color:#8da4b7;font-size:9px}.inspector{position:relative;top:auto;width:100%;padding-top:20px;margin:0 0 30px;order:3;min-height:184px}.inspector h3{font-size:20px}.inspector p:not(.panel-index):not(.story-name){font-size:13px;max-width:520px}.inspector h3 .engine-name{font-size:25px;display:inline;margin-right:15px}.panel-index{font-size:8px}.related{margin-top:13px}.engine-dock{grid-template-columns:repeat(4,minmax(0,1fr));gap:7px 3px;padding:17px 0}.engine-button{grid-template-columns:1fr;grid-template-rows:15px 23px 17px;gap:3px;padding:9px 9px;min-height:80px}.engine-button .ordinal{grid-row:auto;padding:0;font-size:7px}.engine-button strong{font-size:17px}.engine-button small{font-size:9px}.colophon{align-items:flex-start;gap:8px;flex-wrap:wrap;padding:15px 0 22px;min-height:70px;font-size:8px}.colophon p{gap:7px;line-height:20px}.colophon .mono{font-size:7px}.colophon button{font-size:8px;padding:4px 0}.edition{display:none}.story-progress{max-width:360px}.scenario-card{min-height:57px}.story-heading>button{min-height:24px}.inspector[data-engine=strata]:after{font-size:10px}}
-@media(max-width:370px){.observatory{padding:0 17px}.signature-divider,.signature>.mono{display:none}.view-switch button{padding:7px 12px}.intro h1{font-size:82px}.intro h2{font-size:19px}.visual-stage{width:calc(100% + 34px);margin-left:-17px;height:390px}.stage-caption{right:19px}.engine-button{padding:8px 6px}.engine-button small{font-size:8px}.engine-button strong{font-size:16px}.gesture-hint{font-size:8px}.inspector h3 .engine-name{display:block}.colophon{display:block}.colophon button{margin-top:7px}}
-@media(prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
-@media(min-width:761px) and (max-height:820px){.masthead{height:79px}.workspace{height:calc(100svh - 226px);min-height:505px}.intro{padding-top:29px}.intro h1{font-size:96px;margin-bottom:18px}.intro h2{font-size:21px;line-height:1.55;margin-bottom:12px}.eyebrow{margin-bottom:17px}.intro-copy{font-size:12px;line-height:1.75}.inspector{top:328px;width:288px;padding-top:16px}.inspector h3{font-size:17px;margin-bottom:7px}.inspector h3 .engine-name{font-size:22px;display:inline;margin-right:11px}.inspector p:not(.panel-index):not(.story-name){font-size:11px;line-height:1.7}.panel-index{margin-bottom:9px}.related{margin-top:11px;gap:5px}.related-caption{font-size:9px}.related button:not(.text-action){min-height:26px;padding:4px 9px;font-size:10px}.visual-stage{top:-5px;bottom:30px;left:28%;right:-5%}.gesture-hint{bottom:12px;font-size:9px;left:43%}.graph-tools{bottom:4px}.stage-caption{top:10px}.story-name{font-size:11px;margin-bottom:6px}.story-progress{margin-bottom:9px}.story-step-label{font-size:10px;margin-bottom:5px}.glass-action{margin-top:10px;min-height:32px;padding:8px 13px}.scenario-card{min-height:46px;padding:8px 0}.scenario-card strong{font-size:12px}.scenario-card small{font-size:9px}.engine-dock{padding:12px 0}.colophon{min-height:48px}.inspector[data-engine=strata]:after{position:absolute;right:0;top:16px;margin:0;font-size:8px}}
-.graph-tools,.stage-caption{z-index:2}
-.engine-signal{display:block;width:21px;height:21px;flex:none;overflow:visible}
-.engine-button,.related button[data-engine]{--signal:#CBD8E1;--signal-light:#EEF5FA;--signal-rgb:203,216,225}
-.engine-button.is-preview,.engine-button[aria-pressed=true],.related button.is-preview{--signal:var(--thread);--signal-light:var(--thread-light);--signal-rgb:var(--thread-rgb)}
-.signal-orbit{fill:none;stroke:var(--signal);stroke-width:.7;opacity:.36;transition:stroke .4s,opacity .4s}
-.signal-arc{fill:none;stroke:var(--signal-light);stroke-width:.75;stroke-linecap:round;opacity:.65;transition:stroke .4s}
-.signal-halo{fill:var(--signal);opacity:.09;transition:fill .4s,opacity .4s}
-.signal-core{fill:var(--signal);filter:drop-shadow(0 0 2px rgba(var(--signal-rgb),.42));transition:fill .4s,filter .4s}
-.signal-glint{fill:var(--signal-light);opacity:.9;transition:fill .4s}
-.engine-button .ordinal{display:flex;flex-direction:column;align-items:center;gap:4px;padding-top:0;transform:translateY(-1px)}
-.engine-button{transition:background .4s,border-color .4s,box-shadow .4s}
-.engine-button .engine-signal{opacity:.78;transition:opacity .4s}
-.engine-button.is-preview .engine-signal,.engine-button.is-related .engine-signal,.engine-button[aria-pressed=true] .engine-signal{opacity:1}
-.engine-button.is-related{border-color:#cbd8e112}
-.engine-button.is-preview,.engine-button[aria-pressed=true]{border-color:rgba(var(--signal-rgb),.28);background:linear-gradient(140deg,rgba(var(--signal-rgb),.075),rgba(var(--signal-rgb),.016));box-shadow:inset 0 1px 0 #e6f3ff1c,inset 0 -1px 0 rgba(var(--signal-rgb),.06),0 9px 19px #0005}
-.engine-button .ordinal{transition:color .4s}
-.engine-button.is-preview .ordinal,.engine-button[aria-pressed=true] .ordinal{color:var(--signal-light)}
-.engine-button[aria-pressed=true] strong{color:#fff}
-.engine-button.is-preview .signal-orbit,.engine-button[aria-pressed=true] .signal-orbit{opacity:.78}
-.engine-button.is-preview .signal-halo,.engine-button[aria-pressed=true] .signal-halo{opacity:.2}
-.inspector{transition:border-color .35s;border-top-color:rgba(var(--thread-rgb,185,216,242),.28)}
-.related button:not(.text-action){display:inline-flex;align-items:center;gap:6px;border-color:rgba(var(--signal-rgb),.18);background:linear-gradient(125deg,rgba(var(--signal-rgb),.045),rgba(var(--signal-rgb),.012));transition:background .4s,border-color .4s}
-.related button.is-preview:not(.text-action){border-color:rgba(var(--signal-rgb),.48);background:rgba(var(--signal-rgb),.1)}
-.related .engine-signal{width:14px;height:14px;opacity:.9}
-.story-progress button[aria-current=step]:before{background:var(--thread-light);box-shadow:0 0 8px rgba(var(--thread-rgb),.3)}
-.story-progress button.past:before{background:var(--thread);opacity:.68}
-.story-step-label{color:var(--thread-light,#bfd7eb)}
-@media(max-width:760px){.engine-button .ordinal{flex-direction:row;gap:6px;transform:none;height:15px}.engine-button .engine-signal{width:16px;height:16px}}
-@media(forced-colors:active){.intro h1{color:CanvasText;background:none}.engine-button,.view-switch,.graph-tools,.glass-action{border:1px solid ButtonText}.engine-button[aria-pressed=true],.view-switch button[aria-pressed=true]{outline:2px solid Highlight}.observatory{background:Canvas}.inspector{border-color:CanvasText}.signature img{background:#000}.visual-stage{forced-color-adjust:none;background:#000;border-radius:12px}}
-@media(min-width:761px){.intro-copy{transition:opacity .25s}.observatory[data-detail=true] .intro-copy{opacity:0}.observatory[data-detail=true] .inspector{top:365px}.inspector h3 .engine-name{display:inline;margin-right:12px}.inspector[data-engine=strata]:after{position:absolute;right:0;top:21px;font-size:8px;margin:0}.related-caption{font-size:9px}.inspector h3{line-height:1.6}}
-@media(min-width:1700px){.observatory[data-detail=true] .inspector{top:410px}}
-@media(min-width:761px) and (max-height:820px){.observatory[data-detail=true] .inspector{top:285px}.inspector[data-engine=strata]:after{top:16px}}
 
-/* Bespoke embroidered entry. The raster carries the real thread texture;
-   the quiet frame only establishes a clear, generous hit area. */
-/* Fixed silhouette. Light moves over the material; the control never follows the cursor. */
-.synk-portal{
-  --portal-x:28%;--portal-y:20%;
-  position:relative;isolation:isolate;display:inline-flex;align-items:center;justify-content:center;
-  flex-shrink:0;gap:9px;min-height:52px;padding:7px 17px 7px 13px;border-radius:13px;
-  text-decoration:none;color:#e2e8ed;border:1px solid transparent;
-  background:transparent;box-shadow:none;
-  transition:border-color .5s,box-shadow .5s;
-  -webkit-tap-highlight-color:transparent;
-}
-.synk-portal::before{
-  content:'';position:absolute;inset:0;z-index:-1;border-radius:inherit;pointer-events:none;
-  background:radial-gradient(ellipse 120px 75px at var(--portal-x) var(--portal-y),#d6e7ff1c,transparent 85%),
-    linear-gradient(118deg,transparent 14%,#eff7ff04 24%,#eff7ff18 25%,#dceeff0a 36%,transparent 37%,transparent 72%,#c1d6eb07 73%,transparent 89%),
-    linear-gradient(165deg,#242b33d9,#10161beb 52%,#070b10f5);
-  box-shadow:inset 0 1px 0 #f3f8ff24,inset 0 -3px 2px #000b,inset 0 -1px 0 #b8d3e846;
-  opacity:0;transition:opacity .5s cubic-bezier(.2,.7,.2,1);
-}
-.synk-portal::after{
-  content:'';position:absolute;inset:0;z-index:-1;border-radius:inherit;padding:1px;pointer-events:none;
-  background:linear-gradient(125deg,#eff7ff9c 0%,#d7eaff36 21%,#a7c0d00a 46%,#a7bbcb30 77%,#f3f8ff70);
-  -webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);
-  -webkit-mask-composite:xor;mask-composite:exclude;
-  opacity:0;transition:opacity .5s;
-}
-.portal-rim{
-  position:absolute;inset:0;border-radius:inherit;padding:1px;pointer-events:none;opacity:0;
-  background:radial-gradient(ellipse 70px 44px at var(--portal-x) var(--portal-y),#f0f5fc91,transparent 86%),
-    linear-gradient(112deg,transparent 5%,#6c96c24d 24%,#8da89057 42%,#d2bd7c57 60%,#cf939e4d 75%,transparent 95%);
-  -webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);
-  -webkit-mask-composite:xor;mask-composite:exclude;
-  transition:opacity .5s;
-}
-.portal-thread{position:relative;display:block;flex-shrink:0;width:92px;height:36px;margin-right:15px}
-.portal-embroidery,.portal-thread-light{display:block;width:100%;height:100%;object-fit:contain}
-.portal-embroidery{filter:drop-shadow(0 3px 2px #000c)}
-/* A second exposure of the original fibers preserves their texture and alpha. */
-.portal-thread-light{
-  position:absolute;inset:0;pointer-events:none;filter:brightness(1.4) saturate(.8);opacity:0;
-  -webkit-mask-image:linear-gradient(115deg,transparent 5%,#000 45%,transparent 85%);
-  mask-image:linear-gradient(115deg,transparent 5%,#000 45%,transparent 85%);
-  -webkit-mask-size:220% 100%;mask-size:220% 100%;
-  -webkit-mask-position:var(--portal-x) 50%;mask-position:var(--portal-x) 50%;
-  transition:opacity .5s;
-}
-.portal-label{font-size:11px;font-weight:500;letter-spacing:.01em;white-space:nowrap;color:#b0b8c1;transition:color .35s}
-.portal-arrow{display:grid;place-items:center;flex-shrink:0;width:14px;height:18px;color:#a8b5c1;transition:color .35s}
-.portal-arrow svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:1.35;stroke-linecap:round;stroke-linejoin:round;transition:transform .4s cubic-bezier(.2,.8,.2,1)}
-.synk-portal:focus-visible{outline:2px solid #edf7ff;outline-offset:5px}
-.synk-portal:is(.is-lit,:focus-visible,:active){border-color:#d5e4f01a;box-shadow:0 2px 0 #000b,0 5px 7px #0008,0 12px 30px #0005}
-.synk-portal:is(.is-lit,:focus-visible,:active)::before,.synk-portal:is(.is-lit,:focus-visible,:active)::after{opacity:1}
-.synk-portal:is(.is-lit,:focus-visible) .portal-rim{opacity:.65}
-.synk-portal:is(.is-lit,:focus-visible) .portal-thread-light{opacity:.55}
-.synk-portal:is(.is-lit,:focus-visible) .portal-label{color:#f1f5fa}
-.synk-portal:is(.is-lit,:focus-visible) .portal-arrow{color:#edf3f9}
-.synk-portal:is(.is-lit,:focus-visible) .portal-arrow svg{transform:translate(1.5px,-1.5px)}
-.synk-portal:active,.portal-departing .synk-portal{box-shadow:inset 0 2px 6px #000c,inset 0 1px 0 #d9eafa0c;transition-duration:.12s}
-.synk-portal:active .portal-thread{filter:brightness(.9)}
-/* A quiet departure, with no expanding wave or spatial jump. */
-.observatory{transition:opacity .36s cubic-bezier(.4,0,.2,1)}
-.portal-departing .observatory{opacity:0}
-@media(max-width:760px){
-  .synk-portal{min-height:46px;padding:5px 12px 5px 10px;gap:8px;border-radius:12px}
-  .portal-thread{width:84px;height:33px;margin-right:11px}
-  .signature>.mono,.signature-divider{display:none}
-}
-@media(prefers-reduced-motion:reduce){
-  .synk-portal .portal-arrow svg{transform:none!important}
-  .portal-thread-light{display:none}
-  .portal-departing .observatory{opacity:1}
-}
-@media(forced-colors:active){
-  .synk-portal{color:LinkText;background:Canvas;border:2px solid LinkText;box-shadow:none;backdrop-filter:none}
-  .synk-portal::before,.synk-portal::after,.portal-rim,.portal-thread-light{display:none}
-  .portal-label,.portal-arrow{color:LinkText}
-  .portal-embroidery{filter:none}.synk-portal:focus-visible{outline-color:Highlight}
-}
-/* Keep navigation entirely outside the interactive constellation. */
-.portal-dock{position:relative;display:flex;flex-shrink:0;align-items:center}
-.signature>.mono{opacity:.76}
-.graph-tools{bottom:4px}
-.gesture-hint{left:65.5%;bottom:12px;transform:translateX(-50%);white-space:nowrap;font-size:9px;color:#71818e}
-@media(min-width:761px){.intro h1{font-size:clamp(86px,7.2vw,122px)}}
-@media(min-width:1700px){.gesture-hint{left:64.5%}}
-@media(max-width:1100px) and (min-width:761px){.gesture-hint{left:68%}}
-@media(max-width:760px){
-  .masthead{height:68px}.signature>.mono{display:block;max-width:none;font-size:8px;letter-spacing:1.4px}
-  .visual-stage{margin-bottom:0}
-  .graph-tools{bottom:13px}
-  .gesture-hint{transform:none;white-space:normal;justify-content:center;align-self:center;margin-bottom:30px;font-size:8px}
-}
-@media(max-width:480px){.signature-detail{display:none}}
-@media(forced-colors:active){.portal-dock .synk-portal{background:Canvas;border-color:LinkText}}
-</style>
-<script>(function(){try{const raw=sessionStorage.getItem('synk-atlas-handoff');sessionStorage.removeItem('synk-atlas-handoff');if(!raw)return;const v=JSON.parse(raw);if(Date.now()-v.time>8000||![v.x,v.y,v.size].every(Number.isFinite)||v.size<20||v.size>1000)return;const root=document.documentElement;root.dataset.atlasArrival='pending';root.style.setProperty('--arrival-x',v.x+'px');root.style.setProperty('--arrival-y',v.y+'px');root.style.setProperty('--arrival-size',v.size+'px');setTimeout(()=>root.removeAttribute('data-atlas-arrival'),3000)}catch{}})();</script><link rel="stylesheet" href="/atlas-portal-arrival.css?v=4ae630a9f9db"><script defer src="/atlas-portal-arrival.js?v=4ae630a9f9db"></script></head>
+  <link rel="stylesheet" href="/atlas-editorial.css?v=edcc655d9678">
+<script>(function(){try{const raw=sessionStorage.getItem('synk-atlas-handoff');sessionStorage.removeItem('synk-atlas-handoff');if(!raw)return;const v=JSON.parse(raw);if(Date.now()-v.time>8000||![v.x,v.y,v.size].every(Number.isFinite)||v.size<20||v.size>1000)return;const root=document.documentElement;root.dataset.atlasArrival='pending';root.style.setProperty('--arrival-x',v.x+'px');root.style.setProperty('--arrival-y',v.y+'px');root.style.setProperty('--arrival-size',v.size+'px');setTimeout(()=>root.removeAttribute('data-atlas-arrival'),3000)}catch{}})();</script><link rel="stylesheet" href="/atlas-portal-arrival.css?v=6953431e2ed8"><script defer src="/atlas-portal-arrival.js?v=6953431e2ed8"></script></head>
 <body><div class="atlas-arrival" aria-hidden="true"><div class="atlas-arrival-orb"></div></div>
   <a class="skip-link" href="#engine-nav">엔진 선택으로 건너뛰기</a>
   <main class="observatory" id="observatory">
     <header class="masthead">
-      <div class="signature"><span class="mono">ATLAS<span class="signature-detail"> / ENGINE SYSTEM</span></span></div>
-
-        <div class="portal-dock">
-      <a class="synk-portal" href="/#top" aria-label="SYNK 살펴보기, SYNK 홈페이지로 이동">
-        <span class="portal-rim" aria-hidden="true"></span>
-        <span class="portal-thread">
-          <img class="portal-embroidery" src="/assets/atlas-442f185dbf9e.webp" width="138" height="54" alt="SYNK">
-          <img class="portal-thread-light" src="/assets/atlas-442f185dbf9e.webp" width="138" height="54" alt="" aria-hidden="true">
-        </span>
-        <span class="portal-label">살펴보기</span>
-        <span class="portal-arrow" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 18 18 6M6 6h12v12"/></svg></span>
-      </a>
-        </div>
+      <div class="signature"><img class="signature-logo" src="/assets/brand-synk.webp" width="744" height="360" alt="SYNK"><span class="mono signature-detail">ATLAS</span></div>
+      <nav class="section-nav" aria-label="Atlas 페이지 목차"><a href="#engine-explorer">엔진</a><a href="#personalization">개인화 시스템</a><a href="#applications">적용 분야</a></nav>
+      <div class="portal-dock">
+        <a class="synk-portal" href="/#top" aria-label="SYNK 회사 소개, 회사 홈페이지로 이동">
+          <span class="portal-rim" aria-hidden="true"></span>
+          <span class="portal-thread">
+            <img class="portal-embroidery" src="/assets/atlas-442f185dbf9e.webp" width="138" height="54" alt="SYNK" loading="lazy">
+            <img class="portal-thread-light" src="/assets/atlas-442f185dbf9e.webp" width="138" height="54" alt="" aria-hidden="true" loading="lazy">
+          </span>
+          <span class="portal-label">회사 소개</span>
+          <span class="portal-arrow" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 18 18 6M6 6h12v12"/></svg></span>
+        </a>
+      </div>
     </header>
 
     <section class="workspace" aria-label="Atlas 엔진 연결망">
       <div class="intro">
-        <p class="eyebrow mono"><span></span> CONNECTED, AROUND YOU.</p>
-        <h1>Atlas</h1>
-        <h2>여덟 엔진이 모여<br>당신을 위한 Atlas가 됩니다</h2>
-        <p class="intro-copy">목표와 상황에 맞는 배움과 도움을<br>제공하는 개인화 시스템</p>
+        <div class="intro-heading">
+          <h1>Atlas</h1>
+          <p class="eyebrow">SYNK의 초개인화 엔진</p>
+        </div>
+        <div class="intro-statement">
+          <h2>SYNK는 Atlas로<br>개인화 시스템을 만듭니다</h2>
+          <p class="intro-copy">개인의 목표와 상황을 이해하고,<br>필요한 배움과 도움을 연결합니다.</p>
+        </div>
       </div>
 
       <div class="visual-stage" id="visual-stage">
-        <canvas id="constellation" role="img" aria-label="중앙에서 빛이 흐르는 Atlas 광원과 Core, Strata, Loom, Vellum, Trail, Prism, Temper, Reed를 잇는 은백색 입체 연결망. 엔진에 포인터를 올리거나 아래 버튼으로 키보드 초점을 옮기면 해당 브랜드색이 연결을 따라 번집니다. 클릭하거나 터치하면 선택이 고정되고 선택한 관계에만 스티치가 나타납니다. 기능 점이나 이름에 포인터를 올리면 점이 살짝 움직이고, 연결된 주변 점과 선이 탄력 있게 따라옵니다."></canvas>
-        <div class="stage-caption"><span class="hairline"></span><span class="mono" id="stage-caption">EIGHT ENGINES. ONE ATLAS</span></div>
-        <div class="graph-tools" role="group" aria-label="연결망 조작">
-          <button type="button" id="zoom-out" aria-label="축소" title="축소">−</button>
-          <button type="button" id="reset-view" aria-label="시점과 선택 초기화" title="시점과 선택 초기화"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 3H3v5M16 3h5v5M21 16v5h-5M8 21H3v-5"/></svg></button>
-          <button type="button" id="zoom-in" aria-label="확대" title="확대">+</button>
-        </div>
-
+        <canvas id="constellation" role="img" aria-label="Atlas를 가운데 두고 Core, Strata, Loom, Vellum, Trail, Prism, Temper, Reed 여덟 엔진을 한 궤도에 놓은 연결 지도. 엔진을 가리키거나 선택하면 그 엔진의 연결선과 설명이 나타납니다."></canvas>
+        <p class="stage-caption mono" id="stage-caption">08 ENGINES / ONE SYSTEM</p>
+        <p class="stage-hint" aria-hidden="true">엔진을 눌러 연결 보기</p>
       </div>
 
-      <aside class="inspector" id="inspector" aria-label="선택한 연결 설명">
-        <div id="explore-panel">
-          <p class="panel-index mono" id="panel-index">01 — 08 / CONNECTED SYSTEM</p>
-          <div id="engine-detail" aria-live="polite" aria-atomic="true">
-            <h3 id="detail-title">목표에 따라 달라지는 경험</h3>
-            <p id="detail-description">각 엔진의 역할을 연결해 목표에 맞는 배울 내용과<br>안내·표현 방식을 설계합니다.</p>
-          </div>
-          <div class="related" id="related"><button type="button" class="text-action" id="start-exploring">Core부터 살펴보기 <span aria-hidden="true">↗</span></button></div>
-        </div>
-        <div id="story-panel" hidden>
-          <div class="story-heading"><p class="panel-index mono">FOLLOW THE CONNECTION</p><button type="button" id="story-back" aria-label="다른 경험 고르기" hidden>다른 경험</button></div>
-          <div id="scenario-picker"></div>
-          <div id="story-player" hidden>
-            <p class="story-name" id="story-name"></p>
-            <div class="story-progress" id="story-progress" role="group" aria-label="경험 단계"></div>
-            <div id="story-step" aria-live="polite" aria-atomic="true"></div>
-            <button type="button" class="glass-action" id="next-step">다음 연결 <span aria-hidden="true">→</span></button>
+      <section class="engine-explorer" id="engine-explorer" aria-labelledby="explorer-title">
+        <div class="explorer-head">
+          <h2 class="explorer-title" id="explorer-title">여덟 엔진</h2>
+          <div class="view-tabs" role="group" aria-label="살펴보는 방식">
+            <button type="button" data-view="explore" aria-pressed="true">엔진별로</button>
+            <button type="button" data-view="story" aria-pressed="false">예시로</button>
           </div>
         </div>
-      </aside>
-
-      <p class="gesture-hint"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h10M8 3v10M3 8l2-2M3 8l2 2M13 8l-2-2M13 8l-2 2"/></svg><span>드래그해 둘러보고, 연결을 선택하세요</span></p>
+        <nav class="engine-dock" id="engine-nav" aria-label="여덟 엔진 선택"></nav>
+        <aside class="inspector" id="inspector" aria-label="선택한 연결 설명">
+          <div id="explore-panel">
+            <p class="panel-index mono" id="panel-index">ENGINE CONNECTIONS / 01 — 08</p>
+            <div id="engine-detail" aria-live="polite" aria-atomic="true">
+              <h3 id="detail-title">여덟 역할을 하나로</h3>
+              <p id="detail-description">이해와 판단부터 표현, 기록, 변화의 확인까지.<br>여덟 엔진이 각자의 역할로 개인화를 완성해 갑니다.</p>
+              <ul class="concepts" id="concepts" aria-label="주요 기능" hidden></ul>
+            </div>
+            <div class="related" id="related"><button type="button" class="text-action" id="start-exploring">Core부터 살펴보기 <span class="arrow-icon" aria-hidden="true"></span></button></div>
+          </div>
+          <div id="story-panel" hidden>
+            <div class="story-heading"><p class="panel-index mono">FOLLOW THE CONNECTION</p><button type="button" id="story-back" aria-label="다른 경험 고르기" hidden>다른 경험</button></div>
+            <div id="scenario-picker"></div>
+            <div id="story-player" hidden>
+              <p class="story-name" id="story-name"></p>
+              <div class="story-progress" id="story-progress" role="group" aria-label="경험 단계"></div>
+              <div id="story-step" aria-live="polite" aria-atomic="true"></div>
+              <button type="button" class="glass-action" id="next-step">다음 연결 <span aria-hidden="true">→</span></button>
+            </div>
+          </div>
+        </aside>
+      </section>
     </section>
 
-    <nav class="engine-dock" id="engine-nav" aria-label="여덟 엔진 선택"></nav>
-    <footer class="colophon"><p><span class="mono">SYNK ATLAS</span><span class="footer-dot">·</span>여덟 엔진, 한 사람을 위한 설계</p><button type="button" id="about-open">이 연결망에 대하여 <span aria-hidden="true">↗</span></button><span class="mono edition">CONNECTION STUDY / 01</span></footer>
+    <section class="personalization" id="personalization" aria-labelledby="personalization-title">
+      <div class="section-heading"><p class="section-index mono">02 / PERSONALIZATION</p><h2 id="personalization-title">개인의 차이가<br>시스템의 기준이 됩니다</h2><p class="section-lead">같은 목표라도 출발점과 필요한 도움은 다릅니다.<br>Atlas는 그 차이를 다음 경험에 반영하도록 설계합니다.</p></div>
+      <ol class="system-flow">
+        <li><img class="flow-icon" src="/assets/loom-search-20260918.webp" width="355" height="480" alt="" loading="lazy" decoding="async"><span class="flow-number mono">01</span><h3>이해</h3><div class="flow-detail"><p>목표와 현재 상황, 이전의 경험을 살펴<br>지금 필요한 도움의 방향을 정합니다.</p><span class="flow-engines">Core · Strata · Trail</span></div><span class="flow-result">개인의 맥락</span></li>
+        <li><img class="flow-icon" src="/assets/loom-adapt-20260918.webp" width="480" height="446" alt="" loading="lazy" decoding="async"><span class="flow-number mono">02</span><h3>구성</h3><div class="flow-detail"><p>배울 내용과 설명, 화면과 소리를 연결해<br>개인에게 맞는 경험을 구성합니다.</p><span class="flow-engines">Loom · Vellum · Reed</span></div><span class="flow-result">맞춤 경험</span></li>
+        <li><img class="flow-icon" src="/assets/loom-check-20260918.webp" width="480" height="437" alt="" loading="lazy" decoding="async"><span class="flow-number mono">03</span><h3>확인</h3><div class="flow-detail"><p>어떤 도움이 있었고 무엇이 달라졌는지.<br>확인한 결과를 다음 선택에 반영합니다.</p><span class="flow-engines">Prism · Temper · Trail</span></div><span class="flow-result">다음 선택</span></li>
+      </ol>
+      <p class="scope-note">개발 중인 개인화 시스템의 설계 방향입니다. Strata는 설계·준비 단계입니다.</p>
+    </section>
+
+    <section class="applications" id="applications" aria-labelledby="applications-title">
+      <div class="section-heading"><p class="section-index mono">03 / BUILT WITH ATLAS</p><h2 id="applications-title">하나의 기술,<br>다양한 경험</h2><p class="section-lead">SYNK는 각 서비스의 목적에 맞게<br>필요한 엔진을 연결합니다.</p></div>
+      <div class="application-list">
+        <a class="application-link" data-service="lab" href="/lab/" target="_top"><span class="application-art" aria-hidden="true"><img src="/assets/lab-object.webp" width="1000" height="707" alt="" loading="lazy" decoding="async"></span><span class="application-name">LAB</span><span class="application-copy"><strong>배움의 다음 단계</strong><span>목표와 학습 결과에 맞는 한국어 과제와 힌트</span></span><span class="arrow-icon" aria-hidden="true"></span></a>
+        <a class="application-link" data-service="shift" href="/shift/" target="_top"><span class="application-art" aria-hidden="true"><img src="/assets/shift-work-20260918.webp" width="1120" height="1120" alt="" loading="lazy" decoding="async"></span><span class="application-name">SHIFT</span><span class="application-copy"><strong>일에 맞는 AI 경험</strong><span>참여자의 업무와 수준을 고려한 실습과 제작 과정</span></span><span class="arrow-icon" aria-hidden="true"></span></a>
+        <a class="application-link" data-service="pulse" href="/pulse/" target="_top"><span class="application-art" aria-hidden="true"><img src="/assets/pulse-listening-20260918.webp" width="1120" height="1120" alt="" loading="lazy" decoding="async"></span><span class="application-name">PULSE</span><span class="application-copy"><strong>감각으로 전하는 이야기</strong><span>캐릭터의 움직임, 음악과 장면 표현</span></span><span class="arrow-icon" aria-hidden="true"></span></a>
+        <a class="application-link" data-service="path" href="/path/" target="_top"><span class="application-art" aria-hidden="true"><img src="/assets/path-vr-felt-20260918.webp" width="1024" height="1024" alt="" loading="lazy" decoding="async"></span><span class="application-name">PATH</span><span class="application-copy"><strong>목표로 이어지는 준비</strong><span>희망 전공과 진로에 맞춘 유학·면접 연습</span></span><span class="arrow-icon" aria-hidden="true"></span></a>
+      </div>
+      <p class="scope-note">LAB을 중심으로 개인화 학습 기능을 개발하고 있습니다. 각 서비스의 제공 범위는 해당 소개에서 확인할 수 있습니다.</p>
+    </section>
+    <footer class="colophon"><p><span class="mono">SYNK / ATLAS</span><span class="footer-dot">·</span>개인을 위한 시스템을 만듭니다.</p><button type="button" id="about-open">개발 범위 <span class="arrow-icon" aria-hidden="true"></span></button></footer>
   </main>
   <dialog id="about-dialog" aria-labelledby="about-title">
-    <button type="button" id="about-close" aria-label="설명 닫기">×</button>
     <p class="eyebrow mono">BEHIND THE CONNECTIONS</p>
-    <h2 id="about-title">여덟 엔진이 모여<br>하나의 Atlas</h2>
+    <h2 id="about-title">Atlas의 개발 범위</h2>
     <p>Atlas는 Core·Strata·Loom·Vellum·Trail·Prism·Temper·Reed의 능력을 연결해 목표와 상황에 맞는 배움과 도움을 설계하는 중심입니다.</p>
-    <p>이 화면은 현재 엔진 설계에서 중요한 관계를 골라 표현한 시각화입니다. 중앙에서 빛이 흐르는 광원은 Atlas를 나타냅니다. 평소에는 은백색으로 이어지며, 엔진에 포인터를 올리거나 키보드 초점을 옮기면 해당 브랜드색이 연결을 따라 번졌다가 벗어나면 돌아옵니다. 클릭하거나 터치하면 선택이 고정되고, 선택한 관계에만 스티치가 나타납니다. 기능 점이나 이름에 포인터를 올리면 점이 살짝 움직이고, 연결된 주변 점과 선이 탄력 있게 따라옵니다. 점의 수와 움직임은 실제 이용자 수나 실시간 처리량을 뜻하지 않습니다. 작은 점은 주변 개념을 표현하는 시각 요소입니다.</p>
-    <p>화면 가장자리의 옅은 연결은 공간의 깊이를 표현하며 별도 엔진이나 데이터를 뜻하지 않습니다. Strata는 설계·준비 단계이며, 전체 연결의 라이브 운영을 나타내지 않습니다.</p>
+    <p>LAB을 중심으로 개인화 학습 기능을 개발하고 있습니다. SHIFT·PULSE·PATH는 서비스에 필요한 엔진을 활용합니다. Strata는 설계·준비 단계이며, 소개에는 개발 중인 기능이 포함됩니다.</p>
+    <p>연결망은 현재 엔진 설계의 관계를 표현한 시각화입니다. 실제 이용자 수나 실시간 처리량, 전체 연결의 라이브 운영을 뜻하지 않습니다.</p>
+    <button type="button" id="about-close">닫기</button>
   </dialog>
   <noscript><p class="no-script">이 시각화에는 JavaScript가 필요합니다. Atlas는 Core·Strata·Loom·Vellum·Trail·Prism·Temper·Reed를 연결해 개인의 목표에 맞는 배움과 도움을 설계합니다.</p></noscript>
   <script>/*
@@ -487,865 +380,35 @@ window.ATLAS_DATA = {
   return Object.freeze({ damp, advanceSpring, coast, createClock, resetClock, stepClock });
 });
 </script>
-  <script>/* Loom: reusable screen-space network renderer. No textures or external runtime.
- * RGB arrays accept 0..255 (or normalized 0..1). All geometry uses CSS pixels.
- * Layer order: analytic lines, material stitches, dots/glows/rings, glass nucleus.
- * Atlas owns projection, layout, labels, input, motion clock and accessibility.
+  <script>/* Atlas map — eight engines on one orbit around Atlas. Canvas 2D; no textures, GPU or runtime.
+ * One ink on the ground of the page: a hairline circle, eight strokes, small capitals and a sphere
+ * shaded in grain. Nothing is coloured and nothing moves on its own. A pointer, a key or a choice
+ * draws the lines of that engine once and turns the light on the sphere toward it; then the frame
+ * loop sleeps again.
  */
-(function (root) {
-  'use strict';
-  const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
-  const LINE_VS = `
-precision highp float;
-attribute vec2 aPosition;
-attribute vec2 aLocal;
-attribute vec2 aExtent;
-attribute vec4 aColor;
-uniform vec2 uViewport;
-varying vec2 vLocal;
-varying vec2 vExtent;
-varying vec4 vColor;
-void main(){
-  vLocal=aLocal; vExtent=aExtent; vColor=aColor;
-  gl_Position=vec4(aPosition.x/uViewport.x*2.-1.,1.-aPosition.y/uViewport.y*2.,0.,1.);
-}`;
-  const LINE_FS = `
-precision highp float;
-varying vec2 vLocal;
-varying vec2 vExtent;
-varying vec4 vColor;
-uniform float uAA;
-void main(){
-  // Pixel-integrated coverage retains the energy of lines narrower than one pixel.
-  float vSide=abs(vLocal.y);
-  float coverage=clamp((vExtent.y-vSide)/uAA+.5,0.,1.)
-    -clamp((-vExtent.y-vSide)/uAA+.5,0.,1.);
-  coverage*=clamp((vExtent.x-abs(vLocal.x))/uAA+.5,0.,1.);
-  float a=coverage*vColor.a;
-  if(a<.0005)discard;
-  gl_FragColor=vec4(vColor.rgb*a,a);
-}`;
-  const STITCH_VS = `
-precision highp float;
-attribute vec2 aPosition;
-attribute vec2 aLocal;
-attribute vec2 aExtent;
-attribute vec4 aColor;
-attribute vec3 aFiber;
-uniform vec2 uViewport;
-varying vec2 vLocal;
-varying vec2 vExtent;
-varying vec4 vColor;
-varying vec3 vFiber;
-void main(){
-  vLocal=aLocal; vExtent=aExtent; vColor=aColor; vFiber=aFiber;
-  gl_Position=vec4(aPosition.x/uViewport.x*2.-1.,1.-aPosition.y/uViewport.y*2.,0.,1.);
-}`;
-  const STITCH_FS = `
-precision highp float;
-varying vec2 vLocal;
-varying vec2 vExtent;
-varying vec4 vColor;
-varying vec3 vFiber;
-uniform float uAA;
-float capsule(vec2 p){return length(vec2(max(abs(p.x)-vExtent.x,0.),p.y))-vExtent.y;}
-void main(){
-  float radius=vExtent.y, width=radius*2.;
-  vec2 tangent=vFiber.yz, normal=vec2(-tangent.y,tangent.x);
-  float quality=smoothstep(1.05,3.1,width/uAA);
-  // Thread-space coordinates never depend on frame time or screen pixel position.
-  float along=vLocal.x+vFiber.x;
-  float twist=along/max(width*2.65,2.0)*6.2831853;
-  float ny=clamp(vLocal.y/max(radius,.001),-.999,.999);
-  float theta=asin(ny);
-  float strand=cos(theta*3.-twist);
-  float fiber=sin(theta*8.5-twist*2.0)*.5+.5;
-  float surface=quality*(sin(twist*2.1+theta*3.)*.028+fiber*.016)*width;
-  float distance=capsule(vLocal)-surface;
-  float coverage=clamp(.5-distance/uAA,0.,1.);
-  // Conserve thin-thread coverage below one physical pixel.
-  coverage=min(coverage,width/uAA);
-  float nx=max(abs(vLocal.x)-vExtent.x,0.)*sign(vLocal.x)/max(radius,.001);
-  float nz=sqrt(max(.001,1.-min(nx*nx+ny*ny,.999)));
-  vec2 light=vec2(-.42,-.57);
-  float lighting=clamp(nx*dot(tangent,light)+ny*dot(normal,light)+nz*.77,0.,1.);
-  float shade=.43+lighting*.70;
-  shade*=1.-quality*pow(.5-.5*strand,3.)*.24;
-  vec3 rgb=vColor.rgb*shade;
-  // Broad diffuse yarn reflection, with three gently twisted plies; no neon rim.
-  rgb+=mix(vColor.rgb,vec3(1.),.48)*pow(lighting,9.)*(.085+quality*.045);
-  rgb+=vColor.rgb*quality*pow(.5+.5*strand,6.)*.105;
-  rgb*=1.-quality*fiber*.035;
-  float fringe=exp(-max(distance,0.)/max(width*.10,.09));
-  fringe*=quality*.078*(.30+.70*pow(.5+.5*sin(twist*3.7),4.));
-  fringe*=1.-smoothstep(width*.12+uAA*.3,width*.35+uAA*.6,distance);
-  float body=clamp(coverage+fringe*(1.-coverage),0.,1.)*vColor.a;
-  vec2 shadowShift=vec2(dot(tangent,vec2(.19,.40)),dot(normal,vec2(.19,.40)))*width;
-  float shadow=(1.-smoothstep(-uAA*.2,uAA*.9+width*.22,capsule(vLocal-shadowShift)));
-  shadow*=vColor.a*.18*(1.-body);
-  float alpha=body+shadow;
-  if(alpha<.0005)discard;
-  gl_FragColor=vec4(rgb*body+vec3(.008,.014,.019)*shadow,alpha);
-}`;
-  const PARTICLE_VS = `
-precision highp float;
-attribute vec2 aPosition;
-attribute vec2 aLocal;
-attribute vec3 aShape;
-attribute vec4 aColor;
-uniform vec2 uViewport;
-varying vec2 vLocal;
-varying vec3 vShape;
-varying vec4 vColor;
-void main(){
-  vLocal=aLocal; vShape=aShape; vColor=aColor;
-  gl_Position=vec4(aPosition.x/uViewport.x*2.-1.,1.-aPosition.y/uViewport.y*2.,0.,1.);
-}`;
-  const PARTICLE_FS = `
-precision highp float;
-varying vec2 vLocal;
-varying vec3 vShape;
-varying vec4 vColor;
-uniform float uAA;
-void main(){
-  float distance=length(vLocal), radius=vShape.x, kind=vShape.y;
-  float coverage;
-  if(kind<.5){
-    coverage=clamp((radius-distance)/uAA+.5,0.,1.);
-  }else if(kind<1.5){
-    float r=distance/max(radius,.001), rr=r*r;
-    coverage=(exp(-rr*5.5)*.32+exp(-rr*34.)*.34+exp(-rr*220.)*.34);
-    coverage*=1.-smoothstep(.72,1.,r);
-  }else{
-    coverage=clamp((vShape.z*.5-abs(distance-radius))/uAA+.5,0.,1.);
-  }
-  float a=coverage*vColor.a;
-  if(a<.0004)discard;
-  gl_FragColor=vec4(vColor.rgb*a,a);
-}`;
-  const NUCLEUS_VS = `
-precision highp float;
-attribute vec2 aCorner;
-uniform vec2 uViewport;
-uniform vec2 uCenter;
-uniform float uRadius;
-varying vec2 vP;
-void main(){
-  vP=aCorner*1.9;
-  vec2 p=uCenter+vP*uRadius;
-  gl_Position=vec4(p.x/uViewport.x*2.-1.,1.-p.y/uViewport.y*2.,0.,1.);
-}`;
-  const NUCLEUS_FS = `
-precision highp float;
-varying vec2 vP;
-uniform float uTime;
-uniform float uEnergy;
-uniform float uPixel;
-uniform vec3 uAccent;
-uniform float uSilver;
-uniform float uInnerLight;
-float gauss(vec2 p,vec2 at,vec2 scale){vec2 q=(p-at)/scale;return exp(-dot(q,q)*2.);}
-void main(){
-  vec2 p=vP;
-  float r=length(p), r2=dot(p,p), t=uTime, energy=uEnergy;
-  // The 1.9R quad is mostly atmosphere. Outside the antialiased silhouette the
-  // sphere has zero opacity, so preserve its exact halo without interior shading.
-  if(r>=1.+uPixel){
-    float outside=max(r-1.,0.);
-    float halo=(exp(-outside*7.5)*.061+exp(-r2*1.65)*.020);
-    halo*=smoothstep(.70,1.05,r)*(1.-smoothstep(1.47,1.88,r));
-    halo*=.88+energy*.08;
-    if(halo<.0004)discard;
-    vec3 atmosphere=mix(vec3(.23,.43,.66),vec3(.41,.44,.48),clamp(uSilver,0.,1.));
-    gl_FragColor=vec4(atmosphere*halo,halo);
-    return;
-  }
-  float sphere=1.-smoothstep(1.-uPixel,1.+uPixel,r);
-  float z=sqrt(max(0.,1.-min(r2,1.)));
-  vec3 n=normalize(vec3(p.x,-p.y,max(z,.0001)));
-  vec3 light=normalize(vec3(-.48,.66,.65));
-  float diffuse=max(dot(n,light),0.);
-  float fresnel=pow(1.-z,3.1);
-  float breath=.963+.037*sin(t*.61);
-  float vitality=(.77+energy*.25)*breath;
-  // Finish affects the shell palette; engine pigment belongs to interior light.
-  float silver=clamp(uSilver,0.,1.);
-  float response=silver*smoothstep(.25,1.75,energy);
-  // Higher energy expands the interior's volume; its peak radiance saturates.
-  vitality=mix(vitality,(.85+.28*energy/(.65+energy))*breath,silver);
-  vec3 innerBase=mix(vec3(.26,.55,.93),vec3(.75,.77,.79),silver);
-  vec3 inner=mix(innerBase,clamp(uAccent*.89+vec3(.045),0.,1.),mix(.29,.62,silver));
-  vec3 pale=mix(mix(vec3(.69,.84,.98),vec3(.90,.92,.94),silver),inner,.14);
-  vec3 body=mix(mix(vec3(.020,.034,.068),vec3(.032,.034,.037),silver),
-    mix(vec3(.075,.125,.220),vec3(.114,.121,.135),silver),diffuse*.72);
-  body+=mix(vec3(.10,.18,.31),vec3(.17,.18,.20),silver)*pow(diffuse,10.)*.36;
-  // A stable softbox and a second, softer reflection reveal the outer glass shell.
-  float reflection=gauss(p,vec2(-.27+sin(t*.08)*.012,-.48),vec2(.45,.125));
-  float reflectionSoft=gauss(p,vec2(-.31,-.43),vec2(.57,.29));
-  body+=mix(vec3(.73,.84,.94),vec3(.84,.855,.88),silver)*reflection*.48;
-  body+=mix(vec3(.15,.23,.34),vec3(.215,.23,.25),silver)*reflectionSoft*.40;
-  float crescent=pow(max(0.,dot(normalize(vec2(-.56,-.83)),normalize(p+vec2(.0001)))),5.);
-  body+=mix(vec3(.34,.52,.73),vec3(.47,.51,.56),silver)*fresnel*(.30+crescent*.85);
-  body+=mix(vec3(.23,.44,.70),vec3(.395,.43,.48),silver)*fresnel*gauss(p,vec2(.62,.52),vec2(.67,.82))*.67;
-  float interior=1.-smoothstep(.78,1.005,r);
-  vec2 coreCenter=vec2(sin(t*.12)*.028,.065+cos(t*.09)*.020);
-  float coreRadius=.255+response*.085;
-  vec2 coreP=(p-coreCenter)/coreRadius;
-  float coreR2=dot(coreP,coreP), coreR=sqrt(coreR2);
-  float coreZ=sqrt(max(0.,1.-min(coreR2,1.)));
-  float coreMask=1.-smoothstep(.58,1.08,coreR);
-  // A smaller luminous body sits behind the front threads. Its shaded shoulder
-  // and partial refracted rim establish a second surface inside the outer glass.
-  float coreLight=exp(-coreR2*1.65)*(.54+.46*clamp(-coreP.x*.31+coreP.y*.43+coreZ*.72,0.,1.));
-  float coreShoulder=exp(-pow((coreR-.84)/.095,2.))*clamp(coreP.x*.34+coreP.y*.63,0.,1.);
-  body*=1.-silver*coreMask*.075;
-  body+=mix(inner,pale,.12)*(coreLight*.22+coreShoulder*.083)*silver*vitality*interior;
-  vec2 source=vec2(.14+sin(t*.18)*.16,.14+cos(t*.13)*.13);
-  source=mix(source,coreCenter+vec2(.07,.08),silver*.70);
-  float volume=gauss(p,source,vec2(.53+response*.11,.48+response*.10));
-  body+=inner*volume*.125*vitality*interior;
-  // A bounded accent in the existing interior only: no new wave or moving geometry.
-  float innerLight=clamp(uInnerLight,0.,1.)*silver;
-  body+=mix(inner,pale,.12)*(coreLight*.072+volume*.028)*innerLight*interior;
-  // Two refracted layers precess at different depths. Their phase, width and
-  // transmission differ, so the light visibly passes through a volume, not a disc.
-  for(int layer=0;layer<2;layer++){
-    float depth=float(layer);
-    float angle=mix(-.66,.91,depth)+sin(t*(.085-depth*.018)+depth*1.7)*(.14+depth*.035);
-    mat2 rot=mat2(cos(angle),-sin(angle),sin(angle),cos(angle));
-    vec2 q=rot*(p*(1.+z*(.25-depth*.12)));
-    q+=rot*(p-coreCenter)*silver*coreMask*(.17-depth*.08);
-    q.x+=sin(t*.11+depth*2.1)*.055*z;
-    float bend=sin(q.x*(3.55+depth*.42)+t*(.28-depth*.10)+depth*1.3)*(.14-depth*.035);
-    bend+=sin(q.x*6.4-t*.17+depth)*.031;
-    float axis=.055+depth*.16+sin(t*.12+depth*2.)*.046;
-    float line=q.y-bend-axis;
-    float focusX=.19+sin(t*.19+depth*1.8)*.35;
-    float focus=.42+.58*exp(-pow((q.x-focusX)/.49,2.));
-    float envelope=interior*focus*(1.-smoothstep(.73,1.17,abs(q.x)));
-    float transmission=mix(1.,.40,depth)*vitality;
-    transmission*=1.-silver*depth*(.08+coreMask*.50);
-    float veil=exp(-pow(line/(.103+depth*.034),2.));
-    body+=inner*veil*envelope*transmission*.22;
-    float filaments=0.;
-    float layerTime=t*(1.+silver*(.10-depth*.31));
-    for(int i=0;i<5;i++){
-      float fi=float(i)-2.;
-      float offset=fi*(.028+depth*.012)+sin(q.x*4.5+fi*.68+layerTime*.20+depth)*.012;
-      float distance=abs(line-offset);
-      float width=max(uPixel*(.63+depth*.20),.0045+depth*.002);
-      width*=1.+silver*(coreZ*.13*(1.-depth)-depth*.05);
-      float thread=exp(-pow(distance/width,2.));
-      float diffusion=exp(-pow(distance/(width*3.5+.008),2.));
-      float weight=(.30-.035*abs(fi))*(1.+sin(q.x*2.9-layerTime*.30+fi*.58)*.12);
-      float clarity=1.+(1.-depth)*(.40+.18*(1.-min(abs(fi),1.)));
-      filaments+=(thread*clarity+diffusion*.17)*weight;
-    }
-    body+=mix(inner,pale,.32-depth*.12)*filaments*envelope*transmission;
-  }
-  // A bent lower caustic is the transmitted image of those internal light layers.
-  float causticRadius=.70+sin(t*.14)*.018+response*.03;
-  float caustic=exp(-pow((length((p-vec2(-.035,-.025))*vec2(1.,1.13))-causticRadius)/.018,2.));
-  float lower=smoothstep(-.12,.53,p.y)*smoothstep(-.68,.25,p.x);
-  body+=inner*caustic*lower*interior*.31*vitality;
-  float refracted=gauss(p,vec2(.35+sin(t*.12)*.035,.48),vec2(.28,.18));
-  body+=pale*refracted*.076*vitality;
-  float rim=exp(-pow((r-.984)/max(uPixel*1.3,.009),2.));
-  body+=mix(vec3(.41,.60,.79),vec3(.56,.60,.65),silver)*rim*(.21+crescent*.49);
-  // Atmosphere is radial and fully transparent at the quad boundary.
-  float outside=max(r-1.,0.);
-  float halo=(exp(-outside*7.5)*.061+exp(-r2*1.65)*.020);
-  halo*=smoothstep(.70,1.05,r)*(1.-smoothstep(1.47,1.88,r));
-  halo*=.88+energy*.08;
-  float opacity=sphere*.988;
-  vec3 rgb=body*opacity+mix(vec3(.23,.43,.66),vec3(.41,.44,.48),silver)*halo*(1.-opacity);
-  float alpha=opacity+halo*(1.-opacity);
-  if(alpha<.0004)discard;
-  gl_FragColor=vec4(rgb,alpha);
-}`;
-
-  function shader(gl, type, source, modern) {
-    let text = source;
-    if (modern) {
-      text = '#version 300 es\n' + text.replace(/attribute /g, 'in ').replace(/varying /g, type === gl.VERTEX_SHADER ? 'out ' : 'in ');
-      if (type === gl.FRAGMENT_SHADER) text = text.replace('precision highp float;', 'precision highp float;\nout vec4 fragColor;').replace(/gl_FragColor/g, 'fragColor');
-    }
-    const value = gl.createShader(type);
-    gl.shaderSource(value, text); gl.compileShader(value);
-    if (!gl.getShaderParameter(value, gl.COMPILE_STATUS)) {
-      const error = gl.getShaderInfoLog(value); gl.deleteShader(value); throw new Error('Loom shader: ' + error);
-    }
-    return value;
-  }
-  function program(gl, vs, fs, modern) {
-    const value = gl.createProgram(); let vertex, fragment;
-    try {
-      vertex = shader(gl, gl.VERTEX_SHADER, vs, modern); fragment = shader(gl, gl.FRAGMENT_SHADER, fs, modern);
-      gl.attachShader(value, vertex); gl.attachShader(value, fragment); gl.linkProgram(value);
-      if (!gl.getProgramParameter(value, gl.LINK_STATUS)) throw new Error('Loom program: ' + gl.getProgramInfoLog(value));
-    } catch (error) { gl.deleteProgram(value); throw error; }
-    finally { if (vertex) gl.deleteShader(vertex); if (fragment) gl.deleteShader(fragment); }
-    return value;
-  }
-  function batch(size, stride) { return { data: new Float32Array(size), used: 0, stride, buffer: null, bytes: 0, count: 0 }; }
-  function reserve(value, extra) {
-    if (value.used + extra <= value.data.length) return;
-    let capacity = value.data.length;
-    while (capacity < value.used + extra) capacity *= 2;
-    const next = new Float32Array(capacity); next.set(value.data); value.data = next;
-  }
-
-  class LoomNetworkRenderer {
-    constructor(canvas, options) {
-      this.canvas = canvas; this.options = options || {};
-      this.supported = false; this.lost = false; this.destroyed = false;
-      this.width = 1; this.height = 1; this.dpr = 1; this.time = 0;
-      this.lines = batch(131072, 10); this.particles = batch(32768, 11);
-      this.stitches = batch(262144, 13);
-      this.arcX = new Float64Array(97); this.arcY = new Float64Array(97); this.arcLength = new Float64Array(97);
-      this.arcPoint = new Float64Array(4);
-      this.orb = { visible: false, x: 0, y: 0, radius: 0, time: 0, energy: 1, red: .26, green: .55, blue: .93, silver: 0, innerLight: 0 };
-      const attributes = { alpha: true, antialias: false, premultipliedAlpha: true, depth: false, stencil: false, preserveDrawingBuffer: false, powerPreference: 'high-performance' };
-      this.gl = canvas.getContext('webgl2', attributes); this.modern = Boolean(this.gl);
-      if (!this.gl) this.gl = canvas.getContext('webgl', attributes);
-      if (!this.gl) throw new Error('Loom network: WebGL is unavailable.');
-      const precision = this.gl.getShaderPrecisionFormat(this.gl.FRAGMENT_SHADER, this.gl.HIGH_FLOAT);
-      if (!precision || precision.precision === 0) throw new Error('Loom network requires highp fragment precision.');
-      this.stats = { drawCalls: 0, vertices: 0, points: 0, segments: 0, stitches: 0, frames: 0, renderer: this.modern ? 'WebGL 2 / Loom analytic AA' : 'WebGL 1 / Loom analytic AA' };
-      this.onLost = event => {
-        event.preventDefault(); this.lost = true; this.supported = false;
-        if (this.options.onContextLost) this.options.onContextLost(event);
-      };
-      this.onRestored = () => {
-        if (this.destroyed) return;
-        try {
-          this.initialize(); this.lost = false; this.supported = true;
-          this.resize(this.width, this.height, this.dpr);
-          if (this.options.onContextRestored) this.options.onContextRestored();
-        } catch (error) {
-          this.lost = true; this.supported = false;
-          if (this.options.onContextLost) this.options.onContextLost(error);
-        }
-      };
-      try { this.initialize(); this.supported = true; }
-      catch (error) { this.disposeResources(); throw error; }
-      canvas.addEventListener('webglcontextlost', this.onLost, false);
-      canvas.addEventListener('webglcontextrestored', this.onRestored, false);
-    }
-
-    initialize() {
-      const gl = this.gl;
-      this.lineProgram = program(gl, LINE_VS, LINE_FS, this.modern);
-      this.stitchProgram = program(gl, STITCH_VS, STITCH_FS, this.modern);
-      this.particleProgram = program(gl, PARTICLE_VS, PARTICLE_FS, this.modern);
-      this.nucleusProgram = program(gl, NUCLEUS_VS, NUCLEUS_FS, this.modern);
-      this.lineUniforms = this.uniforms(this.lineProgram, ['Viewport', 'AA']);
-      this.stitchUniforms = this.uniforms(this.stitchProgram, ['Viewport', 'AA']);
-      this.particleUniforms = this.uniforms(this.particleProgram, ['Viewport', 'AA']);
-      this.nucleusUniforms = this.uniforms(this.nucleusProgram, ['Viewport', 'Center', 'Radius', 'Time', 'Energy', 'Pixel', 'Accent', 'Silver', 'InnerLight']);
-      this.lineLayout = this.layout(this.lineProgram, [['aPosition', 2, 0], ['aLocal', 2, 8], ['aExtent', 2, 16], ['aColor', 4, 24]]);
-      this.stitchLayout = this.layout(this.stitchProgram, [['aPosition', 2, 0], ['aLocal', 2, 8], ['aExtent', 2, 16], ['aColor', 4, 24], ['aFiber', 3, 40]]);
-      this.particleLayout = this.layout(this.particleProgram, [['aPosition', 2, 0], ['aLocal', 2, 8], ['aShape', 3, 16], ['aColor', 4, 28]]);
-      this.cornerLocation = gl.getAttribLocation(this.nucleusProgram, 'aCorner');
-      this.lines.buffer = gl.createBuffer(); this.lines.bytes = 0;
-      this.stitches.buffer = gl.createBuffer(); this.stitches.bytes = 0;
-      this.particles.buffer = gl.createBuffer(); this.particles.bytes = 0;
-      this.quad = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, this.quad);
-      gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 1, -1, -1, 1, -1, 1, 1, -1, 1, 1]), gl.STATIC_DRAW);
-      gl.disable(gl.DEPTH_TEST); gl.disable(gl.CULL_FACE); gl.enable(gl.BLEND);
-      gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA); gl.clearColor(0, 0, 0, 0);
-    }
-
-    uniforms(value, names) {
-      const output = {};
-      for (const name of names) output[name] = this.gl.getUniformLocation(value, 'u' + name);
-      return output;
-    }
-    layout(value, entries) { return entries.map(entry => [this.gl.getAttribLocation(value, entry[0]), entry[1], entry[2]]); }
-
-    resize(width, height, dpr) {
-      this.width = Math.max(1, Number(width) || 1); this.height = Math.max(1, Number(height) || 1);
-      this.dpr = clamp(Number(dpr) || 1, .5, 2);
-      const w = Math.round(this.width * this.dpr), h = Math.round(this.height * this.dpr);
-      if (this.canvas.width !== w) this.canvas.width = w;
-      if (this.canvas.height !== h) this.canvas.height = h;
-      if (!this.lost && !this.destroyed) this.gl.viewport(0, 0, w, h);
-    }
-
-    begin(timeSeconds) {
-      this.time = Number(timeSeconds) || 0; this.lines.used = this.particles.used = this.stitches.used = 0;
-      this.lines.count = this.particles.count = this.stitches.count = 0; this.orb.visible = false;
-      this.stats.drawCalls = this.stats.vertices = this.stats.points = this.stats.segments = this.stats.stitches = 0;
-    }
-
-    line(ax, ay, bx, by, rgb, alpha, width) {
-      if (!(alpha > 0) || !(width > 0)) return;
-      const dx = bx - ax, dy = by - ay, length = Math.sqrt(dx * dx + dy * dy);
-      if (length < .001 || !Number.isFinite(length)) return;
-      const nx = -dy / length, ny = dx / length, tx = dx / length, ty = dy / length;
-      const pad = .6 / this.dpr, half = width * .5, side = half + pad;
-      const cx = (ax + bx) * .5, cy = (ay + by) * .5, along = length * .5 + pad;
-      const scale = Math.max(rgb[0], rgb[1], rgb[2]) > 1 ? 1 / 255 : 1;
-      const r = rgb[0] * scale, g = rgb[1] * scale, b = rgb[2] * scale, a = clamp(alpha, 0, 1);
-      const batch = this.lines; reserve(batch, 60); let at = batch.used; const data = batch.data;
-      for (let i = 0; i < 6; i++) {
-        const sx = i === 0 || i === 2 || i === 3 ? -1 : 1;
-        const sy = i === 0 || i === 1 || i === 4 ? -1 : 1;
-        const x = along * sx, y = side * sy;
-        data[at++] = cx + tx * x + nx * y; data[at++] = cy + ty * x + ny * y;
-        data[at++] = x; data[at++] = y; data[at++] = length * .5; data[at++] = half;
-        data[at++] = r; data[at++] = g; data[at++] = b; data[at++] = a;
-      }
-      batch.used = at; batch.count++;
-    }
-
-    curve(curve, rgb, alpha, width) {
-      if (!(alpha > 0) || !(width > 0)) return;
-      const a = curve.a, b = curve.b, c = curve.c;
-      const length = Math.hypot(c.x - a.x, c.y - a.y) + Math.hypot(b.x - c.x, b.y - c.y);
-      const count = length > 290 ? 24 : length > 145 ? 20 : 16;
-      let x = a.x, y = a.y;
-      for (let i = 1; i <= count; i++) {
-        const t = i / count, k = 1 - t;
-        const nextX = k * k * a.x + 2 * k * t * c.x + t * t * b.x;
-        const nextY = k * k * a.y + 2 * k * t * c.y + t * t * b.y;
-        this.line(x, y, nextX, nextY, rgb, alpha, width); x = nextX; y = nextY;
-      }
-    }
-
-    // One raised yarn capsule. The endpoints describe its outer tips, not cap centers.
-    emitStitch(ax, ay, bx, by, rgb, alpha, width, phase) {
-      const dx = bx - ax, dy = by - ay, length = Math.hypot(dx, dy);
-      if (!(length > .035)) return;
-      const scale = Math.max(rgb[0], rgb[1], rgb[2]) > 1 ? 1 / 255 : 1;
-      this.yarnCapsule((ax + bx) * .5, (ay + by) * .5, dx / length, dy / length, length,
-        rgb[0] * scale, rgb[1] * scale, rgb[2] * scale, clamp(alpha, 0, 1), width, phase);
-    }
-
-    yarnCapsule(cx, cy, tx, ty, length, r, g, b, a, width, phase) {
-      const nx = -ty, ny = tx;
-      const radius = Math.min(width, length) * .5, straight = Math.max(0, length * .5 - radius);
-      const pad = width * .48 + .9 / this.dpr, side = radius + pad, along = length * .5 + pad;
-      const value = this.stitches; reserve(value, 78); let at = value.used; const data = value.data;
-      for (let i = 0; i < 6; i++) {
-        const sx = i === 0 || i === 2 || i === 3 ? -1 : 1;
-        const sy = i === 0 || i === 1 || i === 4 ? -1 : 1;
-        const x = along * sx, y = side * sy;
-        data[at++] = cx + tx * x + nx * y; data[at++] = cy + ty * x + ny * y;
-        data[at++] = x; data[at++] = y; data[at++] = straight; data[at++] = radius;
-        data[at++] = r; data[at++] = g; data[at++] = b; data[at++] = a;
-        data[at++] = phase; data[at++] = tx; data[at++] = ty;
-      }
-      value.used = at; value.count++;
-    }
-
-    /** Physical yarn stitches. Options use CSS px: length, gap, phase.
-     * Defaults: length=max(3.8,width*3.1), gap=max(1.7,width*.92), phase=0.
-     * Recommended width .65..3; accepted .25..12. Tips stay within the path.
-     * Adjacent path calls can continue the pattern with phase=prior path length.
-     */
-    stitch(ax, ay, bx, by, rgb, alpha, width, options) {
-      if (!(alpha > 0) || !(width > 0) || !Number.isFinite(ax + ay + bx + by + width)) return;
-      const dx = bx - ax, dy = by - ay, total = Math.hypot(dx, dy);
-      if (total < .05) return;
-      width = clamp(width, .25, 12);
-      const threadLength = options && Number.isFinite(options.length) ? clamp(options.length, width, 64) : Math.max(3.8, width * 3.1);
-      const gap = options && Number.isFinite(options.gap) ? clamp(options.gap, .25, 200) : Math.max(1.7, width * .92);
-      const phase = options && Number.isFinite(options.phase) ? options.phase : 0;
-      const period = threadLength + gap, offset = ((phase % period) + period) % period;
-      const ux = dx / total, uy = dy / total;
-      const scale = Math.max(rgb[0], rgb[1], rgb[2]) > 1 ? 1 / 255 : 1;
-      const r = rgb[0] * scale, g = rgb[1] * scale, b = rgb[2] * scale, opacity = clamp(alpha, 0, 1);
-      for (let start = -offset; start < total; start += period) {
-        const from = Math.max(0, start), to = Math.min(total, start + threadLength);
-        if (to - from < .05) continue;
-        const middle = (from + to) * .5;
-        this.yarnCapsule(ax + ux * middle, ay + uy * middle, ux, uy, to - from, r, g, b, opacity, width, middle + phase);
-      }
-    }
-
-    arcAt(distance, count, outputOffset, curve) {
-      let lo = 0, hi = count;
-      const lengths = this.arcLength;
-      while (hi - lo > 1) { const mid = (lo + hi) >> 1; if (lengths[mid] < distance) lo = mid; else hi = mid; }
-      const fraction = clamp((distance - lengths[lo]) / Math.max(.00001, lengths[hi] - lengths[lo]), 0, 1);
-      const t = (lo + fraction) / count, k = 1 - t;
-      this.arcPoint[outputOffset] = k * k * curve.a.x + 2 * k * t * curve.c.x + t * t * curve.b.x;
-      this.arcPoint[outputOffset + 1] = k * k * curve.a.y + 2 * k * t * curve.c.y + t * t * curve.b.y;
-    }
-
-    /** The complete quadratic curve is measured first. Spacing never resets at
-     * tessellation boundaries; all capsules share one continuous thread coordinate.
-     */
-    stitchCurve(curve, rgb, alpha, width, options) {
-      if (!(alpha > 0) || !(width > 0) || !Number.isFinite(width)) return;
-      const a = curve.a, b = curve.b, c = curve.c;
-      if (!Number.isFinite(a.x + a.y + b.x + b.y + c.x + c.y)) return;
-      const bound = Math.hypot(c.x - a.x, c.y - a.y) + Math.hypot(b.x - c.x, b.y - c.y);
-      if (bound < .05) return;
-      const count = clamp(Math.ceil(bound / 7), 32, 96);
-      let x = a.x, y = a.y, total = 0;
-      this.arcX[0] = x; this.arcY[0] = y; this.arcLength[0] = 0;
-      for (let i = 1; i <= count; i++) {
-        const t = i / count, k = 1 - t;
-        const px = k * k * a.x + 2 * k * t * c.x + t * t * b.x;
-        const py = k * k * a.y + 2 * k * t * c.y + t * t * b.y;
-        total += Math.hypot(px - x, py - y);
-        this.arcX[i] = px; this.arcY[i] = py; this.arcLength[i] = total; x = px; y = py;
-      }
-      width = clamp(width, .25, 12);
-      const threadLength = options && Number.isFinite(options.length) ? clamp(options.length, width, 64) : Math.max(3.8, width * 3.1);
-      const gap = options && Number.isFinite(options.gap) ? clamp(options.gap, .25, 200) : Math.max(1.7, width * .92);
-      const phase = options && Number.isFinite(options.phase) ? options.phase : 0;
-      const period = threadLength + gap, offset = ((phase % period) + period) % period;
-      for (let start = -offset; start < total; start += period) {
-        const from = Math.max(0, start), to = Math.min(total, start + threadLength);
-        if (to - from < .05) continue;
-        this.arcAt(from, count, 0, curve); this.arcAt(to, count, 2, curve);
-        this.emitStitch(this.arcPoint[0], this.arcPoint[1], this.arcPoint[2], this.arcPoint[3], rgb, alpha, width, (from + to) * .5 + phase);
-      }
-    }
-
-    particle(x, y, radius, rgb, alpha, kind, width) {
-      if (!(alpha > 0) || !(radius > 0) || !Number.isFinite(x + y + radius)) return;
-      const extent = radius + (kind === 1 ? 0 : (kind === 2 ? width * .5 : 0) + 1 / this.dpr);
-      const scale = Math.max(rgb[0], rgb[1], rgb[2]) > 1 ? 1 / 255 : 1;
-      const r = rgb[0] * scale, g = rgb[1] * scale, b = rgb[2] * scale, a = clamp(alpha, 0, 1);
-      const batch = this.particles; reserve(batch, 66); let at = batch.used; const data = batch.data;
-      for (let i = 0; i < 6; i++) {
-        const sx = i === 0 || i === 2 || i === 3 ? -1 : 1;
-        const sy = i === 0 || i === 1 || i === 4 ? -1 : 1;
-        const lx = extent * sx, ly = extent * sy;
-        data[at++] = x + lx; data[at++] = y + ly; data[at++] = lx; data[at++] = ly;
-        data[at++] = radius; data[at++] = kind; data[at++] = width;
-        data[at++] = r; data[at++] = g; data[at++] = b; data[at++] = a;
-      }
-      batch.used = at; batch.count++;
-    }
-
-    dot(x, y, radius, rgb, alpha) { this.particle(x, y, radius, rgb, alpha, 0, 0); }
-    glow(x, y, size, rgb, alpha) { this.particle(x, y, size * .5, rgb, alpha, 1, 0); }
-    ring(x, y, radius, rgb, alpha, width) { this.particle(x, y, radius, rgb, alpha, 2, Math.max(.1, width || .6)); }
-
-    // Accent accepts RGB bytes or normalized RGB and only pigments inner light.
-    // Finish: omitted/0 = legacy lapis; 'silver'/1 = neutral silver glass;
-    // numbers between 0 and 1 blend those finishes without changing geometry.
-    // Optional innerLight (0..1, default 0) adds a restrained silver-only inner glow.
-    nucleus(x, y, radius, time, energy, rgb, finish, innerLight) {
-      const orb = this.orb; orb.visible = radius > 0;
-      orb.x = x; orb.y = y; orb.radius = radius;
-      orb.time = Number.isFinite(time) ? time : this.time;
-      orb.energy = Number.isFinite(energy) ? clamp(energy, 0, 2) : 1;
-      orb.silver = finish === 'silver' ? 1 : Number.isFinite(finish) ? clamp(finish, 0, 1) : 0;
-      orb.innerLight = Number.isFinite(innerLight) ? clamp(innerLight, 0, 1) : 0;
-      if (rgb && Number.isFinite(rgb[0]) && Number.isFinite(rgb[1]) && Number.isFinite(rgb[2])) {
-        const scale = Math.max(rgb[0], rgb[1], rgb[2]) > 1 ? 1 / 255 : 1;
-        orb.red = clamp(rgb[0] * scale, 0, 1); orb.green = clamp(rgb[1] * scale, 0, 1); orb.blue = clamp(rgb[2] * scale, 0, 1);
-      } else {
-        orb.red = .26 + (216 / 255 - .26) * orb.silver;
-        orb.green = .55 + (223 / 255 - .55) * orb.silver;
-        orb.blue = .93 + (230 / 255 - .93) * orb.silver;
-      }
-    }
-
-    upload(batch, layout) {
-      const gl = this.gl; gl.bindBuffer(gl.ARRAY_BUFFER, batch.buffer);
-      if (batch.bytes !== batch.data.byteLength) {
-        gl.bufferData(gl.ARRAY_BUFFER, batch.data.byteLength, gl.DYNAMIC_DRAW); batch.bytes = batch.data.byteLength;
-      }
-      // WebGL 2 uploads only live data, without allocating a per-frame subarray view.
-      if (this.modern) gl.bufferSubData(gl.ARRAY_BUFFER, 0, batch.data, 0, batch.used);
-      else gl.bufferSubData(gl.ARRAY_BUFFER, 0, batch.data);
-      for (const entry of layout) {
-        gl.enableVertexAttribArray(entry[0]); gl.vertexAttribPointer(entry[0], entry[1], gl.FLOAT, false, batch.stride * 4, entry[2]);
-      }
-      const count = batch.used / batch.stride;
-      gl.drawArrays(gl.TRIANGLES, 0, count); this.stats.drawCalls++; this.stats.vertices += count;
-      for (const entry of layout) gl.disableVertexAttribArray(entry[0]);
-    }
-
-    end() {
-      if (this.destroyed || this.lost || !this.supported) return this.stats;
-      const gl = this.gl;
-      gl.clear(gl.COLOR_BUFFER_BIT);
-      if (this.lines.used) {
-        gl.useProgram(this.lineProgram);
-        gl.uniform2f(this.lineUniforms.Viewport, this.width, this.height); gl.uniform1f(this.lineUniforms.AA, 1 / this.dpr);
-        this.upload(this.lines, this.lineLayout);
-      }
-      if (this.stitches.used) {
-        gl.useProgram(this.stitchProgram);
-        gl.uniform2f(this.stitchUniforms.Viewport, this.width, this.height); gl.uniform1f(this.stitchUniforms.AA, 1 / this.dpr);
-        this.upload(this.stitches, this.stitchLayout);
-      }
-      if (this.particles.used) {
-        gl.useProgram(this.particleProgram);
-        gl.uniform2f(this.particleUniforms.Viewport, this.width, this.height); gl.uniform1f(this.particleUniforms.AA, 1 / this.dpr);
-        this.upload(this.particles, this.particleLayout);
-      }
-      if (this.orb.visible) {
-        const orb = this.orb, u = this.nucleusUniforms;
-        gl.useProgram(this.nucleusProgram); gl.uniform2f(u.Viewport, this.width, this.height);
-        gl.uniform2f(u.Center, orb.x, orb.y); gl.uniform1f(u.Radius, orb.radius);
-        gl.uniform1f(u.Time, orb.time); gl.uniform1f(u.Energy, orb.energy); gl.uniform1f(u.Pixel, 1 / (orb.radius * this.dpr));
-        gl.uniform3f(u.Accent, orb.red, orb.green, orb.blue);
-        gl.uniform1f(u.Silver, orb.silver);
-        gl.uniform1f(u.InnerLight, orb.innerLight);
-        gl.bindBuffer(gl.ARRAY_BUFFER, this.quad); gl.enableVertexAttribArray(this.cornerLocation);
-        gl.vertexAttribPointer(this.cornerLocation, 2, gl.FLOAT, false, 8, 0);
-        gl.drawArrays(gl.TRIANGLES, 0, 6); gl.disableVertexAttribArray(this.cornerLocation);
-        this.stats.drawCalls++; this.stats.vertices += 6;
-      }
-      this.stats.points = this.particles.count; this.stats.segments = this.lines.count; this.stats.stitches = this.stitches.count; this.stats.frames++;
-      return this.stats;
-    }
-
-    disposeResources() {
-      const gl = this.gl;
-      if (this.lineProgram) gl.deleteProgram(this.lineProgram);
-      if (this.stitchProgram) gl.deleteProgram(this.stitchProgram);
-      if (this.particleProgram) gl.deleteProgram(this.particleProgram);
-      if (this.nucleusProgram) gl.deleteProgram(this.nucleusProgram);
-      if (this.lines.buffer) gl.deleteBuffer(this.lines.buffer);
-      if (this.stitches.buffer) gl.deleteBuffer(this.stitches.buffer);
-      if (this.particles.buffer) gl.deleteBuffer(this.particles.buffer);
-      if (this.quad) gl.deleteBuffer(this.quad);
-    }
-
-    destroy() {
-      if (this.destroyed) return;
-      this.destroyed = true; this.supported = false;
-      this.canvas.removeEventListener('webglcontextlost', this.onLost, false);
-      this.canvas.removeEventListener('webglcontextrestored', this.onRestored, false);
-      if (!this.lost) this.disposeResources();
-    }
-  }
-  root.LoomNetworkRenderer = LoomNetworkRenderer;
-})(typeof window !== 'undefined' ? window : globalThis);
-</script>
-  <script>/* Atlas depth field: decorative spatial context, never engines or measured data.
- * All topology is seeded and bounded. Rendering uses the caller's existing batch;
- * no DOM, listeners, timers, textures, GPU resources, or per-frame topology.
- */
-(function (root) {
-  'use strict';
-
-  const TAU = Math.PI * 2;
-  const SILVER = Object.freeze([181, 193, 205]);
-  const NEAR_SILVER = Object.freeze([204, 213, 223]);
-  const clamp = (value, low = 0, high = 1) => Math.max(low, Math.min(high, value));
-  const ease = value => { const t = clamp(value); return t * t * (3 - 2 * t); };
-  const smooth = (low, high, value) => ease((value - low) / (high - low));
-
-  function randomSource(seed) {
-    let value = seed >>> 0;
-    return function () {
-      value += 0x6D2B79F5;
-      let bits = value;
-      bits = Math.imul(bits ^ bits >>> 15, bits | 1);
-      bits ^= bits + Math.imul(bits ^ bits >>> 7, bits | 61);
-      return ((bits ^ bits >>> 14) >>> 0) / 4294967296;
-    };
-  }
-
-  function node(x, y, z, layer, random) {
-    return {
-      x, y, z, layer, phase: random() * TAU, speed: .025 + random() * .026,
-      size: .45 + random() * .42, light: .75 + random() * .25,
-      p: { x: 0, y: 0, depth: 0, scale: 1, visibility: 0, valid: false }
-    };
-  }
-
-  function crossesQuietCenter(a, b) {
-    const ax = a.x / 1.06, ay = a.y / .80;
-    const dx = (b.x - a.x) / 1.06, dy = (b.y - a.y) / .80;
-    const distance = dx * dx + dy * dy;
-    const t = distance ? clamp(-(ax * dx + ay * dy) / distance) : 0;
-    return Math.hypot(ax + dx * t, ay + dy * t) < .72;
-  }
-
-  class AtlasDepthField {
-    constructor(options = {}) {
-      const random = randomSource(Number.isFinite(options.seed) ? options.seed : 0xA71A5D3F);
-      this.backgroundNodes = [];
-      this.backgroundEdges = [];
-      this.foregroundNodes = [];
-      this.foregroundEdges = [];
-
-      // Three loose depth planes. The open center leaves the real engine map legible.
-      for (let layer = 0; layer < 3; layer++) {
-        const start = this.backgroundNodes.length;
-        for (let i = 0; i < 50; i++) {
-          let x = 0, y = 0;
-          for (let attempt = 0; attempt < 30; attempt++) {
-            x = (random() * 2 - 1) * 2.6;
-            y = (random() * 2 - 1) * 2.16;
-            const radius = Math.hypot(x / 1.12, y / .90);
-            if (radius > 1 || (radius > .72 && random() < .12)) break;
-          }
-          const z = -1.58 - layer * .61 - random() * .14;
-          this.backgroundNodes.push(node(x, y, z, layer, random));
-        }
-
-        // Short local relations make fragments that continue beyond the visible map.
-        const candidates = [], degree = new Uint8Array(50);
-        for (let i = 0; i < 50; i++) {
-          const a = this.backgroundNodes[start + i];
-          for (let j = i + 1; j < 50; j++) {
-            const b = this.backgroundNodes[start + j];
-            const distance = Math.hypot(a.x - b.x, a.y - b.y);
-            if (distance > .13 && distance < 1.14 && !crossesQuietCenter(a, b)) candidates.push({ i, j, distance });
-          }
-        }
-        candidates.sort((a, b) => a.distance - b.distance);
-        let count = 0;
-        for (const candidate of candidates) {
-          if (count >= 66) break;
-          if (degree[candidate.i] >= 3 || degree[candidate.j] >= 3) continue;
-          degree[candidate.i]++; degree[candidate.j]++; count++;
-          this.backgroundEdges.push({
-            a: this.backgroundNodes[start + candidate.i], b: this.backgroundNodes[start + candidate.j],
-            layer, light: .65 + random() * .35, cross: false
-          });
-        }
-      }
-
-      // A handful of bridges makes the planes read as a volume, not separate sheets.
-      for (let layer = 0; layer < 2; layer++) {
-        for (let k = 0; k < 3; k++) {
-          const a = this.backgroundNodes[layer * 50 + 7 + k * 15];
-          let nearest = null, distance = Infinity;
-          for (let i = (layer + 1) * 50; i < (layer + 2) * 50; i++) {
-            const candidate = this.backgroundNodes[i];
-            const d = Math.hypot(a.x - candidate.x, a.y - candidate.y);
-            if (d < distance && !crossesQuietCenter(a, candidate)) { nearest = candidate; distance = d; }
-          }
-          if (nearest && distance < .9) this.backgroundEdges.push({ a, b: nearest, layer, light: .52, cross: true });
-        }
-      }
-
-      // Incomplete large fragments graze the frame. They never encircle the nucleus.
-      for (let i = 0; i < 10; i++) {
-        const angle = i / 10 * TAU + .19 + (random() - .5) * .17;
-        const x = Math.cos(angle) * (1.49 + random() * .17);
-        const y = Math.sin(angle) * (.91 + random() * .14);
-        const foreground = node(x, y, .76 + random() * .47, 3, random);
-        foreground.size = 1.4 + random() * 1.8;
-        this.foregroundNodes.push(foreground);
-      }
-      for (const [a, b] of [[0, 1], [1, 2], [3, 4], [4, 5], [6, 7], [7, 8], [8, 9]]) {
-        this.foregroundEdges.push({
-          a: this.foregroundNodes[a], b: this.foregroundNodes[b], bend: (random() - .5) * .065,
-          curve: { a: { x: 0, y: 0 }, b: { x: 0, y: 0 }, c: { x: 0, y: 0 } }
-        });
-      }
-
-      this.counts = Object.freeze({
-        backgroundNodes: this.backgroundNodes.length, backgroundEdges: this.backgroundEdges.length,
-        foregroundNodes: this.foregroundNodes.length, foregroundEdges: this.foregroundEdges.length
-      });
-    }
-
-    projectNodes(nodes, state, foreground) {
-      const time = Number.isFinite(state.time) ? state.time : 0;
-      const width = state.width, height = state.height;
-      const intro = Number.isFinite(state.intro) ? clamp(state.intro) : 1;
-      for (const item of nodes) {
-        const p = item.p;
-        if (!foreground && state.mobile && item.layer === 1) { p.valid = false; continue; }
-        const phase = item.phase + time * item.speed;
-        const drift = foreground ? .012 : .021;
-        // Pass the reusable output as an optional fourth argument. A normal three-
-        // argument projector also works; its result is copied into this stable slot.
-        const projected = state.project(
-          item.x + Math.sin(phase) * drift,
-          item.y + Math.cos(phase * .83 + item.phase) * drift,
-          item.z + Math.sin(phase * .59) * .014, p
-        );
-        if (projected && projected !== p) {
-          p.x = projected.x; p.y = projected.y;
-          p.depth = projected.depth; p.scale = projected.scale;
-        }
-        p.valid = Number.isFinite(p.x) && Number.isFinite(p.y) && Number.isFinite(p.scale) && p.scale > 0 && p.scale < 5;
-        if (!p.valid) continue;
-        const radius = Math.hypot((p.x - width * .5) / (width * .5), (p.y - height * .493) / (height * .5));
-        const opening = foreground ? smooth(.36, .94, intro) : smooth(.11 + item.layer * .055, .72 + item.layer * .055, intro);
-        p.visibility = opening * (foreground ? smooth(.76, 1.13, radius) : .06 + .94 * smooth(.31, .88, radius));
-      }
-    }
-
-    edgeVisible(a, b, state, margin) {
-      return a.valid && b.valid &&
-        !(a.x < -margin && b.x < -margin) && !(a.x > state.width + margin && b.x > state.width + margin) &&
-        !(a.y < -margin && b.y < -margin) && !(a.y > state.height + margin && b.y > state.height + margin);
-    }
-
-    drawBack(gpu, state) {
-      if (!gpu || !state || typeof state.project !== 'function' || !(state.width > 0 && state.height > 0)) return;
-      this.projectNodes(this.backgroundNodes, state, false);
-      for (const edge of this.backgroundEdges) {
-        const a = edge.a.p, b = edge.b.p;
-        if (!this.edgeVisible(a, b, state, 36)) continue;
-        const density = .078 - edge.layer * .016;
-        const alpha = density * edge.light * Math.sqrt(a.visibility * b.visibility) * (state.mobile ? .80 : 1);
-        if (alpha < .004) continue;
-        gpu.line(a.x, a.y, b.x, b.y, SILVER, alpha, edge.cross ? .43 : .53 - edge.layer * .06);
-      }
-      for (const item of this.backgroundNodes) {
-        const p = item.p;
-        if (!p.valid || p.x < -8 || p.x > state.width + 8 || p.y < -8 || p.y > state.height + 8) continue;
-        const alpha = (.20 - item.layer * .040) * item.light * p.visibility;
-        if (alpha < .004) continue;
-        const radius = item.size * clamp(p.scale, .46, 1.2);
-        gpu.dot(p.x, p.y, radius, SILVER, alpha * (state.mobile ? .78 : 1));
-      }
-    }
-
-    drawFront(gpu, state) {
-      if (!gpu || !state || typeof state.project !== 'function' || !(state.width > 0 && state.height > 0)) return;
-      this.projectNodes(this.foregroundNodes, state, true);
-      const density = state.mobile ? .36 : 1;
-      for (const edge of this.foregroundEdges) {
-        const a = edge.a.p, b = edge.b.p;
-        if (!this.edgeVisible(a, b, state, 80)) continue;
-        const alpha = .043 * Math.sqrt(a.visibility * b.visibility) * density;
-        if (alpha < .004) continue;
-        const curve = edge.curve, dx = b.x - a.x, dy = b.y - a.y;
-        curve.a.x = a.x; curve.a.y = a.y; curve.b.x = b.x; curve.b.y = b.y;
-        curve.c.x = (a.x + b.x) * .5 - dy * edge.bend;
-        curve.c.y = (a.y + b.y) * .5 + dx * edge.bend;
-        // Two quiet widths suggest a soft nearby strand without a blur pass.
-        gpu.curve(curve, NEAR_SILVER, alpha * .20, state.mobile ? 2 : 3.1);
-        gpu.curve(curve, NEAR_SILVER, alpha, state.mobile ? .64 : .88);
-      }
-      for (const item of this.foregroundNodes) {
-        const p = item.p;
-        if (!p.valid || p.x < -28 || p.x > state.width + 28 || p.y < -28 || p.y > state.height + 28) continue;
-        const alpha = .12 * item.light * p.visibility * density;
-        if (alpha < .004) continue;
-        const radius = item.size * clamp(p.scale, .8, 1.65) * (state.mobile ? .72 : 1);
-        gpu.glow(p.x, p.y, radius * 10, NEAR_SILVER, alpha * .38);
-        gpu.dot(p.x, p.y, radius, NEAR_SILVER, alpha * .34);
-        gpu.ring(p.x, p.y, radius * 1.08, NEAR_SILVER, alpha * .40, .42);
-      }
-    }
-  }
-
-  root.AtlasDepthField = AtlasDepthField;
-})(typeof window !== 'undefined' ? window : globalThis);
-</script>
-  <script>/* Atlas / Living Constellation — Loom GPU rendering and continuous scene motion. */
 (function () {
   'use strict';
 
   const TAU = Math.PI * 2;
   const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
   const mix = (a, b, t) => a + (b - a) * t;
-  const SILVER = [211,218,225], SILVER_LIGHT = [238,242,246];
-  const ease = value => { const t=clamp(value,0,1);return t*t*(3-2*t); };
-  const tint = (base,accent,amount) => base.map((v,i)=>mix(v,accent[i],amount));
-  const REVEAL_SEGMENTS = 24;
+  const ease = value => { const t = clamp(value, 0, 1); return t * t * (3 - 2 * t); };
   const motion = window.LoomMotion;
+  const INK = [10, 10, 10];
+  const FONT = '"Inter Tight", "SUIT Variable", sans-serif';
+  const KR_FONT = '"SUIT Variable", "SUIT", sans-serif';
+  // Atlas takes this share of its orbit; letters stand apart by this share of their size.
+  const ORBIT = .8, SPHERE = .38, TRACK = .1;
+  // There is one ink. Rank comes from how strongly a part is printed, never from weight or colour.
+  const STRENGTH = { orbit: .28, line: .62, story: .3, name: .86, quiet: .3, legend: .68 };
+  // Light on the sphere: its direction at rest, its lean toward the viewer, its falloff, reach and floor.
+  const LIGHT = { rest: -TAU * .108, lift: .56, fall: 2.4, gain: .9, floor: .02, rim: .06 };
+  // Sizes of a name and its stroke, and the corners the page keeps for its own words:
+  // the caption above left and the hint below right.
+  const SMALL = { name: 10, gap: 13, wide: 48, edge: 8, tick: 4, point: 2.2, caption: [236, 38], hint: [126, 41] };
+  const ROOMY = { name: 12, gap: 18, wide: 60, edge: 14, tick: 5, point: 2.7, caption: [286, 46], hint: [168, 48] };
+  // Stages up to this height show the map alone; the stylesheet hides the caption and hint at the same height.
+  const LOW = 339.98;
   function random(seed) {
     return function () {
       seed |= 0; seed = seed + 0x6D2B79F5 | 0;
@@ -1354,24 +417,40 @@ void main(){
       return ((t ^ t >>> 14) >>> 0) / 4294967296;
     };
   }
-  function rgba(c, a) { return `rgba(${c[0]},${c[1]},${c[2]},${clamp(a, 0, 1)})`; }
-  function color(value) {
-    const hex = String(value || '#a9cce7').replace('#', '');
-    const full = hex.length === 3 ? hex.split('').map(c => c + c).join('') : hex;
-    if (!/^[0-9a-f]{6}$/i.test(full)) return [174, 199, 222];
-    const raw = [0, 2, 4].map(i => parseInt(full.slice(i, i + 2), 16));
-    return raw;
+  function ink(strength) { return `rgba(${INK[0]},${INK[1]},${INK[2]},${clamp(strength, 0, 1)})`; }
+
+  // The order in which grains appear as a surface grows lighter. Every new grain takes the
+  // emptiest place left, so grains keep even distances at every shade and never clump.
+  const GRID = 64;
+  let order = null;
+  function grainOrder() {
+    if (order) return order;
+    const count = GRID * GRID, rnd = random(862104), crowd = new Float32Array(count), taken = new Uint8Array(count);
+    const reach = 9, span = reach * 2 + 1, near = new Float32Array(span * span);
+    for (let y = -reach; y <= reach; y++) for (let x = -reach; x <= reach; x++) near[(y + reach) * span + x + reach] = Math.exp(-(x * x + y * y) / 7.22);
+    for (let i = 0; i < count; i++) crowd[i] = rnd() * 1e-4;
+    // The emptiest place of every row is remembered, so a new grain recounts only the rows it crowds.
+    const rowLeast = new Float32Array(GRID), rowPlace = new Int32Array(GRID);
+    const recount = row => {
+      let place = -1, least = Infinity;
+      for (let i = row * GRID, end = i + GRID; i < end; i++) if (!taken[i] && crowd[i] < least) { least = crowd[i]; place = i; }
+      rowLeast[row] = least; rowPlace[row] = place;
+    };
+    for (let row = 0; row < GRID; row++) recount(row);
+    order = new Float32Array(count);
+    for (let step = 0; step < count; step++) {
+      let py = 0;
+      for (let row = 1; row < GRID; row++) if (rowLeast[row] < rowLeast[py]) py = row;
+      const place = rowPlace[py], px = place % GRID;
+      taken[place] = 1; order[place] = (step + .5) / count;
+      for (let y = -reach; y <= reach; y++) {
+        const row = (py + y + GRID) % GRID, line = (y + reach) * span + reach;
+        for (let x = -reach; x <= reach; x++) crowd[row * GRID + (px + x + GRID) % GRID] += near[line + x];
+        recount(row);
+      }
+    }
+    return order;
   }
-  function makeSprite(size, stops) {
-    const canvas = document.createElement('canvas'); canvas.width = size; canvas.height = size;
-    const ctx = canvas.getContext('2d'); const r = size / 2;
-    const gradient = ctx.createRadialGradient(r, r, 0, r, r, r);
-    stops.forEach(s => gradient.addColorStop(s[0], s[1]));
-    ctx.fillStyle = gradient; ctx.fillRect(0, 0, size, size);
-    return canvas;
-  }
-  const FONT = '"Inter Tight", "Inter", "SUIT Variable", sans-serif';
-  const KR_FONT = '"SUIT Variable", "SUIT", sans-serif';
 
   class AtlasConstellation {
     constructor(canvas, options) {
@@ -1381,124 +460,42 @@ void main(){
       this.options = options || {};
       this.engines = (this.options.engines || []).slice(0, 8);
       this.relations = (this.options.relations || []).filter(r => this.engines.some(e => e.id === r.from) && this.engines.some(e => e.id === r.to));
-      this.nodes = []; this.edges = []; this.groups = []; this.paths = [];
+      this.groups = []; this.paths = [];
       this.selected = null; this.hovered = null; this.scenario = null;
-      this.destroyed = false; this.visible = true; this.raf = 0; this.time = 0;
-      this.lastFrame = 0; this.frameMS = 16.67; this.frames = 0;
+      this.destroyed = false; this.visible = true; this.raf = 0; this.time = 0; this.frames = 0;
       this.clock = motion.createClock(); this.dt = 0;
-      this.samples = new Float32Array(720); this.sampleCount = 0; this.sampleCursor = 0;
-      this.renderCosts = new Float32Array(720); this.renderCost = 0;
-      this.width = 1; this.height = 1; this.zoom = 1; this.targetZoom = 1;
-      this.yaw = -0.045; this.pitch = -0.035;
-      this.targetYaw = this.yaw; this.targetPitch = this.pitch;
-      this.velocityX = 0; this.velocityY = 0;
-      this.pointer = null; this.labelBoxes = []; this.projectedHubs = [];
-      this.featureBoxes=[];this.hoveredFeature=null;this.featureAdjacency=new Map();
-      this.featurePointer=null;this.featureContact=null;
-      this.labelState = new Map(); this.labelSprites = new Map(); this.hoverCandidate = null; this.hoverSince = 0;
-      this.threadSprites = new Map();
-      this.orbTint = SILVER.slice(); this.orbEnergy = .25;
-      this.coreLight={id:null,since:0,start:null,issued:false,amount:0,count:0};this.innerLight=0;
-      this.adjacency = new Map(); this.frameProjection = null;
+      this.width = 1; this.height = 1; this.stageHeight = null; this.dpr = 1; this.frameLayout = null;
+      this.pointer = null; this.labelBoxes = []; this.legendBoxes = []; this.legendFits = null; this.projectedHubs = [];
+      this.labelSprites = new Map(); this.sphereSprites = new Map();
+      this.hoverCandidate = null; this.hoverSince = 0;
+      this.adjacency = new Map();
       this.motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
       this.paused = this.motionQuery.matches;
-      this.introComplete=this.paused;this.introProgress=this.paused?1:0;
-      this.depthField=new window.AtlasDepthField();
-      this.depthState={project:this.project.bind(this),width:1,height:1,time:0,intro:0,mobile:false};
-      this.glow = makeSprite(96, [[0, 'rgba(244,247,250,0.95)'], [.08, 'rgba(228,234,240,.56)'], [.24, 'rgba(199,210,221,.12)'], [.55, 'rgba(174,188,202,.028)'], [1, 'rgba(174,188,202,0)']]);
+      this.responseUntil = 0;
       this.build();
-      this.initGPU();
       this.bind();
       this.resize();
       this.requestDraw();
     }
 
-    initGPU() {
-      this.gpuCanvas = document.createElement('canvas');
-      this.gpuCanvas.className = 'loom-network-surface';
-      this.gpuCanvas.setAttribute('aria-hidden', 'true');
-      Object.assign(this.gpuCanvas.style, {position:'absolute',inset:'0',width:'100%',height:'100%',pointerEvents:'none'});
-      this.canvas.before(this.gpuCanvas);
-      Object.assign(this.canvas.style, {position:'relative',zIndex:'1'});
-      this.gpu = null; this.gpuAvailable = false;
-      try {
-        this.gpu = new window.LoomNetworkRenderer(this.gpuCanvas, {
-          onContextLost: () => { this.gpuAvailable = false; this.requestDraw(); },
-          onContextRestored: () => { this.gpuAvailable = true; this.resize(); }
-        });
-        this.gpuAvailable = true;
-      } catch (error) { this.gpuCanvas.remove(); }
-    }
-
     build() {
-      const rnd = random(862104);
-      // The constellations occupy an asymmetric volume rather than a circular menu.
-      const anchors = [
-        [-.52, -.55, .30], [.10, -.69, -.31], [.72, -.41, .26], [.68, .18, -.30],
-        [.38, .64, .31], [-.25, .56, -.24], [-.71, .30, .24], [-.65, -.17, -.32]
-      ];
+      const count = this.engines.length;
       this.engines.forEach((engine, index) => {
-        const original = anchors[index];
-        const anchor = [original[0] - original[1] * .23, original[1] - original[0] * .08, original[2]];
-        const group = { id: engine.id, engine, index, color: color(engine.color), highlight:color(engine.threadHighlight||engine.color), shadow:color(engine.threadShadow||engine.color), x: anchor[0], y: anchor[1], z: anchor[2], nodes: [], focus: 1, detail:0, hub: null };
-        group.light=group.color.map((v,i)=>mix(v,group.highlight[i],.28));
-        group.engaged=false;group.revealAge=0;group.reveal=new Float32Array(REVEAL_SEGMENTS);
-        this.groups.push(group);
-        const count = 35 + index % 4;
-        for (let j = 0; j < count; j++) {
-          const isHub = j === 0;
-          const angle = j * 2.399963 + index * .58;
-          const radius = isHub ? 0 : .04 + Math.sqrt(j / count) * (.23 + rnd() * .16);
-          const bridge = j >= 29;
-          const inward = bridge ? .26 + (j - 29) / (count - 29) * .52 : 0;
-          const node = {
-            index: this.nodes.length, group: index, localIndex: j,
-            x: anchor[0] * (1 - inward) + Math.cos(angle) * radius * (bridge ? .23 : index % 2 ? 1.02 : .86),
-            y: anchor[1] * (1 - inward) + Math.sin(angle) * radius * (bridge ? .18 : .78),
-            z: anchor[2] * (1 - inward * .65) + (rnd() - .5) * .43,
-            phase: rnd() * TAU, speed: .18 + rnd() * .19,
-            size: isHub ? 2.8 : j <= 6 ? 1.45 : .65 + rnd() * .70,
-            concept: j > 0 && j <= 6 ? (engine.concepts || [])[j - 1] : null,
-            isHub, bridge, p: null, baseP:null, chroma:0,inspect:0,
-            tissue:{x:{value:0,velocity:0},y:{value:0,velocity:0},weight:0,depth:0},links:[]
-          };
-          if (isHub) { node.z = anchor[2]; group.hub = node; }
-          this.nodes.push(node); group.nodes.push(node);
-        }
-        group.nodes.forEach(node=>{node.colorDelay=Math.min(.30,Math.hypot(node.x-group.hub.x,node.y-group.hub.y,node.z-group.hub.z)*.70);});
-        const pairs = new Set();
-        const addEdge = (a, b, kind) => {
-          if (a === b) return;
-          const key = [Math.min(a.index, b.index), Math.max(a.index, b.index)].join(':');
-          if (pairs.has(key)) return;
-          pairs.add(key); this.edges.push({ a, b, group: index, kind, opacity: .77 + rnd() * .23,inspect:0 });
-        };
-        group.nodes.slice(1).forEach((node, j) => {
-          if (j < 6) addEdge(group.hub, node, 'concept');
-          const nearest = group.nodes.filter(n => n !== node && !n.isHub).sort((a, b) => {
-            const da = (node.x - a.x) ** 2 + (node.y - a.y) ** 2 + (node.z - a.z) ** 2 * .5;
-            const db = (node.x - b.x) ** 2 + (node.y - b.y) ** 2 + (node.z - b.z) ** 2 * .5;
-            return da - db;
-          });
-          nearest.slice(0, j % 3 === 0 ? 3 : 2).forEach(n => addEdge(node, n, 'local'));
-          if (j % 4 === 0) addEdge(node, group.nodes[1 + j % 6], 'concept');
+        // Clockwise in the order of the engine list, half a step past twelve so no name points into a corner.
+        const angle = (index + .5) / count * TAU;
+        this.groups.push({
+          id: engine.id, engine, index, angle, x: Math.sin(angle) * ORBIT, y: -Math.cos(angle) * ORBIT,
+          label: String(engine.name || engine.id).toUpperCase(), focus: 1, detail: 0, p: { x: 0, y: 0 }
         });
       });
-      this.nodes.filter(n=>n.concept).forEach(node=>this.featureAdjacency.set(node.index,new Set()));
-      this.edges.forEach(edge=>{
-        edge.a.links.push(edge.b);edge.b.links.push(edge.a);
-        this.featureAdjacency.get(edge.a.index)?.add(edge.b.index);
-        this.featureAdjacency.get(edge.b.index)?.add(edge.a.index);
-      });
-      this.relations.forEach((relation, i) => {
-        const a = this.groups.find(g => g.id === relation.from);
-        const b = this.groups.find(g => g.id === relation.to);
-        this.paths.push({ a, b, relation, phase: rnd(), lift: (i % 2 ? -1 : 1) * (.10 + rnd() * .16), offset: rnd() * TAU, emphasis: 0,
-          origin:null,revealAge:0,reveal:new Float32Array(REVEAL_SEGMENTS),colors:Array.from({length:REVEAL_SEGMENTS},()=>SILVER.slice()) });
+      this.relations.forEach(relation => {
+        const a = this.groups.find(g => g.id === relation.from), b = this.groups.find(g => g.id === relation.to);
+        const apart = Math.abs(a.index - b.index);
+        // Neighbours on the orbit are joined along the orbit itself; all others across it.
+        this.paths.push({ a, b, relation, along: count > 2 && (apart === 1 || apart === count - 1), emphasis: 0, shared: 0, reveal: 0, origin: null });
       });
       this.groups.forEach(g => this.adjacency.set(g.id, new Set([g.id])));
       this.relations.forEach(r => { this.adjacency.get(r.from).add(r.to); this.adjacency.get(r.to).add(r.from); });
-      this.dust = Array.from({ length: 38 }, () => ({ x: (rnd() - .5) * 2.5, y: (rnd() - .5) * 2.1, z: (rnd() - .5) * 1.3, alpha: .09 + rnd() * .24, size: .3 + rnd() * .4, phase: rnd() * TAU }));
     }
 
     bind() {
@@ -1509,75 +506,44 @@ void main(){
       this.canvas.style.touchAction = 'pan-y';
       on(this.canvas, 'pointerdown', event => {
         if (event.button !== 0 && event.pointerType !== 'touch') return;
-        this.finishIntro();
-        this.velocityX = this.velocityY = 0;
-        this.pointer = { id: event.pointerId, x: event.clientX, y: event.clientY, lastX: event.clientX, lastY: event.clientY, lastTime: event.timeStamp, dragged: false, touch: event.pointerType === 'touch', vertical: false };
+        this.pointer = { id: event.pointerId, x: event.clientX, y: event.clientY, moved: false };
       });
       on(this.canvas, 'pointermove', event => {
-        if (this.pointer && this.pointer.id === event.pointerId) {
-          const p = this.pointer; const dx = event.clientX - p.x; const dy = event.clientY - p.y;
-          if (p.touch && !p.dragged && Math.abs(dy) > Math.abs(dx) && Math.abs(dy) > 8) p.vertical = true;
-          if (!p.vertical && !p.dragged && Math.hypot(dx, dy) > 7 && (!p.touch || Math.abs(dx) > Math.abs(dy))) {
-            p.dragged = true;this.setFeatureHover(null);this.setHover(null); this.hoverCandidate = null; this.canvas.setPointerCapture(event.pointerId); this.canvas.style.cursor = 'grabbing';
-          }
-          if (p.dragged) {
-            if (event.cancelable) event.preventDefault();
-            const deltaX = event.clientX - p.lastX; const deltaY = event.clientY - p.lastY;
-            this.targetYaw = clamp(this.targetYaw + deltaX * .003, -.43, .43);
-            this.targetPitch = clamp(this.targetPitch - deltaY * .0025, -.28, .28);
-            const eventDt = clamp((event.timeStamp - p.lastTime) / 1000, .004, .08);
-            this.velocityX = motion.damp(this.velocityX, clamp(deltaX * .003 / eventDt, -1.2, 1.2), .032, eventDt);
-            this.velocityY = motion.damp(this.velocityY, clamp(-deltaY * .0025 / eventDt, -.8, .8), .032, eventDt);
-            if (this.paused) { this.yaw = this.targetYaw; this.pitch = this.targetPitch; }
-            this.requestDraw();
-          }
-          p.lastX = event.clientX; p.lastY = event.clientY; p.lastTime = event.timeStamp;
-        }
-        if (event.pointerType !== 'touch' && (!this.pointer || !this.pointer.dragged)) {
-          const rect=this.canvas.getBoundingClientRect();
-          this.featurePointer={x:event.clientX-rect.left,y:event.clientY-rect.top};
-          const feature=this.hitFeature(event.clientX,event.clientY);
-          this.setFeatureHover(feature);
-          const hit = feature===null?this.hit(event.clientX,event.clientY,true):this.groups[this.nodes[feature].group].id;
-          if (hit !== this.hoverCandidate) { this.hoverCandidate = hit; this.hoverSince = performance.now(); }
-          if (this.paused||feature!==null) this.setHover(hit);
-          this.canvas.style.cursor = hit ? 'pointer' : 'grab';
-        }
+        const p = this.pointer;
+        if (p && p.id === event.pointerId && Math.hypot(event.clientX - p.x, event.clientY - p.y) > 8) p.moved = true;
+        if (event.pointerType === 'touch') return;
+        const hit = this.hit(event.clientX, event.clientY, true);
+        if (hit !== this.hoverCandidate) { this.hoverCandidate = hit; this.hoverSince = performance.now(); this.requestDraw(); }
+        if (this.paused) this.setHover(hit);
+        this.canvas.style.cursor = hit ? 'pointer' : 'default';
       });
       on(this.canvas, 'pointerup', event => {
         const p = this.pointer;
         if (!p || p.id !== event.pointerId) return;
-        if (!p.dragged && !p.vertical) {
-          const feature=this.hitFeature(event.clientX,event.clientY);
-          const id=feature===null?this.hit(event.clientX,event.clientY):this.groups[this.nodes[feature].group].id;
-          const next=feature===null&&id===this.selected?null:id;
-          this.select(next);
-          if (typeof this.options.onSelect === 'function') this.options.onSelect(next);
-        }
-        if (event.timeStamp - p.lastTime > 90) this.velocityX = this.velocityY = 0;
         this.pointer = null;
-        if (this.canvas.hasPointerCapture(event.pointerId)) this.canvas.releasePointerCapture(event.pointerId);
-        this.canvas.style.cursor = this.hovered ? 'pointer' : 'grab';
+        // A scroll that began on the map is not a choice.
+        if (p.moved) return;
+        const id = this.hit(event.clientX, event.clientY);
+        const next = id === this.selected ? null : id;
+        this.select(next);
+        if (typeof this.options.onSelect === 'function') this.options.onSelect(next);
       });
-      on(this.canvas, 'pointercancel', () => { this.pointer = null;this.setFeatureHover(null); this.velocityX = this.velocityY = 0; this.canvas.style.cursor = 'grab'; });
-      on(this.canvas, 'pointerleave', () => { if (!this.pointer || !this.pointer.dragged) this.hoverEngine(this.options.getFocusEngine?.()||null); });
-      on(window,'blur',()=>{this.pointer=null;this.velocityX=this.velocityY=0;this.hoverEngine(null);this.canvas.style.cursor='grab';});
-      on(this.canvas, 'wheel', event => {
-        if (!event.ctrlKey && !event.metaKey) return;
-        event.preventDefault(); this.zoomBy(Math.exp(-event.deltaY * .0015));
-      }, { passive: false });
+      on(this.canvas, 'pointercancel', () => { this.pointer = null; });
+      on(this.canvas, 'pointerleave', () => { this.hoverEngine(this.options.getFocusEngine?.() || null); });
+      on(window, 'blur', () => { this.pointer = null; this.hoverEngine(null); this.canvas.style.cursor = 'default'; });
       on(document, 'visibilitychange', () => {
-        this.lastFrame = 0; motion.resetClock(this.clock);
+        motion.resetClock(this.clock);
         if (document.hidden) this.cancelFrame(); else this.requestDraw();
       });
       const motionChange = e => { if (e.matches) this.setPaused(true); };
       if (this.motionQuery.addEventListener) on(this.motionQuery, 'change', motionChange);
+      // The stage gives the size; the canvas is then set to whole device pixels inside it.
       if (typeof ResizeObserver !== 'undefined') {
-        this.resizeObserver = new ResizeObserver(() => this.resize()); this.resizeObserver.observe(this.canvas);
+        this.resizeObserver = new ResizeObserver(() => this.resize()); this.resizeObserver.observe(this.canvas.parentElement || this.canvas);
       } else on(window, 'resize', () => this.resize());
       if (typeof IntersectionObserver !== 'undefined') {
         this.intersectionObserver = new IntersectionObserver(entries => {
-          this.visible = entries[0].isIntersecting; this.lastFrame = 0; motion.resetClock(this.clock);
+          this.visible = entries[0].isIntersecting; motion.resetClock(this.clock);
           if (this.visible) this.requestDraw(); else this.cancelFrame();
         }, { rootMargin: '80px' });
         this.intersectionObserver.observe(this.canvas);
@@ -1586,215 +552,137 @@ void main(){
 
     resize() {
       if (this.destroyed) return;
-      const rect = this.canvas.getBoundingClientRect();
-      this.width = Math.max(1, rect.width); this.height = Math.max(1, rect.height);
-      this.dpr = Math.min(window.devicePixelRatio || 1, 2);
-      const pixelWidth = Math.round(this.width * this.dpr), pixelHeight = Math.round(this.height * this.dpr);
+      const rect = (this.canvas.parentElement || this.canvas).getBoundingClientRect();
+      this.dpr = clamp(window.devicePixelRatio || 1, 1, 3);
+      // One canvas pixel is one device pixel, so hairlines and grains are drawn as they are, never resampled.
+      const pixelWidth = Math.max(1, Math.round(rect.width * this.dpr)), pixelHeight = Math.max(1, Math.round(rect.height * this.dpr));
+      this.width = pixelWidth / this.dpr; this.height = pixelHeight / this.dpr; this.stageHeight = rect.height;
       if (this.canvas.width !== pixelWidth || this.canvas.height !== pixelHeight) {
         this.canvas.width = pixelWidth; this.canvas.height = pixelHeight;
-        this.labelState.clear(); this.labelSprites.clear();
+        this.labelSprites.clear(); this.sphereSprites.clear();
       }
+      // A hair over the exact quotient: browsers round lengths down, and must not land below the whole pixel.
+      // Set on every change of size or density, since the same bitmap can stand for a different number of points.
+      const cssWidth = (pixelWidth + .004) / this.dpr + 'px', cssHeight = (pixelHeight + .004) / this.dpr + 'px';
+      if (this.canvas.style.width !== cssWidth || this.canvas.style.height !== cssHeight) { this.canvas.style.width = cssWidth; this.canvas.style.height = cssHeight; }
       this.ctx.setTransform(this.dpr, 0, 0, this.dpr, 0, 0);
-      this.gpu?.resize(this.width, this.height, this.dpr);
-      this.frameProjection = null;
       this.requestDraw();
     }
 
-    project(x, y, z, out = {}) {
-      const rotation = this.frameProjection;
-      const cy = rotation ? rotation.cy : Math.cos(this.yaw), sy = rotation ? rotation.sy : Math.sin(this.yaw), cp = rotation ? rotation.cp : Math.cos(this.pitch), sp = rotation ? rotation.sp : Math.sin(this.pitch);
-      const rx = x * cy + z * sy; const rz = -x * sy + z * cy;
-      const ry = y * cp - rz * sp; const depth = y * sp + rz * cp;
-      const perspective = 3.7 / (3.7 - depth);
-      const scale = Math.min(this.width * .405, this.height * .445) * this.zoom;
-      out.x=this.width*.5+rx*scale*perspective;out.y=this.height*.493+ry*scale*perspective;
-      out.z=depth;out.scale=perspective;out.depth=clamp((depth+.8)/1.6,0,1);
+    // The finest mark the screen can show clearly: one device pixel, two on the densest screens.
+    // Every line is this wide and every grain of the sphere this large.
+    unit() { return Math.max(1, Math.round(this.dpr * .62)); }
+    hair() { return this.unit() / this.dpr; }
+    snap(value) { return Math.round(value * this.dpr) / this.dpr; }
+
+    // Where a name sits beside its stroke: outside the orbit, in line with it.
+    labelBox(group, p, type, width) {
+      const dx = Math.sin(group.angle), dy = -Math.cos(group.angle);
+      const side = Math.abs(dx) > .5 ? Math.sign(dx) : 0;
+      const x = side ? p.x + side * type.gap - (side < 0 ? width : 0) : p.x + dx * type.gap * .5 - width / 2;
+      const y = side ? p.y + dy * type.gap * .3 : p.y + Math.sign(dy) * (type.gap + type.name * .5);
+      return { x, y, top: y - type.name * .5, w: width, h: type.name, side };
+    }
+
+    // The orbit is a circle on every stage. It grows until a name would leave the stage
+    // or enter a corner the page keeps for itself.
+    layout() {
+      // The stage as the page measures it decides whether it is low; the map itself is drawn on whole pixels.
+      const width = this.width, height = this.height, low = (this.stageHeight ?? height) <= LOW, key = width + '|' + height + '|' + this.dpr + '|' + low;
+      if (this.frameLayout?.key === key) return this.frameLayout;
+      const type = width < 520 || low ? SMALL : ROOMY;
+      const x = this.snap(width * .5), y = this.snap(height * (low ? .5 : .493)), p = { x: 0, y: 0 };
+      const corners = low ? [] : [[0, 0, type.caption[0], type.caption[1]], [width - type.hint[0], height - type.hint[1], width, height]];
+      const clear = scale => this.groups.every(group => {
+        p.x = x + group.x * scale; p.y = y + group.y * scale;
+        const box = this.labelBox(group, p, type, type.wide), right = box.x + box.w, bottom = box.top + box.h;
+        if (box.x < type.edge || right > width - type.edge || box.top < type.edge || bottom > height - type.edge) return false;
+        return corners.every(([left, top, far, base]) => right + 8 <= left || box.x - 8 >= far || bottom + 8 <= top || box.top - 8 >= base);
+      });
+      // The search narrows toward the largest size that still fits; a larger orbit never fits better.
+      let least = 1, most = Math.max(1, Math.min(width * (type === SMALL ? .41 : .43), height * (low ? .46 : .4)));
+      if (!clear(most)) {
+        for (let i = 0; i < 28; i++) { const middle = (least + most) / 2; if (clear(middle)) least = middle; else most = middle; }
+        most = Math.max(1, Math.floor(least * 100) / 100);
+      }
+      return this.frameLayout = { key, type, low, x, y, scale: most };
+    }
+
+    project(x, y, out = {}) {
+      const layout = this.layout();
+      out.x = layout.x + x * layout.scale; out.y = layout.y + y * layout.scale;
       return out;
     }
 
-    neighbors(id) {
-      return this.adjacency.get(id) || new Set([id]);
+    orbit() {
+      const layout = this.layout();
+      return { x: layout.x, y: layout.y, r: layout.scale * ORBIT };
     }
 
+    // Atlas keeps a fixed share of its orbit, so there is always air between them.
+    nucleusRadius() { return Math.max(1, Math.round(this.layout().scale * ORBIT * SPHERE * this.dpr)) / this.dpr; }
+
+    neighbors(id) { return this.adjacency.get(id) || new Set([id]); }
+
     focusFor(id) {
-      const active = this.hovered || this.selected;
-      if (active && active !== 'atlas') {
-        if (id === active) return 1.45;
-        return this.neighbors(active).has(id) ? .70 : .14;
-      }
-      if (this.scenario) return this.scenario.has(id) ? 1.28 : .17;
+      const active = this.hovered || this.selected, chosen = Boolean(active) && active !== 'atlas';
+      if (chosen && id === active) return 1;
+      // A story keeps its own engines in view at every step, and only those.
+      if (this.scenario) return this.scenario.has(id) ? 1 : .3;
+      if (chosen) return this.neighbors(active).has(id) ? 1 : .3;
       return 1;
     }
 
     setHover(id) {
       if (id === this.hovered) return;
-      if(id)this.finishIntro();
       this.hovered = id;
       if (typeof this.options.onHover === 'function') this.options.onHover(id);
-      this.requestDraw();
+      this.wakeResponse();
     }
 
     // DOM controls and keyboard focus share the canvas preview state and its latch.
     hoverEngine(id) {
-      this.setFeatureHover(null);
-      const next=this.groups.some(g=>g.id===id)?id:null;
-      this.hoverCandidate=next;this.hoverSince=performance.now()-100;
+      const next = this.groups.some(g => g.id === id) ? id : null;
+      this.hoverCandidate = next; this.hoverSince = performance.now() - 100;
       this.setHover(next);
     }
 
     select(id) {
-      this.finishIntro();
-      this.setFeatureHover(null);
       this.selected = id === 'atlas' || this.groups.some(g => g.id === id) ? id : null;
       this.hovered = null; this.hoverCandidate = null;
-      this.requestDraw();
+      this.wakeResponse();
     }
 
-    setScenario(ids) { if(ids?.length)this.finishIntro();this.scenario = ids && ids.length ? new Set(ids) : null; this.requestDraw(); }
+    setScenario(ids) { this.scenario = ids && ids.length ? new Set(ids) : null; this.wakeResponse(); }
 
     setPaused(value) {
-      this.paused = Boolean(value); this.lastFrame = 0; motion.resetClock(this.clock);
-      if(this.paused)this.finishIntro();
-      this.velocityX = this.velocityY = 0;
-      if (this.paused) { this.targetYaw = this.yaw; this.targetPitch = this.pitch; this.targetZoom = this.zoom; }
+      this.paused = Boolean(value); motion.resetClock(this.clock);
       this.requestDraw();
     }
 
     reset() {
-      this.finishIntro();
-      this.setFeatureHover(null);
-      Object.assign(this.coreLight,{id:null,since:this.time,start:null,issued:false,amount:0});this.innerLight=0;
-      if(this.paused)this.nodes.forEach(n=>{n.tissue.x.value=n.tissue.x.velocity=n.tissue.y.value=n.tissue.y.velocity=0;});
       this.selected = null; this.hovered = null; this.hoverCandidate = null; this.scenario = null;
-      this.targetZoom = 1; this.targetYaw = -.045; this.targetPitch = -.035;
-      this.velocityX = this.velocityY = 0;
-      if (this.paused) { this.yaw = this.targetYaw; this.pitch = this.targetPitch; this.zoom = this.targetZoom; }
-      this.requestDraw();
-    }
-
-    zoomBy(factor) { this.finishIntro();this.targetZoom = clamp(this.targetZoom * (Number(factor) || 1), .76, 1.18); if(this.paused)this.zoom=this.targetZoom; this.requestDraw(); }
-
-    finishIntro() {
-      if(this.introComplete)return;
-      this.introComplete=true;this.introProgress=1;
-      this.canvas.style.opacity='1';if(this.gpuCanvas)this.gpuCanvas.style.opacity='1';
-    }
-
-    appearance(depth=.5) { return this.introComplete?1:ease((this.time-.50-depth*.42)/.82); }
-
-    labelAppearance() { return this.introComplete?1:ease((this.time-1.02)/.98); }
-
-    setFeatureHover(index) {
-      const next=Number.isInteger(index)&&this.nodes[index]?.concept?index:null;
-      if(next===this.hoveredFeature)return;
-      this.hoveredFeature=next;
-      this.featureContact=null;
-      this.nodes.forEach(n=>{n.tissue.weight=0;n.tissue.depth=0;});
-      if(next!==null){
-        this.finishIntro();
-        const node=this.nodes[next],p=node.baseP||node.p,box=this.featureBoxes.find(b=>b.index===next);
-        const dx=p.x-(this.featurePointer?.x??p.x),dy=p.y-(this.featurePointer?.y??p.y),distance=Math.hypot(dx,dy);
-        this.featureContact={x:p.x,y:p.y,dx:distance>3?dx/distance:Math.cos(node.phase),dy:distance>3?dy/distance:Math.sin(node.phase),box:box?{x:box.x,y:box.y,w:box.w,h:box.h}:null,since:this.time};
-        node.tissue.weight=1;
-        for(const neighbor of node.links){neighbor.tissue.weight=neighbor.isHub?.16:.42;neighbor.tissue.depth=1;}
-        for(const neighbor of node.links)for(const outer of neighbor.links){
-          if(outer!==node&&!outer.tissue.weight){outer.tissue.weight=outer.isHub?.04:.10;outer.tissue.depth=2;}
-        }
-      }
-      this.requestDraw();
-    }
-
-    hitFeature(clientX,clientY) {
-      const r=this.canvas.getBoundingClientRect(),x=clientX-r.left,y=clientY-r.top;
-      const contains=(box,pad)=>x>=box.x-pad&&x<=box.x+box.w+pad&&y>=box.y-pad&&y<=box.y+box.h+pad;
-      const current=this.featureBoxes.find(box=>box.index===this.hoveredFeature);
-      const held=this.nodes[this.hoveredFeature],contact=this.featureContact;
-      // A deformed point cannot push itself out of its own pointer target.
-      if(held?.baseP&&(Math.hypot(x-held.baseP.x,y-held.baseP.y)<19||Math.hypot(x-held.p.x,y-held.p.y)<19||current&&contains(current,11)||contact?.box&&contains(contact.box,11)))return held.index;
-      let nearest=null,distance=12;
-      for(const node of this.nodes){
-        if(!node.concept||!node.p||node.appearance<.25||this.groups[node.group].focus<.25)continue;
-        const d=Math.hypot(x-node.p.x,y-node.p.y);if(d<distance){nearest=node.index;distance=d;}
-      }
-      if(nearest!==null)return nearest;
-      for(const box of this.featureBoxes)if(contains(box,6))return box.index;
-      return null;
-    }
-
-    advanceFeatureTissue(dt) {
-      // Screen-space offsets share Loom's exact spring. Every line uses the same
-      // displaced endpoints; no independent dash animation or free-running force loop.
-      const source=this.nodes[this.hoveredFeature],contact=this.featureContact;
-      const disabled=this.motionQuery.matches;
-      let targetX=0,targetY=0;
-      if(source&&contact){
-        const p=source.baseP,dx=p.x-(this.featurePointer?.x??p.x),dy=p.y-(this.featurePointer?.y??p.y);
-        const ux=contact.dx*20+dx*.45,uy=contact.dy*20+dy*.45,length=Math.hypot(ux,uy)||1;
-        const age=this.time-contact.since,breath=Math.sin(age*1.8),amplitude=this.width<520?6.5:9;
-        targetX=ux/length*(amplitude+breath*.85)-uy/length*Math.sin(age*1.35)*1.1;
-        targetY=uy/length*(amplitude+breath*.85)+ux/length*Math.sin(age*1.35)*1.1;
-      }
-      const carriedX=source?.tissue.x.value||0,carriedY=source?.tissue.y.value||0;
-      for(const node of this.nodes){
-        const state=node.tissue,weight=state.weight,isSource=node===source;
-        let x=0,y=0;
-        if(source&&weight){
-          x=isSource?targetX:carriedX*weight;y=isSource?targetY:carriedY*weight;
-          if(!isSource){
-            const dx=node.baseP.x-source.baseP.x,dy=node.baseP.y-source.baseP.y,distance=Math.hypot(dx,dy)||1;
-            const expansion=Math.sin((this.time-contact.since)*1.8)*weight*.9;
-            x+=dx/distance*expansion;y+=dy/distance*expansion;
-          }
-        }
-        if(disabled){state.x.value=state.x.velocity=state.y.value=state.y.velocity=0;}
-        else if(!this.paused){
-          const response=isSource?.16:weight?.23+state.depth*.045:.30;
-          motion.advanceSpring(state.x,x,response,dt);motion.advanceSpring(state.y,y,response,dt);
-        }
-        node.p.x+=state.x.value;node.p.y+=state.y.value;
-      }
-    }
-
-    advanceCoreLight(active,dt) {
-      const light=this.coreLight,chosen=this.groups.find(g=>g.id===active),id=chosen?.id||null;
-      if(id!==light.id){
-        light.id=id;light.since=this.time;light.start=null;light.issued=false;
-        if(this.paused)light.amount=0;
-      }
-      if(this.motionQuery.matches){light.amount=0;light.start=null;light.issued=true;return;}
-      if(this.paused)return;
-      // One soft breath stays inside the glass. No rings, outward pulses or field lighting.
-      if(chosen&&!light.issued&&this.time-light.since>=.80&&chosen.revealAge>=.72){
-        light.start=this.time;light.issued=true;light.count++;
-      }
-      const age=light.start===null?-1:this.time-light.start;
-      const target=age<0?0:.78*ease(age/.52)*(1-ease((age-.52)/1.28));
-      light.amount=motion.damp(light.amount,target,target>light.amount?.12:.22,dt);
-      if(age>2.5&&light.amount<.001){light.amount=0;light.start=null;}
+      this.wakeResponse();
     }
 
     hit(clientX, clientY, hover = false) {
       const r = this.canvas.getBoundingClientRect(); const x = clientX - r.left, y = clientY - r.top;
-      if (hover && this.hovered) {
-        const current = this.groups.find(g => g.id === this.hovered);
-        if (current && Math.hypot(x-current.hub.p.x, y-current.hub.p.y)<40) return this.hovered;
-        const label = this.labelBoxes.find(box => box.id === this.hovered);
-        if (label && x>label.x-14 && x<label.x+label.w+14 && y>label.y-14 && y<label.y+label.h+14) return this.hovered;
-      }
-      for (const box of this.labelBoxes) if (x >= box.x - 5 && x <= box.x + box.w + 5 && y >= box.y - 6 && y <= box.y + box.h + 6) return box.id;
-      const center = this.project(0, 0, 0);
-      if (Math.hypot(x - center.x, y - center.y) < this.nucleusRadius()) return hover?null:'atlas';
-      let best = null, distance = hover ? 17 : 23;
-      for (const node of this.nodes) {
-        if (!node.p) continue;
-        if (hover && !node.isHub && !node.concept) continue;
-        const d = Math.hypot(x - node.p.x, y - node.p.y);
-        if (d < distance) { best = this.groups[node.group].id; distance = d; }
+      for (const box of this.labelBoxes) if (x >= box.x - 10 && x <= box.x + box.w + 10 && y >= box.y - 12 && y <= box.y + box.h + 12) return box.id;
+      const center = this.project(0, 0);
+      if (Math.hypot(x - center.x, y - center.y) < this.nucleusRadius()) return hover ? null : 'atlas';
+      let best = null, distance = hover ? 20 : 26;
+      for (const group of this.groups) {
+        const p = this.project(group.x, group.y, group.p), d = Math.hypot(x - p.x, y - p.y);
+        if (d < distance) { best = group.id; distance = d; }
       }
       return best;
     }
 
     cancelFrame() { if (this.raf) { cancelAnimationFrame(this.raf); this.raf = 0; } }
+
+    wakeResponse() { this.responseUntil = this.time + 1.2; this.requestDraw(); }
+
+    needsResponse() { return !this.paused && (this.hoverCandidate !== this.hovered || this.time < this.responseUntil); }
 
     requestDraw() {
       if (this.raf || this.destroyed || !this.visible || document.hidden) return;
@@ -1804,119 +692,56 @@ void main(){
     frame(timestamp) {
       this.raf = 0;
       if (this.destroyed || !this.visible || document.hidden) return;
-      const tick = motion.stepClock(this.clock, timestamp, {paused:this.paused});
-      const dt = tick.dt; this.dt = dt; this.time = tick.time;
-      if(!this.introComplete){
-        this.introProgress=ease(this.time/2.15);
-        const opacity=String(ease((this.time+.04)/.55));this.canvas.style.opacity=opacity;this.gpuCanvas.style.opacity=opacity;
-        if(this.time>=2.15)this.finishIntro();
-      }
-      if (!this.paused && !tick.firstFrame && tick.rawDt > 0) {
-        this.frameMS = motion.damp(this.frameMS, tick.rawDt * 1000, .5, Math.min(tick.rawDt,.1));
-        this.samples[this.sampleCursor] = tick.rawDt * 1000;
-        this.renderCosts[this.sampleCursor] = this.renderCost;
-        this.sampleCursor = (this.sampleCursor + 1) % this.samples.length;
-        this.sampleCount = Math.min(this.sampleCount + 1, this.samples.length);
-      }
-      this.lastFrame = timestamp; this.frames++;
+      const tick = motion.stepClock(this.clock, timestamp, { paused: this.paused });
+      this.dt = tick.dt; this.time = tick.time; this.frames++;
       if (this.hoverCandidate !== this.hovered && performance.now() - this.hoverSince > 90) this.setHover(this.hoverCandidate);
-      if (!this.paused) {
-        if (!this.pointer || !this.pointer.dragged) {
-          const yawCoast = motion.coast({value:this.targetYaw,velocity:this.velocityX},8.5,dt,-.43,.43);
-          const pitchCoast = motion.coast({value:this.targetPitch,velocity:this.velocityY},9.5,dt,-.28,.28);
-          this.targetYaw = yawCoast.value; this.velocityX = yawCoast.velocity;
-          this.targetPitch = pitchCoast.value; this.velocityY = pitchCoast.velocity;
-        }
-        this.yaw = motion.damp(this.yaw,this.targetYaw,.105,dt);
-        this.pitch = motion.damp(this.pitch,this.targetPitch,.105,dt);
-        this.zoom = motion.damp(this.zoom,this.targetZoom,.17,dt);
-      }
-      this.groups.forEach(g => { const target = this.focusFor(g.id); g.focus = this.paused ? target : motion.damp(g.focus,target,.22,dt); });
-      const active = this.hovered || this.selected;
-      this.groups.forEach(g=>{const target=g.id===active?1:0;g.detail=this.paused?target:motion.damp(g.detail,target,target?.24:.17,dt);});
-      const adjacent=this.featureAdjacency.get(this.hoveredFeature);
-      this.nodes.forEach(node=>{const target=node.index===this.hoveredFeature?1:adjacent?.has(node.index)? .32:0;node.inspect=this.paused?target:motion.damp(node.inspect,target,target?.14:.22,dt);});
-      this.edges.forEach(edge=>{const target=edge.a.index===this.hoveredFeature||edge.b.index===this.hoveredFeature?1:0;edge.inspect=this.paused?target:motion.damp(edge.inspect,target,target?.16:.24,dt);});
-      this.advanceColor(active,dt);
-      const chosen=this.groups.find(g=>g.id===active);
-      const arrival=chosen?(this.paused?1:ease((chosen.revealAge-.32)/.30)):0;
-      const nucleusTint=chosen?tint(SILVER,chosen.color,arrival):SILVER;
-      this.orbTint=this.orbTint.map((value,i)=>this.paused?nucleusTint[i]:motion.damp(value,nucleusTint[i],chosen?.22:.18,dt));
-      this.orbEnergy=this.paused?(chosen?1:.58):motion.damp(this.orbEnergy,chosen?1:.58,.42,dt);
-      this.advanceCoreLight(active,dt);
-      const openingLight=this.introComplete?0:.24*ease(this.time/.42)*(1-ease((this.time-.45)/.85));
-      this.innerLight=Math.min(1,this.coreLight.amount+openingLight);
-      this.paths.forEach(path => { const target=active&&(path.a.id===active||path.b.id===active)?1:0;path.emphasis=this.paused?target:motion.damp(path.emphasis,target,.24,dt); });
-      const yaw = this.yaw + Math.sin(this.time*.075)*.024, pitch = this.pitch + Math.sin(this.time*.055)*.012;
-      this.frameProjection = {cy:Math.cos(yaw),sy:Math.sin(yaw),cp:Math.cos(pitch),sp:Math.sin(pitch)};
-      const start = performance.now();
-      for(const node of this.nodes){
-        const t=this.time,amp=node.isHub?.009:.014;
-        node.baseP=this.project(node.x+Math.sin(t*node.speed+node.phase)*amp,node.y+Math.cos(t*node.speed*.79+node.phase)*amp,node.z+Math.sin(t*.12+node.phase)*.016,node.baseP||{});
-        node.p=Object.assign(node.p||{},node.baseP);
-        node.appearance=this.appearance(node.p.depth);
-      }
-      this.advanceFeatureTissue(dt);
+      this.advance(this.dt);
       this.render();
-      this.renderCost = performance.now() - start;
-      if (!this.paused) this.requestDraw();
+      if (this.needsResponse()) this.requestDraw();
+      else motion.resetClock(this.clock);
     }
 
-    advanceColor(active,dt) {
-      const advance=(current,target,on)=>this.paused?(on?1:0):motion.damp(current,on?Math.max(current,target):0,on?.085:.15,dt);
-      this.groups.forEach(g=>{
-        const engaged=active?active===g.id:Boolean(this.scenario?.has(g.id));
-        if(engaged&&!g.engaged)g.revealAge=0;
-        g.engaged=engaged;if(engaged)g.revealAge+=dt;
-        g.nodes.forEach(n=>{n.chroma=advance(n.chroma,engaged?ease((g.revealAge-n.colorDelay)/.22):0,engaged);});
-        for(let i=0;i<REVEAL_SEGMENTS;i++){
-          const target=engaged?ease((g.revealAge-.04-(i+.5)/REVEAL_SEGMENTS*.46)/.20):0;
-          g.reveal[i]=advance(g.reveal[i],target,engaged);
-        }
-      });
-      this.paths.forEach(path=>{
-        const origin=active&&(path.a.id===active||path.b.id===active)?active:null;
-        if(origin&&origin!==path.origin)path.revealAge=0;
-        path.origin=origin;if(origin)path.revealAge+=dt;
-        const source=origin===path.a.id?path.a:path.b;
-        for(let i=0;i<REVEAL_SEGMENTS;i++){
-          const position=(i+.5)/REVEAL_SEGMENTS,distance=origin===path.a.id?position:1-position;
-          const target=origin?ease((path.revealAge-.10-distance*.52)/.22):0;
-          // Keep each segment's previous pigment until the new origin's wave arrives.
-          // This also handles direct A-to-B hover without recoloring the whole link.
-          for(let channel=0;channel<3;channel++){
-            if(origin)path.colors[i][channel]=this.paused?source.light[channel]:motion.damp(path.colors[i][channel],source.light[channel],.065,dt*target);
-            else if(path.reveal[i]<.002)path.colors[i][channel]=SILVER[channel];
-          }
-          path.reveal[i]=advance(path.reveal[i],target,Boolean(origin));
-        }
-      });
-    }
-
-    lightCurve(gpu,curve,reveal,accent,alpha,width) {
-      // Per-segment color is batched by the shared renderer; no extra GPU draw calls.
-      let previous=curve.a;
-      for(let i=0;i<REVEAL_SEGMENTS;i++){
-        const p=this.curveAt(curve,(i+1)/REVEAL_SEGMENTS);
-        gpu.line(previous.x,previous.y,p.x,p.y,tint(SILVER,Array.isArray(accent[0])?accent[i]:accent,reveal[i]),alpha,width);
-        previous=p;
+    advance(dt) {
+      const still = this.paused, settle = (value, target, response) => still ? target : motion.damp(value, target, response, dt);
+      const active = this.groups.find(g => g.id === (this.hovered || this.selected)) || null;
+      for (const group of this.groups) {
+        group.focus = settle(group.focus, this.focusFor(group.id), .12);
+        group.detail = settle(group.detail, group === active ? 1 : 0, .12);
+        this.project(group.x, group.y, group.p);
+      }
+      for (const path of this.paths) {
+        const shared = Boolean(this.scenario && this.scenario.has(path.a.id) && this.scenario.has(path.b.id));
+        const origin = active && (path.a === active || path.b === active) && (shared || !this.scenario) ? active : null;
+        if (origin && origin !== path.origin) path.reveal = 0;
+        path.origin = origin;
+        path.emphasis = settle(path.emphasis, origin ? 1 : 0, origin ? .1 : .16);
+        path.shared = settle(path.shared, shared ? 1 : 0, .12);
+        // A line is drawn outward from the chosen engine once, and then it stays.
+        if (origin) path.reveal = still ? 1 : Math.min(1, path.reveal + dt / .36);
+        else if (path.emphasis < .01) path.reveal = 0;
       }
     }
 
-    stitchLightCurve(gpu,curve,reveal,accent,alpha,width,options) {
-      let previous=curve.a,walked=0;
-      for(let i=0;i<REVEAL_SEGMENTS;i++){
-        const p=this.curveAt(curve,(i+1)/REVEAL_SEGMENTS);
-        if(reveal[i]>.012)gpu.stitch(previous.x,previous.y,p.x,p.y,Array.isArray(accent[0])?accent[i]:accent,alpha*reveal[i],width,{...options,phase:options.phase+walked});
-        walked+=Math.hypot(p.x-previous.x,p.y-previous.y);previous=p;
-      }
+    render() {
+      const ctx = this.ctx, type = this.layout().type;
+      ctx.clearRect(0, 0, this.width, this.height);
+      const orbit = this.orbit(), radius = this.nucleusRadius();
+      for (const group of this.groups) this.project(group.x, group.y, group.p);
+      this.projectedHubs = this.groups.map(g => ({ id: g.id, x: g.p.x, y: g.p.y, depth: 0 }));
+      ctx.lineWidth = this.hair(); ctx.strokeStyle = ink(STRENGTH.orbit);
+      ctx.beginPath(); ctx.arc(orbit.x, orbit.y, orbit.r, 0, TAU); ctx.stroke();
+      this.drawRelations(ctx, orbit, radius);
+      this.drawSphere(ctx, orbit);
+      this.drawEngines(ctx, type);
+      this.drawLegend(ctx, type);
     }
 
-    curvePoints(a, b, lift, offset) {
-      const dx = b.x - a.x, dy = b.y - a.y;
-      const distance = Math.hypot(dx, dy) || 1;
-      const bend = lift * Math.min(this.width, this.height) * .48;
-      return { a, b, c: { x: (a.x + b.x) * .5 - dy / distance * bend, y: (a.y + b.y) * .5 + dx / distance * bend + (offset || 0) } };
+    // Lines either clear Atlas or pass behind its middle; none grazes its edge.
+    chord(path, orbit, radius) {
+      const a = path.a.p, b = path.b.p;
+      const mx = (a.x + b.x) * .5 - orbit.x, my = (a.y + b.y) * .5 - orbit.y, distance = Math.hypot(mx, my);
+      const pull = distance > .5 && distance < radius + 22 ? Math.min(1, radius * .5 / distance) : 1;
+      return { a, b, c: { x: orbit.x + mx * (2 * pull - 1), y: orbit.y + my * (2 * pull - 1) } };
     }
 
     curveAt(curve, t) {
@@ -1924,302 +749,198 @@ void main(){
       return { x: k * k * curve.a.x + 2 * k * t * curve.c.x + t * t * curve.b.x, y: k * k * curve.a.y + 2 * k * t * curve.c.y + t * t * curve.b.y };
     }
 
-    render() {
-      if (this.gpuAvailable) this.renderGPU();
-      else this.renderCanvas();
+    // The part of a curve between two of its points is a curve of the same kind, so it is drawn as one stroke.
+    strokeCurve(ctx, curve, from, to) {
+      if (to - from < .004) return;
+      const along = (p, q, t) => ({ x: mix(p.x, q.x, t), y: mix(p.y, q.y, t) });
+      const first = along(curve.a, curve.c, from), second = along(curve.c, curve.b, from);
+      const start = along(first, second, from), bend = along(first, second, to), end = this.curveAt(curve, to);
+      ctx.beginPath(); ctx.moveTo(start.x, start.y); ctx.quadraticCurveTo(bend.x, bend.y, end.x, end.y); ctx.stroke();
     }
 
-    renderGPU() { this.renderField(this.gpu); }
+    // The shorter way round the orbit from one engine toward another.
+    strokeArc(ctx, orbit, from, to, share) {
+      if (share < .004) return;
+      let turn = (to.angle - from.angle) % TAU;
+      if (turn > Math.PI) turn -= TAU; else if (turn < -Math.PI) turn += TAU;
+      const start = from.angle - TAU / 4;
+      ctx.beginPath(); ctx.arc(orbit.x, orbit.y, orbit.r, start, start + turn * share, turn < 0); ctx.stroke();
+    }
 
-    renderField(gpu) {
-      const ctx=this.ctx,w=this.width,h=this.height,t=this.time,mobile=w<520;
-      ctx.clearRect(0,0,w,h);gpu.begin(t);
-      const center=this.project(0,0,0),radius=this.nucleusRadius();
-      Object.assign(this.depthState,{width:w,height:h,time:t,intro:this.introComplete?1:ease((t-.05)/1.12),mobile});
-      this.depthField.drawBack(gpu,this.depthState);
-      gpu.glow(center.x,center.y,Math.min(w,h)*1.08,[173,185,198],.048);
-      for(const particle of this.dust){
-        const p=this.project(particle.x+Math.sin(t*.04+particle.phase)*.018,particle.y,particle.z);
-        gpu.dot(p.x,p.y,particle.size,[192,201,211],particle.alpha*.30*this.appearance(0));
+    // At rest the orbit is empty. Relations appear only for a chosen engine or a story.
+    drawRelations(ctx, orbit, radius) {
+      ctx.lineWidth = this.hair();
+      for (const path of this.paths) {
+        const quiet = path.shared * STRENGTH.story * (1 - path.emphasis);
+        if (quiet < .01) continue;
+        ctx.strokeStyle = ink(quiet);
+        if (path.along) this.strokeArc(ctx, orbit, path.a, path.b, 1); else this.strokeCurve(ctx, this.chord(path, orbit, radius), 0, 1);
       }
-      this.projectedHubs=this.groups.map(g=>({id:g.id,x:g.hub.p.x,y:g.hub.p.y,depth:g.hub.p.z}));
-      // Permanent relationships stay as fine light; tactile detail appears only with focus.
-      for(let i=0;i<this.paths.length;i++){
-        const path=this.paths[i],focus=Math.min(path.a.focus,path.b.focus),detail=path.emphasis;
-        const appearing=this.appearance((path.a.hub.p.depth+path.b.hub.p.depth)*.5);
-        const alpha=mix(.21*focus,.60,detail)*appearing,thread=path.colors;
-        const curve=this.curvePoints(path.a.hub.p,path.b.hub.p,path.lift,0);
-        this.lightCurve(gpu,curve,path.reveal,thread,alpha*(1-detail*.22),mix(.60,.88,detail));
-        this.lightCurve(gpu,this.curvePoints(path.a.nodes[1+i%6].p,path.b.nodes[1+(i+2)%6].p,path.lift*.7,0),path.reveal,thread,alpha*.45,.46);
-        this.lightCurve(gpu,this.curvePoints(path.a.nodes[29+i%5].p,path.b.nodes[29+(i+1)%5].p,path.lift*.86,0),path.reveal,thread,alpha*.34,.40);
-        if(detail>.01)this.stitchLightCurve(gpu,curve,path.reveal,thread,detail*.40,1.30,{length:5.8,gap:3.8,phase:path.phase*8});
-        const inScenario=this.scenario&&this.scenario.has(path.a.id)&&this.scenario.has(path.b.id);
-        const progress=(t*.052+path.phase)%1;
-        const segment=Math.min(23,Math.floor(progress*24));
-        this.flowPulse(gpu,curve,progress,(.14+.64*detail+(inScenario?.22:0))*Math.min(1,focus)*appearing,detail>.5?21:13,tint(SILVER,thread[segment],path.reveal[segment]));
+      for (const path of this.paths) {
+        if (path.emphasis < .01) continue;
+        const reveal = ease(path.reveal), from = path.origin === path.b ? path.b : path.a, to = from === path.a ? path.b : path.a;
+        ctx.strokeStyle = ink(path.emphasis * STRENGTH.line);
+        if (path.along) this.strokeArc(ctx, orbit, from, to, reveal);
+        else if (from === path.b) this.strokeCurve(ctx, this.chord(path, orbit, radius), 1 - reveal, 1);
+        else this.strokeCurve(ctx, this.chord(path, orbit, radius), 0, reveal);
       }
-      this.groups.forEach((group,index)=>{
-        const f=group.focus*group.hub.appearance,detail=group.detail,curve=this.curvePoints(group.hub.p,center,(index%2?-1:1)*.15,0);
-        this.lightCurve(gpu,curve,group.reveal,group.light,(.30+detail*.18)*f,.90+detail*.10);
-        if(detail>.01){
-          this.lightCurve(gpu,curve,group.reveal,group.light,.045*detail,4.8);
-          this.stitchLightCurve(gpu,curve,group.reveal,group.color,.52*detail,1.8,{length:7.5,gap:4,phase:index*.72});
-        }
-        this.lightCurve(gpu,this.curvePoints(group.nodes[1+index%6].p,center,(index%2?-1:1)*.12,0),group.reveal,group.light,.11*f,.53);
-        for(let strand=0;strand<2;strand++){
-          const end={x:center.x+Math.cos(index*.79+strand*.4)*24,y:center.y+Math.sin(index*.79+strand*.4)*24};
-          this.lightCurve(gpu,this.curvePoints(group.nodes[29+strand*2].p,end,(index%2?-1:1)*(.13+strand*.026),0),group.reveal,group.light,(.11-strand*.024)*f,.45);
-        }
-        const progress=(t*.043+index*.131)%1;
-        this.flowPulse(gpu,curve,progress,(.42+detail*.34)*Math.min(1,f),detail>.5?24:18,tint(SILVER,group.light,group.reveal[Math.min(23,Math.floor(progress*24))]));
-      });
-      for(const edge of this.edges){
-        const a=edge.a.p,b=edge.b.p,group=this.groups[edge.group],depth=(a.depth+b.depth)*.5;
-        const alpha=((edge.kind==='concept'?.36:.225)*(.65+depth*.6)*group.focus*edge.opacity+edge.inspect*.08)*Math.min(edge.a.appearance,edge.b.appearance);
-        gpu.line(a.x,a.y,b.x,b.y,tint(SILVER,group.light,(edge.a.chroma+edge.b.chroma)*.5),alpha,edge.kind==='concept'?.78:.59);
-        if(edge.inspect>.01)gpu.stitch(a.x,a.y,b.x,b.y,group.light,edge.inspect*.24,1.15,{length:4.8,gap:3.8,phase:edge.a.index*.37});
-        if(group.detail>.02&&edge.kind==='concept'&&edge.a.isHub){
-          gpu.stitch(a.x,a.y,b.x,b.y,group.color,group.detail*.42*Math.min(edge.a.chroma,edge.b.chroma)*(1-edge.inspect),1.18,{length:4.8,gap:3.5,phase:edge.a.index*.37});
-        }
+      // A chosen engine meets Atlas along its own radius.
+      for (const group of this.groups) {
+        if (group.detail < .01) continue;
+        const dx = (group.p.x - orbit.x) / orbit.r, dy = (group.p.y - orbit.y) / orbit.r, reach = mix(orbit.r, radius * .5, ease(group.detail));
+        ctx.strokeStyle = ink(group.detail * STRENGTH.line);
+        ctx.beginPath(); ctx.moveTo(group.p.x, group.p.y); ctx.lineTo(orbit.x + dx * reach, orbit.y + dy * reach); ctx.stroke();
       }
-      for(const node of this.nodes){
-        const group=this.groups[node.group],p=node.p,f=group.focus;
-        const light=tint(SILVER,group.light,node.chroma),pigment=tint(SILVER,group.color,node.chroma);
-        const bright=clamp((.49+p.depth*.5)*f+node.inspect*.18,.035,1)*node.appearance,size=node.size*p.scale*(mobile?.89:1);
-        if(node.concept&&node.inspect>.02)gpu.glow(p.x,p.y,18,group.light,node.inspect*.15);
-        if(node.isHub){
-          const breath=.87+.13*Math.sin(t*.56+group.index*.73);
-          gpu.glow(p.x,p.y,37+group.detail*12,pigment,bright*.48*breath);
-          gpu.ring(p.x,p.y,6.5+group.detail*.9,light,(.26+group.detail*.19)*f*node.appearance,.65);
-          gpu.dot(p.x,p.y,size+group.detail*.5,light,bright);
-          gpu.dot(p.x-.4,p.y-.55,.82,tint(SILVER_LIGHT,group.highlight,node.chroma),bright);
-        }else{
-          if(node.localIndex<=6)gpu.glow(p.x,p.y,12,pigment,bright*.17);
-          gpu.dot(p.x,p.y,size,light,bright*.85);
+    }
+
+    // A black sphere under one light, printed grain by grain. At rest the light falls from
+    // the upper left; for a chosen engine it falls from that engine.
+    sphereSprite(group) {
+      const pixels = Math.round(this.nucleusRadius() * this.dpr), key = (group ? group.id : 'rest') + '|' + pixels + '|' + this.dpr;
+      if (this.sphereSprites.has(key)) return this.sphereSprites.get(key);
+      const grain = grainOrder(), cell = this.unit(), size = pixels * 2 + 4, middle = size / 2;
+      const canvas = document.createElement('canvas'); canvas.width = size; canvas.height = size;
+      const ctx = canvas.getContext('2d'), image = ctx.createImageData(size, size), data = image.data;
+      const side = Math.sqrt(1 - LIGHT.lift * LIGHT.lift), angle = group ? group.angle : LIGHT.rest;
+      const lx = Math.sin(angle) * side, ly = -Math.cos(angle) * side, outer = (1 + 1.5 / pixels) ** 2;
+      let grains = 0;
+      for (let py = 0; py < size; py++) {
+        const y = (py + .5 - middle) / pixels, gy = Math.floor(py / cell), cy = ((gy + .5) * cell - middle) / pixels, row = (gy % GRID) * GRID;
+        for (let px = 0; px < size; px++) {
+          const x = (px + .5 - middle) / pixels, reach = x * x + y * y;
+          if (reach > outer) continue;
+          const cover = Math.round(clamp((1 - Math.sqrt(reach)) * pixels + .5, 0, 1) * 255);
+          if (!cover) continue;
+          const gx = Math.floor(px / cell), cx = ((gx + .5) * cell - middle) / pixels;
+          const z = Math.sqrt(Math.max(0, 1 - cx * cx - cy * cy)), facing = Math.max(0, cx * lx + cy * ly + z * LIGHT.lift);
+          const light = LIGHT.floor + Math.pow(facing, LIGHT.fall) * LIGHT.gain + Math.pow(1 - z, 5) * LIGHT.rim;
+          const lit = light > grain[row + gx % GRID], i = (py * size + px) * 4;
+          if (lit) grains++;
+          data[i] = data[i + 1] = data[i + 2] = lit ? 255 : INK[0];
+          data[i + 3] = cover;
         }
       }
-      this.depthField.drawFront(gpu,this.depthState);
-      // Shared time and smoothly changing tint connect the nucleus to the active engine.
-      gpu.glow(center.x,center.y,radius*3.5,this.orbTint,.19);
-      gpu.nucleus(center.x,center.y,radius,t,this.orbEnergy,this.orbTint,'silver',this.innerLight);
-      gpu.end();
-      const title=this.textSprite('A T L A S',mobile?12:14,'500','rgb(235,239,244)',FONT);
-      ctx.globalAlpha=this.introComplete?1:ease((t-.35)/.65);
-      ctx.drawImage(title.canvas,center.x-title.w/2,center.y+radius+15,title.w,title.h);ctx.globalAlpha=1;
-      this.drawLabels(center,mobile);
+      ctx.putImageData(image, 0, 0);
+      const sprite = { canvas, size, pixels, cell, grains };
+      if (this.sphereSprites.size >= 9) this.sphereSprites.delete(this.sphereSprites.keys().next().value);
+      this.sphereSprites.set(key, sprite);
+      return sprite;
     }
 
-    flowPulse(gpu,curve,progress,alpha,size,rgb){
-      const strength=alpha*Math.pow(Math.sin(progress*Math.PI),.65),p=this.curveAt(curve,progress);
-      gpu.glow(p.x,p.y,size,rgb,strength*.66);
-      gpu.dot(p.x,p.y,.8,rgb.map(v=>mix(v,255,.5)),strength*.78);
-      let last=p;
-      for(let i=1;i<=5;i++){
-        const q=this.curveAt(curve,Math.max(0,progress-i*.005));
-        gpu.line(last.x,last.y,q.x,q.y,rgb,strength*(1-i/6)*.48,.78);last=q;
-      }
-    }
-
-    renderCanvas() {
-      if(!this.canvasPainter)this.canvasPainter=this.makeCanvasPainter();
-      this.renderField(this.canvasPainter);
-    }
-
-    nucleusRadius() { return (this.width<520?clamp(this.width*.125,39,50):clamp(Math.min(this.width,this.height)*.132,68,92))*Math.sqrt(this.zoom); }
-
-    drawCanvasNucleus(x,y,radius,t,energy,tint,innerLight=0) {
-      const ctx=this.ctx;ctx.save();ctx.translate(x,y);ctx.scale(radius,radius);
-      ctx.beginPath();ctx.arc(0,0,1,0,TAU);ctx.clip();
-      const body=ctx.createRadialGradient(-.34,-.45,.01,.11,.18,1.2);
-      body.addColorStop(0,'#333b45');body.addColorStop(.3,'#151a21');body.addColorStop(.67,'#080b11');body.addColorStop(.9,'#2d3540');body.addColorStop(1,'#a5b0bc');
-      ctx.fillStyle=body;ctx.fillRect(-1,-1,2,2);
-      if(innerLight>.001){
-        const light=ctx.createRadialGradient(0,.08,0,0,.08,.52);
-        const pigment=tint.map((v,i)=>mix(v,SILVER_LIGHT[i],.24));
-        light.addColorStop(0,rgba(pigment,innerLight*.095));light.addColorStop(.4,rgba(pigment,innerLight*.043));light.addColorStop(1,rgba(pigment,0));
-        ctx.fillStyle=light;ctx.fillRect(-.6,-.6,1.2,1.2);
-      }
-      ctx.save();ctx.rotate(-.60+Math.sin(t*.075)*.14);
-      const c=tint.map((v,i)=>mix(SILVER_LIGHT[i],v,.64));
-      for(let i=0;i<10;i++){
-        const yy=(i-4.5)*.034+Math.sin(t*.28)*.07;
-        ctx.beginPath();ctx.moveTo(-1.13,yy-.16);ctx.bezierCurveTo(-.38,yy+.73,.16,yy-.51,1.11,yy+.18);
-        ctx.strokeStyle=rgba(c,(i===5?.72:.075+Math.sin(i*.7+t*.3)*.024)*(.8+energy*.3));
-        ctx.lineWidth=i===5?.016:.010;ctx.stroke();
-      }
-      ctx.restore();
-      const reflection=ctx.createRadialGradient(-.31,-.46,0,-.31,-.46,.43);
-      reflection.addColorStop(0,'rgba(238,243,248,.42)');reflection.addColorStop(.25,'rgba(183,196,210,.18)');reflection.addColorStop(1,'rgba(170,186,203,0)');
-      ctx.save();ctx.translate(0,-.18);ctx.scale(1,.52);ctx.fillStyle=reflection;ctx.fillRect(-1,-1,2,2);ctx.restore();
-      ctx.restore();ctx.beginPath();ctx.arc(x,y,radius,0,TAU);ctx.strokeStyle='rgba(197,210,224,.52)';ctx.lineWidth=.7;ctx.stroke();
-    }
-    makeCanvasPainter() {
-      const ctx=this.ctx;
-      const stamp=(rgb)=>{
-        rgb=rgb.map(v=>clamp(Math.round(v/8)*8,0,255));
-        const key='stitch:'+rgb.map(v=>Math.round(v)).join(',');
-        if(this.threadSprites.has(key))return this.threadSprites.get(key);
-        const c=document.createElement('canvas');c.width=96;c.height=32;const p=c.getContext('2d');
-        p.beginPath();p.roundRect(6,6,84,20,10);
-        const g=p.createLinearGradient(0,6,0,26);g.addColorStop(0,rgba(rgb.map(v=>mix(v,255,.50)),.7));g.addColorStop(.28,rgba(rgb.map(v=>mix(v,255,.25)),1));g.addColorStop(.52,rgba(rgb,1));g.addColorStop(1,rgba(rgb.map(v=>v*.38),1));
-        p.fillStyle=g;p.fill();p.save();p.clip();
-        for(let i=-15;i<112;i+=6){p.beginPath();p.moveTo(i,3);p.bezierCurveTo(i+14,9,i-7,21,i+7,30);p.strokeStyle='rgba(255,255,255,.2)';p.lineWidth=1;p.stroke();p.beginPath();p.moveTo(i+2,3);p.bezierCurveTo(i+16,9,i-5,21,i+9,30);p.strokeStyle='rgba(0,0,0,.25)';p.stroke();}
-        p.restore();if(this.threadSprites.size>=192)this.threadSprites.delete(this.threadSprites.keys().next().value);this.threadSprites.set(key,c);return c;
-      };
-      const stitch=(ax,ay,bx,by,rgb,alpha,width,options={})=>{
-        const dx=bx-ax,dy=by-ay,distance=Math.hypot(dx,dy);if(distance<.1||alpha<.002)return;
-        const length=options.length||Math.max(3.8,width*3.1),gap=options.gap||Math.max(1.7,width*.92),period=length+gap;
-        const sprite=stamp(rgb);ctx.save();ctx.translate(ax,ay);ctx.rotate(Math.atan2(dy,dx));ctx.globalAlpha=clamp(alpha,0,1);
-        for(let x=-(options.phase||0)%period;x<distance;x+=period){const a=Math.max(0,x),b=Math.min(distance,x+length);if(b-a<.2)continue;ctx.drawImage(sprite,a-width*.3,-width*.8,b-a+width*.6,width*1.6);}
+    drawSphere(ctx, orbit) {
+      const place = (sprite, strength) => {
+        if (strength < .01) return;
+        // Placed on whole device pixels, so every grain stays sharp.
+        ctx.save(); ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.globalAlpha = strength;
+        ctx.drawImage(sprite.canvas, Math.round(orbit.x * this.dpr) - sprite.size / 2, Math.round(orbit.y * this.dpr) - sprite.size / 2);
         ctx.restore();
       };
-      const stitchCurve=(curve,rgb,alpha,width,options={})=>{
-        const length=options.length||Math.max(3.8,width*3.1),gap=options.gap||Math.max(1.7,width*.92),period=length+gap;
-        let previous=curve.a,walked=0;
-        for(let i=1;i<=56;i++){
-          const p=this.curveAt(curve,i/56),d=Math.hypot(p.x-previous.x,p.y-previous.y);
-          stitch(previous.x,previous.y,p.x,p.y,rgb,alpha,width,{length,gap,phase:((options.phase||0)+walked)%period});
-          walked+=d;previous=p;
-        }
-      };
-      return {begin(){},end(){},stitch,stitchCurve,
-        line(ax,ay,bx,by,rgb,alpha,width){if(alpha<.003)return;ctx.beginPath();ctx.moveTo(ax,ay);ctx.lineTo(bx,by);ctx.strokeStyle=rgba(rgb,alpha);ctx.lineWidth=width;ctx.stroke();},
-        curve(curve,rgb,alpha,width){if(alpha<.003)return;ctx.beginPath();ctx.moveTo(curve.a.x,curve.a.y);ctx.quadraticCurveTo(curve.c.x,curve.c.y,curve.b.x,curve.b.y);ctx.strokeStyle=rgba(rgb,alpha);ctx.lineWidth=width;ctx.stroke();},
-        ring(x,y,radius,rgb,alpha,width){if(alpha<.003)return;ctx.beginPath();ctx.arc(x,y,radius,0,TAU);ctx.strokeStyle=rgba(rgb,alpha);ctx.lineWidth=width;ctx.stroke();},
-        nucleus:(x,y,radius,t,energy,tint,finish,innerLight)=>this.drawCanvasNucleus(x,y,radius,t,energy,tint,innerLight),
-        dot(x,y,radius,rgb,alpha){if(alpha<.003)return;ctx.beginPath();ctx.arc(x,y,radius,0,TAU);ctx.fillStyle=rgba(rgb,alpha);ctx.fill();},
-        glow:(x,y,size,rgb,alpha)=>{ctx.globalAlpha=alpha;ctx.drawImage(this.glow,x-size/2,y-size/2,size,size);ctx.globalAlpha=1;}
-      };
-    }
-    textSprite(text, size, weight, fill, family) {
-      const key=[text,size,weight,fill,family,this.dpr].join('|');
-      if(this.labelSprites.has(key))return this.labelSprites.get(key);
-      const pad=10, canvas=document.createElement('canvas'), context=canvas.getContext('2d');
-      context.font=`${weight} ${size}px ${family}`;
-      const width=context.measureText(text).width,w=Math.ceil(width+pad*2),h=Math.ceil(size+pad*2+4);
-      canvas.width=Math.ceil(w*this.dpr);canvas.height=Math.ceil(h*this.dpr);
-      context.setTransform(this.dpr,0,0,this.dpr,0,0);
-      context.font=`${weight} ${size}px ${family}`;context.textBaseline='middle';
-      context.lineWidth=3;context.lineJoin='round';context.strokeStyle='rgba(3,8,14,.9)';
-      context.shadowColor='rgba(3,8,14,.98)';context.shadowBlur=5;
-      context.strokeText(text,pad,h/2);context.fillStyle=fill;context.fillText(text,pad,h/2);
-      const sprite={canvas,w,h,width,pad};this.labelSprites.set(key,sprite);return sprite;
+      place(this.sphereSprite(null), 1);
+      // The light turns toward the chosen engine.
+      for (const group of this.groups) if (group.detail > .01) place(this.sphereSprite(group), group.detail);
     }
 
-    drawLabels(center, mobile) {
-      const ctx = this.ctx, fontSize = mobile ? 11 : 13, labelIntro=this.labelAppearance();
-      this.featureBoxes.length=0;
-      const boxes = this.groups.map(group => {
-        const p = group.hub.p; const dx = p.x - center.x, dy = p.y - center.y;
-        const sprite=this.textSprite(group.engine.name,fontSize,'500','rgb(225,231,237)',FONT);
-        const len = Math.hypot(dx, dy) || 1; const width = sprite.width;
-        const shiftX = dx / len * ((mobile ? 14 : 18)+width*.5), shiftY = dy / len * (mobile ? 20 : 26);
-        return { id: group.id, group, sprite, x: p.x + shiftX - width * .5, y: p.y + shiftY - fontSize * .5, w: width, h: fontSize, p };
-      });
-      const pad = mobile ? 14 : 25;
-      // Deterministic label collision resolution is run in screen space after projection.
-      for (let iteration = 0; iteration < 9; iteration++) {
-        for (let i = 0; i < boxes.length; i++) {
-          const a = boxes[i];
-          for (let j = i + 1; j < boxes.length; j++) {
-            const b = boxes[j];
-            const overlapX = Math.min(a.x + a.w + 9, b.x + b.w + 9) - Math.max(a.x - 9, b.x - 9);
-            const overlapY = Math.min(a.y + a.h + 7, b.y + b.h + 7) - Math.max(a.y - 7, b.y - 7);
-            if (overlapX > 0 && overlapY > 0) {
-              const amount = overlapY * .52; const direction = a.y < b.y ? -1 : 1;
-              a.y += amount * direction; b.y -= amount * direction;
-            }
-          }
-          a.x = clamp(a.x, pad, this.width - a.w - pad);
-          a.y = clamp(a.y, pad, this.height - a.h - pad);
+    // Capitals set apart. A browser that can space canvas text does so and keeps its kerning;
+    // any other gets the same distance letter by letter.
+    letters(ctx, text, space) {
+      const key = ctx.font + '|' + space + '|' + text;
+      if (!this.labelSprites.has(key)) {
+        const steps = []; let width = 0;
+        if ('letterSpacing' in ctx) { ctx.letterSpacing = space + 'px'; width = ctx.measureText(text).width; ctx.letterSpacing = '0px'; }
+        else for (const letter of text) { steps.push(width); width += ctx.measureText(letter).width + space; }
+        this.labelSprites.set(key, { steps, width: Math.max(0, width - space) });
+      }
+      return this.labelSprites.get(key);
+    }
+
+    drawLetters(ctx, text, x, y, space) {
+      const set = this.letters(ctx, text, space); let i = 0;
+      ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+      if (set.steps.length) for (const letter of text) ctx.fillText(letter, x + set.steps[i++], y);
+      else { ctx.letterSpacing = space + 'px'; ctx.fillText(text, x, y); ctx.letterSpacing = '0px'; }
+      return set.width;
+    }
+
+    drawEngines(ctx, type) {
+      const boxes = [], hair = this.hair(), space = type.name * TRACK;
+      for (const group of this.groups) {
+        const p = group.p, detail = group.detail, presence = mix(STRENGTH.quiet, 1, clamp((group.focus - .3) / .7, 0, 1));
+        const ux = Math.sin(group.angle), uy = -Math.cos(group.angle);
+        // A short stroke across the orbit, as on a dial. The chosen engine is the one point on the map.
+        if (detail < .99) {
+          ctx.lineWidth = hair; ctx.strokeStyle = ink(presence * (1 - detail));
+          ctx.beginPath(); ctx.moveTo(p.x - ux * type.tick, p.y - uy * type.tick); ctx.lineTo(p.x + ux * type.tick, p.y + uy * type.tick); ctx.stroke();
         }
+        if (detail > .01) { ctx.fillStyle = ink(detail); ctx.beginPath(); ctx.arc(p.x, p.y, type.point * ease(detail), 0, TAU); ctx.fill(); }
+
+        ctx.font = `500 ${type.name}px ${FONT}`;
+        const width = this.letters(ctx, group.label, space).width;
+        const { x, y, top } = this.labelBox(group, p, type, width);
+        boxes.push({ id: group.id, group, x, y: top, w: width, h: type.name, p });
+        ctx.fillStyle = ink(presence * mix(STRENGTH.name, 1, detail));
+        this.drawLetters(ctx, group.label, x, y + type.name * .06, space);
+        if (detail > .01) { ctx.fillStyle = ink(detail); ctx.fillRect(x, this.snap(y + type.name * .5 + 5), width * ease(detail), hair); }
       }
       this.labelBoxes = boxes;
-      boxes.forEach(box => {
-        let stable=this.labelState.get(box.id);
-        if(!stable){stable={x:box.x,y:box.y,alpha:1};this.labelState.set(box.id,stable);}
-        stable.x=this.paused?box.x:motion.damp(stable.x,box.x,.075,this.dt);
-        stable.y=this.paused?box.y:motion.damp(stable.y,box.y,.075,this.dt);
-        box.x=stable.x;box.y=stable.y;
-        const f = box.group.focus;
-        const cx = box.x + box.w / 2, cy = box.y + box.h / 2;
-        ctx.globalAlpha=clamp(.86*f,.38,1)*labelIntro;
-        ctx.drawImage(box.sprite.canvas,box.x-box.sprite.pad,cy-box.sprite.h/2,box.sprite.w,box.sprite.h);
-        ctx.globalAlpha=1;
-        if (Math.hypot(cx - box.p.x, cy - box.p.y) > 39) {
-          ctx.beginPath(); ctx.moveTo(box.p.x, box.p.y); ctx.lineTo(cx, cy + (cy < box.p.y ? 9 : -9));
-          ctx.lineWidth = .5; ctx.strokeStyle = rgba(tint(SILVER,box.group.color,box.group.hub.chroma), .16 * f*box.group.hub.appearance*labelIntro); ctx.stroke();
-        }
-        if (f > 1.02) {
-          ctx.beginPath(); ctx.moveTo(box.x, box.y + box.h + 6); ctx.lineTo(box.x + box.w, box.y + box.h + 6);
-          ctx.strokeStyle = rgba(box.group.color, clamp((f-1)*.85,0,.38)); ctx.lineWidth = .6; ctx.stroke();
-        }
+    }
+
+    // The same corner serves every engine, so the map and the panel agree on who lists the features.
+    legendArea(ctx, type) {
+      if (type === SMALL) return null;
+      const size = 12.5, line = 23, pad = 28, rows = 5;
+      ctx.font = `500 ${size}px ${KR_FONT}`;
+      let widest = 0;
+      for (const group of this.groups) for (const text of (group.engine.concepts || []).slice(0, rows)) {
+        const key = ctx.font + '|' + text;
+        if (!this.labelSprites.has(key)) this.labelSprites.set(key, ctx.measureText(text).width);
+        widest = Math.max(widest, this.labelSprites.get(key));
+      }
+      if (!widest) return null;
+      const right = this.width - pad, bottom = this.height - pad - 4, top = bottom - (rows - 1) * line - line * .5 - 20;
+      const area = { x: right - widest - 12, y: top - 12, w: widest + 12, h: bottom - top + 24, right, bottom, top, size, line };
+      const orbit = this.orbit(), reach = orbit.r + 30;
+      // Its nearest corner must stay outside the orbit, and clear of every name.
+      const inside = Math.hypot(area.x - orbit.x, area.y - orbit.y) < reach;
+      const crowded = this.labelBoxes.some(box => box.x - 12 < area.x + area.w && box.x + box.w + 12 > area.x && box.y - 12 < area.y + area.h && box.y + box.h + 12 > area.y);
+      return inside || crowded ? null : area;
+    }
+
+    // Roomy stages list what the chosen engine does; small ones leave that to the panel beside the map.
+    drawLegend(ctx, type) {
+      this.legendBoxes = [];
+      const area = this.legendArea(ctx, type), fits = Boolean(area);
+      if (fits !== this.legendFits) { this.legendFits = fits; if (typeof this.options.onLegend === 'function') this.options.onLegend(fits); }
+      if (!area || this.scenario) return;
+      const active = this.groups.find(g => g.id === (this.hovered || this.selected));
+      if (!active || active.detail < .02) return;
+      const concepts = (active.engine.concepts || []).slice(0, 5), { size, line, right, bottom } = area;
+      if (!concepts.length) return;
+      ctx.font = `500 ${size}px ${KR_FONT}`; ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
+      ctx.fillStyle = ink(active.detail * STRENGTH.legend);
+      concepts.forEach((text, i) => {
+        const y = bottom - (concepts.length - 1 - i) * line, width = ctx.measureText(text).width;
+        ctx.fillText(text, right, y);
+        this.legendBoxes.push({ engine: active.id, label: text, x: right - width, y: y - size / 2, w: width, h: size });
       });
-      const taken = boxes.map(b => ({ x: b.x - 9, y: b.y - 8, w: b.w + 18, h: b.h + 16 }));
-      const coreRadius=this.nucleusRadius()*1.15;
-      taken.push({ x: center.x-coreRadius, y: center.y-coreRadius, w:coreRadius*2, h:coreRadius*2+44 });
-      const activeId = this.hovered || this.selected;
-      const candidates=this.nodes.filter(n=>n.concept).map(node=>({node,group:this.groups[node.group],active:this.groups[node.group].id===activeId}));
-      candidates.sort((a,b)=>Number(b.node.index===this.hoveredFeature)-Number(a.node.index===this.hoveredFeature)||Number(b.active)-Number(a.active)).forEach(({ node, group, active }) => {
-        const text = typeof node.concept === 'string' ? node.concept : node.concept.label || node.concept.name || '';
-        if (!text) return;
-        const sprite=this.textSprite(text,mobile?9:11,'500',node.inspect>.25?'rgb(244,247,250)':'rgb(196,207,218)',KR_FONT);
-        const p = node.p, width = sprite.width, height = 12;
-        const positions = [{ x: p.x + 8, y: p.y - 6 }, { x: p.x - width - 8, y: p.y - 6 }, { x: p.x - width / 2, y: p.y + 10 }, { x: p.x - width / 2, y: p.y - 22 },{x:p.x-width/2,y:p.y+27},{x:p.x-width/2,y:p.y-39},
-          {x:p.x-width-18,y:p.y-28},{x:p.x+18,y:p.y-28},{x:p.x-width-18,y:p.y+16},{x:p.x+18,y:p.y+16},
-          {x:p.x-width/2,y:p.y+45},{x:p.x-width/2,y:p.y-57}];
-        const key='concept:'+node.index;
-        let state=this.labelState.get(key);
-        if(!state){state={x:positions[0].x,y:positions[0].y,alpha:0,slot:null};this.labelState.set(key,state);}
-        const wanted=node.index===this.hoveredFeature||(active?node.localIndex<=(mobile?3:5):!mobile&&node.localIndex===3&&group.focus>.79);
-        const valid=a=>a.x>10&&a.x+width<this.width-10&&a.y>10&&a.y+height<this.height-10&&!taken.some(b=>a.x<b.x+b.w&&a.x+width>b.x&&a.y<b.y+b.h&&a.y+height>b.y);
-        // Choose a side only on first appearance. Hover priority and small tissue
-        // motion may change visibility, never the label's place around its point.
-        // A viewport resize clears labelState and permits a fresh layout.
-        if(state.slot===null&&wanted){const slot=positions.findIndex(valid);if(slot>=0)state.slot=slot;}
-        const placement=positions[state.slot??0];
-        const show=wanted&&state.slot!==null&&(node.index===this.hoveredFeature||valid(placement));
-        const targetAlpha=show?(active ? .91 : .49):0;
-        if(state.alpha<.025){state.x=placement.x;state.y=placement.y;}
-        else {state.x=this.paused?placement.x:motion.damp(state.x,placement.x,.17,this.dt);state.y=this.paused?placement.y:motion.damp(state.y,placement.y,.17,this.dt);}
-        state.alpha=this.paused?targetAlpha:motion.damp(state.alpha,targetAlpha,.19,this.dt);
-        if(show)taken.push({x:placement.x-4,y:placement.y-4,w:width+8,h:height+8});
-        if(state.alpha>.015){
-          const anchorX=clamp(p.x,state.x-3,state.x+width+3),anchorY=clamp(p.y,state.y-3,state.y+height+3);
-          if(active&&Math.hypot(anchorX-p.x,anchorY-p.y)>14){ctx.beginPath();ctx.moveTo(p.x,p.y);ctx.lineTo(anchorX,anchorY);ctx.strokeStyle=rgba(group.light,(.13+node.inspect*.17)*state.alpha*labelIntro);ctx.lineWidth=.5;ctx.stroke();}
-          ctx.globalAlpha=state.alpha*node.appearance*labelIntro;ctx.drawImage(sprite.canvas,state.x-sprite.pad,state.y+height/2-sprite.h/2,sprite.w,sprite.h);ctx.globalAlpha=1;
-        }
-        if(state.alpha*node.appearance*labelIntro>.18)this.featureBoxes.push({index:node.index,node,x:state.x,y:state.y,w:width,h:height,label:text});
-      });
+      ctx.font = `500 10px ${FONT}`; ctx.fillStyle = ink(active.detail);
+      const width = this.letters(ctx, active.label, 10 * TRACK).width;
+      this.drawLetters(ctx, active.label, right - width, bottom - (concepts.length - 1) * line - line * .5 - 20, 10 * TRACK);
     }
 
     getHubPositions() { return this.projectedHubs.map(p => ({ ...p })); }
-    getFeaturePositions() { return this.featureBoxes.map(box=>({index:box.index,engine:this.groups[box.node.group].id,label:box.label,x:box.x+box.w/2,y:box.y+box.h/2,width:box.w,height:box.h,nodeX:box.node.p.x,nodeY:box.node.p.y,baseX:box.node.baseP.x,baseY:box.node.baseP.y,displacementX:box.node.tissue.x.value,displacementY:box.node.tissue.y.value})); }
+    getFeaturePositions() { return this.legendBoxes.map(box => ({ engine: box.engine, label: box.label, x: box.x + box.w / 2, y: box.y + box.h / 2, width: box.w, height: box.h })); }
 
     getSummary() {
-      const samples=Array.from(this.samples.slice(0,this.sampleCount)).sort((a,b)=>a-b);
-      const costs=Array.from(this.renderCosts.slice(0,this.sampleCount)).sort((a,b)=>a-b);
-      const at=(values,p)=>values.length?Number(values[Math.floor((values.length-1)*p)].toFixed(2)):0;
       return {
-        engines: this.groups.length, nodes: this.nodes.length,
-        localEdges: this.edges.length, relationships: this.paths.length,
-        connections: this.edges.length + this.paths.length * 3 + this.groups.length * 4,
-        decorativeDepth:this.depthField.counts,
+        engines: this.groups.length, relationships: this.paths.length,
         selected: this.selected, hovered: this.hovered,
-        hoveredFeature:this.hoveredFeature===null?null:{index:this.hoveredFeature,label:typeof this.nodes[this.hoveredFeature].concept==='string'?this.nodes[this.hoveredFeature].concept:this.nodes[this.hoveredFeature].concept.label,connections:this.featureAdjacency.get(this.hoveredFeature)?.size||0},
-        featureResponse:{activeEdges:this.edges.filter(e=>e.inspect>.5).length,displacedNodes:this.nodes.filter(n=>Math.hypot(n.tissue.x.value,n.tissue.y.value)>.1).length,maxDisplacement:+Math.max(...this.nodes.map(n=>Math.hypot(n.tissue.x.value,n.tissue.y.value))).toFixed(3),mode:'local spring'},
         scenario: this.scenario ? Array.from(this.scenario) : null,
         paused: this.paused, visible: this.visible && !document.hidden,
+        motion: { mode: 'still map, local response', responding: this.needsResponse() },
         frames: this.frames, time: Number(this.time.toFixed(3)),
-        fps: this.paused ? 0 : Math.round(1000 / this.frameMS),
-        renderer:this.gpuAvailable?'Loom WebGL / living light':'Canvas 2D / living light fallback',
-        material:'silver glass, spatial brand color reveal and selective stitches',
-        nucleusTint:this.orbTint.map(v=>Number(v.toFixed(2))),nucleusEnergy:Number(this.orbEnergy.toFixed(3)),
-        cinematic:{introComplete:this.introComplete,introProgress:+this.introProgress.toFixed(3),nucleusRadius:+this.nucleusRadius().toFixed(2),labelAppearance:+this.labelAppearance().toFixed(3),innerLight:+this.innerLight.toFixed(3),highlights:this.coreLight.count},
-        colorState:this.groups.map(g=>({id:g.id,hub:+g.hub.chroma.toFixed(3),near:+g.reveal[0].toFixed(3),far:+g.reveal[REVEAL_SEGMENTS-1].toFixed(3)})),
-        performance:{samples:this.sampleCount,frameMedianMs:at(samples,.5),frameP95Ms:at(samples,.95),frameMaxMs:at(samples,1),over25ms:samples.filter(t=>t>25).length,cpuRenderMedianMs:at(costs,.5),cpuRenderP95Ms:at(costs,.95),gpuDrawCalls:this.gpuAvailable?this.gpu.stats.drawCalls:0,stitches:this.gpuAvailable?this.gpu.stats.stitches:0},
-        width: Math.round(this.width), height: Math.round(this.height), dpr: this.dpr,
-        zoom: this.zoom, targetZoom:this.targetZoom, destroyed: this.destroyed
+        renderer: 'Canvas 2D / orbit map', material: 'one ink, hairlines, grain sphere', legend: this.legendFits ? 'map' : 'panel',
+        cinematic: { introComplete: true, introProgress: 1, nucleusCenter: this.project(0, 0), nucleusRadius: +this.nucleusRadius().toFixed(2) },
+        width: Math.round(this.width), height: Math.round(this.height), dpr: this.dpr, hairline: +this.hair().toFixed(3), destroyed: this.destroyed
       };
     }
 
@@ -2228,8 +949,8 @@ void main(){
       this.listeners.forEach(remove => remove());
       if (this.resizeObserver) this.resizeObserver.disconnect();
       if (this.intersectionObserver) this.intersectionObserver.disconnect();
-      this.gpu?.destroy(); this.gpuCanvas?.remove(); this.labelSprites.clear();this.threadSprites.clear();
-      this.canvas.style.cursor = ''; this.canvas.style.touchAction = '';
+      this.labelSprites.clear(); this.sphereSprites.clear();
+      this.canvas.style.cursor = ''; this.canvas.style.touchAction = ''; this.canvas.style.width = ''; this.canvas.style.height = '';
     }
   }
   window.AtlasConstellation = AtlasConstellation;
@@ -2240,33 +961,14 @@ void main(){
   const data = window.ATLAS_DATA;
   const $ = id => document.getElementById(id);
   const labels = { core:'이해와 판단', strata:'배움의 지도', loom:'장면과 감각', vellum:'말과 반응', trail:'경험의 기억', prism:'집계와 발견', temper:'변화의 확인', reed:'목소리와 소리' };
-  const state = { view:'explore', selected:null, scenario:null, step:0, paused:matchMedia('(prefers-reduced-motion: reduce)').matches };
+  const state = { view:'explore', selected:null, scenario:null, step:0, paused:false };
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');
-  let graph;
+  let graph,preloadPaused=false;
   let previewOwner=null,previewKind=null,previewId=null;
   const create = (tag, text, cls) => { const el=document.createElement(tag); if(text)el.textContent=text;if(cls)el.className=cls;return el; };
-  function setThreadColor(element,engine) {
-    const color=engine?.color||'#B9D8F2';
-    element.style.setProperty('--thread',color);
-    element.style.setProperty('--thread-rgb',[1,3,5].map(i=>parseInt(color.slice(i,i+2),16)).join(','));
-    element.style.setProperty('--thread-light',engine?.threadHighlight||'#E9F5FF');
-    element.style.setProperty('--thread-shadow',engine?.threadShadow||'#52657F');
-  }
-  function engineSignal() {
-    const svg=document.createElementNS('http://www.w3.org/2000/svg','svg');
-    svg.setAttribute('viewBox','0 0 24 24');svg.setAttribute('aria-hidden','true');svg.setAttribute('focusable','false');svg.classList.add('engine-signal');
-    const layers=[
-      ['circle','signal-halo',{cx:12,cy:12,r:5.8}],
-      ['circle','signal-orbit',{cx:12,cy:12,r:8.2}],
-      ['path','signal-arc',{d:'M4.9 7.9A8.2 8.2 0 0 1 12 3.8'}],
-      ['circle','signal-core',{cx:12,cy:12,r:2.3}],
-      ['circle','signal-glint',{cx:11.5,cy:11.5,r:.8}]
-    ];
-    for(const [tag,name,attributes] of layers){const part=document.createElementNS(svg.namespaceURI,tag);part.setAttribute('class',name);for(const [key,value] of Object.entries(attributes))part.setAttribute(key,value);svg.append(part);}
-    return svg;
-  }
   function syncPreview(id) {
     previewId=data.engines.some(engine=>engine.id===id)?id:null;
+    $('observatory').dataset.preview=String(Boolean(previewId));
     document.querySelectorAll('.engine-button,.related button[data-engine]').forEach(button=>button.classList.toggle('is-preview',button.dataset.engine===previewId));
   }
   function clearPreview() {
@@ -2291,7 +993,6 @@ void main(){
   function flash() { $('inspector').classList.remove('flash'); requestAnimationFrame(()=>$('inspector').classList.add('flash')); }
   function updateDock() {
     $('observatory').dataset.detail=String(Boolean(state.selected)||state.view==='story');
-    setThreadColor($('inspector'),data.engines.find(engine=>engine.id===state.selected));
     const related = new Set(data.relations.filter(r=>r.from===state.selected||r.to===state.selected).flatMap(r=>[r.from,r.to]));
     document.querySelectorAll('.engine-button').forEach(button=>{
       const active=button.dataset.engine===state.selected;
@@ -2309,21 +1010,22 @@ void main(){
     if(state.view!=='explore')setView('explore');
     $('inspector').dataset.engine=id||'';
     const engine=data.engines.find(e=>e.id===id);
-    $('detail-title').replaceChildren(); $('related').replaceChildren();
+    $('detail-title').replaceChildren(); $('related').replaceChildren(); $('concepts').replaceChildren(); $('concepts').hidden=!engine;
     if(engine) {
       $('panel-index').textContent=String(data.engines.indexOf(engine)+1).padStart(2,'0')+' / ENGINE CONNECTION';
       $('detail-title').append(create('span',engine.name,'engine-name'),document.createTextNode(engine.role));
       $('detail-description').textContent=engine.description;
+      engine.concepts.forEach(text=>$('concepts').append(create('li',text)));
       $('related').append(create('span','함께 연결되는 엔진','related-caption'));
       const peers=[...new Set(data.relations.filter(r=>r.from===id||r.to===id).map(r=>r.from===id?r.to:r.from))];
-      peers.forEach(peer=>{const found=data.engines.find(e=>e.id===peer);const btn=create('button');btn.type='button';btn.dataset.engine=peer;setThreadColor(btn,found);btn.append(engineSignal(),document.createTextNode(found.name+' ↗'));const relation=data.relations.find(r=>(r.from===id&&r.to===peer)||(r.to===id&&r.from===peer));btn.title=relation.reason;btn.setAttribute('aria-label',found.name+' 연결 보기: '+relation.reason);bindEnginePreview(btn,peer);btn.addEventListener('click',()=>selectEngine(peer));$('related').append(btn);});
+      peers.forEach(peer=>{const found=data.engines.find(e=>e.id===peer);const btn=create('button');btn.type='button';btn.dataset.engine=peer;btn.append(document.createTextNode(found.name+' ↗'));const relation=data.relations.find(r=>(r.from===id&&r.to===peer)||(r.to===id&&r.from===peer));btn.title=relation.reason;btn.setAttribute('aria-label',found.name+' 연결 보기: '+relation.reason);bindEnginePreview(btn,peer);btn.addEventListener('click',()=>selectEngine(peer));$('related').append(btn);});
       $('stage-caption').textContent=engine.name.toUpperCase()+' / CONNECTED TO ATLAS';
     } else {
-      $('panel-index').textContent='01 — 08 / CONNECTED SYSTEM';
-      $('detail-title').textContent='목표에 따라 달라지는 경험';
-      $('detail-description').replaceChildren(document.createTextNode('각 엔진의 역할을 연결해 목표에 맞는 배울 내용과'),document.createElement('br'),document.createTextNode('안내·표현 방식을 설계합니다.'));
-      const start=create('button','Core부터 살펴보기 ↗','text-action');start.type='button';start.addEventListener('click',()=>selectEngine('core'));$('related').append(start);
-      $('stage-caption').textContent='EIGHT ENGINES. ONE ATLAS';
+      $('panel-index').textContent='ENGINE CONNECTIONS / 01 — 08';
+      $('detail-title').textContent='여덟 역할을 하나로';
+      $('detail-description').replaceChildren(document.createTextNode('이해와 판단부터 표현, 기록, 변화의 확인까지.'),document.createElement('br'),document.createTextNode('여덟 엔진이 각자의 역할로 개인화를 완성해 갑니다.'));
+      const start=create('button','Core부터 살펴보기','text-action');start.type='button';const arrow=create('span',null,'arrow-icon');arrow.setAttribute('aria-hidden','true');start.append(arrow);start.addEventListener('click',()=>selectEngine('core'));$('related').append(start);
+      $('stage-caption').textContent='08 ENGINES / ONE SYSTEM';
     }
     updateDock();flash();
     if(restoreFocus&&id)$('engine-nav').querySelector(`[data-engine="${id}"]`)?.focus({preventScroll:true});
@@ -2355,7 +1057,6 @@ void main(){
     $('story-progress').replaceChildren();
     for(let i=0;i<=scenario.steps.length;i++){
       const button=create('button');button.type='button';button.setAttribute('aria-label',i===scenario.steps.length?'마지막: 나에게 돌아오는 경험':`${i+1}단계: ${scenario.steps[i].label}`);
-      setThreadColor(button,data.engines.find(engine=>engine.id===scenario.steps[i]?.engine));
       button.addEventListener('click',()=>{state.step=i;renderStep();});$('story-progress').append(button);
     }
     renderStep();
@@ -2379,11 +1080,10 @@ void main(){
     $('stage-caption').textContent=final?'CONNECTED, AROUND YOU.':`EXPERIENCE PATH / ${String(state.step+1).padStart(2,'0')}`;
     updateDock();flash();
   }
-  function syncMotion(){graph?.setPaused(state.paused);}
+  function syncMotion(){graph?.setPaused(state.paused||reduced.matches||preloadPaused);}
   data.engines.forEach((engine,index)=>{
     const button=create('button',null,'engine-button');button.type='button';button.dataset.engine=engine.id;button.setAttribute('aria-label',`${engine.name} · ${labels[engine.id]} 연결 보기`);button.setAttribute('aria-pressed','false');
-    setThreadColor(button,engine);
-    const ordinal=create('span',null,'ordinal mono');ordinal.append(engineSignal(),create('span',String(index+1).padStart(2,'0')));
+    const ordinal=create('span',String(index+1).padStart(2,'0'),'ordinal mono');
     button.append(ordinal,create('strong',engine.name),create('small',labels[engine.id]));
     bindEnginePreview(button,engine.id);
     button.addEventListener('click',()=>selectEngine(state.view==='explore'&&state.selected===engine.id?null:engine.id));$('engine-nav').append(button);
@@ -2391,15 +1091,13 @@ void main(){
   data.scenarios.forEach((scenario,index)=>{
     const button=create('button',null,'scenario-card');button.type='button';button.dataset.scenario=scenario.id;const copy=create('span');copy.append(create('strong',scenario.title),create('small',scenario.subtitle));button.append(copy,create('span','↗'));button.addEventListener('click',()=>chooseScenario(scenario));$('scenario-picker').append(button);
   });
-  try {graph=new window.AtlasConstellation($('constellation'),{engines:data.engines,relations:data.relations,onSelect:id=>selectEngine(id),onHover:syncPreview,getFocusEngine:()=>previewKind==='keyboard'&&previewOwner===document.activeElement&&previewOwner.matches(':focus-visible')?previewOwner.dataset.engine:null});syncMotion();}
+  try {graph=new window.AtlasConstellation($('constellation'),{engines:data.engines,relations:data.relations,onSelect:id=>selectEngine(id),onHover:syncPreview,onLegend:fits=>{$('observatory').dataset.legend=fits?'map':'panel';},getFocusEngine:()=>previewKind==='keyboard'&&previewOwner===document.activeElement&&previewOwner.matches(':focus-visible')?previewOwner.dataset.engine:null});syncMotion();}
   catch(error){console.error('Atlas visualization failed:',error);$('stage-caption').textContent='엔진 버튼으로 연결을 살펴보세요';}
   document.querySelectorAll('[data-view]').forEach(button=>button.addEventListener('click',()=>{setView(button.dataset.view);if(button.dataset.view==='explore')selectEngine(state.selected);}));
   $('start-exploring').addEventListener('click',()=>selectEngine('core'));
   $('story-back').addEventListener('click',()=>showPicker(true));
   $('next-step').addEventListener('click',()=>{state.step=state.step===state.scenario.steps.length?0:state.step+1;renderStep();});
-  $('zoom-in').addEventListener('click',()=>graph?.zoomBy(1.15));$('zoom-out').addEventListener('click',()=>graph?.zoomBy(1/1.15));
-  $('reset-view').addEventListener('click',()=>{graph?.reset();selectEngine(null);});
-  reduced.addEventListener('change',event=>{state.paused=event.matches;syncMotion();});
+  reduced.addEventListener('change',syncMotion);
   $('engine-nav').addEventListener('keydown',event=>{
     const buttons=[...$('engine-nav').querySelectorAll('button')];let i=buttons.indexOf(document.activeElement);if(i<0)return;
     if(event.key==='ArrowRight'||event.key==='ArrowDown')i=(i+1)%buttons.length;
@@ -2414,7 +1112,7 @@ void main(){
   document.fonts.ready.then(()=>{if(graph&&!graph.destroyed){graph.labelSprites.clear();graph.requestDraw();}});
   window.addEventListener('blur',clearPreview);
   window.addEventListener('pagehide',event=>{if(!event.persisted)graph?.destroy();});
-  window.atlasPreview={setPreloadPaused:value=>graph?.setPaused(Boolean(value)),getState:()=>({...state,scenario:state.scenario?.id||null}),getSummary:()=>graph?.getSummary(),getHubPositions:()=>graph?.getHubPositions(),getFeaturePositions:()=>graph?.getFeaturePositions()};
+  window.atlasPreview={setPreloadPaused:value=>{preloadPaused=Boolean(value);syncMotion();},getState:()=>({...state,scenario:state.scenario?.id||null}),getSummary:()=>graph?.getSummary(),getHubPositions:()=>graph?.getHubPositions(),getFeaturePositions:()=>graph?.getFeaturePositions()};
 })();
 </script>
   <script>(() => {

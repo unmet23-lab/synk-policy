@@ -1,12 +1,16 @@
 const root=document.documentElement;
 const homeTitle=document.title;
+const companyPath=(location.pathname.startsWith('/en/')?'/en/':'/')+'#top';
 const entry=document.querySelector('[data-cosmic-entry]');
 const portal=document.querySelector('[data-cosmic-atlas]');
-const planet=document.querySelector('[data-cosmic-planet]');
-const clamp=(value,min,max)=>Math.min(max,Math.max(min,value));
+const companyPortal=document.querySelector('[data-cosmic-company]');
+const ieung=document.querySelector('[data-cosmic-ieung]');
+const IEUNG_DURATION=1100;
+if(portal)portal.href='/atlas/';
+if(companyPortal)companyPortal.href=companyPath;
 const setView=view=>{root.dataset.entryView=view;if(view==='company')document.dispatchEvent(new Event('synk:company-view'));};
 const isAtlasPath=()=>location.pathname.replace(/\/$/,'')==='/atlas';
-let frame,ready=false,resolveReady;
+let frame,ready=false,resolveReady,routeRevision=0,activeTravel=null;
 const readyPromise=new Promise(resolve=>{resolveReady=resolve;});
 
 function pauseAtlas(value){try{frame?.contentWindow?.atlasPreview?.setPreloadPaused(value);}catch{}}
@@ -33,19 +37,28 @@ function hideAtlas(){
   document.title=homeTitle;
 }
 function syncRoute(){
+  routeRevision++;
+  activeTravel?.();
+  document.querySelector('.cosmic-transition')?.remove();
   if(isAtlasPath()&&ready){showAtlas(false);return;}
   hideAtlas();
   setView(location.hash?'company':'intro');
   if(!location.hash)prepareAtlas();
 }
 function showCompany(){
-  history.pushState({},'','/#top');
+  routeRevision++;
+  activeTravel?.();
+  history.pushState({},'',companyPath);
   hideAtlas();
   setView('company');
-  requestAnimationFrame(()=>document.getElementById('top')?.scrollIntoView());
+  requestAnimationFrame(()=>{
+    const top=document.getElementById('top');
+    top?.scrollIntoView();
+    top?.focus({preventScroll:true});
+  });
 }
 function prepareAtlas(){
-  if(!portal||!planet||frame||location.hash||isAtlasPath())return;
+  if(!portal||!entry||frame||location.hash||isAtlasPath())return;
   try{sessionStorage.removeItem('synk-atlas-handoff');}catch{}
   frame=document.createElement('iframe');
   frame.className='cosmic-atlas-frame';
@@ -56,7 +69,9 @@ function prepareAtlas(){
   frame.addEventListener('load',()=>{
     let child;
     try{child=frame.contentWindow;}catch{return;}
-    child.document.querySelector('.synk-portal')?.addEventListener('click',event=>{
+    const companyLink=child.document.querySelector('.synk-portal');
+    if(companyLink)companyLink.href=companyPath;
+    companyLink?.addEventListener('click',event=>{
       if(event.button!==0||event.metaKey||event.ctrlKey||event.shiftKey||event.altKey)return;
       event.preventDefault();
       event.stopImmediatePropagation();
@@ -84,84 +99,146 @@ function waitForAtlas(ms){
   if(ready)return Promise.resolve(true);
   return Promise.race([readyPromise,new Promise(resolve=>setTimeout(()=>resolve(false),ms))]);
 }
+function atlasTarget(){
+  const canvas=frame?.contentDocument?.getElementById('constellation');
+  const rect=canvas?.getBoundingClientRect();
+  const summary=frame?.contentWindow?.atlasPreview?.getSummary();
+  const center=summary?.cinematic?.nucleusCenter;
+  if(!rect?.width||!summary?.width||!center||!summary.cinematic.nucleusRadius)return null;
+  const ratio=rect.width/summary.width;
+  const target={x:rect.left+center.x*ratio,y:rect.top+center.y*ratio,radius:summary.cinematic.nucleusRadius*ratio};
+  return Object.values(target).every(Number.isFinite)&&target.radius>0?target:null;
+}
+
+function ieungDeparture(){
+  const rect=ieung?.getBoundingClientRect();
+  if(!rect||![rect.left,rect.top,rect.width,rect.height].every(Number.isFinite)||rect.width<=0||rect.height<=0||rect.bottom<=0||rect.top>=innerHeight)return null;
+  // These ratios describe the existing letter's inner counter, not a new ring asset.
+  return {x:rect.left+rect.width/2,y:rect.top+rect.height/2,rx:rect.width*67/248,ry:rect.height*20/130,outerRx:rect.width/2,outerRy:rect.height/2,ink:getComputedStyle(ieung).fill};
+}
+
+function sampleIeungTransition(departure,target,progress){
+  const smooth=value=>{const t=Math.min(1,Math.max(0,value));return t*t*(3-2*t);};
+  const move=smooth(progress/.72);
+  const travel=smooth((progress-.22)/.5);
+  const mix=(a,b)=>a+(b-a)*move;
+  return {
+    x:departure.x+(target.x-departure.x)*travel,y:departure.y+(target.y-departure.y)*travel,
+    rx:mix(departure.rx,target.radius),ry:mix(departure.ry,target.radius),
+    outerRx:mix(departure.outerRx,target.radius+2),outerRy:mix(departure.outerRy,target.radius+2),
+    round:move,sceneScale:1+.22*smooth(progress/.4),sceneOpacity:1-smooth((progress-.06)/.34),
+    ringOpacity:1-smooth((progress-.35)/.38),orbOpacity:smooth(progress/.24),reveal:smooth((progress-.72)/.28)
+  };
+}
+
+function ieungOutline(state){
+  const {x,y,rx,ry,outerRx,outerRy,round}=state;
+  const curve=(a,b,cx,cy)=>`M${x} ${y-b}C${x-a*cx} ${y-b} ${x-a} ${y-b*cy} ${x-a} ${y}C${x-a} ${y+b*cy} ${x-a*cx} ${y+b} ${x} ${y+b}C${x+a*cx} ${y+b} ${x+a} ${y+b*cy} ${x+a} ${y}C${x+a} ${y-b*cy} ${x+a*cx} ${y-b} ${x} ${y-b}Z`;
+  const control=initial=>initial+(.55228475-initial)*round;
+  return curve(outerRx,outerRy,control(76/124),control(41/65))+curve(rx,ry,control(42/67),control(12/20));
+}
+
+function travelFromIeung(overlay,target,departure){
+  const backdrop=document.createElement('div');
+  backdrop.className='cosmic-transition-backdrop';
+  const ring=document.createElementNS('http://www.w3.org/2000/svg','svg');
+  ring.setAttribute('class','cosmic-transition-ieung');
+  ring.setAttribute('viewBox',`0 0 ${innerWidth} ${innerHeight}`);
+  const path=document.createElementNS('http://www.w3.org/2000/svg','path');
+  path.setAttribute('fill-rule','evenodd');
+  path.setAttribute('fill',departure.ink);
+  ring.append(path);
+  overlay.append(backdrop,ring);
+  document.body.append(overlay);
+  const previousStyle=frame.getAttribute('style');
+  const entryStyle=entry.getAttribute('style');
+  const cover=Math.hypot(Math.max(target.x,innerWidth-target.x),Math.max(target.y,innerHeight-target.y))+4;
+  frame.classList.add('is-matching-ieung');
+  entry.classList.add('is-ieung-departing');
+  root.dataset.cosmicTransition='ieung';
+  frame.style.transformOrigin=`${target.x}px ${target.y}px`;
+  entry.style.transformOrigin=`${departure.x}px ${departure.y+scrollY}px`;
+  const render=progress=>{
+    const state=sampleIeungTransition(departure,target,progress);
+    const radius=target.radius+1+(cover-target.radius-1)*state.reveal;
+    frame.style.transform=`translate(${state.x-target.x}px,${state.y-target.y}px) scale(${state.rx/target.radius},${state.ry/target.radius})`;
+    frame.style.clipPath=`circle(${radius}px at ${target.x}px ${target.y}px)`;
+    frame.style.opacity=String(state.orbOpacity);
+    entry.style.transform=`scale(${state.sceneScale})`;
+    entry.style.opacity=String(state.sceneOpacity);
+    path.setAttribute('d',ieungOutline(state));
+    ring.style.opacity=String(state.ringOpacity);
+  };
+  render(0);
+  return new Promise(resolve=>{
+    let raf=0,start=null,settled=false;
+    const finish=()=>{
+      if(settled)return;
+      settled=true;
+      cancelAnimationFrame(raf);
+      removeEventListener('resize',finish);
+      document.removeEventListener('visibilitychange',onVisibility);
+      frame.classList.remove('is-matching-ieung');
+      entry.classList.remove('is-ieung-departing');
+      delete root.dataset.cosmicTransition;
+      if(previousStyle===null)frame.removeAttribute('style');else frame.setAttribute('style',previousStyle);
+      if(entryStyle===null)entry.removeAttribute('style');else entry.setAttribute('style',entryStyle);
+      overlay.remove();
+      activeTravel=null;
+      resolve();
+    };
+    const onVisibility=()=>{if(document.hidden)finish();};
+    const tick=now=>{
+      if(start===null)start=now;
+      const progress=Math.min(1,(now-start)/IEUNG_DURATION);
+      render(progress);
+      if(progress===1)finish();else raf=requestAnimationFrame(tick);
+    };
+    activeTravel=finish;
+    addEventListener('resize',finish,{once:true});
+    document.addEventListener('visibilitychange',onVisibility);
+    raf=requestAnimationFrame(tick);
+  });
+}
 addEventListener('hashchange',syncRoute);
 addEventListener('popstate',syncRoute);
 addEventListener('pageshow',syncRoute);
-document.querySelector('[data-cosmic-company]')?.addEventListener('click',()=>setView('company'));
-if(portal&&planet)requestAnimationFrame(()=>requestAnimationFrame(prepareAtlas));
+companyPortal?.addEventListener('click',event=>{
+  if(event.defaultPrevented||event.button!==0||event.metaKey||event.ctrlKey||event.shiftKey||event.altKey)return;
+  event.preventDefault();
+  showCompany();
+});
+if(portal&&entry)requestAnimationFrame(()=>requestAnimationFrame(prepareAtlas));
 
-// Match the Atlas canvas nucleus even when the viewport or fonts differ.
-function atlasOrbTarget(){
-  if(ready){
-    try{
-      const canvas=frame.contentDocument.getElementById('constellation');
-      const rect=canvas.getBoundingClientRect();
-      const summary=frame.contentWindow.atlasPreview.getSummary();
-      if(rect.width&&summary?.cinematic?.nucleusRadius)
-        return {x:rect.left+summary.width*.5,y:rect.top+summary.height*.493,radius:summary.cinematic.nucleusRadius};
-    }catch{}
-  }
-  const probe=document.createElement('div');
-  probe.style.cssText='position:absolute;width:100px;height:100px;overflow:scroll;visibility:hidden';
-  planet.parentElement.append(probe);
-  const width=innerWidth-(probe.offsetWidth-probe.clientWidth);
-  probe.remove();
-  const height=innerHeight;
-  if(width<=760){
-    const stageHeight=width<=370?390:440;
-    const radius=width<520?clamp(width*.125,39,50):clamp(Math.min(width,stageHeight)*.132,68,92);
-    return {x:width*.5,y:width<=370?527.262:560.115,radius};
-  }
-  const short=height<=820,wide=width>=1700,tablet=width<=1100;
-  const padding=width*(wide?.055:tablet?.034:.044);
-  const contentWidth=width-padding*2;
-  const left=short?.28:wide?.25:tablet?.29:.26;
-  const right=short?-.05:wide?-.04:tablet?-.07:-.05;
-  const top=short?-5:tablet?10:-21;
-  const bottom=short?30:wide?25:tablet?65:44;
-  const workspaceHeight=short?Math.max(505,height-226):wide?Math.max(760,height-274):clamp(height-251,660,1000);
-  const stageWidth=contentWidth*(1-left-right);
-  const stageHeight=workspaceHeight-top-bottom;
-  const radius=stageWidth<520?clamp(stageWidth*.125,39,50):clamp(Math.min(stageWidth,stageHeight)*.132,68,92);
-  return {x:padding+contentWidth*(left+(1-left-right)*.5),y:(short?79:103)+top+stageHeight*.493,radius};
-}
-function nativeHandoff(target){
-  try{sessionStorage.setItem('synk-atlas-handoff',JSON.stringify({x:target.x-target.radius,y:target.y-target.radius,size:target.radius*2,time:Date.now()}));}catch{}
-  location.assign(portal.href);
-}
-if(portal&&planet){
+if(portal&&entry){
   let departing=false;
   portal.addEventListener('click',async event=>{
-    if(departing||event.defaultPrevented||event.button!==0||event.metaKey||event.ctrlKey||event.shiftKey||event.altKey)return;
-    const mask='radial-gradient(circle,#000 59%,transparent 61%)';
-    const animate=!matchMedia('(prefers-reduced-motion: reduce)').matches&&!matchMedia('(forced-colors: active)').matches&&(CSS.supports('mask-image',mask)||CSS.supports('-webkit-mask-image',mask));
+    if(event.defaultPrevented||event.button!==0||event.metaKey||event.ctrlKey||event.shiftKey||event.altKey)return;
     event.preventDefault();
+    if(departing||root.dataset.cosmicAtlas==='active')return;
+    entry.dispatchEvent?.(new Event('synk:entry-depart'));
+    const animate=!matchMedia('(prefers-reduced-motion: reduce)').matches&&!matchMedia('(forced-colors: active)').matches;
+    // The sky clock stops synchronously before this snapshot is measured.
+    const departure=animate?ieungDeparture():null;
     departing=true;
     if(!animate){
       if(!showAtlas())location.assign(portal.href);
       departing=false;
       return;
     }
-    const rect=planet.getBoundingClientRect();
-    const target=atlasOrbTarget();
-    const size=target.radius*2/.835;
+    const originRoute=location.pathname+(location.search||'')+location.hash;
+    const originRevision=routeRevision;
     const overlay=document.createElement('div');
     overlay.className='cosmic-transition';
     overlay.setAttribute('aria-hidden','true');
-    overlay.style.setProperty('--planet-left',`${rect.left}px`);
-    overlay.style.setProperty('--planet-top',`${rect.top}px`);
-    overlay.style.setProperty('--planet-size',`${rect.width}px`);
-    overlay.style.setProperty('--planet-dx',`${target.x-size/2-rect.left}px`);
-    overlay.style.setProperty('--planet-dy',`${target.y-size/2-rect.top}px`);
-    overlay.style.setProperty('--planet-scale',`${size/rect.width}`);
-    overlay.style.setProperty('--planet-image-transform',getComputedStyle(planet.querySelector('img')).transform);
-    overlay.innerHTML='<div class="cosmic-transition-sphere"><div class="cosmic-transition-orb"></div><div class="cosmic-transition-planet"><img src="/assets/cosmic-planet-20260923.webp" alt=""></div></div>';
-    document.body.append(overlay);
-    requestAnimationFrame(()=>requestAnimationFrame(()=>overlay.classList.add('is-traveling')));
-    await new Promise(resolve=>setTimeout(resolve,1580));
-    if(!await waitForAtlas(2500)){nativeHandoff(target);return;}
+    const available=await waitForAtlas(2500);
+    if(routeRevision!==originRevision||location.pathname+(location.search||'')+location.hash!==originRoute){departing=false;return;}
+    if(!available){location.assign(portal.href);return;}
+    const target=departure?atlasTarget():null;
+    if(target)await travelFromIeung(overlay,target,departure);
+    if(routeRevision!==originRevision||location.pathname+(location.search||'')+location.hash!==originRoute){overlay.remove();departing=false;return;}
     showAtlas();
-    overlay.classList.add('is-completing');
-    setTimeout(()=>{overlay.remove();departing=false;},450);
+    overlay.remove();
+    departing=false;
   });
 }

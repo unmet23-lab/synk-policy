@@ -1,0 +1,15 @@
+.korean-arrival-overlay{position:fixed;inset:0;z-index:980;overflow:hidden;pointer-events:none;isolation:isolate}
+.korean-arrival-backdrop{position:absolute;inset:0;background:#f7f8fa;will-change:opacity}
+.korean-arrival-planet{position:absolute;left:0;top:0;display:block;max-width:none;transform-origin:0 0;object-fit:contain;will-change:transform}
+.cosmic-entry[data-korean-arrival="loading"] .korean-arrival-planet{opacity:0}
+.cosmic-entry[data-korean-arrival] [data-cosmic-planet],
+.cosmic-entry[data-korean-arrival] .korean-architecture,
+.cosmic-entry[data-korean-arrival] .cosmic-wordmark,
+.cosmic-entry[data-korean-arrival] .cosmic-actions{opacity:0}
+@media(prefers-reduced-motion:reduce),(forced-colors:active){
+ .korean-arrival-overlay{display:none}
+ .cosmic-entry[data-korean-arrival] [data-cosmic-planet],
+ .cosmic-entry[data-korean-arrival] .korean-architecture,
+ .cosmic-entry[data-korean-arrival] .cosmic-wordmark,
+ .cosmic-entry[data-korean-arrival] .cosmic-actions{opacity:1}
+}
