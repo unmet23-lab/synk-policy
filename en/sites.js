@@ -1,5 +1,5 @@
-import {initOrbConversation} from '/en/orb-conversation.js?v=84be3027a570';
-import {initGlassControls} from '/glass-controls.js?v=f24bf0fe2a20';
+import {initOrbConversation} from '/en/orb-conversation.js?v=4b069b74852b';
+import {initGlassControls} from '/glass-controls.js?v=d559a4d50948';
 initGlassControls();
 // A deliberate brand preview: swiping selects; following a link navigates.
 const brandDeck=document.querySelector('[data-brand-deck]');
@@ -183,10 +183,11 @@ window.addEventListener('hashchange',()=>revealLinkedDetails());
 document.addEventListener('click',event=>{const link=event.target.closest('a[href]');if(!link)return;const target=new URL(link.href,location.href);if(target.origin===location.origin&&target.pathname===location.pathname)revealLinkedDetails(target.hash);},true);
 
 // The dock's section links show where the reader is: the last section whose top has passed 40% of the
-// window. Only the link's colour and underline change, at once; nothing moves.
+// window. Only the link's colour and underline change, at once; nothing moves. Sections hidden behind the
+// entrance of / are not places the reader can be, so the bar over the entrance marks nothing.
 {
  const pairs=[...document.querySelectorAll('.bar-menu a[href*="#"]')].map(link=>{const url=new URL(link.href,location.href);let id='';try{id=decodeURIComponent(url.hash.slice(1));}catch{}return url.pathname===location.pathname&&id?[link,document.getElementById(id)]:null;}).filter(pair=>pair&&pair[1]);
  let frame=0;
- const mark=()=>{frame=0;let current=null;for(const [link,target] of pairs)if(target.getBoundingClientRect().top<innerHeight*.4)current=link;for(const [link] of pairs){if(link===current)link.setAttribute('aria-current','location');else link.removeAttribute('aria-current');}};
- if(pairs.length){addEventListener('scroll',()=>{if(!frame)frame=requestAnimationFrame(mark);},{passive:true});addEventListener('resize',()=>{if(!frame)frame=requestAnimationFrame(mark);});mark();}
+ const mark=()=>{frame=0;let current=null;for(const [link,target] of pairs)if(target.getClientRects().length&&target.getBoundingClientRect().top<innerHeight*.4)current=link;for(const [link] of pairs){if(link===current)link.setAttribute('aria-current','location');else link.removeAttribute('aria-current');}};
+ if(pairs.length){addEventListener('scroll',()=>{if(!frame)frame=requestAnimationFrame(mark);},{passive:true});addEventListener('resize',()=>{if(!frame)frame=requestAnimationFrame(mark);});document.addEventListener('synk:company-view',()=>{if(!frame)frame=requestAnimationFrame(mark);});mark();}
 }

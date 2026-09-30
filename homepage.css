@@ -79,7 +79,7 @@ button{cursor:pointer}
 #top:focus,[tabindex="-1"]:focus{outline:none}
 ::selection{background:rgba(10,10,10,.12)}
 .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
-.skip{position:absolute;left:12px;top:12px;z-index:200;padding:10px 16px;border-radius:999px;background:var(--ink);color:#fff;font-size:14px;transform:translateY(-200%)}
+.skip{position:absolute;left:12px;top:12px;z-index:200;padding:10px 16px;border-radius:999px;background:var(--ink);color:#fff;font-size:15px;transform:translateY(-200%)}
 .skip:focus{transform:none}
 .shell{width:min(var(--max),calc(100% - 2 * var(--gutter)));margin-inline:auto}
 
@@ -133,6 +133,7 @@ body[data-site="synk"] .primary-link{background:var(--ink)}
 .quiet-link,.line-link,.text-button{display:inline-flex;align-items:center;gap:8px;min-height:44px;color:var(--ink);font:600 15px/1 var(--sans);letter-spacing:-.01em;text-decoration:underline;text-decoration-thickness:var(--hair);text-underline-offset:7px;text-decoration-color:var(--ink-4);transition:text-decoration-color var(--fast) var(--ease)}
 .quiet-link:hover,.line-link:hover,.text-button:hover{text-decoration-color:var(--ink)}
 
+/* site-bar:start. compose-atlas.mjs copies this part into site-bar.css, so /atlas/ wears the same bar. */
 /* ── Header: the glass dock ────────────────────────────────────────────── */
 /* A frosted capsule holding the felt logo, this site's sections, the five brands and the language.
    It stays where it is while the page moves under it; the page shows through its edge. */
@@ -160,15 +161,15 @@ body[data-site="synk"] .primary-link{background:var(--ink)}
 .bar-logo img{width:auto;height:28px}
 body[data-site="synk"] .bar-logo img{height:26px}
 .bar-menu{display:flex;align-items:center;gap:2px}
-.bar-menu a,.bar-brands a,.header-language a{display:inline-flex;align-items:center;height:40px;padding:0 13px;border-radius:999px;font:500 14px/1 var(--sans);letter-spacing:-.015em;color:var(--ink-2);white-space:nowrap;transition:color var(--fast) var(--ease),background-color var(--fast) var(--ease)}
+.bar-menu a,.bar-brands a,.header-language a{display:inline-flex;align-items:center;height:40px;padding:0 13px;border-radius:999px;font:500 15px/1 var(--sans);letter-spacing:-.015em;color:var(--ink-2);white-space:nowrap;transition:color var(--fast) var(--ease),background-color var(--fast) var(--ease)}
 .bar-menu a:hover,.bar-brands a:hover,.header-language a:hover{color:var(--ink);background:rgba(10,10,10,.045)}
-.bar-menu a[aria-current="location"]{color:var(--ink);text-decoration:underline;text-decoration-thickness:var(--hair);text-underline-offset:6px;transition:none}
+.bar-menu a:is([aria-current="location"],[aria-current="page"]){color:var(--ink);text-decoration:underline;text-decoration-thickness:var(--hair);text-underline-offset:6px;transition:none}
 .bar-brands{display:flex;align-items:center;gap:0;margin-left:8px;padding-left:8px;border-left:var(--hair) solid var(--line);height:28px}
-.bar-brands a{height:34px;padding:0 10px;font:500 11.5px/1 'SYNK Latin',var(--sans);letter-spacing:.07em;color:var(--ink-3)}
+.bar-brands a{height:34px;padding:0 10px;font:500 11px/1 'SYNK Latin',var(--sans);letter-spacing:.07em;color:var(--ink-3)}
 .bar-brands a[aria-current="page"]{color:var(--ink);background:rgba(255,255,255,.95);box-shadow:0 0 0 .5px rgba(10,10,10,.12),0 2px 6px -2px rgba(10,10,10,.18)}
 .header-language{display:flex;align-items:center;gap:0;margin-left:4px;padding-left:8px;border-left:var(--hair) solid var(--line);height:28px}
 .header-language>span{display:none}
-.header-language a{height:34px;padding:0 9px;font:500 11.5px/1 'SYNK Latin',var(--sans);letter-spacing:.07em;color:var(--ink-3)}
+.header-language a{height:34px;padding:0 9px;font:500 11px/1 'SYNK Latin',var(--sans);letter-spacing:.07em;color:var(--ink-3)}
 .header-language a[aria-current="page"]{color:var(--ink)}
 .menu-toggle{display:none}
 
@@ -205,6 +206,7 @@ body[data-site="synk"] .bar-logo img{height:26px}
  .header.menu-open .bar-brands{order:11;display:flex;flex-wrap:wrap;flex-basis:100%;height:auto;margin:0;padding:8px 6px 4px 0;border-left:0;border-top:var(--hair) solid var(--line);gap:4px}
  .header.menu-open .bar-brands a{height:36px;padding:0 12px}
 }
+/* site-bar:end */
 
 /* ── Company page (/#top) ──────────────────────────────────────────────── */
 .hero{padding-top:clamp(56px,7vw,104px)}
@@ -215,7 +217,7 @@ body[data-site="synk"] .bar-logo img{height:26px}
 .hero-copy{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));column-gap:var(--gap);row-gap:28px;align-items:end}
 .hero-copy h1{grid-column:1/-1}
 .hero-copy h1 span{display:block}
-.hero-copy>p{grid-column:1/span 6;font-size:clamp(17px,1.4vw,20px);line-height:1.62;color:var(--ink-2);max-width:32em}
+.hero-copy>p{grid-column:1/span 6;font-size:clamp(18px,1.4vw,20px);line-height:1.62;color:var(--ink-2);max-width:32em}
 .hero-actions{grid-column:8/-1;justify-self:end;display:flex;flex-wrap:wrap;align-items:center;gap:10px 26px}
 .companions{position:relative}
 .companions-scene{width:100%;aspect-ratio:16/9;object-fit:cover;object-position:50% 58%;border-radius:var(--radius);background:var(--plate)}
@@ -241,104 +243,25 @@ svg.directory-logo{height:28.5px;margin-block:-3.25px}
 [data-field="lab"] .directory-object{width:62%;margin-bottom:-4%}
 [data-field="lab"] .directory-object img{filter:drop-shadow(0 16px 16px rgba(60,30,20,.28)) drop-shadow(0 4px 6px rgba(60,30,20,.2))}
 
-/* Atlas on the company page: the engine map with one engine's role beside it, a preview of the letter
-   practice, goal examples, and what each business takes from Atlas. The same content as the live page. */
-.atlas-section{padding-top:var(--section);display:grid;gap:clamp(56px,6vw,96px)}
-.atlas-heading{display:grid;gap:22px;max-width:880px}
-.atlas-heading .small-label{display:flex;align-items:center;gap:16px}
-.atlas-heading .small-label::after{content:"";flex:1;border-top:var(--hair) solid var(--line)}
-.atlas-heading>p{max-width:40em;font-size:clamp(16.5px,1.3vw,19px)}
-.atlas-explorer-layout{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));column-gap:var(--gap);row-gap:32px;align-items:center}
-.atlas-engine-map{grid-column:1/span 7;display:grid;gap:16px}
-.atlas-engine-map>img{width:92%;justify-self:center}
-.atlas-engine-map .visual-explainer-guide{text-align:center}
-.atlas-map-controls{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px;padding:4px;border-radius:20px;background:var(--wash)}
-.atlas-map-controls button{min-height:42px;border-radius:16px;font:600 14px/1 'SYNK Latin',var(--sans);letter-spacing:-.01em;color:var(--ink-2);transition:color var(--fast) var(--ease),background-color var(--fast) var(--ease),box-shadow var(--fast) var(--ease)}
-.atlas-map-controls button:hover{color:var(--ink)}
-.atlas-map-controls button[aria-selected="true"]{color:var(--ink);background:#fff;box-shadow:inset 0 1px 0 #fff,0 0 0 .5px rgba(10,10,10,.12),0 3px 10px -4px rgba(10,10,10,.28)}
-.atlas-role-panels{grid-column:9/-1;display:grid;gap:40px}
-.atlas-role-panels>article{display:grid;gap:12px;align-content:start}
-.atlas-role-panels h3{font:600 clamp(34px,3.4vw,52px)/1 'SYNK Latin',var(--sans);letter-spacing:-.04em}
-.atlas-role-panels h4{font-size:clamp(17px,1.4vw,20px);letter-spacing:-.025em}
-.atlas-role-panels p{font-size:15.5px}
-.atlas-explorer.is-interactive .atlas-role-panels>article{padding-top:22px;border-top:var(--hair) solid var(--ink)}
-
-.atlas-learning-demo{display:grid;gap:32px;padding:clamp(28px,4vw,56px);border-radius:var(--radius);background:var(--wash)}
-.learning-demo-intro{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));column-gap:var(--gap);row-gap:24px;align-items:center}
-.learning-demo-heading{grid-column:1/span 6;display:grid;gap:14px}
-.learning-demo-heading h3{font-size:clamp(26px,2.6vw,38px);letter-spacing:-.04em;line-height:1.2}
-.learning-context{grid-column:8/-1;display:grid;grid-template-columns:88px 1fr;gap:18px;align-items:center;padding:18px 20px;border-radius:20px;background:#fff}
-.learning-context img{width:88px;height:88px;object-fit:contain}
-.learning-context>div{display:grid;gap:4px}
-.learning-context span{font-size:12px;font-weight:600;color:var(--accent-ink,var(--ink-3))}
-.learning-context h4{font-size:16px}
-.learning-context p{font-size:14px}
-.learning-choice-label{font-size:13.5px;color:var(--ink-3)}
-.learning-choices{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px;padding:4px;border-radius:22px;background:rgba(255,255,255,.55)}
-.learning-choices button{display:grid;gap:4px;justify-items:start;padding:14px 18px;border-radius:18px;text-align:left;color:var(--ink-2);transition:background-color var(--fast) var(--ease),box-shadow var(--fast) var(--ease),color var(--fast) var(--ease)}
-.learning-choices button strong{font-size:15.5px;color:inherit}
-.learning-choices button span{font-size:13px;color:var(--ink-3)}
-.learning-choices button:hover{color:var(--ink)}
-.learning-choices button[aria-selected="true"]{color:var(--ink);background:#fff;box-shadow:inset 0 1px 0 #fff,0 0 0 .5px rgba(10,10,10,.12),0 4px 12px -5px rgba(10,10,10,.28)}
-.learning-scene-panels{display:grid;gap:40px}
-.learning-scene-panel{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));column-gap:var(--gap);row-gap:24px;align-items:center}
-.learning-scene-panel>figure{grid-column:1/span 5;display:grid;gap:12px;margin:0}
-.learning-scene-panel>figure img{width:100%;aspect-ratio:1;object-fit:contain;padding:8%;border-radius:22px;background:#fff}
-.learning-scene-panel>figure figcaption{font-size:13px;color:var(--ink-3)}
-.learning-guidance{grid-column:7/-1;display:grid;gap:12px}
-.learning-stage{font:400 11px/1.4 var(--mono);letter-spacing:.08em;color:var(--ink-3)}
-.learning-guidance h4{font-size:clamp(20px,1.8vw,24px);letter-spacing:-.03em}
-.learning-prompts{display:grid;border-top:var(--hair) solid var(--line)}
-.learning-prompts li{display:grid;grid-template-columns:32px 1fr;padding:12px 0;border-bottom:var(--hair) solid var(--line);font-size:15px;color:var(--ink)}
-.learning-prompts li span{grid-column:1;grid-row:1;font:400 11px/1.9 var(--mono);color:var(--ink-3)}
-.learning-prompts li{grid-auto-flow:dense}
-.learning-hint{border-bottom:var(--hair) solid var(--line)}
-.learning-hint>summary{display:flex;justify-content:space-between;align-items:center;min-height:48px;cursor:pointer;list-style:none;font-size:14.5px;font-weight:600}
-.learning-hint>summary::-webkit-details-marker{display:none}
-.learning-hint>summary>span{display:grid;place-items:center;width:28px;height:28px;border-radius:999px;background:#fff;font-size:15px;color:var(--ink-2);transition:transform var(--fast) var(--ease)}
-.learning-hint[open]>summary>span{transform:rotate(45deg);background:var(--ink);color:#fff}
-.learning-hint>p{padding-bottom:16px;font-size:14.5px}
-.learning-demo-footer{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:14px 28px;padding-top:24px;border-top:var(--hair) solid var(--line)}
-.learning-demo-footer p{max-width:44em;font-size:14px}
-
-.atlas-adaptation{display:grid;gap:36px}
-.atlas-evolution{display:grid;gap:16px;max-width:880px}
-.atlas-evolution h3{font-size:clamp(26px,2.8vw,40px);letter-spacing:-.04em;line-height:1.2}
-.atlas-goal-explorer{display:grid;gap:22px}
-.atlas-goal-topline{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:8px 24px}
-.atlas-goal-topline p{font-size:13.5px;color:var(--ink-3)}
-.atlas-goal-topline span{font:400 11px/1.4 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3)}
-html[lang="ko"] .atlas-goal-topline span{font:600 12px/1.4 var(--sans);letter-spacing:0;text-transform:none}
-.atlas-goal-nav button{display:inline-flex;align-items:center;gap:10px}
-.atlas-goal-number{font:400 11px/1 var(--mono);color:var(--ink-3)}
-.atlas-goal-nav button strong{font-size:14.5px;color:inherit}
-.atlas-goal-arrow{display:none}
-.atlas-goal-panels{display:grid;gap:48px}
-.atlas-goal-panel{display:grid;gap:28px}
-.atlas-goal-summary{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));column-gap:var(--gap);row-gap:22px;align-items:center}
-.atlas-goal-art{grid-column:1/span 5;display:grid;place-items:center;aspect-ratio:5/4;margin:0;border-radius:var(--radius);overflow:hidden}
-.atlas-goal-art img{width:74%;height:auto;mix-blend-mode:multiply}
-.atlas-goal-context{grid-column:7/-1;display:grid;gap:12px}
-.atlas-goal-context h4{font-size:clamp(22px,2vw,28px);letter-spacing:-.035em;line-height:1.25}
-.atlas-goal-steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));column-gap:var(--gap);border-top:var(--hair) solid var(--ink)}
-.atlas-goal-steps li{display:grid;align-content:start;gap:8px;padding:20px 24px 24px 0;border-bottom:var(--hair) solid var(--line)}
-.atlas-goal-steps li+li{padding-left:24px;border-left:var(--hair) solid var(--line)}
-.atlas-goal-step-title{display:flex;align-items:baseline;gap:12px}
-.atlas-goal-step-title span{font:400 11px/1 var(--mono);color:var(--ink-3)}
-.atlas-goal-step-title h5{margin:0;font-size:16px;letter-spacing:-.02em}
-.atlas-goal-steps li p{font-size:14.5px}
-.atlas-goal-takeaway{font-size:14.5px;color:var(--ink)}
-
-.atlas-applications{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));column-gap:var(--gap);border-top:var(--hair) solid var(--ink)}
-.atlas-applications>a{display:grid;align-content:start;gap:14px;padding:22px 20px 26px 0;border-bottom:var(--hair) solid var(--line);color:var(--ink)}
-.atlas-applications>a+a{padding-left:20px;border-left:var(--hair) solid var(--line)}
-.atlas-applications strong{display:flex;justify-content:space-between;align-items:center;color:inherit}
-.application-embroidery{width:auto;height:30px}
-.atlas-applications strong span{font-weight:400;color:var(--ink-3);transition:transform var(--fast) var(--ease),color var(--fast) var(--ease)}
-.atlas-applications>a:hover strong span{color:var(--ink);transform:translate(2px,-2px)}
-.atlas-applications p{font-size:15px;color:var(--ink-2)}
-.atlas-scope{max-width:60em;margin-top:-40px;font-size:13.5px;color:var(--ink-3)}
+/* Atlas on the company page is one screen (2026-10-01, qa/flow-fix-20261001): what it is, a still picture of
+   the map on /atlas/ in the same ink, and the way there. The engines, the goal examples and the letter preview
+   are told once, on /atlas/. */
+.atlas-brief{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));column-gap:var(--gap);row-gap:clamp(36px,4vw,56px);align-items:start;padding-top:var(--section)}
+.atlas-brief-head{grid-column:1/-1;display:grid;gap:22px;max-width:980px}
+.atlas-brief-head .small-label{display:flex;align-items:center;gap:16px}
+.atlas-brief-head .small-label::after{content:"";flex:1;border-top:var(--hair) solid var(--line)}
+.atlas-brief-copy{grid-column:1/span 5;display:grid;gap:26px;justify-items:start;align-self:center}
+.atlas-brief-copy>p:first-child{font-size:clamp(18px,1.4vw,20px);line-height:1.66}
+.atlas-scope{font-size:13px;line-height:1.6;color:var(--ink-3)}
 .atlas-scope br{display:none}
+.atlas-brief-map{grid-column:7/-1;position:relative;container-type:inline-size;margin:0;padding:clamp(28px,3vw,44px) clamp(20px,2.4vw,36px);border-radius:var(--radius);background:var(--plate)}
+.atlas-brief-map svg{display:block;width:100%;max-width:520px;height:auto;margin:0 auto;overflow:visible}
+.atlas-brief-caption{position:absolute;left:clamp(20px,2vw,28px);top:clamp(18px,1.8vw,26px);font:400 11px/1.3 var(--mono);letter-spacing:.1em;color:var(--ink-3)}
+.atlas-brief-orbit{fill:none;stroke:rgba(10,10,10,.28);stroke-width:var(--hair);vector-effect:non-scaling-stroke}
+.atlas-brief-marks path{fill:none;stroke:var(--ink);stroke-width:var(--hair);vector-effect:non-scaling-stroke}
+/* Names are set in the units of the 600-wide picture, so they read at about 11px on a wide plate and 10px on a phone. */
+.atlas-brief-marks text{font:500 13px 'SYNK Latin',var(--sans);letter-spacing:.1em;fill:rgba(10,10,10,.86);dominant-baseline:central}
+@container (max-width:440px){.atlas-brief-marks text{font-size:18px}}
 
 .company-note{padding-top:var(--section)}
 .company-note-inner{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));column-gap:var(--gap);row-gap:48px;align-items:start}
@@ -351,16 +274,16 @@ html[lang="ko"] .atlas-goal-topline span{font:600 12px/1.4 var(--sans);letter-sp
 .company-process li{display:grid;grid-template-columns:48px 1fr;gap:16px;align-items:center;padding:16px 0;border-bottom:var(--hair) solid var(--line)}
 .company-process li:last-child{border-bottom:0}
 .company-process .loom-illustration{width:48px;height:48px;object-fit:contain}
-.company-process li strong{display:block;font-size:16px;letter-spacing:-.02em}
-.company-process li p{font-size:14px;line-height:1.55}
-.process-note{margin-top:12px;font-size:12.5px;color:var(--ink-3)}
+.company-process li strong{display:block;font-size:clamp(16px,1.2vw,17px);letter-spacing:-.02em}
+.company-process li p{font-size:15px;line-height:1.55}
+.process-note{margin-top:12px;font-size:13px;color:var(--ink-3)}
 .principles{margin-top:clamp(72px,8vw,120px);border-top:var(--hair) solid var(--ink);counter-reset:principle}
 .principle-row{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));column-gap:var(--gap);align-items:start;padding:28px 0 30px;border-bottom:var(--hair) solid var(--line);counter-increment:principle}
 .principle-row::before{content:"0" counter(principle);grid-column:1/span 1;font:400 11px/1.4 var(--mono);letter-spacing:.1em;color:var(--ink-3);padding-top:7px}
 .principle-row .loom-illustration{display:none}
-.principle-row h3{grid-column:2/span 4}
+.principle-row h3{grid-column:2/span 4;font-size:clamp(18px,1.4vw,20px)}
 .principle-row p{grid-column:7/-1}
-.company-scope-note{padding-top:24px;font-size:13.5px;color:var(--ink-3);max-width:52em}
+.company-scope-note{padding-top:24px;font-size:13px;color:var(--ink-3);max-width:52em}
 
 /* ── Question chamber ──────────────────────────────────────────────────── */
 .help-section{padding-top:var(--section)}
@@ -384,7 +307,7 @@ html[lang="ko"] .atlas-goal-topline span{font:600 12px/1.4 var(--sans);letter-sp
 .orb-surface{position:relative;display:block;width:100%;aspect-ratio:1;border-radius:50%}
 .orb-canvas{position:absolute;inset:0;width:100%;height:100%}
 .orb-surface:not(.orb-rendered){background:radial-gradient(circle at 34% 30%,color-mix(in srgb,var(--field) 45%,#fff) 0,color-mix(in srgb,var(--field) 40%,#000) 100%)}
-.orb-invite{display:inline-flex;align-items:center;gap:10px;min-height:44px;padding:0 20px;border-radius:999px;background:var(--paper);box-shadow:0 0 0 .5px rgba(10,10,10,.12),0 6px 16px -10px rgba(10,10,10,.35);font:600 14px/1 var(--sans)}
+.orb-invite{display:inline-flex;align-items:center;gap:10px;min-height:44px;padding:0 20px;border-radius:999px;background:var(--paper);box-shadow:0 0 0 .5px rgba(10,10,10,.12),0 6px 16px -10px rgba(10,10,10,.35);font:600 15px/1 var(--sans)}
 .orb-invite svg{width:16px;height:16px}
 .orb-launch:hover .orb-invite{box-shadow:0 0 0 .5px rgba(10,10,10,.2),0 10px 22px -12px rgba(10,10,10,.45)}
 .orb-workspace{grid-column:1/-1}
@@ -448,7 +371,7 @@ form[aria-busy="true"] .send{opacity:.55}
 .contact-provider{font-size:13px}
 .help-privacy{font-size:13px;color:var(--ink-3);text-decoration:underline;text-decoration-thickness:var(--hair);text-underline-offset:5px}
 .orb-switch{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:10px;margin-top:28px}
-.orb-switch button{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 20px;border-radius:999px;background:var(--paper);font-size:14px;font-weight:600;box-shadow:0 0 0 .5px rgba(10,10,10,.12)}
+.orb-switch button{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 20px;border-radius:999px;background:var(--paper);font-size:15px;font-weight:600;box-shadow:0 0 0 .5px rgba(10,10,10,.12)}
 .orb-help.orb-ready:not(.is-open) .orb-workspace{display:none}
 .help-anchor{position:relative;top:calc(-1 * var(--site-header-height,76px))}
 
@@ -466,9 +389,9 @@ form[aria-busy="true"] .send{opacity:.55}
 .footer-links a,.back-chat{font-size:13px;color:var(--ink-2)}
 .footer-links a:hover,.back-chat:hover{color:var(--ink)}
 .back-chat span{margin-left:6px}
-.footer-info{display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px 24px;font-size:12px;color:var(--ink-3)}
-.footer-info p{font-size:12px;color:var(--ink-3)}
-.footer-info button{margin-left:6px;font-size:12px;color:var(--ink-2);text-decoration:underline;text-decoration-thickness:var(--hair);text-underline-offset:4px}
+.footer-info{display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px 24px;font-size:13px;color:var(--ink-3)}
+.footer-info p{font-size:13px;color:var(--ink-3)}
+.footer-info button{margin-left:6px;font-size:13px;color:var(--ink-2);text-decoration:underline;text-decoration-thickness:var(--hair);text-underline-offset:4px}
 
 /* ── Document dialog and toast ─────────────────────────────────────────── */
 dialog#document-dialog{width:min(720px,calc(100% - 32px));max-height:min(86vh,900px);overflow:auto;padding:0;border:0;border-radius:24px;background:var(--paper);color:var(--ink);box-shadow:0 30px 80px -30px rgba(10,10,10,.5)}
@@ -942,15 +865,8 @@ html[lang="en"] .shift-workflow__heading .eyebrow{font:400 11px/1.4 var(--mono);
 @media (max-width:1100px){
  .hero-copy>p{grid-column:1/span 7}
  .hero-actions{grid-column:1/-1;justify-self:start}
- .atlas-engine-map{grid-column:1/-1}
- .atlas-role-panels{grid-column:1/-1}
- .learning-demo-heading,.learning-context{grid-column:1/-1}
- .learning-scene-panel>figure{grid-column:1/span 5}
- .learning-guidance{grid-column:6/-1}
- .atlas-goal-art{grid-column:1/span 5}
- .atlas-goal-context{grid-column:6/-1}
- .atlas-applications{grid-template-columns:repeat(2,minmax(0,1fr))}
- .atlas-applications>a:nth-child(3){padding-left:0;border-left:0}
+ .atlas-brief-copy,.atlas-brief-map{grid-column:1/-1}
+ .atlas-brief-map svg{max-width:460px}
  .company-intro-text,.company-process{grid-column:1/-1}
  .principle-row h3{grid-column:2/span 11}
  .principle-row p{grid-column:2/span 11;margin-top:10px}
@@ -964,19 +880,7 @@ html[lang="en"] .shift-workflow__heading .eyebrow{font:400 11px/1.4 var(--mono);
  :root{--radius:22px;--radius-s:16px}
  .hero-copy>p{grid-column:1/-1}
  .hero-copy{row-gap:22px}
- .atlas-map-controls{grid-template-columns:repeat(4,minmax(0,1fr))}
- .atlas-map-controls button{font-size:13px}
- .atlas-learning-demo{padding:24px 18px}
- .learning-choices{grid-template-columns:1fr}
- .learning-scene-panel>figure,.learning-guidance{grid-column:1/-1}
- .learning-scene-panel>figure img{max-width:320px}
- .learning-demo-footer{flex-direction:column;align-items:flex-start}
- .atlas-goal-art,.atlas-goal-context{grid-column:1/-1}
- .atlas-goal-steps{grid-template-columns:1fr}
- .atlas-goal-steps li,.atlas-goal-steps li+li{padding-left:0;padding-right:0;border-left:0}
- .atlas-applications{grid-template-columns:1fr}
- .atlas-applications>a,.atlas-applications>a+a{padding-left:0;padding-right:0;border-left:0}
- .atlas-scope{margin-top:-24px}
+ .atlas-brief-map{padding:40px 12px 20px}
  .principle-row{grid-template-columns:32px 1fr;column-gap:12px;padding:22px 0 24px}
  .principle-row::before{grid-column:1}
  .principle-row h3,.principle-row p{grid-column:2}
@@ -1108,7 +1012,7 @@ html[lang="en"] .visual-explainer--cards .visual-scene-name{font:400 11px/1.4 va
  .principle-row+.principle-row{padding-left:20px;border-left:var(--hair) solid var(--line)}
  .principle-row::before,.principle-row h3,.principle-row p{grid-column:auto}
  .principle-row::before{padding-top:0}
- .principle-row h3{font-size:clamp(17px,1.35vw,20px)}
+ .principle-row h3{font-size:clamp(18px,1.4vw,20px)}
  .principle-row p{font-size:15px}
 }
 
@@ -1159,19 +1063,19 @@ html[lang="en"] .visual-explainer--cards .visual-scene-name{font:400 11px/1.4 va
  .directory-arrow{width:34px;height:34px;margin:10px 10px 0 0;font-size:14px}
  .directory-object{width:76%}
  [data-field="lab"] .directory-object{width:70%}
- .world-directory strong{font-size:14px;line-height:1.35}
+ .world-directory strong{font-size:15px;line-height:1.35}
 }
 
 /* ── Forced colours ────────────────────────────────────────────────────── */
 @media (forced-colors:active){
- .header.bar,.header.bar.has-rim,.orb-chamber,.world-directory>a,.company-process,.atlas-engine-map,.atlas-learning-demo{border:1px solid CanvasText;background:Canvas;-webkit-backdrop-filter:none;backdrop-filter:none;box-shadow:none}
+ .header.bar,.header.bar.has-rim,.orb-chamber,.world-directory>a,.company-process,.atlas-brief-map{border:1px solid CanvasText;background:Canvas;-webkit-backdrop-filter:none;backdrop-filter:none;box-shadow:none}
  .header.bar::before,.header.bar::after{display:none}
  .primary-link,.send,.toast{border:1px solid ButtonText}
  .question-entry:focus-within{outline:2px solid Highlight;outline-offset:2px}
  .lab-talks>li.is-talk-paired{outline:2px solid Highlight;outline-offset:-2px}
  /* The chosen tab, step, volume or brand keeps a visible mark when the system paints its own colours. */
- :is(.visual-scene-nav button,.shift-workflow__steps a,.atlas-map-controls button,.learning-choices button,.lab-tracker__tabs button)[aria-selected="true"],.bar-brands a[aria-current="page"],.roadmap-nav a[aria-current]{outline:2px solid Highlight;outline-offset:-2px}
- .story-items,.story-evidence-grid,.lab-benefits,.atlas-goal-steps{border-top-color:CanvasText}
+ :is(.visual-scene-nav button,.shift-workflow__steps a,.lab-tracker__tabs button)[aria-selected="true"],.bar-brands a[aria-current="page"],.roadmap-nav a[aria-current]{outline:2px solid Highlight;outline-offset:-2px}
+ .story-items,.story-evidence-grid,.lab-benefits{border-top-color:CanvasText}
  .story-continuation[data-destination]{border:1px solid CanvasText;background:Canvas;color:CanvasText}
  .world-directory>a::before{background:Canvas;border-bottom:1px solid CanvasText}
  :is(#lab.lab-bento,#shift.shift-hero,#pulse.world-pulse,#path.path-hero){border:1px solid CanvasText;background:Canvas}

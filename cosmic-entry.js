@@ -43,18 +43,26 @@ function syncRoute(){
   if(isAtlasPath()&&ready){showAtlas(false);return;}
   hideAtlas();
   setView(location.hash?'company':'intro');
-  if(!location.hash)prepareAtlas();
+  // The view switched in this task, so the section can be scrolled to at once.
+  if(location.hash)sectionOf(location.hash)?.scrollIntoView();
 }
-function showCompany(){
+// The element a company address names (#top, #contact, ...), if the page has it.
+function sectionOf(hash){
+  let id='';
+  try{id=decodeURIComponent(hash.slice(1));}catch{}
+  return id?document.getElementById(id):null;
+}
+function showCompany(hash='#top'){
   routeRevision++;
   activeTravel?.();
-  history.pushState({},'',companyPath);
+  history.pushState({},'',companyPath.replace(/#.*$/,'')+hash);
   hideAtlas();
   setView('company');
   requestAnimationFrame(()=>{
-    const top=document.getElementById('top');
-    top?.scrollIntoView();
-    top?.focus({preventScroll:true});
+    const target=sectionOf(hash)||document.getElementById('top');
+    target?.scrollIntoView();
+    const main=document.getElementById('top');
+    (target===main?main:target?.querySelector('h2,h3')||main)?.focus?.({preventScroll:true});
   });
 }
 function prepareAtlas(){
@@ -69,13 +77,16 @@ function prepareAtlas(){
   frame.addEventListener('load',()=>{
     let child;
     try{child=frame.contentWindow;}catch{return;}
-    const companyLink=child.document.querySelector('.synk-portal');
-    if(companyLink)companyLink.href=companyPath;
-    companyLink?.addEventListener('click',event=>{
-      if(event.button!==0||event.metaKey||event.ctrlKey||event.shiftKey||event.altKey)return;
+    const companyBase=companyPath.replace(/#.*$/,'');
+    child.document.querySelectorAll('a[href^="/#"],a[href="/"]').forEach(link=>{link.href=companyBase+link.getAttribute('href').slice(1);});
+    child.document.addEventListener('click',event=>{
+      const link=event.target.closest?.('a[href]');
+      if(!link||event.button!==0||event.metaKey||event.ctrlKey||event.shiftKey||event.altKey)return;
+      const url=new URL(link.href,location.href);
+      if(url.origin!==location.origin||url.pathname!==companyBase||!url.hash)return;
       event.preventDefault();
       event.stopImmediatePropagation();
-      showCompany();
+      showCompany(url.hash);
     },true);
     const started=performance.now();
     const check=()=>{
@@ -161,8 +172,14 @@ function travelFromIeung(overlay,target,departure){
   const render=progress=>{
     const state=sampleIeungTransition(departure,target,progress);
     const radius=target.radius+1+(cover-target.radius-1)*state.reveal;
-    frame.style.transform=`translate(${state.x-target.x}px,${state.y-target.y}px) scale(${state.rx/target.radius},${state.ry/target.radius})`;
-    frame.style.clipPath=`circle(${radius}px at ${target.x}px ${target.y}px)`;
+    const scaleX=state.rx/target.radius,scaleY=state.ry/target.radius;
+    frame.style.transform=`translate(${state.x-target.x}px,${state.y-target.y}px) scale(${scaleX},${scaleY})`;
+    // Atlas is never clipped, so the browser paints all of it; the white paper above it has a window where
+    // the sphere shows, and the window opens over the page at the end. (A growing clip on the frame left a
+    // band the browser had not painted yet, seen as a black crescent for a frame.)
+    const opening=`radial-gradient(${radius*scaleX}px ${radius*scaleY}px at ${state.x}px ${state.y}px,#0000 calc(100% - .5px),#000 100%)`;
+    backdrop.style.webkitMaskImage=opening;
+    backdrop.style.maskImage=opening;
     frame.style.opacity=String(state.orbOpacity);
     entry.style.transform=`scale(${state.sceneScale})`;
     entry.style.opacity=String(state.sceneOpacity);
@@ -208,7 +225,9 @@ companyPortal?.addEventListener('click',event=>{
   event.preventDefault();
   showCompany();
 });
-if(portal&&entry)requestAnimationFrame(()=>requestAnimationFrame(prepareAtlas));
+// Atlas is loaded when a visitor reaches for it (a pointer over the link, a touch or keyboard focus),
+// not with the entrance: a visit that goes to the company never downloads it.
+if(portal&&entry)for(const type of ['pointerenter','pointerdown','focus','touchstart'])portal.addEventListener(type,()=>{if(!location.hash)prepareAtlas();},{passive:true});
 
 if(portal&&entry){
   let departing=false;
@@ -231,7 +250,10 @@ if(portal&&entry){
     const overlay=document.createElement('div');
     overlay.className='cosmic-transition';
     overlay.setAttribute('aria-hidden','true');
+    prepareAtlas();
+    if(!ready)portal.setAttribute('aria-busy','true');
     const available=await waitForAtlas(2500);
+    portal.removeAttribute('aria-busy');
     if(routeRevision!==originRevision||location.pathname+(location.search||'')+location.hash!==originRoute){departing=false;return;}
     if(!available){location.assign(portal.href);return;}
     const target=departure?atlasTarget():null;

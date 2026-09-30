@@ -1,4 +1,4 @@
-.atlas-arrival{display:none;position:fixed;inset:0;z-index:100;background:#02050b;pointer-events:none}
+.atlas-arrival{display:none;position:fixed;inset:0;z-index:100;background:#fff;pointer-events:none}
 html[data-atlas-arrival] .atlas-arrival{display:block}
 html[data-atlas-arrival="pending"] .observatory{opacity:0}
 .atlas-arrival-orb{position:absolute;left:var(--arrival-x);top:var(--arrival-y);width:var(--arrival-size);height:var(--arrival-size);border-radius:50%;background:radial-gradient(circle at 30% 26%,#f4f4f4 0%,#9a9a9a 24%,#2c2c2c 52%,#0a0a0a 78%);transform-origin:0 0}
