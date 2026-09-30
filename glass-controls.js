@@ -38,25 +38,39 @@ function frostMask(width,height,from,to,radius){
  return canvas.toDataURL();
 }
 
+// One pass: the page bent at the rim (displacement map), blurred inside it (Gaussian blur kept where the
+// feathered frost mask is opaque), the frost laid over the bent rim.
 function mountRim(dock){
  const svg=document.createElementNS(NS,'svg');
  svg.setAttribute('aria-hidden','true');svg.setAttribute('focusable','false');
  svg.style.cssText='position:absolute;width:0;height:0;overflow:hidden';
- svg.innerHTML='<filter id="synk-dock-rim" x="0" y="0" width="100%" height="100%" color-interpolation-filters="sRGB"><feImage x="0" y="0" preserveAspectRatio="none" result="map"/><feDisplacementMap in="SourceGraphic" in2="map" scale="26" xChannelSelector="R" yChannelSelector="G"/></filter>';
+ svg.innerHTML='<filter id="synk-dock-rim" x="0" y="0" width="100%" height="100%" color-interpolation-filters="sRGB">'
+  +'<feImage x="0" y="0" preserveAspectRatio="none" result="map"/>'
+  +'<feDisplacementMap in="SourceGraphic" in2="map" scale="26" xChannelSelector="R" yChannelSelector="G" result="bent"/>'
+  +'<feGaussianBlur in="SourceGraphic" stdDeviation="14" edgeMode="duplicate" result="blurred"/>'
+  +'<feImage x="0" y="0" preserveAspectRatio="none" result="mask"/>'
+  +'<feComposite in="blurred" in2="mask" operator="in" result="frost"/>'
+  +'<feComposite in="frost" in2="bent" operator="over"/></filter>';
  document.body.append(svg);
- const map=svg.querySelector('feImage');
- let size='';
+ const [map,mask]=svg.querySelectorAll('feImage');
+ let size='',on=false;
  const update=()=>{
+  if(!on)return;
   const rect=dock.getBoundingClientRect(),width=Math.round(rect.width),height=Math.round(rect.height);
   // The dock is a capsule, or a rounded panel while its list is open.
   const radius=Math.min(parseFloat(getComputedStyle(dock).borderTopLeftRadius)||height/2,height/2,width/2);
   if(!width||!height||size===width+'x'+height+'x'+radius)return;
   size=width+'x'+height+'x'+radius;
-  map.setAttribute('width',width);map.setAttribute('height',height);map.setAttribute('href',rimMap(width,height,Math.min(14,radius*.5),radius));
-  dock.style.setProperty('--dock-rim','url(#synk-dock-rim)');dock.style.setProperty('--dock-frost','url('+frostMask(width,height,2,13,radius)+')');dock.classList.add('has-rim');
+  const frost=frostMask(width,height,2,13,radius);
+  for(const image of [map,mask]){image.setAttribute('width',width);image.setAttribute('height',height);}
+  map.setAttribute('href',rimMap(width,height,Math.min(14,radius*.5),radius));mask.setAttribute('href',frost);
+  dock.style.setProperty('--dock-rim','url(#synk-dock-rim)');dock.style.setProperty('--dock-frost','url('+frost+')');dock.classList.add('has-rim');
  };
  new ResizeObserver(update).observe(dock);
- update();
+ return {
+  on(){if(on)return;on=true;size='';update();},
+  off(){on=false;dock.classList.remove('has-rim');dock.style.removeProperty('--dock-rim');dock.style.removeProperty('--dock-frost');}
+ };
 }
 
 export function initGlassControls(){
@@ -66,7 +80,12 @@ export function initGlassControls(){
  // The colour under the dock follows its width.
  const wrap=dock.closest('.site-header-wrap');
  new ResizeObserver(()=>wrap?.style.setProperty('--dock-width',Math.round(dock.getBoundingClientRect().width)+'px')).observe(dock);
- if(bends()&&!clear.matches&&!forced.matches)mountRim(dock);
+ if(bends()){
+  // Plain glass while the system asks for less transparency or paints its own colours, bent glass again after.
+  const rim=mountRim(dock),sync=()=>clear.matches||forced.matches?rim.off():rim.on();
+  clear.addEventListener?.('change',sync);forced.addEventListener?.('change',sync);
+  sync();
+ }
  let frame=0,point=null;
  const reset=()=>{cancelAnimationFrame(frame);frame=0;point=null;dock.style.removeProperty('--glass-x');dock.style.removeProperty('--glass-y');};
  dock.addEventListener('pointermove',event=>{

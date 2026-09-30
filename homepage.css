@@ -23,14 +23,16 @@
  --sans:'SYNK Bracket','SYNK Latin','SUIT Variable',system-ui,-apple-system,'Apple SD Gothic Neo','Malgun Gothic',sans-serif;
  --mono:'DM Mono','SYNK Latin','SUIT Variable',ui-monospace,monospace;
  --gutter:clamp(20px,3.4vw,48px);--max:1440px;--gap:clamp(16px,1.8vw,24px);
- --section:clamp(112px,13vw,200px);
+ --section:clamp(88px,8.6vw,124px);
  --radius:28px;--radius-s:18px;
  --ease:cubic-bezier(.2,.7,.2,1);--fast:160ms;
  /* The thinnest line a screen can draw: one device pixel, two on very dense phones. */
  --hair:1px;
  /* Colour fields: one inset, one radius and one light for every business field. */
  --field-inset:clamp(8px,.8vw,12px);--field-radius:clamp(20px,2vw,30px);--field-gap:clamp(8px,.8vw,12px);
- --field-light:radial-gradient(90% 60% at 18% -18%,rgba(255,255,255,.22),rgba(255,255,255,0) 62%),radial-gradient(110% 90% at 88% 108%,rgba(0,0,0,.17),rgba(0,0,0,0) 58%);
+ --field-light:radial-gradient(1100px 560px at 16% -220px,rgba(255,255,255,.1),rgba(255,255,255,0) 70%),radial-gradient(1300px 900px at 92% calc(100% + 260px),rgba(0,0,0,.18),rgba(0,0,0,0) 62%);
+ /* A still grain on every colour field, like print on felt (qa/homepage-v9-20260930/make-grain.py). */
+ --field-grain:url('/assets/field-grain-20260930.webp') 0 0/192px 192px repeat;
 }
 @media (min-resolution:2dppx){:root{--hair:.5px}}
 @media (min-resolution:2.42dppx){:root{--hair:.84px}}
@@ -44,15 +46,15 @@ body[data-site="path"]{--accent:#526956;--accent-ink:#3b503e;--accent-wash:#eff3
 body{--wash:color-mix(in srgb,var(--accent) 7%,#fff);--wash-2:color-mix(in srgb,var(--accent) 11%,#fff)}
 body[data-site="synk"]{--wash:var(--plate);--wash-2:var(--plate-deep)}
 /* A link to one business carries that business's colour wherever it appears. */
-[data-destination="lab"],.atlas-applications>a[href$="/lab/"]{--link-field:#f96859;--link-on:#000}
-[data-destination="shift"],.atlas-applications>a[href$="/shift/"]{--link-field:#3d6bc9;--link-on:#fff}
-[data-destination="pulse"],.atlas-applications>a[href$="/pulse/"]{--link-field:#99295d;--link-on:#fff}
-[data-destination="path"],.atlas-applications>a[href$="/path/"]{--link-field:#526956;--link-on:#fff}
+[data-destination="lab"]{--link-field:#f96859;--link-on:#2a120d}
+[data-destination="shift"]{--link-field:#3d6bc9;--link-on:#fff}
+[data-destination="pulse"]{--link-field:#99295d;--link-on:#fff}
+[data-destination="path"]{--link-field:#526956;--link-on:#fff}
 body[data-site="synk"]{--orb-light:#fff;--field:#0a0a0a;--on-field:#fff;--on-field-2:rgba(255,255,255,.82);--on-field-3:rgba(255,255,255,.7);--on-field-line:rgba(255,255,255,.22);--field-shadow:rgba(0,0,0,.5);--field-button:#fff;--field-button-ink:#0a0a0a;--orb-dark:#18181a}
-:is(body[data-site="lab"],[data-field="lab"]){--field-light:radial-gradient(90% 60% at 18% -18%,rgba(255,255,255,.24),rgba(255,255,255,0) 62%);--field:#f96859;--on-field:#000;--on-field-2:rgba(0,0,0,.84);--on-field-3:rgba(0,0,0,.78);--on-field-line:rgba(0,0,0,.22);--field-shadow:rgba(120,22,12,.42);--field-button:#000;--field-button-ink:#fff}
+:is(body[data-site="lab"],[data-field="lab"]){--field-light:radial-gradient(1100px 620px at 16% -200px,rgba(255,255,255,.24),rgba(255,255,255,0) 70%);--field:#f96859;--on-field:#2a120d;--on-field-2:#2a120d;--on-field-3:#2a120d;--on-field-line:rgba(42,18,13,.24);--field-shadow:rgba(120,22,12,.42);--field-button:#2a120d;--field-button-ink:#fef0e9}
 :is(body[data-site="shift"],[data-field="shift"]){--field:#3d6bc9;--on-field:#fff;--on-field-2:#fff;--on-field-3:#fff;--on-field-line:rgba(255,255,255,.34);--field-shadow:rgba(10,24,70,.45);--field-button:#fff;--field-button-ink:#24448c}
 :is(body[data-site="pulse"],[data-field="pulse"]){--field:#99295d;--on-field:#fff;--on-field-2:rgba(255,255,255,.92);--on-field-3:rgba(255,255,255,.88);--on-field-line:rgba(255,255,255,.3);--field-shadow:rgba(50,6,24,.5);--field-button:#fff;--field-button-ink:#99295d}
-:is(body[data-site="path"],[data-field="path"]){--field:#526956;--on-field:#fff;--on-field-2:rgba(255,255,255,.94);--on-field-3:rgba(255,255,255,.9);--on-field-line:rgba(255,255,255,.3);--field-shadow:rgba(16,28,18,.5);--field-button:#fff;--field-button-ink:#3b503e}
+:is(body[data-site="path"],[data-field="path"]){--field:#526956;--on-field:#fff;--on-field-2:#fff;--on-field-3:#fff;--on-field-line:rgba(255,255,255,.34);--field-shadow:rgba(16,28,18,.5);--field-button:#fff;--field-button-ink:#3b503e}
 
 /* ── Base ──────────────────────────────────────────────────────────────── */
 *,*::before,*::after{box-sizing:border-box}
@@ -137,21 +139,18 @@ body[data-site="synk"] .primary-link{background:var(--ink)}
 .site-header-wrap{position:sticky;top:0;z-index:60;padding:14px var(--gutter) 0;pointer-events:none}
 .site-header-wrap .header{pointer-events:auto}
 .header.bar{position:relative;display:flex;align-items:center;gap:4px;width:fit-content;max-width:100%;height:62px;margin:0 auto;padding:0 10px 0 7px;border-radius:999px;isolation:isolate;
- background:linear-gradient(180deg,rgba(255,255,255,.82),rgba(247,247,248,.7));
- -webkit-backdrop-filter:saturate(1.7) blur(18px);backdrop-filter:var(--dock-rim,) saturate(1.7) blur(18px);
+ background:linear-gradient(180deg,rgba(255,255,255,.9),rgba(250,250,251,.84));
+ -webkit-backdrop-filter:saturate(1.1) blur(20px);backdrop-filter:var(--dock-rim,) saturate(1.1) blur(20px);
  box-shadow:inset 0 1px 0 rgba(255,255,255,.95),inset 0 -1px 0 rgba(10,10,10,.035),0 0 0 .5px rgba(10,10,10,.12),0 1px 2px rgba(10,10,10,.05),0 14px 34px -18px rgba(10,10,10,.28)}
 /* Sunlight from the upper left along the rim, and a little colour where the light leaves the glass. */
 .header.bar::before{content:"";position:absolute;inset:0;border-radius:inherit;padding:1px;pointer-events:none;z-index:-1;
  background:radial-gradient(160px 60px at var(--glass-x,16%) var(--glass-y,0%),#fff,rgba(255,255,255,0) 70%),linear-gradient(118deg,rgba(255,255,255,1) 0%,rgba(255,255,255,.2) 22%,rgba(255,255,255,0) 50%,rgba(255,255,255,.15) 78%,rgba(255,255,255,.75) 100%);
  -webkit-mask:linear-gradient(#000 0 0) content-box exclude,linear-gradient(#000 0 0);mask:linear-gradient(#000 0 0) content-box exclude,linear-gradient(#000 0 0)}
-/* Where the browser bends light (see glass-controls.js), the outer ring of the dock is clear glass that
-   bends the page at the rim, and the frost sits just inside it, so the words stay easy to read. */
-.header.bar.has-rim{background:rgba(255,255,255,.14);-webkit-backdrop-filter:saturate(1.5);backdrop-filter:var(--dock-rim,) saturate(1.5)}
+/* Where the browser bends light (see glass-controls.js), one backdrop filter bends the page at the rim and
+   frosts it inside, so the words stay easy to read. The white tint of the frost sits inside the rim only. */
+.header.bar.has-rim{background:rgba(255,255,255,.14);-webkit-backdrop-filter:saturate(1.1);backdrop-filter:var(--dock-rim,) saturate(1.1)}
 .header.bar.has-rim::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;z-index:-2;-webkit-mask:var(--dock-frost) center/100% 100% no-repeat;mask:var(--dock-frost) center/100% 100% no-repeat;
- background:linear-gradient(180deg,rgba(255,255,255,.8),rgba(247,247,248,.68));-webkit-backdrop-filter:blur(16px) saturate(1.3);backdrop-filter:blur(16px) saturate(1.3)}
-/* A little colour where the light leaves the glass. */
-.site-header-wrap::after{content:"";position:absolute;left:50%;top:66px;width:calc(var(--dock-width,760px) * .74);height:14px;border-radius:50%;pointer-events:none;z-index:-1;transform:translateX(-50%);filter:blur(9px);opacity:.4;
- background:linear-gradient(90deg,rgba(249,104,89,0),rgba(249,104,89,.55) 18%,rgba(245,196,69,.5) 38%,rgba(125,180,90,.45) 58%,rgba(61,107,201,.5) 78%,rgba(61,107,201,0))}
+ background:linear-gradient(180deg,rgba(255,255,255,.9),rgba(250,250,251,.84))}
 /* The felt logo sits in a bead of clearer glass at the head of the dock. */
 .bar-logo{display:flex;align-items:center;height:48px;padding:0 20px;margin-right:10px;border-radius:999px;
  background:linear-gradient(180deg,rgba(255,255,255,.96),rgba(255,255,255,.62));
@@ -163,6 +162,7 @@ body[data-site="synk"] .bar-logo img{height:26px}
 .bar-menu{display:flex;align-items:center;gap:2px}
 .bar-menu a,.bar-brands a,.header-language a{display:inline-flex;align-items:center;height:40px;padding:0 13px;border-radius:999px;font:500 14px/1 var(--sans);letter-spacing:-.015em;color:var(--ink-2);white-space:nowrap;transition:color var(--fast) var(--ease),background-color var(--fast) var(--ease)}
 .bar-menu a:hover,.bar-brands a:hover,.header-language a:hover{color:var(--ink);background:rgba(10,10,10,.045)}
+.bar-menu a[aria-current="location"]{color:var(--ink);text-decoration:underline;text-decoration-thickness:var(--hair);text-underline-offset:6px;transition:none}
 .bar-brands{display:flex;align-items:center;gap:0;margin-left:8px;padding-left:8px;border-left:var(--hair) solid var(--line);height:28px}
 .bar-brands a{height:34px;padding:0 10px;font:500 11.5px/1 'SYNK Latin',var(--sans);letter-spacing:.07em;color:var(--ink-3)}
 .bar-brands a[aria-current="page"]{color:var(--ink);background:rgba(255,255,255,.95);box-shadow:0 0 0 .5px rgba(10,10,10,.12),0 2px 6px -2px rgba(10,10,10,.18)}
@@ -194,7 +194,6 @@ body[data-site="synk"] .bar-logo img{height:26px}
 }
 @media (max-width:900px){
  .site-header-wrap{padding:10px 12px 0}
- .site-header-wrap::after{top:56px}
  .header.bar{width:100%;height:54px;padding:0 6px;border-radius:27px}
  .header.bar.menu-open{height:auto;padding-bottom:10px;border-radius:24px}
  .bar-logo{margin-right:auto;height:42px;padding:0 16px}
@@ -221,23 +220,26 @@ body[data-site="synk"] .bar-logo img{height:26px}
 .companions{position:relative}
 .companions-scene{width:100%;aspect-ratio:16/9;object-fit:cover;object-position:50% 58%;border-radius:var(--radius);background:var(--plate)}
 .companions figcaption{display:flex;justify-content:space-between;gap:16px;margin-top:16px;font-size:13px;color:var(--ink-3)}
-/* The four businesses side by side, each on its own colour with the felt object from the first
-   screen of its page, like one line-up. The logo sits in a glass bead, as in the dock. */
-.world-directory{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:var(--field-gap);margin-top:clamp(72px,8vw,120px)}
-.world-directory>a{position:relative;display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-rows:auto minmax(0,1fr) auto;align-items:start;min-height:clamp(440px,37vw,560px);padding:clamp(14px,1.3vw,20px);border-radius:var(--field-radius);overflow:hidden;isolation:isolate;color:var(--on-field);background:var(--field-light),var(--field)}
-.world-directory>a>div{display:contents}
-.directory-logo{grid-column:1;grid-row:1;justify-self:start;box-sizing:content-box;width:auto;height:20px;padding:13px 17px;border-radius:999px;background:linear-gradient(180deg,rgba(255,255,255,.95),rgba(255,255,255,.78));-webkit-backdrop-filter:blur(10px) saturate(1.4);backdrop-filter:blur(10px) saturate(1.4);box-shadow:inset 0 1px 0 #fff,0 0 0 .5px rgba(0,0,0,.08),0 10px 22px -12px rgba(0,0,0,.5)}
+/* The four businesses side by side: the brand colour is the wall behind the felt object (top 58%), a shared
+   light floor carries the logo and the line, in ink. The object stands on the seam, its shadow on the floor.
+   The colour appears once per business and at half the area of a full colour tile. */
+.world-directory{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:clamp(12px,1.4vw,20px);margin-top:clamp(72px,8vw,120px)}
+.world-directory>a{position:relative;display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-rows:58% minmax(0,1fr);height:clamp(380px,32vw,460px);border-radius:var(--field-radius);overflow:hidden;isolation:isolate;color:var(--ink);background:var(--plate);transition:background-color var(--fast) var(--ease)}
+.world-directory>a::before{content:"";grid-area:1/1/2/-1;z-index:-2;background:var(--field-grain),var(--field-light),var(--field)}
+.world-directory>a:hover{background:var(--plate-deep)}
+.world-directory>a>div{grid-area:2/1/3/-1;display:grid;align-content:end;justify-items:start;gap:12px;padding:0 clamp(16px,1.4vw,22px) clamp(16px,1.4vw,22px)}
+.directory-logo{width:auto;height:22px}
 /* The PATH artwork carries more space above and below its letters (467px against 360px). */
-svg.directory-logo{height:26px;padding-block:10px}
-.world-directory strong{grid-column:1/-1;grid-row:3;padding:0 6px 6px;font-size:clamp(17px,1.35vw,21px);font-weight:600;line-height:1.3;letter-spacing:-.025em;color:var(--on-field)}
-.directory-arrow{grid-column:2;grid-row:1;display:grid;place-items:center;width:46px;height:46px;border-radius:50%;font-size:17px;line-height:1;color:#000;background:rgba(255,255,255,.94);box-shadow:inset 0 1px 0 #fff,0 8px 18px -10px rgba(0,0,0,.5);transition:background-color var(--fast) var(--ease),color var(--fast) var(--ease)}
+svg.directory-logo{height:28.5px;margin-block:-3.25px}
+.world-directory strong{font-size:clamp(15px,1.2vw,18px);font-weight:600;line-height:1.35;letter-spacing:-.02em;color:var(--ink)}
+.directory-arrow{grid-area:1/2;align-self:start;margin:clamp(12px,1.1vw,16px) clamp(12px,1.1vw,16px) 0 0;display:grid;place-items:center;width:44px;height:44px;border-radius:50%;font-size:16px;line-height:1;color:#000;background:rgba(255,255,255,.94);box-shadow:inset 0 1px 0 #fff,0 8px 18px -10px rgba(0,0,0,.5);transition:background-color var(--fast) var(--ease),color var(--fast) var(--ease)}
 .world-directory>a:hover .directory-arrow{background:#000;color:#fff}
 .world-directory>a:focus-visible{outline:2px solid var(--ink);outline-offset:3px}
-.directory-object{grid-column:1/-1;grid-row:2;align-self:center;justify-self:center;width:90%;z-index:-1}
+.directory-object{grid-area:1/1/2/-1;align-self:end;justify-self:center;width:66%;margin-bottom:-7%;z-index:-1}
 .directory-object img{display:block;width:100%;height:auto}
 /* The LAB tile is cut out without its floor, so it gets its own shadow. */
-[data-field="lab"] .directory-object{width:84%}
-[data-field="lab"] .directory-object img{filter:drop-shadow(0 20px 22px rgba(120,22,12,.3)) drop-shadow(0 5px 8px rgba(90,14,8,.2))}
+[data-field="lab"] .directory-object{width:62%;margin-bottom:-4%}
+[data-field="lab"] .directory-object img{filter:drop-shadow(0 16px 16px rgba(60,30,20,.28)) drop-shadow(0 4px 6px rgba(60,30,20,.2))}
 
 /* Atlas on the company page: the engine map with one engine's role beside it, a preview of the letter
    practice, goal examples, and what each business takes from Atlas. The same content as the live page. */
@@ -327,17 +329,14 @@ html[lang="ko"] .atlas-goal-topline span{font:600 12px/1.4 var(--sans);letter-sp
 .atlas-goal-steps li p{font-size:14.5px}
 .atlas-goal-takeaway{font-size:14.5px;color:var(--ink)}
 
-.atlas-applications{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:var(--field-gap)}
-.atlas-applications>a{display:grid;align-content:space-between;gap:28px;min-height:200px;padding:22px 22px 24px;border-radius:var(--radius-s);color:var(--link-on);background:var(--field-light),var(--link-field)}
-
-.atlas-applications strong{display:flex;justify-content:space-between;align-items:center}
-.application-embroidery{width:auto;height:34px}
-.atlas-applications strong{color:inherit}
-.atlas-applications strong span{font-weight:400;color:inherit;transition:transform var(--fast) var(--ease),color var(--fast) var(--ease)}
-.atlas-applications>a:hover strong span{transform:translate(2px,-2px)}
-.atlas-applications p{font-size:14.5px;color:inherit}
-/* The embroidered names are felt pieces: a white card under each keeps its thread colours true. */
-.atlas-applications .application-embroidery{height:30px;width:auto;padding:8px 12px;box-sizing:content-box;border-radius:999px;background:#fff;box-shadow:inset 0 1px 0 #fff,0 0 0 .5px rgba(0,0,0,.08),0 10px 22px -12px rgba(0,0,0,.5)}
+.atlas-applications{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));column-gap:var(--gap);border-top:var(--hair) solid var(--ink)}
+.atlas-applications>a{display:grid;align-content:start;gap:14px;padding:22px 20px 26px 0;border-bottom:var(--hair) solid var(--line);color:var(--ink)}
+.atlas-applications>a+a{padding-left:20px;border-left:var(--hair) solid var(--line)}
+.atlas-applications strong{display:flex;justify-content:space-between;align-items:center;color:inherit}
+.application-embroidery{width:auto;height:30px}
+.atlas-applications strong span{font-weight:400;color:var(--ink-3);transition:transform var(--fast) var(--ease),color var(--fast) var(--ease)}
+.atlas-applications>a:hover strong span{color:var(--ink);transform:translate(2px,-2px)}
+.atlas-applications p{font-size:15px;color:var(--ink-2)}
 .atlas-scope{max-width:60em;margin-top:-40px;font-size:13.5px;color:var(--ink-3)}
 .atlas-scope br{display:none}
 
@@ -368,7 +367,7 @@ html[lang="ko"] .atlas-goal-topline span{font:600 12px/1.4 var(--sans);letter-sp
 /* Every page closes on its colour: the question sphere printed in a deep tone of it. When the desk opens,
    the conversation and the enquiry sit on a white sheet inside the field. The company closes on black. */
 #contact.orb-help{width:auto;max-width:none;margin-inline:0}
-.orb-chamber{position:relative;display:grid;grid-template-columns:repeat(12,minmax(0,1fr));column-gap:var(--gap);margin-inline:var(--field-inset);padding:clamp(48px,6vw,96px) calc(max(var(--gutter),(100% - var(--max)) / 2) - var(--field-inset));border-radius:var(--field-radius);color:var(--on-field);background:var(--field-light),var(--field)}
+.orb-chamber{position:relative;display:grid;grid-template-columns:repeat(12,minmax(0,1fr));column-gap:var(--gap);margin-inline:var(--field-inset);padding:clamp(48px,6vw,96px) calc(max(var(--gutter),(100% - var(--max)) / 2) - var(--field-inset));border-radius:var(--field-radius);color:var(--on-field);background:var(--field-grain),var(--field-light),var(--field)}
 .orb-chamber .orb-eyebrow{color:var(--on-field-3)}
 .orb-chamber .orb-heading h2{color:var(--on-field)}
 /* White pills on the field keep the ink of the page. */
@@ -556,7 +555,7 @@ html[lang="en"] .stage-label{font:400 11px/1.4 var(--mono);letter-spacing:.1em;t
 /* A link to the chapter that continues this one. */
 .story-continuation{display:grid;grid-template-columns:48px 1fr auto;align-items:center;gap:18px;max-width:640px;margin-top:40px;padding:16px 22px 16px 16px;border-radius:var(--radius-s);background:var(--wash);transition:background-color var(--fast) var(--ease)}
 .story-continuation:hover{background:var(--wash-2)}
-.story-continuation[data-destination]{color:var(--link-on);background:var(--field-light),var(--link-field)}
+.story-continuation[data-destination]{color:var(--link-on);background:var(--field-grain),var(--field-light),var(--link-field)}
 .story-continuation[data-destination]:hover{background:var(--link-field)}
 .story-continuation[data-destination] :is(.continuation-brand,.continuation-arrow){color:inherit}
 .story-continuation[data-destination] .continuation-icon{filter:drop-shadow(0 4px 6px rgba(0,0,0,.25))}
@@ -647,7 +646,7 @@ html[lang="en"] .stage-label{font:400 11px/1.4 var(--mono);letter-spacing:.1em;t
    right as on a studio backdrop. The four pages keep their own markup: the wrappers step aside
    (display:contents) so every piece sits on one grid. */
 #worlds:has(> :is(#lab,#shift,#pulse)){padding-top:0}
-:is(#lab.lab-bento,#shift.shift-hero,#pulse.world-pulse,#path.path-hero){display:grid;grid-template-columns:repeat(12,minmax(0,1fr));grid-template-rows:auto auto clamp(28px,4.4vh,56px) auto auto minmax(28px,1fr) auto;column-gap:var(--gap);row-gap:0;align-items:start;width:auto;max-width:none;margin:calc(var(--field-inset) - var(--site-header-height,76px)) var(--field-inset) 0;padding:calc(var(--site-header-height,76px) + clamp(28px,4.4vh,64px)) calc(max(var(--gutter),(100% - var(--max)) / 2) - var(--field-inset)) clamp(24px,2.8vw,44px);border-radius:var(--field-radius);color:var(--on-field);background:var(--field-light),var(--field)}
+:is(#lab.lab-bento,#shift.shift-hero,#pulse.world-pulse,#path.path-hero){display:grid;grid-template-columns:repeat(12,minmax(0,1fr));grid-template-rows:auto auto clamp(28px,4.4vh,56px) auto auto minmax(28px,1fr) auto auto;column-gap:var(--gap);row-gap:0;align-items:start;width:auto;max-width:none;margin:calc(var(--field-inset) - var(--site-header-height,76px)) var(--field-inset) 0;padding:calc(var(--site-header-height,76px) + clamp(28px,4.4vh,64px)) calc(max(var(--gutter),(100% - var(--max)) / 2) - var(--field-inset)) clamp(24px,2.8vw,44px);border-radius:var(--field-radius);color:var(--on-field);background:var(--field-grain),var(--field-light),var(--field)}
 /* On a landscape screen the field fills the window, less its inset above and below. */
 @media (min-width:761px) and (min-aspect-ratio:1/1){:is(#lab.lab-bento,#shift.shift-hero,#pulse.world-pulse,#path.path-hero){min-height:clamp(600px,calc(100svh - 2 * var(--field-inset)),1000px)}}
 :is(#lab .lab-layout,#lab .lab-card--direction,#shift .shift-hero-heading,#shift .shift-hero-details,#pulse .pulse-layout,#pulse .world-copy,#path .path-hero-copy){display:contents}
@@ -666,8 +665,12 @@ html[lang="en"] #path-title{--hero-measure:12.6em}
 :is(#lab-title,#shift-title,#pulse-title,#path-title){grid-column:1/-1;grid-row:2;max-width:var(--hero-measure);font-size:var(--hero-size,clamp(40px,7.4vw,120px));line-height:.98;letter-spacing:-.05em;font-weight:300;color:var(--on-field)}
 :is(#lab-title,#shift-title,#pulse-title,#path-title)::first-line{font-weight:700}
 :is(#lab,#shift,#pulse,#path) [data-vision-subtext]{grid-column:1/span 5;grid-row:4;max-width:30em;font-size:clamp(16px,1.2vw,18px);line-height:1.66;color:var(--on-field-2)}
+/* The first sentence reads as the lead under the headline; the rest waits at the foot of the field, smaller. */
+:is(#lab,#shift,#pulse,#path) [data-vision-subtext]:has(> .hero-lead){display:contents}
+:is(#lab,#shift,#pulse,#path) .hero-lead{grid-column:1/span 5;grid-row:4;display:block;max-width:24em;font-size:clamp(18px,1.55vw,22px);line-height:1.45;font-weight:500;letter-spacing:-.02em;color:var(--on-field)}
+:is(#lab,#shift,#pulse,#path) .hero-more{grid-column:1/span 5;grid-row:7;align-self:end;display:block;max-width:31em;margin-top:18px;font-size:15px;line-height:1.65;color:var(--on-field-2)}
 :is(#lab,#shift,#pulse,#path) .world-links{grid-column:1/span 5;grid-row:5;margin-top:26px}
-#lab .lab-patent-note{grid-column:1/span 5;grid-row:7;align-self:end;margin-top:14px}
+#lab .lab-patent-note{grid-column:1/span 5;grid-row:8;align-self:end;margin-top:12px}
 :is(#lab .learning-scene,#shift .shift-hero-visual,#pulse .pulse-scene,#path .path-hero-visual){grid-column:7/-1;grid-row:4/-1;align-self:end;justify-self:end;display:grid;grid-template-rows:none;justify-items:end;gap:16px;margin:0}
 /* The object's height follows the window, so the buttons stay on the first screen of a laptop. */
 :is(#shift .shift-hero-visual,#pulse .pulse-scene,#path .path-hero-visual)>img{grid-area:auto;width:auto;height:auto;max-width:min(100%,640px);max-height:max(240px,var(--hero-object,42svh));aspect-ratio:auto;padding:0;object-fit:contain}
@@ -758,6 +761,9 @@ html[lang="en"] #path-title{--hero-measure:12.6em}
 .lab-volumes{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));column-gap:var(--gap);border-top:var(--hair) solid var(--ink)}
 .lab-volume{display:grid;gap:8px;padding:18px 18px 20px 0;border-bottom:var(--hair) solid var(--line)}
 .lab-volume.is-roadmap-current{background:linear-gradient(90deg,color-mix(in srgb,var(--accent) 8%,transparent),transparent 70%)}
+/* The conversation book that goes with the chosen core volume. */
+.lab-talks>li.is-talk-paired{background:linear-gradient(90deg,color-mix(in srgb,var(--accent) 8%,transparent),transparent 70%)}
+.lab-talks>li.is-talk-paired strong{color:var(--accent-ink)}
 .lab-volume__heading{display:flex;align-items:baseline;gap:12px}
 .lab-volume__number{font:400 11px/1 var(--mono);letter-spacing:.06em;color:var(--ink-3)}
 .lab-volume__level{font-size:13px;font-weight:600;color:var(--accent-ink)}
@@ -944,6 +950,7 @@ html[lang="en"] .shift-workflow__heading .eyebrow{font:400 11px/1.4 var(--mono);
  .atlas-goal-art{grid-column:1/span 5}
  .atlas-goal-context{grid-column:6/-1}
  .atlas-applications{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .atlas-applications>a:nth-child(3){padding-left:0;border-left:0}
  .company-intro-text,.company-process{grid-column:1/-1}
  .principle-row h3{grid-column:2/span 11}
  .principle-row p{grid-column:2/span 11;margin-top:10px}
@@ -968,6 +975,7 @@ html[lang="en"] .shift-workflow__heading .eyebrow{font:400 11px/1.4 var(--mono);
  .atlas-goal-steps{grid-template-columns:1fr}
  .atlas-goal-steps li,.atlas-goal-steps li+li{padding-left:0;padding-right:0;border-left:0}
  .atlas-applications{grid-template-columns:1fr}
+ .atlas-applications>a,.atlas-applications>a+a{padding-left:0;padding-right:0;border-left:0}
  .atlas-scope{margin-top:-24px}
  .principle-row{grid-template-columns:32px 1fr;column-gap:12px;padding:22px 0 24px}
  .principle-row::before{grid-column:1}
@@ -984,48 +992,187 @@ html[lang="en"] .shift-workflow__heading .eyebrow{font:400 11px/1.4 var(--mono);
  .document-content,.document-top,.document-footer{padding-inline:20px}
 }
 
+/* ── Chapter bands, scene cards, rhythm (v9) ───────────────────────────── */
+/* Once or twice in the middle of a page a whole section stands on the business colour, as the first screen
+   does: its heading on the colour, its working parts on white paper. LAB's AI chapter uses the 7% wash. */
+:is(#lab-class,#lab-ai,#shift-delivery,#pulse-studio,#pulse-content,#path-journey).story-section{width:auto;max-width:none;margin:calc(var(--section) + 40px) var(--field-inset) 0;padding:clamp(56px,6.4vw,104px) calc(max(var(--gutter),(100% - var(--max)) / 2) - var(--field-inset));border-radius:var(--field-radius)}
+:is(#lab-class,#lab-ai,#shift-delivery,#pulse-studio,#pulse-content,#path-journey).story-section{color:var(--on-field);background:var(--field-grain),var(--field-light),var(--field)}
+:is(#lab-class,#lab-ai,#shift-delivery,#pulse-studio,#pulse-content,#path-journey)+:is(section,div){padding-top:calc(var(--section) + 40px)}
+:is(#lab-class,#lab-ai,#shift-delivery,#pulse-studio,#pulse-content,#path-journey) .story-heading>.small-label{color:var(--on-field-3)}
+:is(#lab-class,#lab-ai,#shift-delivery,#pulse-studio,#pulse-content,#path-journey) .story-heading>.small-label::after{border-color:var(--on-field-line)}
+:is(#lab-class,#lab-ai,#shift-delivery,#pulse-studio,#pulse-content,#path-journey) .story-heading :is(h2,p){color:var(--on-field)}
+:is(#lab-class,#lab-ai,#shift-delivery,#pulse-studio,#pulse-content,#path-journey) .story-heading>p{color:var(--on-field-2)}
+:is(#lab-class,#lab-ai,#shift-delivery,#pulse-studio,#pulse-content,#path-journey)>.story-note,:is(#lab-class,#lab-ai,#shift-delivery,#pulse-studio,#pulse-content,#path-journey) .story-feature>.story-note{color:var(--on-field-3)}
+/* Working parts on paper inside a band. */
+:is(#lab-class,#lab-ai,#path-journey) :is(.story-details,.visual-explainer:not(.visual-explainer--cards)){padding:clamp(18px,2.2vw,32px);border-radius:var(--radius);background:var(--paper);color:var(--ink)}
+:is(#lab-class,#lab-ai,#path-journey) .story-details{padding-block:4px;border-top:0}
+:is(#lab-class,#lab-ai,#path-journey) .story-details details:last-child{border-bottom:0}
+#lab-ai .story-continuation{background:var(--paper);color:var(--ink)}
+/* SHIFT: the three steps on lapis. */
+:is(#shift-delivery,#lab-ai) .story-items{border-top-color:var(--on-field-line)}
+:is(#shift-delivery,#lab-ai) .story-items>article{border-color:var(--on-field-line)}
+:is(#shift-delivery,#lab-ai) .story-items :is(h3,p,summary){color:var(--on-field)}
+:is(#shift-delivery,#lab-ai) .story-items p{color:var(--on-field-2)}
+:is(#shift-delivery,#lab-ai) .story-index{color:var(--on-field-3)}
+#lab-ai .story-items .story-preview{color:var(--on-field-2)}
+#lab-ai .story-items details[open] :is(p,li){color:var(--on-field)}
+/* PULSE content on berry: the radio scene and the three friends standing on the colour. */
+#pulse-content .pulse-content-copy :is(h3,p,a,span){color:var(--on-field)}
+#pulse-content .pulse-content-copy p{color:var(--on-field-2)}
+#pulse-content .pulse-content-category{color:var(--on-field-3)}
+#pulse-content .quiet-link{text-decoration-color:var(--on-field-line)}
+#pulse-content .pulse-content-media figcaption{color:var(--on-field-3)}
+#pulse-content .pulse-content-cast{aspect-ratio:auto;padding:0;column-gap:4%}
+#pulse-content .pulse-content-cast img{width:100%;filter:drop-shadow(0 18px 22px var(--field-shadow))}
+/* LAB 90 minutes: the grouped half hour is the one big number of the page. */
+#lab-class .class-time-block{max-width:none}
+#lab-class .class-time{grid-template-columns:auto auto;justify-content:start;align-items:end;border-top:var(--hair) solid var(--on-field-line)}
+#lab-class .class-time>div{padding:18px 0 0;border-bottom:0}
+#lab-class .class-time>div+div{padding-left:clamp(32px,5vw,88px);margin-left:clamp(32px,5vw,88px);border-left:var(--hair) solid var(--on-field-line)}
+#lab-class .class-time span,#lab-class .class-time small,#lab-class .class-time-note{color:var(--on-field-2)}
+#lab-class .class-time strong{font-size:clamp(56px,6.6vw,96px);color:var(--on-field)}
+#lab-class .class-time>div:last-child strong{font-size:clamp(112px,15.2vw,220px);line-height:.84;letter-spacing:-.06em;color:var(--on-field)}
+#lab-class .class-time>div:last-child small{font-size:clamp(20px,2vw,30px)}
+
+/* Scene cards: every scene of an explorer side by side instead of one behind tabs. */
+.visual-explainer--cards .visual-scene-panels{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--gap);align-items:stretch}
+.visual-explainer--cards .visual-scene{display:flex;flex-direction:column;gap:0;border-radius:var(--radius);background:var(--paper);box-shadow:inset 0 0 0 var(--hair) var(--line);overflow:hidden;color:var(--ink)}
+.visual-explainer--cards .visual-scene-art{width:100%;aspect-ratio:4/3;border-radius:0}
+.visual-explainer--cards .visual-scene-art img{width:74%}
+.visual-explainer--cards .visual-scene-art--landscape img{width:100%}
+.visual-explainer--cards .visual-scene-copy{display:grid;gap:12px;align-content:start;padding:6px clamp(18px,1.7vw,28px) clamp(20px,1.9vw,30px)}
+.visual-explainer--cards .visual-scene-copy{grid-template-columns:auto 1fr;column-gap:12px}
+.visual-explainer--cards .visual-scene-copy>:not(.visual-scene-number,.visual-scene-name){grid-column:1/-1}
+.visual-explainer--cards .visual-scene-name{align-self:center;font:600 13px/1.4 var(--sans);letter-spacing:-.01em;color:var(--accent-ink)}
+html[lang="en"] .visual-explainer--cards .visual-scene-name{font:400 11px/1.4 var(--mono);letter-spacing:.1em;text-transform:uppercase}
+.visual-explainer--cards>.visual-explainer-guide{margin-bottom:-6px}
+#lab-class .visual-explainer--cards>.visual-explainer-guide{margin-top:clamp(28px,3.4vw,52px);color:var(--on-field-2)}
+#lab-class .visual-explainer--cards .visual-scene-panels{margin-top:18px}
+.visual-explainer--cards .visual-scene-copy h3{font-size:clamp(20px,1.7vw,25px)}
+.visual-explainer--cards .visual-scene-summary{font-size:15.5px}
+.visual-explainer--cards .visual-scene-example{margin-top:2px}
+#lab-class .visual-explainer--cards .visual-scene{box-shadow:none}
+
+/* LAB scene sections as a split: the reading column on the left, the felt object on the right. */
+@media (min-width:1101px){
+ :is(#lab-year,#lab-languages,#lab-culture,#lab-ai-practice):has(.visual-explainer.is-interactive){display:grid;grid-template-columns:repeat(12,minmax(0,1fr));column-gap:var(--gap);align-items:start}
+ :is(#lab-year,#lab-languages,#lab-culture,#lab-ai-practice):has(.visual-explainer.is-interactive) :is(.story-feature,.visual-explainer,.visual-scene-panels,.visual-scene){display:contents}
+ :is(#lab-year,#lab-languages,#lab-culture,#lab-ai-practice):has(.visual-explainer.is-interactive) .section-alias{position:absolute}
+ :is(#lab-year,#lab-languages,#lab-culture,#lab-ai-practice):has(.visual-explainer.is-interactive)>.story-feature>.story-introduction{display:block;grid-column:1/span 6;grid-row:1}
+ :is(#lab-year,#lab-languages,#lab-culture,#lab-ai-practice):has(.visual-explainer.is-interactive)>.story-feature>.visual-explainer>.visual-explainer-guide{grid-column:1/span 6;grid-row:2;margin-top:36px}
+ :is(#lab-year,#lab-languages,#lab-culture,#lab-ai-practice):has(.visual-explainer.is-interactive)>.story-feature>.visual-explainer>.visual-scene-nav{grid-column:1/span 6;grid-row:3;justify-self:start;margin-top:12px}
+ :is(#lab-year,#lab-languages,#lab-culture,#lab-ai-practice):has(.visual-explainer.is-interactive)>.story-feature .visual-scene>.visual-scene-copy{grid-column:1/span 6;grid-row:4;margin-top:36px}
+ :is(#lab-year,#lab-languages,#lab-culture,#lab-ai-practice):has(.visual-explainer.is-interactive)>.story-details{grid-column:1/span 6;grid-row:5;display:block;margin-top:44px}
+ :is(#lab-year,#lab-languages,#lab-culture,#lab-ai-practice):has(.visual-explainer.is-interactive)>.story-note{grid-column:1/span 6;grid-row:6;margin-top:18px}
+ :is(#lab-year,#lab-languages,#lab-culture,#lab-ai-practice):has(.visual-explainer.is-interactive)>.story-evidence{grid-column:1/-1;grid-row:7;margin-top:72px}
+ :is(#lab-year,#lab-languages,#lab-culture,#lab-ai-practice):has(.visual-explainer.is-interactive)>.story-continuation{grid-column:1/span 6;grid-row:8}
+ :is(#lab-year,#lab-languages,#lab-culture,#lab-ai-practice):has(.visual-explainer.is-interactive)>.story-feature .visual-scene>.visual-scene-art{grid-column:8/-1;grid-row:1/7;position:sticky;top:calc(var(--site-header-height,76px) + 32px);width:100%;aspect-ratio:1}
+ :is(#lab-year,#lab-languages,#lab-culture,#lab-ai-practice):has(.visual-explainer.is-interactive)>.story-feature .visual-scene>.visual-scene-art img{width:96%}
+}
+#pulse-content .pulse-content-radio figcaption{padding:12px 2px 0;background:none}
+/* PULSE ad & model video: the AI models on berry, the formats under them, the client brief on white. */
+#pulse-studio .story-items{border-top-color:var(--on-field-line)}
+#pulse-studio .story-items>article{border-color:var(--on-field-line)}
+#pulse-studio .story-items :is(h3,p){color:var(--on-field)}
+#pulse-studio .story-items p{color:var(--on-field-2)}
+#pulse-studio .story-index{color:var(--on-field-3)}
+.pulse-models{display:grid;gap:24px;margin-top:clamp(48px,5.4vw,84px)}
+.pulse-models-heading{display:grid;gap:12px;max-width:780px}
+.pulse-models-heading>.small-label{display:flex;align-items:center;gap:16px;color:var(--on-field-3)}
+.pulse-models-heading h3{font-size:clamp(24px,2.3vw,32px);line-height:1.25;letter-spacing:-.035em;color:var(--on-field)}
+.pulse-models-heading p{max-width:46em;color:var(--on-field-2)}
+.pulse-model-list{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:var(--field-gap);margin:6px 0 0;padding:0;list-style:none}
+.pulse-model figure{display:grid;gap:12px;margin:0}
+.pulse-model img{display:block;width:100%;aspect-ratio:3/4;object-fit:cover;border-radius:var(--radius-s);background:rgba(0,0,0,.12);box-shadow:0 20px 34px -22px rgba(30,4,16,.6)}
+.pulse-model figcaption{display:grid;gap:3px;padding:0 2px;font-size:13px;line-height:1.45;color:var(--on-field-2)}
+.pulse-model figcaption strong{font-size:18px;font-weight:650;letter-spacing:-.02em;color:var(--on-field)}
+.pulse-models-note{font-size:13px;color:var(--on-field-3)}
+.pulse-studio-formats{margin-top:clamp(48px,5vw,72px)}
+.pulse-brief-steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));column-gap:var(--gap);margin:clamp(40px,4.4vw,64px) 0 0;padding:0;list-style:none;border-top:var(--hair) solid var(--ink)}
+.pulse-brief-steps>li{display:grid;align-content:start;gap:10px;padding:24px 24px 28px 0;border-bottom:var(--hair) solid var(--line)}
+.pulse-brief-steps>li:not(:nth-child(3n+1)){padding-left:24px;border-left:var(--hair) solid var(--line)}
+.pulse-brief-steps h3{font-size:20px}
+.pulse-brief-steps p{font-size:16px}
+.pulse-brief>.story-note{margin-top:22px}
+.pulse-brief>.world-links{margin-top:28px}
+
+/* Long question lists: two columns on wide windows. */
+@media (min-width:1101px){
+ .story-details:has(>details:nth-of-type(4)){display:grid;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:var(--gap);align-items:start}
+}
+
+/* Company values: five in one row. */
+@media (min-width:1101px){
+ .principles{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));border-bottom:var(--hair) solid var(--line)}
+ .principle-row{display:grid;grid-template-columns:none;align-content:start;gap:14px;padding:24px 20px 30px 0;border-bottom:0}
+ .principle-row+.principle-row{padding-left:20px;border-left:var(--hair) solid var(--line)}
+ .principle-row::before,.principle-row h3,.principle-row p{grid-column:auto}
+ .principle-row::before{padding-top:0}
+ .principle-row h3{font-size:clamp(17px,1.35vw,20px)}
+ .principle-row p{font-size:15px}
+}
+
 /* ── Colour fields on narrower windows ─────────────────────────────────── */
 @media (max-width:1100px){
+ .pulse-model-list{grid-template-columns:repeat(3,minmax(0,1fr))}
+ .visual-explainer--cards .visual-scene-panels{grid-template-columns:repeat(2,minmax(0,1fr))}
  .world-directory{grid-template-columns:repeat(2,minmax(0,1fr))}
- .world-directory>a{min-height:clamp(380px,50vw,520px)}
+ .world-directory>a{height:clamp(380px,48vw,460px)}
  :is(#lab-title,#shift-title,#pulse-title,#path-title){font-size:var(--hero-size-m,clamp(40px,8.2vw,90px))}
  html[lang="en"] #shift-title{--hero-size-m:clamp(34px,6.2vw,68px)}
- :is(#lab,#shift,#pulse,#path) :is([data-vision-subtext],.world-links),#lab .lab-patent-note{grid-column:1/span 6}
+ :is(#lab,#shift,#pulse,#path) :is([data-vision-subtext],.world-links,.hero-lead,.hero-more),#lab .lab-patent-note{grid-column:1/span 6}
 }
 @media (max-width:760px){
  :is(#lab.lab-bento,#shift.shift-hero,#pulse.world-pulse,#path.path-hero){grid-template-rows:none;min-height:0;padding:calc(var(--site-header-height,64px) + 26px) calc(var(--gutter) - var(--field-inset)) 28px}
  :is(#lab .lab-card__meta,#shift .stage-label,#pulse .world-heading,#path .stage-label){grid-row:auto;order:1}
  :is(#lab-title,#shift-title,#pulse-title,#path-title){grid-row:auto;order:2;max-width:none;font-size:clamp(34px,10.4vw,48px);font-weight:700}
  :is(#lab-title,#shift-title,#pulse-title,#path-title)::first-line{font-weight:inherit}
- :is(#lab .learning-scene,#shift .shift-hero-visual,#pulse .pulse-scene,#path .path-hero-visual){grid-column:1/-1;grid-row:auto;order:3;justify-self:center;justify-items:center;margin:30px 0 26px}
+ :is(#lab .learning-scene,#shift .shift-hero-visual,#pulse .pulse-scene,#path .path-hero-visual){grid-column:1/-1;grid-row:auto;order:5;justify-self:center;justify-items:center;margin:30px 0 22px}
  :is(#lab .learning-scene,#pulse .pulse-scene,#path .path-hero-visual) figcaption{justify-items:center;text-align:center}
  :is(#shift .shift-hero-visual,#pulse .pulse-scene,#path .path-hero-visual)>img,#lab .learning-scene>button img{max-height:none;max-width:min(100%,520px)}
  :is(#lab,#shift,#pulse,#path) [data-vision-subtext]{grid-column:1/-1;grid-row:auto;order:4}
- :is(#lab,#shift,#pulse,#path) .world-links{grid-column:1/-1;grid-row:auto;order:5}
- #lab .lab-patent-note{grid-column:1/-1;grid-row:auto;order:6}
+ :is(#lab,#shift,#pulse,#path) .hero-lead{grid-column:1/-1;grid-row:auto;order:3;margin-top:18px;font-size:18px;line-height:1.5}
+ :is(#lab,#shift,#pulse,#path) .hero-more{grid-column:1/-1;grid-row:auto;order:6;margin-top:0}
+ :is(#lab,#shift,#pulse,#path) .world-links{grid-column:1/-1;grid-row:auto;order:4}
+ #lab .lab-patent-note{grid-column:1/-1;grid-row:auto;order:7}
  .orb-chamber{padding:40px 18px 28px}
+ :is(#lab-class,#lab-ai,#shift-delivery,#pulse-studio,#pulse-content,#path-journey).story-section{padding:44px calc(var(--gutter) - var(--field-inset)) 36px}
+ .pulse-model-list{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .pulse-brief-steps{grid-template-columns:1fr}
+ .pulse-brief-steps>li,.pulse-brief-steps>li:not(:nth-child(3n+1)){padding:20px 0 22px;border-left:0}
+ #lab-class .class-time>div+div{padding-left:24px;margin-left:24px}
+ /* Scenes and evidence: one row the visitor swipes through (no automatic turning). */
+ :is(.visual-explainer--cards .visual-scene-panels,.story-evidence-grid){display:grid;grid-auto-flow:column;grid-auto-columns:86%;grid-template-columns:none;gap:12px;overflow-x:auto;overscroll-behavior-x:contain;scroll-snap-type:x mandatory;scrollbar-width:none;border-top:0}
+ :is(.visual-explainer--cards .visual-scene-panels,.story-evidence-grid)::-webkit-scrollbar{display:none}
+ :is(.visual-explainer--cards .visual-scene,.story-evidence-grid>article){scroll-snap-align:start}
+ .story-evidence-grid>article,.story-evidence-grid>article+article{padding:18px;border:var(--hair) solid var(--line);border-radius:var(--radius-s)}
  /* On a phone the label sits at the very top of the field, under the light: the white-text fields drop it there. */
- :is(body[data-site="shift"],body[data-site="pulse"],body[data-site="path"]) .orb-chamber{background:radial-gradient(110% 90% at 88% 108%,rgba(0,0,0,.17),rgba(0,0,0,0) 58%),var(--field)}
+ :is(body[data-site="shift"],body[data-site="pulse"],body[data-site="path"]) .orb-chamber{background:var(--field-grain),radial-gradient(110% 90% at 88% 108%,rgba(0,0,0,.17),rgba(0,0,0,0) 58%),var(--field)}
 }
 }
 @media (max-width:640px){
- .world-directory>a{min-height:clamp(232px,66vw,300px);padding:10px}
- .directory-logo{height:12px;padding:9px 11px}
- svg.directory-logo{height:15.6px;padding-block:7.2px}
- .directory-arrow{width:34px;height:34px;font-size:14px}
- .directory-object{width:92%}
- [data-field="lab"] .directory-object{width:86%}
- .world-directory strong{padding:0 4px 4px;font-size:14.5px;line-height:1.35}
+ .world-directory{gap:10px}
+ .world-directory>a{height:clamp(250px,74vw,300px);grid-template-rows:56% minmax(0,1fr)}
+ .world-directory>a>div{gap:8px;padding:0 12px 12px}
+ .directory-logo{height:15px}
+ svg.directory-logo{height:19.5px;margin-block:-2.25px}
+ .directory-arrow{width:34px;height:34px;margin:10px 10px 0 0;font-size:14px}
+ .directory-object{width:76%}
+ [data-field="lab"] .directory-object{width:70%}
+ .world-directory strong{font-size:14px;line-height:1.35}
 }
 
 /* ── Forced colours ────────────────────────────────────────────────────── */
 @media (forced-colors:active){
  .header.bar,.header.bar.has-rim,.orb-chamber,.world-directory>a,.company-process,.atlas-engine-map,.atlas-learning-demo{border:1px solid CanvasText;background:Canvas;-webkit-backdrop-filter:none;backdrop-filter:none;box-shadow:none}
- .header.bar::before,.header.bar::after,.site-header-wrap::after{display:none}
+ .header.bar::before,.header.bar::after{display:none}
  .primary-link,.send,.toast{border:1px solid ButtonText}
+ .question-entry:focus-within{outline:2px solid Highlight;outline-offset:2px}
+ .lab-talks>li.is-talk-paired{outline:2px solid Highlight;outline-offset:-2px}
  /* The chosen tab, step, volume or brand keeps a visible mark when the system paints its own colours. */
  :is(.visual-scene-nav button,.shift-workflow__steps a,.atlas-map-controls button,.learning-choices button,.lab-tracker__tabs button)[aria-selected="true"],.bar-brands a[aria-current="page"],.roadmap-nav a[aria-current]{outline:2px solid Highlight;outline-offset:-2px}
  .story-items,.story-evidence-grid,.lab-benefits,.atlas-goal-steps{border-top-color:CanvasText}
- .atlas-applications>a,.story-continuation[data-destination]{border:1px solid CanvasText;background:Canvas;color:CanvasText}
+ .story-continuation[data-destination]{border:1px solid CanvasText;background:Canvas;color:CanvasText}
+ .world-directory>a::before{background:Canvas;border-bottom:1px solid CanvasText}
  :is(#lab.lab-bento,#shift.shift-hero,#pulse.world-pulse,#path.path-hero){border:1px solid CanvasText;background:Canvas}
 }
