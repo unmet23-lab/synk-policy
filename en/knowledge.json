@@ -34,14 +34,14 @@
         "Start with the email writing demo, AI production guides, and K-LOFI information. These examples alone do not establish results for customers or students, or prove that SYNK is better than another company.",
         "We are currently preparing a new business registration. Once it is complete, we will provide the actual registration details.",
         "The “© 2026 SYNK. All rights reserved.” notice in the footer is SYNK’s copyright notice. Please check separately which uses of individual works, logos, and characters are permitted.",
-        "SYNK’s founder is Yuho Yang. He is building SYNK by connecting experience in architecture, psychology, performance, and education.",
-        "Finding a reason to learn, making your own choices, and creating something together. I want technology to make more room for these experiences. That is why I am building SYNK.",
+        "SYNK’s founder is Yuho Yang. Yuho studied architecture and psychology and worked as a performer on stage and on screen.",
+        "When I worked at an academy in Mongolia, I knew each student needed different help, but I never had the time to tailor it to every one of them. I started SYNK to do that work with technology.",
         "The creator introduced on this website and in SHIFT content is the founder. He sets the company’s direction, decides which tasks to delegate to AI and which results to review personally, and shares the actual production process and the reasons for revisions.",
-        "Founder Yuho Yang’s education: Department of Architecture, Howon University · Department of Psychology, Chung-Ang University. In his words: “I bring my studies of spaces and people, stage and creative projects, and experience running an educational institution into the planning and making of SYNK.”",
+        "Founder Yuho Yang’s education: Department of Architecture, Howon University · Department of Psychology, Chung-Ang University.",
         "Education · Operations — 2026 Former Deputy Director, Skyline Edu, Mongolia (Student advising, class operations, and online promotion)",
         "Performance · Projects — 2023 RCA · Royal College of Art (Royal College of Art graduate project · Main Performer), 2023 TV series “Bora! Deborah” · Netflix (Appearance in the opening sequence of Episode 1), 2014 LOEN Entertainment (Performer)",
         "Awards — 2019 Fine Art Photography Awards (Open Theme category · Winner), 2017 MK Challenge · Hosted by Maeil Business Newspaper (Project Leader · Runner-up)",
-        "Studying architecture and psychology, performing on stage, and working in education in Mongolia have each given me a different perspective: an eye for structure, an interest in how people think and act, and experience creating something with others. At SYNK, I bring these perspectives together to design support around each person's goals and circumstances.",
+        "In Yuho’s words: “I studied architecture and psychology, worked as a performer on stage and on screen, and served as deputy director of an academy in Mongolia. Architecture gave me an eye for structure, psychology an interest in how people think and act, and the stage the experience of making something together with others. Today I put all of this into planning and building SYNK.”",
         "Atlas is SYNK's core technology for finding the learning and support each person needs, based on their goals and experience. Eight engines share the work: understanding the person, choosing what to learn and in what order, explaining it, and reviewing the results.",
         "A student may first prepare for university admission, then need help with presentations or job interviews while studying in Korea. We are developing Atlas to adjust tasks and explanations using the learner's new goals and recent work.",
         "Core — Choosing the next learning step. Looks at what a learner wants to achieve and where they are struggling, then identifies the next task and the support they need.",
@@ -1899,7 +1899,7 @@
       "sourceId": "company",
       "brand": "synk",
       "title": "Who is building SYNK?",
-      "answer": "SYNK’s founder is Yuho Yang. He is building SYNK by connecting experience in architecture, psychology, performance, and education.\n\nFinding a reason to learn, making your own choices, and creating something together. I want technology to make more room for these experiences. That is why I am building SYNK.\n\nThe creator introduced on this website and in SHIFT content is the founder. He sets the company’s direction, decides which tasks to delegate to AI and which results to review personally, and shares the actual production process and the reasons for revisions.",
+      "answer": "SYNK’s founder is Yuho Yang. Yuho studied architecture and psychology and worked as a performer on stage and on screen.\n\nWhen I worked at an academy in Mongolia, I knew each student needed different help, but I never had the time to tailor it to every one of them. I started SYNK to do that work with technology.\n\nThe creator introduced on this website and in SHIFT content is the founder. He sets the company’s direction, decides which tasks to delegate to AI and which results to review personally, and shares the actual production process and the reasons for revisions.",
       "questionExamples": [
         "Who is building SYNK?",
         "What is the founder’s name?",
@@ -1925,7 +1925,7 @@
         "label": "Meet the founder",
         "href": "/en/founder/"
       },
-      "reviewedAt": "2026-09-23",
+      "reviewedAt": "2026-10-02",
       "aliases": [
         "SYNK를 만드는 사람은 누구인가요?",
         "대표 이름이 뭐예요?",
@@ -1955,7 +1955,7 @@
         "university",
         "Yuho Yang"
       ],
-      "answer": "Founder Yuho Yang’s education: Department of Architecture, Howon University · Department of Psychology, Chung-Ang University. In his words: “I bring my studies of spaces and people, stage and creative projects, and experience running an educational institution into the planning and making of SYNK.”\n\nEducation · Operations — 2026 Former Deputy Director, Skyline Edu, Mongolia (Student advising, class operations, and online promotion)\n\nPerformance · Projects — 2023 RCA · Royal College of Art (Royal College of Art graduate project · Main Performer), 2023 TV series “Bora! Deborah” · Netflix (Appearance in the opening sequence of Episode 1), 2014 LOEN Entertainment (Performer)\n\nAwards — 2019 Fine Art Photography Awards (Open Theme category · Winner), 2017 MK Challenge · Hosted by Maeil Business Newspaper (Project Leader · Runner-up)\n\nStudying architecture and psychology, performing on stage, and working in education in Mongolia have each given me a different perspective: an eye for structure, an interest in how people think and act, and experience creating something with others. At SYNK, I bring these perspectives together to design support around each person's goals and circumstances.",
+      "answer": "Founder Yuho Yang’s education: Department of Architecture, Howon University · Department of Psychology, Chung-Ang University.\n\nEducation · Operations — 2026 Former Deputy Director, Skyline Edu, Mongolia (Student advising, class operations, and online promotion)\n\nPerformance · Projects — 2023 RCA · Royal College of Art (Royal College of Art graduate project · Main Performer), 2023 TV series “Bora! Deborah” · Netflix (Appearance in the opening sequence of Episode 1), 2014 LOEN Entertainment (Performer)\n\nAwards — 2019 Fine Art Photography Awards (Open Theme category · Winner), 2017 MK Challenge · Hosted by Maeil Business Newspaper (Project Leader · Runner-up)\n\nIn Yuho’s words: “I studied architecture and psychology, worked as a performer on stage and on screen, and served as deputy director of an academy in Mongolia. Architecture gave me an eye for structure, psychology an interest in how people think and act, and the stage the experience of making something together with others. Today I put all of this into planning and building SYNK.”",
       "relatedIds": [
         "synk-planner",
         "synk-founder",
@@ -1965,7 +1965,7 @@
         "label": "Meet the founder",
         "href": "/en/founder/"
       },
-      "reviewedAt": "2026-09-23",
+      "reviewedAt": "2026-10-02",
       "aliases": [
         "창업자는 어떤 경험을 해 왔나요?",
         "창업자 학력이 궁금해요",

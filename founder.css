@@ -75,7 +75,7 @@ body.founder-page{
 .founder-hero h1>span{display:block}
 .founder-lead{
   max-width:27em;margin-top:28px!important;
-  color:var(--founder-muted);font-size:18px;line-height:1.9;letter-spacing:-.02em;
+  color:var(--founder-muted);font-size:18px;line-height:1.9;letter-spacing:-.02em;text-wrap:pretty;
 }
 .founder-name{display:flex;align-items:baseline;flex-wrap:wrap;gap:12px;margin-top:34px}
 .founder-name strong{font-size:19px;font-weight:650;letter-spacing:-.02em}
