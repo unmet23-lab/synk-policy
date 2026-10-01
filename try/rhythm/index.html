@@ -47,7 +47,7 @@
     <div class="game-backdrop" id="game-backdrop"></div>
     <div class="game-vignette"></div>
     <canvas id="stage" aria-label="네 레인 위의 노트가 아래쪽 판정선으로 내려옵니다. D F J K 키 또는 화면 아래 네 버튼을 사용하세요."></canvas>
-    <header class="game-header"><div class="game-song"><img src="assets/logo-paper.svg" alt="SYNK"><span class="song-divider"></span><div><span class="mono" id="game-track-number">TRACK 01</span><strong id="game-title">파란 신호가 켜지면</strong></div></div><div class="game-meta"><span id="game-clock" class="mono">00:00 / 03:22</span><button class="icon-button" id="pause-button" aria-label="일시 정지"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14M16 5v14"/></svg></button></div></header>
+    <header class="game-header"><div class="game-song"><img src="assets/logo-paper.svg" alt="SYNK"><span class="song-divider"></span><div><span class="mono" id="game-track-number">TRACK 01</span><strong id="game-title">초록</strong></div></div><div class="game-meta"><span id="game-clock" class="mono">00:00 / 03:22</span><button class="icon-button" id="pause-button" aria-label="일시 정지"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14M16 5v14"/></svg></button></div></header>
     <div class="song-progress"><div id="song-progress-fill"></div></div>
     <div class="score-panel"><span class="mono score-label">RHYTHM SCORE</span><strong class="mono" id="score">000000</strong><span id="accuracy" class="mono">—</span></div>
     <div class="combo-panel" id="combo-panel"><strong class="mono" id="combo">0</strong><span class="mono">COMBO</span></div>
@@ -62,7 +62,7 @@
 
   <section id="results" class="results" hidden aria-labelledby="result-title">
     <header class="result-header"><img src="assets/logo-ink.svg" alt="SYNK"><button class="text-button" id="back-button">곡 선택으로 <span aria-hidden="true">↗</span></button></header>
-    <div class="result-hero"><div class="result-cover"><img src="assets/signal-stage.webp" alt="펠트 리본 무대"><span class="mono" id="result-track">TRACK 01</span></div><div><p class="eyebrow mono">TRACK COMPLETE</p><h1 id="result-title">한 곡, 잘 들었어요.</h1><p id="result-subtitle">파란 신호가 켜지면</p></div></div>
+    <div class="result-hero"><div class="result-cover"><img src="assets/signal-stage.webp" alt="펠트 리본 무대"><span class="mono" id="result-track">TRACK 01</span></div><div><p class="eyebrow mono">TRACK COMPLETE</p><h1 id="result-title">한 곡, 잘 들었어요.</h1><p id="result-subtitle">초록</p></div></div>
     <div class="result-stats"><div><span>리듬 정확도</span><strong class="mono" id="result-accuracy">0%</strong><p>타이밍과 롱노트 완주 기준</p></div><div><span>최대 콤보</span><strong class="mono" id="result-combo">0</strong><p>박자에 맞춘 연속 입력</p></div><div><span>한국어 선택</span><strong class="mono" id="result-learning">0 / 5</strong><p>타이밍과 별도로 확인해요.</p></div></div>
     <div class="result-main"><div class="review-section"><h2>오늘 만난 표현</h2><div id="review-list"></div></div><div class="recall-card"><img src="assets/sticker-book.webp" alt="" aria-hidden="true"><p class="eyebrow mono">ONE MORE SENTENCE</p><h2>다른 문장도<br>이해할 수 있을까요?</h2><p id="recall-intro">음악 없이, 새로운 문장으로 한 번 더.</p><div id="recall-content" hidden><p id="recall-sentence"></p><strong id="recall-question"></strong><div id="recall-options"></div><p id="recall-feedback" role="status"></p></div><button class="secondary-button" id="recall-button">한 문장 확인하기 <span aria-hidden="true">↗</span></button></div></div>
     <div class="result-actions"><button class="primary-button" id="replay-button">한 번 더 연주 <span aria-hidden="true">↗</span></button><p>정답 레인과 노트 순서는 다음 판에서 달라져요.</p></div>
@@ -72,6 +72,6 @@
   <dialog id="settings-dialog"><button class="dialog-close" data-close="settings-dialog" aria-label="닫기">×</button><p class="eyebrow mono">YOUR PLAY</p><h2>내게 맞는 연주.</h2><label class="setting-row"><span><strong>소리</strong><small>SYNK의 Suno 한국어 노래와 타격음</small></span><input id="sound-setting" type="checkbox" checked></label><label class="setting-row"><span><strong>효과 줄이기</strong><small>빛 번짐과 입자 움직임을 줄여요.</small></span><input id="effects-setting" type="checkbox"></label><label class="offset-label" for="offset-setting">입력 보정 <output id="offset-value">0 ms</output></label><input id="offset-setting" type="range" min="-200" max="200" step="10" value="0"><p class="help-note">노트를 누르는 순간이 계속 늦게 판정되면 + 방향으로 조금씩 조절하세요. 블루투스 이어폰은 소리 지연이 클 수 있어요.</p><button class="primary-button" data-close="settings-dialog">설정 완료 <span aria-hidden="true">↗</span></button></dialog>
   <div class="loading-overlay" id="loading" hidden role="status"><span class="loading-mark"></span><p>첫 번째 박자를 준비하고 있어요.</p></div>
   <div class="toast" id="toast" role="status" hidden></div>
-  <script type="module" src="app.js?v=20261001-suno"></script>
+  <script type="module" src="app.js?v=20261001-titles"></script>
 </body>
 </html>

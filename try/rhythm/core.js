@@ -1,4 +1,4 @@
-import {SUNO_RECORDINGS} from './suno-tracks.js?v=20261001-suno';
+import {SUNO_RECORDINGS} from './suno-tracks.js?v=20261001-titles';
 export const LEVELS = {
   easy: {label:'편하게', step:1, window:.28, perfect:.115, great:.195, approach:3.5},
   normal: {label:'리드미컬', step:.5, window:.23, perfect:.085, great:.155, approach:2.9},

@@ -1,6 +1,6 @@
-import {TRACKS,LEVELS,RoundState,random,shuffle} from './core.js?v=20261001-suno';
-import {MusicPlayer} from './audio.js?v=20261001-suno';
-import {Stage} from './stage.js?v=20261001-suno';
+import {TRACKS,LEVELS,RoundState,random,shuffle} from './core.js?v=20261001-titles';
+import {MusicPlayer} from './audio.js?v=20261001-titles';
+import {Stage} from './stage.js?v=20261001-titles';
 const $=id=>document.getElementById(id);
 const state={track:0,level:'easy',screen:'lobby',round:null,pressed:new Set(),paused:false,loading:false,offset:0,activeQuestion:null,recallIndex:0};
 const music=new MusicPlayer(),stage=new Stage($('stage'));
