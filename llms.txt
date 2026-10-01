@@ -149,6 +149,7 @@ SYNK LAB의 교재는 문법을 다루는 시냅스 코어 6권과 회화를 다
 - [SYNK PULSE](https://synk.im/pulse/)
 - [SYNK PATH](https://synk.im/path/)
 - [Public company notes](https://synk.im/knowledge.json)
+- [Korean listening racing game](https://synk.im/try/racing/)
 - [Korean rhythm reading game](https://synk.im/try/rhythm/)
 - [Web enquiry form](https://synk.im/#contact-web)
 - [Privacy policy](https://synk.im/privacy/)
@@ -164,9 +165,17 @@ Current company and service information is maintained in the reviewed public not
 hello@synk.im
 
 
-## Korean rhythm reading game
+## Korean racing and rhythm minigames
 
-Read short Korean sentences, choose their meaning and play the beat. Three full Korean songs created by SYNK with Suno; timing and language results stay separate. Explanations and new sentence variations follow each round. This prototype has no learner efficacy or TOPIK score study, and keeps records only in the open page.
+SYNK LAB is preparing 10 minigames. Korean Racing and Words in Rhythm are playable prototypes. Racing connects spoken Korean to picture or word lanes and rewards correct choices with boosts. It includes 2,000 vocabulary items, 400 learning stages sharing one coastal course, and 2,008 voice clips. The showcase contains an actual automated-play recording and an original 3810 x 2160 gameplay capture.
 
+Rhythm uses three original tracks, four lanes and short Korean sentence meanings. Timing and language scores are separate; review uses new sentence variations. Listening and reading are practised directly. Speaking and writing extend into offline classroom tasks; the current games do not assess pronunciation or free writing. Offline learning toward TOPIK Level 1 and a subsequent village/NPC path are in preparation.
+
+External research informs retrieval, feedback and narration design, not measured SYNK efficacy or a TOPIK pass guarantee.
+
+- [Play Korean Racing](https://synk.im/try/racing/)
 - [Play Words in Rhythm](https://synk.im/try/rhythm/)
-- [Learning design and actual captures](https://synk.im/lab/#work)
+- [Actual gameplay, narration and research](https://synk.im/lab/#work)
+- [Game learning meta-analysis, Dixon et al. 2022](https://www.lltjournal.org/item/10125-73464/)
+- [Retrieval practice, Yang et al. 2021](https://pubmed.ncbi.nlm.nih.gov/33683913/)
+- [Modality conditions, Reinwein 2012](https://pubmed.ncbi.nlm.nih.gov/21989625/)
