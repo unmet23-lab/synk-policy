@@ -2,6 +2,7 @@
 <html lang="ko">
 <head>
   <meta charset="utf-8">
+  <link rel="preload" href="/assets/suit.woff2" as="font" type="font/woff2" crossorigin>
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="color-scheme" content="light">
   <meta name="description" content="SYNK는 Atlas를 기반으로 개인화 시스템을 만듭니다. 개인의 목표와 상황을 이해하고, 필요한 배움과 도움을 연결하는 여덟 엔진.">
@@ -13,11 +14,11 @@
 <link rel="canonical" href="https://synk.im/atlas/">
   <style data-synk-폰트="SUIT">@font-face{font-family:'SUIT Variable';font-weight:100 900;font-display:swap;src:url(/assets/suit.woff2) format('woff2-variations');}</style><style>@font-face{font-family:'Inter Tight';font-weight:500;font-display:swap;src:url(/assets/inter-tight-medium.woff2) format('woff2')}@font-face{font-family:'DM Mono';font-weight:400;font-display:swap;src:url(/assets/dm-mono.woff2) format('woff2')}</style>
 
-  <link rel="stylesheet" href="/atlas-editorial.css?v=6efac2e27ca7">
+  <link rel="stylesheet" href="/atlas-editorial.css?v=6c8b8b5dc702">
 <link rel="stylesheet" href="/site-bar.css?v=597e5d1403e5"><script type="module" src="/site-bar.js?v=597e5d1403e5"></script><script>(function(){try{const raw=sessionStorage.getItem('synk-atlas-handoff');sessionStorage.removeItem('synk-atlas-handoff');if(!raw)return;const v=JSON.parse(raw);if(Date.now()-v.time>8000||![v.x,v.y,v.size].every(Number.isFinite)||v.size<20||v.size>1000)return;const root=document.documentElement;root.dataset.atlasArrival='pending';root.style.setProperty('--arrival-x',v.x+'px');root.style.setProperty('--arrival-y',v.y+'px');root.style.setProperty('--arrival-size',v.size+'px');setTimeout(()=>root.removeAttribute('data-atlas-arrival'),3000)}catch{}})();</script><link rel="stylesheet" href="/atlas-portal-arrival.css?v=1c75a6d77bc5"><script defer src="/atlas-portal-arrival.js?v=6953431e2ed8"></script></head>
 <body data-site="synk"><div class="atlas-arrival" aria-hidden="true"><div class="atlas-arrival-orb"></div></div>
   <a class="skip-link" href="#engine-nav">엔진 선택으로 건너뛰기</a>
-  <div class="site-header-wrap site-bar" data-site-bar="synk"><header class="header shell bar"><a class="bar-logo wordmark" href="/" aria-label="SYNK 첫 화면으로" target="_top"><img src="/assets/brand-synk.webp" alt="SYNK" width="744" height="360"></a><nav id="main-nav" class="bar-menu" aria-label="SYNK 메뉴"><a href="/#top" target="_top">회사 소개</a><a href="/atlas/" aria-current="page" target="_top">아틀라스</a><a href="/#contact" class="bar-contact" target="_top">문의</a></nav><nav class="bar-brands" aria-label="사업 선택"><a href="/lab/" aria-label="SYNK LAB 홈페이지 열기" target="_top">LAB</a><a href="/shift/" aria-label="SYNK SHIFT 홈페이지 열기" target="_top">SHIFT</a><a href="/pulse/" aria-label="SYNK PULSE 홈페이지 열기" target="_top">PULSE</a><a href="/path/" aria-label="SYNK PATH 홈페이지 열기" target="_top">PATH</a></nav><nav class="header-language" aria-label="언어 선택"><a href="/atlas/" lang="ko" hreflang="ko" aria-label="한국어" aria-current="page" target="_top">KR</a><span aria-hidden="true">·</span><a href="/en/" lang="en" hreflang="en" aria-label="English overview" target="_top">EN</a></nav><button class="menu-toggle" type="button" aria-expanded="false" aria-controls="main-nav"><span class="sr-only">메뉴</span><span class="menu-icon" aria-hidden="true"></span></button></header></div>
+  <div class="site-header-wrap site-bar" data-site-bar="synk"><header class="header shell bar"><a class="bar-logo wordmark" href="/" aria-label="SYNK 첫 화면으로" target="_top"><img src="/assets/opt/brand-synk-w144.webp" alt="SYNK" width="744" height="360"></a><nav id="main-nav" class="bar-menu" aria-label="SYNK 메뉴"><a href="/#top" target="_top">회사 소개</a><a href="/atlas/" aria-current="page" target="_top">아틀라스</a><a href="/#contact" class="bar-contact" target="_top">문의</a></nav><nav class="bar-brands" aria-label="사업 선택"><a href="/lab/" aria-label="SYNK LAB 홈페이지 열기" target="_top">LAB</a><a href="/shift/" aria-label="SYNK SHIFT 홈페이지 열기" target="_top">SHIFT</a><a href="/pulse/" aria-label="SYNK PULSE 홈페이지 열기" target="_top">PULSE</a><a href="/path/" aria-label="SYNK PATH 홈페이지 열기" target="_top">PATH</a></nav><nav class="header-language" aria-label="언어 선택"><a href="/atlas/" lang="ko" hreflang="ko" aria-label="한국어" aria-current="page" target="_top">KR</a><span aria-hidden="true">·</span><a href="/en/" lang="en" hreflang="en" aria-label="English overview" target="_top">EN</a></nav><button class="menu-toggle" type="button" aria-expanded="false" aria-controls="main-nav"><span class="sr-only">메뉴</span><span class="menu-icon" aria-hidden="true"></span></button></header></div>
   <main class="observatory" id="observatory">
 
     <section class="workspace" aria-label="Atlas 엔진 연결망">
@@ -28,7 +29,7 @@
         </div>
         <div class="intro-statement">
           <h2>SYNK는 Atlas로<br>개인화 시스템을 만듭니다</h2>
-          <p class="intro-copy">개인의 목표와 상황을 이해하고,<br>필요한 배움과 도움을 연결합니다.</p>
+          <p class="intro-copy">목표와 상황을 읽고,<br>지금 필요한 도움을 고릅니다.</p>
         </div>
       </div>
 
@@ -51,8 +52,8 @@
           <div id="explore-panel">
             <p class="panel-index mono" id="panel-index">ENGINE CONNECTIONS / 01 — 08</p>
             <div id="engine-detail" aria-live="polite" aria-atomic="true">
-              <h3 id="detail-title">여덟 역할을 하나로</h3>
-              <p id="detail-description">이해와 판단부터 표현, 기록, 변화의 확인까지.<br>여덟 엔진이 각자의 역할로 개인화를 완성해 갑니다.</p>
+              <h3 id="detail-title">여덟 엔진이 나눠 맡습니다</h3>
+              <p id="detail-description">이해와 판단, 장면과 말,<br>기록과 확인까지.</p>
               <ul class="concepts" id="concepts" aria-label="주요 기능" hidden></ul>
             </div>
             <div class="related" id="related"><button type="button" class="text-action" id="start-exploring">Core부터 살펴보기 <span class="arrow-icon" aria-hidden="true"></span></button></div>
@@ -72,70 +73,60 @@
     </section>
 
     <section class="personalization" id="personalization" aria-labelledby="personalization-title">
-      <div class="section-heading"><p class="section-index mono">02 / PERSONALIZATION</p><h2 id="personalization-title">개인의 차이가<br>시스템의 기준이 됩니다</h2><p class="section-lead">같은 목표라도 출발점과 필요한 도움은 다릅니다.<br>Atlas는 그 차이를 다음 경험에 반영하도록 설계합니다.</p></div>
+      <div class="section-heading"><p class="section-index mono">02 / PERSONALIZATION</p><h2 id="personalization-title">같은 목표,<br>다른 도움</h2><p class="section-lead">출발점이 다르면 필요한 도움도 다릅니다.<br>Atlas는 그 차이를 다음 연습에 반영하도록 만들고 있습니다.</p></div>
       <ol class="system-flow">
-        <li><img class="flow-icon" src="/assets/loom-search-20260918.webp" width="355" height="480" alt="" loading="lazy" decoding="async"><span class="flow-number mono">01</span><h3>이해</h3><div class="flow-detail"><p>목표와 현재 상황, 이전의 경험을 살펴<br>지금 필요한 도움의 방향을 정합니다.</p><span class="flow-engines">Core · Strata · Trail</span></div><span class="flow-result">개인의 맥락</span></li>
-        <li><img class="flow-icon" src="/assets/loom-adapt-20260918.webp" width="480" height="446" alt="" loading="lazy" decoding="async"><span class="flow-number mono">02</span><h3>구성</h3><div class="flow-detail"><p>배울 내용과 설명, 화면과 소리를 연결해<br>개인에게 맞는 경험을 구성합니다.</p><span class="flow-engines">Loom · Vellum · Reed</span></div><span class="flow-result">맞춤 경험</span></li>
-        <li><img class="flow-icon" src="/assets/loom-check-20260918.webp" width="480" height="437" alt="" loading="lazy" decoding="async"><span class="flow-number mono">03</span><h3>확인</h3><div class="flow-detail"><p>어떤 도움이 있었고 무엇이 달라졌는지.<br>확인한 결과를 다음 선택에 반영합니다.</p><span class="flow-engines">Prism · Temper · Trail</span></div><span class="flow-result">다음 선택</span></li>
+        <li><img class="flow-icon" src="/assets/opt/loom-search-20260918-w128.webp" width="355" height="480" alt="" loading="lazy" decoding="async"><span class="flow-number mono">01</span><h3>이해</h3><div class="flow-detail"><p>목표와 지금 상황,<br>지난 경험을 봅니다.</p><span class="flow-engines">Core · Strata · Trail</span></div></li>
+        <li><img class="flow-icon" src="/assets/opt/loom-adapt-20260918-w176.webp" width="480" height="446" alt="" loading="lazy" decoding="async"><span class="flow-number mono">02</span><h3>구성</h3><div class="flow-detail"><p>배울 내용과 설명, 화면과 소리를<br>한 사람에게 맞춥니다.</p><span class="flow-engines">Loom · Vellum · Reed</span></div></li>
+        <li><img class="flow-icon" src="/assets/opt/loom-check-20260918-w176.webp" width="480" height="437" alt="" loading="lazy" decoding="async"><span class="flow-number mono">03</span><h3>확인</h3><div class="flow-detail"><p>무엇이 달라졌는지 확인하고,<br>다음 선택에 씁니다.</p><span class="flow-engines">Prism · Temper · Trail</span></div></li>
       </ol>
       <p class="scope-note">개발 중인 개인화 시스템의 설계 방향입니다. Strata는 설계·준비 단계입니다.</p>
     </section>
 
     <section class="adaptation" id="atlas-goals" aria-labelledby="atlas-goals-title">
-      <div class="section-heading"><p class="section-index mono">03 / ADAPTATION</p><h2 id="atlas-goals-title">목표가 달라지면,<br>준비할 내용도 달라집니다</h2><p class="section-lead">처음에는 대학 입학을 준비하던 학생도, 유학 중에는 발표나 취업 면접이 더 중요해질 수 있습니다. 아틀라스는 새로 정한 목표와 최근의 학습 결과를 함께 살펴 과제와 설명 방식을 조정하도록 개발하고 있습니다.</p></div>
+      <div class="section-heading"><p class="section-index mono">03 / ADAPTATION</p><h2 id="atlas-goals-title">목표가 바뀌면,<br>연습도 바뀝니다</h2><p class="section-lead">입학을 준비하던 학생도 유학 중에는 발표나 면접이 더 급해집니다. 아틀라스는 새 목표와 최근 학습 결과를 보고 과제를 바꾸도록 개발하고 있습니다.</p></div>
       <div class="example-explorer" data-scene-explorer data-prefetch-scenes>
         <div class="example-nav" data-scene-nav hidden aria-label="목표별 연습 예시"><button type="button" id="atlas-goal-choice-study" data-scene-choice><span class="mono">01</span>유학 준비</button><button type="button" id="atlas-goal-choice-presentation" data-scene-choice><span class="mono">02</span>수업 발표</button><button type="button" id="atlas-goal-choice-interview" data-scene-choice><span class="mono">03</span>취업 면접</button></div>
         <section class="goal-panel" data-scene-panel id="atlas-goal-study" aria-label="유학 준비 예시">
-          <div class="goal-context"><span class="goal-art"><img src="/assets/path-study-plan-20260919.webp" alt="펠트 대학 건물까지 이어지는 초록색 길과 학습 계획 노트" width="1120" height="1120" loading="lazy" decoding="async"></span><div><p class="example-label">유학 준비</p><h3>지원할 전공과 이유를 말하기</h3><p>한국 대학에 지원하려고 합니다. 관심 있는 전공과 그 전공을 배우고 싶은 이유를 한국어로 설명하는 연습이 필요합니다.</p></div></div>
-          <ol class="goal-steps"><li><span class="mono">01</span><h4>목표와 현재 수준 확인</h4><p>지원하고 싶은 전공과 이유를 짧게 말해 보며, 알고 있는 표현과 막히는 부분을 살펴봅니다.</p></li><li><span class="mono">02</span><h4>필요한 연습 선택</h4><p>내 경험과 전공을 연결해 말하는 연습을 고르고, 필요한 이유 표현을 함께 익힙니다.</p></li><li><span class="mono">03</span><h4>다시 해 본 결과 확인</h4><p>힌트 없이 전공과 지원 이유를 설명할 수 있는지, 듣는 사람이 이해할 수 있는지 확인합니다.</p></li></ol>
-          <p class="goal-takeaway">말할 수 있는 내용은 더 구체적으로, 막힌 표현은 짧은 문장부터 연습합니다.</p>
+          <div class="goal-context"><span class="goal-art"><img src="/assets/path-study-plan-20260919.webp" alt="펠트 대학 건물까지 이어지는 초록색 길과 학습 계획 노트" width="1120" height="1120" loading="lazy" decoding="async"></span><div><p class="example-label">유학 준비</p><h3>지원할 전공과 이유를 말하기</h3><p>관심 있는 전공과 그 이유를 한국어로 설명해야 합니다.</p></div></div>
+          <ol class="goal-steps"><li><span class="mono">01</span><h4>지금 수준 확인</h4><p>전공과 이유를 짧게 말해 보고, 막히는 표현을 찾습니다.</p></li><li><span class="mono">02</span><h4>필요한 연습</h4><p>내 경험과 전공을 이어 말하는 연습을 합니다.</p></li><li><span class="mono">03</span><h4>다시 해 보기</h4><p>힌트 없이도 설명할 수 있는지 확인합니다.</p></li></ol>
         </section><section class="goal-panel" data-scene-panel id="atlas-goal-presentation" aria-label="수업 발표 예시">
-          <div class="goal-context"><span class="goal-art"><img src="/assets/lab-presentation-20260919.webp" alt="발표 순서를 나타내는 펠트 보드와 작은 연단" width="1120" height="1120" loading="lazy" decoding="async"></span><div><p class="example-label">수업 발표</p><h3>조사한 내용을 친구들에게 설명하기</h3><p>대학 수업에서 조별 발표를 맡았습니다. 조사한 내용을 순서대로 설명하고 친구들의 질문에 답해야 합니다.</p></div></div>
-          <ol class="goal-steps"><li><span class="mono">01</span><h4>목표와 현재 수준 확인</h4><p>발표할 내용을 짧게 설명해 보며, 생각이 잘 이어지는지와 설명하기 어려운 부분을 살펴봅니다.</p></li><li><span class="mono">02</span><h4>필요한 연습 선택</h4><p>핵심 내용과 근거를 순서대로 말하고, 예상 질문에 내 말로 답하는 연습을 합니다.</p></li><li><span class="mono">03</span><h4>다시 해 본 결과 확인</h4><p>원고를 그대로 읽지 않고 핵심을 전달하는지, 추가 질문에도 답할 수 있는지 확인합니다.</p></li></ol>
-          <p class="goal-takeaway">발표 흐름이 잡혔다면, 질문을 듣고 바로 답하는 연습으로 이어갑니다.</p>
+          <div class="goal-context"><span class="goal-art"><img src="/assets/opt/lab-presentation-20260919-w672.webp" alt="발표 순서를 나타내는 펠트 보드와 작은 연단" width="1120" height="1120" loading="lazy" decoding="async"></span><div><p class="example-label">수업 발표</p><h3>조사한 내용을 친구들에게 설명하기</h3><p>조사한 내용을 순서대로 설명하고, 친구들의 질문에 답해야 합니다.</p></div></div>
+          <ol class="goal-steps"><li><span class="mono">01</span><h4>지금 수준 확인</h4><p>발표 내용을 짧게 말해 보고, 설명이 어려운 부분을 찾습니다.</p></li><li><span class="mono">02</span><h4>필요한 연습</h4><p>핵심과 근거를 순서대로 말하고, 예상 질문에 답해 봅니다.</p></li><li><span class="mono">03</span><h4>다시 해 보기</h4><p>원고 없이 핵심을 전할 수 있는지 확인합니다.</p></li></ol>
         </section><section class="goal-panel" data-scene-panel id="atlas-goal-interview" aria-label="취업 면접 예시">
-          <div class="goal-context"><span class="goal-art"><img src="/assets/path-interview-practice-20260919.webp" alt="자기소개 서류와 질문 카드가 놓인 초록색 펠트 파일" width="1120" height="1120" loading="lazy" decoding="async"></span><div><p class="example-label">취업 면접</p><h3>내가 해 본 일을 면접에서 전달하기</h3><p>취업 면접을 앞두고 있습니다. 프로젝트에서 맡았던 일과 문제를 해결한 경험을 구체적으로 설명해야 합니다.</p></div></div>
-          <ol class="goal-steps"><li><span class="mono">01</span><h4>목표와 현재 수준 확인</h4><p>해 본 프로젝트를 하나 고르고, 내가 맡은 역할과 직접 한 일을 설명해 봅니다.</p></li><li><span class="mono">02</span><h4>필요한 연습 선택</h4><p>상황, 내가 한 일, 결과를 연결해 답하고 면접관이 더 물을 만한 질문을 연습합니다.</p></li><li><span class="mono">03</span><h4>다시 해 본 결과 확인</h4><p>같은 경험을 다른 질문에도 연결할 수 있는지, 내 역할이 분명히 드러나는지 확인합니다.</p></li></ol>
-          <p class="goal-takeaway">스스로 설명할 수 있는 경험은 남기고, 답하기 어려웠던 질문을 다음 연습에 반영합니다.</p>
+          <div class="goal-context"><span class="goal-art"><img src="/assets/path-interview-practice-20260919.webp" alt="자기소개 서류와 질문 카드가 놓인 초록색 펠트 파일" width="1120" height="1120" loading="lazy" decoding="async"></span><div><p class="example-label">취업 면접</p><h3>내가 해 본 일을 면접에서 전달하기</h3><p>프로젝트에서 맡은 일과 문제를 해결한 경험을 설명해야 합니다.</p></div></div>
+          <ol class="goal-steps"><li><span class="mono">01</span><h4>지금 수준 확인</h4><p>해 본 프로젝트 하나를 골라, 내가 한 일을 말해 봅니다.</p></li><li><span class="mono">02</span><h4>필요한 연습</h4><p>상황과 한 일, 결과를 이어 답하고 꼬리 질문에 대비합니다.</p></li><li><span class="mono">03</span><h4>다시 해 보기</h4><p>다른 질문에도 같은 경험을 쓸 수 있는지 확인합니다.</p></li></ol>
         </section>
       </div>
       <p class="scope-note">목표에 따라 연습이 달라지는 방식을 보여주는 예시입니다.</p>
     </section>
 
     <section class="hands-on" id="atlas-example" aria-labelledby="atlas-example-title">
-      <div class="section-heading"><p class="section-index mono">04 / HANDS-ON</p><h2 id="atlas-example-title">교수님께 부탁하는<br>메일을 써 보세요</h2><p class="section-lead">상황에 맞춰 메일을 쓰고, 필요한 힌트로 내 글을 다듬는 연습입니다.</p></div>
+      <div class="section-heading"><p class="section-index mono">04 / HANDS-ON</p><h2 id="atlas-example-title">교수님께 부탁하는<br>메일을 써 보세요</h2><p class="section-lead">상황에 맞춰 메일을 쓰고, 필요한 힌트만 열어 내 글을 고칩니다.</p></div>
       <div class="letter-layout">
-        <p class="example-guide" id="atlas-help-choice-label">아래 항목은 도움 미리보기입니다. 직접 연습하려면 ‘메일 쓰기 체험하기’를 누르세요.</p>
-        <div class="letter-situation"><p class="example-label">메일을 쓸 상황</p><h3>몸이 아파 과제 제출일을 놓쳤습니다</h3><p>제출일은 어제였습니다. 교수님께 늦어진 이유를 설명하고, 제출 기한을 5일 늘려 주실 수 있는지 부탁하는 메일을 써야 합니다.</p></div>
+        <div class="letter-situation"><p class="example-label">메일을 쓸 상황</p><h3>몸이 아파 과제 제출일을 놓쳤습니다</h3><p>제출일은 어제였습니다. 늦어진 이유를 설명하고, 기한을 5일 늘려 달라고 부탁해야 합니다.</p></div>
         <div class="example-explorer" data-scene-explorer>
-          <div class="example-nav example-nav--help" data-scene-nav hidden aria-labelledby="atlas-help-choice-label"><button type="button" id="atlas-choice-organize" data-scene-choice><strong>내용 정리</strong><span>무엇을 써야 할지 모르겠다면</span></button><button type="button" id="atlas-choice-request" data-scene-choice><strong>정중한 부탁</strong><span>교수님께 어떻게 말할지 어렵다면</span></button><button type="button" id="atlas-choice-try" data-scene-choice><strong>혼자 써 보기</strong><span>힌트 없이 먼저 써 보고 싶다면</span></button></div>
+          <div class="example-nav example-nav--help" data-scene-nav hidden aria-label="필요한 도움 고르기"><button type="button" id="atlas-choice-organize" data-scene-choice><strong>내용 정리</strong><span>무엇을 써야 할지 모르겠다면</span></button><button type="button" id="atlas-choice-request" data-scene-choice><strong>정중한 부탁</strong><span>교수님께 어떻게 말할지 어렵다면</span></button><button type="button" id="atlas-choice-try" data-scene-choice><strong>혼자 써 보기</strong><span>힌트 없이 먼저 써 보고 싶다면</span></button></div>
           <article class="letter-panel" data-scene-panel id="atlas-help-organize">
-            <p class="panel-index mono">01 / 내용 정리</p><h3>메일에 넣을 세 가지를 정리해 보세요</h3><p>무슨 말을 쓸지 막히면 내용을 정리하는 도움부터 봅니다. 처음부터 완성된 문장으로 쓰지 않아도 괜찮습니다.</p>
-            <ol class="letter-prompts"><li><span class="mono">01</span>교수님이 사정을 알 수 있도록 과제를 제때 내지 못한 이유를 적어 보세요.</li><li><span class="mono">02</span>상황에 나온 요청 기간을 확인하고, 시간이 얼마나 더 필요한지 적어 보세요.</li><li><span class="mono">03</span>제출 기한을 늘릴 수 있는지, 교수님께 부탁할 내용을 적어 보세요.</li></ol>
-            <details class="letter-hint"><summary>힌트 예시 열기</summary><p>늦어진 이유 → 더 필요한 기간 → 기한을 늘려 달라는 부탁 순서로 메모해 보세요. 정중한 문장으로 다듬는 일은 그다음에 해도 됩니다.</p></details>
+            <p class="panel-index mono">01 / 내용 정리</p><h3>메일에 넣을 세 가지를 정리해 보세요</h3><p>늦어진 이유, 더 필요한 기간, 부탁할 내용부터 적습니다.</p>
           </article><article class="letter-panel" data-scene-panel id="atlas-help-request">
-            <p class="panel-index mono">02 / 정중한 부탁</p><h3>교수님께 부탁하는 표현을 확인해 보세요</h3><p>전할 내용이 정해졌다면 말투를 다듬을 차례입니다. 아래 기준과 내가 쓴 문장을 하나씩 비교해 보세요.</p>
-            <ol class="letter-prompts"><li><span class="mono">01</span>교수님께는 높임말을 씁니다. 문장 끝에 반말이 남아 있지 않은지 확인해 보세요.</li><li><span class="mono">02</span>기한을 바꾸려면 교수님의 허락이 필요합니다. 일방적으로 알리지 않고 가능한지 묻는 표현으로 써 보세요.</li><li><span class="mono">03</span>시간이 얼마나 더 필요한지 밝혀야 부탁을 이해할 수 있습니다. 상황에 나온 요청 기간을 빠뜨리지 않았는지 확인해 보세요.</li></ol>
-            <details class="letter-hint"><summary>힌트 예시 열기</summary><p>허락을 구할 때는 ‘-아/어도 될까요?’ 같은 표현을 쓸 수 있습니다. 제출 기한을 늘려 달라는 부탁에 연결해 보세요.</p></details>
+            <p class="panel-index mono">02 / 정중한 부탁</p><h3>교수님께 부탁하는 표현을 확인해 보세요</h3><p>높임말과 허락을 구하는 표현을 내 문장과 비교합니다.</p>
           </article><article class="letter-panel" data-scene-panel id="atlas-help-try">
-            <p class="panel-index mono">03 / 혼자 써 보기</p><h3>먼저 쓰고, 필요한 부분만 고쳐 보세요</h3><p>체험 첫 화면에서 힌트를 줄 친구를 고른 뒤 ‘메일 쓰기 시작’을 누르세요. 완성된 답을 받는 대신 내 문장으로 써 봅니다.</p>
-            <ol class="letter-prompts"><li><span class="mono">01</span>늦어진 이유와 더 필요한 기간, 부탁을 담아 써 보세요. 힌트는 필요할 때만 열어도 됩니다.</li><li><span class="mono">02</span>다 썼다면 ‘내 글 확인하고 고치기’를 눌러 빠진 내용과 말투를 살펴보세요.</li><li><span class="mono">03</span>고친 뒤 ‘내 메일 완성하기’를 누르세요. 글을 수정했다면 ‘처음 글과 고친 글 나란히 보기’에서 달라진 부분을 확인할 수 있습니다.</li></ol>
-            <details class="letter-hint"><summary>힌트 예시 열기</summary><p>메일을 소리 내어 읽어 보세요. 늦어진 이유나 요청 기간이 빠졌거나 부탁이 명령처럼 들리는 부분만 고쳐 보세요.</p></details>
+            <p class="panel-index mono">03 / 혼자 써 보기</p><h3>먼저 쓰고, 필요한 부분만 고쳐 보세요</h3><p>힌트 없이 먼저 쓰고, 빠진 내용과 말투만 고칩니다.</p>
           </article>
         </div>
       </div>
-      <div class="letter-footer"><p>체험에서는 필요한 힌트만 열어 보고 내 글을 직접 고칩니다. 작성한 메일은 실제 교수님께 전송되지 않습니다.</p><a class="text-action" href="/try/letter/" target="_top">메일 쓰기 체험하기 <span class="arrow-icon" aria-hidden="true"></span></a></div>
+      <div class="letter-footer"><p>작성한 메일은 실제로 전송되지 않습니다.</p><a class="text-action" href="/try/letter/" target="_top">메일 쓰기 체험하기 <span class="arrow-icon" aria-hidden="true"></span></a></div>
     </section>
 
     <section class="applications" id="applications" aria-labelledby="applications-title">
-      <div class="section-heading"><p class="section-index mono">05 / BUILT WITH ATLAS</p><h2 id="applications-title">하나의 기술,<br>다양한 경험</h2><p class="section-lead">SYNK는 각 서비스의 목적에 맞게<br>필요한 엔진을 연결합니다.</p></div>
+      <div class="section-heading"><p class="section-index mono">05 / BUILT WITH ATLAS</p><h2 id="applications-title">Atlas가<br>쓰이는 곳</h2><p class="section-lead">서비스마다 목적에 맞는<br>엔진을 골라 씁니다.</p></div>
       <ul class="application-list">
-        <li><a class="application-link" data-service="lab" href="/lab/" target="_top"><span class="application-name">LAB</span><strong>배움의 다음 단계</strong><span class="application-detail">목표와 학습 결과에 맞는 한국어 과제와 힌트</span><span class="arrow-icon" aria-hidden="true"></span></a></li>
-        <li><a class="application-link" data-service="shift" href="/shift/" target="_top"><span class="application-name">SHIFT</span><strong>일에 맞는 AI 경험</strong><span class="application-detail">참여자의 업무와 수준을 고려한 실습과 제작 과정</span><span class="arrow-icon" aria-hidden="true"></span></a></li>
-        <li><a class="application-link" data-service="pulse" href="/pulse/" target="_top"><span class="application-name">PULSE</span><strong>감각으로 전하는 이야기</strong><span class="application-detail">캐릭터의 움직임, 음악과 장면 표현</span><span class="arrow-icon" aria-hidden="true"></span></a></li>
-        <li><a class="application-link" data-service="path" href="/path/" target="_top"><span class="application-name">PATH</span><strong>목표로 이어지는 준비</strong><span class="application-detail">희망 전공과 진로에 맞춘 유학·면접 연습</span><span class="arrow-icon" aria-hidden="true"></span></a></li>
+        <li><a class="application-link" data-service="lab" href="/lab/" target="_top"><span class="application-name">LAB</span><span class="application-detail">목표와 학습 결과에 맞춘 한국어 과제와 힌트</span><span class="arrow-icon" aria-hidden="true"></span></a></li>
+        <li><a class="application-link" data-service="shift" href="/shift/" target="_top"><span class="application-name">SHIFT</span><span class="application-detail">업무와 수준에 맞춘 AI 실습과 제작</span><span class="arrow-icon" aria-hidden="true"></span></a></li>
+        <li><a class="application-link" data-service="pulse" href="/pulse/" target="_top"><span class="application-name">PULSE</span><span class="application-detail">캐릭터의 움직임과 음악, 장면 표현</span><span class="arrow-icon" aria-hidden="true"></span></a></li>
+        <li><a class="application-link" data-service="path" href="/path/" target="_top"><span class="application-name">PATH</span><span class="application-detail">희망 전공과 진로에 맞춘 유학·면접 연습</span><span class="arrow-icon" aria-hidden="true"></span></a></li>
       </ul>
-      <p class="scope-note">LAB을 중심으로 개인화 학습 기능을 개발하고 있습니다. 각 서비스의 제공 범위는 해당 소개에서 확인할 수 있습니다.</p>
+      <p class="scope-note">개인화 학습 기능은 LAB에서 먼저 개발하고 있습니다.</p>
     </section>
     <footer class="colophon"><p><span class="mono">SYNK / ATLAS</span><span class="footer-dot">·</span>개인을 위한 시스템을 만듭니다.</p><button type="button" id="about-open">개발 범위 <span class="arrow-icon" aria-hidden="true"></span></button></footer>
   </main>
@@ -1054,8 +1045,8 @@ window.ATLAS_DATA = {
       $('stage-caption').textContent=engine.name.toUpperCase()+' / CONNECTED TO ATLAS';
     } else {
       $('panel-index').textContent='ENGINE CONNECTIONS / 01 — 08';
-      $('detail-title').textContent='여덟 역할을 하나로';
-      $('detail-description').replaceChildren(document.createTextNode('이해와 판단부터 표현, 기록, 변화의 확인까지.'),document.createElement('br'),document.createTextNode('여덟 엔진이 각자의 역할로 개인화를 완성해 갑니다.'));
+      $('detail-title').textContent='여덟 엔진이 나눠 맡습니다';
+      $('detail-description').replaceChildren(document.createTextNode('이해와 판단, 장면과 말,'),document.createElement('br'),document.createTextNode('기록과 확인까지.'));
       const start=create('button','Core부터 살펴보기','text-action');start.type='button';const arrow=create('span',null,'arrow-icon');arrow.setAttribute('aria-hidden','true');start.append(arrow);start.addEventListener('click',()=>selectEngine('core'));$('related').append(start);
       $('stage-caption').textContent='08 ENGINES / ONE SYSTEM';
     }

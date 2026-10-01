@@ -176,10 +176,10 @@ button:disabled{cursor:default;opacity:.4}
 
 /* ── Built with Atlas: one line for each business; their felt objects open the company page ── */
 .application-list{margin:56px 0 0;padding:0;list-style:none;border-top:1px solid var(--ink)}
-.application-link{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,3fr) minmax(0,5fr) 24px;align-items:baseline;column-gap:24px;padding:26px 0;border-bottom:1px solid var(--line);color:var(--ink);text-decoration:none}
+.application-link{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,8fr) 24px;align-items:baseline;column-gap:24px;padding:26px 0;border-bottom:1px solid var(--line);color:var(--ink);text-decoration:none}
 .application-name{font:700 var(--t-item)/1 var(--latin);letter-spacing:-.03em}
 .application-link strong{font:800 var(--t-body)/1.4 var(--suit);letter-spacing:-.03em;word-break:keep-all}
-.application-detail{font:500 var(--t-ui)/1.6 var(--suit);letter-spacing:-.02em;color:var(--ink-3);word-break:keep-all}
+.application-detail{font:500 var(--t-ui)/1.6 var(--suit);letter-spacing:-.02em;color:var(--ink-2);word-break:keep-all}
 .application-link .arrow-icon{align-self:center;justify-self:end;width:18px;height:18px;color:var(--ink)}
 .application-link:hover .application-name{text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:5px}
 .application-link:focus-visible{outline-offset:6px;border-radius:6px}

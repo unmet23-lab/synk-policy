@@ -3,11 +3,24 @@
 // Nothing moves on its own; no microphone, remote renderer or recorded input.
 // Its two inks come from CSS (color = the dark grains, caret-color = the lit ones), so on a colour
 // field it is printed in a deep tone of that colour.
-const GRID=64;let grainCache=null;
+const GRID=64;let grainJob=null;
 function random(seed){return function(){seed|=0;seed=seed+0x6D2B79F5|0;let t=Math.imul(seed^seed>>>15,1|seed);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+// The grain order and the sphere's shape take about 40 ms on a fast laptop and four times that on a slow phone.
+// They are worked out in slices of a few milliseconds while the page is idle, so no task is long and scrolling
+// never waits for them; the sphere is the same, pixel for pixel (2026-10-01, qa/perf-20261001).
+const whenIdle=window.requestIdleCallback?callback=>requestIdleCallback(callback,{timeout:1000}):callback=>setTimeout(()=>callback(null),16);
+function inSlices(steps){
+ return new Promise(resolve=>{
+  const run=deadline=>{
+   const stop=performance.now()+(deadline&&!deadline.didTimeout?Math.min(8,deadline.timeRemaining()):8);
+   for(;;){const next=steps.next();if(next.done){resolve(next.value);return;}if(performance.now()>=stop)break;}
+   whenIdle(run);
+  };
+  whenIdle(run);
+ });
+}
 // An even order for the grains: each next grain goes to the emptiest place (same seed as the Atlas map).
-function grainOrder(){
- if(grainCache)return grainCache;
+function* grainSteps(){
  const count=GRID*GRID,rnd=random(862104),crowd=new Float32Array(count),taken=new Uint8Array(count);
  const reach=9,span=reach*2+1,near=new Float32Array(span*span);
  for(let y=-reach;y<=reach;y++)for(let x=-reach;x<=reach;x++)near[(y+reach)*span+x+reach]=Math.exp(-(x*x+y*y)/7.22);
@@ -20,9 +33,11 @@ function grainOrder(){
   let py=0;for(let row=1;row<GRID;row++)if(rowLeast[row]<rowLeast[py])py=row;
   const place=rowPlace[py],px=place%GRID;taken[place]=1;order[place]=(step+.5)/count;
   for(let y=-reach;y<=reach;y++){const row=(py+y+GRID)%GRID,line=(y+reach)*span+reach;for(let x=-reach;x<=reach;x++)crowd[row*GRID+(px+x+GRID)%GRID]+=near[line+x];recount(row);}
+  if(step%128===127)yield;
  }
- return grainCache=order;
+ return order;
 }
+function grainOrder(){return grainJob??=inSlices(grainSteps());}
 const LIGHT={angle:-Math.PI*2*.108,lift:.56,fall:2.4,gain:.9,floor:.02,rim:.06};
 const FALL=new Float32Array(1025);for(let i=0;i<=1024;i++)FALL[i]=Math.pow(i/1024,LIGHT.fall)*LIGHT.gain;
 // Any CSS colour to [r,g,b,a] through a one-pixel canvas.
@@ -36,11 +51,11 @@ function mountOrb(button){
  const canvas=button.querySelector('canvas'),surface=button.querySelector('.orb-surface');
  const ctx=canvas?.getContext('2d');if(!ctx||!surface)return;
  const reduced=matchMedia('(prefers-reduced-motion: reduce)'),fine=matchMedia('(hover: hover) and (pointer: fine)');
- let angle=LIGHT.angle,lift=LIGHT.lift,frame=0,drawn='',shape=null;
+ let angle=LIGHT.angle,lift=LIGHT.lift,frame=0,drawn='',shape=null,preparing='';
  // Everything that depends only on the size is worked out once: where each device pixel sits on the
  // sphere, how much of it the edge covers, and the grain it is compared with.
- function measure(size,dpr){
-  const cell=Math.max(1,Math.round(dpr*.62)),radius=size/2-dpr,middle=size/2,grain=grainOrder(),outer=(1+1.5/radius)**2;
+ function* measureSteps(size,dpr,grain){
+  const cell=Math.max(1,Math.round(dpr*.62)),radius=size/2-dpr,middle=size/2,outer=(1+1.5/radius)**2;
   const index=[],cx=[],cy=[],cz=[],rim=[],threshold=[],cover=[];
   for(let py=0;py<size;py++){
    const y=(py+.5-middle)/radius,gy=Math.floor(py/cell),sy=((gy+.5)*cell-middle)/radius,row=(gy%GRID)*GRID;
@@ -50,8 +65,16 @@ function mountOrb(button){
     const gx=Math.floor(px/cell),sx=((gx+.5)*cell-middle)/radius,z=Math.sqrt(Math.max(0,1-sx*sx-sy*sy));
     index.push((py*size+px)*4);cx.push(sx);cy.push(sy);cz.push(z);rim.push(LIGHT.floor+Math.pow(1-z,5)*LIGHT.rim);threshold.push(grain[row+gx%GRID]);cover.push(edge);
    }
+   if(py%32===31)yield;
   }
-  return {size,index:Int32Array.from(index),cx:Float32Array.from(cx),cy:Float32Array.from(cy),cz:Float32Array.from(cz),rim:Float32Array.from(rim),threshold:Float32Array.from(threshold),cover:Uint8Array.from(cover)};
+  return {size,dpr,index:Int32Array.from(index),cx:Float32Array.from(cx),cy:Float32Array.from(cy),cz:Float32Array.from(cz),rim:Float32Array.from(rim),threshold:Float32Array.from(threshold),cover:Uint8Array.from(cover)};
+ }
+ // Worked out in idle slices (above); the frame after it is ready draws it.
+ function prepare(size,dpr){
+  const want=size+'|'+dpr;
+  if(preparing===want)return;
+  preparing=want;
+  grainOrder().then(grain=>inSlices(measureSteps(size,dpr,grain))).then(next=>{if(preparing!==want)return;preparing='';shape=next;request();});
  }
  function paint(){
   frame=0;
@@ -59,8 +82,10 @@ function mountOrb(button){
   const dpr=Math.min(Math.max(devicePixelRatio||1,1),3),width=surface.getBoundingClientRect().width;if(!width)return;
   const style=getComputedStyle(surface),inks=style.color+'/'+style.caretColor;
   const size=Math.round(width*dpr),key=size+'|'+dpr+'|'+angle.toFixed(2)+'|'+lift.toFixed(2)+'|'+inks;
-  if(key===drawn)return;drawn=key;
-  if(!shape||shape.size!==size||shape.dpr!==dpr){shape=measure(size,dpr);shape.dpr=dpr;canvas.width=canvas.height=size;}
+  if(key===drawn)return;
+  if(!shape||shape.size!==size||shape.dpr!==dpr){prepare(size,dpr);return;}
+  drawn=key;
+  if(canvas.width!==size)canvas.width=canvas.height=size;
   // A hair over the exact quotient so the browser never draws the bitmap a pixel short (grains stay sharp).
   const css=(size+.004)/dpr+'px';if(canvas.style.width!==css){canvas.style.width=canvas.style.height=css;}
   const image=ctx.createImageData(size,size),data=image.data,side=Math.sqrt(1-lift*lift),lx=Math.sin(angle)*side,ly=-Math.cos(angle)*side;
@@ -74,10 +99,13 @@ function mountOrb(button){
   surface.classList.add('orb-rendered');
  }
  const request=()=>{if(!frame)frame=requestAnimationFrame(paint);};
- // The sphere sits at the foot of the page: it is worked out only when it comes within reach.
- let near=!('IntersectionObserver' in window);
- if(!near)new IntersectionObserver(entries=>{near=entries.some(entry=>entry.isIntersecting);if(near)request();},{rootMargin:'800px 0px'}).observe(surface);
- new ResizeObserver(request).observe(surface);
+ // The sphere sits at the foot of the page. It is worked out in a quiet moment soon after the page settles,
+ // or when it comes within reach, whichever is first, so scrolling down never waits for it (2026-10-01).
+ let near=!('IntersectionObserver' in window),idle=0;
+ const quiet=window.requestIdleCallback?callback=>requestIdleCallback(callback,{timeout:2500}):callback=>setTimeout(callback,300);
+ const later=()=>{if(idle)return;idle=quiet(()=>{idle=0;near=true;request();});};
+ if(!near)new IntersectionObserver(entries=>{if(entries.some(entry=>entry.isIntersecting)){near=true;request();}},{rootMargin:'800px 0px'}).observe(surface);
+ new ResizeObserver(later).observe(surface);
  button.addEventListener('pointermove',event=>{
   if(reduced.matches||!fine.matches||event.pointerType==='touch')return;
   const r=surface.getBoundingClientRect(),dx=(event.clientX-r.left)/r.width*2-1,dy=(event.clientY-r.top)/r.height*2-1,d=Math.min(1,Math.hypot(dx,dy));

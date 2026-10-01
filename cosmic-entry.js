@@ -183,8 +183,9 @@ function travelFromIeung(overlay,target,departure){
     frame.style.opacity=String(state.orbOpacity);
     entry.style.transform=`scale(${state.sceneScale})`;
     entry.style.opacity=String(state.sceneOpacity);
-    path.setAttribute('d',ieungOutline(state));
-    ring.style.opacity=String(state.ringOpacity);
+    // Once the ㅇ has faded it is no longer drawn, so the last part of the change repaints less.
+    if(state.ringOpacity>.005){path.setAttribute('d',ieungOutline(state));ring.style.opacity=String(state.ringOpacity);}
+    else if(ring.style.visibility!=='hidden')ring.style.visibility='hidden';
   };
   render(0);
   return new Promise(resolve=>{

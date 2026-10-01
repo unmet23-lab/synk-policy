@@ -1,7 +1,22 @@
 import {createScene,stepScene} from './loom-scene.js';
-const {composeEyeOnly}=await import('./eye-composite.js'+new URL(import.meta.url).search);
 
+const search=new URL(import.meta.url).search;
 const image=src=>new Promise((resolve,reject)=>{const img=new Image();img.onload=()=>resolve(img);img.onerror=()=>reject(new Error('Image unavailable'));img.src=src;});
+// The closed-eye frame takes a few hundred milliseconds of pixel work and image decoding. A worker does it away
+// from the page, so scrolling does not stall while the demo comes into view (2026-10-01, qa/perf-20261001).
+// Browsers without module workers, OffscreenCanvas or createImageBitmap compose it here, as before.
+const composeAway=(base,closed,manifest)=>new Promise((resolve,reject)=>{
+  if(typeof Worker!=='function'||typeof OffscreenCanvas!=='function'||typeof createImageBitmap!=='function'){reject(new Error('No composing worker'));return;}
+  const worker=new Worker(new URL('./eye-composite-worker.js'+search,import.meta.url),{type:'module'});
+  worker.onmessage=({data})=>{worker.terminate();if(data.error)reject(new Error(data.error));else resolve(data);};
+  worker.onerror=event=>{worker.terminate();event.preventDefault();reject(new Error('Composing worker unavailable'));};
+  worker.postMessage({base:String(base),closed:String(closed),manifest});
+});
+const composeHere=async(base,closed,manifest)=>{
+  const {composeEyeOnly}=await import('./eye-composite.js'+search);
+  const [baseImage,closedImage]=await Promise.all([image(base),image(closed)]);
+  return composeEyeOnly(baseImage,closedImage,manifest);
+};
 export async function initBlinkDemo(region=document.querySelector('[data-blink-demo]')) {
   if(!region||region.dataset.initializing)return;
   region.dataset.initializing='true';
@@ -10,10 +25,10 @@ export async function initBlinkDemo(region=document.querySelector('[data-blink-d
   const replay=region.querySelector('[data-blink-replay]'),hold=region.querySelector('[data-blink-hold]');
   const motion=region.querySelector('[data-blink-motion]'),status=region.querySelector('[data-blink-status]');
   try {
-    const manifestURL=new URL('./blink-manifest.json'+new URL(import.meta.url).search,import.meta.url);
+    const manifestURL=new URL('./blink-manifest.json'+search,import.meta.url);
     const manifest=await fetch(manifestURL).then(response=>{if(!response.ok)throw new Error('Manifest unavailable');return response.json();});
-    const [base,closed]=await Promise.all([image(new URL(manifest.base,manifestURL)),image(new URL(manifest.closed,manifestURL))]);
-    const frames=composeEyeOnly(base,closed,manifest);
+    const base=new URL(manifest.base,manifestURL),closed=new URL(manifest.closed,manifestURL);
+    const frames=await composeAway(base,closed,manifest).catch(()=>composeHere(base,closed,manifest));
     canvas.width=frames.open.width;canvas.height=frames.open.height;
     const ctx=canvas.getContext('2d');
     const state=createScene({seed:913,windStrength:0,gustStrength:0});

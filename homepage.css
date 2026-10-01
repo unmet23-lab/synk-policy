@@ -12,6 +12,13 @@
 @font-face{font-family:'SYNK Latin';src:url('/assets/inter-tight.woff2') format('woff2'),url('/assets/inter-tight.ttf') format('truetype');font-weight:400;font-display:swap}
 @font-face{font-family:'SYNK Latin';src:url('/assets/inter-tight-medium.woff2') format('woff2'),url('/assets/inter-tight-medium.ttf') format('truetype');font-weight:500;font-display:swap}
 @font-face{font-family:'SYNK Latin';src:url('/assets/inter-tight-bold.woff2') format('woff2'),url('/assets/inter-tight-bold.ttf') format('truetype');font-weight:700;font-display:swap}
+/* 'SYNK Letters' is the same Inter Tight, limited to letters, digits, the middle dot, dashes, quotes and
+   arrows. With it first in the text stack, spaces and other punctuation come from SUIT with the Hangul around
+   them: a Korean sentence is shaped as one run instead of being cut at every space, which made the first
+   layout of a long page three times slower (2026-10-01, qa/perf-20261001). */
+@font-face{font-family:'SYNK Letters';src:url('/assets/inter-tight.woff2') format('woff2');font-weight:400;font-display:swap;unicode-range:U+0030-0039,U+0041-005A,U+0061-007A,U+00B7,U+00D7,U+2010-2027,U+2190-21FF}
+@font-face{font-family:'SYNK Letters';src:url('/assets/inter-tight-medium.woff2') format('woff2');font-weight:500;font-display:swap;unicode-range:U+0030-0039,U+0041-005A,U+0061-007A,U+00B7,U+00D7,U+2010-2027,U+2190-21FF}
+@font-face{font-family:'SYNK Letters';src:url('/assets/inter-tight-bold.woff2') format('woff2');font-weight:700;font-display:swap;unicode-range:U+0030-0039,U+0041-005A,U+0061-007A,U+00B7,U+00D7,U+2010-2027,U+2190-21FF}
 @font-face{font-family:'DM Mono';src:url('/assets/dm-mono.woff2') format('woff2'),url('/assets/dm-mono.ttf') format('truetype');font-weight:400;font-display:swap}
 
 /* ── Tokens ────────────────────────────────────────────────────────────── */
@@ -20,7 +27,9 @@
  --line:rgba(10,10,10,.14);--line-soft:rgba(10,10,10,.08);
  --paper:#fff;--plate:#f4f4f5;--plate-deep:#ececee;
  --accent:#0a0a0a;--accent-ink:#0a0a0a;--accent-wash:#f4f4f5;
- --sans:'SYNK Bracket','SYNK Latin','SUIT Variable',system-ui,-apple-system,'Apple SD Gothic Neo','Malgun Gothic',sans-serif;
+ --sans:'SYNK Bracket','SYNK Letters','SUIT Variable','Apple SD Gothic Neo','Malgun Gothic',system-ui,-apple-system,sans-serif;
+ /* Large titles: the full Inter Tight first, so their spaces and commas are drawn as they were designed. */
+ --display:'SYNK Bracket','SYNK Latin','SUIT Variable','Apple SD Gothic Neo','Malgun Gothic',system-ui,-apple-system,sans-serif;
  --mono:'DM Mono','SYNK Latin','SUIT Variable',ui-monospace,monospace;
  --gutter:clamp(20px,3.4vw,48px);--max:1440px;--gap:clamp(16px,1.8vw,24px);
  --section:clamp(88px,8.6vw,124px);
@@ -104,6 +113,7 @@ button{cursor:pointer}
 
 /* ── Type ──────────────────────────────────────────────────────────────── */
 /* Two-line titles: the first line bold, what follows light, as on the first screen. */
+:where(#top) :is(h1,h2){font-family:var(--display)}
 :where(#top) h1{font-size:clamp(44px,7.6vw,112px);line-height:1.02;letter-spacing:-.05em;font-weight:700}
 :where(#top) h2{font-size:clamp(34px,5vw,76px);line-height:1.1;letter-spacing:-.045em;font-weight:700}
 /* The words before the break are marked at build time (mark-title-leads.mjs), so a first line that wraps
@@ -443,7 +453,15 @@ html[lang="en"] .stage-label{font:400 11px/1.4 var(--mono);letter-spacing:.1em;t
 .story-items>article{display:grid;align-content:start;gap:10px;padding:24px 24px 30px 0;border-bottom:var(--hair) solid var(--line)}
 .story-items>article+article{padding-left:24px;border-left:var(--hair) solid var(--line)}
 .story-items--three>article:nth-child(3n+1){padding-left:0;border-left:0}
-.story-items:not(.story-items--three)>article:nth-child(2n+1){padding-left:0;border-left:0}
+.story-items:not(.story-items--three,.story-items--four)>article:nth-child(2n+1){padding-left:0;border-left:0}
+/* LAB's short sections (2026-10-01): four points in a row, a line that matters, two or four pictured cards. */
+.story-items--four{grid-template-columns:repeat(4,minmax(0,1fr))}
+.story-items--four>article:nth-child(4n+1){padding-left:0;border-left:0}
+.story-promise{margin:clamp(28px,3vw,40px) 0 0;max-width:46em;font:600 clamp(17px,1.35vw,19px)/1.55 var(--sans);letter-spacing:-.012em;color:var(--ink)}
+.visual-explainer--compact{margin-top:clamp(40px,4.4vw,64px)}
+.story-section--compact>.class-time-block{margin-top:clamp(36px,4vw,56px)}
+@media (min-width:1101px){.visual-explainer--compact[data-count="2"] .visual-scene-panels{grid-template-columns:repeat(2,minmax(0,1fr))}.visual-explainer--compact[data-count="4"] .visual-scene-panels{grid-template-columns:repeat(4,minmax(0,1fr))}}
+@media (min-width:761px) and (max-width:1100px){.story-items--four{grid-template-columns:repeat(2,minmax(0,1fr))}.story-items--four>article:nth-child(2n+1){padding-left:0;border-left:0}}
 .story-items>article h3{font-size:20px}
 .story-items>article p{font-size:16px}
 .story-item-detail summary,.story-details summary,.lab-benefit summary,.lab-curriculum-fold>summary,.lab-feedback-preview>summary,.work-design-note summary,.brand-story>summary,.visual-scene-detail>summary,.story-evidence details>summary{display:flex;justify-content:space-between;align-items:center;gap:16px;cursor:pointer;list-style:none}
@@ -841,7 +859,7 @@ html[lang="en"] .shift-workflow__heading .eyebrow{font:400 11px/1.4 var(--mono);
  .pulse-advertising-visual{max-width:640px}
 }
 @media (max-width:760px){
- .story-items,.story-items--three,.story-evidence-grid,.lab-benefits,.pulse-advertising-options{grid-template-columns:1fr}
+ .story-items,.story-items--three,.story-items--four,.story-evidence-grid,.lab-benefits,.pulse-advertising-options{grid-template-columns:1fr}
  .story-items>article,.story-items>article+article,.story-evidence-grid>article,.story-evidence-grid>article+article,.lab-benefit,.lab-benefit+.lab-benefit,.pulse-advertising-option,.pulse-advertising-option+.pulse-advertising-option{padding-left:0;padding-right:0;border-left:0}
  .visual-scene-art,.visual-scene-copy{grid-column:1/-1}
  .lab-layout,.pulse-layout,.shift-hero,.path-hero{row-gap:24px}

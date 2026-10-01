@@ -3,7 +3,6 @@ import {initLearningInteractions} from './interactions/learning.js?v=e41b2347e02
 import {initCurriculumNarrative} from './interactions/curriculum.js?v=db9dda0d05d2';
 import {initFeltInteractions} from './interactions/felt.js?v=8b2ce7e3bff0';
 import {initScrollExperience} from './interactions/scroll.js?v=aaa280e1826b';
-import {initInitialReveal} from './interactions/reveal.js?v=d8318391e1c7';
 
 let gsap, ScrollTrigger;
 // Complete a direct section link after initial layout/ScrollTrigger refresh.
@@ -12,23 +11,10 @@ const initialFragment=location.hash;
 let visitorActed=false;
 const markVisitor=()=>{visitorActed=true;};
 for(const type of ['pointerdown','keydown','wheel','touchstart'])addEventListener(type,markVisitor,{once:true,passive:true});
-const loadClassicScript=src=>new Promise((resolve,reject)=>{
-  const script=document.createElement('script');
-  const timeout=setTimeout(()=>reject(new Error('Motion load timed out')),1500);
-  script.src=new URL(src,import.meta.url).href;
-  script.onload=()=>{clearTimeout(timeout);resolve();};
-  script.onerror=()=>{clearTimeout(timeout);reject(new Error('Motion unavailable'));};
-  document.head.append(script);
-});
-try {
-  await loadClassicScript('./vendor/gsap.min.js');
-  gsap=window.gsap;
-  initInitialReveal(gsap);
-  await loadClassicScript('./vendor/ScrollTrigger.min.js');
-  gsap=window.gsap;
-  ScrollTrigger=window.ScrollTrigger;
-  if(gsap&&ScrollTrigger)gsap.registerPlugin(ScrollTrigger);
-} catch { window.synkEntry?.finish(); /* Native reading and controls remain available. */ }
+// The homepages stand still: homepage.css overrules every reveal and lift the motion library used to play.
+// It is no longer loaded (2026-10-01, qa/perf-20261001): it kept a frame loop and scroll watchers running
+// for effects no one could see. Every enhancement below works without it; the entrance finishes at once.
+window.synkEntry?.finish();
 
 const preference=matchMedia('(prefers-reduced-motion: reduce)');
 let cleanups=[];

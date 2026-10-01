@@ -2,15 +2,23 @@
  * high-resolution source art and a boundary-matched color field. The field changes
  * color offset, not texture detail. Alpha/outside-mask bytes stay with the base.
  */
+// A page canvas, or an OffscreenCanvas in eye-composite-worker.js, where there is no document.
+const surface=(width,height)=>{
+  if(typeof document==='undefined')return new OffscreenCanvas(width,height);
+  const canvas=document.createElement('canvas');canvas.width=width;canvas.height=height;return canvas;
+};
 export function composeEyeOnly(base, closed, manifest) {
-  const width=base.naturalWidth, height=base.naturalHeight;
-  const original=document.createElement('canvas');original.width=width;original.height=height;
+  const width=base.naturalWidth??base.width, height=base.naturalHeight??base.height;
+  const original=surface(width,height);
   const ctx=original.getContext('2d',{willReadFrequently:true});
   ctx.drawImage(base,0,0);
   const open=ctx.getImageData(0,0,width,height);
   const finished=new ImageData(new Uint8ClampedArray(open.data),width,height);
-  const registered=document.createElement('canvas');registered.width=width;registered.height=height;
+  const registered=surface(width,height);
   const sourceContext=registered.getContext('2d',{willReadFrequently:true});
+  // An image element is downscaled the same at every setting; the worker's ImageBitmap needs 'high' to look the same
+  // (measured differences in the eye regions only, qa/perf-20261001/README.md).
+  sourceContext.imageSmoothingQuality='high';
   const ratio=width/manifest.coordinateSpace;
   const affected=new Uint8Array(width*height);
   for (const {target,offset,scale=1} of manifest.masks) {
