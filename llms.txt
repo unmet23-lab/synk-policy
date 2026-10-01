@@ -166,7 +166,7 @@ hello@synk.im
 
 ## Korean rhythm reading game
 
-Read short Korean sentences, choose their meaning and play the beat. Three original tracks; timing and language results stay separate. Explanations and new sentence variations follow each round. This prototype has no learner efficacy or TOPIK score study, and keeps records only in the open page.
+Read short Korean sentences, choose their meaning and play the beat. Three full Korean songs created by SYNK with Suno; timing and language results stay separate. Explanations and new sentence variations follow each round. This prototype has no learner efficacy or TOPIK score study, and keeps records only in the open page.
 
 - [Play Words in Rhythm](https://synk.im/try/rhythm/)
 - [Learning design and actual captures](https://synk.im/lab/#work)

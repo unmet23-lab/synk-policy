@@ -1,6 +1,6 @@
-import {TRACKS,LEVELS,RoundState,random,shuffle} from './core.js';
-import {MusicPlayer} from './audio.js';
-import {Stage} from './stage.js';
+import {TRACKS,LEVELS,RoundState,random,shuffle} from './core.js?v=20261001-suno';
+import {MusicPlayer} from './audio.js?v=20261001-suno';
+import {Stage} from './stage.js?v=20261001-suno';
 const $=id=>document.getElementById(id);
 const state={track:0,level:'easy',screen:'lobby',round:null,pressed:new Set(),paused:false,loading:false,offset:0,activeQuestion:null,recallIndex:0};
 const music=new MusicPlayer(),stage=new Stage($('stage'));
@@ -11,7 +11,7 @@ const lanes=[...$('lane-controls').querySelectorAll('button')];
 
 function renderTracks(){
   $('track-grid').replaceChildren();
-  for(const track of TRACKS){const b=document.createElement('button');b.className='track';b.dataset.track=track.id;b.setAttribute('aria-pressed',String(state.track===track.id));b.setAttribute('aria-label',`${track.title}, ${track.tag}, ${track.bpm} BPM`);b.innerHTML=`<img class="track-cover" src="assets/signal-stage.webp" alt=""><span class="track-description"><span class="track-number mono">TRACK 0${track.id+1}</span><strong class="track-title">${track.title}</strong><span class="track-info mono">${track.bpm} BPM · ${clock(track.bars*4*60/track.bpm)} · 4 KEYS</span><span class="track-type">${track.tag}</span></span><span class="track-selected" aria-hidden="true"></span>`;b.addEventListener('click',()=>{state.track=track.id;for(const x of $('track-grid').children)x.setAttribute('aria-pressed',String(Number(x.dataset.track)===state.track));});$('track-grid').append(b);}
+  for(const track of TRACKS){const b=document.createElement('button');b.className='track';b.dataset.track=track.id;b.setAttribute('aria-pressed',String(state.track===track.id));b.setAttribute('aria-label',`${track.title}, ${track.tag}, ${track.bpm.toFixed(1)} BPM`);b.innerHTML=`<img class="track-cover" src="assets/signal-stage.webp" alt=""><span class="track-description"><span class="track-number mono">TRACK 0${track.id+1} · SYNK / SUNO</span><strong class="track-title">${track.title}</strong><span class="track-info mono">${track.bpm.toFixed(1)} BPM · ${clock(track.duration)} · 4 KEYS</span><span class="track-type">${track.tag}</span></span><span class="track-selected" aria-hidden="true"></span>`;b.addEventListener('click',()=>{state.track=track.id;for(const x of $('track-grid').children)x.setAttribute('aria-pressed',String(Number(x.dataset.track)===state.track));});$('track-grid').append(b);}
 }
 function screen(name){for(const s of ['lobby','game','results'])$(s).hidden=s!==name;state.screen=name;document.body.classList.toggle('playing',name==='game');if(name!=='game')window.scrollTo({top:0,behavior:'instant'});if(name==='game')stage.resize();}
 function toast(message){clearTimeout(toastTimer);$('toast').textContent=message;$('toast').hidden=false;toastTimer=setTimeout(()=>$('toast').hidden=true,3600);}
@@ -20,7 +20,7 @@ function resetQuestion(){state.activeQuestion=null;$('phrase-card').hidden=true;
 async function start(){
   if(state.loading)return;state.loading=true;const generation=++startGeneration;$('loading').hidden=false;$('start-button').disabled=true;
   try{
-    if(!window.AudioContext||!window.OfflineAudioContext)throw new Error('이 브라우저는 음악 재생을 지원하지 않아요. 최신 Chrome 또는 Edge에서 열어주세요.');
+    if(!window.AudioContext)throw new Error('이 브라우저는 음악 재생을 지원하지 않아요. 최신 Chrome 또는 Edge에서 열어주세요.');
     const track=TRACKS[state.track],buffer=await music.prepare(track);if(generation!==startGeneration)return;
     state.round=new RoundState(track,state.level,crypto.getRandomValues(new Uint32Array(1))[0]);state.pressed.clear();state.paused=false;stage.particles=[];stage.flashes=[0,0,0,0];resetQuestion();
     $('game').dataset.track=track.id;$('game-title').textContent=track.title;$('game-track-number').textContent=`TRACK 0${track.id+1} / ${LEVELS[state.level].label}`;
@@ -84,4 +84,4 @@ document.addEventListener('keyup',e=>{if(Object.hasOwn(keyLanes,e.code)){if(stat
 document.addEventListener('visibilitychange',()=>{if(document.hidden)pause();});window.addEventListener('blur',()=>pause());
 renderTracks();
 // Read-only diagnostics for QA. Input remains through real keyboard/pointer events.
-window.synkRhythm={snapshot:()=>({screen:state.screen,paused:state.paused,loading:state.loading,time:music.time,audioState:music.state,score:state.round?.score,combo:state.round?.combo,correct:state.round?.correctCount,processed:state.round?.processed,notes:state.round?.notes.map(n=>({time:n.time,lane:n.lane,duration:n.duration,state:n.state})),questions:state.round?.questions.map(q=>({time:q.time,showTime:q.showTime,state:q.state,response:q.response,options:q.options,answer:q.answer,prompt:q.prompt})),duration:state.round?.duration,level:state.level,track:state.track}),audio:()=>music.context};
+window.synkRhythm={snapshot:()=>({screen:state.screen,paused:state.paused,loading:state.loading,time:music.time,audioState:music.state,recording:music.recording,signalLevel:music.signalLevel,score:state.round?.score,combo:state.round?.combo,correct:state.round?.correctCount,processed:state.round?.processed,notes:state.round?.notes.map(n=>({time:n.time,lane:n.lane,duration:n.duration,state:n.state})),questions:state.round?.questions.map(q=>({time:q.time,showTime:q.showTime,state:q.state,response:q.response,options:q.options,answer:q.answer,prompt:q.prompt})),duration:state.round?.duration,level:state.level,track:state.track}),audio:()=>music.context};
