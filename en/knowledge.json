@@ -63,7 +63,7 @@
         "SHIFT — Shapes AI practice and production activities around participants' work and experience.",
         "PULSE — Uses the engines needed for character movement, music, and visual scenes.",
         "PATH — Adjusts practice for life in Korea and interviews to each learner's intended major, career plans, and Korean level.",
-        "We are developing personalized learning features with LAB as the main focus. SHIFT, PULSE, and PATH use the engines needed for their services.\nThe descriptions above include features in development and Strata, which is planned for a future addition.",
+        "We are developing personalized learning features at LAB first. SHIFT, PULSE, and PATH use the engines their services need.\nThe descriptions above include features in development and Strata, which is planned for a future addition.",
         "Strata is planned as a future addition."
       ],
       "updatedAt": "2026-10-02"
@@ -3874,7 +3874,7 @@
         "How is Atlas used by each brand?",
         "What does it mean for Atlas to evolve with the user?"
       ],
-      "answer": "Atlas is SYNK's core technology for finding the learning and support each person needs, based on their goals and experience. Eight engines share the work: understanding the person, choosing what to learn and in what order, explaining it, and reviewing the results.\n\nA student may first prepare for university admission, then need help with presentations or job interviews while studying in Korea. We are developing Atlas to adjust tasks and explanations using the learner's new goals and recent work.\n\nCore — Choosing the next learning step. Looks at what a learner wants to achieve and where they are struggling, then identifies the next task and the support they need.\n\nLoom — Scenes that respond to you. Combines soft materials, light, and movement to create interfaces and characters, with scenes that respond naturally to the user's actions.\n\nVellum — Explanations that make sense. Offers explanations and hints suited to the current task and the student's answer. Explains why the practice matters and what to look at when the student gets stuck.\n\nTrail — Tracking practice and progress. Records the tasks completed and the help received. Lets learners compare earlier and recent answers to see what has changed.\n\nPrism — Comparing learning results. Finds recurring difficulties and differences across learning examples. Highlights which content and explanations need a closer look.\n\nTemper — Checking whether support helped. Checks what actually changed after a hint or practice activity, then uses those results to improve tasks and support.\n\nReed — Music and sound for each scene. Handles music and sound for creative work and learning scenes. Adjusts their use around the listening experience and moments that need focus.\n\nStrata (planned) — A map of what to learn next. Connects grammar, expressions, and vocabulary by difficulty and prerequisites. Helps identify the learning needed for a goal and which basics to revisit after a mistake.\n\nPractice writing for a specific situation, then use the hints you need to improve your own draft.\n\nYou were ill and missed an assignment deadline.\n\nThe deadline was yesterday. Write an email explaining why you are late and asking your professor for a five-day extension.\n\nPlan the three things your email needs. If you are stuck for words, start with help organizing your message. You do not need to write complete sentences yet.\n\nCheck how to make a request to your professor. Once you know what to say, work on how to say it. Compare your sentences with each point below.\n\nWrite first, then revise what needs work. On the first demo screen, choose a friend to give you hints, then select “Start writing.” Write in your own words rather than receiving a complete answer.\n\nIn the demo, you choose the hints you need and revise your own writing. Your email is not sent to a real professor.\n\nLAB — Adjusts Korean tasks and hints to the student's goals and learning results.\n\nSHIFT — Shapes AI practice and production activities around participants' work and experience.\n\nPULSE — Uses the engines needed for character movement, music, and visual scenes.\n\nPATH — Adjusts practice for life in Korea and interviews to each learner's intended major, career plans, and Korean level.\n\nWe are developing personalized learning features with LAB as the main focus. SHIFT, PULSE, and PATH use the engines needed for their services.\nThe descriptions above include features in development and Strata, which is planned for a future addition.",
+      "answer": "Atlas is SYNK's core technology for finding the learning and support each person needs, based on their goals and experience. Eight engines share the work: understanding the person, choosing what to learn and in what order, explaining it, and reviewing the results.\n\nA student may first prepare for university admission, then need help with presentations or job interviews while studying in Korea. We are developing Atlas to adjust tasks and explanations using the learner's new goals and recent work.\n\nCore — Choosing the next learning step. Looks at what a learner wants to achieve and where they are struggling, then identifies the next task and the support they need.\n\nLoom — Scenes that respond to you. Combines soft materials, light, and movement to create interfaces and characters, with scenes that respond naturally to the user's actions.\n\nVellum — Explanations that make sense. Offers explanations and hints suited to the current task and the student's answer. Explains why the practice matters and what to look at when the student gets stuck.\n\nTrail — Tracking practice and progress. Records the tasks completed and the help received. Lets learners compare earlier and recent answers to see what has changed.\n\nPrism — Comparing learning results. Finds recurring difficulties and differences across learning examples. Highlights which content and explanations need a closer look.\n\nTemper — Checking whether support helped. Checks what actually changed after a hint or practice activity, then uses those results to improve tasks and support.\n\nReed — Music and sound for each scene. Handles music and sound for creative work and learning scenes. Adjusts their use around the listening experience and moments that need focus.\n\nStrata (planned) — A map of what to learn next. Connects grammar, expressions, and vocabulary by difficulty and prerequisites. Helps identify the learning needed for a goal and which basics to revisit after a mistake.\n\nPractice writing for a specific situation, then use the hints you need to improve your own draft.\n\nYou were ill and missed an assignment deadline.\n\nThe deadline was yesterday. Write an email explaining why you are late and asking your professor for a five-day extension.\n\nPlan the three things your email needs. If you are stuck for words, start with help organizing your message. You do not need to write complete sentences yet.\n\nCheck how to make a request to your professor. Once you know what to say, work on how to say it. Compare your sentences with each point below.\n\nWrite first, then revise what needs work. On the first demo screen, choose a friend to give you hints, then select “Start writing.” Write in your own words rather than receiving a complete answer.\n\nIn the demo, you choose the hints you need and revise your own writing. Your email is not sent to a real professor.\n\nLAB — Adjusts Korean tasks and hints to the student's goals and learning results.\n\nSHIFT — Shapes AI practice and production activities around participants' work and experience.\n\nPULSE — Uses the engines needed for character movement, music, and visual scenes.\n\nPATH — Adjusts practice for life in Korea and interviews to each learner's intended major, career plans, and Korean level.\n\nWe are developing personalized learning features at LAB first. SHIFT, PULSE, and PATH use the engines their services need.\nThe descriptions above include features in development and Strata, which is planned for a future addition.",
       "relatedIds": [
         "synk-intro",
         "lab-personalization",
@@ -3885,7 +3885,7 @@
         "label": "Explore Atlas",
         "href": "/en/#atlas"
       },
-      "reviewedAt": "2026-09-23",
+      "reviewedAt": "2026-10-02",
       "aliases": [
         "SYNK 아틀라스는 어떻게 작동하나요?",
         "아틀라스의 여덟 엔진은 어떤 역할을 하나요?",
@@ -3908,7 +3908,7 @@
         "What does Core do?",
         "What is the Core engine?"
       ],
-      "answer": "Core — Choosing the next learning step. Looks at what a learner wants to achieve and where they are struggling, then identifies the next task and the support they need.\n\nWe are developing personalized learning features with LAB as the main focus. SHIFT, PULSE, and PATH use the engines needed for their services.\nThe descriptions above include features in development and Strata, which is planned for a future addition.",
+      "answer": "Core — Choosing the next learning step. Looks at what a learner wants to achieve and where they are struggling, then identifies the next task and the support they need.\n\nWe are developing personalized learning features at LAB first. SHIFT, PULSE, and PATH use the engines their services need.\nThe descriptions above include features in development and Strata, which is planned for a future addition.",
       "relatedIds": [
         "synk-atlas",
         "lab-personalization"
@@ -3917,7 +3917,7 @@
         "label": "Explore the eight engines",
         "href": "/en/#atlas"
       },
-      "reviewedAt": "2026-09-23",
+      "reviewedAt": "2026-10-02",
       "aliases": [
         "Core은 어떤 역할을 하나요?",
         "코어 엔진이 뭐예요?"
@@ -3938,7 +3938,7 @@
         "What does Loom do?",
         "What is the Loom engine?"
       ],
-      "answer": "Loom — Scenes that respond to you. Combines soft materials, light, and movement to create interfaces and characters, with scenes that respond naturally to the user's actions.\n\nWe are developing personalized learning features with LAB as the main focus. SHIFT, PULSE, and PATH use the engines needed for their services.\nThe descriptions above include features in development and Strata, which is planned for a future addition.",
+      "answer": "Loom — Scenes that respond to you. Combines soft materials, light, and movement to create interfaces and characters, with scenes that respond naturally to the user's actions.\n\nWe are developing personalized learning features at LAB first. SHIFT, PULSE, and PATH use the engines their services need.\nThe descriptions above include features in development and Strata, which is planned for a future addition.",
       "relatedIds": [
         "synk-atlas",
         "lab-personalization"
@@ -3947,7 +3947,7 @@
         "label": "Explore the eight engines",
         "href": "/en/#atlas"
       },
-      "reviewedAt": "2026-09-23",
+      "reviewedAt": "2026-10-02",
       "aliases": [
         "Loom은 어떤 역할을 하나요?",
         "룸 엔진이 뭐예요?"
@@ -3968,7 +3968,7 @@
         "What does Vellum do?",
         "What is the Vellum engine?"
       ],
-      "answer": "Vellum — Explanations that make sense. Offers explanations and hints suited to the current task and the student's answer. Explains why the practice matters and what to look at when the student gets stuck.\n\nWe are developing personalized learning features with LAB as the main focus. SHIFT, PULSE, and PATH use the engines needed for their services.\nThe descriptions above include features in development and Strata, which is planned for a future addition.",
+      "answer": "Vellum — Explanations that make sense. Offers explanations and hints suited to the current task and the student's answer. Explains why the practice matters and what to look at when the student gets stuck.\n\nWe are developing personalized learning features at LAB first. SHIFT, PULSE, and PATH use the engines their services need.\nThe descriptions above include features in development and Strata, which is planned for a future addition.",
       "relatedIds": [
         "synk-atlas",
         "lab-personalization"
@@ -3977,7 +3977,7 @@
         "label": "Explore the eight engines",
         "href": "/en/#atlas"
       },
-      "reviewedAt": "2026-09-23",
+      "reviewedAt": "2026-10-02",
       "aliases": [
         "Vellum은 어떤 역할을 하나요?",
         "벨룸 엔진이 뭐예요?"
@@ -3998,7 +3998,7 @@
         "What does Trail do?",
         "What is the Trail engine?"
       ],
-      "answer": "Trail — Tracking practice and progress. Records the tasks completed and the help received. Lets learners compare earlier and recent answers to see what has changed.\n\nWe are developing personalized learning features with LAB as the main focus. SHIFT, PULSE, and PATH use the engines needed for their services.\nThe descriptions above include features in development and Strata, which is planned for a future addition.",
+      "answer": "Trail — Tracking practice and progress. Records the tasks completed and the help received. Lets learners compare earlier and recent answers to see what has changed.\n\nWe are developing personalized learning features at LAB first. SHIFT, PULSE, and PATH use the engines their services need.\nThe descriptions above include features in development and Strata, which is planned for a future addition.",
       "relatedIds": [
         "synk-atlas",
         "lab-personalization"
@@ -4007,7 +4007,7 @@
         "label": "Explore the eight engines",
         "href": "/en/#atlas"
       },
-      "reviewedAt": "2026-09-23",
+      "reviewedAt": "2026-10-02",
       "aliases": [
         "Trail은 어떤 역할을 하나요?",
         "트레일 엔진이 뭐예요?"
@@ -4028,7 +4028,7 @@
         "What does Prism do?",
         "What is the Prism engine?"
       ],
-      "answer": "Prism — Comparing learning results. Finds recurring difficulties and differences across learning examples. Highlights which content and explanations need a closer look.\n\nWe are developing personalized learning features with LAB as the main focus. SHIFT, PULSE, and PATH use the engines needed for their services.\nThe descriptions above include features in development and Strata, which is planned for a future addition.",
+      "answer": "Prism — Comparing learning results. Finds recurring difficulties and differences across learning examples. Highlights which content and explanations need a closer look.\n\nWe are developing personalized learning features at LAB first. SHIFT, PULSE, and PATH use the engines their services need.\nThe descriptions above include features in development and Strata, which is planned for a future addition.",
       "relatedIds": [
         "synk-atlas",
         "lab-personalization"
@@ -4037,7 +4037,7 @@
         "label": "Explore the eight engines",
         "href": "/en/#atlas"
       },
-      "reviewedAt": "2026-09-23",
+      "reviewedAt": "2026-10-02",
       "aliases": [
         "Prism은 어떤 역할을 하나요?",
         "프리즘 엔진이 뭐예요?"
@@ -4058,7 +4058,7 @@
         "What does Temper do?",
         "What is the Temper engine?"
       ],
-      "answer": "Temper — Checking whether support helped. Checks what actually changed after a hint or practice activity, then uses those results to improve tasks and support.\n\nWe are developing personalized learning features with LAB as the main focus. SHIFT, PULSE, and PATH use the engines needed for their services.\nThe descriptions above include features in development and Strata, which is planned for a future addition.",
+      "answer": "Temper — Checking whether support helped. Checks what actually changed after a hint or practice activity, then uses those results to improve tasks and support.\n\nWe are developing personalized learning features at LAB first. SHIFT, PULSE, and PATH use the engines their services need.\nThe descriptions above include features in development and Strata, which is planned for a future addition.",
       "relatedIds": [
         "synk-atlas",
         "lab-personalization"
@@ -4067,7 +4067,7 @@
         "label": "Explore the eight engines",
         "href": "/en/#atlas"
       },
-      "reviewedAt": "2026-09-23",
+      "reviewedAt": "2026-10-02",
       "aliases": [
         "Temper은 어떤 역할을 하나요?",
         "템퍼 엔진이 뭐예요?"
@@ -4088,7 +4088,7 @@
         "What does Reed do?",
         "What is the Reed engine?"
       ],
-      "answer": "Reed — Music and sound for each scene. Handles music and sound for creative work and learning scenes. Adjusts their use around the listening experience and moments that need focus.\n\nWe are developing personalized learning features with LAB as the main focus. SHIFT, PULSE, and PATH use the engines needed for their services.\nThe descriptions above include features in development and Strata, which is planned for a future addition.",
+      "answer": "Reed — Music and sound for each scene. Handles music and sound for creative work and learning scenes. Adjusts their use around the listening experience and moments that need focus.\n\nWe are developing personalized learning features at LAB first. SHIFT, PULSE, and PATH use the engines their services need.\nThe descriptions above include features in development and Strata, which is planned for a future addition.",
       "relatedIds": [
         "synk-atlas",
         "lab-personalization"
@@ -4097,7 +4097,7 @@
         "label": "Explore the eight engines",
         "href": "/en/#atlas"
       },
-      "reviewedAt": "2026-09-23",
+      "reviewedAt": "2026-10-02",
       "aliases": [
         "Reed은 어떤 역할을 하나요?",
         "리드 엔진이 뭐예요?"
