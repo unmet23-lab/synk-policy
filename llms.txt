@@ -119,7 +119,7 @@ SYNK LAB의 교재는 문법을 다루는 시냅스 코어 6권과 회화를 다
 
 시냅스 코어에서 배운 문법과 시냅스 톡의 대화를 바탕으로, 역할과 목표가 분명한 게임을 만듭니다. 장면과 캐릭터는 학생이 상황을 이해하고 직접 참여할 수 있도록 구성합니다.
 
-말의 리듬에서는 문장을 읽고 네 레인 중 답을 고릅니다. 연주 타이밍과 한국어 정답을 구분해 보고, 곡이 끝난 뒤 새 문장으로 다시 확인합니다.
+말의 리듬에서는 짧은 문장과 질문을 나레이션으로 듣고, 두 버튼 O/X 중 하나를 박자에 맞춰 누릅니다. 음성이 나올 때 음악을 낮추고 연주 노트를 비웁니다. 리듬 타이밍과 듣기 정답을 따로 확인하고, 곡이 끝나면 해설과 새로운 음성 문제로 복습합니다.
 
 게임에서 쓴 문장과 선택한 답을 학습 기록으로 남겨, 다음 연습과 피드백에 활용하도록 개발하고 있습니다.
 
@@ -150,7 +150,7 @@ SYNK LAB의 교재는 문법을 다루는 시냅스 코어 6권과 회화를 다
 - [SYNK PATH](https://synk.im/path/)
 - [Public company notes](https://synk.im/knowledge.json)
 - [Korean listening racing game](https://synk.im/try/racing/)
-- [Korean rhythm reading game](https://synk.im/try/rhythm/)
+- [Korean rhythm listening game](https://synk.im/try/rhythm/)
 - [Web enquiry form](https://synk.im/#contact-web)
 - [Privacy policy](https://synk.im/privacy/)
 - [Terms](https://synk.im/terms/)
