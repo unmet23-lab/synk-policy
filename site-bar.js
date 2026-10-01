@@ -1,6 +1,6 @@
 // The company bar on /atlas/: the same frosted glass as on the company page, and on narrow windows the
 // same folding list. On the company page app.js and sites.js do this for the same markup.
-import {initGlassControls} from '/glass-controls.js?v=afc3456f2ceb';
+import {initGlassControls} from '/glass-controls.js?v=c59f5584849b';
 initGlassControls();
 const header=document.querySelector('.site-header-wrap .header');
 const toggle=header?.querySelector('.menu-toggle');

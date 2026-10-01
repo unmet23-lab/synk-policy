@@ -19,6 +19,28 @@ function inSlices(steps){
   whenIdle(run);
  });
 }
+// The grain order is the same on every page and in the Atlas map (orb-conversation.js keeps an identical copy of
+// these two helpers). Once worked out it is kept in this browser as each place's step, so the next page reads it
+// instead of computing it again (2026-10-01, qa/perf-20261001). Anything unreadable is ignored and recomputed.
+const GRAIN_KEY='synk-grain-order-v1';
+function storedGrain(count){
+ try{
+  const text=localStorage.getItem(GRAIN_KEY);if(!text||text.length!==Math.ceil(count*2/3)*4)return null;
+  const bytes=Uint8Array.from(atob(text),c=>c.charCodeAt(0)),steps=new Uint16Array(bytes.buffer,0,count);
+  const seen=new Uint8Array(count),order=new Float32Array(count);
+  for(let place=0;place<count;place++){const step=steps[place];if(step>=count||seen[step])return null;seen[step]=1;order[place]=(step+.5)/count;}
+  return order;
+ }catch{return null;}
+}
+function storeGrain(order){
+ try{
+  const count=order.length,steps=new Uint16Array(count);
+  for(let place=0;place<count;place++)steps[place]=Math.round(order[place]*count-.5);
+  const bytes=new Uint8Array(steps.buffer);let text='';
+  for(let i=0;i<bytes.length;i+=0x8000)text+=String.fromCharCode.apply(null,bytes.subarray(i,i+0x8000));
+  localStorage.setItem(GRAIN_KEY,btoa(text));
+ }catch{}
+}
 // An even order for the grains: each next grain goes to the emptiest place (same seed as the Atlas map).
 function* grainSteps(){
  const count=GRID*GRID,rnd=random(862104),crowd=new Float32Array(count),taken=new Uint8Array(count);
@@ -37,7 +59,11 @@ function* grainSteps(){
  }
  return order;
 }
-function grainOrder(){return grainJob??=inSlices(grainSteps());}
+function grainOrder(){
+ if(grainJob)return grainJob;
+ const stored=storedGrain(GRID*GRID);
+ return grainJob=stored?Promise.resolve(stored):inSlices(grainSteps()).then(order=>{storeGrain(order);return order;});
+}
 const LIGHT={angle:-Math.PI*2*.108,lift:.56,fall:2.4,gain:.9,floor:.02,rim:.06};
 const FALL=new Float32Array(1025);for(let i=0;i<=1024;i++)FALL[i]=Math.pow(i/1024,LIGHT.fall)*LIGHT.gain;
 // Any CSS colour to [r,g,b,a] through a one-pixel canvas.

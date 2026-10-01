@@ -38,6 +38,21 @@ function frostMask(width,height,from,to,radius){
  return canvas.toDataURL();
 }
 
+// Both images depend only on the dock's size. Recent pairs are kept for the visit, so the next page (and Atlas, which
+// shares this tab) uses it instead of drawing and encoding both again (2026-10-01, qa/perf-20261001).
+const RIM_KEY='synk-dock-rim-v1';
+function rimImages(width,height,radius){
+ const size=width+'x'+height+'x'+radius;
+ let kept=[];
+ try{kept=JSON.parse(sessionStorage.getItem(RIM_KEY)||'[]');if(!Array.isArray(kept))kept=[];}catch{}
+ const hit=kept.find(entry=>entry?.size===size&&String(entry.map).startsWith('data:image/png')&&String(entry.frost).startsWith('data:image/png'));
+ if(hit)return hit;
+ const made={size,map:rimMap(width,height,Math.min(14,radius*.5),radius),frost:frostMask(width,height,2,13,radius)};
+ // Every page's dock has its own width (its own sections): the last eight sizes are kept.
+ try{sessionStorage.setItem(RIM_KEY,JSON.stringify([made,...kept.filter(entry=>entry?.size!==size)].slice(0,8)));}catch{}
+ return made;
+}
+
 // One pass: the page bent at the rim (displacement map), blurred inside it (Gaussian blur kept where the
 // feathered frost mask is opaque), the frost laid over the bent rim.
 function mountRim(dock){
@@ -61,14 +76,16 @@ function mountRim(dock){
   const radius=Math.min(parseFloat(getComputedStyle(dock).borderTopLeftRadius)||height/2,height/2,width/2);
   if(!width||!height||size===width+'x'+height+'x'+radius)return;
   size=width+'x'+height+'x'+radius;
-  const frost=frostMask(width,height,2,13,radius);
+  const images=rimImages(width,height,radius),frost=images.frost;
   for(const image of [map,mask]){image.setAttribute('width',width);image.setAttribute('height',height);}
-  map.setAttribute('href',rimMap(width,height,Math.min(14,radius*.5),radius));mask.setAttribute('href',frost);
+  map.setAttribute('href',images.map);mask.setAttribute('href',frost);
   dock.style.setProperty('--dock-rim','url(#synk-dock-rim)');dock.style.setProperty('--dock-frost','url('+frost+')');dock.classList.add('has-rim');
  };
  new ResizeObserver(update).observe(dock);
  return {
-  on(){if(on)return;on=true;size='';update();},
+  // Measured in the next frame, with that frame's layout, rather than right now while the page may still be
+  // loading (a forced layout of the whole page, qa/perf-20261001). The ResizeObserver covers every later change.
+  on(){if(on)return;on=true;size='';requestAnimationFrame(update);},
   off(){on=false;dock.classList.remove('has-rim');dock.style.removeProperty('--dock-rim');dock.style.removeProperty('--dock-frost');}
  };
 }
