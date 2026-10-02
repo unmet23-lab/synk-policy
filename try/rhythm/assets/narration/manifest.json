@@ -1,6 +1,4 @@
 {
-  "voice": "ko-KR-SunHiNeural",
-  "engine": "edge-tts",
   "rate": "-8%",
   "format": "MP3 mono 24kHz 64kbps",
   "clips": [
