@@ -10,4 +10,4 @@ Privacy source: SYNK-appsscript docs/개인정보처리방침_초안_v1.md. The 
 
 Meta public setup pages: `/terms/` gives the Korean/English public website and messaging terms, and `/data-deletion/` gives Korean/English deletion instructions for Messenger and Instagram consultation records. Both use the shared `/assets/legal.css` brand surface and link back to the privacy policy. Keep the three URLs consistent in the Meta app dashboard and update them together when the messaging scope changes.
 
-Preserve CNAME and existing student tool routes /name/, /diag/, /retro/ and /preview2/. The legacy preview footer also removes the retired registration number. Review TXT files, credentials and internal operational notes are never part of this public website.
+Preserve CNAME and existing student tool routes /name/, /diag/ and /retro/. Review TXT files, credentials and internal operational notes are never part of this public website.
