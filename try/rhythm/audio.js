@@ -24,7 +24,7 @@ export async function loadNarration(voice,context,signal){
  voiceCache.set(key,buffer);return buffer;
 }
 export class MusicPlayer{
- constructor(){this.context=null;this.source=null;this.origin=0;this.master=null;this.musicGain=null;this.voiceGain=null;this.voiceSources=[];this.voices=[];this.scheduledVoices=[];this.enabled=true;this.analyser=null;this.voiceAnalyser=null;this.recording=null;this.abort=null;}
+ constructor({onDelivery=()=>{}}={}){this.onDelivery=onDelivery;this.context=null;this.source=null;this.origin=0;this.master=null;this.musicGain=null;this.voiceGain=null;this.voiceSources=[];this.voices=[];this.scheduledVoices=[];this.enabled=true;this.analyser=null;this.voiceAnalyser=null;this.recording=null;this.abort=null;}
  async prepare(track,questions=[]){
   this.stop();const context=new AudioContext({latencyHint:'interactive'});this.context=context;this.abort=new AbortController();await context.resume();
   this.master=context.createGain();this.master.gain.value=.7;this.musicGain=context.createGain();this.musicGain.gain.value=this.enabled?1:0;this.musicGain.connect(this.master);
@@ -39,6 +39,7 @@ export class MusicPlayer{
   this.origin=this.context.currentTime+4*beat+.12;this.source=this.context.createBufferSource();this.source.buffer=buffer;this.source.loop=false;this.source.connect(this.musicGain);this.source.start(this.origin);
   for(const {q,buffer:voiceBuffer} of this.voices){
    const start=this.origin+q.showTime,end=start+voiceBuffer.duration,source=this.context.createBufferSource();
+   const context=this.context;source.onended=()=>{if(this.context===context&&context.state!=='closed'&&context.currentTime>=end-.03)this.onDelivery(q,{audio:'completed'});};
    source.buffer=voiceBuffer;source.connect(this.voiceGain);source.start(start);this.voiceSources.push(source);
    this.scheduledVoices.push({id:q.id,url:q.voice.url,start:q.showTime,end:q.showTime+voiceBuffer.duration});
    const gain=this.musicGain.gain,level=this.enabled?1:0;

@@ -468,6 +468,8 @@ export function createKnowledgeEngine(data){
       if(/이름|어떤앱|무슨앱|기능|있어|있나/.test(c))return from(['lab-personalization']);
     }
     if((/게임|체험|편지|메일쓰기/.test(c)||prevIds.has('lab-start')||prevIds.has('lab-game-demo'))&&/고쳐|교정|피드백|첨삭|답장|자동으로|진도(?:가|는|도)?(?:저장|기록|반영|남)|(?:실제|진짜)(?:로)?.{0,6}(?:저장|기록|반영)|기록(?:이|은|되는)?(?:저장|남|화면)|저장되는화면/.test(c)&&!/개인정보|누가봐|누가보|삭제/.test(c))return from(['lab-game-demo']);
+    // The LAB games by name (2026-10-02, seven playable games): what a named game is or practises is told in the games answer.
+    if(/바람길|주문폭주|선생님이돌아왔|입장검사|빈칸베기/.test(c)&&(!brand||brand==='lab')&&!/체험|편지|메일/.test(c))return from(['lab-game-demo']);
     if(/게임/.test(c)&&/공부|학습|효과|배우|배운|배워|실력|늘|도움|되나|돼요|끝나|만하|장난|놀기만|시간낭비|무슨말|어떻게|뭔데|무슨게임|어떤게임|연습|다음에|정해주|골라주|맞춰|쓴문장|쓴글|제가쓴|내가쓴|방식/.test(c)&&(!brand||brand==='lab')&&!/체험|편지|메일/.test(c))return from(['lab-personalization']);
     if(/운동|몸풀기|워밍업|스트레칭|움직이/.test(c)&&/수업|전에|이유|왜/.test(c)&&(!brand||brand==='lab'))return from(['lab-culture']);
     if(/english\s*page|영어\s*페이지|영어로\s*(?:보|읽|된|볼|안내|되어)|영어\s*(?:버전|판|안내)|영문(?:페이지|사이트|판)|english\s*version/.test(q))return from(['guide-language'],'language');
