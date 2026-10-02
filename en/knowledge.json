@@ -26,9 +26,8 @@
         "The main SYNK website explains the company’s philosophy and Atlas, our shared technology.",
         "The SYNK characters you meet on this website are Mongle, Kkamong, and Marin.",
         "Meet Mongle, with a coral-colored body and stitching; Kkamong, with green eyes and brown fur; and Marin, with a navy helmet and yellow eyes.",
-        "An engine that fits you better the more you use it. SYNK is a personalization technology company that started in Korean education. We are extending our core engine, Atlas, to games, study, work, and consulting.",
+        "I wanted to care for each student properly. When I worked at an academy in Mongolia, I knew each student needed different help, but I never had the time to tailor it to every one of them. I started SYNK to do that work with technology.",
         "On SHIFT, the founder shares the process of building a company with AI and the decisions made along the way. We publish the approaches tried, failures, and reasons for revisions so others can draw on them in their own work.",
-        "We adapt to the settings you choose and the results of what you actually tried, not to your age, gender, or nationality. When your goal changes, the next practice and suggestion change with it, and we tell you why we prepared them.",
         "Check whether the service meets your needs, what you will receive, and the terms of use. The demos and production guides on the website also show work we have actually made.",
         "LAB prepares tasks and feedback for learners’ needs. SHIFT develops methods and support for work and careers, while PULSE makes music and creative work to enjoy.",
         "Start with the email writing demo, AI production guides, and K-LOFI information. These examples alone do not establish results for customers or students, or prove that SYNK is better than another company.",
@@ -1837,7 +1836,7 @@
         "label": "Meet the founder",
         "href": "/en/founder/"
       },
-      "answer": "An engine that fits you better the more you use it. SYNK is a personalization technology company that started in Korean education. We are extending our core engine, Atlas, to games, study, work, and consulting.\n\nOn SHIFT, the founder shares the process of building a company with AI and the decisions made along the way. We publish the approaches tried, failures, and reasons for revisions so others can draw on them in their own work.\n\nWe adapt to the settings you choose and the results of what you actually tried, not to your age, gender, or nationality. When your goal changes, the next practice and suggestion change with it, and we tell you why we prepared them.",
+      "answer": "I wanted to care for each student properly. When I worked at an academy in Mongolia, I knew each student needed different help, but I never had the time to tailor it to every one of them. I started SYNK to do that work with technology.\n\nSYNK is a personalization technology company that started in Korean education. We are extending our core engine, Atlas, to games, study, work, and consulting.\n\nOn SHIFT, the founder shares the process of building a company with AI and the decisions made along the way. We publish the approaches tried, failures, and reasons for revisions so others can draw on them in their own work.",
       "reviewedAt": "2026-10-02",
       "aliases": [
         "기획자는 어떤 회사를 만들고 싶나요?",

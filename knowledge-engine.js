@@ -315,7 +315,7 @@ export function createKnowledgeEngine(data){
     if(/다른(?:회사|학원|교육).*얼마나|다른학원보다|얼마나낫|레퍼런스|실적|강의이력|강의한곳|어디서강의|후기|리뷰|합격생|합격자|합격사례|성공사례|고객사례|실제사례/.test(c)&&!/자료|가이드|예시|가상/.test(c))return from([brand==='shift'&&/수익|매출|벌/.test(c)&&!/다른(?:회사|고객|기업)|수치|실제로얼마나|보여|볼수/.test(c)?'shift-results':'guide-evidence']);
     if(/몇\s*(?:%|퍼센트|프로)|수치|정량/.test(input+c)&&/줄|늘|효과|절감|향상|오르|높아/.test(c))return from([brand==='shift'||/업무|직원|ai/.test(c)?'shift-results':'guide-evidence']);
     if(/(?:월|한달에?|연|일년에?)(?:\d+|천|백|억)(?:만)?(?:원)?.{0,4}(?:벌|수익|매출)|돈(?:을)?(?:많이)?벌|수익(?:이|을)?(?:낼|날|얻)|벌수있|(?:매출|수익).{0,6}(?:오르|오를|오른|올라|늘|증가|높아)|몇퍼(?:센트)?(?:올라|오르|늘)/.test(c))return from([brand==='shift'||/ai|창업|사업/.test(c)?'shift-results':'guide-evidence']);
-    if(/협력대학|협약맺은.*대학|언제만들었|언제만든회사|언제세워|세워진|설립된|만들어진지|생긴지|몇년차|창업(?:했|한지|연도|일)|언제창업|나라장터|조달청|조달|입찰|등록업체|벤더등록/.test(c))return from(['guide-unpublished'],'needs_confirmation');
+    if(/협력대학|협약맺은.*대학|언제만들었|언제만든회사|언제세워|세워진|설립된|만들어진지|생긴지|몇년차|(?<!왜)창업(?:했|한지|연도|일)|언제창업|나라장터|조달청|조달|입찰|등록업체|벤더등록/.test(c))return from(['guide-unpublished'],'needs_confirmation');
     if(/효과(?:는|를)?(?:어떻게)?(?:측정|평가|검증)|성과(?:는|를)?(?:어떻게)?(?:측정|평가)|만족도조사/.test(c))return from([brand==='shift'?'shift-results':'guide-evidence']);
     if(/카카오톡|카톡/.test(c)&&/문의|연락|상담/.test(c))return from(['guide-contact']);
     if(/음악|노래|영상|곡|캐릭터|마스코트|일러스트|그림|로고/.test(c)&&/만들어줄|만들어주|제작해주|맞춤.*제작|만들어주기도|제작도해/.test(c))return from([/로고|브랜딩/.test(c)&&!/캐릭터|마스코트/.test(c)?'shift-scope':'pulse-collaboration']);
@@ -430,7 +430,7 @@ export function createKnowledgeEngine(data){
     if(brands.length>1&&/둘다|따로|각각|같이|함께|중복|동시에/.test(c)&&/등록|신청|가입|이용|다녀|들어/.test(c))return from(['synk-brands']);
     if(/synk|싱크/.test(c)&&brands.length===0&&/소개(?:해|글|문)|한문단|한줄|요약해|정리해/.test(c))return from(['synk-intro']);
     if((/(?:교육|학원|한국어|ai|컨설팅).{0,16}(?:음악|노래|작품|콘텐츠|로파이|라디오)|(?:음악|노래|로파이).{0,16}(?:교육|학원|한국어|컨설팅)/.test(c))&&/왜|이상|같이|함께|한회사|하나의회사|어떻게연결|연결고리|공통점|접점|연관|관계|무슨상관/.test(c))return from(/왜|굳이|특이|이상/.test(c)&&!/연결고리|공통점|접점/.test(c)?['synk-intro','synk-brands']:/연결고리|공통점|접점|왜같이|왜함께/.test(c)?['synk-brands','synk-intro']:['synk-brands']);
-    if(/다른(?:\S{0,6})?(?:업체|회사|학원|곳|기관|유학원|교육기관)(?:이랑|과|와|보다|하고|랑)?.{0,8}(?:다르|다른지|다른가|다른데|달라|차이|차별|나은|좋)|차별점|차별화|왜여기|왜synk|(?:유학원|에이전시|대행사|학원|업체|다른곳)(?:이랑|과|와|하고|랑)?(?:똑같|같은거|뭐가다|차이|다르|다른|모가다)|(?:여기|synk|너네|이곳|lab|shift|path|pulse)(?:는|가|이|랑|은)?.{0,6}(?:뭐가|무엇이|어떤점이)다(?:르|른|라)/.test(c)&&brands.length<2)return from([/(?:모델|캐스팅)(?:에이전시|대행사)/.test(c)?'pulse-models':/(?:광고|영상|촬영)(?:에이전시|대행사)/.test(c)?'pulse-studio':/유학원|에이전시|대행사/.test(c)||brand==='path'?'path-why':brand==='lab'?'lab-method':'synk-value']);
+    if(/다른(?:\S{0,6})?(?:업체|회사|학원|곳|기관|유학원|교육기관)(?:이랑|과|와|보다|하고|랑)?.{0,8}(?:다르|다른지|다른가|다른데|달라|차이|차별|나은|좋)|차별점|차별화|왜여기|왜synk(?!(?:를|을)?(?:만들|시작|창업|세우))|(?:유학원|에이전시|대행사|학원|업체|다른곳)(?:이랑|과|와|하고|랑)?(?:똑같|같은거|뭐가다|차이|다르|다른|모가다)|(?:여기|synk|너네|이곳|lab|shift|path|pulse)(?:는|가|이|랑|은)?.{0,6}(?:뭐가|무엇이|어떤점이)다(?:르|른|라)/.test(c)&&brands.length<2)return from([/(?:모델|캐스팅)(?:에이전시|대행사)/.test(c)?'pulse-models':/(?:광고|영상|촬영)(?:에이전시|대행사)/.test(c)?'pulse-studio':/유학원|에이전시|대행사/.test(c)||brand==='path'?'path-why':brand==='lab'?'lab-method':'synk-value']);
     if(/어디(?:서|에서)?(?:담당|맡|해요|하나|해)|어디(?:에|로|에다|다|다가)?(?:물어|문의|여쭤|연락|얘기)|어느(?:브랜드|쪽|곳)(?:이|에서)?(?:담당|맡|해)|누가담당/.test(c)&&(brands.length>1||(/브랜딩|광고|교육|음악|유학|한국어|컨설팅/.test(c)&&/이랑|과|와|하고|랑/.test(c))))return from(['synk-choose']);
     if(/(?:남는게|남는것|손에남|뭐가남|얻는게|얻는것)/.test(c)&&/1년|과정|수업|교육|끝나|하면/.test(c))return from([brand==='shift'||organizationService?'shift-takeaway':'lab-year']);
     if(/알바|아르바이트|시간제|파트타임/.test(c)&&/시간|몇|허용|가능|할수|돼|되/.test(c))return from(['lab-topik']);
@@ -565,7 +565,7 @@ export function createKnowledgeEngine(data){
     if(brands.length>1){if(/어디(?:에|로)|어느쪽|어느곳|맡|담당|누구한테|누가/.test(c))return from(['synk-choose']);if(/차이|관계|다르|같|각각|구분|비교|브랜드|사업/.test(c))return from(['synk-brands']);return from(brands.map(b=>brandIds[b]));}
     if(/(?:세|네)(?:가지)?사업|(?:세|네)(?:가지)?브랜드|[34]개사업|사업구성|브랜드구성|사업구조/.test(c))return from(['synk-brands']);
     if(/차별|강점|차이점|더좋|왜선택|선택할때|다른곳/.test(c))return from(['synk-value']);
-    if(!followupCue&&/왜.*(?:이일|이런일|시작|만들)|너네.*목적|존재이유|(?:창업|회사를만든|시작하게된|만들게된).{0,6}(?:계기|이유|동기|배경)|(?:계기|이유)(?:가|는)?.{0,4}(?:창업|만들)/.test(c))return from(['synk-founder']);
+    if(!followupCue&&/왜.*(?:이일|이런일|시작|만들|창업)|너네.*목적|존재이유|(?:창업|회사를만든|시작하게된|만들게된).{0,6}(?:계기|이유|동기|배경)|(?:계기|이유)(?:가|는)?.{0,4}(?:창업|만들)/.test(c))return from(['synk-founder']);
     if(/(?:철학말고|실제로보여|실제결과|실제일한과정)/.test(c))return from(['shift-making']);
     if(/교육.*ai.*음악.*(왜|회사)|왜.*한회사/.test(c))return from(['synk-brands']);
     if(/철학|가치|중요|믿음|지향|교육과창작|왜.*함께|개인화시스템/.test(c))return from(['philosophy-purpose']);
