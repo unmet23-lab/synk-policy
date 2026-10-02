@@ -1,5 +1,3 @@
-import {architecturalFaceUv,configureCityMaterials} from './city-materials.js';
-
 // A sea-facing Korean coastal district, built from authored architectural parts.
 // Positive world road offset is the sea, so all buildings stay on negative X.
 // No transparent glass sorting, dynamic lights, external assets or per-frame
@@ -12,18 +10,64 @@ export function buildCoastalCity(THREE, {pathX, groundHeight, roadEnd = 2250} = 
   const disposed = new Set(), object = new THREE.Object3D(), clamp = (v,a,b) => Math.max(a,Math.min(b,v));
   const twilight = {value: 0}; let theme = 'coast', lastQuality = 'high', lastS = -Infinity;
   const materials = {
-    stone: new THREE.MeshStandardMaterial({color: 0xbdb8aa, roughness: .72, metalness: .02, vertexColors: true}),
-    pale: new THREE.MeshStandardMaterial({color: 0xcec9bd, roughness: .61, metalness: .035, vertexColors: true}),
-    bronze: new THREE.MeshStandardMaterial({color: 0x8d826a, roughness: .30, metalness: .90, envMapIntensity:.82, vertexColors: true}),
-    glass: new THREE.MeshStandardMaterial({color: 0x87989d, roughness: .105, metalness: .035, envMapIntensity: 1.0, vertexColors: true}),
-    darkGlass: new THREE.MeshStandardMaterial({color: 0x788583, roughness: .12, metalness: .035, envMapIntensity: .90, vertexColors: true}),
-    timber: new THREE.MeshStandardMaterial({color: 0x796148, roughness: .70, vertexColors: true}),
+    stone: new THREE.MeshStandardMaterial({color: 0xc4bfb2, roughness: .80, metalness: .02, vertexColors: true}),
+    pale: new THREE.MeshStandardMaterial({color: 0xdfd9cd, roughness: .66, metalness: .04, vertexColors: true}),
+    bronze: new THREE.MeshStandardMaterial({color: 0x65594b, roughness: .31, metalness: .62, vertexColors: true}),
+    glass: new THREE.MeshStandardMaterial({color: 0x7ba6b5, roughness: .20, metalness: .49, envMapIntensity: 1.05, vertexColors: true}),
+    darkGlass: new THREE.MeshStandardMaterial({color: 0x405b61, roughness: .27, metalness: .37, envMapIntensity: .80, vertexColors: true}),
+    timber: new THREE.MeshStandardMaterial({color: 0x82715a, roughness: .80, vertexColors: true}),
     green: new THREE.MeshStandardMaterial({color: 0x557463, roughness: .87, vertexColors: true}),
     lamp: new THREE.MeshStandardMaterial({color: 0xffeac2, emissive: 0xffca85, emissiveIntensity: .08, roughness: .38}),
     sign: new THREE.MeshBasicMaterial({color: 0xf0e2c8, map: makeSignAtlas(THREE), side: THREE.DoubleSide}),
     contact: new THREE.MeshBasicMaterial({color:0x263633,map:contactTexture(THREE),transparent:true,opacity:.23,depthWrite:false,polygonOffset:true,polygonOffsetFactor:-1,polygonOffsetUnits:-1}),
   };
-  const materialFinish=configureCityMaterials(materials,{twilight});
+  // Floor joints, inset bronze mullions and independently illuminated rooms are
+  // part of the opaque glass shader, saving thousands of thin floor meshes.
+  for (const key of ['glass', 'darkGlass']) {
+    const material = materials[key];
+    material.onBeforeCompile = shader => {
+      shader.uniforms.cityTwilight = twilight;
+      shader.vertexShader = 'attribute vec2 cityUv; varying vec2 vCityUv;\n' + shader.vertexShader;
+      shader.vertexShader = shader.vertexShader.replace('#include <begin_vertex>', '#include <begin_vertex>\nvCityUv = cityUv;');
+      shader.fragmentShader = 'uniform float cityTwilight; varying vec2 vCityUv;\n' + shader.fragmentShader;
+      shader.fragmentShader = shader.fragmentShader.replace('#include <color_fragment>', `#include <color_fragment>
+        vec2 cell = fract(vCityUv);
+        float verticalFrame = smoothstep(.008, .021, min(cell.x, 1.0-cell.x));
+        float horizontalFrame = smoothstep(.016, .038, min(cell.y, 1.0-cell.y));
+        float pane = verticalFrame * horizontalFrame;
+        float room = fract(sin(dot(floor(vCityUv), vec2(127.1,311.7)))*43758.5453);
+        diffuseColor.rgb *= mix(vec3(.45,.48,.47), vec3(.94+room*.045), pane);
+      `);
+      shader.fragmentShader = shader.fragmentShader.replace('#include <emissivemap_fragment>', `#include <emissivemap_fragment>
+        float litRoom = step(.58, room) * pane;
+        totalEmissiveRadiance += vec3(1.0,.58,.22) * litRoom * cityTwilight * .48;
+      `);
+    };
+    material.customProgramCacheKey = () => 'coastal-city-window-grid-v2';
+  }
+  // World-scale mineral grain and architectural joints, without a downloaded
+  // texture or a high-frequency noisy look. The same pattern covers the pads.
+  for(const key of ['stone','pale','timber']) {
+    const material=materials[key];
+    material.onBeforeCompile=shader=>{
+      shader.vertexShader='varying vec3 vCitySurface; varying float vCityHorizontal;\n'+shader.vertexShader;
+      shader.vertexShader=shader.vertexShader.replace('#include <begin_vertex>','#include <begin_vertex>\nvCitySurface=position;vCityHorizontal=abs(normal.y);');
+      shader.fragmentShader='varying vec3 vCitySurface; varying float vCityHorizontal;\n'+shader.fragmentShader;
+      const finish=key==='timber'?`
+        float grain=sin(vCitySurface.y*21.0+sin(vCitySurface.z*2.7)*2.0)*.018;
+        diffuseColor.rgb *= .97+grain;
+      `:`
+        vec2 stoneUv=vCityHorizontal>.55?vCitySurface.xz:vCitySurface.xy+vCitySurface.zy*.35;
+        float mineral=fract(sin(dot(floor(stoneUv*62.0),vec2(12.9898,78.233)))*43758.5453);
+        float grainFade=1.0-smoothstep(.015,.045,length(fwidth(stoneUv)));
+        vec2 joint=fract(stoneUv/vec2(2.1,.72));
+        float mortar=1.0-smoothstep(.004,.014,min(min(joint.x,1.0-joint.x),min(joint.y,1.0-joint.y)));
+        diffuseColor.rgb *= .979+(mineral-.5)*.042*grainFade-mortar*.048;
+      `;
+      shader.fragmentShader=shader.fragmentShader.replace('#include <color_fragment>','#include <color_fragment>\n'+finish);
+    };
+    material.customProgramCacheKey=()=>`coastal-city-${key}-finish-v1`;
+  }
   const templates = {
     box: new THREE.BoxGeometry(1,1,1),
     prism: new THREE.CylinderGeometry(1,1,1,8,1,false),
@@ -36,7 +80,7 @@ export function buildCoastalCity(THREE, {pathX, groundHeight, roadEnd = 2250} = 
   const buckets = new Map();
   function bucket(block, tier, key) {
     const id = `${block}:${tier}:${key}`;
-    if (!buckets.has(id)) buckets.set(id, {block,tier,key,position:[],normal:[],uv:[],color:[],cityUv:[],cityCell:[],citySeed:[]});
+    if (!buckets.has(id)) buckets.set(id, {block,tier,key,position:[],normal:[],uv:[],color:[],cityUv:[]});
     return buckets.get(id);
   }
   function part(block,tier,key,geometry,x,y,z,w,h,d,yaw=0,tint=1,atlas=null) {
@@ -51,8 +95,7 @@ export function buildCoastalCity(THREE, {pathX, groundHeight, roadEnd = 2250} = 
       b.position.push(point.x,point.y,point.z); b.normal.push(normal.x,normal.y,normal.z);
       const u = uv?.getX(i) ?? 0, v = uv?.getY(i) ?? 0;
       b.uv.push(atlas!==null ? (u+atlas%2)/2 : u, atlas!==null ? (v+3-Math.floor(atlas/2))/4 : v);
-      const face=architecturalFaceUv({u,v,w,h,d,nx:ns.getX(i),ny:ns.getY(i),nz:ns.getZ(i),shape:geometry,wood:key==='timber',floorPitch:block==='skyline'?3.3:3.7});
-      b.cityUv.push(...face.uv);b.cityCell.push(...face.cell);b.citySeed.push((Math.sin(x*.131+z*.017+y*.071)*43758.5453)%997);
+      b.cityUv.push(u*Math.max(w,d)/3.4,v*h/(block==='skyline'?3.3:3.7));
       b.color.push(...(Array.isArray(tint)?tint:[tint,tint,tint]));
     }
   }
@@ -104,7 +147,7 @@ export function buildCoastalCity(THREE, {pathX, groundHeight, roadEnd = 2250} = 
       const corners=[[pathX(s0)+offsets[j],s0],[pathX(s0)+offsets[j+1],s0],[pathX(s1)+offsets[j],s1],[pathX(s1)+offsets[j+1],s1]];
       for(const n of [0,2,1,1,2,3]) {
         const [x,z]=corners[n],y=groundHeight(x,z)+.045;
-        data.position.push(x,y,z);data.normal.push(0,1,0);data.uv.push(x*.25,z*.25);data.cityUv.push(x-pathX(z),z);data.cityCell.push(1.65,.72);data.citySeed.push(0);
+        data.position.push(x,y,z);data.normal.push(0,1,0);data.uv.push(x*.25,z*.25);data.cityUv.push(0,0);
         const shade=(k+j)%3===0?.80:.86;data.color.push(shade,shade,shade);
       }
     }
@@ -233,13 +276,9 @@ export function buildCoastalCity(THREE, {pathX, groundHeight, roadEnd = 2250} = 
           if(kind==='party') {
             const triangle=[[-.65,0],[.40,-1.05],[.40,1.05]], [du,dv]=triangle[person];
             positions.push(pointAt(terrace,width*.5+2.15+du,.24,dv,pad.yaw+Math.atan2(-du,-dv)));
-          } else {
-            const z=s+(person-(count-1)*.5)*2.2,x=pathX(z)-11.9;
-            positions.push({x,y:surfaceHeightAt(x,z),z,yaw:Math.PI*.5});
-          }
+          } else positions.push(pointAt(terrace,width*.5+2.15,.24,(person-(count-1)*.5)*1.65,pad.yaw+Math.PI*.5));
         }
-        const center=kind==='cheer'?{x:pathX(s)-11.9,y:surfaceHeightAt(pathX(s)-11.9,s),z:s,yaw:Math.PI*.5}:pointAt(terrace,width*.5+2.15,.24,0);
-        activityAnchors.push({id:`${b.id}-${kind}`,kind,blockId:b.id,...center,positions});
+        activityAnchors.push({id:`${b.id}-${kind}`,kind,blockId:b.id,...pointAt(terrace,width*.5+2.15,.24,0),positions});
       }
       if(j===2){
         // A waist-height counter leaves the conversation floor and road view
@@ -312,7 +351,7 @@ export function buildCoastalCity(THREE, {pathX, groundHeight, roadEnd = 2250} = 
   // Geometry ownership is entirely local; no caller-owned materials or assets.
   for (const b of buckets.values()) {
     const geometry=new THREE.BufferGeometry();
-    for (const [key,itemSize] of [['position',3],['normal',3],['uv',2],['color',3],['cityUv',2],['cityCell',2],['citySeed',1]]) geometry.setAttribute(key,new THREE.Float32BufferAttribute(b[key],itemSize));
+    for (const [key,itemSize] of [['position',3],['normal',3],['uv',2],['color',3],['cityUv',2]]) geometry.setAttribute(key,new THREE.Float32BufferAttribute(b[key],itemSize));
     geometry.computeBoundingBox(); geometry.computeBoundingSphere();
     const mesh=new THREE.Mesh(geometry,materials[b.key]); mesh.name=`city-${b.block}-${b.tier}-${b.key}`;
     mesh.receiveShadow=b.key!=='sign'&&b.key!=='contact'; mesh.castShadow=false; mesh.userData.cityTier=b.tier;
@@ -323,7 +362,7 @@ export function buildCoastalCity(THREE, {pathX, groundHeight, roadEnd = 2250} = 
   for (const geometry of Object.values(templates)) geometry.dispose();
   buckets.clear();
   const stats={shops:features.filter(f=>f.kind==='shop').length,towers:towerPlan.length,blocks:streetPlan.length,quality:'high',theme,
-    storedTriangles:0,visibleTriangles:0,drawCalls:0,shadowDrawCalls:0,visibleShops:0,roadMinimumClearance:Infinity,materials:materialFinish.stats,materialDetail:1};
+    storedTriangles:0,visibleTriangles:0,drawCalls:0,shadowDrawCalls:0,visibleShops:0,roadMinimumClearance:Infinity};
   for (const b of blocks) for (const mesh of b.meshes) stats.storedTriangles+=mesh.geometry.attributes.position.count/3;
   for (const b of blocks) for (const mesh of b.meshes) {
     const p=mesh.geometry.attributes.position;
@@ -333,7 +372,6 @@ export function buildCoastalCity(THREE, {pathX, groundHeight, roadEnd = 2250} = 
   const frustum=new THREE.Frustum(), projection=new THREE.Matrix4();
   function update({playerS=75,quality='high',camera=null}={}) {
     const q=['high','balanced','low'].includes(quality)?quality:'balanced';
-    materialFinish.setQuality(q);stats.materialDetail=materialFinish.detail.value;
     lastQuality=q; lastS=playerS; stats.theme=theme;stats.quality=q;stats.visibleTriangles=0;stats.drawCalls=0;stats.shadowDrawCalls=0;stats.visibleShops=0;
     if (camera) {camera.updateMatrixWorld(); projection.multiplyMatrices(camera.projectionMatrix,camera.matrixWorldInverse);frustum.setFromProjectionMatrix(projection);}
     const limits=q==='high'?{shell:1150,detail:260,tiny:130}:q==='balanced'?{shell:900,detail:190,tiny:0}:{shell:650,detail:0,tiny:0};

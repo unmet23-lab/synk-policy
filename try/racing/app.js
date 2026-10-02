@@ -20,8 +20,6 @@ import { createAtmosphere } from './atmosphere.js';
 import { buildCourseTerrain } from './render-world.js';
 import { buildCoastalCity } from './cityscape.js';
 import { buildCityLife } from './city-life.js';
-import { createCoastalRocks } from './coastal-rocks.js';
-import { createCoastalBoats } from './seascape-boats.js';
 
 const $ = id => document.getElementById(id);
 let coach=null,learningAvailable=true;
@@ -31,7 +29,6 @@ try{coach=globalThis.SynkLearning?.createGame({gameId:'korean-racing',storage:lo
 function learn(action,fallback=null){try{return coach?action(coach):fallback;}catch{learningAvailable=false;return fallback;}}
 function learningScope(){const summary=learn(c=>c.summary());return !coach||!learningAvailable?'맞춤 기록을 연결하지 못했어요. 기본 코스는 계속 플레이할 수 있어요.':summary?.storage.available?'이 브라우저의 공통 학습 기록 · 학생 계정 연결 전':'저장이 제한되어 이번 페이지에서만 맞춤 기록을 유지해요.';}
 function nextPersonalized(){return learn(c=>personalizedStage(c,{audioAvailable:!soundTouched||soundEnabled,modality:requestedModality}));}
-const assignment=()=>learn(c=>c.assignment?.());
 if('scrollRestoration' in history)history.scrollRestoration='manual';
 const stage = $('experience');
 let mobile = matchMedia('(max-width: 650px)').matches;
@@ -176,11 +173,8 @@ function displayQuestion(){
 function narrateQuestion(interrupt=false){if(!gate||gate.judged||!gate.announced)return;displayQuestion();if(gate.q.mode==='reading'){$('repeat-question').disabled=true;$('voice-status').textContent='지문을 읽고 길을 골라요';return;}if(interrupt&&gate.presentationId)learn(c=>c.help(gate.presentationId,'replay'));if(!soundEnabled&&gate.presentationId)learn(c=>c.delivery(gate.presentationId,{audio:'failed'}));const voice=questionNarration(gate.q,gate.types,WORD_BY_ID);speak(voice.ids,voice.text,'question',interrupt,gate.presentationId);}
 function renderStages(){
   $('stages').dataset.collection=activeCollection;
-  const target=assignment(),targetStage=target?nextPersonalized()?.stage:null;
   const query=$('stage-search').value.trim(),filter=activeCollection==='campaign'?'all':$('stage-filter').value;
-  const list=target?(targetStage?[targetStage]:[]):availableStages().filter(s=>(filter==='all'||s.mode===filter||s.band===filter)&&(!query||`${s.title} ${s.number} ${s.campaign?s.skill:s.words.map(id=>WORD_BY_ID[id].word).join(' ')}`.includes(query)));
-  for(const id of ['collection-campaign','collection-words','stage-search','stage-filter','review-stage'])$(id).hidden=!!target;
-  $('watch').disabled=!!target||!ready||starting;
+  const list=availableStages().filter(s=>(filter==='all'||s.mode===filter||s.band===filter)&&(!query||`${s.title} ${s.number} ${s.campaign?s.skill:s.words.map(id=>WORD_BY_ID[id].word).join(' ')}`.includes(query)));
   const pages=Math.max(1,Math.ceil(list.length/12));stagePage=clamp(stagePage,0,pages-1);
   $('stage-pagination').hidden=pages===1;
   $('stage-count').textContent=`${list.length}개 스테이지`;$('stage-page').textContent=`${stagePage+1} / ${pages}`;
@@ -190,7 +184,7 @@ function renderStages(){
   $('campaign-count').textContent=ALL_COURSES.filter(s=>progress.stages[s.id]?.cleared).length;
   const medals=ALL_COURSES.reduce((n,s)=>n+medalFor(progress.stages[s.id]?.bestScore||0),0);$('medal-count').textContent=medals;renderCollection();
   const personal=nextPersonalized();
-  $('journey-title').textContent=personal?(assignment()?personal.stage.title:'나에게 맞는 다음 5문항'):CHAPTERS[recommendedStage(progress).chapter-1].title;
+  $('journey-title').textContent=personal?'나에게 맞는 다음 5문항':CHAPTERS[recommendedStage(progress).chapter-1].title;
   $('journey-note').textContent=personal?.reason||`${recommendedStage(progress).skill} · 다음 코스`;
   $('journey-next').textContent=personal?'추천 문항으로 달리기 →':`${recommendedStage(progress).title} 달리기 →`;
   $('journey-next').disabled=!ready||starting;
@@ -199,7 +193,7 @@ function renderStages(){
   for(const s of list.slice(stagePage*12,stagePage*12+12)){
     const b=document.createElement('button');b.className='stage-card';b.classList.toggle('selected',s.id===selectedStage.id);b.dataset.stage=s.id;b.setAttribute('aria-pressed',String(s.id===selectedStage.id));
     const unlocked=isUnlocked(s);b.classList.toggle('locked',!unlocked);b.classList.toggle('stage-finale',!!s.finale);
-    for(const [tag,css,text] of [['span','stage-card-top',s.campaign?`LEVEL ${s.level} / ${s.skill}`:`${String(s.number).padStart(3,'0')} / ${s.mode==='picture'?'그림 + 듣기':'듣고 단어 선택'}`],['strong','',s.title],['span','stage-words',s.personalized?s.skill:s.campaign?CHAPTERS[s.chapter-1].goal:s.words.map(id=>WORD_BY_ID[id].word).join(' · ')],['span','stage-status',progress.stages[s.id]?.cleared?`${'◆'.repeat(medalFor(progress.stages[s.id].bestScore))} 통과 · 최고 ${progress.stages[s.id].bestScore}/5`:!unlocked?'이전 코스 4/5 통과로 열기 · 시연 보기 가능':progress.stages[s.id]?`다시 도전 · 최고 ${progress.stages[s.id].bestScore}/5`:`${stageSize(s)}문제 · 도전하기`]]){
+    for(const [tag,css,text] of [['span','stage-card-top',s.campaign?`LEVEL ${s.level} / ${s.skill}`:`${String(s.number).padStart(3,'0')} / ${s.mode==='picture'?'그림 + 듣기':'듣고 단어 선택'}`],['strong','',s.title],['span','stage-words',s.campaign?CHAPTERS[s.chapter-1].goal:s.words.map(id=>WORD_BY_ID[id].word).join(' · ')],['span','stage-status',progress.stages[s.id]?.cleared?`${'◆'.repeat(medalFor(progress.stages[s.id].bestScore))} 통과 · 최고 ${progress.stages[s.id].bestScore}/5`:!unlocked?'이전 코스 4/5 통과로 열기 · 시연 보기 가능':progress.stages[s.id]?`다시 도전 · 최고 ${progress.stages[s.id].bestScore}/5`:`${stageSize(s)}문제 · 도전하기`]]){
       const e=document.createElement(tag);e.className=css;e.textContent=s.finale&&css==='stage-words'?`새로운 문장 5개 · ${s.reward.title}`:s.finale&&css==='stage-status'&&!unlocked?'챕터의 두 코스를 통과하면 열려요':text;b.appendChild(e);
     }
     b.addEventListener('click',()=>selectStage(s));$('stage-grid').appendChild(b);
@@ -207,7 +201,6 @@ function renderStages(){
   if(!list.length){const p=document.createElement('p');p.className='empty-stages';p.textContent='다른 단어나 주제로 찾아보세요.';$('stage-grid').appendChild(p);}
 }
 function selectStage(s){
-  if(assignment()){const plan=nextPersonalized();if(!plan){showToast('지정 문항을 준비하지 못했어요. WORLD에서 다시 열어 주세요.');return;}s=plan.stage;}
   if(starting)return;if(garageOpen)garageUI.close();clearTutorial();selectedStage=s;questionBank=makeQuestions(s);running=false;auto=false;silence();
   const name=document.createElement('span');name.textContent='스테이지 선택 ↓';$('choose-stage').replaceChildren(document.createTextNode(labelStage(s)+' '),name);
   refreshStartLabel();$('start').disabled=!ready||!isUnlocked(s);
@@ -336,14 +329,17 @@ function setupJourneyScenery(sky){
 function setScenery(theme){
   if(!scenery.sky)return;
   scenery.theme=theme;scenery.bloom.visible=theme==='bloom';scenery.details.setTheme(theme);
-  scenery.city.setTheme(theme==='bloom'?'bloom':'sunset');
+  scenery.city.setTheme(theme);
   scenery.cityLife.setTheme(theme);
-  scenery.atmosphere.setTheme('sunset');
-  sunDirection.set(.34,.115,.94).normalize();
-  light.color.set(0xffd4ac);light.intensity=2.15;
-  ambientLight.intensity=.88;ambientLight.color.set(0xc4c8e2);ambientLight.groundColor.set(0x756550);
-  renderer.toneMappingExposure=1.04;
-  scene.environment=scenery.environments.sunset.texture;scene.environmentIntensity=.95;scene.environmentRotation.y=0;
+  scenery.atmosphere.setTheme(theme);
+  sunDirection.set(...(theme==='sunset'?[.34,.115,.94]:[.58,.72,.38])).normalize();
+  light.color.set(theme==='sunset'?0xffcc9d:0xfff3de);light.intensity=theme==='sunset'?2.05:2.75;
+  ambientLight.intensity=theme==='sunset'?.80:.78;
+  ambientLight.color.set(theme==='sunset'?0xbfc4df:0xc1dff8);ambientLight.groundColor.set(theme==='sunset'?0x78634d:0x677c4c);
+  renderer.toneMappingExposure=theme==='sunset'?1.02:1.06;
+  scene.environment=scenery.environments[theme].texture;
+  scene.environmentIntensity=theme==='sunset'?.85:1.04;
+  scene.environmentRotation.y=0;
 }
 function setupWater(daySky,sunsetSky) {
   scenery.atmosphere=createAtmosphere(THREE,{daySky,sunsetSky,time:worldTime,sunDirection,shoreOffset:groundHeight.shoreOffset,ROAD_END});
@@ -351,7 +347,15 @@ function setupWater(daySky,sunsetSky) {
 }
 function setupCoastalScenery() {
   const coast=buildDistantCoast(THREE,{material:coastalTerrainMaterial(),roadPoint,pathX,groundHeight,ROAD_END,textures:{pineCanopy:pineCanopyTexture},random});scene.add(coast);scenery.coast=coast;
-  scenery.boats=createCoastalBoats(THREE,{pathX,groundHeight});scene.add(scenery.boats.group);
+  const hullMaterial=new THREE.MeshStandardMaterial({color:0xf2f1e3,roughness:.5});
+  const sailMaterial=new THREE.MeshStandardMaterial({color:0xfffae8,side:THREE.DoubleSide,roughness:.85});
+  for(const [x,z,angle,size] of [[260,340,.45,1],[470,940,-.4,1.3],[370,1810,.75,1.15]]){
+    const boat=new THREE.Group();
+    const hull=new THREE.Mesh(new THREE.SphereGeometry(1,12,6),hullMaterial);hull.scale.set(1.15,.48,3.2);hull.position.y=.18;
+    const mast=new THREE.Mesh(new THREE.CylinderGeometry(.06,.08,8,6),hullMaterial);mast.position.y=4;
+    const geo=new THREE.BufferGeometry();geo.setAttribute('position',new THREE.Float32BufferAttribute([0,.8,-2.8,0,.8,.12,0,7.6,.12],3));geo.computeVertexNormals();
+    const sail=new THREE.Mesh(geo,sailMaterial);boat.add(hull,mast,sail);boat.position.set(x,-2.1,z);boat.rotation.y=angle;boat.scale.setScalar(size);scene.add(boat);
+  }
 }
 function setupVegetation() {
   // Roadside stone, grass and steel rails are instanced rather than thousands of draw calls.
@@ -516,7 +520,7 @@ function applyRenderQuality(){
   renderQuality=qualitySettings(mode,{pixelRatio:capture4k?2:devicePixelRatio,explicit:currentQuality!=='auto'});
   renderer.setPixelRatio(renderQuality.pixelRatio);renderer.shadowMap.enabled=renderQuality.shadows;
   if(light.shadow.mapSize.x!==renderQuality.shadowSize){light.shadow.map?.dispose();light.shadow.map=null;light.shadow.mapSize.setScalar(renderQuality.shadowSize);}
-  scenery.atmosphere?.setQuality(mode);renderer.shadowMap.needsUpdate=true;resize();
+  renderer.shadowMap.needsUpdate=true;resize();
 }
 function resize(){if(!renderer)return;const w=stage.clientWidth,h=stage.clientHeight;mobile=w<=650;renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix();if(running)requestAnimationFrame(()=>stage.scrollIntoView({behavior:'instant',block:'start'}));}
 
@@ -547,13 +551,11 @@ async function init() {
     const pmrem=new THREE.PMREMGenerator(renderer),environmentScene=new THREE.Scene();
     const environmentSky=new THREE.Mesh(scenery.atmosphere.sky.geometry,scenery.atmosphere.sky.material);environmentScene.add(environmentSky);
     scenery.environments={};
-    scenery.atmosphere.setTheme('sunset');environmentSky.rotation.copy(scenery.atmosphere.sky.rotation);sunDirection.set(.34,.115,.94).normalize();
-    scenery.environments.sunset=pmrem.fromScene(environmentScene,.01,.1,5000,{size:deviceGraphics.coarsePointer?128:256});
+    for(const theme of ['bloom','coast','sunset']){scenery.atmosphere.setTheme(theme);environmentSky.rotation.copy(scenery.atmosphere.sky.rotation);sunDirection.set(...(theme==='sunset'?[.34,.115,.94]:[.58,.72,.38])).normalize();scenery.environments[theme]=pmrem.fromScene(environmentScene,.01,.1,5000,{size:deviceGraphics.coarsePointer?128:256});}
     environmentScene.remove(environmentSky);pmrem.dispose();setupJourneyScenery(clearSky);
     const draco=new DRACOLoader();draco.setDecoderPath('./vendor/');draco.setDecoderConfig({type:'wasm'});
     const loader=new GLTFLoader();loader.setDRACOLoader(draco);
-    const [gltf,felt,rockScan]=await Promise.all([loader.loadAsync('./assets/car.glb'),textures.loadAsync('./assets/felt/driver-felt.webp'),loader.loadAsync('./assets/coastal-rocks-v6.glb')]);
-    scenery.rockShelves=createCoastalRocks(THREE,{source:rockScan.scene,pathX,groundHeight});scene.add(scenery.rockShelves.group);
+    const [gltf,felt]=await Promise.all([loader.loadAsync('./assets/car.glb'),textures.loadAsync('./assets/felt/driver-felt.webp')]);
     driverFeltTexture=felt;felt.wrapS=felt.wrapT=THREE.RepeatWrapping;felt.repeat.set(3,3);felt.anisotropy=Math.min(4,renderer.capabilities.getMaxAnisotropy());
     draco.dispose();
     carTemplate=gltf.scene.children[0];car=prepareCar(carTemplate,0xaad882);wheels=car.userData.wheels;
@@ -715,7 +717,6 @@ function reset(play) {
   camera.position.copy(roadPoint(playerS-(mobile?12.5:7.4),mobile?-1.8:5.4,mobile?4.5:3.6));camera.lookAt(roadPoint(playerS+(mobile?14:12),mobile?3.8:1.8,1.2));
 }
 async function start(demo=false,bypassTutorial=false) {
-  if(assignment()){if(demo){showToast('이번 목표는 직접 응답하며 연습해요.');return;}const plan=nextPersonalized();if(!plan){showToast('지정 문항을 준비하지 못했어요. WORLD에서 다시 열어 주세요.');return;}selectedStage=plan.stage;}
   if(!ready||starting||!demo&&!isUnlocked(selectedStage))return;
   if(!demo&&!bypassTutorial&&!tutorialCompleted&&!tutorialDismissed){await startTutorial();return;}
   clearTutorial();
@@ -724,7 +725,7 @@ async function start(demo=false,bypassTutorial=false) {
   if(!soundTouched){soundEnabled=true;updateSoundButton();}
   if(soundEnabled){try{await ensureAudio();await narrator.prepare([...commonClips,...stageClips(selectedStage)]);}catch{narrationUnavailable=true;}}
   auto=demo;roundWasDemo=demo;questionBank=makeQuestions(selectedStage);starting=false;
-  $('start').disabled=!isUnlocked(selectedStage);$('watch').disabled=!!assignment();$('start').firstChild.textContent=`${questionBank.length}문제 달리기 `;
+  $('start').disabled=!isUnlocked(selectedStage);$('watch').disabled=false;$('start').firstChild.textContent=`${questionBank.length}문제 달리기 `;
   reset(true);stage.scrollIntoView({behavior:'auto',block:'start'});
   $('start').blur();$('watch').blur();
   speak(['intro'],'출발! 문제를 듣고 길을 골라줘.','intro');
@@ -886,8 +887,6 @@ function frame() {
   }
     scenery.details?.update({time:worldTime.value,playerS,motion:!reducedMotion,detailDistance:renderQuality.detailDistance,quality:mode});
     scenery.terrain?.update({playerS:garageOpen?93:playerS,quality:mode,camera});
-    scenery.rockShelves?.update({playerS,quality:mode,camera});
-    scenery.boats?.update({dt,time:worldTime.value,playerS,quality:mode,camera,paused:paused||garageOpen||document.hidden,motion:!reducedMotion});
     scenery.city?.update({playerS:garageOpen?93:playerS,quality:mode,camera,time:worldTime.value});
     scenery.cityLife?.update({time:worldTime.value,playerS:garageOpen?93:playerS,playerX:car?.position.x??pathX(playerS),quality:mode,camera,motion:!reducedMotion,paused:paused||garageOpen||document.hidden,celebrating:running&&boost>0});
   renderer.render(scene,camera);
@@ -945,6 +944,6 @@ window.addEventListener('keyup',e=>{if(['ArrowLeft','KeyA'].includes(e.code)){in
 window.addEventListener('blur',()=>{inputs.left=inputs.right=false;if(running&&!paused)pause();});
 document.addEventListener('visibilitychange',()=>{if(document.hidden&&running&&!paused)pause();});
 // Read-only telemetry makes verification reproducible without a hidden game bypass.
-window.__racing={snapshot:()=>({ready,running,paused,auto,roundWasDemo,elapsed,playerS,playerOffset,tutorial:tutorial?{step:tutorial.step,mistakes:tutorial.mistakes,boostElapsed:tutorial.boostElapsed,voicePending:tutorialVoicePending,completed:tutorialCompleted,saved:tutorialSaved}:null,collection:{coins:garage.coins,owned:[...garage.owned],equipped:{...garage.equipped},wish:garage.wish,mission:dailyMission(progress,Date.now(),garage),garageOpen,preview:previewCar?.userData.vehicleKind,angle:garageAngle},driving:{collisions,contactTimer,combo,bestCombo,shield,shieldBlocked,rivals:rivals.map(r=>({s:r.s,offset:r.offset})),waitingForChoice:questionChosen===false},scenery:scenery.theme,atmosphere:scenery.atmosphere?.stats,boats:scenery.boats?.stats,rockShelves:scenery.rockShelves?.stats,landscape:scenery.coast?.userData.stats,city:scenery.city?.stats,cityLife:scenery.cityLife?.stats,groundProps:scenery.groundProps,terrain:scenery.terrain?.stats,vegetation:scenery.details?.stats,screenX:car?+car.position.clone().project(camera).x.toFixed(4):null,driver:{name:driverName,mood:driverMood,seated:!!car?.userData.mascot},vehicle:car?.userData.modelStats,velocity,boost,correct,answers:answers.map(a=>({...a})),stage:{id:selectedStage.id,title:selectedStage.title,mode:selectedStage.mode,level:selectedStage.level,campaign:selectedStage.campaign,words:selectedStage.words},gate:gate?{s:gate.s,prompt:gate.q.prompt,spoken:gate.q.spoken,types:[...gate.types],questionId:gate.q.id,announced:gate.announced}:null,quality:mode,narration:narrator.snapshot(),audioState:audio?.state,audioClock:audio?.currentTime,narrationUnavailable,learning:{words:Object.keys(progress.words).length,correctWords:Object.values(progress.words).filter(p=>p.correct>0).length,rounds:progress.rounds,cleared:Object.values(progress.stages).filter(p=>p.cleared).length},render:{pixelRatio:renderer?.getPixelRatio(),calls:renderer?.info.render.calls,triangles:renderer?.info.render.triangles,geometries:renderer?.info.memory.geometries,textures:renderer?.info.memory.textures,averageFps:frameSample.length?+(frameSample.length/frameSample.reduce((a,b)=>a+b,0)).toFixed(1):0},viewport:{width:stage.clientWidth,height:stage.clientHeight}})};
+window.__racing={snapshot:()=>({ready,running,paused,auto,roundWasDemo,elapsed,playerS,playerOffset,tutorial:tutorial?{step:tutorial.step,mistakes:tutorial.mistakes,boostElapsed:tutorial.boostElapsed,voicePending:tutorialVoicePending,completed:tutorialCompleted,saved:tutorialSaved}:null,collection:{coins:garage.coins,owned:[...garage.owned],equipped:{...garage.equipped},wish:garage.wish,mission:dailyMission(progress,Date.now(),garage),garageOpen,preview:previewCar?.userData.vehicleKind,angle:garageAngle},driving:{collisions,contactTimer,combo,bestCombo,shield,shieldBlocked,rivals:rivals.map(r=>({s:r.s,offset:r.offset})),waitingForChoice:questionChosen===false},scenery:scenery.theme,landscape:scenery.coast?.userData.stats,city:scenery.city?.stats,cityLife:scenery.cityLife?.stats,groundProps:scenery.groundProps,terrain:scenery.terrain?.stats,vegetation:scenery.details?.stats,screenX:car?+car.position.clone().project(camera).x.toFixed(4):null,driver:{name:driverName,mood:driverMood,seated:!!car?.userData.mascot},vehicle:car?.userData.modelStats,velocity,boost,correct,answers:answers.map(a=>({...a})),stage:{id:selectedStage.id,title:selectedStage.title,mode:selectedStage.mode,level:selectedStage.level,campaign:selectedStage.campaign,words:selectedStage.words},gate:gate?{s:gate.s,prompt:gate.q.prompt,spoken:gate.q.spoken,types:[...gate.types],questionId:gate.q.id,announced:gate.announced}:null,quality:mode,narration:narrator.snapshot(),audioState:audio?.state,audioClock:audio?.currentTime,narrationUnavailable,learning:{words:Object.keys(progress.words).length,correctWords:Object.values(progress.words).filter(p=>p.correct>0).length,rounds:progress.rounds,cleared:Object.values(progress.stages).filter(p=>p.cleared).length},render:{pixelRatio:renderer?.getPixelRatio(),calls:renderer?.info.render.calls,triangles:renderer?.info.render.triangles,geometries:renderer?.info.memory.geometries,textures:renderer?.info.memory.textures,averageFps:frameSample.length?+(frameSample.length/frameSample.reduce((a,b)=>a+b,0)).toFixed(1):0},viewport:{width:stage.clientWidth,height:stage.clientHeight}})};
 renderStages();
 init();

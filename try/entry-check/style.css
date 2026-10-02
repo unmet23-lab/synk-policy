@@ -319,8 +319,6 @@ button:focus-visible,a:focus-visible{outline:3px solid var(--focus);outline-offs
 .stars i.on{filter:none;animation:pop .3s var(--ease) both}
 .stars i.on:nth-child(2){animation-delay:.08s}.stars i.on:nth-child(3){animation-delay:.16s}
 .r-note{margin:10px 0 0;font-size:14.5px;line-height:1.55;color:rgba(43,35,32,.86);max-width:30em}
-.r-help:not([hidden]){display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:12px 0 0;font-size:14px;line-height:1.5;color:rgba(43,35,32,.86);max-width:32em}
-.r-help>span{flex:1 1 100%}
 .res-mongle{width:min(30vw,170px);height:auto;margin-bottom:-6px}
 .res-grid{position:relative;z-index:1;margin:-26px 0 0;padding:0 16px 40px;display:grid;gap:14px}
 .res-grid .paper{padding:18px}

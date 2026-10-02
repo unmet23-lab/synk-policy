@@ -1,4 +1,3 @@
-import {mountListeningCheck} from './listening-check-ui.js';
 import {RunnerModel,driveDemo} from './core.js';
 import {INSTRUCTIONS,actionLabel} from './instructions.js';
 import {createWorld} from './world.js';
@@ -47,7 +46,6 @@ function audioInit(){
 async function ensureVoices(){try{if(!audioInit()||!await voiceBank.resume())return false;return await voiceBank.prepare(INSTRUCTIONS);}catch{return false;}}
 function cancelVoice(){previewRevision++;voiceBank?.stop();}
 function setSound(value){
-  if (!value && listeningCheck?.open) listeningCheck.interrupt();
   if(!value&&running&&!model.finished&&!paused)pause();
   sound=value;if(voiceGain)voiceGain.gain.value=sound?.88:0;
   $('sound').setAttribute('aria-pressed',String(sound));$('sound').setAttribute('aria-label',sound?'소리 끄기':'소리 켜기');
@@ -184,7 +182,6 @@ async function init(){
     ready=true;$('loading').hidden=true;for(const id of ['start','demo','practice','shop-button'])$(id).disabled=false;$('start').querySelector('span').textContent='바람길 달리기';
   }catch(e){console.error(e);$('loading-text').textContent='3D 화면을 열 수 없어요. Chrome·Edge의 하드웨어 가속을 확인해 주세요.';}
 }
-const listeningCheck=mountListeningCheck({coach,beforeOpen:()=>{if(running&&!model?.finished)return false;cancelVoice();closeModal();return true;},onClose:()=>{if(running&&model?.finished)showModal('result');}});
 init();requestAnimationFrame(frame);
 $('learning-reset').addEventListener('click',()=>{try{coach?.reset();for(const m of model?.missions||[])m.presentationId=null;practicePresentation=null;learningFailed=!coach;nextPlan=null;}catch{learningFailed=true;}refreshRecommendation();});
 refreshRecommendation();

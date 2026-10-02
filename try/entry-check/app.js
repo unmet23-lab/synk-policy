@@ -2,7 +2,7 @@
 import { VENUES, CAST, SKILL_LABEL } from './content.js';
 import { TUTORIAL, TUTORIAL_CASES, VOICE_ID } from './narration.js';
 import { koreanTime, minutes, venueById, activeRules, memoActive, judge, composeShift, scoreShift, unlocked, itemLabel } from './core.js';
-import { GAME_ID, caseMetadata, rankCases, recommendVenue, answerPayload, skillReport, FLOW_ENTRY, MAGNIFIER_AFTER, FLOW_WORDS, assignmentCases, assignmentVenues, entryTargetLabel } from './learning.js';
+import { GAME_ID, caseMetadata, rankCases, recommendVenue, answerPayload, skillReport } from './learning.js';
 import * as sound from './audio.js';
 
 const $ = (s) => document.querySelector(s);
@@ -25,12 +25,9 @@ const progress = loadProgress();
 let coach = null;
 try { coach = window.SynkLearning?.createGame({ gameId: GAME_ID, storage: window.localStorage }) || null; } catch { coach = null; }
 const atlas = (fn, fallback = null) => { if (!coach) return fallback; try { return fn(coach); } catch { return fallback; } };
-const assignment=()=>atlas(c=>c.assignment?.());
-const assignmentSeen=new Set();
 
 /* ── 상태 ── */
-const state = { venue: null, queue: [], index: 0, results: [], combo: 0, cur: null, memoShown: false, ranked: null, busy: false, shift: 0, guardUntil: 0,
-  flow: null, magnifierTimer: 0, flowLine: null };
+const state = { venue: null, queue: [], index: 0, results: [], combo: 0, cur: null, memoShown: false, ranked: null, busy: false, shift: 0, guardUntil: 0 };
 // 근무마다 번호를 올린다. 기다림(움직임·알림) 뒤에 번호가 바뀌었으면 그 근무는 끝난 것이라 이어 가지 않는다(나간 뒤 이전 근무가 뒤에서 진행되던 문제).
 const live = (token) => token === state.shift;
 // 덮개(안내·알림)를 닫은 직후의 두 번째 탭이 아래 도장 줄을 누르지 않게 잠깐 막는다.
@@ -75,23 +72,20 @@ const show = (id) => {
 
 /* ── 입구 ── */
 function renderLobby() {
-  const target=assignment(),targetVenues=assignmentVenues(target,[...assignmentSeen]);
   const ids = unlockedIds();
   const rec = progress.plays === 0 ? null : atlas((c) => recommendVenue(c, ids));
-  const venue = targetVenues[0] || venueById(rec?.venueId) || VENUES.find((v) => ids.includes(v.id) && (progress.stars[v.id] || 0) < 3) || VENUES[0];
+  const venue = venueById(rec?.venueId) || VENUES.find((v) => ids.includes(v.id) && (progress.stars[v.id] || 0) < 3) || VENUES[0];
   $('#rec-day').textContent = `${venue.day}일차`;
   $('#rec-name').textContent = venue.name;
-  $('#rec-reason').textContent = target ? (targetVenues.length?entryTargetLabel(target):'지정 손님을 준비하지 못했어요. WORLD에서 다시 열어 주세요.') : progress.plays === 0
+  $('#rec-reason').textContent = progress.plays === 0
     ? '처음이라 가장 쉬운 하늘 수영장부터 시작해요. 안내문은 세 줄이에요.'
     : rec?.reason ? `${rec.reason} 이 연습을 하는 손님이 가장 많은 근무지예요.` : '앞 근무지에서 별을 모아 다음 근무지를 열어요.';
   $('#rec-start').onclick = () => startShift(venue.id);
-  $('#rec-start').disabled=!!target&&!targetVenues.length;
-  $('#how-tutorial').hidden=!!target;
   const warn = atlas((c) => c.summary().storage?.warning) || (!coach ? '학습 기록을 쓸 수 없어 기본 순서로 진행해요.' : null) || (!progressSaved ? '이 브라우저에 진행을 저장할 수 없어요.' : null);
   $('#storage-note').hidden = !warn; $('#storage-note').textContent = warn || '';
   const list = $('#venues'); list.textContent = '';
   for (const v of VENUES) {
-    const open = target?targetVenues.some(x=>x.id===v.id):unlocked(progress, v.id), stars = progress.stars[v.id] || 0;
+    const open = unlocked(progress, v.id), stars = progress.stars[v.id] || 0;
     const li = el('li');
     const b = el('button', `venue${open ? '' : ' locked'}${v.id === venue.id ? ' is-rec' : ''}`);
     b.type = 'button';
@@ -99,7 +93,6 @@ function renderLobby() {
     b.innerHTML = `<span class="thumb"><img src="assets/scenes/${v.scene}-m.webp" alt="" loading="lazy"><b class="num">${v.day}</b>${open ? '' : '<span class="lock">앞 근무지 별 1개면 열려요</span>'}</span>
       <span class="body"><strong>${esc(v.name)}</strong><small>${esc(v.notice.kind)} · 규칙 ${v.notice.rules.length + (v.memo ? 1 : 0)}개</small>
       <span class="stars" aria-hidden="true">${[1, 2, 3].map((i) => `<i class="${i <= stars ? 'on' : ''}"></i>`).join('')}</span></span>`;
-    if(target&&!open){li.hidden=true;}else if(target){b.querySelector('.body small').textContent=`이번 목표 손님 ${assignmentCases(v.cases,target).length}명`;}
     if (open) b.onclick = () => startShift(v.id); else b.disabled = true;
     li.append(b); list.append(li);
   }
@@ -110,16 +103,11 @@ function renderLobby() {
 function startShift(venueId, { tutorial = !progress.tutorial } = {}) {
   sound.unlock(); sound.stopVoice();
   const v = venueById(venueId);
-  const target=assignment(),targetCases=v&&target?assignmentCases(v.cases,target):null;
-  if (!v || (target?!targetCases.length:!unlocked(progress, v.id))) return;
-  if(target)tutorial=false;
+  if (!v || !unlocked(progress, v.id)) return;
   tut.on = tutorial && v.id === 'pool'; tut.i = 0; hideCoach();
   state.ranked = progress.plays === 0 || tut.on ? null : atlas((c) => rankCases(c, v.cases));
-  Object.assign(state, { venue: v, queue: targetCases || (tut.on ? tutorialQueue(v) : composeShift(v, { ranked: state.ranked?.order, firstTime: !progress.tutorial })),
+  Object.assign(state, { venue: v, queue: tut.on ? tutorialQueue(v) : composeShift(v, { ranked: state.ranked?.order, firstTime: !progress.tutorial }),
     index: 0, results: [], combo: 0, cur: null, memoShown: false, busy: false, shift: state.shift + 1 });
-  // 순간 맞춤: 돋보기가 스스로 나오는 때만 맞춘다(연수 근무는 정해진 대로).
-  clearTimeout(state.magnifierTimer); state.flowLine = null;
-  state.flow = tut.on ? null : atlas((c) => c.live?.(FLOW_ENTRY, { words: FLOW_WORDS }) ?? null);
   sound.preloadVoices([VOICE_ID.brief(v.id), VOICE_ID.memo(), ...(tut.on ? TUTORIAL.map((t) => VOICE_ID.tutorial(t.id)) : []),
     ...state.queue.flatMap((c) => [VOICE_ID.line(c.id), VOICE_ID.reply(c.id), VOICE_ID.oops(c.id), VOICE_ID.thanks(c.who), VOICE_ID.why(c.who)]),
     ...[0, 1, 2, 3].map(VOICE_ID.result)]);
@@ -144,7 +132,7 @@ function startShift(venueId, { tutorial = !progress.tutorial } = {}) {
   $('#brief-day').textContent = `${v.day}일차`;
   $('#brief-title').lastChild.textContent = ` ${v.name}`;
   $('#brief-text').textContent = v.briefing;
-  const why = target ? entryTargetLabel(target) : tut.on ? '처음이라 연수를 함께 해요. 하는 방법을 한 단계씩 알려 줄게요.'
+  const why = tut.on ? '처음이라 연수를 함께 해요. 하는 방법을 한 단계씩 알려 줄게요.'
     : state.ranked?.reason && progress.plays > 0 ? `오늘의 손님은 기록에 맞춰 골랐어요. ${state.ranked.reason}` : '';
   $('#brief-reason').hidden = !why; $('#brief-reason').textContent = why;
   $('#briefing').hidden = false; setOverlay(true);
@@ -224,11 +212,8 @@ async function nextGuest() {
   renderDoc(item);
   renderTray(item);
   renderQueue();
-  state.cur.pid = atlas((c) => (state.flow ? state.flow.present(caseMetadata(item)) : c.present(caseMetadata(item))));
+  state.cur.pid = atlas((c) => c.present(caseMetadata(item)));
   setDock('ready');
-  // 지난 손님 뒤에 돋보기 시점이 바뀌었으면 무엇이 바뀌었는지만 한 줄로 알린다.
-  if (state.flowLine) { $('#dock-hint').hidden = false; $('#dock-hint').textContent = state.flowLine; announce(state.flowLine); state.flowLine = null; }
-  scheduleMagnifier(token);
   $('#bubble').focus({ preventScroll: true });
   // 손님이 창문 앞에 선 뒤 말한다. 연수 단계가 있는 손님이면 대사 뒤에 안내 목소리가 이어진다.
   const idx = state.index;
@@ -312,19 +297,8 @@ function startChoosing(e) {
 function cancelChoosing() { if (!state.cur || state.cur.done || tut.on) return; state.cur.choosing = false; setDock('ready'); $('#btn-reject').focus(); }
 function chooseRule(id, e) { if (state.cur?.choosing) decide(id, e); }
 
-/** 순간 맞춤이 정한 때가 되면 첫 돋보기가 스스로 나온다. 누른 것과 똑같이 도움으로 기록한다. */
-function scheduleMagnifier(token) {
-  clearTimeout(state.magnifierTimer);
-  const after = state.flow ? MAGNIFIER_AFTER[state.flow.settings().values.magnifier] : null;
-  if (after == null || tut.on) return;
-  const cur = state.cur;
-  state.magnifierTimer = setTimeout(() => {
-    if (live(token) && state.cur === cur && !cur.done && !cur.choosing && cur.hint === 0 && !$('#game').hidden) showClue();
-  }, after);
-}
-function useHint(e) { if (!guarded(e)) showClue(); }
-function showClue() {
-  const cur = state.cur; if (!cur || cur.done || cur.hint >= 2 || tut.on) return;
+function useHint(e) {
+  const cur = state.cur; if (!cur || cur.done || cur.hint >= 2 || guarded(e) || tut.on) return;
   cur.hint += 1; sound.play('ask', .7);
   atlas((c) => c.help(cur.pid, 'hint'));
   const item = cur.item;
@@ -359,14 +333,9 @@ async function decide(choice, e) {
   if (cur.guided) atlas((c) => c.help(cur.pid, 'answer'));
   sound.unlock(); hideCoach(); sound.stopVoice();
   cur.done = true; state.busy = true;
-  if(assignment())assignmentSeen.add(cur.item.id);
   const item = cur.item, v = state.venue, token = state.shift;
   const result = judge(item, choice);
-  clearTimeout(state.magnifierTimer);
-  // 같은 응답이 공통 학습 기록(도움 받은 정답은 혼자 해낸 것으로 세지 않음)과 돋보기 시점을 함께 움직인다.
-  const out = state.flow ? atlas(() => state.flow.answer(cur.pid, answerPayload(result.correct))) : null;
-  const rec = out ? out.recorded : atlas((c) => c.answer(cur.pid, answerPayload(result.correct)));
-  if (out?.line) state.flowLine = out.line.text;
+  const rec = atlas((c) => c.answer(cur.pid, answerPayload(result.correct)));
   state.results.push({ caseId: item.id, who: item.who, choice, expected: item.answer, correct: result.correct, skill: item.skill,
     hinted: cur.hint > 0, guided: !!cur.guided, independent: !!rec?.independent });
   state.combo = result.correct ? state.combo + 1 : 0;
@@ -480,16 +449,9 @@ async function next() {
 /* ── 근무 끝 ── */
 function finishShift() {
   const v = state.venue, score = scoreShift(state.results);
-  // 순간 맞춤: 근무를 마치며 저장한다. 돋보기를 늦추는 것은 엔진이 때가 됐다고 볼 때 물어보고, 받아들일 때만 한다.
-  clearTimeout(state.magnifierTimer);
-  const flow = state.flow; state.flow = null;
-  const offer = flow ? atlas(() => flow.offerLessHelp(), { offer: false }) : { offer: false };
-  if (flow) atlas(() => flow.end());
   const before = unlockedIds();
-  if(!assignment()){
-    progress.stars[v.id] = Math.max(progress.stars[v.id] || 0, score.stars);
-    progress.plays += 1; progress.tutorial = true;
-  }
+  progress.stars[v.id] = Math.max(progress.stars[v.id] || 0, score.stars);
+  progress.plays += 1; progress.tutorial = true;
   const today = new Date().toLocaleDateString('sv'); // 이 기기의 날짜(YYYY-MM-DD)로 하루 한 번
   const celebrate = progress.doneDay !== today; progress.doneDay = today;
   saveProgress();
@@ -509,12 +471,6 @@ function finishShift() {
   if (score.bestRun >= 3) notes.push(`최고 ${score.bestRun}연속!`);
   if (opened.length) notes.push(`새 근무지 ‘${opened.join('’, ‘')}’${josa(opened.at(-1), '이', '가')} 열렸어요.`);
   $('#r-note').textContent = notes.join(' ');
-  const help = $('#r-help'); help.hidden = !offer?.offer;
-  $('#r-help-yes').onclick = () => {
-    const change = flow && atlas(() => flow.acceptLessHelp()); help.hidden = true;
-    if (change?.line) { $('#r-note').textContent += ` ${change.line.text}`; announce(change.line.text); }
-  };
-  $('#r-help-no').onclick = () => { if (flow) atlas(() => flow.declineLessHelp()); help.hidden = true; };
 
   const log = $('#r-log'); log.textContent = '';
   for (const r of state.results) {
@@ -554,10 +510,9 @@ function renderSkills(score, focusId) {
 function renderNext(v) {
   const ids = unlockedIds();
   const rec = atlas((c) => recommendVenue(c, ids));
-  const goal=assignment();
-  const target = assignmentVenues(goal,[...assignmentSeen])[0] || venueById(rec?.venueId) || VENUES.find((x) => ids.includes(x.id) && (progress.stars[x.id] || 0) < 3) || v;
+  const target = venueById(rec?.venueId) || VENUES.find((x) => ids.includes(x.id) && (progress.stars[x.id] || 0) < 3) || v;
   $('#r-next-name').textContent = `${target.day}일차 · ${target.name}`;
-  $('#r-next-reason').textContent = goal ? entryTargetLabel(goal) : rec?.reason ? `${rec.reason}` : target.id === v.id ? '같은 근무지에서 새 손님을 만나요.' : '다음 근무지에서 새 안내문을 읽어요.';
+  $('#r-next-reason').textContent = rec?.reason ? `${rec.reason}` : target.id === v.id ? '같은 근무지에서 새 손님을 만나요.' : '다음 근무지에서 새 안내문을 읽어요.';
   $('#r-next').onclick = () => startShift(target.id);
   $('#r-again').onclick = () => startShift(v.id);
   return rec;
@@ -575,7 +530,6 @@ $('#resume').onclick = () => $('#pause-dialog').close();
 function leaveShift() {
   if (state.cur && !state.cur.done) atlas((c) => c.answer(state.cur.pid, { correct: null, assessable: false, reason: 'unanswered' }));
   // 이 근무를 끝낸다: 기다리던 움직임·알림이 돌아와도 이어 가지 않는다
-  clearTimeout(state.magnifierTimer); if (state.flow) { atlas(() => state.flow.end()); state.flow = null; }
   state.shift += 1; state.busy = false; state.cur = null; setOverlay(false);
   $('#briefing').hidden = true; $('#memo-alert').hidden = true; $('#feedback').hidden = true;
   document.documentElement.style.removeProperty('--fb-room');

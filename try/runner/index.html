@@ -36,7 +36,7 @@
         </div>
         <p class="listening-note"><span aria-hidden="true">♫</span> 달리는 동안에는 목소리만 들어요.</p>
         <button id="start" class="start-button" disabled><span>마을을 준비하고 있어요</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12h15m-6-6 6 6-6 6"/></svg></button>
-        <div class="intro-secondary"><button id="listening-check" class="demo-button">듣기 확인 3문항 <span>♫</span></button><button id="practice" class="demo-button" disabled>소리·동작 익히기 <span>♫</span></button><button id="demo" class="demo-button" disabled>구경하기 <span>↗</span></button></div>
+        <div class="intro-secondary"><button id="practice" class="demo-button" disabled>소리·동작 익히기 <span>♫</span></button><button id="demo" class="demo-button" disabled>구경하기 <span>↗</span></button></div>
         <section id="travel-plan" class="travel-plan" aria-label="다음 여행 목표"><div id="journey-goals"></div><div id="wishlist-goal"></div></section>
         <p id="learning-reason" class="learning-note" role="status"></p><p class="best-label">최고 생존 거리 <strong id="best-intro">0 m</strong><span>이 브라우저에 저장돼요</span></p>
         <p class="synk-collection-line"><span data-collection-balance>코인을 불러오고 있어요.</span><a data-collection-garage href="/try/racing/?garage=1">공통 차고 →</a></p>
@@ -89,7 +89,7 @@
         <div class="result-distance"><strong id="result-distance">0</strong><span>m</span></div><p id="result-best"></p>
         <div class="result-stats"><div><strong id="result-coins">0</strong><span>밝힌 등불</span></div><div><strong id="result-correct">0 / 0</strong><span>수행한 부탁</span></div><div><strong id="result-near">0</strong><span>최대 연속 수행</span></div></div>
         <p id="result-learning" class="learning-note" role="status"></p><p class="synk-collection-line"><span id="result-collection-reward" role="status"></span><a data-collection-garage href="/try/racing/?garage=1">공통 차고 →</a></p><p id="result-shop-reward" class="shop-reward" role="status"></p><div id="result-goals" class="result-goals" role="status"></div><div id="review" class="review"></div>
-        <button id="result-listening-check" class="start-button">달리기 뒤 듣기 확인 <span>♫</span></button><button id="restart" class="start-button">한 번 더 달릴까? <span>→</span></button><button id="result-home" class="text-button">처음 화면으로</button>
+        <button id="restart" class="start-button">한 번 더 달릴까? <span>→</span></button><button id="result-home" class="text-button">처음 화면으로</button>
         <button id="result-shop" class="text-button shop-result-link">모은 별로 바람상점 보기 →</button>
       </section>
     </div>
@@ -103,7 +103,6 @@
     <div id="loading" class="loading"><span class="loader"></span><p id="loading-text">마을에 햇살을 들이고 있어요.</p></div>
     <p id="live" class="sr-only" aria-live="polite" aria-atomic="true"></p>
   </main>
-  <dialog id="listening-check-dialog" class="listening-check-dialog"><header><span id="check-count"></span><button id="check-close" class="text-button">닫기</button></header><h2>귀로 듣고, 뜻을 골라요.</h2><p>달리지 않고 듣는 확인이에요. 음성을 끝까지 들은 뒤 답을 골라 주세요.</p><p id="check-status" role="status"></p><div id="check-choices"></div><button id="check-replay" class="start-button">다시 듣기 ↻</button><p id="check-feedback" role="status"></p><button id="check-next" class="start-button" hidden>다음 지시 듣기</button></dialog>
   <script type="importmap">{"imports":{"three":"./vendor/three.module.js"}}</script>
   <script src="./atlas-learning.js"></script><script src="./collection.js"></script><script type="module" src="./app.js"></script>
 </body>
