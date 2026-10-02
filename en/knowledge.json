@@ -12,7 +12,7 @@
         "SYNK PULSE — Making time for music and stories. What matters to PULSE is the joy of a work and the impression it leaves. Through music, video, and character stories, we want to create work people return to hear and see again.",
         "SYNK PATH — Helping students find their own way in Korean academic and everyday life. PATH’s goal is for students to take part in classes in Korean, solve everyday problems, and make their own career decisions. We are preparing a service that combines study planning around each student’s intended major and career with Korean learning and VR scenario practice. Students’ writing, presentations, and project work are organized into portfolios. Schools and employers can understand their motivation and experience through materials the students agree to share.",
         "Each brand’s website explains which experiences are available now and which services are still in preparation.",
-        "An engine that helps each person differently.",
+        "An engine that fits you better the more you use it.",
         "SYNK is a personalization technology company that started in Korean education. We are extending our core engine, Atlas, to games, study, work, and consulting.",
         "LAB is an EdTech brand preparing Korean education, textbooks, scenario-based games, and a personalized learning app.",
         "SHIFT focuses on AI training and consulting for companies and organizations, as well as corporate branding.",
@@ -26,7 +26,7 @@
         "The main SYNK website explains the company’s philosophy and Atlas, our shared technology.",
         "The SYNK characters you meet on this website are Mongle, Kkamong, and Marin.",
         "Meet Mongle, with a coral-colored body and stitching; Kkamong, with green eyes and brown fur; and Marin, with a navy helmet and yellow eyes.",
-        "An engine that helps each person differently. SYNK is a personalization technology company that started in Korean education. We are extending our core engine, Atlas, to games, study, work, and consulting.",
+        "An engine that fits you better the more you use it. SYNK is a personalization technology company that started in Korean education. We are extending our core engine, Atlas, to games, study, work, and consulting.",
         "On SHIFT, the founder shares the process of building a company with AI and the decisions made along the way. We publish the approaches tried, failures, and reasons for revisions so others can draw on them in their own work.",
         "We adapt to the settings you choose and the results of what you actually tried, not to your age, gender, or nationality. When your goal changes, the next practice and suggestion change with it, and we tell you why we prepared them.",
         "Check whether the service meets your needs, what you will receive, and the terms of use. The demos and production guides on the website also show work we have actually made.",
@@ -378,7 +378,7 @@
       "id": "vision",
       "title": "SYNK — Our brands",
       "paragraphs": [
-        "SYNK\nAn engine that helps each person differently.",
+        "SYNK\nAn engine that fits you better the more you use it.",
         "SYNK is a personalization technology company that started in Korean education. We are extending our core engine, Atlas, to games, study, work, and consulting.",
         "SYNK LAB\nAn EdTech company designing personalized Korean education",
         "SYNK LAB develops Korean textbooks, games, and a personalized learning app. We are preparing a one-year, in-person program aiming for TOPIK Level 4, alongside conversation classes with native Korean teachers and global English classes. It is education for studying in Korea and the life that follows, covering cultural experiences, AI use, and collaborative tasks.",
@@ -476,7 +476,7 @@
         "What future is SYNK working toward?",
         "What kind of future does SYNK imagine?"
       ],
-      "answer": "An engine that helps each person differently.\n\nSYNK is a personalization technology company that started in Korean education. We are extending our core engine, Atlas, to games, study, work, and consulting.",
+      "answer": "An engine that fits you better the more you use it.\n\nSYNK is a personalization technology company that started in Korean education. We are extending our core engine, Atlas, to games, study, work, and consulting.",
       "sourceId": "company",
       "relatedIds": [
         "synk-visions",
@@ -511,7 +511,7 @@
         "What are the visions of SYNK LAB, SHIFT, and PULSE?",
         "How do the visions of LAB, SHIFT, and PULSE differ?"
       ],
-      "answer": "SYNK\nAn engine that helps each person differently.\n\nSYNK is a personalization technology company that started in Korean education. We are extending our core engine, Atlas, to games, study, work, and consulting.\n\nSYNK LAB\nAn EdTech company designing personalized Korean education\n\nSYNK LAB develops Korean textbooks, games, and a personalized learning app. We are preparing a one-year, in-person program aiming for TOPIK Level 4, alongside conversation classes with native Korean teachers and global English classes. It is education for studying in Korea and the life that follows, covering cultural experiences, AI use, and collaborative tasks.\n\nSYNK SHIFT\nAI training and branding for companies and organizations\n\nSYNK SHIFT is preparing AI lectures and hands-on training, workplace consulting, and corporate branding. Training and production methods are shaped around participants’ experience and actual work.\n\nSYNK PULSE\nContent and IP built through music and stories\n\nSYNK PULSE creates music, videos, characters, and stories. Our work spans online content and original intellectual property (IP), licensing and co-production, advertising collaborations, and ad and model video production.\n\nSYNK PATH\nPrepare together, from studying in Korea to your career.\n\nSYNK PATH supports international learners preparing for study, daily life, and work in Korea. We plan together from school selection, Korean learning, and interviews through to careers after graduation. We are preparing a service that uses LAB’s Korean education and VR practice to let learners experience situations they will face in Korea, then organize their preparation into a portfolio.\n\nThese visions describe the future each brand is working toward. Each brand’s service information explains what is available, what is in preparation, and the terms of use.",
+      "answer": "SYNK\nAn engine that fits you better the more you use it.\n\nSYNK is a personalization technology company that started in Korean education. We are extending our core engine, Atlas, to games, study, work, and consulting.\n\nSYNK LAB\nAn EdTech company designing personalized Korean education\n\nSYNK LAB develops Korean textbooks, games, and a personalized learning app. We are preparing a one-year, in-person program aiming for TOPIK Level 4, alongside conversation classes with native Korean teachers and global English classes. It is education for studying in Korea and the life that follows, covering cultural experiences, AI use, and collaborative tasks.\n\nSYNK SHIFT\nAI training and branding for companies and organizations\n\nSYNK SHIFT is preparing AI lectures and hands-on training, workplace consulting, and corporate branding. Training and production methods are shaped around participants’ experience and actual work.\n\nSYNK PULSE\nContent and IP built through music and stories\n\nSYNK PULSE creates music, videos, characters, and stories. Our work spans online content and original intellectual property (IP), licensing and co-production, advertising collaborations, and ad and model video production.\n\nSYNK PATH\nPrepare together, from studying in Korea to your career.\n\nSYNK PATH supports international learners preparing for study, daily life, and work in Korea. We plan together from school selection, Korean learning, and interviews through to careers after graduation. We are preparing a service that uses LAB’s Korean education and VR practice to let learners experience situations they will face in Korea, then organize their preparation into a portfolio.\n\nThese visions describe the future each brand is working toward. Each brand’s service information explains what is available, what is in preparation, and the terms of use.",
       "sourceId": "vision",
       "relatedIds": [
         "synk-vision",
@@ -1821,7 +1821,7 @@
         "label": "Meet the founder",
         "href": "/en/founder/"
       },
-      "answer": "An engine that helps each person differently. SYNK is a personalization technology company that started in Korean education. We are extending our core engine, Atlas, to games, study, work, and consulting.\n\nOn SHIFT, the founder shares the process of building a company with AI and the decisions made along the way. We publish the approaches tried, failures, and reasons for revisions so others can draw on them in their own work.\n\nWe adapt to the settings you choose and the results of what you actually tried, not to your age, gender, or nationality. When your goal changes, the next practice and suggestion change with it, and we tell you why we prepared them.",
+      "answer": "An engine that fits you better the more you use it. SYNK is a personalization technology company that started in Korean education. We are extending our core engine, Atlas, to games, study, work, and consulting.\n\nOn SHIFT, the founder shares the process of building a company with AI and the decisions made along the way. We publish the approaches tried, failures, and reasons for revisions so others can draw on them in their own work.\n\nWe adapt to the settings you choose and the results of what you actually tried, not to your age, gender, or nationality. When your goal changes, the next practice and suggestion change with it, and we tell you why we prepared them.",
       "reviewedAt": "2026-10-02",
       "aliases": [
         "기획자는 어떤 회사를 만들고 싶나요?",
@@ -4137,7 +4137,7 @@
   "visions": {
     "synk": {
       "name": "SYNK",
-      "headline": "사람마다 다르게 돕는 엔진을 만듭니다.",
+      "headline": "쓸수록 나에게 맞춰지는 엔진을 만듭니다.",
       "subtext": "SYNK는 한국어 교육에서 시작한 개인화 기술 회사입니다. 그 중심인 엔진 아틀라스를 게임과 공부, 일과 상담으로 넓혀 가고 있습니다."
     },
     "lab": {
