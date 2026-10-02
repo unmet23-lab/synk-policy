@@ -1,5 +1,5 @@
-import './atlas/engine.js?v=9622dd65e536';
-import './atlas/experiences.js?v=9622dd65e536';
+import './atlas/engine.js?v=c8191aeda089';
+import './atlas/experiences.js?v=c8191aeda089';
 const A=globalThis.SynkAtlas,X=globalThis.SynkAtlasExperiences;
 const key='synk-letter-atlas-v1',scope={domain:'LAB',workspace:'letter-demo',subject:'this-browser'};
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));

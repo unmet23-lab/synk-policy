@@ -1,7 +1,7 @@
-import {copy} from './data.js?v=9622dd65e536';
-import {createViews} from './views.js?v=9622dd65e536';
-import {createSession,updateDraft,beginReview,finishLetter} from './session.js?v=9622dd65e536';
-import {createAtlasUI} from './atlas-ui.js?v=9622dd65e536';
+import {copy} from './data.js?v=c8191aeda089';
+import {createViews} from './views.js?v=c8191aeda089';
+import {createSession,updateDraft,beginReview,finishLetter} from './session.js?v=c8191aeda089';
+import {createAtlasUI} from './atlas-ui.js?v=c8191aeda089';
 const main=document.querySelector('#experience'),notice=document.querySelector('#notice'),dialog=document.querySelector('#restart-dialog');
 const state=createSession(),views=createViews(state);
 let atlasStorage=null;try{atlasStorage=window.localStorage;}catch{}
