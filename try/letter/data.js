@@ -241,8 +241,7 @@ export const copy = {
       "작성한 메일은 서버로 전송되지 않으며, 새로고침하면 모두 사라집니다.",
       "이 게임은 사용자의 글을 평가하지 않는 간단한 쓰기 체험입니다."
     ],
-    "product": "SYNK WORLD 앱 일부 기능 체험",
-    "release": "2027년 1월 Google Play 및 App Store 출시 예정"
+    "product": "SYNK WORLD 앱 일부 기능 체험"
   },
   "checks": [
     {
