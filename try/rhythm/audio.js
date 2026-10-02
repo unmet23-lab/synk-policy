@@ -1,4 +1,4 @@
-// Real SYNK Suno recordings. Oscillators are only countdown and key feedback.
+// Real SYNK recordings. Oscillators are only countdown and key feedback.
 const cache=new Map();
 const voiceCache=new Map();
 const frequency=m=>440*2**((m-69)/12);
