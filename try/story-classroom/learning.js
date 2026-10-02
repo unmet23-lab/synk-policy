@@ -7,6 +7,12 @@ import { EPISODE, STORY_VERSION } from './story.js';
 
 export const GAME_ID = 'story-classroom';
 export const RESPONSE_FORMAT = 'action';
+// Moment-level declaration (Atlas 순간 맞춤 §5): reading the request aloud is help, most help first.
+// The help style chosen at the hub reaches it through Core's own mapping (Flow.declaredFrom):
+// step-by-step keeps automatic reading, working alone reads only when asked. The person's own
+// auto-read button in this game always wins for the session.
+export const FLOW_VOICE = Object.freeze({ id: 'story-classroom.voice', version: 1, target: 0.8,
+  knobs: Object.freeze([Object.freeze({ id: 'voice', kind: 'support', label: '부탁 읽어 주기', values: Object.freeze(['자동', '누르면']), start: 0 })]) });
 export const SKILL_LABELS = Object.freeze({
   'ko.reading.detail': '읽고 대상·위치 찾기',
   'ko.reading.negation': '읽고 부정·변경 이해하기',
@@ -18,6 +24,17 @@ const MAPPING = Object.freeze({
   'surprise-cake': ['detail', 1], 'surprise-ribbon': ['sequence', 2],
   'review-snacks': ['detail', 1], 'review-paper': ['negation', 2],
   'review-cake': ['sequence', 2],
+});
+// The TOPIK I grammar each request uses (strata/topik-i.grammar.json): the particles after who
+// moves, what moves and where it goes (마린은, 과자를, 상자 안에), then the endings of the sentence
+// (놓은 뒤 → -(으)ㄴ 후에). Strata's particleAfter and grammarIn (strata/topik-i-forms.js) read them
+// and a test keeps the two the same. Drafts until teachers review them.
+export const GRAMMAR = Object.freeze({
+  'cleanup-snacks': ['G202', 'G203', 'G206'], 'cleanup-paper': ['G202', 'G203', 'G206'],
+  'clue-flowers': ['G202', 'G203', 'G206'], 'clue-letter': ['G202', 'G203', 'G206', 'G406'],
+  'surprise-cake': ['G202', 'G203', 'G206'], 'surprise-ribbon': ['G202', 'G203', 'G206', 'G406'],
+  'review-snacks': ['G201', 'G203', 'G206'], 'review-paper': ['G202', 'G203', 'G206'],
+  'review-cake': ['G202', 'G203', 'G206', 'G406'],
 });
 const MISSIONS = new Map([...EPISODE.acts.flatMap(act => act.missions), ...EPISODE.review].map(m => [m.id, m]));
 const STATUS_LABELS = Object.freeze({
@@ -31,13 +48,18 @@ export function missionMetadata(mission) {
   const key = `${GAME_ID}.${mission.id}.${STORY_VERSION}`;
   return { id: `${GAME_ID}.${mission.id}`, itemKey: key, familyKey: key,
     skillId: `ko.reading.${mapped[0]}`, difficulty: mapped[1], modality: 'reading',
-    responseFormat: RESPONSE_FORMAT, audioRequired: false, confounded: false };
+    responseFormat: RESPONSE_FORMAT, audioRequired: false, confounded: false, conceptIds: [...GRAMMAR[mission.id]] };
 }
+export function assignmentMissions(missions,target){
+  if(!target)return missions;
+  return missions.filter(m=>{const meta=missionMetadata(m);return meta.skillId===target.skillId&&meta.difficulty===target.difficulty&&meta.modality===target.modality&&meta.responseFormat===target.responseFormat&&target.familyKeys?.includes(meta.familyKey)&&(!target.itemKeys?.length||target.itemKeys.includes(meta.itemKey));});
+}
+export function storyTargetLabel(target){return `이번 목표: ${SKILL_LABELS[target.skillId]||'지정 부탁 읽기'} · 난도 ${target.difficulty}. 지정된 ${target.requiredAttempts}개 부탁을 행동으로 옮겨요.`;}
 
 export function missionCandidates(missions) {
   return missions.map(mission => { const m = missionMetadata(mission); return {
     id: m.id, missionId: mission.id, skillIds: [m.skillId], difficulty: m.difficulty,
-    modality: m.modality, responseFormat: m.responseFormat, itemKey: m.itemKey,
+    modality: m.modality, responseFormat: m.responseFormat, itemKey: m.itemKey, conceptIds: m.conceptIds,
   }; });
 }
 
@@ -82,6 +104,17 @@ export class StoryLearning {
       // supply storageScope/accountKey here, or manufacture an account session.
       this.coach = coach || factory?.({ gameId: GAME_ID, storage: storage ?? runtime?.localStorage }) || null;
     } catch (error) { this.coach = null; this._fail(error); }
+  }
+
+  /** Automatic reading at the start, from the help style chosen at the hub (true = read aloud by
+   * itself). Nothing chosen, no engine or anything unexpected keeps today's default: automatic. */
+  voiceDefault() {
+    try {
+      const Flow = this.runtime?.SynkLearning?.Flow, presentation = this.coach?.presentation?.();
+      if (!Flow?.declaredFrom || !presentation) return true;
+      const index = Flow.declaredFrom(FLOW_VOICE, presentation).knobs.voice;
+      return index === undefined || FLOW_VOICE.knobs[0].values[index] === '자동';
+    } catch { return true; }
   }
 
   /** A fresh playthrough, never deletion/reset of the shared learning log. */
@@ -166,9 +199,10 @@ export class StoryLearning {
   }
 
   summary() { return this._call('summary'); }
+  assignment() { return typeof this.coach?.assignment==='function'?this._call('assignment'):null; }
   recommend(missions = EPISODE.review) {
     let candidates;
-    try { candidates = missionCandidates(missions); } catch (error) { this._fail(error); return null; }
+    try { const target=assignmentMissions(missions,this.assignment());candidates = missionCandidates(target.length?target:missions); } catch (error) { this._fail(error); return null; }
     return this._call('recommend', candidates, { audioAvailable: true });
   }
 

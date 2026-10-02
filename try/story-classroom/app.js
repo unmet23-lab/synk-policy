@@ -4,7 +4,7 @@ import {StoryStage,names} from './stage.js';
 import {StoryAudio} from './audio.js';
 import {StoryVoice} from './voice.js';
 import {VOICE_LINE_BY_ID,voiceForMission} from './voice-lines.js';
-import {createStoryLearning,skillReport} from './learning.js';
+import {createStoryLearning,skillReport,assignmentMissions,storyTargetLabel} from './learning.js';
 
 const $=id=>document.getElementById(id);
 const escape=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -17,14 +17,18 @@ const voice=new StoryVoice({audio,onStatus:state=>{$('voice-status').textContent
  if(ids.length){game.markAudioHelp(ids,{source,voiceId:line.id});learning.help(ids,{kind:'audio',source,requestId:`${line.id}:${++voiceHelpSerial}`});persist();}
 }});
 voice.readingOnly=new URLSearchParams(location.search).get('reading')==='1';
+// 입구에서 고른 도움 방식(순간 맞춤 선언 FLOW_VOICE)이 자동 읽기의 처음 값을 정한다. 이 판에서 누른 단추가 언제나 이긴다.
+const chosenVoice=learning.voiceDefault();voice.automatic=chosenVoice;
 const portraits={teacher:'teacher.webp',marin:'marin-focus.webp',kkamong:'kkamong-focus.webp',mongle:'mongle-body.webp'};
 const speakerNames={teacher:'선생님',marin:'마린',kkamong:'까몽',mongle:'몽글',narrator:'이야기'};
 let notes=[],saved=null,busy=false,started=false,teacherVisible=false,feedback=null,toastTimer,lastRenderedPhase=null,voiceKey='',voiceHelpSerial=0;
 try{const raw=STORAGE?JSON.parse(localStorage.getItem(STORAGE)):null;if(raw?.game&&new StoryGame().restore(raw.game))saved=raw;}catch{}
 const stage=new StoryStage($('stage'),{onActor:selectActor,onObject:selectObject,onPlace:place});
-if(saved){$('resume').hidden=false;}
+if(saved&&!learning.assignment()){$('resume').hidden=false;}
+const initialTarget=learning.assignment();
+if(initialTarget)document.querySelector('.reading-note span').textContent=storyTargetLabel(initialTarget);
 
-function persist(){try{const scope=learning.progressScope();if(STORAGE&&scope.persistent&&scope.key===STORAGE)localStorage.setItem(STORAGE,JSON.stringify({version:2,game:game.snapshot(),notes:notes.slice(-60)}));}catch{}}
+function persist(){try{const scope=learning.progressScope();if(!learning.assignment()&&STORAGE&&scope.persistent&&scope.key===STORAGE)localStorage.setItem(STORAGE,JSON.stringify({version:2,game:game.snapshot(),notes:notes.slice(-60)}));}catch{}}
 function toast(text){$('toast').textContent=text;$('toast').classList.add('visible');clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('toast').classList.remove('visible'),3500);}
 function rememberLine(line){if(line&&!notes.some(n=>n.key===`${game.phase}:${game.actIndex}:${game.dialogueIndex}`))notes.push({...line,voiceId:game.currentVoiceLine?.id,key:`${game.phase}:${game.actIndex}:${game.dialogueIndex}`});}
 function voiceLines(){if(feedback?.voiceId)return [VOICE_LINE_BY_ID[feedback.voiceId]];if(['play','review'].includes(game.phase))return game.missions.filter(m=>!game.completedIds.includes(m.id)).map(m=>voiceForMission(m.id));return [game.currentVoiceLine].filter(Boolean);}
@@ -66,8 +70,9 @@ function render(){
  const plan=available.length?learning.recommend(available):null;
  const preferred=available.find(m=>m.id===plan?.selected?.missionId);
  $('missions').dataset.recommended=preferred?.id||'';
- if(preferred){const index=game.missions.indexOf(preferred),copy=$('missions').children[index]?.querySelector('small');if(copy)copy.textContent='기록을 보고 먼저 추천하는 부탁';}
- document.querySelector('.mission-footnote').textContent=preferred?(plan.reason||'기록을 보고 다음 부탁을 골랐어요. 원하는 부탁부터 해도 괜찮아요.'):'글 속에 힌트가 있어요. 언제든 다시 읽어 보세요.';
+ const target=learning.assignment(),targetMissions=assignmentMissions(game.missions,target);
+ if(preferred){const index=game.missions.indexOf(preferred),copy=$('missions').children[index]?.querySelector('small');if(copy)copy.textContent=target&&targetMissions.includes(preferred)?'이번 목표 · 먼저 해 볼 부탁':'기록을 보고 먼저 추천하는 부탁';}
+ document.querySelector('.mission-footnote').textContent=target?`${storyTargetLabel(target)} 순서가 있는 부탁은 앞 행동부터 함께 해요.`:preferred?(plan.reason||'기록을 보고 다음 부탁을 골랐어요. 원하는 부탁부터 해도 괜찮아요.'):'글 속에 힌트가 있어요. 언제든 다시 읽어 보세요.';
  const name=game.actor?names[game.actor]:null,object=game.held?names[game.held]:null;
  $('selection').textContent=busy?`${name||'친구'}이 물건을 옮기고 있어요…`:playing?(object?`${name||'친구'} · ${object} 선택. 놓을 곳을 골라 주세요.`:name?`${name} 선택. 옮길 물건을 골라 주세요.`:'먼저 마린 또는 까몽을 골라 주세요.'):'이야기를 천천히 읽고 이어 가세요.';
  $('cancel-selection').hidden=!playing||!game.held||busy;
@@ -80,9 +85,13 @@ function render(){
 }
 
 async function start(resume=false){
+ const target=learning.assignment(),targetMissions=target?assignmentMissions([...EPISODE.acts.flatMap(a=>a.missions),...EPISODE.review],target):null;
+ if(target&&!targetMissions.length){toast('지정 부탁을 준비하지 못했어요. WORLD에서 다시 열어 주세요.');return;}
+ if(target)resume=false;
  if(busy)return;voice.stop();voiceKey='';started=true;feedback=null;stage.reset();teacherVisible=false;
+ if(!chosenVoice&&!voice.automatic&&!voice.readingOnly)toast('입구에서 고른 도움 방식대로, 부탁은 눌러야 소리로 읽어 줘요.');
  if(resume&&saved&&game.restore(saved.game)){notes=Array.isArray(saved.notes)?saved.notes.filter(n=>typeof n.text==='string'&&typeof n.speaker==='string').slice(-60):[];teacherVisible=game.phase!=='opening'||game.dialogueIndex>=3;stage.teacher(teacherVisible);}
- else{game.restart();notes=[];}
+ else{if(target)game.startPractice(targetMissions.map(m=>m.id));else game.restart();notes=[];}
  learning.beginRun({restored:resume});
  await audio.start();setSound();render();$('chapter-title').setAttribute('tabindex','-1');$('chapter-title').focus({preventScroll:true});window.scrollTo({top:0,behavior:'instant'});
 }

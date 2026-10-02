@@ -6,17 +6,46 @@ import { SKILL_LABEL } from './content.js';
 export const GAME_ID = 'entry-check';
 export const FORMAT = 'single-choice';
 
+// 순간 맞춤(Core flow.js, 아틀라스_순간맞춤 §5): 돋보기가 스스로 나오는 때만 이 사람에 맞춘다.
+// 규칙·손님·정답은 그대로다. 도움이 많은 쪽이 앞이고, 처음 값은 지금 방식(누르면 나옴)이다.
+// 막히면 엔진이 더 일찍 보여 주고, 늦추는 것은 물어보고 받아들일 때만 한다. 입구에서 고른 도움 방식이 있으면 그대로 따른다.
+export const FLOW_ENTRY = { id: 'entry-check.magnifier', version: 1, target: 0.8, knobs: [
+  { id: 'magnifier', kind: 'support', label: '돋보기 도움', values: ['바로', '머뭇거리면', '누르면'], start: 2 }] };
+// 첫 돋보기가 스스로 나오는 때(ms). null은 눌렀을 때만.
+export const MAGNIFIER_AFTER = { 바로: 0, 머뭇거리면: 12000, 누르면: null };
+export const FLOW_WORDS = { 'ease.support': '다음 손님부터는 돋보기를 조금 더 일찍 보여 줄게요.',
+  'accepted-less-help': '말한 대로 돋보기를 조금 늦게 보여 줄게요.' };
+
+// 규칙 문장이 쓰는 TOPIK I 문형(strata/topik-i.grammar.json). 문장을 Strata의 grammarIn
+// (strata/topik-i-forms.js)이 읽은 것이고, 시험이 둘이 같은지 본다(교원 검수 전 초안).
+// 손님 문항은 판단 근거가 되는 규칙(evidence)들의 문형을 쓴다.
+export const RULE_GRAMMAR = Object.freeze({
+  'pool.cap': ['G403'], 'pool.food': ['G402'], 'pool.kid': ['G212', 'G403'],
+  'library.card': ['G402'], 'library.food': ['G402', 'G401'], 'library.time': ['G212', 'G402'],
+  'museum.time': ['G212', 'G402'], 'museum.camera': ['G402'], 'museum.fee': ['G212', 'G402'],
+  'concert.date': ['G212', 'G402'], 'concert.chair': ['G505', 'G402'], 'concert.kid': ['G212', 'G403'], 'concert.food': ['G402'] });
+const CASE_GRAMMAR = new Map(VENUES.flatMap((v) => v.cases.map((c) => [c.id, [...new Set(c.evidence.flatMap((r) => RULE_GRAMMAR[`${v.id}.${r}`] || []))]])));
+
 export function caseMetadata(c) {
   const key = `${GAME_ID}.${c.id}.v1`;
   return { id: `${GAME_ID}.${c.id}`, itemKey: key, familyKey: key, skillId: c.skill, difficulty: c.difficulty,
-    modality: 'reading', responseFormat: FORMAT, audioRequired: false, confounded: false };
+    modality: 'reading', responseFormat: FORMAT, audioRequired: false, confounded: false, conceptIds: [...(CASE_GRAMMAR.get(c.id) || [])] };
 }
+export function assignmentCases(cases,target){
+  if(!target)return cases;
+  return cases.filter(c=>{const m=caseMetadata(c);return m.skillId===target.skillId&&m.difficulty===target.difficulty&&m.modality===target.modality&&m.responseFormat===target.responseFormat&&target.familyKeys?.includes(m.familyKey)&&(!target.itemKeys?.length||target.itemKeys.includes(m.itemKey));});
+}
+export function assignmentVenues(target,seen=[]){
+  if(!target)return [];
+  return VENUES.filter(v=>assignmentCases(v.cases,target).length).sort((a,b)=>assignmentCases(b.cases,target).filter(c=>!seen.includes(c.id)).length-assignmentCases(a.cases,target).filter(c=>!seen.includes(c.id)).length);
+}
+export function entryTargetLabel(target){return `이번 목표: 읽기 · ${SKILL_LABEL[target.skillId]||'지정 표현'} · 난도 ${target.difficulty}. 지정된 ${target.requiredAttempts}명의 손님을 확인해요.`;}
 
 export function caseCandidates(cases) {
   return cases.map((c) => {
     const m = caseMetadata(c);
     return { id: m.id, caseId: c.id, skillIds: [m.skillId], difficulty: m.difficulty, modality: m.modality,
-      responseFormat: m.responseFormat, itemKey: m.itemKey };
+      responseFormat: m.responseFormat, itemKey: m.itemKey, conceptIds: m.conceptIds };
   });
 }
 
