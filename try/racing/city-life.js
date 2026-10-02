@@ -1,6 +1,6 @@
 // Adult pedestrians and terrace guests share nine instanced batches. Their
 // authored activities are anchored to cityscape's real seats and pavements.
-export function buildCityLife(THREE, {anchors = [], groundHeight, pathX} = {}) {
+export function buildCityLife(THREE, {anchors = [], groundHeight, pathX, surfaceHeightAt = null} = {}) {
   if (!THREE || typeof groundHeight !== 'function' || typeof pathX !== 'function') throw new TypeError('City life needs THREE, groundHeight and pathX.');
   if (!Array.isArray(anchors)) throw new TypeError('City activity anchors must be an array.');
   const group = new THREE.Group(); group.name = 'coastal-city-life';
@@ -35,6 +35,7 @@ export function buildCityLife(THREE, {anchors = [], groundHeight, pathX} = {}) {
     for(const [y,w,d] of rings)for(let j=0;j<8;j++){const a=j*Math.PI/4;pos.push(Math.cos(a)*w,y,Math.sin(a)*d);}
     for(let i=0;i<rings.length-1;i++)for(let j=0;j<8;j++){const a=i*8+j,b=i*8+(j+1)%8;idx.push(a,b,a+8,b,b+8,a+8);}
     for(let j=1;j<7;j++){idx.push(0,j+1,j);idx.push(32,32+j,33+j);}
+    for(let i=0;i<idx.length;i+=3)[idx[i+1],idx[i+2]]=[idx[i+2],idx[i+1]];
     const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(pos,3));g.setIndex(idx);g.computeVertexNormals();return g;
   }
   const geometry={
@@ -56,6 +57,7 @@ export function buildCityLife(THREE, {anchors = [], groundHeight, pathX} = {}) {
     buckets[key]={mesh,count:0,triangles:(g.index?.count||g.attributes.position.count)/3};group.add(mesh);
   }
   const object=new THREE.Object3D(),aVector=new THREE.Vector3(),bVector=new THREE.Vector3(),axis=new THREE.Vector3(0,1,0),up=new THREE.Vector3(),limbRotation=new THREE.Quaternion();
+  const yawRotation=new THREE.Quaternion(),partRotation=new THREE.Quaternion(),localEuler=new THREE.Euler();
   const sphere=new THREE.Sphere(new THREE.Vector3(),1.8),frustum=new THREE.Frustum(),projection=new THREE.Matrix4();
   let theme='coast',clock=0,lastTime=null,lastInput={},disposed=false;
   const stats={actors:actors.length,visibleActors:0,animatedActors:0,drawCalls:0,shadowDrawCalls:0,visibleTriangles:0,storedTriangles:Object.values(buckets).reduce((n,b)=>n+b.triangles,0),quality:'high',theme,time:0};
@@ -68,31 +70,43 @@ export function buildCityLife(THREE, {anchors = [], groundHeight, pathX} = {}) {
     object.updateMatrix();bucket.mesh.setMatrixAt(bucket.count,object.matrix);
     if(key!=='shadow')bucket.mesh.setColorAt(bucket.count,color(tint));bucket.count++;
   }
-  function drawActor(actor,t,playerS,playerX,animated) {
-    const p=actor.position, seated=actor.kind==='table',s=actor.scale;
-    let x=p.x,y=p.y,z=p.z,yaw=p.yaw??actor.anchor.yaw??0,walk=0,near=0;
+  function placement(actor,t) {
+    const p=actor.position;
+    let x=p.x,y=p.y,z=p.z,yaw=p.yaw??actor.anchor.yaw??0,walk=0;
     const localTime=t+actor.phaseOffset;
     if(actor.kind==='walk') {
-      const {start,end}=actor.anchor,duration=Math.max(8,actor.anchor.duration||22),angle=localTime/duration*Math.PI*2;
+      const {start,end}=actor.anchor,length=Math.hypot(end.x-start.x,end.z-start.z);
+      // A cosine round trip must last pi * distance / peak speed; a fixed
+      // short period makes a 43m pavement look like a sprinting conveyor.
+      const duration=Math.max(length*Math.PI/1.45,actor.anchor.duration||0,8),angle=localTime/duration*Math.PI*2;
       const progress=(1-Math.cos(angle))*.5;
       x=start.x+(end.x-start.x)*progress;z=start.z+(end.z-start.z)*progress;
       if(Number.isFinite(actor.anchor.roadRelativeOffset))x=pathX(z)+actor.anchor.roadRelativeOffset;
-      x=Math.min(x,pathX(z)-10.3);y=groundHeight(x,z)+.045;
+      x=Math.min(x,pathX(z)-10.3);
+      const pavement=typeof surfaceHeightAt==='function'?surfaceHeightAt(x,z):NaN;
+      y=Number.isFinite(pavement)?pavement:groundHeight(x,z)+.045;
       // Smooth out the turnaround rather than teleporting to the path start.
       const direction=Math.sin(angle);walk=clamp(Math.abs(direction)*1.8,0,1);
       yaw=Math.atan2(end.x-start.x,end.z-start.z)+(direction<0?Math.PI:0);
     }
-    const distance=Math.hypot(x-playerX,z-playerS);near=clamp((48-distance)/20,0,1);
+    return {x,y,z,yaw,walk};
+  }
+  function drawActor(actor,t,playerS,playerX,animated,celebrating) {
+    const p=actor.position, seated=actor.kind==='table',s=actor.scale;
+    let {x,y,z,yaw,walk}=placement(actor,t);
+    const localTime=t+actor.phaseOffset;
+    const distance=Math.hypot(x-playerX,z-playerS),near=clamp(((celebrating?60:48)-distance)/20,0,1);
     if(actor.kind==='cheer')yaw=Math.atan2(playerX-x,playerS-z);
     const party=actor.kind==='party',beat=localTime*(1.55+actor.r*.40),stride=localTime*(4.5+actor.r*.7);
-    const sway=party?Math.sin(beat)*.025:Math.sin(stride*2)*.014*walk;
+    const dance=party&&actor.r>.5?(1+Math.sin(beat))*.018:0;
+    const sway=party?-dance:Math.sin(stride*2)*.014*walk;
     const seatHeight=Number.isFinite(p.seatHeight)?p.seatHeight:.57;
     const pelvisY=seated?(seatHeight+.10)/s:.925+sway;
     const hipZ=seated?-.075:0;
     const hipL=[-.092,pelvisY,hipZ],hipR=[.092,pelvisY,hipZ];
     const stepL=Math.sin(stride)*.22*walk,stepR=-stepL;
-    const kneeL=seated?[-.105,.505/s,.36/s]:[-.095,.49+Math.max(0,stepL)*.19,stepL*.64];
-    const kneeR=seated?[.105,.505/s,.36/s]:[.095,.49+Math.max(0,stepR)*.19,stepR*.64];
+    const kneeL=seated?[-.105,.505/s,.36/s]:[-.095,.49+Math.max(0,stepL)*.19-dance*.45,stepL*.64+dance];
+    const kneeR=seated?[.105,.505/s,.36/s]:[.095,.49+Math.max(0,stepR)*.19-dance*.45,stepR*.64+dance*.3];
     const ankleL=seated?[-.108,.08/s,.43/s]:[-.098,.08+Math.max(0,stepL)*.24,stepL];
     const ankleR=seated?[.108,.08/s,.43/s]:[.098,.08+Math.max(0,stepR)*.24,stepR];
     const shoulderY=pelvisY+.435,neckY=pelvisY+.55,headY=pelvisY+.70;
@@ -100,9 +114,10 @@ export function buildCityLife(THREE, {anchors = [], groundHeight, pathX} = {}) {
     const shoulderL=[-.211,shoulderY,hipZ],shoulderR=[.211,shoulderY,hipZ];
     let elbowL=[-.245,shoulderY-.275,hipZ-stepR*.6],elbowR=[.245,shoulderY-.275,hipZ-stepL*.6];
     let handL=[-.24,shoulderY-.52,hipZ-stepR],handR=[.24,shoulderY-.52,hipZ-stepL];
-    let drinkHand=null;
+    let drinkHand=null,drinkSip=0;
     if(seated||party) {
       const sip=seated?Math.pow(Math.max(0,Math.sin(localTime*.48+actor.phase)),5):Math.pow(Math.max(0,Math.sin(localTime*.32+actor.phase)),8)*.75;
+      drinkSip=sip;
       elbowR=[.255,shoulderY-.20+sip*.08,hipZ+.17];
       handR=[.135,shoulderY-.14+sip*.30,hipZ+.255-sip*.07];drinkHand=handR;
       elbowL=[-.265,shoulderY-.24,hipZ+.13];
@@ -119,8 +134,12 @@ export function buildCityLife(THREE, {anchors = [], groundHeight, pathX} = {}) {
       }
     }
     const cos=Math.cos(yaw),sin=Math.sin(yaw);
+    yawRotation.setFromAxisAngle(axis,yaw);
     const world=q=>[x+s*(cos*q[0]+sin*q[2]),y+s*q[1],z+s*(-sin*q[0]+cos*q[2])];
-    function part(key,position,scale,tint,rot=[0,0,0]) {meshPart(key,world(position),scale.map(v=>v*s),tint,[rot[0],yaw+rot[1],rot[2]]);}
+    function part(key,position,scale,tint,rot=[0,0,0]) {
+      partRotation.setFromEuler(localEuler.set(...rot)).premultiply(yawRotation);
+      meshPart(key,world(position),scale.map(v=>v*s),tint,partRotation);
+    }
     function limb(from,to,r,tint,depth=1) {
       aVector.set(...world(from));bVector.set(...world(to));up.subVectors(bVector,aVector);const length=up.length();
       limbRotation.setFromUnitVectors(axis,up.normalize());
@@ -153,8 +172,9 @@ export function buildCityLife(THREE, {anchors = [], groundHeight, pathX} = {}) {
     }
     if(drinkHand) {
       const cupPosition=[drinkHand[0],drinkHand[1]+.046,drinkHand[2]+.026];
-      part('cup',cupPosition,[1,1,1],actor.r>.5?0xd7c3a3:0xe8dfce);
-      part('liquid',[cupPosition[0],cupPosition[1]+.053,cupPosition[2]],[1,1,1],actor.r>.5?0x805433:0xb09867,[-Math.PI*.5,0,0]);
+      const tilt=-drinkSip*.55;
+      part('cup',cupPosition,[1,1,1],actor.r>.5?0xd7c3a3:0xe8dfce,[tilt,0,0]);
+      part('liquid',[cupPosition[0],cupPosition[1]+.053*Math.cos(tilt),cupPosition[2]+.053*Math.sin(tilt)],[1,1,1],actor.r>.5?0x805433:0xb09867,[-Math.PI*.5+tilt,0,0]);
     }
     meshPart('shadow',[x,y+.012,z],[seated?.36:.28,seated?.43:.18,1],0,[ -Math.PI*.5,0,yaw]);
     poses.push({id:actor.id,kind:actor.kind,position:{x,y,z},yaw,height:actor.height,seated,seatHeight,animated,
@@ -162,7 +182,8 @@ export function buildCityLife(THREE, {anchors = [], groundHeight, pathX} = {}) {
   }
   function update(input={}) {
     if(disposed)return stats;
-    const {time=0,playerS=75,playerX=pathX(playerS),quality='high',camera=null,motion=true,paused=false}=input;lastInput=input;
+    const {time=0,playerS=75,playerX=pathX(playerS),quality='high',camera=null,motion=true,paused=false,celebrating=false}=input;lastInput=input;
+    const previousClock=clock;
     if(Number.isFinite(time)){if(lastTime!==null&&!paused&&motion)clock+=clamp(time-lastTime,0,.15);lastTime=time;}
     const q=['high','balanced','low'].includes(quality)?quality:'balanced';
     stats.quality=q;stats.theme=theme;stats.time=clock;stats.visibleActors=0;stats.animatedActors=0;stats.visibleTriangles=0;stats.drawCalls=0;poses.length=0;
@@ -170,18 +191,20 @@ export function buildCityLife(THREE, {anchors = [], groundHeight, pathX} = {}) {
     if(camera){camera.updateMatrixWorld();projection.multiplyMatrices(camera.projectionMatrix,camera.matrixWorldInverse);frustum.setFromProjectionMatrix(projection);}
     const distance=q==='high'?260:q==='balanced'?200:140;
     if(group.visible)for(const actor of actors) {
-      const offset=actor.position.z-playerS;
+      const current=placement(actor,actor.frozenTime??0),offset=current.z-playerS;
       if(offset < -28 || offset>distance)continue;
+      if(Number.isFinite(actor.anchor.blockS)&&(Math.abs(actor.anchor.blockS-playerS)>=distance||actor.anchor.blockS-playerS<=-125))continue;
       // Keep both seated partners on lower tiers; reduce distant pedestrians.
       if(q==='low'&&offset>75&&actor.kind==='walk')continue;
-      sphere.center.set(actor.position.x,actor.position.y+1,actor.position.z);
+      sphere.center.set(current.x,current.y+1,current.z);
       if(camera&&!frustum.intersectsSphere(sphere))continue;
       const animated=motion&&!paused&&Math.abs(offset)<(q==='low'?65:110);
       // Distant people remain in a stable, individual pose; near motion updates
       // every render, so no 12/18 fps skeletal stepping is exposed up close.
-      if(actor.frozenTime===undefined||animated)actor.frozenTime=clock;
-      if(!actor.reactionTarget||motion&&!paused)actor.reactionTarget={playerS,playerX};
-      drawActor(actor,actor.frozenTime,actor.reactionTarget.playerS,actor.reactionTarget.playerX,animated);
+      if(actor.frozenTime===undefined)actor.frozenTime=0;
+      if(animated)actor.frozenTime+=clock-previousClock;
+      if(!actor.reactionTarget||motion&&!paused)actor.reactionTarget={playerS,playerX,celebrating};
+      drawActor(actor,actor.frozenTime,actor.reactionTarget.playerS,actor.reactionTarget.playerX,animated,actor.reactionTarget.celebrating);
       stats.visibleActors++;if(animated)stats.animatedActors++;
     }
     for(const b of Object.values(buckets)) {

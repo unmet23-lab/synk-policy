@@ -123,8 +123,19 @@ export function buildCoastalCity(THREE, {pathX, groundHeight, roadEnd = 2250} = 
   }
   function foundation(b,pad,width,depth) {
     const depthY=Math.max(.7,pad.maxGround-pad.minGround+.5);
-    buildingPart(b,'shell','stone','box',pad,0,-depthY*.5,0,width,depthY,depth,.90);
-    buildingPart(b,'shell','pale','box',pad,0,.12,0,width+.12,.24,depth+.12,.90);
+    const shop=pad.kind==='shop',coreWidth=shop?width-7.1:width;
+    buildingPart(b,'shell','stone','box',pad,0,-depthY*.5,0,coreWidth,depthY,depth,shop?[.56,.60,.60]:.76);
+    buildingPart(b,'shell','stone','box',pad,0,.12,0,coreWidth+.12,.24,depth+.12,.84);
+    if(!shop)return pad;
+    const half=(width-8)*.5;let frontMax=-Infinity,frontMin=Infinity;
+    for(const u of [half+.5,half+4.4])for(const v of [-depth*.5,depth*.5]){
+      const [x,,z]=at(pad,u,0,v),height=groundHeight(x,z);frontMax=Math.max(frontMax,height);frontMin=Math.min(frontMin,height);
+    }
+    const terraceTop=frontMax+.18,terrace={...pad,baseY:terraceTop-.24};pad.terraceY=terraceTop;
+    const thickness=Math.max(.32,terrace.baseY-frontMin+.20);
+    buildingPart(b,'shell','stone','box',terrace,half+2.35,-thickness*.5,0,4.1,thickness,depth,.68);
+    buildingPart(b,'shell','stone','box',terrace,half+2.35,.12,0,4.18,.24,depth+.08,.82);
+    return terrace;
   }
   function promenade(b,start,end) {
     // Paving follows the current terrain point for point; neither the road
@@ -142,6 +153,17 @@ export function buildCoastalCity(THREE, {pathX, groundHeight, roadEnd = 2250} = 
     }
     walks.push({start,end,inner:-9.3,outer:-18.1});
   }
+  function surfaceHeightAt(x,z) {
+    const offset=x-pathX(z),walk=walks.find(w=>z>=w.start&&z<=w.end&&offset>=w.outer-.01&&offset<=w.inner+.01);
+    if(!walk)return groundHeight(x,z)+.045;
+    const count=Math.ceil((walk.end-walk.start)/5),step=(walk.end-walk.start)/count;
+    const cell=clamp(Math.floor((z-walk.start)/step),0,count-1),z0=walk.start+cell*step,z1=z0+step,t=clamp((z-z0)/step,0,1);
+    const center=pathX(z0)+(pathX(z1)-pathX(z0))*t,off=x-center,column=off< -13.7?0:1;
+    const x0=[-18.1,-13.7][column],x1=x0+4.4,u=clamp((off-x0)/(x1-x0),0,1);
+    const y00=groundHeight(pathX(z0)+x0,z0)+.045,y10=groundHeight(pathX(z0)+x1,z0)+.045;
+    const y01=groundHeight(pathX(z1)+x0,z1)+.045,y11=groundHeight(pathX(z1)+x1,z1)+.045;
+    return u+t<=1?y00+u*(y10-y00)+t*(y01-y00):y11+(1-u)*(y01-y11)+(1-t)*(y10-y11);
+  }
   // Four walkable pockets, with park/view breaks instead of an endless wall.
   const streetPlan = [
     {s:380,count:5,offset:-26}, {s:730,count:5,offset:-29},
@@ -153,16 +175,17 @@ export function buildCoastalCity(THREE, {pathX, groundHeight, roadEnd = 2250} = 
     for (let j=0;j<plan.count;j++) {
       const s=plan.s*scaleS+(j-(plan.count-1)*.5)*spacing;
       const width=14+(j%3)*1.6, depth=18+(j%2)*2.5, floors=2+(j+index)%3, height=floors*3.7;
+      const style=(index+j)%4;
       const pad=groundPad(s,plan.offset-(j%2)*4,width+8,depth+7,'shop');
-      foundation(b,pad,width+8,depth+7);
+      const terrace=foundation(b,pad,width+8,depth+7);
       // Wide stone entry treads bridge the natural grade to each terrace pad.
-      const entry=at(pad,width*.5+6.2,0,0), rise=Math.max(0,pad.baseY+.24-groundHeight(entry[0],entry[2]));
+      const entry=at(terrace,width*.5+6.2,0,0), rise=Math.max(0,terrace.baseY+.24-groundHeight(entry[0],entry[2]));
       const steps=Math.max(2,Math.min(6,Math.ceil(rise/.28)));
       for(let step=0;step<steps;step++) {
         const top=rise*(steps-step)/steps;
-        buildingPart(b,'shell','stone','box',pad,width*.5+4.2+step*.36,.24-rise+top*.5,0,.40,Math.max(.12,top),3.2,.91);
+        buildingPart(b,'shell','stone','box',terrace,width*.5+4.2+step*.36,.24-rise+top*.5,0,.40,Math.max(.12,top),3.2,.84);
       }
-      features.push({kind:'shop',s,x:pad.x,z:pad.z,y:pad.baseY,height,floors,width,depth,style:(index+j)%4});
+      features.push({kind:'shop',s,x:pad.x,z:pad.z,y:pad.baseY,height,floors,width,depth,style});
       // Recessed glass on all sides, travertine frame and a staggered top floor.
       const facadeTones=[[.93,.91,.87],[.88,.91,.89],[.88,.85,.78],[.86,.89,.91]];
       buildingPart(b,'shell','pale','box',pad,0,height*.5+.24,0,width,height,depth,facadeTones[(j+index)%4]);
@@ -180,13 +203,36 @@ export function buildCoastalCity(THREE, {pathX, groundHeight, roadEnd = 2250} = 
       for (const sign of [-1,1]) {
         buildingPart(b,'shell','pale','box',pad,width*.5+.24,height*.5,sign*(depth*.5-.4),.48,height,.7,.88);
       }
-      buildingPart(b,'shell','bronze','box',pad,width*.5+1.45,3.75,0,3.05,.20,depth+1.3,1);
+      const awningHeight=style===1?3.44:style===2?3.92:3.75;
+      buildingPart(b,'shell',style===1?'timber':'bronze','box',pad,width*.5+1.45,awningHeight,0,3.05,.20,depth+1.3,style===1?.75:1);
       // Shadowed stone recess and a real framed entry door instead of a
       // continuous unbroken dark strip across the shop's ground floor.
       buildingPart(b,'shell','bronze','box',pad,width*.5+.16,1.70,0,.24,2.90,2.35,.73);
       buildingPart(b,'shell','glass','box',pad,width*.5+.30,1.68,0,.075,2.60,1.96,.90);
-      buildingPart(b,'shell','pale','box',pad,-width*.17,height+1.3,-depth*.12,width*.64,2.6,depth*.73,.94);
-      buildingPart(b,'shell','bronze','box',pad,-width*.17,height+2.68,-depth*.12,width*.68,.18,depth*.78,.83);
+      // Street-level shopfront lives on the low pedestrian terrace. It screens
+      // the hillside retaining core with an inhabited recessed display, rather
+      // than exposing a tall bright podium to the chase camera.
+      const storefrontHeight=Math.max(2.4,Math.min(3.1,pad.baseY+.16-(terrace.baseY+.24)));
+      buildingPart(b,'shell','darkGlass','box',terrace,width*.5+.59,.24+storefrontHeight*.5,0,.14,storefrontHeight,depth*.82,.91);
+      buildingPart(b,'shell',style===1?'timber':'bronze','box',terrace,width*.5+.74,.25+storefrontHeight,0,.28,.18,depth*.90,.86);
+      for(const side of [-1,1])buildingPart(b,'shell',style===1?'timber':'bronze','box',terrace,width*.5+.76,.24+storefrontHeight*.5,side*depth*.42,.23,storefrontHeight,.24,.90);
+      buildingPart(b,'detail','bronze','box',terrace,width*.5+.69,1.64,0,.08,2.6,2.0,.84);
+      buildingPart(b,'detail','glass','box',terrace,width*.5+.75,1.60,0,.06,2.45,1.80,.93);
+      buildingPart(b,'detail','bronze','box',terrace,width*.5+.80,1.51,.67,.08,.64,.055,.9);
+      const roofConfigs=[[-.22,1.65,.53,.66,'pale'],[-.12,2.15,.70,.69,'timber'],[-.28,3.45,.43,.58,'bronze'],[-.09,2.85,.67,.74,'pale']];
+      const [roofOffset,roofHeight,roofWidth,roofDepth,roofMaterial]=roofConfigs[style];
+      buildingPart(b,'shell',roofMaterial,'box',pad,width*roofOffset,height+roofHeight*.5,-depth*.12,width*roofWidth,roofHeight,depth*roofDepth,style===1?.78:.94);
+      buildingPart(b,'shell','bronze','box',pad,width*roofOffset,height+roofHeight+.08,-depth*.12,width*(roofWidth+.04),.16,depth*(roofDepth+.045),.83);
+      // Four actual facade families share the same existing material palette.
+      if(style===1){
+        for(const sign of [-1,1])buildingPart(b,'shell','timber','box',pad,width*.5+.30,1.94,sign*depth*.42,.24,3.4,depth*.13,.73);
+        buildingPart(b,'shell','timber','box',pad,0,1.93,-depth*.5-.26,width*.92,.34,.14,.76);
+      }else if(style===2){
+        buildingPart(b,'shell','bronze','box',pad,width*.5+.34,height-.26,0,.23,.35,depth*.92,.91);
+        for(const sign of [-1,1])buildingPart(b,'shell','bronze','box',pad,width*.5+.35,height*.5,sign*depth*.40,.16,height-.56,.16,.92);
+      }else if(style===3){
+        for(let v=-depth*.33;v<depth*.35;v+=2.75)buildingPart(b,'shell','pale','box',pad,width*.5+.37,(height+3.7)*.5,v,.38,height-3.7,.11,.87);
+      }
       // Fine facade details appear only when the player can resolve them.
       for (let k=1;k<floors;k++) {
         buildingPart(b,'detail','pale','box',pad,width*.5+.19,k*3.7+.17,0,.46,.19,depth*.97,.86);
@@ -195,64 +241,72 @@ export function buildCoastalCity(THREE, {pathX, groundHeight, roadEnd = 2250} = 
         for (let v=-depth*.38;v<depth*.41;v+=3.4) buildingPart(b,'detail','bronze','box',pad,width*.5+.17,k*3.7+1.9,v,.12,3.35,.10,.85);
       }
       for(let u=-width*.31;u<=width*.34;u+=3.1) buildingPart(b,'detail','bronze','box',pad,u,(height+1)*.5,-depth*.5-.15,.085,height-1.4,.085,.87);
-      buildingPart(b,'detail','timber','box',pad,width*.5+.35,2.7,0,.12,.50,depth*.66,1);
+      buildingPart(b,'detail','timber','box',terrace,width*.5+.85,storefrontHeight+.24,0,.14,.50,depth*.66,.87);
       // Small environmental signs, separate from the learning interface.
       // A plane faces local +Z; road-facing signs need a local +X rotation.
-      const signPos=at(pad,width*.5+.45,2.72,0);
+      const signPos=at(terrace,width*.5+.94,storefrontHeight+.26,0);
       part(b.id,'detail','sign','plane',...signPos,depth*.46,.46,1,pad.yaw+Math.PI*.5,1,(j+index)%8);
-      buildingPart(b,'detail','lamp','box',pad,width*.5+2.55,3.55,0,.065,.065,depth*.70);
+      buildingPart(b,'detail','lamp','box',pad,width*.5+2.55,awningHeight-.15,0,.065,.065,depth*.70);
       buildingPart(b,'detail','bronze','box',pad,width*.5+.37,1.61,.72,.09,.65,.07,1);
-      buildingPart(b,'detail','timber','box',pad,width*.5+1.15,.54,depth*.33,2.05,.60,3.5,.80);
+      buildingPart(b,'detail','timber','box',terrace,width*.5+1.15,.54,depth*.33,2.05,.60,3.5,.80);
       for (const side of [-1,1]) {
-        buildingPart(b,'detail','bronze','planter',pad,width*.5+1.55,.69,side*(depth*.5+1.6),.6,.9,.6,1);
-        buildingPart(b,'detail','green','dome',pad,width*.5+1.55,1.14,side*(depth*.5+1.6),.84,.96,.84,.93);
+        buildingPart(b,'detail','bronze','planter',terrace,width*.5+1.55,.69,side*(depth*.5+1.6),.6,.9,.6,1);
+        buildingPart(b,'detail','green','dome',terrace,width*.5+1.55,1.14,side*(depth*.5+1.6),.84,.96,.84,.93);
       }
       // Bistro terrace tables, paired chairs, slim railing and roof planting.
       if(j===0) for (const side of [-1,1]) {
         const u=width*.5+2.25,v=side*depth*.24;
-        buildingPart(b,'activity','contact','groundQuad',pad,u,.242,v,1.65,1,2.9,1);
-        buildingPart(b,'activity','timber','column',pad,u,1.055,v,.64,.09,.64,.92);
-        buildingPart(b,'activity','bronze','column',pad,u,.67,v,.065,.85,.065,1);
+        buildingPart(b,'activity','contact','groundQuad',terrace,u,.242,v,1.65,1,2.9,1);
+        buildingPart(b,'activity','timber','column',terrace,u,1.055,v,.64,.09,.64,.92);
+        buildingPart(b,'activity','bronze','column',terrace,u,.67,v,.065,.85,.065,1);
         const guests=[];
         for (const chairSide of [-1,1]) {
           const chairV=v+chairSide*.94;
-          buildingPart(b,'activity','timber','box',pad,u,.775,chairV,.48,.07,.48,.92);
-          buildingPart(b,'activity','timber','box',pad,u,1.08,chairV+chairSide*.21,.48,.60,.075,.92);
-          for(const a of [-.18,.18])for(const z of [-.18,.18]) buildingPart(b,'activity','bronze','box',pad,u+a,.51,chairV+z,.04,.54,.04,.86);
-          guests.push({...pointAt(pad,u,.24,chairV,pad.yaw+(chairSide===1?Math.PI:0)),seatHeight:.57});
+          buildingPart(b,'activity','timber','box',terrace,u,.775,chairV,.48,.07,.48,.92);
+          buildingPart(b,'activity','timber','box',terrace,u,1.08,chairV+chairSide*.21,.48,.60,.075,.92);
+          for(const a of [-.18,.18])for(const z of [-.18,.18]) buildingPart(b,'activity','bronze','box',terrace,u+a,.51,chairV+z,.04,.54,.04,.86);
+          guests.push({...pointAt(terrace,u,.24,chairV,pad.yaw+(chairSide===1?Math.PI:0)),seatHeight:.57});
         }
-        activityAnchors.push({id:`${b.id}-table-${side}`,kind:'table',blockId:b.id,...pointAt(pad,u,.24,v),guests,tableTop:pointAt(pad,u,1.10,v)});
+        activityAnchors.push({id:`${b.id}-table-${side}`,kind:'table',blockId:b.id,...pointAt(terrace,u,.24,v),guests,tableTop:pointAt(terrace,u,1.10,v)});
       }
       if(j===1||j===2){
         const kind=j===1?'cheer':'party',positions=[];
         const count=kind==='party'?3:2;
-        for(let person=0;person<count;person++) positions.push(pointAt(pad,width*.5+2.15,.24,(person-(count-1)*.5)*1.65,pad.yaw+Math.PI*.5+(kind==='party'?(person-1)*.42:0)));
-        activityAnchors.push({id:`${b.id}-${kind}`,kind,blockId:b.id,...pointAt(pad,width*.5+2.15,.24,0),positions});
+        for(let person=0;person<count;person++) {
+          if(kind==='party') {
+            const triangle=[[-.65,0],[.40,-1.05],[.40,1.05]], [du,dv]=triangle[person];
+            positions.push(pointAt(terrace,width*.5+2.15+du,.24,dv,pad.yaw+Math.atan2(-du,-dv)));
+          } else positions.push(pointAt(terrace,width*.5+2.15,.24,(person-(count-1)*.5)*1.65,pad.yaw+Math.PI*.5));
+        }
+        activityAnchors.push({id:`${b.id}-${kind}`,kind,blockId:b.id,...pointAt(terrace,width*.5+2.15,.24,0),positions});
       }
       if(j===2){
         // A waist-height counter leaves the conversation floor and road view
         // clear. Two small terraces have warm festoon bulbs under the canopy.
         const u=width*.5+2.1,v=-depth*.33;
-        buildingPart(b,'activity','timber','box',pad,u,.69,v,1.17,.90,2.8,.88);
-        buildingPart(b,'activity','bronze','box',pad,u,1.18,v,1.32,.09,2.95,.83);
-        for(const z of [-.85,0,.85])buildingPart(b,'activity','lamp','column',pad,u,1.305,v+z,.075,.16,.075,1);
+        buildingPart(b,'activity','timber','box',terrace,u,.69,v,1.17,.90,2.8,.88);
+        buildingPart(b,'activity','bronze','box',terrace,u,1.18,v,1.32,.09,2.95,.83);
+        for(let panel=-1.20;panel<=1.21;panel+=.24)buildingPart(b,'activity','timber','box',terrace,u+.60,.68,v+panel,.048,.86,.12,.65);
+        buildingPart(b,'activity','bronze','box',terrace,u+.79,.46,v,.065,.065,2.42,.86);
+        for(const side of [-1,1])buildingPart(b,'activity','bronze','box',terrace,u+.67,.46,v+side*1.02,.25,.045,.06,.85);
+        for(const z of [-.85,0,.85])buildingPart(b,'activity','lamp','column',terrace,u,1.305,v+z,.075,.16,.075,1);
         if(index<2){
-          for(const side of [-1,1])buildingPart(b,'activity','bronze','column',pad,width*.5+3.25,1.81,side*4.1,.045,3.14,.045,.87);
-          buildingPart(b,'activity','bronze','box',pad,width*.5+3.25,3.37,0,.029,.029,8.24,.82);
+          for(const side of [-1,1])buildingPart(b,'activity','bronze','column',terrace,width*.5+3.25,1.81,side*4.1,.045,3.14,.045,.87);
+          buildingPart(b,'activity','bronze','box',terrace,width*.5+3.25,3.37,0,.029,.029,8.24,.82);
           for(let bulb=0;bulb<9;bulb++){
             const z=-3.9+bulb*.975,y=3.23-Math.sin((bulb+1)*Math.PI/10)*.18;
-            buildingPart(b,'activity','bronze','column',pad,width*.5+3.25,(y+3.37)*.5,z,.014,3.37-y,.014,.85);
-            buildingPart(b,'activity','lamp','column',pad,width*.5+3.25,y-.045,z,.058,.095,.058,1);
+            buildingPart(b,'activity','bronze','column',terrace,width*.5+3.25,(y+3.37)*.5,z,.014,3.37-y,.014,.85);
+            buildingPart(b,'activity','lamp','column',terrace,width*.5+3.25,y-.045,z,.058,.095,.058,1);
           }
         }
       }
-      buildingPart(b,'tiny','green','box',pad,-width*.12,height+2.9,depth*.32,width*.53,.48,.64,.93);
-      buildingPart(b,'tiny','bronze','box',pad,-width*.12,height+3.1,depth*.34,width*.59,.07,.075,.84);
+      buildingPart(b,'detail','green','box',pad,width*roofOffset,height+roofHeight+.40,depth*(roofDepth*.5-.12-.06),width*(roofWidth-.08),.48,.64,.93);
+      buildingPart(b,'detail','bronze','box',pad,width*roofOffset,height+roofHeight+.62,depth*(roofDepth*.5-.12-.04),width*(roofWidth-.02),.07,.075,.84);
       // A single warm lamp strip serves each storefront, with no PointLight.
     }
     for(let walker=0;walker<2;walker++) {
       const startS=plan.s*scaleS+(walker===0?-52:3),endS=startS+43,offset=-10.6;
-      const roadPoint=z=>{const x=pathX(z)+offset;return {x,y:groundHeight(x,z)+.045,z};};
+      const roadPoint=z=>{const x=pathX(z)+offset;return {x,y:surfaceHeightAt(x,z),z};};
       const start=roadPoint(startS),end=roadPoint(endS),path=Array.from({length:9},(_,i)=>roadPoint(startS+(endS-startS)*i/8));
       activityAnchors.push({id:`${b.id}-walk-${walker}`,kind:'walk',blockId:b.id,...start,yaw:Math.atan2(end.x-start.x,end.z-start.z),start,end,path,roadRelativeOffset:offset,phase:walker*.43});
     }
@@ -293,6 +347,7 @@ export function buildCoastalCity(THREE, {pathX, groundHeight, roadEnd = 2250} = 
     }
     buildingPart(skyline,'detail','lamp','box',pad,-width*.22,height+crownHeight-1.05,-depth*.47,width*.41,.13,.13);
   });
+  for(const anchor of activityAnchors)anchor.blockS=blocks.find(b=>b.id===anchor.blockId).s;
   // Geometry ownership is entirely local; no caller-owned materials or assets.
   for (const b of buckets.values()) {
     const geometry=new THREE.BufferGeometry();
@@ -350,7 +405,7 @@ export function buildCoastalCity(THREE, {pathX, groundHeight, roadEnd = 2250} = 
     group.clear();
   }
   update({playerS:75,quality:'high'});
-  return {group,setTheme,update,stats,containsFootprint,dispose};
+  return {group,setTheme,update,stats,containsFootprint,surfaceHeightAt,dispose};
 }
 
 function makeSignAtlas(THREE) {

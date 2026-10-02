@@ -322,7 +322,7 @@ function setupJourneyScenery(sky){
   const tint=new THREE.Color();for(let i=0;i<1700;i++){const z=random()*ROAD_END,x=pathX(z)-8-random()*17;tempObj.position.set(x,groundHeight(x,z)-.015,z);tempObj.rotation.set((random()-.5)*.16,random()*6.28,(random()-.5)*.12);tempObj.scale.setScalar(.7+random()*.55);tempObj.updateMatrix();flowers.setMatrixAt(i,tempObj.matrix);tint.set(i%3===0?0xfff3de:i%3===1?0xf1c8c6:0xf2dfab);flowers.setColorAt(i,tint);}flowers.receiveShadow=true;flowerGroup.add(flowers);
   const particles=new THREE.BufferGeometry(),positions=[];for(let i=0;i<65;i++)positions.push((random()-.5)*40,1+random()*12,random()*65);particles.setAttribute('position',new THREE.Float32BufferAttribute(positions,3));
   const petals=new THREE.Points(particles,new THREE.PointsMaterial({color:0xf6ded9,size:.065,transparent:true,opacity:.65,depthWrite:false}));petals.visible=!reducedMotion;flowerGroup.add(petals);scenery.petals=petals;
-  scenery.cityLife=buildCityLife(THREE,{anchors:scenery.city.group.userData.activityAnchors,groundHeight,pathX});scene.add(scenery.cityLife.group);
+  scenery.cityLife=buildCityLife(THREE,{anchors:scenery.city.group.userData.activityAnchors,groundHeight,pathX,surfaceHeightAt:scenery.city.surfaceHeightAt});scene.add(scenery.cityLife.group);
   scenery.details=buildSceneryDetails(THREE,{roadPoint,pathX,groundHeight,ROAD_END,textures:{...surfaceTextures,pineCanopy:pineCanopyTexture,blossomCanopy:blossomCanopyTexture},random,excludeAt:(x,z,margin)=>scenery.city.containsFootprint(x,z,margin)});scene.add(scenery.details.group);
   setScenery(selectedStage.scene||'coast');
 }
