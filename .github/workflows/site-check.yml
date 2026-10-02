@@ -1,0 +1,40 @@
+# synk.im 배포 점검(2026-10-03). main에 올라갈 때마다 공개 사이트가 바뀐 대로 나왔는지, 페이지·LAB 게임·질문창이 도는지,
+# 제작 도구 이름이 없는지 본다. 점검 내용과 기준은 .github/site-check/check.mjs 머리글에 있다.
+# 공개 저장소라 실행 시간은 무료다. 잇달아 올라가면 앞의 점검은 멈추고 마지막 것만 끝까지 돈다.
+name: synk.im 배포 점검
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: site-check
+  cancel-in-progress: true
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: 플레이라이트 준비
+        run: |
+          npm install --no-save --no-package-lock playwright@1.62.1
+          npx playwright install --with-deps chromium
+      - name: 점검
+        run: node .github/site-check/check.mjs
+        env:
+          SITE_BASE: https://synk.im
+      - name: 문제가 난 화면 올리기
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: site-check-screens
+          path: site-check-artifacts
+          if-no-files-found: ignore
+          retention-days: 7
