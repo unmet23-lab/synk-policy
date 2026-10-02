@@ -11,6 +11,14 @@
       "redirectUris": [
         "synktalk://oauth/callback"
       ]
+    },
+    {
+      "product": "platform",
+      "clientId": "291a98a7-4fa8-44fe-b5de-8acb790bea21",
+      "redirectUris": [
+        "https://synk.im/brief/computer/",
+        "https://synk.im/brief/meeting/"
+      ]
     }
   ],
   "clients": {

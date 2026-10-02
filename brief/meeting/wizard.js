@@ -3,6 +3,8 @@
  * 도구 하나 = content(질문·문장) + rules(계산) + view(그림·결과). 이 파일은 셋을 이어 화면을 만든다.
  * 네트워크·AI 호출이 없다. 고른 답과 Atlas 기록은 이 기기의 localStorage에만 둔다.
  * Atlas(atlas/engine.js)가 없거나 저장이 막힌 브라우저에서도 기본값으로 끝까지 동작한다.
+ * 예외 하나: 'SYNK 설정 불러오기'를 누르면 core/account.js가 SYNK 계정에서 본인이 고른 설정만 읽어 온다.
+ * 이 도구에서 직접 정한 것(팁 스위치, 결과 분량 반응)이 있으면 그쪽이 이긴다.
  */
 (function (root) {
   'use strict';
@@ -12,7 +14,9 @@
     set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); return true; } catch { return false; } },
     del(k) { try { localStorage.removeItem(k); } catch { /* 저장이 막힌 브라우저 */ } },
   };
-  const reduced = () => { try { return matchMedia('(prefers-reduced-motion: reduce)').matches; } catch { return false; } };
+  const reduced = () => { try { return document.documentElement.classList.contains('synk-motion-reduced') || matchMedia('(prefers-reduced-motion: reduce)').matches; } catch { return false; } };
+  // SYNK 계정에서 고른 설명 길이 → 결과 분량(간단히·기본·자세히).
+  const ACCOUNT_LAYOUT = Object.freeze({ brief: 'quick', standard: 'guided', detailed: 'deep' });
   const ICON = {
     check: '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 8.5l3 3 6-7" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
     bulb: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.6 10.8c.7.5 1.1 1.3 1.1 2.2h5c0-.9.4-1.7 1.1-2.2A6 6 0 0 0 12 3z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>',
@@ -74,7 +78,19 @@
     const fromHash = /^#r=/.test(location.hash) ? decode(location.hash.slice(3)) : null;
     if (fromHash && typeof fromHash === 'object') state = { answers: R.sanitize(fromHash), at: 'result', checks: {} };
     else if (saved && saved.v === C.version && saved.answers) state = { answers: R.sanitize(saved.answers), at: saved.at || 'intro', checks: saved.checks || {} };
-    let tipsOn = mem.support() !== 'choose';
+    // SYNK 계정에서 불러온 고른 설정(있으면). 이 도구의 팁 스위치를 한 번도 안 건드렸을 때만 팁을 정한다.
+    const account = root.SynkToolAccount || null;
+    let chosen = account ? account.read() : null;
+    const chosenTips = () => { const s = chosen && chosen.presentation && chosen.presentation.support; return s ? s === 'step' : true; };
+    let tipsOn = mem.support() ? mem.support() !== 'choose' : chosenTips();
+    function applyLook() {
+      const p = (chosen && chosen.presentation) || {};
+      try {
+        document.documentElement.classList.toggle('synk-text-large', p.textSize === 'large');
+        document.documentElement.classList.toggle('synk-motion-reduced', p.motion === 'reduced');
+      } catch { /* 문서가 없는 시험 환경 */ }
+    }
+    applyLook();
     let plan = null, completion = null, layout = null, feedbackGiven = null, lastTip = null;
     // 이번 방문에서 결과에 '도착'했는지. 공유 링크로 처음 연 결과도 도착으로 본다.
     // 같은 탭에서 같은 링크를 새로고침하면 도착이 아니다(기록이 두 번 쌓이지 않게).
@@ -119,10 +135,16 @@
       const resume = hasAnswers() ? '<p class="hint"><button type="button" class="linkbtn" data-action="resume">지난번 답에 이어서 하기</button></p>' : '';
       // 질문 없이 바로 받을 자료(피드에서 약속한 PDF·ZIP 등). 있으면 시작 버튼 아래에 둔다.
       const links = (i.links || []).length ? `<div class="quick"><p>${esc(i.linksLabel || '바로 받기')}</p><ul>${i.links.map(l => `<li><a href="${esc(l.href)}"${l.download ? ' download' : ' target="_blank" rel="noopener"'}>${esc(l.label)}</a>${l.sub ? `<small>${esc(l.sub)}</small>` : ''}</li>`).join('')}</ul></div>` : '';
-      el.innerHTML = `<section class="intro fade-in"><div><p class="eyebrow">${esc(i.eyebrow)}</p><h1 id="q" tabindex="-1">${i.title}</h1><p class="lead">${esc(i.lead)}</p><ul class="meta">${i.meta.map(m => `<li>${esc(m)}</li>`).join('')}</ul><span class="start"><button type="button" class="btn primary" data-action="begin">${esc(i.start)} ${ICON.right}</button></span>${resume}${links}<p class="privacy">${esc(i.privacy)}</p></div><div class="art" aria-hidden="true">${V.hero ? V.hero() : ''}</div></section>`;
+      // SYNK 계정에서 고른 설정: 따르고 있으면 무엇인지와 끊기, 아니면 불러오기(등록한 synk.im 주소에서만).
+      const words = chosen && chosen.presentation && account ? account.describe(chosen.presentation) : [];
+      const accountNote = words.length ? `<p class="hint account-note">SYNK 계정에서 고른 설정을 따라요 · ${esc(words.join(' · '))} <button type="button" class="linkbtn" data-action="account">끊기</button></p>`
+        : account && account.available() ? `<p class="hint account-note"><button type="button" class="linkbtn" data-action="account">SYNK 계정의 내 설정 불러오기</button> · 로그인해 고른 설정(도움 방식·설명 길이·글씨 크기)만 읽어 와요</p>` : '';
+      el.innerHTML = `<section class="intro fade-in"><div><p class="eyebrow">${esc(i.eyebrow)}</p><h1 id="q" tabindex="-1">${i.title}</h1><p class="lead">${esc(i.lead)}</p><ul class="meta">${i.meta.map(m => `<li>${esc(m)}</li>`).join('')}</ul><span class="start"><button type="button" class="btn primary" data-action="begin">${esc(i.start)} ${ICON.right}</button></span>${resume}${links}<p class="privacy">${esc(i.privacy)}</p>${accountNote}</div><div class="art" aria-hidden="true">${V.hero ? V.hero() : ''}</div></section>`;
     }
     function forget() {
       mem.clear(); store.del(KEY);
+      if (account) account.forget();
+      chosen = null; applyLook(); syncAccount();
       state = { answers: {}, at: 'intro', checks: {} }; plan = null; completion = null; layout = null; feedbackGiven = null; tipsOn = true;
       syncTips();
       if (location.hash) history.replaceState(null, '', location.pathname + location.search);
@@ -162,7 +184,9 @@
         if (arrived) startRound();
         else plan = mem.peek(tool.id, tool.candidates);
       }
-      if (!layout) layout = (plan && plan.selected && plan.selected.id) || tool.defaultLayout || 'guided';
+      // 이 도구에서 분량 반응을 준 적이 없으면 SYNK 계정에서 고른 설명 길이를 따른다.
+      const fromAccount = !(plan && plan.outcomeBasis && plan.outcomeBasis !== 'unobserved') && chosen && chosen.presentation && ACCOUNT_LAYOUT[chosen.presentation.explanation];
+      if (!layout) layout = fromAccount || (plan && plan.selected && plan.selected.id) || tool.defaultLayout || 'guided';
       const out = V.result({ rec, answers: state.answers, layout, plan, tipsOn, checks: state.checks, feedbackGiven, content: C, rules: R });
       el.innerHTML = `<div class="stage single fade-in">${out.html}</div>`;
       el._texts = out.texts || {};
@@ -266,6 +290,7 @@
       }
       else if (name === 'print') { window.print(); }
       else if (name === 'tips') toggleTips();
+      else if (name === 'account') accountAction();
       else if (name === 'forget') forget();
     });
 
@@ -291,8 +316,45 @@
     function syncTips() { if (tipsBtn) tipsBtn.setAttribute('aria-checked', String(tipsOn)); }
     if (tipsBtn) tipsBtn.addEventListener('click', toggleTips);
     document.querySelectorAll('[data-forget]').forEach(b => b.addEventListener('click', forget));
+    // 머리줄의 'SYNK 설정 불러오기'(core/account.js). 등록된 synk.im 주소에서만 보인다.
+    function syncAccount() {
+      if (!accountBtn) return;
+      const slot = accountBtn.closest('[data-account-slot]') || accountBtn;
+      slot.hidden = !(account && account.available());
+      const has = !!(chosen && chosen.presentation);
+      accountBtn.textContent = has ? 'SYNK 설정 끊기' : 'SYNK 설정 불러오기';
+      accountBtn.setAttribute('aria-label', has ? 'SYNK 계정에서 불러온 설정을 이 기기에서 지우기' : 'SYNK 계정에 로그인해 고른 설정(도움 방식·설명 길이·글씨 크기)만 불러오기');
+    }
+    function announce(text) { say(text); toast(text); }
+    const accountBtn = document.querySelector('[data-account]');
+    function accountAction() {
+      if (!account) return;
+      if (chosen && chosen.presentation) {
+        account.forget(); chosen = null; tipsOn = mem.support() ? mem.support() !== 'choose' : true; layout = null;
+        applyLook(); syncTips(); syncAccount(); render(false);
+        announce('SYNK 계정에서 불러온 설정을 이 기기에서 지웠어요.');
+        return;
+      }
+      if (accountBtn) accountBtn.disabled = true;
+      account.begin().catch(error => { if (accountBtn) accountBtn.disabled = false; announce(error.message || 'SYNK 계정을 불러오지 못했어요.'); });
+    }
+    if (accountBtn) accountBtn.addEventListener('click', accountAction);
     syncTips();
+    syncAccount();
     render(false);
+    // SYNK 로그인에서 돌아온 경우: 고른 설정만 받아 적용한다(core/account.js가 토큰을 바로 버린다).
+    if (account && account.available()) account.finish().then(result => {
+      if (!result) return;
+      if (result.status === 'loaded' && result.presentation) {
+        chosen = account.read();
+        if (!mem.support()) tipsOn = chosenTips();
+        layout = null; applyLook(); syncTips(); syncAccount(); render(false);
+        announce(`SYNK 계정에서 고른 설정을 불러왔어요 · ${account.describe(chosen.presentation).join(' · ')}`);
+      } else if (result.status === 'loaded') {
+        account.forget(); chosen = null; syncAccount();
+        announce('SYNK 계정에 아직 고른 설정이 없어요. 계정의 학습 기록 저장을 켜고 앱에서 도움 방식이나 글씨 크기를 고르면 여기서도 따라요.');
+      } else announce(result.message);
+    });
     return { state: () => JSON.parse(JSON.stringify(state)), memory: mem };
   }
 

@@ -639,3 +639,8 @@ details>summary::-webkit-details-marker{display:none}
 details>summary::before{content:'';flex:none;width:7px;height:7px;margin:0 10px 0 2px;border-right:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(-45deg);transition:transform .2s}
 details[open]>summary::before{transform:rotate(45deg)}
 .tip-closed>summary::before{margin-right:4px}
+/* SYNK 계정에서 고른 설정(core/account.js): 큰 글씨는 도구 전체를 조금 키우고, 움직임 줄이기는 전환을 끈다. */
+.synk-text-large .tool{zoom:1.12}
+.synk-motion-reduced *,.synk-motion-reduced *::before,.synk-motion-reduced *::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}
+.account-note{font-size:13.5px}
+.account-note .linkbtn{font-size:13.5px;min-height:32px;padding:2px 0}

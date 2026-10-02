@@ -33,7 +33,7 @@
   <main id="app"></main>
   <footer class="foot no-print">
     <span>synkbrief · 처음부터, 하나씩</span>
-    <span><a href="https://www.instagram.com/synkbrief/" target="_blank" rel="noopener">Instagram</a> · <a href="https://www.youtube.com/@synkbrief" target="_blank" rel="noopener">YouTube</a> · <button type="button" data-forget>저장된 기록 지우기</button></span>
+    <span><a href="https://www.instagram.com/synkbrief/" target="_blank" rel="noopener">Instagram</a> · <a href="https://www.youtube.com/@synkbrief" target="_blank" rel="noopener">YouTube</a> · <button type="button" data-forget>저장된 기록 지우기</button><span data-account-slot hidden> · <button type="button" data-account>SYNK 설정 불러오기</button></span></span>
   </footer>
   <div id="live" class="sr" aria-live="polite"></div>
 </div>
@@ -42,6 +42,7 @@
 <script src="content.js"></script>
 <script src="rules.js"></script>
 <script src="view.js"></script>
+<script src="account.js"></script>
 <script src="wizard.js"></script>
 <script>
 SynkWizard.start({
