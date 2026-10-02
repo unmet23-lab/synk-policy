@@ -1,0 +1,30 @@
+{
+  "version": 1,
+  "supabaseUrl": "https://baasvefzinrxaryksayl.supabase.co",
+  "supabasePublishableKey": "sb_publishable_UalaCpFtV6weCR1IvZkTLQ_NW5-dcFK",
+  "portalUrl": "https://synk.im/id-rehearsal/",
+  "learningUrl": "https://synk.im/",
+  "authorizationClients": [
+    {
+      "product": "world",
+      "clientId": "f1a08dbc-2677-46bf-9146-db65688bf445",
+      "redirectUris": [
+        "synktalk://oauth/callback"
+      ]
+    }
+  ],
+  "clients": {
+    "platform": {
+      "clientId": "",
+      "redirectUri": ""
+    },
+    "world": {
+      "clientId": "",
+      "redirectUri": ""
+    },
+    "messenger": {
+      "clientId": "",
+      "redirectUri": ""
+    }
+  }
+}
