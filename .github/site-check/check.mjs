@@ -40,14 +40,30 @@ const urlOf = p => base + '/' + p.split('/').map(encodeURIComponent).join('/');
 // 1. 반영 기다리기
 console.log('1. synk.im 반영 기다리기');
 {
+  // 잇달아 올라오면 앞 점검은 취소되므로, 바로 앞 커밋이 아니라 마지막으로 통과한 점검의 커밋부터 바뀐 파일을 본다.
+  let since = 'HEAD~1', listing = '';
+  if (process.env.GH_TOKEN && process.env.GITHUB_REPOSITORY) {
+    try {
+      const last = JSON.parse(execFileSync('gh', ['run', 'list', '-R', process.env.GITHUB_REPOSITORY, '--workflow', 'site-check.yml',
+        '--status', 'success', '-L', '1', '--json', 'headSha'], {encoding: 'utf8'}))[0]?.headSha;
+      if (last) {
+        // 얕게 받은 CI 사본에만 그 커밋을 더 받는다(손으로 돌리는 전체 저장소를 얕게 바꾸지 않게).
+        if (git('rev-parse', '--is-shallow-repository').toString().trim() === 'true') git('fetch', '-q', '--depth=1', 'origin', last);
+        since = last;
+      }
+    } catch { notes.push('마지막으로 통과한 점검을 못 찾아 바로 앞 커밋과 비교함'); }
+  }
+  for (const from of [...new Set([since, 'HEAD~1'])]) {
+    try { listing = git('diff', '--name-status', from, 'HEAD').toString('utf8'); since = from; break; } catch {}
+  }
+  if (!listing) notes.push('비교할 앞 커밋이 없거나 바뀐 파일이 없어 반영 기다리기를 건너뜀');
+  console.log(`  비교: ${since === 'HEAD~1' ? '바로 앞 커밋' : '마지막 통과 ' + since.slice(0, 7)}부터`);
   let changed = [], removed = [];
-  try {
-    for (const line of git('diff', '--name-status', 'HEAD~1', 'HEAD').toString('utf8').split('\n').filter(Boolean)) {
-      const [kind, ...rest] = line.split('\t'), file = rest.at(-1);
-      if (file.startsWith('.github/') || file.startsWith('_') || file.startsWith('.')) continue;
-      if (kind === 'D') removed.push(file); else if (/^[AMR]/.test(kind)) changed.push(file);
-    }
-  } catch { notes.push('앞 커밋이 없어 반영 기다리기를 건너뜀'); }
+  for (const line of listing.split('\n').filter(Boolean)) {
+    const [kind, ...rest] = line.split('\t'), file = rest.at(-1);
+    if (file.startsWith('.github/') || file.startsWith('_') || file.startsWith('.')) continue;
+    if (kind === 'D') removed.push(file); else if (/^[AMR]/.test(kind)) changed.push(file);
+  }
   // 페이지·스크립트·데이터는 모두, 나머지는 앞에서 30개까지 본다.
   const key = changed.filter(f => /\.(html|js|json|css|txt|xml)$/.test(f));
   const pick = [...new Set([...key, ...changed.filter(f => !key.includes(f)).slice(0, 30)])].slice(0, 80);
