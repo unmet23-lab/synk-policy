@@ -354,7 +354,7 @@ function popText(text, x, y, combo = 0) {
   const p = $('#pop'), a = $('#arena').getBoundingClientRect();
   p.textContent = text; p.hidden = false;
   p.dataset.tier = combo >= 6 ? '3' : combo >= 3 ? '2' : '1';
-  p.style.left = `${x ?? a.width / 2}px`; p.style.top = `${(y ?? a.height * 0.55) - 30}px`;
+  p.style.left = `${x ?? a.width / 2}px`; p.style.top = `${(y ?? a.height * 0.55) - (x == null ? 30 : 62)}px`;   // 벤 조각의 번쩍임과 겹치지 않게 조각 위로
   p.classList.remove('go'); void p.offsetWidth; p.classList.add('go');
   clearTimeout(popText.t); popText.t = setTimeout(() => { p.hidden = true; }, 900);
 }
