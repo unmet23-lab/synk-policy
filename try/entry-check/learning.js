@@ -11,10 +11,20 @@ export const FORMAT = 'single-choice';
 // 막히면 엔진이 더 일찍 보여 주고, 늦추는 것은 물어보고 받아들일 때만 한다. 입구에서 고른 도움 방식이 있으면 그대로 따른다.
 export const FLOW_ENTRY = { id: 'entry-check.magnifier', version: 1, target: 0.8, knobs: [
   { id: 'magnifier', kind: 'support', label: '돋보기 도움', values: ['바로', '머뭇거리면', '누르면'], start: 2 }] };
-// 첫 돋보기가 스스로 나오는 때(ms). null은 눌렀을 때만.
-export const MAGNIFIER_AFTER = { 바로: 0, 머뭇거리면: 12000, 누르면: null };
+// 첫 돋보기가 스스로 나오는 때(ms). null은 눌렀을 때만. 'stuck'은 그 사람이 머뭇거린다고 볼 때.
+export const MAGNIFIER_AFTER = { 바로: 0, 머뭇거리면: 'stuck', 누르면: null };
+// '머뭇거리면'은 모두에게 같은 시계가 아니다. 이 사람이 돋보기 없이 바르게 도장을 찍어 온 시간에 맞춘다
+// (Vellum stuckFor: 그런 응답 다섯 번 뒤부터 그 시간의 가운데 값 × 2.5, 8~90초. 그 전에는 엔진 기본 40초).
+// 게임이 따로 짧은 시계를 정하면 천천히 꼼꼼히 읽는 사람이 매번 끊겨, 혼자 푼 기록이 쌓이지 않는다.
+// 돋보기 단추는 언제든 누를 수 있다.
+export function magnifierAfter(flow) {
+  if (!flow) return null;
+  const after = MAGNIFIER_AFTER[flow.settings().values.magnifier];
+  return after === 'stuck' ? flow.stuck().afterMs : after;
+}
+// 지난번에 이어 가는 근무는 따로 말하지 않는다. 피곤한 날·오랜만인 날은 엔진의 기본 문장 한 줄로 알린다.
 export const FLOW_WORDS = { 'ease.support': '다음 손님부터는 돋보기를 조금 더 일찍 보여 줄게요.',
-  'accepted-less-help': '말한 대로 돋보기를 조금 늦게 보여 줄게요.' };
+  'accepted-less-help': '말한 대로 돋보기를 조금 늦게 보여 줄게요.', 'start.memory': '', 'start.prior': '' };
 
 // 규칙 문장이 쓰는 TOPIK I 문형(strata/topik-i.grammar.json). 문장을 Strata의 grammarIn
 // (strata/topik-i-forms.js)이 읽은 것이고, 시험이 둘이 같은지 본다(교원 검수 전 초안).
