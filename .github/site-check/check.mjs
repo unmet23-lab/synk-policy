@@ -156,7 +156,7 @@ console.log(`  ${routes.length}쪽 × ${devices.length}기기`);
 
 // 4. LAB 게임 — 게임 카드에서 게임 목록을 읽는다. 게임마다 시작 단추는 아래 표로 정한다(새 게임은 여기에 더한다).
 console.log('4. LAB 게임');
-const startOf = {racing: '#watch', rhythm: '#start-button', runner: '#start', 'order-rush': '#start', 'story-classroom': '#start', 'entry-check': '#rec-start', 'blank-slice': '#btn-start'};
+const startOf = {racing: '#watch', rhythm: '#start-button', runner: '#start', 'order-rush': '#start', 'story-classroom': '#start', 'entry-check': '#rec-start', 'blank-slice': '#btn-start', 'talk-rally': '#btn-start'};
 let games = [];
 {
   const s = await open(devices[0], '/lab/');
