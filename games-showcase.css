@@ -1,6 +1,8 @@
-/* LAB 게임 소개(2026-10-02, 일곱 게임). 게임 서재처럼 같은 무게의 카드: 무엇을 하는지 보이는 플레이 장면 한 장, 연습하는 것,
-   한 줄 설명, 세 가지 사실, 바로 해 보기. 마지막 칸은 다음 게임 안내. 그 아래 게임들이 함께 쓰는 것, TOPIK 범위, 접은 연구 근거.
-   색·선·글꼴은 homepage.css의 변수(--ink, --line, --hair, --radius, --accent-ink)를 따른다. 움직임은 없다.
+/* LAB 게임 소개(2026-10-02 일곱 게임, 2026-10-05 여덟 게임). 게임 서재처럼 같은 무게의 카드: 무엇을 하는지 보이는 플레이 장면 한 장,
+   연습하는 것, 한 줄 설명, 세 가지 사실, 「플레이 장면 보기」. 누르면 그 게임의 실제 플레이 5초(소리 없음)를 창에서 보여 준다
+   (games-showcase.js). 게임으로 들어가는 링크는 두지 않는다(10-04 「해 보기는 전부 삭제」). 마지막 칸은 다음 게임 안내.
+   그 아래 게임들이 함께 쓰는 것, TOPIK 범위, 접은 연구 근거. 색·선·글꼴은 homepage.css의 변수를 따르고, 창은 공개 문서 창
+   (#document-dialog)과 같은 모양이다. 움직이는 것은 창 안의 영상뿐이고, 움직임 줄이기에서는 누를 때만 재생한다.
    컴퓨터 4열, 태블릿 2열, 휴대폰은 작은 장면을 옆에 둔 한 줄 카드. */
 .game-showcase{display:grid;gap:clamp(28px,3vw,44px);padding-top:clamp(40px,4.4vw,64px);border-top:var(--hair) solid var(--ink);color:var(--ink)}
 .game-intro{display:grid;gap:14px;max-width:44em}
@@ -10,8 +12,12 @@
 
 .game-cards{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:clamp(14px,1.6vw,22px)}
 .game-card{display:flex;flex-direction:column;min-width:0;border:var(--hair) solid var(--line);border-radius:var(--radius);background:var(--paper);overflow:hidden}
-.game-card-image{display:block;aspect-ratio:16/10;background:#0e1116;overflow:hidden}
+.game-card-image{position:relative;display:block;width:100%;aspect-ratio:16/10;margin:0;padding:0;border:0;background:#0e1116;overflow:hidden;cursor:pointer}
 .game-card-image img{display:block;width:100%;height:100%;object-fit:cover}
+/* 영상이 있다는 표시: 장면 왼쪽 아래의 작은 재생 원 */
+.game-card-play{position:absolute;left:10px;bottom:10px;width:34px;height:34px;border-radius:50%;background:rgba(10,10,10,.62);box-shadow:0 4px 14px -6px rgba(0,0,0,.6)}
+.game-card-play::after{content:"";position:absolute;inset:0;margin:auto;width:0;height:0;transform:translateX(2px);border-style:solid;border-width:6.5px 0 6.5px 11px;border-color:transparent transparent transparent #fff}
+.game-card-image:hover .game-card-play{background:rgba(10,10,10,.82)}
 .game-card-body{display:flex;flex:1;flex-direction:column;gap:8px;padding:16px 16px 18px}
 /* 한글이 섞인 라벨은 고정폭 글꼴의 넓은 자간이 글자를 띄워 보이게 해서, 사이트의 작은 라벨처럼 본문 글꼴로 쓴다. */
 .game-card-kicker{font:600 12px/1.4 var(--sans);letter-spacing:-.01em;color:var(--ink-3)}
@@ -22,11 +28,30 @@
 /* 설명 길이가 달라도 같은 줄의 카드 버튼이 같은 높이에 오도록 맨 아래로 민다. */
 .game-card-actions{display:flex;flex-wrap:wrap;align-items:center;gap:10px 18px;margin-top:auto;padding-top:8px}
 .game-showcase .game-card .primary-link{min-height:44px}
-.game-card-extra{font:500 14px/1.4 var(--sans);color:var(--ink-2);text-decoration:underline;text-decoration-thickness:var(--hair);text-underline-offset:4px}
-.game-card-extra:hover{color:var(--ink)}
-/* 마지막 칸: 다음 게임 안내. 장면 없이 점선으로 비워 둔 자리. */
-.game-card-next{justify-content:flex-end;gap:8px;padding:18px;border-style:dashed;background:transparent}
-.game-card-next p{max-width:22em}
+.game-card-open{border:0;cursor:pointer}
+/* 마지막 칸: 다음 게임 안내. 장면 없이 점선으로 비워 둔 자리. 여덟 카드 아래 한 줄을 다 쓴다. */
+.game-card-next{grid-column:1/-1;flex-direction:row;flex-wrap:wrap;align-items:baseline;gap:6px 18px;padding:16px 18px;border-style:dashed;background:transparent}
+.game-card-next p{max-width:44em}
+
+/* 플레이 장면 창: 공개 문서 창(#document-dialog)과 같은 바탕·모서리·그림자. 맨 위 줄에 「실제 플레이 화면」 안내·멈춤·닫기,
+   그 아래 영상(16:10, 게임 화면을 가리는 것 없이), 그 아래 설명. 너비는 화면 높이에도 맞춰 낮은 화면에서도 넘기기 단추까지 한 번에 보인다. */
+.game-dialog{width:min(840px,calc(100% - 32px),max(320px,calc((100dvh - 330px)*1.6)));max-height:min(94vh,980px);overflow:auto;padding:0;border:0;border-radius:24px;background:var(--paper);color:var(--ink);box-shadow:0 30px 80px -30px rgba(10,10,10,.5)}
+.game-dialog::backdrop{background:rgba(10,10,10,.42);-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px)}
+.game-dialog-bar{display:flex;align-items:center;gap:8px;padding:10px 10px 10px 20px}
+.game-dialog-caption{flex:1;min-width:0;margin:0;font:500 12.5px/1.4 var(--sans);color:var(--ink-3)}
+.game-dialog-toggle{display:inline-flex;align-items:center;gap:7px;min-height:40px;padding:0 14px;border:var(--hair) solid var(--line);border-radius:999px;background:transparent;color:var(--ink);font:600 13px/1 var(--sans);white-space:nowrap;cursor:pointer}
+.game-dialog-toggle .when-playing,.game-dialog[data-playing] .game-dialog-toggle .when-paused{display:none}
+.game-dialog[data-playing] .game-dialog-toggle .when-playing{display:inline}
+.game-dialog-close{display:grid;place-items:center;flex:none;width:40px;height:40px;padding:0;border:0;border-radius:50%;background:var(--line);color:var(--ink);font:400 24px/1 var(--sans);cursor:pointer}
+.game-dialog-media{aspect-ratio:16/10;background:#0e1116}
+.game-dialog-media video{display:block;width:100%;height:100%;object-fit:cover;cursor:pointer}
+.game-dialog-body{display:grid;gap:8px;padding:18px 24px 20px}
+.game-dialog-body h4{margin:0;font:700 clamp(22px,2.2vw,28px)/1.25 var(--display);letter-spacing:-.03em;word-break:keep-all}
+.game-dialog-body>p{margin:0;max-width:44em;font:400 15.5px/1.7 var(--sans);color:var(--ink-2);word-break:keep-all}
+.game-dialog-nav{display:flex;justify-content:space-between;gap:10px;margin-top:8px;padding-top:12px;border-top:var(--hair) solid var(--line)}
+.game-dialog-step{min-height:44px;padding:0 4px;border:0;background:none;color:var(--ink-2);font:500 14px/1.3 var(--sans);cursor:pointer}
+.game-dialog-step:hover{color:var(--ink)}
+.game-dialog button:focus-visible{outline:2px solid var(--accent-ink);outline-offset:3px}
 
 .game-practice{display:grid;gap:16px}
 .game-practice h4{margin:0;font:600 13px/1.4 var(--sans);letter-spacing:-.01em;color:var(--ink-3)}
@@ -53,7 +78,7 @@
 .game-research-grid a{font:400 12px/1.6 var(--sans);color:var(--ink-3);text-underline-offset:3px;overflow-wrap:anywhere}
 .game-research>.game-note{padding-bottom:20px}
 
-.game-showcase a:focus-visible,.game-showcase summary:focus-visible{outline:2px solid var(--accent-ink);outline-offset:4px}
+.game-showcase a:focus-visible,.game-showcase summary:focus-visible,.game-showcase .game-card button:focus-visible{outline:2px solid var(--accent-ink);outline-offset:4px}
 
 @media (max-width:1100px){
  .game-cards{grid-template-columns:repeat(2,minmax(0,1fr))}
@@ -63,14 +88,24 @@
  /* 휴대폰: 작은 장면을 왼쪽에 둔 한 줄 카드로 일곱 게임을 한눈에. 사실 칩은 접는다. */
  .game-cards{grid-template-columns:1fr;gap:10px}
  .game-card{display:grid;grid-template-columns:112px minmax(0,1fr);align-items:start}
- .game-card-image{margin:12px 0 12px 12px;border-radius:calc(var(--radius) - 4px)}
+ .game-card-image{width:auto;margin:12px 0 12px 12px;border-radius:calc(var(--radius) - 4px)}
  .game-card-body{gap:5px;padding:12px 14px 14px}
  .game-card h4{font-size:18px}
  .game-card p{font-size:14px;line-height:1.6}
  .game-facts{display:none}
  .game-card-actions{padding-top:4px}
  .game-showcase .game-card .primary-link{min-height:40px}
- .game-card-next{display:flex;padding:14px 16px}
+ .game-card-next{display:flex;flex-direction:column;align-items:flex-start;padding:14px 16px}
+ .game-card-play{left:6px;bottom:6px;width:26px;height:26px}
+ .game-card-play::after{border-width:5px 0 5px 8.5px}
  .game-practice ol{grid-template-columns:1fr}
  .game-practice li,.game-practice li+li{padding:16px 0;border-left:0;border-bottom:var(--hair) solid var(--line)}
+ /* 휴대폰: 창이 화면 너비를 거의 다 쓰고, 영상 아래 글은 조금 작게 */
+ .game-dialog{width:calc(100% - 20px);border-radius:18px}
+ .game-dialog-bar{padding:8px 8px 8px 14px}
+ .game-dialog-caption{font-size:12px}
+ .game-dialog-toggle{min-height:38px;padding:0 12px}
+ .game-dialog-body{padding:14px 16px 16px}
+ .game-dialog-body>p{font-size:14.5px}
+ .game-dialog .game-facts{display:flex}   /* 카드에서는 접는 사실 칩을 창에서는 보인다 */
 }

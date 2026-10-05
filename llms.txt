@@ -101,7 +101,7 @@ SYNK LAB의 교재는 문법을 다루는 시냅스 코어 6권과 회화를 다
 
 ### LAB 게임은 어떤 한국어를 연습하나요?
 
-SYNK LAB은 미니게임 10종을 준비하고 있습니다. 지금은 홈페이지에서 한국어 게임 일곱 가지를 직접 해 볼 수 있습니다. 한국어 레이싱·말의 리듬·바람길·주문 폭주는 듣기를, 선생님이 돌아왔다·입장 검사·빈칸 베기는 읽기를 연습하는 시제품입니다.
+SYNK LAB은 미니게임 10종을 준비하고 있습니다. 홈페이지 LAB에서는 한국어 게임 여덟 가지의 실제 플레이 장면을 볼 수 있습니다. 한국어 레이싱·말의 리듬·바람길·주문 폭주·말 랠리는 듣기를, 선생님이 돌아왔다·입장 검사·빈칸 베기는 읽기를 연습하는 시제품입니다.
 
 레이싱은 마린·까몽과 해안도로를 달리며 한국어 문제를 듣고 그림·단어 차선으로 답합니다. 정답이면 부스터가 켜집니다. 기초·확장 어휘 2,000개, 5단어씩 400개 학습 스테이지와 2,008개 단어·안내 음성 클립을 준비했습니다. 400개 스테이지는 같은 해안 코스를 공유하며, 어휘 목록이 TOPIK 1–2급 전체 출제 범위를 보장하는 것은 아닙니다. 키보드 A·D/방향키 또는 모바일 좌우·보기 버튼으로 조작합니다.
 
@@ -109,7 +109,7 @@ SYNK LAB은 미니게임 10종을 준비하고 있습니다. 지금은 홈페이
 
 듣기는 단어의 소리를 그림·철자와 연결하고, 읽기는 철자·의미를 알아보는 기초를 연습합니다. 말의 리듬은 우리가 만든 세 곡을 두 레인으로 연주하는 듣기 게임입니다. 짧은 문장과 질문을 나레이션으로 듣고 O/X로 답합니다. 음성이 나올 때는 음악을 낮추고 일반 노트를 비워, 듣기에 집중할 수 있게 했습니다. 시간·장소·이유·조건·바뀐 정보의 이해를 연습하며, 타이밍과 듣기 정답을 따로 확인하고 새로운 음성 문제로 복습합니다. 말하기·쓰기는 게임에서 익힌 표현을 오프라인 대화·문장 작성 과제로 넓히는 구성입니다. 현재 게임은 발음·자유 글쓰기 평가를 제공하지 않습니다. TOPIK I은 듣기·읽기, TOPIK II에는 쓰기, TOPIK 말하기는 별도 시험입니다.
 
-바람길에서는 “왼쪽 길로 가세요.”, “낮은 울타리를 뛰어넘으세요.” 같은 짧은 부탁 16가지를 듣고 몸으로 움직입니다. 달리는 동안에는 글 없이 소리로만 듣고, 글은 시작 전 연습과 끝난 뒤 복습에서 봅니다. 주문 폭주에서는 카페 손님의 주문을 듣고 잔 수와 온도, 빼야 할 재료를 맞춰 음료를 만듭니다. 선생님이 돌아왔다에서는 이야기 속 부탁을 읽고 마린과 까몽을 움직여 교실을 정리하고, 마지막에는 달라진 새 부탁을 다시 읽습니다. 입장 검사에서는 안내문을 읽고 손님의 표·짐·말을 맞춰 본 뒤 통과나 거절 도장을 찍습니다. 빈칸 베기에서는 빈칸이 있는 문장을 읽고 낱말 조각 넷 중 맞는 것만 베어 냅니다.
+바람길에서는 “왼쪽 길로 가세요.”, “낮은 울타리를 뛰어넘으세요.” 같은 짧은 부탁 16가지를 듣고 몸으로 움직입니다. 달리는 동안에는 글 없이 소리로만 듣고, 글은 시작 전 연습과 끝난 뒤 복습에서 봅니다. 주문 폭주에서는 카페 손님의 주문을 듣고 잔 수와 온도, 빼야 할 재료를 맞춰 음료를 만듭니다. 말 랠리에서는 몽글이 공을 치며 건네는 한국어 한마디를 듣고, 알맞은 대답 카드 쪽으로 받아칩니다. 선생님이 돌아왔다에서는 이야기 속 부탁을 읽고 마린과 까몽을 움직여 교실을 정리하고, 마지막에는 달라진 새 부탁을 다시 읽습니다. 입장 검사에서는 안내문을 읽고 손님의 표·짐·말을 맞춰 본 뒤 통과나 거절 도장을 찍습니다. 빈칸 베기에서는 빈칸이 있는 문장을 읽고 낱말 조각 넷 중 맞는 것만 베어 냅니다.
 
 게임 기반 제2언어 학습 메타분석(Dixon 외, 2022)은 비교집단 간 효과크기 d=0.50을 보고했습니다. 인출 연습 메타분석(Yang 외, 2021)은 222개 연구·48,478명에서 g=0.499를 보고했습니다. 그림과 음성의 효과는 자료와 학습 속도에 따라 달라집니다(Reinwein, 2012). 이 연구들을 문제 회상·피드백·짧은 음성·다시 듣기 설계의 근거로 삼았습니다. 효과크기는 향상률이 아니며, SYNK 게임의 TOPIK 점수·장기 학습 효과는 아직 학습자 실험으로 검증하지 않았습니다. 홈페이지 학습 소개에서 원문 근거를 열 수 있습니다.
 
@@ -119,7 +119,7 @@ SYNK LAB은 미니게임 10종을 준비하고 있습니다. 지금은 홈페이
 
 교재에서 익힌 한국어를 게임에서 직접 써 봅니다. LAB은 학생이 쓴 답과 도움이 필요했던 부분을 참고해 다음 과제와 피드백을 조정하는 앱을 개발하고 있습니다.
 
-실제로 쓸 한국어를 연습합니다. 듣기 게임 네 가지와 읽기 게임 세 가지에서, 들은 부탁과 읽은 안내대로 직접 움직입니다. 한국어 이해가 실제 조작으로 이어집니다.
+실제로 쓸 한국어를 연습합니다. 듣기 게임 다섯 가지와 읽기 게임 세 가지에서, 들은 부탁과 읽은 안내대로 직접 움직입니다. 한국어 이해가 실제 조작으로 이어집니다.
 
 시냅스 코어에서 배운 문법과 시냅스 톡의 대화를 바탕으로, 역할과 목표가 분명한 게임을 만듭니다. 장면과 캐릭터는 학생이 상황을 이해하고 직접 참여하게 만듭니다.
 
@@ -156,13 +156,6 @@ SYNK LAB은 미니게임 10종을 준비하고 있습니다. 지금은 홈페이
 - [SYNK PULSE](https://synk.im/pulse/)
 - [SYNK PATH](https://synk.im/path/)
 - [Public company notes](https://synk.im/knowledge.json)
-- [Korean listening racing game](https://synk.im/try/racing/)
-- [Korean rhythm listening game](https://synk.im/try/rhythm/)
-- [Korean listening running game, Wind Run](https://synk.im/try/runner/)
-- [Korean café order listening game, Order Rush](https://synk.im/try/order-rush/)
-- [Korean story reading game, The Teacher Is Back](https://synk.im/try/story-classroom/)
-- [Korean notice reading game, Entry Check](https://synk.im/try/entry-check/)
-- [Korean fill-in-the-blank reading game, Blank Slice](https://synk.im/try/blank-slice/)
 - [Web enquiry form](https://synk.im/#contact-web)
 - [Privacy policy](https://synk.im/privacy/)
 - [Terms](https://synk.im/terms/)
@@ -178,24 +171,17 @@ hello@synk.im
 
 ## Korean games on the LAB page
 
-SYNK LAB is preparing 10 minigames. Seven Korean games are playable prototypes on the website, with no sign-in: Korean Racing, Words in Rhythm, Wind Run and Order Rush practise listening, and The Teacher Is Back, Entry Check and Blank Slice practise reading. All seven share one learning record kept in the browser, which Atlas uses to choose what comes next.
+SYNK LAB is preparing 10 minigames. Eight Korean games are prototypes in development, shown on the LAB page through short clips of real play: Korean Racing, Words in Rhythm, Wind Run, Order Rush and Talk Rally practise listening, and The Teacher Is Back, Entry Check and Blank Slice practise reading. All eight share one learning record, which Atlas uses to choose what comes next.
 
 Korean Racing connects spoken Korean to picture or word lanes and rewards correct choices with boosts. It includes 2,000 vocabulary items, 400 learning stages sharing one coastal course, and 2,008 voice clips. Words in Rhythm plays three Korean songs made by SYNK. When the music softens, players hear a short Korean sentence and a question in the narration, then answer O or X on the beat. Timing and listening answers are scored separately, and review uses new audio questions.
 
-Wind Run gives 16 short spoken requests, such as taking the left path or jumping a low fence, with no text while running; the text appears in the practice before a run and the review after it. In Order Rush, players hear café orders and make each drink, matching the number of cups, hot or iced, and what to leave out. In The Teacher Is Back, players read the requests in a story and move two characters to tidy a classroom, then read new, changed requests. In Entry Check, players read a venue notice, check each guest's ticket, bags and words, and stamp pass or reject. In Blank Slice, players read a sentence with a blank and slash the one word piece out of four that fits.
+Wind Run gives 16 short spoken requests, such as taking the left path or jumping a low fence, with no text while running; the text appears in the practice before a run and the review after it. In Order Rush, players hear café orders and make each drink, matching the number of cups, hot or iced, and what to leave out. In Talk Rally, Mongle says something in Korean as it hits the ball, and players hit it back toward the reply card that fits. In The Teacher Is Back, players read the requests in a story and move two characters to tidy a classroom, then read new, changed requests. In Entry Check, players read a venue notice, check each guest's ticket, bags and words, and stamp pass or reject. In Blank Slice, players read a sentence with a blank and slash the one word piece out of four that fits.
 
 Listening and reading are practised in the games; speaking and writing continue in class, and the current games do not assess pronunciation or free writing. Offline learning toward TOPIK Level 1 and a later path to conversations with village residents are in preparation.
 
 External research informs retrieval, feedback and narration design, not measured SYNK efficacy or a TOPIK pass guarantee.
 
-- [Play Korean Racing](https://synk.im/try/racing/)
-- [Play Words in Rhythm](https://synk.im/try/rhythm/)
-- [Play Wind Run](https://synk.im/try/runner/)
-- [Play Order Rush](https://synk.im/try/order-rush/)
-- [Play The Teacher Is Back](https://synk.im/try/story-classroom/)
-- [Play Entry Check](https://synk.im/try/entry-check/)
-- [Play Blank Slice](https://synk.im/try/blank-slice/)
-- [All seven games, gameplay frames and research](https://synk.im/lab/#work)
+- [All eight games, gameplay clips and research](https://synk.im/lab/#work)
 - [Game learning meta-analysis, Dixon et al. 2022](https://www.lltjournal.org/item/10125-73464/)
 - [Retrieval practice, Yang et al. 2021](https://pubmed.ncbi.nlm.nih.gov/33683913/)
 - [Modality conditions, Reinwein 2012](https://pubmed.ncbi.nlm.nih.gov/21989625/)
