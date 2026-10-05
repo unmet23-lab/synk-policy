@@ -104,7 +104,7 @@ button:disabled{cursor:default;opacity:.4}
 .glass-action{margin-top:22px}
 
 /* ── Sections ── */
-.personalization,.adaptation,.hands-on,.applications{padding:120px var(--pad-x) 0;scroll-margin-top:var(--bar)}
+.personalization,.adaptation,.applications{padding:120px var(--pad-x) 0;scroll-margin-top:var(--bar)}
 /* A section opens with its title across the page and the lead under it, as on the company page. */
 .section-heading{display:grid;justify-items:start}
 .section-index{display:flex;align-items:center;gap:18px;width:100%;max-width:560px;margin:0 0 20px;font-size:var(--t-label);line-height:1.4;letter-spacing:.14em;color:var(--ink-3)}
@@ -124,7 +124,7 @@ button:disabled{cursor:default;opacity:.4}
 .flow-result::before{content:'→ ';font-family:var(--latin)}
 .scope-note{margin:28px 0 0;font:500 var(--t-small)/1.7 var(--suit);letter-spacing:-.01em;color:var(--ink-3);word-break:keep-all}
 
-/* ── Examples: practice that follows a goal, and the email-writing preview ── */
+/* ── Examples: practice that follows a goal ── */
 .example-explorer{margin-top:56px}
 .example-nav{display:flex;flex-wrap:wrap;gap:2px;width:fit-content;max-width:100%;padding:4px;border-radius:999px;background:var(--soft)}
 .example-nav button{display:inline-flex;align-items:center;gap:10px;height:40px;padding:0 18px;border-radius:999px;color:var(--ink-3);font:600 var(--t-ui)/1 var(--suit);letter-spacing:-.02em;transition:color .16s ease}
@@ -133,7 +133,7 @@ button:disabled{cursor:default;opacity:.4}
 .example-nav button[aria-selected=true]{background:var(--paper);color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.08),0 0 0 1px rgba(0,0,0,.04)}
 .example-label{margin:0;font:600 var(--t-small)/1.4 var(--suit);letter-spacing:-.01em;color:var(--ink-3)}
 .goal-panel{margin-top:36px}
-.goal-panel:focus-visible,.letter-panel:focus-visible{outline-offset:8px;border-radius:12px}
+.goal-panel:focus-visible{outline-offset:8px;border-radius:12px}
 .goal-context{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);column-gap:56px;align-items:center}
 /* The felt object on a soft plate: the photo's white paper takes the plate's grey. */
 .goal-art{display:block;width:100%;max-width:400px;aspect-ratio:1;padding:6%;border-radius:24px;background:var(--soft);isolation:isolate}
@@ -147,33 +147,6 @@ button:disabled{cursor:default;opacity:.4}
 .goal-steps h4{margin:10px 0 0;font:800 var(--t-body)/1.4 var(--suit);letter-spacing:-.03em;word-break:keep-all}
 .goal-steps p{margin:10px 0 0;font:500 var(--t-ui)/1.7 var(--suit);letter-spacing:-.02em;color:var(--ink-2);word-break:keep-all}
 .goal-takeaway{margin:24px 0 0;font:700 var(--t-ui)/1.6 var(--suit);letter-spacing:-.02em;color:var(--ink);word-break:keep-all}
-.letter-layout{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);column-gap:56px;align-items:start;margin-top:56px}
-.letter-situation{padding-top:24px;border-top:1px solid var(--ink)}
-.letter-situation h3{margin:10px 0 0;font:800 var(--t-item)/1.35 var(--suit);letter-spacing:-.035em;word-break:keep-all}
-.letter-situation p:not(.example-label){margin:14px 0 0;font:500 var(--t-body)/1.75 var(--suit);letter-spacing:-.02em;color:var(--ink-2);word-break:keep-all}
-.hands-on .example-explorer{margin-top:0}
-.letter-layout .example-guide{grid-column:1/-1;margin:0 0 18px}
-.example-guide{margin:0 0 14px;font:500 var(--t-small)/1.6 var(--suit);letter-spacing:-.01em;color:var(--ink-3);word-break:keep-all}
-.example-nav--help{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));width:100%;padding:0;gap:0;border-radius:0;background:none;border-top:1px solid var(--ink)}
-.example-nav--help button{display:flex;flex-direction:column;align-items:flex-start;justify-content:flex-start;gap:5px;height:auto;padding:16px 14px 16px 0;border-radius:0;border-bottom:1px solid var(--line);text-align:left}
-.example-nav--help button strong{font:700 var(--t-ui)/1.3 var(--suit);letter-spacing:-.02em}
-.example-nav--help button span{font:500 var(--t-small)/1.4 var(--suit);letter-spacing:-.01em;word-break:keep-all}
-.example-nav--help button[aria-selected=true]{background:none;box-shadow:inset 0 2px 0 var(--ink);color:var(--ink)}
-.letter-panel{padding-top:24px}
-.letter-panel h3{margin:0;font:800 var(--t-item)/1.35 var(--suit);letter-spacing:-.035em;word-break:keep-all}
-.letter-panel>p:not(.panel-index){margin:12px 0 0;font:500 var(--t-body)/1.75 var(--suit);letter-spacing:-.02em;color:var(--ink-2);word-break:keep-all}
-.letter-prompts{margin:20px 0 0;padding:0;list-style:none;border-top:1px solid var(--line)}
-.letter-prompts li{display:grid;grid-template-columns:34px minmax(0,1fr);padding:14px 0;border-bottom:1px solid var(--line);font:500 var(--t-ui)/1.6 var(--suit);letter-spacing:-.02em;color:var(--ink);word-break:keep-all}
-.letter-prompts .mono{padding-top:3px;font-size:var(--t-label);letter-spacing:.1em;color:var(--ink-3)}
-.letter-hint{border-bottom:1px solid var(--line)}
-.letter-hint summary{display:flex;align-items:center;justify-content:space-between;min-height:52px;cursor:pointer;list-style:none;font:700 var(--t-ui)/1.3 var(--suit);letter-spacing:-.02em}
-.letter-hint summary::-webkit-details-marker{display:none}
-.letter-hint summary::after{content:'+';font:400 var(--t-lead)/1 var(--latin)}
-.letter-hint[open] summary::after{content:'−'}
-.letter-hint p{margin:0 0 18px;font:500 var(--t-ui)/1.7 var(--suit);letter-spacing:-.02em;color:var(--ink-2);word-break:keep-all}
-.letter-footer{display:flex;align-items:center;justify-content:space-between;gap:24px;margin-top:44px;padding-top:24px;border-top:1px solid var(--line)}
-.letter-footer p{margin:0;max-width:640px;font:500 var(--t-small)/1.7 var(--suit);letter-spacing:-.01em;color:var(--ink-3);word-break:keep-all}
-
 /* ── Built with Atlas: one line for each business; their felt objects open the company page ── */
 .application-list{margin:56px 0 0;padding:0;list-style:none;border-top:1px solid var(--ink)}
 .application-link{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,8fr) 24px;align-items:baseline;column-gap:24px;padding:26px 0;border-bottom:1px solid var(--line);color:var(--ink);text-decoration:none}
@@ -221,7 +194,7 @@ dialog>p:not(.eyebrow){margin:0 0 12px;font:500 var(--t-ui)/1.75 var(--suit);let
   .section-lead{margin-top:20px}
   .system-flow,.goal-steps{grid-template-columns:minmax(0,1fr)}
   .system-flow li,.system-flow li+li,.goal-steps li,.goal-steps li+li{padding:24px 0 20px;border-left:0;border-bottom:1px solid var(--line)}
-  .goal-context,.letter-layout{grid-template-columns:minmax(0,1fr);row-gap:28px}
+  .goal-context{grid-template-columns:minmax(0,1fr);row-gap:28px}
   .goal-art{max-width:320px}
   .application-link{grid-template-columns:minmax(0,1fr) 24px;row-gap:6px}
   .application-link>:not(.arrow-icon){grid-column:1}
@@ -246,15 +219,12 @@ dialog>p:not(.eyebrow){margin:0 0 12px;font:500 var(--t-ui)/1.75 var(--suit);let
   .inspector{min-height:260px;padding:22px 20px 24px;border-radius:20px}
   .inspector[data-engine=strata]::after{top:18px;right:18px}
   .concepts{gap:8px 14px}
-  .personalization,.adaptation,.hands-on,.applications{padding-top:84px}
-  .system-flow,.example-explorer,.letter-layout,.application-list{margin-top:36px}
+  .personalization,.adaptation,.applications{padding-top:84px}
+  .system-flow,.example-explorer,.application-list{margin-top:36px}
   .example-nav{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);width:100%}
   .example-nav button{justify-content:center;gap:6px;padding:0 8px}
-  .example-nav--help{grid-auto-flow:row;grid-template-columns:minmax(0,1fr)}
-  .example-nav--help button{flex-direction:row;align-items:baseline;justify-content:space-between;gap:12px;padding:14px 0}
   .goal-panel{margin-top:28px}
   .goal-art{max-width:240px}
-  .letter-footer{flex-direction:column;align-items:flex-start}
   .application-link{padding:20px 0}
   .colophon{flex-direction:column;align-items:flex-start;margin-top:84px;padding:28px 0 44px}
   .colophon p{flex-direction:column;align-items:flex-start;gap:8px}
