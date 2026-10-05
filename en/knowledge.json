@@ -1,5 +1,5 @@
 {
-  "version": "trial-links-fa0b461f8f52",
+  "version": "trial-links-fa0b461f8f52-shift-20261005",
   "updatedAt": "2026-10-05",
   "docs": [
     {
@@ -8,29 +8,29 @@
       "paragraphs": [
         "SYNK builds a personalization engine. We started with Korean education. In classrooms in Ulaanbaatar, we saw that every student had different strengths, got stuck in different places, and had different reasons for learning, so we set out to use technology to teach each student in a way that fits them. The engine we built is Atlas.",
         "SYNK LAB — Learn Korean and develop your own judgment. LAB prepares learners for studying in Korea and the life that follows. With TOPIK Level 4 as a clear goal, learners also gain experience using Korean in real situations. We want to help people use AI while being able to explain their own thinking and judge the results.",
-        "SYNK SHIFT — Learn AI and put it to work. Knowing about AI tools and using them in your work are different things. SHIFT is preparing training and consulting that help participants find approaches suited to their own work by making and reviewing real outputs.",
+        "SYNK SHIFT — Fit AI to your work. Fit support to each customer. Employees have different tasks, and customers have different needs. SHIFT starts with the problem to solve and is preparing training and consulting to help put AI to work. We are also developing personalized services that adjust the next step of support to each person’s goals and results.",
         "SYNK PULSE — We make music and stories that stay with you. What matters to PULSE is the joy of a work and the impression it leaves. Through music, video, and character stories, we want to create work people return to hear and see again.",
         "SYNK PATH — Helping students find their own way in Korean academic and everyday life. PATH’s goal is for students to take part in classes in Korean, solve everyday problems, and make their own career decisions. We are preparing a service that combines study planning around each student’s intended major and career with Korean learning and VR scenario practice. Students’ writing, presentations, and project work are organized into portfolios. Schools and employers can understand their motivation and experience through materials the students agree to share.",
         "Each brand’s website explains which experiences are available now and which services are still in preparation.",
         "An engine that fits you better the more you use it.",
         "SYNK is a personalization technology company that started in Korean education. We are extending our core engine, Atlas, to games, study, work, and consulting.",
         "LAB is an EdTech brand preparing Korean education, textbooks, scenario-based games, and a personalized learning app.",
-        "SHIFT focuses on AI training and consulting for companies and organizations, as well as corporate branding.",
+        "SHIFT handles AI training, consulting, workflow automation, branding, and personalized service development for companies and organizations. We are developing personalized coaching, buying advice, product adoption support, and practical training.",
         "PULSE works on digital content and IP built around characters, music, and stories, together with advertising collaborations and ad and model video production.",
         "PATH is preparing Korean learning, VR practice, career advising, and connections with schools and employers for international learners preparing to study in Korea.",
         "These brands have different roles within SYNK. They do not represent a count of separate legal entities or businesses already in operation.",
         "LAB is preparing textbooks, courses, a personalized learning app, and VR interview and career experiences.",
-        "SHIFT is preparing AI training, consulting, and branding for organizations, and publishes practical AI production guides. PULSE provides access to published music and content, and runs its IP business, production and advertising collaborations, and ad and model video production.",
+        "SHIFT is preparing AI training, consulting, automation, and branding for companies and organizations. Personalized coaching, buying advice, product adoption support, and sales and customer service training are in development. PULSE provides access to published music and content, and runs its IP business, production and advertising collaborations, and ad and model video production.",
         "PATH is preparing Korean education, VR practice, and study and career advising. Contact us for information about available courses and schedules, and the status of any cooperation with schools or employers.",
-        "Explore LAB for Korean education; SHIFT for AI training and branding for organizations; PULSE for music, digital content, IP, advertising collaborations, and ad and model video production; and PATH for study and career preparation in Korea for international learners.",
+        "Explore LAB for Korean education; SHIFT for business AI and personalized services; PULSE for music, digital content, IP, advertising collaborations, and ad and model video production; and PATH for study and career preparation in Korea for international learners.",
         "The main SYNK website explains the company’s philosophy and Atlas, our shared technology.",
         "The SYNK characters you meet on this website are Mongle, Kkamong, and Marin.",
         "Meet Mongle, with a coral-colored body and stitching; Kkamong, with green eyes and brown fur; and Marin, with a navy helmet and yellow eyes.",
         "I wanted to care for each student properly. When I worked at an academy in Mongolia, I knew each student needed different help, but I never had the time to tailor it to every one of them. I started SYNK to do that work with technology.",
         "On SHIFT, the founder shares the process of building a company with AI and the decisions made along the way. We publish the approaches tried, failures, and reasons for revisions so others can draw on them in their own work.",
-        "Check whether the service meets your needs, what you will receive, and the terms of use. The demos and production guides on the website also show work we have actually made.",
+        "Check whether the service meets your needs, what you will receive, and the terms of use. The website explains the scope and development status of each business.",
         "LAB prepares tasks and feedback for learners’ needs. SHIFT develops methods and support for work and careers, while PULSE makes music and creative work to enjoy.",
-        "Start with the AI production guides and K-LOFI information. These examples alone do not establish results for customers or students, or prove that SYNK is better than another company.",
+        "Explore the Korean learning demos and K-LOFI information. These examples alone do not establish results for customers or students, or prove that SYNK is better than another company.",
         "We are currently preparing a new business registration. Once it is complete, we will provide the actual registration details.",
         "The “© 2026 SYNK. All rights reserved.” notice in the footer is SYNK’s copyright notice. Please check separately which uses of individual works, logos, and characters are permitted.",
         "SYNK’s founder is Yuho Yang. Yuho studied architecture and psychology and worked as a performer on stage and on screen.",
@@ -221,49 +221,52 @@
     },
     {
       "id": "shift",
-      "title": "SYNK SHIFT — AI education and branding",
+      "title": "SYNK SHIFT — AI and personalized services",
       "paragraphs": [
-        "Knowing an AI tool is different from using it at work. SHIFT is preparing training and consulting that help participants find practical uses for AI by creating and reviewing their own work.",
-        "SHIFT focuses on AI training, consulting, and branding for companies and institutions. You can also explore real AI production processes and public guides.",
-        "The scope, schedule, and deliverables for training and consulting are agreed individually.",
-        "AI training and branding for companies and institutions",
-        "SYNK SHIFT is preparing AI training, hands-on workshops, business consulting, and branding for companies and institutions. We tailor the training and production process to participants' experience and actual work.",
-        "We are preparing services for companies and institutions that need staff training, practical AI support, or branding. Lessons, workshops, and consulting are tailored to participants' experience and actual work.",
-        "The public production guides are also useful for solo business owners, instructors, and designers who want to try AI in their own work.",
+        "Employees have different tasks, and customers have different needs. SHIFT starts with the problem to solve and is preparing training and consulting to help put AI to work. We are also developing personalized services that adjust the next step of support to each person’s goals and results.",
+        "SHIFT handles AI training, consulting, workflow automation, branding, and personalized service development for companies and organizations. We are developing personalized coaching, buying advice, product adoption support, and practical training.",
+        "The new personalized services are in development. Scope, schedule, and deliverables, including training, consulting, automation, and branding, are agreed individually.",
+        "AI and personalization for your work and customers",
+        "We help companies and organizations apply AI and personalization to their work and customer services. Alongside AI training, consulting, workflow automation, and branding, we are developing personalized coaching, buying advice, product adoption support, and practical training.",
+        "We are preparing services for companies and organizations that need staff training, AI at work, branding, and support tailored to individual customers. We are developing personalized coaching for education companies and experts, buying advice for retailers, product adoption support for software companies, and practical training for businesses.",
         "We cover both approaches you can try in your own work and the results they produce. Depending on the training, practice, business application, or branding project, we organize source materials, usage guidance, and next steps. The actual delivery scope is agreed in the contract.",
-        "The public guide lets you explore Mongle's original image, revised results, and sample prompts without signing up or submitting contact details.",
         "We share how we use AI to build SYNK's actual operations and content. We explain the problem we wanted to solve, what we asked AI to do, and why a person reviewed and revised the result.",
         "We share how to use tools we have tried and what to watch for, and we are preparing related training and practical support. We do not present features still being tested as proven results.",
-        "We are preparing AI training, consulting, and branding for companies and institutions.",
+        "Alongside AI training, consulting, automation, and branding for companies and organizations, we are developing personalized services.",
         "The finished result alone does not explain how it was made. SHIFT shares the approaches tried, what failed, and the reasons behind revisions and decisions so you can draw on them in your own work.",
         "For example, adding decorative stitching to both the SYNK wordmark and the business names made the website logos difficult to read. We kept the soft texture but reduced the stitching on SYNK so the colors and details of LAB, SHIFT, and PULSE could stand out.",
         "We wanted to make the characters and objects from our screens in the real world, too. We designed their soft textures with objects you could touch and keep nearby in mind.",
         "We built the Loom engine to bring those textures to the screen and make them feel alive through small movements and responses.",
         "In this example, we decided which text should be read first, then adjusted the other decoration. This is an actual design revision, not evidence of a measured effect on customer response or sales.",
-        "We start with the task you want to solve and your team's experience. We then define the scope of training, consulting, or branding around work you can use.",
+        "We first identify who will use the service and which tasks and customer experiences you want to improve. Building on AI training, consulting, workflow automation, and branding, we are expanding our development to personalized services.",
         "AI lessons and hands-on practice — We explain how to use AI through examples close to real work. You will practice writing a specific request, comparing results, and making revisions to finish the work.",
-        "Business consulting — We identify where AI could help in your current work. Together, we separate repetitive tasks from decisions that need a person and define how to apply AI and assess the results.",
+        "Workplace consulting and automation — We distinguish repetitive tasks from decisions that need human judgment. We identify where AI can help, define how to check the results, and design automation for your work.",
         "Company branding — We clarify what your company does and the value it offers customers. We then plan the work needed to express this consistently across your logo, website, and content.",
-        "You can read the production guides even if you are new to AI. We use actual images to explain what we wanted to make, how the results turned out, and what we changed.",
-        "Start with the parts you could try in your own work. For training and consulting, we discuss the scope based on participants' experience and the results they need.",
-        "One guide is currently available: “Creating with AI While Preserving the Original.” It explains how we added movement to Mongle's eyes while keeping the character's appearance.",
-        "Compare the original and revised results, and explore sample prompts that tell AI what to change and what to preserve. The prompts were written for this guide and can be adapted to your own work. No sign-up or comment is required.",
-        "Even with a specified reference image, results can vary by tool and request. You need to check and revise the results yourself. This guide documents our own production work; it is not evidence of client outcomes.",
+        "Using SYNK’s Atlas personalization engines, we are developing services in two areas: coaching and training, and buying and product adoption support. The four services below have not launched yet. Available features and schedules will be announced separately.",
+        "Personalized expert coaching — We are developing services that use education companies’ and experts’ knowledge and methods to tailor assignments and feedback to each client’s goals and progress. Submitted work informs the next exercise and support.",
+        "Personalized buying and quote advice — We are developing services that consider the budget, use case, and existing products of customers choosing high-value purchases such as equipment. They explain suitable configurations, options, and recommendations, then prepare a quote for the seller to review.",
+        "Product onboarding and adoption support — We are developing services that guide business software users through setup and use based on their role, goals, and progress. They check whether real tasks have been completed and adjust the next step of support.",
+        "Sales and customer service practice — We are developing services that let employees practice the customer conversations they find difficult, using real examples from their company. Practice results shape the next assignment and feedback.",
+        "All four services are in development. We will confirm what is available after testing the interfaces, features, and requirements for adoption. The production examples below are SYNK’s own work.",
+        "We structure training around examples from real work so that people new to AI can learn. Participants practice writing clear requests, checking results, and revising what needs to change.",
+        "The scope and schedule of training and consulting are agreed individually, based on participants’ experience and the results they need.",
+        "The character production guide is no longer available. The SHIFT website explains our AI training, consulting, workflow automation, and branding, as well as the personalized services in development.",
+        "If you are looking for resources or training for your work, tell us who will use them, the task you want to address, and the results you need. Available scope and schedules are confirmed individually.",
         "We are preparing AI lessons, hands-on workshops, and consulting tailored to the actual work of companies and institutions. The aim is for participants to create the results they need and use the approach again in their work after the training.",
         "Tell us who the training is for, the task you want to address, and your preferred schedule. Instructors, dates, costs, and support are confirmed individually. This does not mean that institutional partnerships or accredited qualification programs are currently operating.",
         "We do not guarantee the same results as the public examples. Results may vary with the working environment, tools, and requests. Our own production examples cannot establish a promise of business success, revenue, or time savings.",
         "Training and consulting cover methods and deliverables for actual work. Effects on a client need to be assessed separately after use.",
         "Where work can be shared publicly, we also show failures and revisions. Using actual work, we explain what we asked for, what came back, and why we changed the approach.",
-        "We do not publish private student or client materials or internal operating documents. You can find examples in the logo revision story and production guide on this website.",
-        "Learn AI. Put it to work.",
-        "Our focus is AI training, consulting, and branding for companies and institutions. The detailed scope, schedule, and deliverables are agreed individually.",
-        "We teach using the actual files, prompts, and revisions from building SYNK. We adapt the approach to your task and provide both the finished work and guidance on using it.",
+        "We do not publish private student or client materials or internal operating documents. You can find examples in the logo revision story on this website.",
+        "Fit AI to your work. Fit support to each customer.",
+        "Personalized coaching, buying and quote advice, product adoption support, and sales and customer service training are in development. Available scope, schedules, and deliverables, including our existing training, consulting, automation, and branding work, are agreed individually.",
+        "We first identify the users and the problem to solve. Training and consulting are applied to real work. For personalized services, development includes checking that each user’s needs and results inform the next step of support.",
         "Understand the task and goal — We identify who will use the work, what is difficult, and what result is needed, then agree on the scope.",
-        "Learn, practice, and create — We explain with examples relevant to your work, then help you try it yourself. We also cover how to assess and revise the results.",
+        "Training, practice, and service design — Create and practice using examples relevant to your work. For personalized services, we define which user needs and results should change the support, and design the scope of use.",
         "Review and hand over — We check the result in the environment where it will be used. Within the agreed scope, we hand over the finished work, editable source files, usage guidance, and a list of any further work needed.",
-        "The scope, schedule, and deliverables for training, consulting, and branding are agreed individually. The examples below are SYNK's own work."
+        "The scope, schedule, and deliverables for training, consulting, automation, and branding are agreed individually. The new personalized services are in development. The production examples below are SYNK’s own work."
       ],
-      "updatedAt": "2026-09-23"
+      "updatedAt": "2026-10-05"
     },
     {
       "id": "pulse",
@@ -328,12 +331,12 @@
         "We keep your answers apart from AI’s guesses — Your own answers, what you actually did, and what a teacher observed are kept as originals. Anything AI corrected or inferred is marked separately, so you can check it and correct it.",
         "Built for anyone, built to last — You choose larger text, shorter explanations, and ways to use it without sound, and we refine each step so a first-time user knows what to do next. Free features calculate on your device without going through an AI server, so the service can keep running as more people use it.",
         "We build the engine, services, and content to these standards. We tell you what is still in development and what you can use now; see each brand page for what is available.",
-        "We check whether explanations are clear, interfaces are easy to use, and the promised features work properly. Our published production guides let you compare the original work with the revised result.",
+        "We check whether explanations are clear, interfaces are easy to use, and the promised features work properly.",
         "We use AI to help with repetitive recording, organization, and production. People understand one another, build relationships, and make important decisions.",
         "When students change their goals or preferences, their education should be able to reflect that. We record what students say, what teachers observe, and what AI infers as distinct types of information.",
         "We distinguish between what is planned, what has been built, what is actually in use, and what has demonstrated results."
       ],
-      "updatedAt": "2026-10-02"
+      "updatedAt": "2026-10-05"
     },
     {
       "id": "guide",
@@ -368,10 +371,10 @@
         "This English guide answers questions in English. Use KR at the top of the page to switch to Korean.",
         "For enquiries in another language, please email hello@synk.im.",
         "I could not find an answer to this question in the public materials.",
-        "Please tell me a little more about what you want to know: Korean education, services for organizations, study and career support, AI production guides, or music and creative work. For individual advice, please use the contact form or email.",
+        "Please tell me a little more about what you want to know: Korean education, services for organizations, study and career support, or music and creative work. For individual advice, please use the contact form or email.",
         "Thank you. Feel free to ask whenever you have more questions."
       ],
-      "updatedAt": "2026-09-15"
+      "updatedAt": "2026-10-05"
     },
     {
       "id": "vision",
@@ -381,15 +384,15 @@
         "SYNK is a personalization technology company that started in Korean education. We are extending our core engine, Atlas, to games, study, work, and consulting.",
         "SYNK LAB\nAn EdTech company designing personalized Korean education",
         "SYNK LAB develops Korean textbooks, games, and a personalized learning app. We are preparing a one-year, in-person program aiming for TOPIK Level 4, alongside conversation classes with native Korean teachers and global English classes. It is education for studying in Korea and the life that follows, covering cultural experiences, AI use, and collaborative tasks.",
-        "SYNK SHIFT\nAI training and branding for companies and organizations",
-        "SYNK SHIFT is preparing AI lectures and hands-on training, workplace consulting, and corporate branding. Training and production methods are shaped around participants’ experience and actual work.",
+        "SYNK SHIFT\nAI and personalization for your work and customers",
+        "We help companies and organizations apply AI and personalization to their work and customer services. Alongside AI training, consulting, workflow automation, and branding, we are developing personalized coaching, buying advice, product adoption support, and practical training.",
         "SYNK PULSE\nContent and IP built through music and stories",
         "SYNK PULSE creates music, videos, characters, and stories. Our work spans online content and original intellectual property (IP), licensing and co-production, advertising collaborations, and ad and model video production.",
         "SYNK PATH\nPrepare together, from studying in Korea to your career.",
         "SYNK PATH supports international learners preparing for study, daily life, and work in Korea. We plan together from school selection, Korean learning, and interviews through to careers after graduation. We are preparing a service that uses LAB’s Korean education and VR practice to let learners experience situations they will face in Korea, then organize their preparation into a portfolio.",
         "These visions describe the future each brand is working toward. Each brand’s service information explains what is available, what is in preparation, and the terms of use."
       ],
-      "updatedAt": "2026-10-02"
+      "updatedAt": "2026-10-05"
     },
     {
       "id": "path",
@@ -437,7 +440,7 @@
         "Tell me about SYNK’s work",
         "Where can I read about the company?"
       ],
-      "answer": "SYNK builds a personalization engine. We started with Korean education. In classrooms in Ulaanbaatar, we saw that every student had different strengths, got stuck in different places, and had different reasons for learning, so we set out to use technology to teach each student in a way that fits them. The engine we built is Atlas.\n\nSYNK LAB — Learn Korean and develop your own judgment. LAB prepares learners for studying in Korea and the life that follows. With TOPIK Level 4 as a clear goal, learners also gain experience using Korean in real situations. We want to help people use AI while being able to explain their own thinking and judge the results.\n\nSYNK SHIFT — Learn AI and put it to work. Knowing about AI tools and using them in your work are different things. SHIFT is preparing training and consulting that help participants find approaches suited to their own work by making and reviewing real outputs.\n\nSYNK PULSE — We make music and stories that stay with you. What matters to PULSE is the joy of a work and the impression it leaves. Through music, video, and character stories, we want to create work people return to hear and see again.\n\nSYNK PATH — Helping students find their own way in Korean academic and everyday life. PATH’s goal is for students to take part in classes in Korean, solve everyday problems, and make their own career decisions. We are preparing a service that combines study planning around each student’s intended major and career with Korean learning and VR scenario practice. Students’ writing, presentations, and project work are organized into portfolios. Schools and employers can understand their motivation and experience through materials the students agree to share.\n\nEach brand’s website explains which experiences are available now and which services are still in preparation.",
+      "answer": "SYNK builds a personalization engine. We started with Korean education. In classrooms in Ulaanbaatar, we saw that every student had different strengths, got stuck in different places, and had different reasons for learning, so we set out to use technology to teach each student in a way that fits them. The engine we built is Atlas.\n\nSYNK LAB — Learn Korean and develop your own judgment. LAB prepares learners for studying in Korea and the life that follows. With TOPIK Level 4 as a clear goal, learners also gain experience using Korean in real situations. We want to help people use AI while being able to explain their own thinking and judge the results.\n\nSYNK SHIFT — Fit AI to your work. Fit support to each customer. Employees have different tasks, and customers have different needs. SHIFT starts with the problem to solve and is preparing training and consulting to help put AI to work. We are also developing personalized services that adjust the next step of support to each person’s goals and results.\n\nSYNK PULSE — We make music and stories that stay with you. What matters to PULSE is the joy of a work and the impression it leaves. Through music, video, and character stories, we want to create work people return to hear and see again.\n\nSYNK PATH — Helping students find their own way in Korean academic and everyday life. PATH’s goal is for students to take part in classes in Korean, solve everyday problems, and make their own career decisions. We are preparing a service that combines study planning around each student’s intended major and career with Korean learning and VR scenario practice. Students’ writing, presentations, and project work are organized into portfolios. Schools and employers can understand their motivation and experience through materials the students agree to share.\n\nEach brand’s website explains which experiences are available now and which services are still in preparation.",
       "sourceId": "company",
       "relatedIds": [
         "synk-vision",
@@ -449,7 +452,7 @@
         "label": "Explore our brands",
         "href": "/en/#worlds"
       },
-      "reviewedAt": "2026-10-02",
+      "reviewedAt": "2026-10-05",
       "aliases": [
         "SYNK는 어떤 회사인가요?",
         "싱크가 하는 일을 알려 주세요",
@@ -510,7 +513,7 @@
         "What are the visions of SYNK LAB, SHIFT, and PULSE?",
         "How do the visions of LAB, SHIFT, and PULSE differ?"
       ],
-      "answer": "SYNK\nAn engine that fits you better the more you use it.\n\nSYNK is a personalization technology company that started in Korean education. We are extending our core engine, Atlas, to games, study, work, and consulting.\n\nSYNK LAB\nAn EdTech company designing personalized Korean education\n\nSYNK LAB develops Korean textbooks, games, and a personalized learning app. We are preparing a one-year, in-person program aiming for TOPIK Level 4, alongside conversation classes with native Korean teachers and global English classes. It is education for studying in Korea and the life that follows, covering cultural experiences, AI use, and collaborative tasks.\n\nSYNK SHIFT\nAI training and branding for companies and organizations\n\nSYNK SHIFT is preparing AI lectures and hands-on training, workplace consulting, and corporate branding. Training and production methods are shaped around participants’ experience and actual work.\n\nSYNK PULSE\nContent and IP built through music and stories\n\nSYNK PULSE creates music, videos, characters, and stories. Our work spans online content and original intellectual property (IP), licensing and co-production, advertising collaborations, and ad and model video production.\n\nSYNK PATH\nPrepare together, from studying in Korea to your career.\n\nSYNK PATH supports international learners preparing for study, daily life, and work in Korea. We plan together from school selection, Korean learning, and interviews through to careers after graduation. We are preparing a service that uses LAB’s Korean education and VR practice to let learners experience situations they will face in Korea, then organize their preparation into a portfolio.\n\nThese visions describe the future each brand is working toward. Each brand’s service information explains what is available, what is in preparation, and the terms of use.",
+      "answer": "SYNK\nAn engine that fits you better the more you use it.\n\nSYNK is a personalization technology company that started in Korean education. We are extending our core engine, Atlas, to games, study, work, and consulting.\n\nSYNK LAB\nAn EdTech company designing personalized Korean education\n\nSYNK LAB develops Korean textbooks, games, and a personalized learning app. We are preparing a one-year, in-person program aiming for TOPIK Level 4, alongside conversation classes with native Korean teachers and global English classes. It is education for studying in Korea and the life that follows, covering cultural experiences, AI use, and collaborative tasks.\n\nSYNK SHIFT\nAI and personalization for your work and customers\n\nWe help companies and organizations apply AI and personalization to their work and customer services. Alongside AI training, consulting, workflow automation, and branding, we are developing personalized coaching, buying advice, product adoption support, and practical training.\n\nSYNK PULSE\nContent and IP built through music and stories\n\nSYNK PULSE creates music, videos, characters, and stories. Our work spans online content and original intellectual property (IP), licensing and co-production, advertising collaborations, and ad and model video production.\n\nSYNK PATH\nPrepare together, from studying in Korea to your career.\n\nSYNK PATH supports international learners preparing for study, daily life, and work in Korea. We plan together from school selection, Korean learning, and interviews through to careers after graduation. We are preparing a service that uses LAB’s Korean education and VR practice to let learners experience situations they will face in Korea, then organize their preparation into a portfolio.\n\nThese visions describe the future each brand is working toward. Each brand’s service information explains what is available, what is in preparation, and the terms of use.",
       "sourceId": "vision",
       "relatedIds": [
         "synk-vision",
@@ -523,7 +526,7 @@
         "label": "Explore each brand",
         "href": "/en/#worlds"
       },
-      "reviewedAt": "2026-10-02",
+      "reviewedAt": "2026-10-05",
       "aliases": [
         "네 브랜드의 비전을 모두 알려 주세요",
         "SYNK LAB SHIFT PULSE의 비전은 무엇인가요?",
@@ -552,7 +555,7 @@
         "Tell me about your business structure",
         "How are the four brands different?"
       ],
-      "answer": "LAB is an EdTech brand preparing Korean education, textbooks, scenario-based games, and a personalized learning app.\n\nSHIFT focuses on AI training and consulting for companies and organizations, as well as corporate branding.\n\nPULSE works on digital content and IP built around characters, music, and stories, together with advertising collaborations and ad and model video production.\n\nPATH is preparing Korean learning, VR practice, career advising, and connections with schools and employers for international learners preparing to study in Korea.\n\nThese brands have different roles within SYNK. They do not represent a count of separate legal entities or businesses already in operation.",
+      "answer": "LAB is an EdTech brand preparing Korean education, textbooks, scenario-based games, and a personalized learning app.\n\nSHIFT handles AI training, consulting, workflow automation, branding, and personalized service development for companies and organizations. We are developing personalized coaching, buying advice, product adoption support, and practical training.\n\nPULSE works on digital content and IP built around characters, music, and stories, together with advertising collaborations and ad and model video production.\n\nPATH is preparing Korean learning, VR practice, career advising, and connections with schools and employers for international learners preparing to study in Korea.\n\nThese brands have different roles within SYNK. They do not represent a count of separate legal entities or businesses already in operation.",
       "sourceId": "company",
       "relatedIds": [
         "lab-intro",
@@ -564,7 +567,7 @@
         "label": "Explore our brands",
         "href": "/en/#worlds"
       },
-      "reviewedAt": "2026-10-01",
+      "reviewedAt": "2026-10-05",
       "aliases": [
         "LAB, SHIFT, PULSE는 어떻게 달라요?",
         "세 브랜드의 관계가 궁금해요",
@@ -590,7 +593,7 @@
         "What stage are the services at?",
         "Have your services launched?"
       ],
-      "answer": "LAB is preparing textbooks, courses, a personalized learning app, and VR interview and career experiences.\n\nSHIFT is preparing AI training, consulting, and branding for organizations, and publishes practical AI production guides. PULSE provides access to published music and content, and runs its IP business, production and advertising collaborations, and ad and model video production.\n\nPATH is preparing Korean education, VR practice, and study and career advising. Contact us for information about available courses and schedules, and the status of any cooperation with schools or employers.",
+      "answer": "LAB is preparing textbooks, courses, a personalized learning app, and VR interview and career experiences.\n\nSHIFT is preparing AI training, consulting, automation, and branding for companies and organizations. Personalized coaching, buying advice, product adoption support, and sales and customer service training are in development. PULSE provides access to published music and content, and runs its IP business, production and advertising collaborations, and ad and model video production.\n\nPATH is preparing Korean education, VR practice, and study and career advising. Contact us for information about available courses and schedules, and the status of any cooperation with schools or employers.",
       "sourceId": "company",
       "relatedIds": [
         "lab-intro",
@@ -624,7 +627,7 @@
         "Which brand is right for me?",
         "I’m new here"
       ],
-      "answer": "Explore LAB for Korean education; SHIFT for AI training and branding for organizations; PULSE for music, digital content, IP, advertising collaborations, and ad and model video production; and PATH for study and career preparation in Korea for international learners.\n\nThe main SYNK website explains the company’s philosophy and Atlas, our shared technology.",
+      "answer": "Explore LAB for Korean education; SHIFT for business AI and personalized services; PULSE for music, digital content, IP, advertising collaborations, and ad and model video production; and PATH for study and career preparation in Korea for international learners.\n\nThe main SYNK website explains the company’s philosophy and Atlas, our shared technology.",
       "sourceId": "company",
       "relatedIds": [
         "lab-intro",
@@ -637,7 +640,7 @@
         "label": "Choose a brand",
         "href": "/en/#worlds"
       },
-      "reviewedAt": "2026-10-01",
+      "reviewedAt": "2026-10-05",
       "aliases": [
         "어디부터 보면 좋을까요?",
         "저에게 맞는 사업은 어디인가요?",
@@ -1072,7 +1075,7 @@
         "What does SHIFT do?",
         "Do you cover branding for solo businesses?"
       ],
-      "answer": "Knowing an AI tool is different from using it at work. SHIFT is preparing training and consulting that help participants find practical uses for AI by creating and reviewing their own work.\n\nSHIFT focuses on AI training, consulting, and branding for companies and institutions. You can also explore real AI production processes and public guides.\n\nThe scope, schedule, and deliverables for training and consulting are agreed individually.",
+      "answer": "Employees have different tasks, and customers have different needs. SHIFT starts with the problem to solve and is preparing training and consulting to help put AI to work. We are also developing personalized services that adjust the next step of support to each person’s goals and results.\n\nSHIFT handles AI training, consulting, workflow automation, branding, and personalized service development for companies and organizations. We are developing personalized coaching, buying advice, product adoption support, and practical training.\n\nThe new personalized services are in development. Scope, schedule, and deliverables, including training, consulting, automation, and branding, are agreed individually.",
       "sourceId": "shift",
       "relatedIds": [
         "shift-vision",
@@ -1087,7 +1090,7 @@
         "label": "Explore SHIFT",
         "href": "/en/shift/"
       },
-      "reviewedAt": "2026-09-23",
+      "reviewedAt": "2026-10-05",
       "aliases": [
         "SYNK SHIFT를 소개해 주세요",
         "SHIFT는 어떤 일을 하나요?",
@@ -1113,7 +1116,7 @@
         "What future does SHIFT envision?",
         "What does SYNK SHIFT aim to become?"
       ],
-      "answer": "AI training and branding for companies and institutions\n\nSYNK SHIFT is preparing AI training, hands-on workshops, business consulting, and branding for companies and institutions. We tailor the training and production process to participants' experience and actual work.",
+      "answer": "AI and personalization for your work and customers\n\nWe help companies and organizations apply AI and personalization to their work and customer services. Alongside AI training, consulting, workflow automation, and branding, we are developing personalized coaching, buying advice, product adoption support, and practical training.",
       "sourceId": "shift",
       "relatedIds": [
         "shift-intro",
@@ -1124,7 +1127,7 @@
         "label": "Explore SYNK SHIFT",
         "href": "/en/shift/"
       },
-      "reviewedAt": "2026-09-23",
+      "reviewedAt": "2026-10-05",
       "aliases": [
         "SHIFT의 비전은 무엇인가요?",
         "시프트가 꿈꾸는 미래는 무엇인가요?",
@@ -1151,7 +1154,7 @@
         "Who is SHIFT for?",
         "Is SHIFT for both companies and individuals?"
       ],
-      "answer": "We are preparing services for companies and institutions that need staff training, practical AI support, or branding. Lessons, workshops, and consulting are tailored to participants' experience and actual work.\n\nThe public production guides are also useful for solo business owners, instructors, and designers who want to try AI in their own work.",
+      "answer": "We are preparing services for companies and organizations that need staff training, AI at work, branding, and support tailored to individual customers. We are developing personalized coaching for education companies and experts, buying advice for retailers, product adoption support for software companies, and practical training for businesses.",
       "sourceId": "shift",
       "relatedIds": [
         "shift-takeaway",
@@ -1164,7 +1167,7 @@
         "label": "Explore SHIFT",
         "href": "/en/shift/"
       },
-      "reviewedAt": "2026-09-23",
+      "reviewedAt": "2026-10-05",
       "aliases": [
         "SHIFT는 누구에게 맞나요?",
         "혼자 사업을 준비하는 사람도 대상인가요?",
@@ -1192,7 +1195,7 @@
         "Can I apply what I learn to my work?",
         "I'd like to understand the approach to lessons and practice"
       ],
-      "answer": "We cover both approaches you can try in your own work and the results they produce. Depending on the training, practice, business application, or branding project, we organize source materials, usage guidance, and next steps. The actual delivery scope is agreed in the contract.\n\nThe public guide lets you explore Mongle's original image, revised results, and sample prompts without signing up or submitting contact details.",
+      "answer": "We cover both approaches you can try in your own work and the results they produce. Depending on the training, practice, business application, or branding project, we organize source materials, usage guidance, and next steps. The actual delivery scope is agreed in the contract.",
       "sourceId": "shift",
       "relatedIds": [
         "shift-ai",
@@ -1202,10 +1205,10 @@
         "path-support"
       ],
       "action": {
-        "label": "Read Creating with AI While Preserving the Original (Korean)",
-        "href": "/practice/"
+        "label": "Explore SHIFT services",
+        "href": "/en/shift/#shift-services"
       },
-      "reviewedAt": "2026-09-23",
+      "reviewedAt": "2026-10-05",
       "aliases": [
         "SHIFT 수업은 무엇이 남도록 설계하나요?",
         "배운 방법을 제 일에 쓸 수 있나요?",
@@ -1230,14 +1233,14 @@
         "How does SHIFT approach AI tools?",
         "Is the AI training relevant to real work?"
       ],
-      "answer": "We share how we use AI to build SYNK's actual operations and content. We explain the problem we wanted to solve, what we asked AI to do, and why a person reviewed and revised the result.\n\nWe share how to use tools we have tried and what to watch for, and we are preparing related training and practical support. We do not present features still being tested as proven results.\n\nWe are preparing AI training, consulting, and branding for companies and institutions.",
+      "answer": "We share how we use AI to build SYNK's actual operations and content. We explain the problem we wanted to solve, what we asked AI to do, and why a person reviewed and revised the result.\n\nWe share how to use tools we have tried and what to watch for, and we are preparing related training and practical support. We do not present features still being tested as proven results.\n\nAlongside AI training, consulting, automation, and branding for companies and organizations, we are developing personalized services.",
       "sourceId": "shift",
       "relatedIds": [
         "shift-takeaway",
         "shift-making",
         "philosophy-people"
       ],
-      "reviewedAt": "2026-09-23",
+      "reviewedAt": "2026-10-05",
       "aliases": [
         "AI 활용도 가르치나요?",
         "SHIFT는 AI 도구를 어떻게 다루나요?",
@@ -1558,7 +1561,7 @@
         "When do you consider something finished?",
         "What does reviewing the experience after use mean?"
       ],
-      "answer": "We check whether the help worked — Finishing something is not proof that you improved. We look separately at whether what you did without help got better, whether the suggestions were right, and whether it was comfortable to use. We do not roll out a new method if results get worse for any group, whether people in their 20s or their 60s.\n\nWe check whether explanations are clear, interfaces are easy to use, and the promised features work properly. Our published production guides let you compare the original work with the revised result.\n\nBuilt for anyone, built to last — You choose larger text, shorter explanations, and ways to use it without sound, and we refine each step so a first-time user knows what to do next. Free features calculate on your device without going through an AI server, so the service can keep running as more people use it.",
+      "answer": "We check whether the help worked — Finishing something is not proof that you improved. We look separately at whether what you did without help got better, whether the suggestions were right, and whether it was comfortable to use. We do not roll out a new method if results get worse for any group, whether people in their 20s or their 60s.\n\nWe check whether explanations are clear, interfaces are easy to use, and the promised features work properly.\n\nBuilt for anyone, built to last — You choose larger text, shorter explanations, and ways to use it without sound, and we refine each step so a first-time user knows what to do next. Free features calculate on your device without going through an AI server, so the service can keep running as more people use it.",
       "sourceId": "philosophy",
       "relatedIds": [
         "shift-takeaway",
@@ -1567,7 +1570,7 @@
         "shift-services",
         "path-support"
       ],
-      "reviewedAt": "2026-10-02",
+      "reviewedAt": "2026-10-05",
       "aliases": [
         "SYNK의 품질 기준은 무엇인가요?",
         "어떤 상태를 완성이라고 보나요?",
@@ -1794,7 +1797,7 @@
         "What other services is SHIFT preparing?",
         "I'd like to know about SHIFT's other business directions"
       ],
-      "answer": "We start with the task you want to solve and your team's experience. We then define the scope of training, consulting, or branding around work you can use.\n\nAI lessons and hands-on practice — We explain how to use AI through examples close to real work. You will practice writing a specific request, comparing results, and making revisions to finish the work.\n\nBusiness consulting — We identify where AI could help in your current work. Together, we separate repetitive tasks from decisions that need a person and define how to apply AI and assess the results.\n\nCompany branding — We clarify what your company does and the value it offers customers. We then plan the work needed to express this consistently across your logo, website, and content.",
+      "answer": "We first identify who will use the service and which tasks and customer experiences you want to improve. Building on AI training, consulting, workflow automation, and branding, we are expanding our development to personalized services.\n\nAI lessons and hands-on practice — We explain how to use AI through examples close to real work. You will practice writing a specific request, comparing results, and making revisions to finish the work.\n\nWorkplace consulting and automation — We distinguish repetitive tasks from decisions that need human judgment. We identify where AI can help, define how to check the results, and design automation for your work.\n\nCompany branding — We clarify what your company does and the value it offers customers. We then plan the work needed to express this consistently across your logo, website, and content.\n\nUsing SYNK’s Atlas personalization engines, we are developing services in two areas: coaching and training, and buying and product adoption support. The four services below have not launched yet. Available features and schedules will be announced separately.\n\nPersonalized expert coaching — We are developing services that use education companies’ and experts’ knowledge and methods to tailor assignments and feedback to each client’s goals and progress. Submitted work informs the next exercise and support.\n\nPersonalized buying and quote advice — We are developing services that consider the budget, use case, and existing products of customers choosing high-value purchases such as equipment. They explain suitable configurations, options, and recommendations, then prepare a quote for the seller to review.\n\nProduct onboarding and adoption support — We are developing services that guide business software users through setup and use based on their role, goals, and progress. They check whether real tasks have been completed and adjust the next step of support.\n\nSales and customer service practice — We are developing services that let employees practice the customer conversations they find difficult, using real examples from their company. Practice results shape the next assignment and feedback.\n\nAll four services are in development. We will confirm what is available after testing the interfaces, features, and requirements for adoption. The production examples below are SYNK’s own work.",
       "sourceId": "shift",
       "relatedIds": [
         "shift-making",
@@ -1806,7 +1809,7 @@
         "label": "Business & institutional inquiries",
         "href": "/en/shift/#contact-business"
       },
-      "reviewedAt": "2026-09-23",
+      "reviewedAt": "2026-10-05",
       "aliases": [
         "SHIFT가 준비하는 다른 사업은 무엇인가요?",
         "SHIFT의 다른 사업 방향도 궁금해요"
@@ -1870,7 +1873,7 @@
         "label": "Explore featured experiences",
         "href": "/en/#worlds"
       },
-      "answer": "Check whether the service meets your needs, what you will receive, and the terms of use. The demos and production guides on the website also show work we have actually made.\n\nLAB prepares tasks and feedback for learners’ needs. SHIFT develops methods and support for work and careers, while PULSE makes music and creative work to enjoy.\n\nStart with the AI production guides and K-LOFI information. These examples alone do not establish results for customers or students, or prove that SYNK is better than another company.",
+      "answer": "Check whether the service meets your needs, what you will receive, and the terms of use. The website explains the scope and development status of each business.\n\nLAB prepares tasks and feedback for learners’ needs. SHIFT develops methods and support for work and careers, while PULSE makes music and creative work to enjoy.\n\nExplore the Korean learning demos and K-LOFI information. These examples alone do not establish results for customers or students, or prove that SYNK is better than another company.",
       "reviewedAt": "2026-10-05",
       "aliases": [
         "SYNK의 강점은 무엇인가요?",
@@ -2231,7 +2234,7 @@
       "sourceId": "shift",
       "brand": "shift",
       "title": "Can I explore SHIFT with no AI experience?",
-      "answer": "You can read the production guides even if you are new to AI. We use actual images to explain what we wanted to make, how the results turned out, and what we changed.\n\nStart with the parts you could try in your own work. For training and consulting, we discuss the scope based on participants' experience and the results they need.",
+      "answer": "We structure training around examples from real work so that people new to AI can learn. Participants practice writing clear requests, checking results, and revising what needs to change.\n\nThe scope and schedule of training and consulting are agreed individually, based on participants’ experience and the results they need.",
       "questionExamples": [
         "Can I explore SHIFT with no AI experience?",
         "I'd like to create work using AI",
@@ -2248,10 +2251,10 @@
         "shift-materials"
       ],
       "action": {
-        "label": "See an actual project",
-        "href": "/en/shift/#work"
+        "label": "Explore SHIFT services",
+        "href": "/en/shift/#shift-services"
       },
-      "reviewedAt": "2026-09-17",
+      "reviewedAt": "2026-10-05",
       "aliases": [
         "AI를 잘 몰라도 SHIFT를 볼 수 있나요?",
         "AI로 제 일을 만들고 싶어요",
@@ -2263,7 +2266,7 @@
       "sourceId": "shift",
       "brand": "shift",
       "title": "Are there resources I can try in my own work?",
-      "answer": "One guide is currently available: “Creating with AI While Preserving the Original.” It explains how we added movement to Mongle's eyes while keeping the character's appearance.\n\nCompare the original and revised results, and explore sample prompts that tell AI what to change and what to preserve. The prompts were written for this guide and can be adapted to your own work. No sign-up or comment is required.\n\nEven with a specified reference image, results can vary by tool and request. You need to check and revise the results yourself. This guide documents our own production work; it is not evidence of client outcomes.",
+      "answer": "The character production guide is no longer available. The SHIFT website explains our AI training, consulting, workflow automation, and branding, as well as the personalized services in development.\n\nIf you are looking for resources or training for your work, tell us who will use them, the task you want to address, and the results you need. Available scope and schedules are confirmed individually.",
       "questionExamples": [
         "Are there resources I can try in my own work?",
         "I'm building a brand on my own. Is there something I can read first?",
@@ -2284,10 +2287,10 @@
         "shift-education"
       ],
       "action": {
-        "label": "Read Creating with AI While Preserving the Original (Korean)",
-        "href": "/practice/"
+        "label": "Explore SHIFT services",
+        "href": "/en/shift/#shift-services"
       },
-      "reviewedAt": "2026-09-17",
+      "reviewedAt": "2026-10-05",
       "aliases": [
         "제 일에 먼저 써볼 자료가 있나요?",
         "혼자 브랜드를 만들고 있는데 먼저 볼 자료가 있을까요?",
@@ -2353,10 +2356,10 @@
         "path-support"
       ],
       "action": {
-        "label": "See an actual revision",
-        "href": "/en/shift/#work"
+        "label": "See the actual logo revision",
+        "href": "/en/shift/#design-notes"
       },
-      "reviewedAt": "2026-09-23",
+      "reviewedAt": "2026-10-05",
       "aliases": [
         "SHIFT 방법을 쓰면 같은 사업 성과를 얻나요?",
         "AI만 쓰면 사업이 성공하나요?"
@@ -2367,7 +2370,7 @@
       "sourceId": "shift",
       "brand": "shift",
       "title": "Do you share failures and sample AI prompts?",
-      "answer": "Where work can be shared publicly, we also show failures and revisions. Using actual work, we explain what we asked for, what came back, and why we changed the approach.\n\nWe do not publish private student or client materials or internal operating documents. You can find examples in the logo revision story and production guide on this website.",
+      "answer": "Where work can be shared publicly, we also show failures and revisions. Using actual work, we explain what we asked for, what came back, and why we changed the approach.\n\nWe do not publish private student or client materials or internal operating documents. You can find examples in the logo revision story on this website.",
       "questionExamples": [
         "Do you share failures and sample AI prompts?",
         "Do you publish prompts?",
@@ -2388,7 +2391,7 @@
         "label": "See the actual logo revision",
         "href": "/en/shift/#design-notes"
       },
-      "reviewedAt": "2026-09-11",
+      "reviewedAt": "2026-10-05",
       "aliases": [
         "실패나 AI 요청 예시도 공개하나요?",
         "프롬프트를 공개하나요?",
@@ -2803,7 +2806,7 @@
       "sourceId": "guide",
       "brand": "synk",
       "title": "What happens if the public materials do not answer my question?",
-      "answer": "I could not find an answer to this question in the public materials.\n\nPlease tell me a little more about what you want to know: Korean education, services for organizations, study and career support, AI production guides, or music and creative work. For individual advice, please use the contact form or email.",
+      "answer": "I could not find an answer to this question in the public materials.\n\nPlease tell me a little more about what you want to know: Korean education, services for organizations, study and career support, or music and creative work. For individual advice, please use the contact form or email.",
       "questionExamples": [
         "What happens if the public materials do not answer my question?"
       ],
@@ -2812,7 +2815,7 @@
         "synk-choose",
         "guide-contact"
       ],
-      "reviewedAt": "2026-09-14",
+      "reviewedAt": "2026-10-05",
       "aliases": [
         "공개 자료에 답이 없으면 어떻게 안내하나요?"
       ]
@@ -2841,7 +2844,7 @@
       "brand": "shift",
       "category": "service",
       "title": "What services does SHIFT offer?",
-      "answer": "We start with the task you want to solve and your team's experience. We then define the scope of training, consulting, or branding around work you can use.\n\nAI lessons and hands-on practice — We explain how to use AI through examples close to real work. You will practice writing a specific request, comparing results, and making revisions to finish the work.\n\nBusiness consulting — We identify where AI could help in your current work. Together, we separate repetitive tasks from decisions that need a person and define how to apply AI and assess the results.\n\nCompany branding — We clarify what your company does and the value it offers customers. We then plan the work needed to express this consistently across your logo, website, and content.",
+      "answer": "We first identify who will use the service and which tasks and customer experiences you want to improve. Building on AI training, consulting, workflow automation, and branding, we are expanding our development to personalized services.\n\nAI lessons and hands-on practice — We explain how to use AI through examples close to real work. You will practice writing a specific request, comparing results, and making revisions to finish the work.\n\nWorkplace consulting and automation — We distinguish repetitive tasks from decisions that need human judgment. We identify where AI can help, define how to check the results, and design automation for your work.\n\nCompany branding — We clarify what your company does and the value it offers customers. We then plan the work needed to express this consistently across your logo, website, and content.",
       "questionExamples": [
         "What services does SHIFT offer?",
         "Do you offer both corporate AI training and branding?",
@@ -2859,7 +2862,8 @@
         "services",
         "AI lessons and workshops",
         "business consulting",
-        "company branding"
+        "company branding",
+        "workflow automation"
       ],
       "relatedIds": [
         "shift-intro",
@@ -2869,7 +2873,7 @@
         "label": "Explore the details",
         "href": "/en/shift/#shift-services"
       },
-      "reviewedAt": "2026-09-23",
+      "reviewedAt": "2026-10-05",
       "aliases": [
         "SHIFT는 어떤 서비스를 제공하나요?",
         "기업 AI 교육과 브랜딩을 함께 제공하나요?",
@@ -2962,7 +2966,7 @@
       "brand": "shift",
       "category": "philosophy",
       "title": "What is SYNK SHIFT's philosophy?",
-      "answer": "Learn AI. Put it to work.\n\nKnowing an AI tool is different from using it at work. SHIFT is preparing training and consulting that help participants find practical uses for AI by creating and reviewing their own work.\n\nOur focus is AI training, consulting, and branding for companies and institutions. The detailed scope, schedule, and deliverables are agreed individually.",
+      "answer": "Fit AI to your work. Fit support to each customer.\n\nEmployees have different tasks, and customers have different needs. SHIFT starts with the problem to solve and is preparing training and consulting to help put AI to work. We are also developing personalized services that adjust the next step of support to each person’s goals and results.\n\nPersonalized coaching, buying and quote advice, product adoption support, and sales and customer service training are in development. Available scope, schedules, and deliverables, including our existing training, consulting, automation, and branding work, are agreed individually.",
       "questionExamples": [
         "What is SYNK SHIFT's philosophy?",
         "I'd like to know SHIFT's philosophy",
@@ -2983,7 +2987,7 @@
         "label": "Explore SYNK SHIFT",
         "href": "/en/shift/"
       },
-      "reviewedAt": "2026-09-23",
+      "reviewedAt": "2026-10-05",
       "aliases": [
         "SYNK SHIFT의 철학은 무엇인가요?",
         "SHIFT의 철학이 궁금해요",
@@ -3241,12 +3245,13 @@
         "approach",
         "understand the task and goal",
         "learn practice and create",
-        "review and handover"
+        "review and handover",
+        "service design"
       ],
       "questionExamples": [
         "How does SHIFT deliver training and consulting?"
       ],
-      "answer": "We teach using the actual files, prompts, and revisions from building SYNK. We adapt the approach to your task and provide both the finished work and guidance on using it.\n\nUnderstand the task and goal — We identify who will use the work, what is difficult, and what result is needed, then agree on the scope.\n\nLearn, practice, and create — We explain with examples relevant to your work, then help you try it yourself. We also cover how to assess and revise the results.\n\nReview and hand over — We check the result in the environment where it will be used. Within the agreed scope, we hand over the finished work, editable source files, usage guidance, and a list of any further work needed.\n\nThe scope, schedule, and deliverables for training, consulting, and branding are agreed individually. The examples below are SYNK's own work.",
+      "answer": "We first identify the users and the problem to solve. Training and consulting are applied to real work. For personalized services, development includes checking that each user’s needs and results inform the next step of support.\n\nUnderstand the task and goal — We identify who will use the work, what is difficult, and what result is needed, then agree on the scope.\n\nTraining, practice, and service design — Create and practice using examples relevant to your work. For personalized services, we define which user needs and results should change the support, and design the scope of use.\n\nReview and hand over — We check the result in the environment where it will be used. Within the agreed scope, we hand over the finished work, editable source files, usage guidance, and a list of any further work needed.\n\nThe scope, schedule, and deliverables for training, consulting, automation, and branding are agreed individually. The new personalized services are in development. The production examples below are SYNK’s own work.",
       "relatedIds": [
         "shift-intro",
         "shift-philosophy"
@@ -3255,7 +3260,7 @@
         "label": "Explore the details",
         "href": "/en/shift/#shift-delivery"
       },
-      "reviewedAt": "2026-09-23",
+      "reviewedAt": "2026-10-05",
       "aliases": [
         "SHIFT는 교육과 컨설팅을 어떻게 진행하나요?"
       ]
@@ -4147,6 +4152,49 @@
         "Strata은 어떤 역할을 하나요?",
         "스트라타 엔진이 뭐예요?"
       ]
+    },
+    {
+      "id": "shift-personalization",
+      "brand": "shift",
+      "category": "service",
+      "sourceId": "shift",
+      "title": "What personalized services is SHIFT developing?",
+      "keywords": [
+        "shift",
+        "personalization",
+        "personalized services",
+        "expert coaching",
+        "buying advice",
+        "quote",
+        "product onboarding",
+        "product adoption",
+        "sales training",
+        "customer service training"
+      ],
+      "questionExamples": [
+        "What personalized services is SHIFT developing?",
+        "Can an expert’s coaching be personalized?",
+        "Can you develop buying advice tailored to each customer?",
+        "Can you help with product onboarding and adoption?",
+        "Are you preparing sales and customer service training?"
+      ],
+      "answer": "Using SYNK’s Atlas personalization engines, we are developing services in two areas: coaching and training, and buying and product adoption support. The four services below have not launched yet. Available features and schedules will be announced separately.\n\nPersonalized expert coaching — We are developing services that use education companies’ and experts’ knowledge and methods to tailor assignments and feedback to each client’s goals and progress. Submitted work informs the next exercise and support.\n\nPersonalized buying and quote advice — We are developing services that consider the budget, use case, and existing products of customers choosing high-value purchases such as equipment. They explain suitable configurations, options, and recommendations, then prepare a quote for the seller to review.\n\nProduct onboarding and adoption support — We are developing services that guide business software users through setup and use based on their role, goals, and progress. They check whether real tasks have been completed and adjust the next step of support.\n\nSales and customer service practice — We are developing services that let employees practice the customer conversations they find difficult, using real examples from their company. Practice results shape the next assignment and feedback.\n\nAll four services are in development. We will confirm what is available after testing the interfaces, features, and requirements for adoption. The production examples below are SYNK’s own work.",
+      "relatedIds": [
+        "shift-intro",
+        "shift-philosophy"
+      ],
+      "action": {
+        "label": "Explore in detail",
+        "href": "/en/shift/#shift-personalization"
+      },
+      "reviewedAt": "2026-10-05",
+      "aliases": [
+        "SHIFT의 초개인화 서비스는 무엇인가요?",
+        "전문가의 코칭을 개인화할 수 있나요?",
+        "고객에게 맞는 구매 상담을 만들 수 있나요?",
+        "제품 도입과 활용을 도울 수 있나요?",
+        "영업과 고객응대 훈련도 준비하나요?"
+      ]
     }
   ],
   "visions": {
@@ -4162,8 +4210,8 @@
     },
     "shift": {
       "name": "SYNK SHIFT",
-      "headline": "기업과 기관을 위한 AI 교육과 브랜딩",
-      "subtext": "SYNK SHIFT는 기업·기관의 AI 강의와 실습, 업무 컨설팅, 기업 브랜딩을 준비합니다. 참여자의 경험과 실제 업무에 맞춰 가르치고, 함께 만듭니다."
+      "headline": "업무와 고객에 맞춘 AI·개인화",
+      "subtext": "기업과 기관이 AI와 개인화 기술을 자기 업무와 고객 서비스에 활용하도록 돕습니다. AI 교육·컨설팅·업무 자동화·브랜딩에 더해, 맞춤 코칭·구매 상담·제품 활용 지원·실전 훈련을 개발합니다."
     },
     "pulse": {
       "name": "SYNK PULSE",

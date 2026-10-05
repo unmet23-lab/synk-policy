@@ -216,7 +216,8 @@ export function createKnowledgeEngine(data){
     // PUBLIC BUSINESS ROUTING 2026-09-14: service intent is distinct from unpublished company facts.
     const advertisingEducation=/광고/.test(c)&&(/제작법|만드는법|만드는방법|배우|배워|배울|가르치|가르쳐/.test(c)||/광고(?:강의|강좌|수업|교육|연수)|광고.*(?:제작|만들기).*(?:강의|강좌|수업|교육|연수)/.test(c));
     const advertisingService=/광고/.test(c)&&!advertisingEducation;
-    const organizationService=/기관|기업|조직|직원|임직원|팀/.test(c)&&(/교육|강의|연수|컨설팅|브랜딩|가르치|가르쳐|배우|배워|실무|활용|도입|찾아주|진단|자동화|업무개선|효율화/.test(c)||advertisingEducation);
+    const personalizationService=records.has('shift-personalization')&&/구매(?:상담|추천)|제품(?:도입|활용)|고객응대.*훈련|영업.*훈련|전문가.*코칭/.test(c)&&/서비스|개인화|맞춤|개발|만들|지원|준비|훈련|도울/.test(c);
+    const organizationService=personalizationService||(/기관|기업|조직|직원|임직원|팀/.test(c)&&(/교육|강의|연수|컨설팅|브랜딩|가르치|가르쳐|배우|배워|실무|활용|도입|찾아주|진단|자동화|업무개선|효율화/.test(c)||advertisingEducation));
     const languageStudy=(/영어/.test(c)&&/배우|배워|학습|공부|수업|회화|선생|교사|강사|교육|처음|초보|못해|못하|잘못|어려|걱정|괜찮|같이|병행|도되|도돼|도가능|도있|봐주|봐줘|가르|알려주|도해|도하|도배|실력|시험|토익|토플|점수/.test(c)&&!/영어로(?:물어|질문|답|대답|안내|문의|채팅|대화|이용|써도|해도|보|읽)|영어페이지|영문/.test(c))||/원어민(?:회화|선생|교사|강사)|한국(?:인)?(?:선생|교사|강사|쌤)|한국어회화|발음(?:도|을|이)?(?:고쳐|교정|봐주)/.test(c);
     const classLength=/(?:수업|클래스|레슨)(?:은|이|한번|하나|당)?(?:시간(?!표)(?:은|이)?(?:얼마|몇|길)|몇분|얼마나(?:길|돼|되|해|걸))|(?:수업|클래스|레슨|강의).{0,4}몇분(?:짜리|동안)?|몇분(?:짜리|동안)?(?:수업|클래스|레슨|강의)|한(?:번|수업|타임|교시)(?:에|은|이|당)?몇분/.test(c);
     const classFormat=!languageStudy&&((/90분|30분|그룹별발화|그룹발화|소그룹발화|발화시간/.test(c)&&/수업|발화|그룹/.test(c))||classLength);
@@ -423,9 +424,9 @@ export function createKnowledgeEngine(data){
       return from(['guide-unpublished'],'needs_confirmation');
     }
     if(/지금.*(?:운영|단계|준비|출시|돌아가|굴러가|되는|열린|쓸수|써볼|해볼|이용할|체험할|당장)|현재.*(?:운영|단계|준비|출시|돌아가|되는)|이미출시|열었|모두운영|실제로(?:돌아가|하는|되는|운영)|서비스중|운영중인/.test(c)&&!/비용|수강료|신청|앱|라디오|방송|수업|과정|직원|몇명|인원|명이나|매출|수익|엔진|비자|면접|인터뷰|연습|체험/.test(c)&&!followupCue&&!(brands.length&&/사업영역|사업|서비스|영역/.test(c)))return from(['synk-stage']);
-    if(/(?:정확히|구체적으로)?(?:어떤|무슨)(?:일|교육|서비스|사업|도움|회사|곳)(?:을|를|이|인지)?(?:하는|해주는|주는)?(?:곳|회사|데)?(?:인지|이에요|예요|인가요)?.{0,14}(?:소개|설명|알려|알아보)/.test(c)&&!/차이|다른|비교|철학|비전|방향|엔진|아틀라스|가격|비용|어떤도움을받을|도움을받을/.test(c))return from([brandIds[brand]||brandIds[context.brand]||'synk-intro']);
+    if(!personalizationService&&/(?:정확히|구체적으로)?(?:어떤|무슨)(?:일|교육|서비스|사업|도움|회사|곳)(?:을|를|이|인지)?(?:하는|해주는|주는)?(?:곳|회사|데)?(?:인지|이에요|예요|인가요)?.{0,14}(?:소개|설명|알려|알아보)/.test(c)&&!/차이|다른|비교|철학|비전|방향|엔진|아틀라스|가격|비용|어떤도움을받을|도움을받을/.test(c))return from([brandIds[brand]||brandIds[context.brand]||'synk-intro']);
     // "So it is a brand that does X, right?" confirms what a brand is; the introduction answers it.
-    if(brandIds[brand]&&brand!=='lab'&&/(?:브랜드|서비스|회사|팀|곳|프로그램|사업|기업|스튜디오|레이블)(?:이|라고|이라고|로|으로|이라)?(?:보면|이해하면|생각하면|봐도|이해해도|알면|받아들이면)(?:되|맞|될까|괜찮)|(?:브랜드|서비스|회사|팀|프로그램|사업|기업)(?:인가요|이에요|예요|인거죠|인건가요|맞나요|맞죠|인거예요|인가봐요|인지)$/.test(c)&&!/차이|다른|비교|가격|비용|일정|누구|어디|얼마|언제|명단|연락처|왜|철학|비전|목표|계약|저작권|사용|써도|채용|모집|범위|어디까지|정확히|구체적으로|강의|교육만|컨설팅만|만하는|만드는회사|만드는곳/.test(c)&&!data.records.some(r=>r.questionExamples.some(ex=>compact(normalizeQuery(ex))===c)))return from([brandIds[brand]]);
+    if(!personalizationService&&brandIds[brand]&&brand!=='lab'&&/(?:브랜드|서비스|회사|팀|곳|프로그램|사업|기업|스튜디오|레이블)(?:이|라고|이라고|로|으로|이라)?(?:보면|이해하면|생각하면|봐도|이해해도|알면|받아들이면)(?:되|맞|될까|괜찮)|(?:브랜드|서비스|회사|팀|프로그램|사업|기업)(?:인가요|이에요|예요|인거죠|인건가요|맞나요|맞죠|인거예요|인가봐요|인지)$/.test(c)&&!/차이|다른|비교|가격|비용|일정|누구|어디|얼마|언제|명단|연락처|왜|철학|비전|목표|계약|저작권|사용|써도|채용|모집|범위|어디까지|정확히|구체적으로|강의|교육만|컨설팅만|만하는|만드는회사|만드는곳/.test(c)&&!data.records.some(r=>r.questionExamples.some(ex=>compact(normalizeQuery(ex))===c)))return from([brandIds[brand]]);
     if(/어디부터(?:보|봐|시작|읽|들어가)|뭐부터(?:보|봐|읽)|어느(?:페이지|쪽|메뉴|브랜드|사업)(?:부터|를|을)?(?:보|봐|시작|들어가)|둘다관심|양쪽다|둘다궁금|브랜드가(?:너무)?많|사업이(?:너무)?많|맞는(?:브랜드|사업)(?:이|은)?(?:어디|뭐|어느)/.test(c)&&(!brand||brands.length>1||/유학.*한국어|한국어.*유학|둘다|양쪽|브랜드가(?:너무)?많|사업이(?:너무)?많|어느(?:브랜드|사업)|맞는(?:브랜드|사업)/.test(c))&&!/처음배우|초보|한국어(?:를|가)?처음/.test(c))return from(['synk-choose']);
     if(brands.length>1&&/둘다|따로|각각|같이|함께|중복|동시에/.test(c)&&/등록|신청|가입|이용|다녀|들어/.test(c))return from(['synk-brands']);
     if(/synk|싱크/.test(c)&&brands.length===0&&/소개(?:해|글|문)|한문단|한줄|요약해|정리해/.test(c))return from(['synk-intro']);
@@ -506,6 +507,7 @@ export function createKnowledgeEngine(data){
       if(pathwayService&&!/수강료|가격|요금|비용|환불|견적|계약조건|결제|이용조건|얼마(?!나)/.test(c))return from(['path-support'],'needs_confirmation');
       return from([brand==='lab'?'lab-availability':'guide-availability'],'needs_confirmation');
     }
+    if(personalizationService)return from(['shift-personalization']);
     const engineAliases={core:'코어',loom:'룸',vellum:'벨룸',trail:'트레일',prism:'프리즘',temper:'템퍼',reed:'리드',strata:'스트라타'};
     // Synapse Core is a textbook title, and ordinary words such as room or lead are not engine names.
     const namedEngines=Object.entries(engineAliases).filter(([en,ko])=>!(en==='core'&&/시냅스|교재|문법|회화|(?<![가-힣])톡|(?<![가-힣])책|\d\s*권/.test(q))&&(new RegExp('(?:^|[^a-z])'+en+'(?:$|[^a-z])').test(q)||new RegExp('(?:^|[^가-힣])'+ko+'(?!메|서비스|쉐어|더십|더)').test(q))).map(([en])=>'atlas-'+en).filter(id=>records.has(id));
