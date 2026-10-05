@@ -1,5 +1,5 @@
-import {initOrbConversation} from '/en/orb-conversation.js?v=98c2f83ad1ba';
-import {initGlassControls} from '/glass-controls.js?v=c59f5584849b';
+import {initOrbConversation} from '/en/orb-conversation.js?v=428134c1406c';
+import {initGlassControls} from '/glass-controls.js?v=a8ac17711457';
 initGlassControls();
 // A deliberate brand preview: swiping selects; following a link navigates.
 const brandDeck=document.querySelector('[data-brand-deck]');
@@ -164,7 +164,7 @@ document.addEventListener('click',event=>{
 // Preserve shared-page bookmarks when visiting the new company homepage.
 if(location.pathname==='/en/shift/'&&['#shift-people','#contact-pathways'].includes(location.hash))location.replace('/en/path/'+(location.hash==='#shift-people'?'#path-journey':location.hash));
 if(location.pathname==='/en/shift/'&&['#shift-business','#design-notes'].includes(location.hash))location.replace('/en/shift/#shift-services');
-addEventListener('hashchange',()=>{if(location.hash==='#design-notes'&&['/en/','/en/shift/'].includes(location.pathname))location.replace('/en/shift/#shift-services');});
+addEventListener('hashchange',()=>{if(location.hash==='#design-notes'&&(location.pathname==='/en/'||location.pathname==='/en/shift/'))location.replace('/en/shift/#shift-services');});
 if(location.pathname==='/en/'){
  const hash=location.hash.slice(1);
  const brand=hash.startsWith('path')||hash==='contact-pathways'||hash==='shift-people'?'path':hash.startsWith('lab')||hash==='contact-lab'?'lab':hash.startsWith('shift')||['contact-business','contact-pathways','design-notes'].includes(hash)?'shift':hash.startsWith('pulse')||hash==='contact-pulse'?'pulse':null;

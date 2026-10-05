@@ -1,8 +1,8 @@
 // Independent enhancements. The semantic page and native controls work without GSAP.
-import {initLearningInteractions} from '/en/interactions/learning.js?v=e98afdd971b5';
-import {initCurriculumNarrative} from '/interactions/curriculum.js?v=db9dda0d05d2';
-import {initFeltInteractions} from '/en/interactions/felt.js?v=e98afdd971b5';
-import {initScrollExperience} from '/interactions/scroll.js?v=aaa280e1826b';
+import {initLearningInteractions} from '/en/interactions/learning.js?v=e41b2347e027';
+import {initCurriculumNarrative} from '/interactions/curriculum.js?v=02f95e51eb0a';
+import {initFeltInteractions} from '/en/interactions/felt.js?v=7380579d5548';
+import {initScrollExperience} from '/interactions/scroll.js?v=0ebf741490fd';
 
 let gsap, ScrollTrigger;
 // Complete a direct section link after initial layout/ScrollTrigger refresh.

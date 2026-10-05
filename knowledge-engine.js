@@ -286,6 +286,13 @@ export function createKnowledgeEngine(data){
     if(/개인정보|프라이버시|(?:여기|질문창|채팅|대화창|이창|이질문창)(?:에|서|다|에다)?(?:쓴|적은|입력한|남긴|친|보낸|말한)(?:거|것|내용|글|말)?(?:은|는|이|가|도)?.{0,6}(?:저장|보관|남|기록|누가봐|누가보|볼수있|공개|어디로가|어디가|가요|전송|읽)|(?:여기|질문창|채팅|대화창|이창|이질문창)(?:에|서|다|에다)?.{0,16}(?:써도|적어도|입력해도|쓰면|적으면|남기면|치면).{0,8}(?:저장|남|기록|보관|어디)|(?:이름|학교|개인정보|연락처|번호|나이)(?:이랑|과|와|을|를|도|같은거|같은것)?.{0,8}(?:써도|적어도|입력해도|쓰면|적으면).{0,8}(?:저장|남|기록|어디|수집)|^누가(?:봐요|보나요|보는거|읽어|확인해|보죠)|(?:정보|내용)(?:가|는|를|도|이|은)?(?:저장|보관|수집|남아|남나|남는)|데이터(?:를)?수집|수집하는|수집해|(?:어떤|무슨)\S{0,4}(?:들었는지|들은지|봤는지|보는지)|취향(?:을)?분석|기록(?:을)?(?:모으|수집|저장|남기)|(?:뭐|무엇을)(?:듣는지|보는지|하는지|검색하는지)|대화.*(저장|기록|남|전송)|질문.*(저장|기록|남|전송)|저장.*(대화|질문)|쿠키|보관기간|학생정보.*(다루|보호|처리)|(?:질문|대화|입력).*(외부ai|학습에|보내)/.test(c))return from(['guide-privacy']);
       return from(plannedService,/가격|비용|얼마|견적|요금/.test(c)?'needs_confirmation':'matched');
     }
+    // Brand applications of Atlas have their own public scope, separate from the engine overview.
+    // Keep prices, evidence and implementation details on their existing routes below.
+    const atlasValueId=brands.length<=1&&['shift','pulse'].includes(brand)?brand+'-atlas-value':null;
+    const atlasApplication=/아틀라스|atlas|엔진/.test(c)&&/활용|적용|사용|쓰(?:나|는|이|게|고|나요)|써(?:요|서|야)|연결|기여/.test(c);
+    const serviceComparison=/차별|강점|차이점|왜선택|선택할이유/.test(c)||(/챗봇|일반|보통|다른(?:곳|회사|업체|제작사|대행사)|제작사|대행사/.test(c)&&/차이|비교|다르|다른(?:가|지|점)|달라|똑같|같은/.test(c));
+    const atlasValueBoundary=/개인정보|개인자료|프라이버시|사생활|수집|보관|저장|동의|삭제|기록|가격|비용|요금|견적|단가|얼마|유료|무료|환불|결제|할인|계약|신청|등록|출시|일정|날짜|언제|지금|당장|바로|가능|보장|성과|매출|수익|시간절감|통계|수치|증거|입증|검증|특허|소스|알고리즘|구현|프로그래밍|언어모델|모델명/.test(c);
+    if(atlasValueId&&records.has(atlasValueId)&&(atlasApplication||serviceComparison)&&!atlasValueBoundary)return from([atlasValueId]);
     // A bare topic word typed on a brand page opens that brand's answer for it.
     const ONE_WORD={lab:[[/^(?:교재|책|시냅스|교과서)$/,'lab-curriculum'],[/^(?:앱|어플|학습앱)$/,'lab-personalization'],[/^(?:게임|미니게임)$/,'lab-game-demo'],[/^vr$/,'lab-vr'],[/^(?:토픽|topik|4급|급수)$/,'lab-topik'],[/^(?:커리큘럼|과정|1년과정|정규과정)$/,'lab-year'],[/^(?:영어|회화|원어민)$/,'lab-languages'],[/^(?:위치|주소|장소|어디)$/,'lab-location'],[/^(?:수업|수업방식|90분)$/,'lab-class'],[/^(?:대상|누구|나이)$/,'lab-audience'],[/^(?:성인|직장인|어른)$/,'lab-adult'],[/^(?:학부모|보호자|부모)$/,'lab-parent'],[/^(?:개인화|맞춤|맞춤형)$/,'lab-personal'],[/^(?:k컬처|춤|댄스|문화)$/,'lab-culture'],[/^(?:선생님|교사|강사|ai)$/,'lab-teacher'],[/^(?:초보|처음|입문)$/,'lab-start']],
       shift:[[/^(?:가이드|자료|자료실|제작법|제작가이드|가이드링크|자료링크)$/,'shift-materials'],[/^(?:제안서|제안|견적요청|문의방법)$/,'guide-collaboration'],[/^(?:서비스|사업|하는일)$/,'shift-services'],[/^(?:대상|누구|개인|1인|프리랜서)$/,'shift-audience'],[/^(?:진행|절차|프로세스|진행방식|순서)$/,'shift-delivery'],[/^(?:결과물|산출물|납품)$/,'shift-takeaway'],[/^(?:사례|제작사례|실제사례|포트폴리오)$/,'shift-making'],[/^(?:강사|선생님|교육|강의|실습)$/,'shift-education'],[/^(?:초보|입문|비전공)$/,'shift-start'],[/^(?:툴|도구|ai|프로그램)$/,'shift-ai'],[/^(?:브랜딩|로고)$/,'shift-scope'],[/^(?:프롬프트|요청문|실패)$/,'shift-publicity']],
@@ -458,6 +465,12 @@ export function createKnowledgeEngine(data){
     }
     const exact=data.records.find(r=>r.questionExamples.some(ex=>compact(normalizeQuery(ex))===c));
     if(exact)return from([exact.id]);
+    // Keep a published FAQ question attached to its own passage as the catalogue grows.
+    const passageQuestions=data.records.filter(r=>(!brand||r.brand===brand)&&r.answer.split('\n\n').some(p=>{
+      const question=p.match(/^([^—\n]{8,90}\?)\s—\s/);
+      return question&&compact(normalizeQuery(question[1]))===c;
+    }));
+    if(passageQuestions.length)return from(passageQuestions.slice(0,3).map(r=>r.id));
     if(/(?:synk|싱크|회사)(?:라는|의)?(?:이름|명칭)(?:은|이)?.{0,8}(?:뜻|의미|유래|왜)|이름의(?:뜻|의미|유래)/.test(c))return {...unknown(brand),relatedIds:['synk-intro','guide-contact']};
     // The founder page is public: who builds SYNK and the founder's education, career and awards.
     const founderWord='(?:창업자|창업하신분|창업한분|설립자|대표(?:님|이사|분|께서)|기획자|양유호|ceo|사장님|(?:회사를|synk를|싱크를|여기를)?(?:시작|세운|세우신|만든|만드신|창업)(?:한|하신)?분)';
@@ -528,6 +541,8 @@ export function createKnowledgeEngine(data){
       if(pathwayService&&!/수강료|가격|요금|비용|환불|견적|계약조건|결제|이용조건|얼마(?!나)/.test(c))return from(['path-support'],'needs_confirmation');
       return from([brand==='lab'?'lab-availability':'guide-availability'],'needs_confirmation');
     }
+    // Describe the service before generic corporate-training rules; price, availability,
+    // outcome guarantees and private records have already kept their own boundaries.
     if(personalizationService)return from(['shift-personalization']);
     const engineAliases={core:'코어',loom:'룸',vellum:'벨룸',trail:'트레일',prism:'프리즘',temper:'템퍼',reed:'리드',strata:'스트라타'};
     // Synapse Core is a textbook title, and ordinary words such as room or lead are not engine names.
@@ -709,7 +724,7 @@ export function createKnowledgeEngine(data){
       const only=ruleAnswer(parts[0],{...context,brand:brandsIn(normalizeQuery(text))[0]||context.brand});
       return only.records.length&&['matched','needs_confirmation'].includes(only.status)?{...only,combined:true}:result;
     }
-    if(parts.length<2&&!/차이|비교|다른\s*점|다르|관계|연결|연관|이어|같은\s*점|같이|함께|똑같|같은\s*거|비슷|둘\s*다|vs|사이|중에|중에서|나누|나눠|구분|역할/.test(text)&&!/(?:선생님?|친구|사람|강사|교사|부모|엄마|아빠|형제|동생|언니|오빠|누나|형|팀원|직원|아이|애|학생|캐릭터|몽글|까몽|마린)(?:이랑|랑|과|와)\s/.test(text)){parts=text.split(/(?<=[가-힣a-z0-9])(?:이랑|랑|과|와)\s+(?=[가-힣a-z0-9])/i).map(p=>p.trim()).filter(Boolean);joined=true;}
+    if(parts.length<2&&!/차이|비교|다른\s*(?:점|가|지)|다르|관계|연결|연관|이어|같은\s*점|같이|함께|똑같|같은\s*거|비슷|둘\s*다|vs|사이|중에|중에서|나누|나눠|구분|역할/.test(text)&&!/(?:선생님?|친구|사람|강사|교사|부모|엄마|아빠|형제|동생|언니|오빠|누나|형|팀원|직원|아이|애|학생|캐릭터|몽글|까몽|마린)(?:이랑|랑|과|와)\s/.test(text)){parts=text.split(/(?<=[가-힣a-z0-9])(?:이랑|랑|과|와)\s+(?=[가-힣a-z0-9])/i).map(p=>p.trim()).filter(Boolean);joined=true;}
     if(parts.length<2||parts.length>3||parts.some(p=>compact(p).length<2))return result;
     const brand=brandsIn(normalizeQuery(text))[0]||context.brand;
     const found=parts.map(p=>ruleAnswer(p,{...context,brand}));

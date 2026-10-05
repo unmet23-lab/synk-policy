@@ -1099,6 +1099,67 @@ html[lang="en"] .visual-explainer--cards .visual-scene-name{font:400 11px/1.4 va
  :is(#lab.lab-bento,#shift.shift-hero,#pulse.world-pulse,#path.path-hero){border:1px solid CanvasText;background:Canvas}
 }
 
+/* Enterprise pages: the product, its deliverable and an application example share the first view. */
+:is(#shift,#pulse).business-hero{grid-template-rows:auto auto auto auto auto;row-gap:22px;min-height:0;padding-bottom:54px}
+:is(#shift,#pulse).business-hero>.stage-label{grid-column:1/-1;grid-row:1;margin:0}
+:is(#shift,#pulse).business-hero>h1{grid-column:1/-1;grid-row:2;max-width:none;font-size:clamp(42px,5.4vw,82px);line-height:1.1;margin-bottom:16px}
+:is(#shift,#pulse).business-hero>.business-hero-intro{display:block;grid-column:1/span 6;grid-row:3;max-width:34em;align-self:start}
+:is(#shift,#pulse).business-hero .hero-lead,:is(#shift,#pulse).business-hero .hero-more{display:block;max-width:none;margin:0;font-size:inherit;line-height:1.7;font-weight:400;color:inherit}
+:is(#shift,#pulse).business-hero>.world-links{grid-column:1/span 6;grid-row:4;margin-top:0;align-self:start}
+:is(#shift,#pulse).business-hero>.business-hero-state{grid-column:1/span 6;grid-row:5;max-width:34em;font-size:14px;line-height:1.65;color:var(--on-field-2)}
+.business-hero-proof{grid-column:8/-1;grid-row:3/span 3;align-self:start;border-top:1px solid var(--on-field-line);padding-top:22px}
+.hero-proof-heading{display:flex;align-items:center;gap:18px;margin-bottom:22px}
+.hero-proof-heading img{width:88px;height:88px;object-fit:contain}
+.hero-proof-heading h2{font-size:clamp(22px,2.2vw,30px);line-height:1.25;color:var(--on-field);margin-top:8px}
+.business-hero-proof .small-label{font-size:12px;color:var(--on-field-2)}
+.business-hero-proof dl{display:grid;gap:16px;margin:0}
+.business-hero-proof dt{font-size:12px;color:var(--on-field-3);margin-bottom:5px}
+.business-hero-proof dd{margin:0;font-size:16px;line-height:1.6;color:var(--on-field)}
+.business-hero-proof>p{margin-top:18px;font-size:13px;line-height:1.6;color:var(--on-field-2)}
+.business-products>.story-heading{max-width:1000px}
+.business-products>.story-heading>p{max-width:42em}
+.business-offers{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:48px;margin-top:48px}
+.business-offer{padding:30px 0 36px;border-top:1px solid currentColor;display:flex;flex-direction:column;gap:20px;min-width:0}
+.business-offer>header{display:grid;grid-template-columns:auto 1fr;gap:10px 14px;align-items:center}
+.business-offer .offer-who{font-size:13px;line-height:1.5;color:inherit;opacity:.75}
+.business-offer h3{grid-column:1/-1;font-size:clamp(24px,2.1vw,30px);line-height:1.3;color:inherit}
+.business-offer .offer-value{max-width:38em;font-size:17px;line-height:1.7;color:inherit}
+.offer-deliverable{margin:0;padding-top:16px;border-top:1px solid color-mix(in srgb,currentColor 20%,transparent)}
+.offer-deliverable dt{font-size:12px;opacity:.7;margin-bottom:8px}
+.offer-deliverable dd{font-size:16px;line-height:1.6;margin:0;font-weight:600}
+.offer-deliverable dt:not(:first-child){margin-top:22px}
+.offer-deliverable .offer-benefit{font-weight:400;line-height:1.75}
+.offer-example{margin-top:auto;padding:18px 0 0;border-top:1px solid color-mix(in srgb,currentColor 20%,transparent)}
+.offer-example .small-label{font-size:11px;color:inherit;opacity:.7}
+.offer-example p{font-size:15px;line-height:1.65;margin-top:8px;color:inherit}
+.offer-arrow{display:block;margin-top:8px;opacity:.55}
+.offer-example .offer-result{margin-top:8px;font-weight:600}
+.business-atlas{border-top:1px solid color-mix(in srgb,currentColor 25%,transparent);margin-top:64px;padding-top:36px}
+.business-atlas>header{max-width:50em}
+.business-atlas .small-label{color:inherit;opacity:.7}
+.business-atlas h3{font-size:clamp(28px,3vw,42px);line-height:1.2;color:inherit;margin:18px 0}
+.business-atlas p{font-size:16px;line-height:1.7;color:inherit}
+.atlas-value-steps{list-style:none;padding:0;margin:30px 0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:30px}
+.atlas-value-steps li{border-top:1px solid color-mix(in srgb,currentColor 25%,transparent);padding-top:18px}
+.atlas-value-steps h4{font-size:19px;margin:12px 0;color:inherit}
+.business-atlas .story-note,.offer-note{font-size:13px;line-height:1.7;opacity:.8}
+#pulse-studio .business-offer,#pulse-studio .business-atlas{color:var(--on-field)}
+#pulse-studio .business-offer .story-index,#pulse-studio .business-atlas .story-index{color:var(--on-field-2)}
+@media(max-width:760px){
+ :is(#shift,#pulse).business-hero{row-gap:20px;padding-bottom:30px}
+ :is(#shift,#pulse).business-hero>h1{font-size:clamp(29px,8.3vw,48px);line-height:1.2;grid-column:1/-1;grid-row:auto;margin:0}
+ :is(#shift,#pulse).business-hero>.business-hero-intro,:is(#shift,#pulse).business-hero>.world-links,:is(#shift,#pulse).business-hero>.business-hero-state{grid-column:1/-1;grid-row:auto;order:3}
+ :is(#shift,#pulse).business-hero>.world-links{order:4}
+ :is(#shift,#pulse).business-hero>.business-hero-state{order:5;font-size:12px}
+ .business-hero-proof{grid-column:1/-1;grid-row:auto;order:6;margin-top:8px}
+ .hero-proof-heading img{width:68px;height:68px}
+ .business-offers{grid-template-columns:1fr;gap:0;margin-top:32px}
+ .business-offer{padding:24px 0 32px;gap:18px}
+ .business-offer .offer-value{font-size:16px}
+ .business-atlas{margin-top:40px;padding-top:28px}
+ .atlas-value-steps{grid-template-columns:1fr;gap:20px}
+}
+
 /* PULSE's first screen introduces all four service areas before the work below. */
 #pulse.pulse-services-hero{grid-template-rows:auto auto 24px auto auto auto auto;align-content:start}
 #pulse.pulse-services-hero #pulse-title{font-size:clamp(40px,6.8vw,104px);max-width:13em}

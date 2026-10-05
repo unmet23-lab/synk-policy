@@ -1,5 +1,5 @@
-import {createKnowledgeEngine} from './knowledge-engine.js?v=1afa5fa6f51e';
-import {appendPublicActions} from './public-actions.js?v=4ee8278a4f';
+import {createKnowledgeEngine} from './knowledge-engine.js?v=c21c10e3872c';
+import {appendPublicActions} from './public-actions.js?v=f1d1779d1376';
 const $=s=>document.querySelector(s);
 const conversation=$('#questions'),form=$('#question-form'),input=$('#question'),send=$('#send'),messages=$('#messages'),dialog=$('#document-dialog');
 const initialContext=()=>({brand:['lab','shift','pulse','path'].includes(document.body.dataset.site)?document.body.dataset.site:'synk'});
@@ -20,17 +20,17 @@ function paragraphs(parent,text){String(text).split(/\n\n/).forEach(p=>parent.ap
 let pending=null;
 function startKnowledge(){
  if(pending)return pending;
- pending=fetch('/knowledge.json?v=62c28151d41e').then(r=>{if(!r.ok)throw new Error('자료를 불러오지 못했어요.');return r.json();}).then(data=>{
+ pending=fetch('/knowledge.json?v=64d897243596').then(r=>{if(!r.ok)throw new Error('자료를 불러오지 못했어요.');return r.json();}).then(data=>{
   engine=createKnowledgeEngine(data);return engine;
 }).catch(error=>{console.error('Public notes unavailable');$('#answer-note').textContent='공개 안내를 불러오지 못했어요. 질문을 보내 다시 시도해 주세요.';throw error;});
-// A background failure should not become an unhandled rejection before anyone asks.
+ // A background failure should not become an unhandled rejection before anyone asks.
  pending.catch(()=>{});
  return pending;
 }
 if(document.body.dataset.site!=='synk'||document.documentElement.dataset.entryView!=='intro')startKnowledge();
 else document.addEventListener('synk:company-view',startKnowledge,{once:true});
 
-async function getEngine(){if(engine)return engine;try{return await startKnowledge();}catch{const r=await fetch('/knowledge.json?v=62c28151d41e',{cache:'reload'});if(!r.ok)throw new Error('자료를 불러오지 못했어요. 잠시 뒤 다시 질문해 주세요.');engine=createKnowledgeEngine(await r.json());$('#answer-note').textContent=readyNote;return engine;}}
+async function getEngine(){if(engine)return engine;try{return await startKnowledge();}catch{const r=await fetch('/knowledge.json?v=64d897243596',{cache:'reload'});if(!r.ok)throw new Error('자료를 불러오지 못했어요. 잠시 뒤 다시 질문해 주세요.');engine=createKnowledgeEngine(await r.json());$('#answer-note').textContent=readyNote;return engine;}}
 function showAnswers(){document.dispatchEvent(new Event('synk:show-answers'));}
 function enterChat(){showAnswers();conversation.classList.add('is-chatting');$('#introduction').hidden=true;$('#chat-area').hidden=false;}
 function focusQuestion(){showAnswers();input.focus({preventScroll:true});if(!conversation.closest('.orb-help'))(conversation.closest('.help-frame')||conversation).scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth',block:'start'});}

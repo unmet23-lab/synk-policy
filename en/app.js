@@ -1,5 +1,5 @@
-import {createKnowledgeEngine} from '/en/knowledge-engine.js?v=2ac99f605ac4';
-import {appendPublicActions} from '/public-actions.js?v=4ee8278a4f';
+import {createKnowledgeEngine} from '/en/knowledge-engine.js?v=e5f67de3606b';
+import {appendPublicActions} from '/public-actions.js?v=f1d1779d1376';
 const $=s=>document.querySelector(s);
 const conversation=$('#questions'),form=$('#question-form'),input=$('#question'),send=$('#send'),messages=$('#messages'),dialog=$('#document-dialog');
 const initialContext=()=>({brand:['lab','shift','pulse','path'].includes(document.body.dataset.site)?document.body.dataset.site:'synk'});
@@ -20,17 +20,17 @@ function paragraphs(parent,text){String(text).split(/\n\n/).forEach(p=>parent.ap
 let pending=null;
 function startKnowledge(){
  if(pending)return pending;
- pending=fetch('/en/knowledge.json?v=c36d9ed1c233').then(r=>{if(!r.ok)throw new Error("Public information could not be loaded.");return r.json();}).then(data=>{
+ pending=fetch('/en/knowledge.json?v=3df61d8f5558').then(r=>{if(!r.ok)throw new Error("Public information could not be loaded.");return r.json();}).then(data=>{
   engine=createKnowledgeEngine(data);return engine;
 }).catch(error=>{console.error('Public notes unavailable');$('#answer-note').textContent="Public information could not be loaded. Send a question to try again.";throw error;});
-// A background failure should not become an unhandled rejection before anyone asks.
+ // A background failure should not become an unhandled rejection before anyone asks.
  pending.catch(()=>{});
  return pending;
 }
 if(document.body.dataset.site!=='synk'||document.documentElement.dataset.entryView!=='intro')startKnowledge();
 else document.addEventListener('synk:company-view',startKnowledge,{once:true});
 
-async function getEngine(){if(engine)return engine;try{return await startKnowledge();}catch{const r=await fetch('/en/knowledge.json?v=c36d9ed1c233',{cache:'reload'});if(!r.ok)throw new Error("Public information could not be loaded. Please try again shortly.");engine=createKnowledgeEngine(await r.json());$('#answer-note').textContent=readyNote;return engine;}}
+async function getEngine(){if(engine)return engine;try{return await startKnowledge();}catch{const r=await fetch('/en/knowledge.json?v=3df61d8f5558',{cache:'reload'});if(!r.ok)throw new Error("Public information could not be loaded. Please try again shortly.");engine=createKnowledgeEngine(await r.json());$('#answer-note').textContent=readyNote;return engine;}}
 function showAnswers(){document.dispatchEvent(new Event('synk:show-answers'));}
 function enterChat(){showAnswers();conversation.classList.add('is-chatting');$('#introduction').hidden=true;$('#chat-area').hidden=false;}
 function focusQuestion(){showAnswers();input.focus({preventScroll:true});if(!conversation.closest('.orb-help'))(conversation.closest('.help-frame')||conversation).scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth',block:'start'});}
