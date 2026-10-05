@@ -163,11 +163,12 @@ document.addEventListener('click',event=>{
 
 // Preserve shared-page bookmarks when visiting the new company homepage.
 if(location.pathname==='/en/shift/'&&['#shift-people','#contact-pathways'].includes(location.hash))location.replace('/en/path/'+(location.hash==='#shift-people'?'#path-journey':location.hash));
-if(location.pathname==='/en/shift/'&&location.hash==='#shift-business')location.replace('/en/shift/#shift-services');
+if(location.pathname==='/en/shift/'&&['#shift-business','#design-notes'].includes(location.hash))location.replace('/en/shift/#shift-services');
+addEventListener('hashchange',()=>{if(location.hash==='#design-notes'&&['/en/','/en/shift/'].includes(location.pathname))location.replace('/en/shift/#shift-services');});
 if(location.pathname==='/en/'){
  const hash=location.hash.slice(1);
  const brand=hash.startsWith('path')||hash==='contact-pathways'||hash==='shift-people'?'path':hash.startsWith('lab')||hash==='contact-lab'?'lab':hash.startsWith('shift')||['contact-business','contact-pathways','design-notes'].includes(hash)?'shift':hash.startsWith('pulse')||hash==='contact-pulse'?'pulse':null;
- if(brand)location.replace('/en/'+brand+'/'+(hash===brand?'':'#'+(hash==='shift-people'?'path-journey':hash==='shift-business'?'shift-services':hash)));
+ if(brand)location.replace('/en/'+brand+'/'+(hash===brand?'':'#'+(hash==='shift-people'?'path-journey':['shift-business','design-notes'].includes(hash)?'shift-services':hash)));
  else if(hash==='work')location.replace('/en/#worlds');
 }
 // Opening a saved or answer-linked section also reveals its enclosing detail panels.

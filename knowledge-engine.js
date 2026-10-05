@@ -269,6 +269,23 @@ export function createKnowledgeEngine(data){
     if(privateList||(personalTopic&&recordTopic&&(directDemand||(!processQuestion&&/원문|원본|성적표|회원정보/.test(c)))))return from(['guide-personal'],'restricted');
     if(/사업시스템.*원문|(내부|비공개|비밀|미공개).*(시스템|구조|설계|운영|자료|문서|계약|전략|가격|프롬프트|도구|원가|코드|계획|매뉴얼|커리큘럼|원본|파일|기준표|정답|채점|평가표|설문|데이터|규칙|정보|사정|규정|이야기)|(?:커리큘럼|기준표|채점|평가표|정답|자료|문서|파일).{0,10}(?:내부용|내부자료|비공개)|운영매뉴얼|데이터베이스|소스코드|서버설정|시스템지시|저장소|엔진설계|전체지식.*(출력|덤프)/.test(c))return from(/synk.*하는일|synk.*어떤회사/.test(c)?['guide-boundary','synk-intro']:['guide-boundary'],'restricted');
     if(processQuestion&&personalTopic&&/부모|보호자|아이|우리애|애가|자녀|아들|딸/.test(c)&&!/보관|저장|어디에남/.test(c))return from(['lab-parent']);
+    // Planned services keep their reviewed scope even when someone asks about booking or price.
+    // These routes follow the private-data guards and precede general purchasing/off-topic rules.
+    const plannedService=[
+      ['shift-research',/시장조사|소비자(?:반응|조사)|제품테스트|사용자테스트|사용성테스트/.test(c)],
+      ['pulse-rental',/(?:스튜디오|촬영공간|행사공간|장비|카메라|음향|조명).{0,12}(?:대여|대관|빌리|빌릴|렌탈)|(?:대여|대관|렌탈).{0,8}(?:스튜디오|장비)/.test(c)],
+      ['path-settle',/주거|정착지원|입주/.test(c)||((brand==='path'||/한국.*유학/.test(c))&&/숙소|살곳|집구|집을구|기숙사/.test(c))],
+      ['path-visit',/방문.*문화체험/.test(c)||(brand==='path'&&/방문|문화체험/.test(c))],
+      ['synk-products',/입점|(?:synk|싱크).{0,10}상품|상품(?:판매|주문|결제|배송)|^(?:상품|스토어)$/.test(c)&&!/코칭|구매상담|개인화|가상상품/.test(c)]
+    ].filter(([id,hit])=>hit&&records.has(id)).map(([id])=>id);
+    if(plannedService.length){
+    if(/(?:지난번|예전|이전|어제|저번)(?:에)?.{0,8}(?:대화|질문|채팅)/.test(c)&&/다시|볼수|확인|찾|보여|남아|있어/.test(c))return from(['guide-privacy']);
+    if(/상담.*(?:이질문창|홈페이지).*기록/.test(c))return from(['guide-privacy']);
+    if(/제가쓴내용.*지워|제정보.*삭제|(?:내|제|본인)(?:개인)?정보.*(?:지워|삭제)/.test(c))return from(['guide-personal']);
+    if(/(?:제|본인)(?:개인)?정보.*(삭제|수정|확인)/.test(c))return from(['guide-personal']);
+    if(/개인정보|프라이버시|(?:여기|질문창|채팅|대화창|이창|이질문창)(?:에|서|다|에다)?(?:쓴|적은|입력한|남긴|친|보낸|말한)(?:거|것|내용|글|말)?(?:은|는|이|가|도)?.{0,6}(?:저장|보관|남|기록|누가봐|누가보|볼수있|공개|어디로가|어디가|가요|전송|읽)|(?:여기|질문창|채팅|대화창|이창|이질문창)(?:에|서|다|에다)?.{0,16}(?:써도|적어도|입력해도|쓰면|적으면|남기면|치면).{0,8}(?:저장|남|기록|보관|어디)|(?:이름|학교|개인정보|연락처|번호|나이)(?:이랑|과|와|을|를|도|같은거|같은것)?.{0,8}(?:써도|적어도|입력해도|쓰면|적으면).{0,8}(?:저장|남|기록|어디|수집)|^누가(?:봐요|보나요|보는거|읽어|확인해|보죠)|(?:정보|내용)(?:가|는|를|도|이|은)?(?:저장|보관|수집|남아|남나|남는)|데이터(?:를)?수집|수집하는|수집해|(?:어떤|무슨)\S{0,4}(?:들었는지|들은지|봤는지|보는지)|취향(?:을)?분석|기록(?:을)?(?:모으|수집|저장|남기)|(?:뭐|무엇을)(?:듣는지|보는지|하는지|검색하는지)|대화.*(저장|기록|남|전송)|질문.*(저장|기록|남|전송)|저장.*(대화|질문)|쿠키|보관기간|학생정보.*(다루|보호|처리)|(?:질문|대화|입력).*(외부ai|학습에|보내)/.test(c))return from(['guide-privacy']);
+      return from(plannedService,/가격|비용|얼마|견적|요금/.test(c)?'needs_confirmation':'matched');
+    }
     // A bare topic word typed on a brand page opens that brand's answer for it.
     const ONE_WORD={lab:[[/^(?:교재|책|시냅스|교과서)$/,'lab-curriculum'],[/^(?:게임|앱|어플|학습앱)$/,'lab-personalization'],[/^vr$/,'lab-vr'],[/^(?:토픽|topik|4급|급수)$/,'lab-topik'],[/^(?:커리큘럼|과정|1년과정|정규과정)$/,'lab-year'],[/^(?:영어|회화|원어민)$/,'lab-languages'],[/^(?:위치|주소|장소|어디)$/,'lab-location'],[/^(?:수업|수업방식|90분)$/,'lab-class'],[/^(?:대상|누구|나이)$/,'lab-audience'],[/^(?:성인|직장인|어른)$/,'lab-adult'],[/^(?:학부모|보호자|부모)$/,'lab-parent'],[/^(?:개인화|맞춤|맞춤형)$/,'lab-personal'],[/^(?:k컬처|춤|댄스|문화)$/,'lab-culture'],[/^(?:선생님|교사|강사|ai)$/,'lab-teacher'],[/^(?:초보|처음|입문)$/,'lab-start']],
       shift:[[/^(?:가이드|자료|자료실|제작법|제작가이드|가이드링크|자료링크)$/,'shift-materials'],[/^(?:제안서|제안|견적요청|문의방법)$/,'guide-collaboration'],[/^(?:서비스|사업|하는일)$/,'shift-services'],[/^(?:대상|누구|개인|1인|프리랜서)$/,'shift-audience'],[/^(?:진행|절차|프로세스|진행방식|순서)$/,'shift-delivery'],[/^(?:결과물|산출물|납품)$/,'shift-takeaway'],[/^(?:사례|제작사례|실제사례|포트폴리오)$/,'shift-making'],[/^(?:강사|선생님|교육|강의|실습)$/,'shift-education'],[/^(?:초보|입문|비전공)$/,'shift-start'],[/^(?:툴|도구|ai|프로그램)$/,'shift-ai'],[/^(?:브랜딩|로고)$/,'shift-scope'],[/^(?:프롬프트|요청문|실패)$/,'shift-publicity']],

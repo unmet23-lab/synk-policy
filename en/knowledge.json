@@ -1,5 +1,5 @@
 {
-  "version": "trial-links-fa0b461f8f52-shift-20261005",
+  "version": "trial-links-fa0b461f8f52-shift-20261005-services-pulse-20261005",
   "updatedAt": "2026-10-05",
   "docs": [
     {
@@ -15,14 +15,15 @@
         "An engine that fits you better the more you use it.",
         "SYNK is a personalization technology company that started in Korean education. We are extending our core engine, Atlas, to games, study, work, and consulting.",
         "LAB is an EdTech brand preparing Korean education, textbooks, scenario-based games, and a personalized learning app.",
-        "SHIFT handles AI training, consulting, workflow automation, branding, and personalized service development for companies and organizations. We are developing personalized coaching, buying advice, product adoption support, and practical training.",
-        "PULSE works on digital content and IP built around characters, music, and stories, together with advertising collaborations and ad and model video production.",
-        "PATH is preparing Korean learning, VR practice, career advising, and connections with schools and employers for international learners preparing to study in Korea.",
+        "SHIFT handles AI training, consulting, workflow automation, branding, and personalized service development for companies and organizations. We are developing personalized coaching, buying advice, product adoption support, and practical training. Market research and product testing are also in preparation.",
+        "PULSE works on digital content and IP built around characters, music, and stories, together with advertising collaborations and ad and model video production. Studio and equipment hire is in preparation.",
+        "PATH is preparing Korean learning, VR practice, career advising, and connections with schools and employers for international learners preparing to study in Korea. Housing, settling-in support, visits, and cultural experiences are also being prepared through partner operators.",
         "These brands have different roles within SYNK. They do not represent a count of separate legal entities or businesses already in operation.",
         "LAB is preparing textbooks, courses, a personalized learning app, and VR interview and career experiences.",
-        "SHIFT is preparing AI training, consulting, automation, and branding for companies and organizations. Personalized coaching, buying advice, product adoption support, and sales and customer service training are in development. PULSE provides access to published music and content, and runs its IP business, production and advertising collaborations, and ad and model video production.",
+        "SHIFT is preparing AI training, consulting, automation, and branding for companies and organizations. Personalized coaching, buying advice, product adoption support, and sales and customer service training are in development. PULSE provides listening and viewing guides for published music and content, and works on IP, production and advertising collaborations, and ad and model video production.",
         "PATH is preparing Korean education, VR practice, and study and career advising. Contact us for information about available courses and schedules, and the status of any cooperation with schools or employers.",
-        "Explore LAB for Korean education; SHIFT for business AI and personalized services; PULSE for music, digital content, IP, advertising collaborations, and ad and model video production; and PATH for study and career preparation in Korea for international learners.",
+        "SHIFT is preparing market research and product testing, PULSE is preparing studio and equipment hire, and PATH is preparing housing, settling-in support, visits, and cultural experiences. Planned product sales are described in the Products section of the SYNK website. Bookings for these new services and product orders and payments are not open.",
+        "Explore LAB for Korean education; SHIFT for business AI and personalized services; PULSE for music, digital content, IP, advertising collaborations, and ad and model videos; and PATH for international learners preparing for study and work in Korea.",
         "The main SYNK website explains the company’s philosophy and Atlas, our shared technology.",
         "The SYNK characters you meet on this website are Mongle, Kkamong, and Marin.",
         "Meet Mongle, with a coral-colored body and stitching; Kkamong, with green eyes and brown fur; and Marin, with a navy helmet and yellow eyes.",
@@ -62,7 +63,12 @@
         "PULSE — Uses the engines needed for character movement, music, and visual scenes.",
         "PATH — Adjusts practice for life in Korea and interviews to each learner's intended major, career plans, and Korean level.",
         "We are developing it by first connecting it to Korean learning games and our learning app. SHIFT, PULSE, and PATH use the engines their services need.\nThe description above includes features still in development.",
-        "Strata is an engine in development."
+        "Strata is an engine in development.",
+        "We are preparing a shop with selected products for daily life and learning, with clear guidance on their uses, selection criteria, and purchase terms.",
+        "Products for your needs — Consider how products will be used and select the range accordingly.",
+        "Information before choosing — Prepare clear details about features, contents, and use to support your choice.",
+        "Support after purchase — Make seller details, delivery, exchanges, and returns clear before purchase.",
+        "The range and sales, delivery, and exchange terms are in preparation. Orders and payments are not open."
       ],
       "updatedAt": "2026-10-05"
     },
@@ -224,10 +230,10 @@
       "title": "SYNK SHIFT — AI and personalized services",
       "paragraphs": [
         "Employees have different tasks, and customers have different needs. SHIFT starts with the problem to solve and is preparing training and consulting to help put AI to work. We are also developing personalized services that adjust the next step of support to each person’s goals and results.",
-        "SHIFT handles AI training, consulting, workflow automation, branding, and personalized service development for companies and organizations. We are developing personalized coaching, buying advice, product adoption support, and practical training.",
+        "SHIFT handles AI training, consulting, workflow automation, branding, and personalized service development for companies and organizations. We are developing personalized coaching, buying advice, product adoption support, and practical training. Market research and product testing are also in preparation.",
         "The new personalized services are in development. Scope, schedule, and deliverables, including training, consulting, automation, and branding, are agreed individually.",
         "AI and personalization for your work and customers",
-        "We help companies and organizations apply AI and personalization to their work and customer services. Alongside AI training, consulting, workflow automation, and branding, we are developing personalized coaching, buying advice, product adoption support, and practical training.",
+        "We help organizations use AI and personalization in their work and customer services. We are developing tailored coaching, buying advice, product adoption support, and practical training, and preparing market research and product testing.",
         "We are preparing services for companies and organizations that need staff training, AI at work, branding, and support tailored to individual customers. We are developing personalized coaching for education companies and experts, buying advice for retailers, product adoption support for software companies, and practical training for businesses.",
         "We cover both approaches you can try in your own work and the results they produce. Depending on the training, practice, business application, or branding project, we organize source materials, usage guidance, and next steps. The actual delivery scope is agreed in the contract.",
         "We share how we use AI to build SYNK's actual operations and content. We explain the problem we wanted to solve, what we asked AI to do, and why a person reviewed and revised the result.",
@@ -257,26 +263,31 @@
         "We do not guarantee the same results as the public examples. Results may vary with the working environment, tools, and requests. Our own production examples cannot establish a promise of business success, revenue, or time savings.",
         "Training and consulting cover methods and deliverables for actual work. Effects on a client need to be assessed separately after use.",
         "Where work can be shared publicly, we also show failures and revisions. Using actual work, we explain what we asked for, what came back, and why we changed the approach.",
-        "We do not publish private student or client materials or internal operating documents. You can find examples in the logo revision story on this website.",
+        "We do not publish private student or client materials or internal operating documents.",
         "Fit AI to your work. Fit support to each customer.",
-        "Personalized coaching, buying and quote advice, product adoption support, and sales and customer service training are in development. Available scope, schedules, and deliverables, including our existing training, consulting, automation, and branding work, are agreed individually.",
+        "Personalized coaching, buying and quote advice, product adoption support, and sales and customer service training are in development. Available scope, schedules, and deliverables, including our existing training, consulting, automation, and branding work, are agreed individually. Market research and product testing are in preparation; research scope and participation terms will be confirmed individually.",
         "We first identify the users and the problem to solve. Training and consulting are applied to real work. For personalized services, development includes checking that each user’s needs and results inform the next step of support.",
         "Understand the task and goal — We identify who will use the work, what is difficult, and what result is needed, then agree on the scope.",
         "Training, practice, and service design — Create and practice using examples relevant to your work. For personalized services, we define which user needs and results should change the support, and design the scope of use.",
         "Review and hand over — We check the result in the environment where it will be used. Within the agreed scope, we hand over the finished work, editable source files, usage guidance, and a list of any further work needed.",
-        "The scope, schedule, and deliverables for training, consulting, automation, and branding are agreed individually. The new personalized services are in development. The production examples below are SYNK’s own work."
+        "The scope, schedule, and deliverables for training, consulting, automation, and branding are agreed individually. The new personalized services are in development. The production examples below are SYNK’s own work.",
+        "We are preparing a service to test how local users understand and use products, apps, and content before entering a new market.",
+        "Market response — Define the market and audience, then explore responses to products and messages through interviews and surveys.",
+        "Usability testing — Observe people using the product to find where they get stuck and what explanation they need.",
+        "Findings and next steps — Separate observations from interpretation and identify improvements to products, services, and content.",
+        "This service is in preparation. Markets, participants, schedules, and fees will be confirmed individually. Participants will give separate consent and receive compensation. Findings from a limited group will not be presented as representing an entire market."
       ],
       "updatedAt": "2026-10-05"
     },
     {
       "id": "pulse",
-      "title": "SYNK PULSE — Music and stories",
+      "title": "SYNK PULSE — We create AI ads, model films, original content and IP.",
       "paragraphs": [
-        "What matters to PULSE is the joy of a work and the feeling it leaves behind. With music, video, and character stories, we make work people want to return to.",
+        "PULSE turns brand messages into advertising and model videos while developing original music, video, characters and intellectual property (IP). Commissioned work is shaped around its purpose and channels; our own work develops stories and a distinct character that people want to return to.",
         "We also welcome inquiries about creative collaborations, licensing, and advertising.",
-        "We work across online content and original IP, production collaborations and licensing, advertising collaborations, and ad and model video production. We distinguish published work from services in preparation. We do not collect personal listening or viewing activity to build educational or emotional profiles, or guarantee learning or therapeutic effects.",
-        "Content and IP through music and stories",
-        "SYNK PULSE creates music, videos, characters, and stories. Our work spans online content and original intellectual property (IP), licensing and co-production, advertising collaborations, and ad and model video production.",
+        "We work across online content and original IP, production collaborations and licensing, advertising collaborations, and ad and model video production. We distinguish published work from services in preparation. We do not collect personal listening or viewing activity to build educational or emotional profiles, or guarantee learning or therapeutic effects. Hire services are in preparation and bookings are not open. Locations, equipment, availability, prices, and on-site support will be announced once confirmed.",
+        "We create AI ads, model films, original content and IP.",
+        "We create advertising and model films for brands, alongside music, videos, and characters for everyone to enjoy. Our work includes licensing, co-production, and advertising collaborations. Studio and equipment hire is in preparation.",
         "We create music for reading, working, and resting, along with videos that bring music and scenes together. We check that the sound and visuals complement each other and flow naturally from beginning to end.",
         "“The Brightest Person Tonight” is a full-song video lasting 1 minute and 1.6 seconds. It includes music and scenes from a Chuseok courtyard, notes about the song and scenes, and production credits. The K-LOFI 24 live radio stream is listed separately on YouTube.",
         "PULSE's music, videos, characters, and stories are created to be enjoyed. Not all of them are designed for Korean learning. LAB prepares Korean education and learning content.",
@@ -289,7 +300,7 @@
         "To start an inquiry, email hello@synk.im with the work title, media, location, duration, and intended use. This question panel does not grant permission or make a final copyright determination.",
         "K-LOFI 24 is music content from SYNK PULSE. We create music and videos to enjoy while working or resting.",
         "The K-LOFI page has YouTube listening links and information about planned music releases. Check YouTube for the current broadcast status. The full-song video for “The Brightest Person Tonight” is available separately from the live stream.",
-        "We make music and stories that stay with you.",
+        "We bring out a brand’s purpose and a work’s character.",
         "We create online content to enjoy in everyday life, carefully shaping the sound, visuals, and flow of each story.",
         "Music and video — We make music and videos for reading, working, or taking a break. Find our public channels on the SYNK Radio listening page.",
         "Characters and stories — Our stories grow from the personalities and relationships of Mongle, Kkamong, and Marin. We shape their actions and scenes for each format, from short videos to continuing stories.",
@@ -315,9 +326,14 @@
         "Created with AI. Yuho is based on SYNK founder Yuho Yang; the other five are virtual models, not real people.",
         "We have prepared the PULSE video brief you fill in before commissioning. Pick and note what you have decided, and it becomes a one-page direction: who it is for, what to tell them, what shows it, and what they should do next. We set the scenes, models, and formats to match that direction. Anything you have not decided can stay blank, and we will settle it together.",
         "Six steps — Brand & purpose → Customers & strengths → Mood & scenes → Usage plan → Materials → Review & send.",
-        "What you write is saved only on your device, and you send the downloaded file yourself. The brief is a request for consultation; quotes and schedules are confirmed with PULSE separately."
+        "What you write is saved only on your device, and you send the downloaded file yourself. The brief is a request for consultation; quotes and schedules are confirmed with PULSE separately.",
+        "We are preparing space and equipment hire for people producing videos, photos, classes, and small events.",
+        "Production & event space — Confirm a suitable space, access times, and setup requirements for the production and group size.",
+        "Camera & audio equipment — We plan to explain camera, lighting, and audio options, how to use them, and collection and return terms.",
+        "Setup & operation — Plan what you will operate yourself and where on-site assistance is needed.",
+        "Hire services are in preparation and bookings are not open. Locations, equipment, availability, prices, and on-site support will be announced once confirmed."
       ],
-      "updatedAt": "2026-10-02"
+      "updatedAt": "2026-10-05"
     },
     {
       "id": "philosophy",
@@ -385,11 +401,11 @@
         "SYNK LAB\nAn EdTech company designing personalized Korean education",
         "SYNK LAB develops Korean textbooks, games, and a personalized learning app. We are preparing a one-year, in-person program aiming for TOPIK Level 4, alongside conversation classes with native Korean teachers and global English classes. It is education for studying in Korea and the life that follows, covering cultural experiences, AI use, and collaborative tasks.",
         "SYNK SHIFT\nAI and personalization for your work and customers",
-        "We help companies and organizations apply AI and personalization to their work and customer services. Alongside AI training, consulting, workflow automation, and branding, we are developing personalized coaching, buying advice, product adoption support, and practical training.",
-        "SYNK PULSE\nContent and IP built through music and stories",
-        "SYNK PULSE creates music, videos, characters, and stories. Our work spans online content and original intellectual property (IP), licensing and co-production, advertising collaborations, and ad and model video production.",
-        "SYNK PATH\nPrepare together, from studying in Korea to your career.",
-        "SYNK PATH supports international learners preparing for study, daily life, and work in Korea. We plan together from school selection, Korean learning, and interviews through to careers after graduation. We are preparing a service that uses LAB’s Korean education and VR practice to let learners experience situations they will face in Korea, then organize their preparation into a portfolio.",
+        "We help organizations use AI and personalization in their work and customer services. We are developing tailored coaching, buying advice, product adoption support, and practical training, and preparing market research and product testing.",
+        "SYNK PULSE\nWe create AI ads, model films, original content and IP.",
+        "We create advertising and model films for brands, alongside music, videos, and characters for everyone to enjoy. Our work includes licensing, co-production, and advertising collaborations. Studio and equipment hire is in preparation.",
+        "SYNK PATH\nPrepare for study and work in Korea, together.",
+        "SYNK PATH supports international students preparing for study, life, and careers in Korea. We are preparing school planning, Korean study, VR and interview practice, and portfolios. Housing, settling-in support, visits, and cultural experiences are also being prepared through partner operators.",
         "These visions describe the future each brand is working toward. Each brand’s service information explains what is available, what is in preparation, and the terms of use."
       ],
       "updatedAt": "2026-10-05"
@@ -400,9 +416,9 @@
       "paragraphs": [
         "Korean can be useful before you arrive in Korea, starting with visa preparation. If an embassy or consulate requests an interview during the visa review, you need to be ready to explain your reasons for studying and your study plans in your own words. After arrival, you can use your Korean to explain the purpose of your visit at immigration, ask professors questions, and describe your experience in job interviews. PATH is preparing support that combines LAB's Korean lessons, everyday and interview practice, and career guidance.",
         "We are currently preparing VR education and support for studying and working in Korea. Contact us for available programs, schedules, and partner institutions. VR practice does not count as work experience or an accredited qualification, and does not guarantee admission, a visa, or employment.",
-        "We are currently preparing VR education and support for studying and working in Korea. Contact us for available programs, schedules, and the status of school and employer partnerships. Student materials are shared only within the scope the student has reviewed and agreed to. We do not guarantee admission, a visa, or employment.",
+        "We are currently preparing VR education and support for studying and working in Korea. Contact us for available programs, schedules, and the status of school and employer partnerships. Student materials are shared only within the scope the student has reviewed and agreed to. We do not guarantee admission, a visa, or employment. Housing, settling-in support, visits, and cultural experiences are being prepared through partner operators; housing and experience bookings are not open.",
         "Prepare for study and work in Korea, together.",
-        "SYNK PATH is a study, daily life, and career support brand for international students preparing to study in Korea. We plan with you, from choosing a school, learning Korean, and preparing for interviews to considering your career after graduation. We are preparing a service that combines LAB's Korean lessons with VR practice for situations in Korea and helps you organize your preparation into a portfolio.",
+        "SYNK PATH supports international students preparing for study, life, and careers in Korea. We are preparing school planning, Korean study, VR and interview practice, and portfolios. Housing, settling-in support, visits, and cultural experiences are also being prepared through partner operators.",
         "Build independence in studying and living in Korea.",
         "PATH’s goal is for students to take part in classes in Korean, solve everyday problems, and make their own career decisions. We are preparing a service that plans study abroad around each student's intended major and career, combining Korean learning with VR practice. Students' writing, presentations, and project work are organized into portfolios. Schools and employers can understand students' motivation and experience through materials they have agreed to share.",
         "We compare schools' application requirements based on your intended major and career after graduation, then map out your preparation schedule. Taking your current Korean level and available study time into account, we guide you step by step through language learning, application documents, and interview practice.",
@@ -415,9 +431,19 @@
         "When applying to a school or employer, you need to explain why you chose your field and what you have done to prepare. PATH helps organize study plans, your own writing and presentations, and project work into a portfolio that shows your experience and strengths.",
         "Help students explain their experience — Use your work to explain what you were aiming to learn, your role in a project, and how you handled challenges. This gives you specific examples for applications and interviews and helps you identify what to improve next.",
         "Help schools and employers understand applicants — Materials selected by the student can show their motivation, learning process, and role in projects. PATH is preparing connections with schools and employers by reviewing students' career goals and institutions' admission or recruitment requirements. Institutions can use this fuller picture to make selection and support decisions.",
-        "We share only materials the student has reviewed and agreed to share. Learning records are not sent automatically, and VR practice results are not presented as work experience or accredited qualifications."
+        "We share only materials the student has reviewed and agreed to share. Learning records are not sent automatically, and VR practice results are not presented as work experience or accredited qualifications.",
+        "We are preparing support through partner operators to help people planning study or a stay in Korea understand housing options and settle in.",
+        "Understand the terms — Compare housing options against your length of stay, budget, and distance from school.",
+        "Move in & get settled — Prepare guidance on move-in dates, what to bring, and how to use the facilities.",
+        "Contact the operator — Plan support for explaining housing or facility issues to the responsible operator.",
+        "Partner operators, locations, and fees are not yet confirmed, and housing bookings are not open. Contract and property-management responsibilities will be explained against the operator’s terms.",
+        "We are preparing visits and cultural experiences for people considering travel or study in Korea.",
+        "A visit with a purpose — Plan what you would like to experience around your interests, length of stay, and travel needs.",
+        "Local life & culture — We are preparing experiences of everyday life and culture through partner operators.",
+        "Know before you go — Review language support, transport, inclusions, and cancellation terms before choosing.",
+        "Visits and experiences are in preparation and bookings are not open. Partners, schedules, prices, and service scope will be announced once confirmed."
       ],
-      "updatedAt": "2026-10-02"
+      "updatedAt": "2026-10-05"
     }
   ],
   "records": [
@@ -513,7 +539,7 @@
         "What are the visions of SYNK LAB, SHIFT, and PULSE?",
         "How do the visions of LAB, SHIFT, and PULSE differ?"
       ],
-      "answer": "SYNK\nAn engine that fits you better the more you use it.\n\nSYNK is a personalization technology company that started in Korean education. We are extending our core engine, Atlas, to games, study, work, and consulting.\n\nSYNK LAB\nAn EdTech company designing personalized Korean education\n\nSYNK LAB develops Korean textbooks, games, and a personalized learning app. We are preparing a one-year, in-person program aiming for TOPIK Level 4, alongside conversation classes with native Korean teachers and global English classes. It is education for studying in Korea and the life that follows, covering cultural experiences, AI use, and collaborative tasks.\n\nSYNK SHIFT\nAI and personalization for your work and customers\n\nWe help companies and organizations apply AI and personalization to their work and customer services. Alongside AI training, consulting, workflow automation, and branding, we are developing personalized coaching, buying advice, product adoption support, and practical training.\n\nSYNK PULSE\nContent and IP built through music and stories\n\nSYNK PULSE creates music, videos, characters, and stories. Our work spans online content and original intellectual property (IP), licensing and co-production, advertising collaborations, and ad and model video production.\n\nSYNK PATH\nPrepare together, from studying in Korea to your career.\n\nSYNK PATH supports international learners preparing for study, daily life, and work in Korea. We plan together from school selection, Korean learning, and interviews through to careers after graduation. We are preparing a service that uses LAB’s Korean education and VR practice to let learners experience situations they will face in Korea, then organize their preparation into a portfolio.\n\nThese visions describe the future each brand is working toward. Each brand’s service information explains what is available, what is in preparation, and the terms of use.",
+      "answer": "SYNK\nAn engine that fits you better the more you use it.\n\nSYNK is a personalization technology company that started in Korean education. We are extending our core engine, Atlas, to games, study, work, and consulting.\n\nSYNK LAB\nAn EdTech company designing personalized Korean education\n\nSYNK LAB develops Korean textbooks, games, and a personalized learning app. We are preparing a one-year, in-person program aiming for TOPIK Level 4, alongside conversation classes with native Korean teachers and global English classes. It is education for studying in Korea and the life that follows, covering cultural experiences, AI use, and collaborative tasks.\n\nSYNK SHIFT\nAI and personalization for your work and customers\n\nWe help organizations use AI and personalization in their work and customer services. We are developing tailored coaching, buying advice, product adoption support, and practical training, and preparing market research and product testing.\n\nSYNK PULSE\nWe create AI ads, model films, original content and IP.\n\nWe create advertising and model films for brands, alongside music, videos, and characters for everyone to enjoy. Our work includes licensing, co-production, and advertising collaborations. Studio and equipment hire is in preparation.\n\nSYNK PATH\nPrepare for study and work in Korea, together.\n\nSYNK PATH supports international students preparing for study, life, and careers in Korea. We are preparing school planning, Korean study, VR and interview practice, and portfolios. Housing, settling-in support, visits, and cultural experiences are also being prepared through partner operators.\n\nThese visions describe the future each brand is working toward. Each brand’s service information explains what is available, what is in preparation, and the terms of use.",
       "sourceId": "vision",
       "relatedIds": [
         "synk-vision",
@@ -555,7 +581,7 @@
         "Tell me about your business structure",
         "How are the four brands different?"
       ],
-      "answer": "LAB is an EdTech brand preparing Korean education, textbooks, scenario-based games, and a personalized learning app.\n\nSHIFT handles AI training, consulting, workflow automation, branding, and personalized service development for companies and organizations. We are developing personalized coaching, buying advice, product adoption support, and practical training.\n\nPULSE works on digital content and IP built around characters, music, and stories, together with advertising collaborations and ad and model video production.\n\nPATH is preparing Korean learning, VR practice, career advising, and connections with schools and employers for international learners preparing to study in Korea.\n\nThese brands have different roles within SYNK. They do not represent a count of separate legal entities or businesses already in operation.",
+      "answer": "LAB is an EdTech brand preparing Korean education, textbooks, scenario-based games, and a personalized learning app.\n\nSHIFT handles AI training, consulting, workflow automation, branding, and personalized service development for companies and organizations. We are developing personalized coaching, buying advice, product adoption support, and practical training. Market research and product testing are also in preparation.\n\nPULSE works on digital content and IP built around characters, music, and stories, together with advertising collaborations and ad and model video production. Studio and equipment hire is in preparation.\n\nPATH is preparing Korean learning, VR practice, career advising, and connections with schools and employers for international learners preparing to study in Korea. Housing, settling-in support, visits, and cultural experiences are also being prepared through partner operators.\n\nThese brands have different roles within SYNK. They do not represent a count of separate legal entities or businesses already in operation.",
       "sourceId": "company",
       "relatedIds": [
         "lab-intro",
@@ -593,7 +619,7 @@
         "What stage are the services at?",
         "Have your services launched?"
       ],
-      "answer": "LAB is preparing textbooks, courses, a personalized learning app, and VR interview and career experiences.\n\nSHIFT is preparing AI training, consulting, automation, and branding for companies and organizations. Personalized coaching, buying advice, product adoption support, and sales and customer service training are in development. PULSE provides access to published music and content, and runs its IP business, production and advertising collaborations, and ad and model video production.\n\nPATH is preparing Korean education, VR practice, and study and career advising. Contact us for information about available courses and schedules, and the status of any cooperation with schools or employers.",
+      "answer": "LAB is preparing textbooks, courses, a personalized learning app, and VR interview and career experiences.\n\nSHIFT is preparing AI training, consulting, automation, and branding for companies and organizations. Personalized coaching, buying advice, product adoption support, and sales and customer service training are in development. PULSE provides listening and viewing guides for published music and content, and works on IP, production and advertising collaborations, and ad and model video production.\n\nPATH is preparing Korean education, VR practice, and study and career advising. Contact us for information about available courses and schedules, and the status of any cooperation with schools or employers.\n\nSHIFT is preparing market research and product testing, PULSE is preparing studio and equipment hire, and PATH is preparing housing, settling-in support, visits, and cultural experiences. Planned product sales are described in the Products section of the SYNK website. Bookings for these new services and product orders and payments are not open.",
       "sourceId": "company",
       "relatedIds": [
         "lab-intro",
@@ -627,7 +653,7 @@
         "Which brand is right for me?",
         "I’m new here"
       ],
-      "answer": "Explore LAB for Korean education; SHIFT for business AI and personalized services; PULSE for music, digital content, IP, advertising collaborations, and ad and model video production; and PATH for study and career preparation in Korea for international learners.\n\nThe main SYNK website explains the company’s philosophy and Atlas, our shared technology.",
+      "answer": "Explore LAB for Korean education; SHIFT for business AI and personalized services; PULSE for music, digital content, IP, advertising collaborations, and ad and model videos; and PATH for international learners preparing for study and work in Korea.\n\nThe main SYNK website explains the company’s philosophy and Atlas, our shared technology.\n\nSHIFT is preparing market research and product testing, PULSE is preparing studio and equipment hire, and PATH is preparing housing, settling-in support, visits, and cultural experiences. Planned product sales are described in the Products section of the SYNK website. Bookings for these new services and product orders and payments are not open.",
       "sourceId": "company",
       "relatedIds": [
         "lab-intro",
@@ -1075,7 +1101,7 @@
         "What does SHIFT do?",
         "Do you cover branding for solo businesses?"
       ],
-      "answer": "Employees have different tasks, and customers have different needs. SHIFT starts with the problem to solve and is preparing training and consulting to help put AI to work. We are also developing personalized services that adjust the next step of support to each person’s goals and results.\n\nSHIFT handles AI training, consulting, workflow automation, branding, and personalized service development for companies and organizations. We are developing personalized coaching, buying advice, product adoption support, and practical training.\n\nThe new personalized services are in development. Scope, schedule, and deliverables, including training, consulting, automation, and branding, are agreed individually.",
+      "answer": "Employees have different tasks, and customers have different needs. SHIFT starts with the problem to solve and is preparing training and consulting to help put AI to work. We are also developing personalized services that adjust the next step of support to each person’s goals and results.\n\nSHIFT handles AI training, consulting, workflow automation, branding, and personalized service development for companies and organizations. We are developing personalized coaching, buying advice, product adoption support, and practical training. Market research and product testing are also in preparation.\n\nThe new personalized services are in development. Scope, schedule, and deliverables, including training, consulting, automation, and branding, are agreed individually.",
       "sourceId": "shift",
       "relatedIds": [
         "shift-vision",
@@ -1116,7 +1142,7 @@
         "What future does SHIFT envision?",
         "What does SYNK SHIFT aim to become?"
       ],
-      "answer": "AI and personalization for your work and customers\n\nWe help companies and organizations apply AI and personalization to their work and customer services. Alongside AI training, consulting, workflow automation, and branding, we are developing personalized coaching, buying advice, product adoption support, and practical training.",
+      "answer": "AI and personalization for your work and customers\n\nWe help organizations use AI and personalization in their work and customer services. We are developing tailored coaching, buying advice, product adoption support, and practical training, and preparing market research and product testing.",
       "sourceId": "shift",
       "relatedIds": [
         "shift-intro",
@@ -1286,8 +1312,8 @@
         "philosophy-quality"
       ],
       "action": {
-        "label": "See the actual logo revision",
-        "href": "/en/shift/#design-notes"
+        "label": "Explore SHIFT services",
+        "href": "/en/shift/#shift-services"
       },
       "reviewedAt": "2026-09-23",
       "aliases": [
@@ -1321,7 +1347,7 @@
         "What does PULSE create?",
         "Do you create music and stories?"
       ],
-      "answer": "What matters to PULSE is the joy of a work and the feeling it leaves behind. With music, video, and character stories, we make work people want to return to.\n\nWe also welcome inquiries about creative collaborations, licensing, and advertising.\n\nWe work across online content and original IP, production collaborations and licensing, advertising collaborations, and ad and model video production. We distinguish published work from services in preparation. We do not collect personal listening or viewing activity to build educational or emotional profiles, or guarantee learning or therapeutic effects.",
+      "answer": "PULSE turns brand messages into advertising and model videos while developing original music, video, characters and intellectual property (IP). Commissioned work is shaped around its purpose and channels; our own work develops stories and a distinct character that people want to return to.\n\nWe also welcome inquiries about creative collaborations, licensing, and advertising.\n\nWe work across online content and original IP, production collaborations and licensing, advertising collaborations, and ad and model video production. We distinguish published work from services in preparation. We do not collect personal listening or viewing activity to build educational or emotional profiles, or guarantee learning or therapeutic effects. Hire services are in preparation and bookings are not open. Locations, equipment, availability, prices, and on-site support will be announced once confirmed.",
       "sourceId": "pulse",
       "relatedIds": [
         "pulse-vision",
@@ -1335,7 +1361,7 @@
         "label": "Explore PULSE",
         "href": "/en/pulse/"
       },
-      "reviewedAt": "2026-10-02",
+      "reviewedAt": "2026-10-05",
       "aliases": [
         "SYNK PULSE를 소개해 주세요",
         "PULSE는 무엇을 만드나요?",
@@ -1360,7 +1386,7 @@
         "What future does PULSE work toward?",
         "I'd like to know the future SYNK PULSE wants to create"
       ],
-      "answer": "Content and IP through music and stories\n\nSYNK PULSE creates music, videos, characters, and stories. Our work spans online content and original intellectual property (IP), licensing and co-production, advertising collaborations, and ad and model video production.",
+      "answer": "We create AI ads, model films, original content and IP.\n\nWe create advertising and model films for brands, alongside music, videos, and characters for everyone to enjoy. Our work includes licensing, co-production, and advertising collaborations. Studio and equipment hire is in preparation.",
       "sourceId": "pulse",
       "relatedIds": [
         "pulse-intro",
@@ -1371,7 +1397,7 @@
         "label": "Explore SYNK PULSE",
         "href": "/en/pulse/"
       },
-      "reviewedAt": "2026-10-01",
+      "reviewedAt": "2026-10-05",
       "aliases": [
         "PULSE의 비전은 무엇인가요?",
         "펄스가 지향하는 미래는 무엇인가요?",
@@ -2356,8 +2382,8 @@
         "path-support"
       ],
       "action": {
-        "label": "See the actual logo revision",
-        "href": "/en/shift/#design-notes"
+        "label": "Explore SHIFT services",
+        "href": "/en/shift/#shift-services"
       },
       "reviewedAt": "2026-10-05",
       "aliases": [
@@ -2370,7 +2396,7 @@
       "sourceId": "shift",
       "brand": "shift",
       "title": "Do you share failures and sample AI prompts?",
-      "answer": "Where work can be shared publicly, we also show failures and revisions. Using actual work, we explain what we asked for, what came back, and why we changed the approach.\n\nWe do not publish private student or client materials or internal operating documents. You can find examples in the logo revision story on this website.",
+      "answer": "Where work can be shared publicly, we also show failures and revisions. Using actual work, we explain what we asked for, what came back, and why we changed the approach.\n\nWe do not publish private student or client materials or internal operating documents.",
       "questionExamples": [
         "Do you share failures and sample AI prompts?",
         "Do you publish prompts?",
@@ -2388,8 +2414,8 @@
         "guide-boundary"
       ],
       "action": {
-        "label": "See the actual logo revision",
-        "href": "/en/shift/#design-notes"
+        "label": "Explore SHIFT services",
+        "href": "/en/shift/#shift-services"
       },
       "reviewedAt": "2026-10-05",
       "aliases": [
@@ -2966,7 +2992,7 @@
       "brand": "shift",
       "category": "philosophy",
       "title": "What is SYNK SHIFT's philosophy?",
-      "answer": "Fit AI to your work. Fit support to each customer.\n\nEmployees have different tasks, and customers have different needs. SHIFT starts with the problem to solve and is preparing training and consulting to help put AI to work. We are also developing personalized services that adjust the next step of support to each person’s goals and results.\n\nPersonalized coaching, buying and quote advice, product adoption support, and sales and customer service training are in development. Available scope, schedules, and deliverables, including our existing training, consulting, automation, and branding work, are agreed individually.",
+      "answer": "Fit AI to your work. Fit support to each customer.\n\nEmployees have different tasks, and customers have different needs. SHIFT starts with the problem to solve and is preparing training and consulting to help put AI to work. We are also developing personalized services that adjust the next step of support to each person’s goals and results.\n\nPersonalized coaching, buying and quote advice, product adoption support, and sales and customer service training are in development. Available scope, schedules, and deliverables, including our existing training, consulting, automation, and branding work, are agreed individually. Market research and product testing are in preparation; research scope and participation terms will be confirmed individually.",
       "questionExamples": [
         "What is SYNK SHIFT's philosophy?",
         "I'd like to know SHIFT's philosophy",
@@ -3000,7 +3026,7 @@
       "brand": "pulse",
       "category": "philosophy",
       "title": "What is SYNK PULSE's philosophy?",
-      "answer": "We make music and stories that stay with you.\n\nWhat matters to PULSE is the joy of a work and the feeling it leaves behind. With music, video, and character stories, we make work people want to return to.\n\nWe work across online content and original IP, production collaborations and licensing, advertising collaborations, and ad and model video production. We distinguish published work from services in preparation. We do not collect personal listening or viewing activity to build educational or emotional profiles, or guarantee learning or therapeutic effects.",
+      "answer": "We bring out a brand’s purpose and a work’s character.\n\nPULSE turns brand messages into advertising and model videos while developing original music, video, characters and intellectual property (IP). Commissioned work is shaped around its purpose and channels; our own work develops stories and a distinct character that people want to return to.\n\nWe work across online content and original IP, production collaborations and licensing, advertising collaborations, and ad and model video production. We distinguish published work from services in preparation. We do not collect personal listening or viewing activity to build educational or emotional profiles, or guarantee learning or therapeutic effects. Hire services are in preparation and bookings are not open. Locations, equipment, availability, prices, and on-site support will be announced once confirmed.",
       "questionExamples": [
         "What is SYNK PULSE's philosophy?",
         "I'd like to know PULSE's philosophy",
@@ -3021,7 +3047,7 @@
         "label": "Explore SYNK PULSE",
         "href": "/en/pulse/"
       },
-      "reviewedAt": "2026-10-02",
+      "reviewedAt": "2026-10-05",
       "aliases": [
         "SYNK PULSE의 철학은 무엇인가요?",
         "PULSE의 철학이 궁금해요",
@@ -3044,7 +3070,7 @@
       "questionExamples": [
         "What is PATH?"
       ],
-      "answer": "Korean can be useful before you arrive in Korea, starting with visa preparation. If an embassy or consulate requests an interview during the visa review, you need to be ready to explain your reasons for studying and your study plans in your own words. After arrival, you can use your Korean to explain the purpose of your visit at immigration, ask professors questions, and describe your experience in job interviews. PATH is preparing support that combines LAB's Korean lessons, everyday and interview practice, and career guidance.\n\nWe are currently preparing VR education and support for studying and working in Korea. Contact us for available programs, schedules, and the status of school and employer partnerships. Student materials are shared only within the scope the student has reviewed and agreed to. We do not guarantee admission, a visa, or employment.",
+      "answer": "Korean can be useful before you arrive in Korea, starting with visa preparation. If an embassy or consulate requests an interview during the visa review, you need to be ready to explain your reasons for studying and your study plans in your own words. After arrival, you can use your Korean to explain the purpose of your visit at immigration, ask professors questions, and describe your experience in job interviews. PATH is preparing support that combines LAB's Korean lessons, everyday and interview practice, and career guidance.\n\nWe are currently preparing VR education and support for studying and working in Korea. Contact us for available programs, schedules, and the status of school and employer partnerships. Student materials are shared only within the scope the student has reviewed and agreed to. We do not guarantee admission, a visa, or employment. Housing, settling-in support, visits, and cultural experiences are being prepared through partner operators; housing and experience bookings are not open.",
       "relatedIds": [
         "path-vision",
         "synk-brands",
@@ -3054,7 +3080,7 @@
         "label": "Explore PATH",
         "href": "/en/path/"
       },
-      "reviewedAt": "2026-09-23",
+      "reviewedAt": "2026-10-05",
       "aliases": [
         "PATH는 어떤 곳인가요?",
         "What is PATH?"
@@ -3077,7 +3103,7 @@
         "What is PATH's vision?",
         "What future does PATH work toward?"
       ],
-      "answer": "Prepare for study and work in Korea, together.\n\nSYNK PATH is a study, daily life, and career support brand for international students preparing to study in Korea. We plan with you, from choosing a school, learning Korean, and preparing for interviews to considering your career after graduation. We are preparing a service that combines LAB's Korean lessons with VR practice for situations in Korea and helps you organize your preparation into a portfolio.",
+      "answer": "Prepare for study and work in Korea, together.\n\nSYNK PATH supports international students preparing for study, life, and careers in Korea. We are preparing school planning, Korean study, VR and interview practice, and portfolios. Housing, settling-in support, visits, and cultural experiences are also being prepared through partner operators.",
       "sourceId": "path",
       "relatedIds": [
         "path-intro",
@@ -3088,7 +3114,7 @@
         "label": "Explore SYNK PATH",
         "href": "/en/path/"
       },
-      "reviewedAt": "2026-09-23",
+      "reviewedAt": "2026-10-05",
       "aliases": [
         "PATH의 비전은 무엇인가요?",
         "패스가 지향하는 미래는 무엇인가요?"
@@ -3110,7 +3136,7 @@
       "questionExamples": [
         "What is PATH's philosophy?"
       ],
-      "answer": "Build independence in studying and living in Korea.\n\nPATH’s goal is for students to take part in classes in Korean, solve everyday problems, and make their own career decisions. We are preparing a service that plans study abroad around each student's intended major and career, combining Korean learning with VR practice. Students' writing, presentations, and project work are organized into portfolios. Schools and employers can understand students' motivation and experience through materials they have agreed to share.\n\nWe are currently preparing VR education and support for studying and working in Korea. Contact us for available programs, schedules, and the status of school and employer partnerships. Student materials are shared only within the scope the student has reviewed and agreed to. We do not guarantee admission, a visa, or employment.",
+      "answer": "Build independence in studying and living in Korea.\n\nPATH’s goal is for students to take part in classes in Korean, solve everyday problems, and make their own career decisions. We are preparing a service that plans study abroad around each student's intended major and career, combining Korean learning with VR practice. Students' writing, presentations, and project work are organized into portfolios. Schools and employers can understand students' motivation and experience through materials they have agreed to share.\n\nWe are currently preparing VR education and support for studying and working in Korea. Contact us for available programs, schedules, and the status of school and employer partnerships. Student materials are shared only within the scope the student has reviewed and agreed to. We do not guarantee admission, a visa, or employment. Housing, settling-in support, visits, and cultural experiences are being prepared through partner operators; housing and experience bookings are not open.",
       "relatedIds": [
         "synk-brands",
         "lab-personal"
@@ -3119,7 +3145,7 @@
         "label": "Explore PATH",
         "href": "/en/path/"
       },
-      "reviewedAt": "2026-10-02",
+      "reviewedAt": "2026-10-05",
       "aliases": [
         "PATH의 철학은 무엇인가요?"
       ]
@@ -4195,6 +4221,190 @@
         "제품 도입과 활용을 도울 수 있나요?",
         "영업과 고객응대 훈련도 준비하나요?"
       ]
+    },
+    {
+      "id": "shift-research",
+      "brand": "shift",
+      "category": "service",
+      "sourceId": "shift",
+      "title": "How are market research and product testing being prepared?",
+      "keywords": [
+        "research",
+        "market research",
+        "user testing",
+        "usability testing",
+        "local users",
+        "interviews",
+        "surveys"
+      ],
+      "questionExamples": [
+        "How are market research and product testing being prepared?",
+        "Can SHIFT help with user testing?",
+        "I want to research responses from overseas consumers"
+      ],
+      "answer": "We are preparing a service to test how local users understand and use products, apps, and content before entering a new market.\n\nMarket response — Define the market and audience, then explore responses to products and messages through interviews and surveys.\n\nUsability testing — Observe people using the product to find where they get stuck and what explanation they need.\n\nFindings and next steps — Separate observations from interpretation and identify improvements to products, services, and content.\n\nThis service is in preparation. Markets, participants, schedules, and fees will be confirmed individually. Participants will give separate consent and receive compensation. Findings from a limited group will not be presented as representing an entire market.",
+      "relatedIds": [
+        "shift-intro",
+        "shift-philosophy"
+      ],
+      "action": {
+        "label": "View service details",
+        "href": "/en/shift/#shift-research"
+      },
+      "reviewedAt": "2026-10-05",
+      "aliases": [
+        "시장조사와 제품 테스트는 어떻게 준비하나요?",
+        "SHIFT에서 사용자 테스트를 맡길 수 있나요?",
+        "해외 소비자 반응을 조사하고 싶어요",
+        "What market research and product testing are you preparing?"
+      ]
+    },
+    {
+      "id": "pulse-rental",
+      "brand": "pulse",
+      "category": "service",
+      "sourceId": "pulse",
+      "title": "Can I hire a PULSE studio or equipment?",
+      "keywords": [
+        "studio hire",
+        "studio rental",
+        "space hire",
+        "equipment hire",
+        "camera rental",
+        "audio equipment",
+        "bookings"
+      ],
+      "questionExamples": [
+        "Can I hire a PULSE studio or equipment?",
+        "When will production space hire be available?",
+        "I would like to hire cameras and audio equipment"
+      ],
+      "answer": "We are preparing space and equipment hire for people producing videos, photos, classes, and small events.\n\nProduction & event space — Confirm a suitable space, access times, and setup requirements for the production and group size.\n\nCamera & audio equipment — We plan to explain camera, lighting, and audio options, how to use them, and collection and return terms.\n\nSetup & operation — Plan what you will operate yourself and where on-site assistance is needed.\n\nHire services are in preparation and bookings are not open. Locations, equipment, availability, prices, and on-site support will be announced once confirmed.",
+      "relatedIds": [
+        "pulse-intro",
+        "pulse-philosophy"
+      ],
+      "action": {
+        "label": "View service details",
+        "href": "/en/pulse/#pulse-rental"
+      },
+      "reviewedAt": "2026-10-05",
+      "aliases": [
+        "PULSE 스튜디오와 장비를 대여할 수 있나요?",
+        "촬영 공간 대여는 언제 가능한가요?",
+        "카메라와 음향 장비를 빌리고 싶어요",
+        "Can I hire a PULSE studio or equipment?"
+      ]
+    },
+    {
+      "id": "path-settle",
+      "brand": "path",
+      "category": "service",
+      "sourceId": "path",
+      "title": "What is PATH housing and settling-in support?",
+      "keywords": [
+        "housing",
+        "settling in",
+        "move in",
+        "accommodation",
+        "partner operator",
+        "student housing"
+      ],
+      "questionExamples": [
+        "What is PATH housing and settling-in support?",
+        "I need somewhere to live while studying in Korea",
+        "Can I book housing?"
+      ],
+      "answer": "We are preparing support through partner operators to help people planning study or a stay in Korea understand housing options and settle in.\n\nUnderstand the terms — Compare housing options against your length of stay, budget, and distance from school.\n\nMove in & get settled — Prepare guidance on move-in dates, what to bring, and how to use the facilities.\n\nContact the operator — Plan support for explaining housing or facility issues to the responsible operator.\n\nPartner operators, locations, and fees are not yet confirmed, and housing bookings are not open. Contract and property-management responsibilities will be explained against the operator’s terms.",
+      "relatedIds": [
+        "path-intro",
+        "path-philosophy"
+      ],
+      "action": {
+        "label": "View service details",
+        "href": "/en/path/#path-settle"
+      },
+      "reviewedAt": "2026-10-05",
+      "aliases": [
+        "PATH 주거·정착 지원은 무엇인가요?",
+        "한국 유학 중 살 곳을 알아보고 싶어요",
+        "입주 예약을 할 수 있나요?",
+        "What is PATH housing and settling-in support?"
+      ]
+    },
+    {
+      "id": "path-visit",
+      "brand": "path",
+      "category": "service",
+      "sourceId": "path",
+      "title": "What are PATH visits and cultural experiences?",
+      "keywords": [
+        "visits",
+        "cultural experiences",
+        "Korea visit",
+        "local experiences",
+        "itinerary",
+        "bookings"
+      ],
+      "questionExamples": [
+        "What are PATH visits and cultural experiences?",
+        "I want to ask about a visit to Korea and cultural experiences",
+        "Can I book a cultural experience?"
+      ],
+      "answer": "We are preparing visits and cultural experiences for people considering travel or study in Korea.\n\nA visit with a purpose — Plan what you would like to experience around your interests, length of stay, and travel needs.\n\nLocal life & culture — We are preparing experiences of everyday life and culture through partner operators.\n\nKnow before you go — Review language support, transport, inclusions, and cancellation terms before choosing.\n\nVisits and experiences are in preparation and bookings are not open. Partners, schedules, prices, and service scope will be announced once confirmed.",
+      "relatedIds": [
+        "path-intro",
+        "path-philosophy"
+      ],
+      "action": {
+        "label": "View service details",
+        "href": "/en/path/#path-visit"
+      },
+      "reviewedAt": "2026-10-05",
+      "aliases": [
+        "PATH 방문·문화 체험은 무엇인가요?",
+        "한국 방문과 문화 체험을 문의하고 싶어요",
+        "문화 체험을 예약할 수 있나요?",
+        "What visits and cultural experiences is PATH preparing?"
+      ]
+    },
+    {
+      "id": "synk-products",
+      "brand": "synk",
+      "category": "service",
+      "sourceId": "company",
+      "title": "Can I buy SYNK products?",
+      "keywords": [
+        "products",
+        "sales",
+        "shop",
+        "suppliers",
+        "shipping",
+        "exchange",
+        "returns",
+        "store"
+      ],
+      "questionExamples": [
+        "Can I buy SYNK products?",
+        "When will product sales start?",
+        "I would like to discuss supplying products"
+      ],
+      "answer": "We are preparing a shop with selected products for daily life and learning, with clear guidance on their uses, selection criteria, and purchase terms.\n\nProducts for your needs — Consider how products will be used and select the range accordingly.\n\nInformation before choosing — Prepare clear details about features, contents, and use to support your choice.\n\nSupport after purchase — Make seller details, delivery, exchanges, and returns clear before purchase.\n\nThe range and sales, delivery, and exchange terms are in preparation. Orders and payments are not open.",
+      "relatedIds": [
+        "synk-stage",
+        "guide-contact"
+      ],
+      "action": {
+        "label": "Planned products",
+        "href": "/en/#products"
+      },
+      "reviewedAt": "2026-10-05",
+      "aliases": [
+        "SYNK의 상품을 구매할 수 있나요?",
+        "상품 판매는 언제 시작하나요?",
+        "상품 입점 협력을 문의하고 싶어요",
+        "Can I buy products from SYNK?"
+      ]
     }
   ],
   "visions": {
@@ -4211,17 +4421,17 @@
     "shift": {
       "name": "SYNK SHIFT",
       "headline": "업무와 고객에 맞춘 AI·개인화",
-      "subtext": "기업과 기관이 AI와 개인화 기술을 자기 업무와 고객 서비스에 활용하도록 돕습니다. AI 교육·컨설팅·업무 자동화·브랜딩에 더해, 맞춤 코칭·구매 상담·제품 활용 지원·실전 훈련을 개발합니다."
+      "subtext": "기업과 기관이 AI와 개인화 기술을 자기 업무와 고객 서비스에 활용하도록 돕습니다. 맞춤 코칭·구매 상담·제품 활용 지원·실전 훈련을 개발하고, 시장조사·제품 테스트 서비스를 준비합니다."
     },
     "pulse": {
       "name": "SYNK PULSE",
-      "headline": "음악과 이야기로 만드는 콘텐츠와 IP",
-      "subtext": "SYNK PULSE는 음악과 영상, 캐릭터와 이야기를 만듭니다. 온라인 콘텐츠와 자체 지식재산(IP)부터 작품 이용과 공동 제작, 광고 협업, 광고·모델 영상 제작까지 하고 있습니다."
+      "headline": "AI 광고·모델 영상과 콘텐츠·IP를 만듭니다.",
+      "subtext": "브랜드를 위한 광고·모델 영상과, 함께 즐기는 음악·영상·캐릭터를 만듭니다. 작품 이용·공동 제작·광고 협업을 함께 하며, 스튜디오·장비 대여도 준비합니다."
     },
     "path": {
       "name": "SYNK PATH",
       "headline": "한국 유학부터 취업까지, 함께 준비합니다.",
-      "subtext": "SYNK PATH는 한국 유학을 준비하는 외국인을 위한 학업·생활·취업 지원 브랜드입니다. 학교 선택과 한국어 학습, 면접 준비부터 졸업 후 진로까지 함께 계획합니다. LAB의 한국어 교육과 VR 연습으로 한국에서 마주할 상황을 미리 경험하고, 준비한 내용을 포트폴리오로 정리하는 서비스를 준비하고 있습니다."
+      "subtext": "SYNK PATH는 한국 유학을 준비하는 외국인을 위한 학업·생활·취업 지원 브랜드입니다. 학교 선택과 한국어 학습, VR·면접 연습과 포트폴리오를 함께 준비합니다. 한국 체류에 필요한 주거·정착 지원과 방문·문화 체험도 제휴 운영사와 연결하는 방식으로 준비합니다."
     }
   },
   "language": "en"

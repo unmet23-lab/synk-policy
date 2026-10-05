@@ -165,6 +165,19 @@ export function createKnowledgeEngine(data){
   // Exact reviewed questions take precedence over broad topic words.
   if(exact.has(raw)){const ids=exact.get(raw);const local=ids.filter(id=>records.get(id).brand===brand);return from(local.length?local:ids);}
   if(exact.has(q)){const ids=exact.get(q);const local=ids.filter(id=>records.get(id).brand===brand);return from(local.length?local:ids);}
+  // Published planned-service scope precedes generic shopping and accommodation fallbacks.
+  const plannedService=[
+   ['shift-research',/\b(?:market research|consumer research|user testing|usability testing|product testing)\b/.test(q)],
+   ['pulse-rental',/\b(?:studio|production space|equipment|camera|audio equipment)\b.{0,30}\b(?:hire|rent|rental|book)|\b(?:hire|rent|rental|book)\b.{0,30}\b(?:studio|production space|equipment|camera)\b/.test(q)],
+   ['path-settle',/\b(?:housing|settling in|move in|accommodation|somewhere to live)\b/.test(q)&&(brand==='path'||/\b(?:path|study|studying|student)\b/.test(q))],
+   ['path-visit',/\b(?:visit|cultural experience)\w*\b/.test(q)&&(brand==='path'||/\bpath\b/.test(q))],
+   ['synk-products',/\bsynk products?\b|\bproduct (?:sales|orders|shipping|suppliers)\b/.test(q)&&!/\b(?:coaching|personalization|buying advice)\b/.test(q)]
+  ].filter(([id,hit])=>hit&&records.has(id)).map(([id])=>id);
+  if(plannedService.length){
+  if(/\bprivacy|\bcookies?\b|\b(?:save|store|retain|record|collect|track|keep|log|send|sent|upload|transmit)(?:s|ed|ing)?\b.*\b(?:chats?|conversations?|questions?|data|what (?:i|she|he|they|we|my \w+) (?:listen|type|ask|write|say|enter)\w*|anything (?:i|she|he|they|we) (?:type|write|say)\w*|somewhere|servers?|cloud|third part\w*|here)\b|\b(?:chat|conversation|data|anything (?:i|she|he|they) type\w*|what (?:i|she|he) type\w*)\b.*\b(?:saved|stored|collected|tracked|kept|logged|sent)\b/.test(q)&&!/consultation|chat ?gpt|chatbot|brief|proposal|files?/.test(q))return from(['guide-privacy']);
+  if((/\bconsultation|counsel\w*/.test(q)&&/\b(?:notes?|records?|keep|kept|delete|deleted|how long|store)\b/.test(q))||/\b(?:where|how long) (?:exactly )?(?:do|will|would) you (?:keep|store|hold|retain)\b.{0,50}\b(?:notes|progress|records|files|information)\b|\bwho (?:can |gets to )?(?:see|access|view|read) (?:his|her|their|my|the|our) (?:notes|records|progress|files?|data)\b/.test(q))return from(['guide-records']);
+      return from(plannedService,/\b(?:price|cost|fee|quote|how much)\w*\b/.test(q)?'needs_confirmation':'matched');
+    }
   // Everyday conversation.
   if(/^(?:thanks|thank you|many thanks|cheers|appreciate it|much appreciated|great thanks|ok thanks|okay thanks|got it|ok|okay|great|perfect|cool|nice|bye|goodbye|see you|have a (?:nice|good|great) (?:day|one|week(?:end)?))(?: (?:so much|a lot|very much|again|for (?:the|your) (?:help|answer|information)|that helps|that helped|this helps))*$/.test(q)||(/\b(?:thanks|thank you|cheers|appreciate|bye|goodbye|see you|have a (?:nice|good|great) (?:day|one))\b/.test(q)&&!/\?/.test(input)&&!/\b(?:how|what|when|where|who|why|which|can i|could you|do you|is there|are there)\b/.test(q)))return courtesy();
   if(/^(?:more|tell me more|more details|explain more|go on)$/.test(q)&&context.recordIds?.length)return {...from(context.recordIds),expanded:true};

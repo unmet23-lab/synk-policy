@@ -598,7 +598,7 @@ html[lang="en"] .stage-label{font:400 11px/1.4 var(--mono);letter-spacing:.1em;t
 /* Where each headline breaks: after 교육을, 위한, 이야기로 and 취업까지 (and after the matching words in English). */
 #lab-title{--hero-measure:12.4em}
 #shift-title{--hero-measure:9.4em}
-#pulse-title{--hero-measure:9.6em}
+#pulse-title{--hero-measure:13em}
 #path-title{--hero-measure:10.4em}
 html[lang="en"] #shift-title{--hero-measure:14.6em;--hero-size:clamp(38px,6vw,96px)}
 html[lang="en"] #pulse-title{--hero-measure:11.6em}
@@ -1097,4 +1097,44 @@ html[lang="en"] .visual-explainer--cards .visual-scene-name{font:400 11px/1.4 va
  .story-continuation[data-destination]{border:1px solid CanvasText;background:Canvas;color:CanvasText}
  .world-directory>a::before{background:Canvas;border-bottom:1px solid CanvasText}
  :is(#lab.lab-bento,#shift.shift-hero,#pulse.world-pulse,#path.path-hero){border:1px solid CanvasText;background:Canvas}
+}
+
+/* PULSE's first screen introduces all four service areas before the work below. */
+#pulse.pulse-services-hero{grid-template-rows:auto auto 24px auto auto auto auto;align-content:start}
+#pulse.pulse-services-hero #pulse-title{font-size:clamp(40px,6.8vw,104px);max-width:13em}
+#pulse.pulse-services-hero .hero-lead{grid-column:1/span 6;max-width:28em}
+#pulse.pulse-services-hero .hero-more{grid-column:1/span 6;grid-row:7;max-width:38em;margin-top:22px}
+#pulse .pulse-hero-services{grid-column:1/span 6;grid-row:5;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 22px;margin-top:24px}
+#pulse .pulse-hero-services>a{display:grid;grid-template-columns:20px minmax(0,1fr) 15px;gap:9px;align-items:start;padding:16px 0;border-top:var(--hair) solid var(--on-field-line);color:var(--on-field);text-decoration:none;min-width:0}
+#pulse .pulse-hero-services>a:hover strong{text-decoration:underline;text-underline-offset:4px}
+#pulse .pulse-service-index{font:400 10px/2 var(--mono);color:var(--on-field-3)}
+#pulse .pulse-hero-services strong{display:inline;font-size:18px;line-height:1.3;letter-spacing:-.02em;font-weight:700;color:var(--on-field)}
+#pulse .pulse-service-description{display:block;margin-top:7px;font-size:13px;line-height:1.5;color:var(--on-field-2);word-break:keep-all}
+#pulse .pulse-service-status{display:inline-block;margin-left:7px;font-size:11px;line-height:1.4;color:var(--on-field-2)}
+#pulse.pulse-services-hero .world-links{grid-column:1/span 6;grid-row:6;margin-top:18px}
+#pulse .pulse-hero-work{grid-column:8/-1;grid-row:4/8;align-self:center;justify-self:end;width:100%;max-width:520px;gap:16px}
+#pulse .pulse-hero-models{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;width:100%}
+#pulse .pulse-hero-models img{display:block;width:100%;height:auto;aspect-ratio:3/4;object-fit:cover;border-radius:12px}
+#pulse .pulse-hero-work figcaption{display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px 14px;width:100%;font-size:12px;text-align:left}
+#pulse .pulse-hero-work figcaption .quiet-link{font-size:12px}
+@media(max-width:1100px) and (min-width:761px){
+ #pulse .pulse-hero-work{grid-column:8/-1}
+ #pulse .pulse-hero-services{gap:0 14px}
+ #pulse .pulse-hero-services>a{grid-template-columns:minmax(0,1fr) 13px;gap:8px}
+ #pulse .pulse-service-index{display:none}
+ #pulse .pulse-hero-services strong{font-size:16px}
+}
+@media(max-width:760px){
+ #pulse.pulse-services-hero{grid-template-rows:none}
+ #pulse.pulse-services-hero #pulse-title{font-size:clamp(34px,10vw,48px)}
+ #pulse.pulse-services-hero .hero-lead{grid-column:1/-1;grid-row:auto;order:3;font-size:17px}
+ #pulse .pulse-hero-services{grid-column:1/-1;grid-row:auto;order:4;gap:0 16px;margin-top:22px}
+ #pulse .pulse-hero-services>a{grid-template-columns:minmax(0,1fr) 12px;gap:5px;padding:13px 0}
+ #pulse .pulse-service-index{display:none}
+ #pulse .pulse-hero-services strong{font-size:16px}
+ #pulse .pulse-service-description{font-size:12px;margin-top:6px}
+ #pulse .pulse-service-status{display:block;margin:5px 0 0}
+ #pulse.pulse-services-hero .world-links{grid-column:1/-1;grid-row:auto;order:5;margin-top:10px}
+ #pulse .pulse-hero-work{grid-column:1/-1;grid-row:auto;order:6;max-width:480px;margin:28px 0 0}
+ #pulse.pulse-services-hero .hero-more{grid-column:1/-1;grid-row:auto;order:7;margin-top:24px;font-size:14px}
 }
