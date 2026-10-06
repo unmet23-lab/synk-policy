@@ -33,6 +33,111 @@
       "redirectUris": [
         "http://127.0.0.1:43825/synk/oauth/fortune/callback"
       ]
+    },
+    {
+      "product": "platform",
+      "clientId": "9d7f276d-58bf-4c98-a7fd-9c3da0a40408",
+      "redirectUris": [
+        "http://127.0.0.1:43821/synk/oauth/platform/callback"
+      ]
+    },
+    {
+      "product": "world",
+      "clientId": "a256e2f3-62f5-4a18-80f5-c3342c463dd0",
+      "redirectUris": [
+        "http://127.0.0.1:43822/synk/oauth/world/callback"
+      ]
+    },
+    {
+      "product": "messenger",
+      "clientId": "57824287-1db2-4fdd-a29b-ec059d85f136",
+      "redirectUris": [
+        "http://127.0.0.1:43823/synk/oauth/messenger/callback"
+      ]
+    },
+    {
+      "product": "world",
+      "clientId": "5e3730e8-8cf4-4e7e-aa92-c3f1582996b5",
+      "redirectUris": [
+        "http://127.0.0.1:43824/synk/oauth/teacher/callback"
+      ]
+    },
+    {
+      "product": "platform",
+      "clientId": "3313e645-6e13-466c-a788-bc203dcb7219",
+      "redirectUris": [
+        "http://127.0.0.1:43826/synk/oauth/care/callback"
+      ]
+    },
+    {
+      "product": "platform",
+      "clientId": "17e1fbfb-8899-4186-8cf7-a40b1732b84e",
+      "redirectUris": [
+        "http://127.0.0.1:43827/synk/oauth/rehearsal/callback"
+      ]
+    },
+    {
+      "product": "platform",
+      "clientId": "4f1c015d-0523-4b61-9b10-6c3faa09217a",
+      "redirectUris": [
+        "http://127.0.0.1:43828/synk/oauth/family-album/callback"
+      ]
+    },
+    {
+      "product": "platform",
+      "clientId": "9c1f7c0e-db52-42eb-949e-9f2d7e5d4220",
+      "redirectUris": [
+        "http://127.0.0.1:43829/synk/oauth/path/callback"
+      ]
+    },
+    {
+      "product": "platform",
+      "clientId": "6cde60e1-d9c4-489e-8a36-3a2ff392e077",
+      "redirectUris": [
+        "http://127.0.0.1:4280/synk-account/client.html?product=platform"
+      ]
+    },
+    {
+      "product": "world",
+      "clientId": "d4f8347e-72a4-4c8c-8d5f-00aece7ac137",
+      "redirectUris": [
+        "http://127.0.0.1:4280/synk-account/client.html?product=world"
+      ]
+    },
+    {
+      "product": "messenger",
+      "clientId": "040530fe-6181-45fd-ba85-51a31872edbf",
+      "redirectUris": [
+        "http://127.0.0.1:4191/api/synk-id/callback"
+      ]
+    },
+    {
+      "product": "platform",
+      "clientId": "a21621ff-6897-44c4-9a88-233deedbe1cb",
+      "redirectUris": [
+        "http://127.0.0.1:4296/"
+      ]
+    },
+    {
+      "product": "platform",
+      "clientId": "d578f783-64a0-4a97-b780-04246d669f43",
+      "redirectUris": [
+        "http://127.0.0.1:4297/"
+      ]
+    },
+    {
+      "product": "platform",
+      "clientId": "0f9f91d5-4032-4ff3-bb8d-2af1c646633a",
+      "redirectUris": [
+        "http://127.0.0.1:4298/"
+      ]
+    },
+    {
+      "product": "platform",
+      "clientId": "c28ef42a-1b79-428a-816e-97779df8c800",
+      "redirectUris": [
+        "http://127.0.0.1:4292/"
+      ]
     }
   ],
   "clients": {
