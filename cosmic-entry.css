@@ -96,3 +96,7 @@ html[data-cosmic-transition="ieung"],html[data-cosmic-transition="ieung"] body{o
  .cosmic-entry a{color:LinkText!important;background:Canvas!important;border-color:LinkText!important}
  .cosmic-atlas-link{min-height:44px;justify-content:center;border:1px solid LinkText}
 }
+
+/* 싱ㅋ 시그널 (2026-10-06): 아틀라스 페이지가 밤 바탕이 되어, ㅇ이 열리며 지나가는 「아틀라스의 종이」도 같은 밤색이다.
+   흰 종이로 두면 검정→흰→검정으로 번쩍인다. 첫 화면(싱ㅋ·하늘) 자체는 바꾸지 않는다. */
+.cosmic-atlas-frame,.cosmic-transition-backdrop{background:#08090C}

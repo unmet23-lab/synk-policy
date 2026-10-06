@@ -348,3 +348,27 @@ body.founder-page{
   .founder-page :is(.founder-portrait,.principle-grid article,.career-list li,.founder-brands>a){break-inside:avoid}
   .founder-closing{padding-block:40px}
 }
+
+/* ── 싱ㅋ 시그널 (2026-10-06) ─────────────────────────────────────────────
+   홈페이지와 같은 밤 바탕. 위의 규칙은 지우지 않고 이 구획이 덮는다(정본: SYNK-appsscript/docs/디자인/플랫폼_시그널). */
+:root{background:#08090C;--founder-ink:#FAFAF9;--founder-muted:rgba(250,250,249,.66);--founder-line:rgba(255,255,255,.16);color-scheme:dark}
+body.founder-page{background-color:#08090C;color:var(--founder-ink)}
+.founder-page ::selection{color:#fff;background:rgba(255,255,255,.24)}
+.founder-page :focus-visible{outline-color:#FAFAF9}
+.founder-page .skip{color:#08090C;background:#FAFAF9}
+.founder-letter p{color:rgba(250,250,249,.76)}
+.principle-grid article>.index,.career-list time,.founder-brands .arrow,.founder-footer>p{color:rgba(250,250,249,.56)}
+.career-list li+li{border-color:rgba(255,255,255,.1)}
+.founder-brands>a[href="/lab/"] .brand-name{color:#FFB4A9}
+.founder-brands>a[href="/shift/"] .brand-name{color:#C5D6F5}
+.founder-brands>a[href="/pulse/"] .brand-name{color:#F8C7DE}
+.founder-brands>a[href="/path/"] .brand-name{color:#D3E8BE}
+/* 펠트 로고는 흰 구슬 위에. */
+.founder-logo{padding:8px 16px;border-radius:999px;background:#FAFAF9}
+.founder-logo img{width:84px}
+.founder-footer>a.founder-logo{width:fit-content;justify-self:start;align-self:center;flex:none}
+.founder-footer>a img{width:72px}
+/* 유리 단추 대신 흰 알약(플랫폼의 주 행동과 같다). */
+.founder-page .founder-jump,.founder-page .founder-jump:hover,.founder-page .founder-jump:active{border:0;background:#FAFAF9;background-image:none;color:#08090C;box-shadow:none}
+.founder-page .founder-jump::before{display:none}
+.founder-page .founder-jump:hover{box-shadow:0 0 0 6px rgba(250,250,249,.18)}

@@ -1263,3 +1263,109 @@ html[lang="en"] .lab-step{font:400 11px/1.4 var(--mono);letter-spacing:.08em;col
  .footer-links a,.back-chat,.footer-info button{display:inline-flex;align-items:center;min-height:44px}
  .scene-check>summary{min-height:44px}
 }
+
+/* ── 싱ㅋ 시그널 (2026-10-06) ─────────────────────────────────────────────
+   유호님 10-06 「플랫폼 느낌으로 홈페이지를 아예 리디자인」: SYNK 플랫폼(desktop/renderer)과 같은
+   밤 바탕, 사업 색 면, 큰 한글, 작은 계기판 라벨. 첫 화면(싱ㅋ·하늘)은 cosmic-entry.css 그대로 둔다.
+   위의 규칙은 지우지 않고 이 구획이 덮는다. 토큰을 밤으로 뒤집고, 색을 직접 쓴 부품만 짝지어 고친다.
+   2차(같은 날, Fable 검수): 면 값을 플랫폼 면 1·2·3과 맞추고, 사업 타일을 포스터+스티커로, 구역 머리에 번호,
+   과정 카드는 면 위 흰 무대, 아틀라스 요약 지도는 흰 종이 카드(지도는 어디서나 흰 종이).
+   규칙의 정본은 SYNK-appsscript/docs/디자인/플랫폼_시그널/README.md. */
+:root{
+ --ink:#FAFAF9;--ink-2:rgba(250,250,249,.74);--ink-3:rgba(250,250,249,.62);--ink-4:rgba(250,250,249,.3);
+ --line:rgba(255,255,255,.16);--line-soft:rgba(255,255,255,.09);
+ --paper:#08090C;--plate:#111215;--plate-deep:#18191D;--plate-top:#212227;--on-ink:#08090C;
+ --accent:#FAFAF9;--accent-ink:#FAFAF9;--accent-wash:#111215;
+ --iris:conic-gradient(from 210deg,#3D6BC9,#E05C97,#F96859,#F5C445,#7DB45A,#3D6BC9);
+ color-scheme:dark;
+}
+/* 글자로 쓰는 사업 색은 밤 바탕에서 읽히는 옅은 실(2027 실의 「보풀 빛」)로. 면은 그대로.
+   28px 이상의 큰 글자와 면은 원값, 그보다 작은 글자는 옅은 실(원값의 밤 대비가 2.5~3.9:1이라). */
+body[data-site="lab"]{--accent:#f96859;--accent-ink:#FFB4A9;--accent-wash:#1E1311}
+body[data-site="shift"]{--accent:#3d6bc9;--accent-ink:#C5D6F5;--accent-wash:#10151F}
+body[data-site="pulse"]{--accent:#99295d;--accent-ink:#F8C7DE;--accent-wash:#1C1016}
+body[data-site="path"]{--accent:#526956;--accent-ink:#D3E8BE;--accent-wash:#121712}
+body{--wash:color-mix(in srgb,var(--accent) 14%,#111215);--wash-2:color-mix(in srgb,var(--accent) 22%,#111215);background:var(--paper);color:var(--ink)}
+body[data-site="synk"]{--wash:var(--plate);--wash-2:var(--plate-deep);--field:#111215;--orb-dark:#202126}
+::selection{background:rgba(255,255,255,.24);color:#fff}
+:focus-visible{outline-color:var(--ink)}
+
+/* 단추: 주 행동은 밤엔 흰 알약, 손을 올리면 그 사업 색으로 빛난다(플랫폼의 실행 단추와 같다). */
+.primary-link,body[data-site="synk"] .primary-link{background:var(--ink);color:var(--on-ink)}
+.primary-link:hover{box-shadow:0 0 0 6px color-mix(in srgb,var(--accent) 38%,transparent),0 12px 30px -12px color-mix(in srgb,var(--accent) 50%,transparent)}
+.skip,.send,.message-user,.message-user p,.document-footer button,.toast,.lab-tracker__tabs button[aria-selected="true"],.next-choice button[aria-pressed="true"],.work-action,.scene-check[open]>summary>span{color:var(--on-ink)}
+:is(.story-item-detail,.story-details details,.lab-benefit details,.lab-curriculum-fold,.lab-feedback-preview,.brand-story,.visual-scene-detail,.story-evidence details,.contact-web-panel)[open]>summary>span:last-child{color:var(--on-ink)}
+.work-action{background:var(--accent-ink)}
+
+/* 위쪽 유리 메뉴: 밤 유리. 펠트 로고는 흰 구슬 안에 그대로 둔다. */
+.header.bar{background:linear-gradient(180deg,rgba(28,29,33,.84),rgba(17,18,21,.78));box-shadow:inset 0 1px 0 rgba(255,255,255,.1),inset 0 -1px 0 rgba(0,0,0,.45),0 0 0 .5px rgba(255,255,255,.16),0 14px 34px -18px rgba(0,0,0,.75)}
+.header.bar::before{background:radial-gradient(160px 60px at var(--glass-x,16%) var(--glass-y,0%),rgba(255,255,255,.42),rgba(255,255,255,0) 70%),linear-gradient(118deg,rgba(255,255,255,.34) 0%,rgba(255,255,255,.06) 22%,rgba(255,255,255,0) 50%,rgba(255,255,255,.05) 78%,rgba(255,255,255,.22) 100%)}
+.header.bar.has-rim{background:rgba(20,21,25,.24)}
+.header.bar.has-rim::after{background:linear-gradient(180deg,rgba(28,29,33,.86),rgba(17,18,21,.8))}
+.bar-logo{background:linear-gradient(180deg,#fff,rgba(250,250,249,.92));box-shadow:inset 0 1px 0 #fff,0 0 0 .5px rgba(255,255,255,.3),0 4px 12px -6px rgba(0,0,0,.6)}
+.bar-logo:hover{box-shadow:inset 0 1px 0 #fff,0 0 0 .5px rgba(255,255,255,.4),0 6px 16px -6px rgba(0,0,0,.7)}
+.bar-menu a:hover,.bar-brands a:hover,.header-language a:hover,.menu-toggle:hover{background:rgba(255,255,255,.08)}
+.bar-brands a[aria-current="page"]{background:#FAFAF9;color:#08090C;box-shadow:none}
+@media (prefers-reduced-transparency:reduce){.header.bar{background:rgba(17,18,21,.97)}}
+
+/* 선택된 탭·단계: 뒤집은 알약(흰 바탕, 검정 글자). */
+.visual-scene-nav button[aria-selected="true"],.shift-workflow__steps a[aria-selected="true"],.roadmap-nav a[aria-current]{background:#FAFAF9;color:#08090C;box-shadow:none}
+
+/* 구역 머리: 「번호 · 라벨 · 1px 선」. 번호는 페이지마다 01부터, 플랫폼 계기판과 아틀라스 페이지의 구역 번호와 같은 모노 숫자. */
+main{counter-reset:sec}
+:is(.story-purpose,.story-heading,.lab-overview-heading,.lab-try-heading,.story-evidence>header,.atlas-brief-head)>.small-label::before,.section-kicker .eyebrow::before{counter-increment:sec;content:counter(sec,decimal-leading-zero);font:400 11px/1 var(--mono);letter-spacing:.1em;text-transform:none;opacity:.72}
+
+/* 흰 판으로 쓰던 작업 판은 밤 면으로. 흰 바탕이 있는 그림을 받치는 판은 흰 판 그대로 둔다. */
+.lab-tracker__tabs{background:var(--plate-deep)}
+.lab-tracker__panel,.shift-workflow__request textarea{background:var(--plate);color:var(--ink)}
+.next-choice button{background:var(--plate-deep);box-shadow:0 0 0 .5px var(--line)}
+.service-state{background:#FAFAF9;color:#08090C}
+.document-top{background:var(--paper)}
+
+/* 회사 메인의 네 사업: 색 면은 포스터, 펠트 로고는 그 위에 살짝 기울여 붙인 스티커(플랫폼 포스터의 단계 스티커와 같은 규격),
+   아래 밤 면에는 모노 번호와 설명만. 로고 알약이 단추처럼 읽히지 않게 면 위로 올렸다. */
+.world-directory{counter-reset:tile}
+.world-directory>a{counter-increment:tile;background:var(--plate)}
+.world-directory>a:hover{background:var(--plate-deep)}
+.world-directory>a>div{display:contents}
+.directory-logo{grid-area:1/1;align-self:start;justify-self:start;z-index:1;box-sizing:content-box;height:16px;margin:clamp(12px,1.1vw,16px);padding:7px 12px;border-radius:999px;background:#FAFAF9;transform:rotate(-2.5deg);box-shadow:0 8px 22px rgba(0,0,0,.24)}
+svg.directory-logo{height:20.73px;margin:clamp(12px,1.1vw,16px);padding:4.64px 12px}
+.world-directory>a::after{content:"0" counter(tile) " / " attr(data-field);grid-area:2/1/3/-1;align-self:start;margin:16px clamp(16px,1.4vw,22px) 0;font:400 11px/1.4 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3)}
+.world-directory strong{grid-area:2/1/3/-1;align-self:end;padding:0 clamp(16px,1.4vw,22px) clamp(16px,1.4vw,22px);font-size:clamp(18px,1.5vw,21px);font-weight:700}
+/* 여러 칸일 때는 색 면을 64%로 키워 아래 밤 면에 번호·설명만 단단히 남긴다(휴대폰 두 칸은 원래 비율). */
+@media (min-width:641px){.world-directory>a{grid-template-rows:64% minmax(0,1fr)}}
+.directory-arrow{background:#FAFAF9;color:#08090C}
+@media (max-width:640px){
+ .directory-logo{height:13px;margin:10px;padding:6px 10px}
+ svg.directory-logo{height:16.84px;margin:10px;padding:4.08px 10px}
+ .world-directory>a::after{margin:12px 12px 0;font-size:10px}
+ .world-directory strong{padding:0 12px 12px;font-size:15px}
+}
+
+/* 아틀라스 요약 지도: 지도는 어디서나 흰 종이 카드(아틀라스 페이지와 같다). 글은 지도 위쪽에 붙여 제목 아래 빈칸을 없앤다. */
+.atlas-brief-copy{align-self:start;padding-top:clamp(8px,1vw,16px)}
+.atlas-brief-map{--ink:#0A0A0A;--ink-3:rgba(10,10,10,.62);--line:rgba(10,10,10,.14);background:#f4f4f5;color:#0A0A0A}
+
+/* 질문창: 밤 바탕 위에 한 단 올린 면과 1px 테. */
+.orb-chamber{box-shadow:inset 0 0 0 1px var(--line)}
+.orb-invite,.orb-switch button,#copy-email,.question-entry,.suggestions button,.message-assistant,.related-questions button{box-shadow:0 0 0 .5px var(--line)}
+.orb-invite{background:#FAFAF9;color:#08090C}
+.orb-close{box-shadow:0 0 0 .5px var(--line)}
+dialog#document-dialog{box-shadow:0 0 0 1px var(--line),0 30px 80px -30px rgba(0,0,0,.8)}
+dialog#document-dialog::backdrop{background:rgba(4,5,7,.66)}
+.toast{background:#FAFAF9;box-shadow:0 14px 36px -16px rgba(0,0,0,.8)}
+
+/* 흰 바탕 제품 사진: 밤 바탕 위에서는 둥근 흰 판(카드)으로 세운다. 사업 색 면 위의 오려 낸 물건은 그대로. */
+.story-visual>img{background:#fff;border-radius:var(--radius-s)}
+.visual-scene-art{background:#fff}
+.visual-scene-art img{mix-blend-mode:normal}
+/* 과정 카드: 카드 면을 한 단 올리고(면 2 + 1px 선), 사진은 그 안쪽의 흰 무대로 앉힌다. 펠트 원색은 그대로. */
+.visual-explainer--cards .visual-scene{background:var(--plate-deep);box-shadow:inset 0 0 0 1px var(--line-soft)}
+.visual-explainer--cards .visual-scene-art{width:auto;margin:10px 10px 0;border-radius:calc(var(--radius) - 10px)}
+.visual-explainer--cards .visual-scene-copy{padding-top:18px}
+#lab-class .visual-explainer--cards .visual-scene{box-shadow:none}
+/* 질문창의 「대화 시작」은 흰 알약에 검정 글자. */
+.orb-chamber .orb-launch .orb-invite{color:#08090C}
+/* 아래쪽 펠트 로고는 흰 구슬 위에. */
+.footer-bottom .wordmark{display:inline-flex;align-items:center;padding:8px 14px;border-radius:999px;background:#FAFAF9}
+.footer-bottom .wordmark img{height:18px}

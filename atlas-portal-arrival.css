@@ -7,3 +7,6 @@ html[data-atlas-arrival="revealing"] .atlas-arrival{opacity:0;transition:opacity
 html[data-atlas-arrival="revealing"] .atlas-arrival-orb{transform:translate(var(--arrival-dx),var(--arrival-dy)) scale(var(--arrival-scale));opacity:0;transition:transform .42s cubic-bezier(.4,0,.2,1),opacity .32s ease .08s}
 @media(prefers-reduced-motion:reduce){.atlas-arrival,.atlas-arrival-orb,.observatory{transition:none!important}}
 @media(forced-colors:active){.atlas-arrival{background:Canvas}.atlas-arrival-orb{display:none}}
+
+/* 싱ㅋ 시그널 (2026-10-06): 아틀라스 페이지가 밤 바탕이라 도착 화면도 같은 밤색에서 시작한다. */
+@media (forced-colors:none){.atlas-arrival{background:#08090C}}

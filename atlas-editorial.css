@@ -249,3 +249,33 @@ dialog>p:not(.eyebrow){margin:0 0 12px;font:500 var(--t-ui)/1.75 var(--suit);let
   .visual-stage{forced-color-adjust:none;background:#f4f4f5;color:#0a0a0a}
   .arrow-icon{background:LinkText;forced-color-adjust:none}
 }
+
+/* ── 싱ㅋ 시그널 (2026-10-06, Fable 검수) ─────────────────────────────────────
+   다섯 홈페이지·SYNK 플랫폼과 같은 밤 바탕. 지도와 사진 판은 흰 종이 카드로 남긴다: 9월에 물린 「검은 판 위
+   연결망」이 아니라 흰 종이 위의 지도이고, 지도 스크립트의 잉크(#0a0a0a)도 그대로 쓴다. 회사 메인의 요약
+   지도도 같은 흰 종이 카드다. 규칙의 정본은 SYNK-appsscript/docs/디자인/플랫폼_시그널/README.md. */
+:root{color-scheme:dark;--paper:#08090C;--ink:#FAFAF9;--ink-2:rgba(250,250,249,.74);--ink-3:rgba(250,250,249,.62);--line:rgba(255,255,255,.16);--soft:#111215}
+.visual-stage,.goal-art{--paper:#fff;--ink:#0a0a0a;--ink-2:#363636;--ink-3:#6a6a6a;--line:#e7e7e7;--soft:#f4f4f5;background:#f4f4f5;color:#0a0a0a}
+/* 선택은 뒤집은 알약(흰 바탕, 검정 글자). */
+.view-tabs button[aria-pressed=true],.example-nav button[aria-selected=true]{background:#FAFAF9;color:#08090C;box-shadow:none}
+/* 밤 면 위의 작은 부품은 한 단 올린 면과 1px 선으로 윤곽을 잡는다. */
+.concepts{border-top-color:rgba(255,255,255,.12)}
+.related button[data-engine],.inspector[data-engine=strata]::after,#story-back{background:#18191D}
+.related button[data-engine]{box-shadow:0 0 0 1px var(--line)}
+.scenario-card{border-bottom-color:rgba(255,255,255,.1)}
+.story-progress button::before{background:rgba(255,255,255,.16)}
+.text-action:hover,.glass-action:hover{background:#E4E4E2}
+dialog{background:#111215;box-shadow:0 0 0 1px var(--line),0 30px 80px -30px rgba(0,0,0,.8)}
+dialog::backdrop{background:rgba(4,5,7,.66)}
+/* 회사 메뉴: 밤 유리와 흰 구슬 로고(홈페이지와 같다). site-bar.css가 이 파일 뒤에 읽혀 같은 선택자를 덮으므로 body로 한 단 높인다. */
+body .site-header-wrap{--ink:#FAFAF9;--ink-2:rgba(250,250,249,.74);--ink-3:rgba(250,250,249,.62);--line:rgba(255,255,255,.16);--line-soft:rgba(255,255,255,.09)}
+body .header.bar{background:linear-gradient(180deg,rgba(28,29,33,.84),rgba(17,18,21,.78));box-shadow:inset 0 1px 0 rgba(255,255,255,.1),inset 0 -1px 0 rgba(0,0,0,.45),0 0 0 .5px rgba(255,255,255,.16),0 14px 34px -18px rgba(0,0,0,.75)}
+body .header.bar::before{background:radial-gradient(160px 60px at var(--glass-x,16%) var(--glass-y,0%),rgba(255,255,255,.42),rgba(255,255,255,0) 70%),linear-gradient(118deg,rgba(255,255,255,.34) 0%,rgba(255,255,255,.06) 22%,rgba(255,255,255,0) 50%,rgba(255,255,255,.05) 78%,rgba(255,255,255,.22) 100%)}
+body .header.bar.has-rim{background:rgba(20,21,25,.24)}
+body .header.bar.has-rim::after{background:linear-gradient(180deg,rgba(28,29,33,.86),rgba(17,18,21,.8))}
+body .bar-logo{background:linear-gradient(180deg,#fff,rgba(250,250,249,.92));box-shadow:inset 0 1px 0 #fff,0 0 0 .5px rgba(255,255,255,.3),0 4px 12px -6px rgba(0,0,0,.6)}
+body .bar-logo:hover{box-shadow:inset 0 1px 0 #fff,0 0 0 .5px rgba(255,255,255,.4),0 6px 16px -6px rgba(0,0,0,.7)}
+body :is(.bar-menu a,.bar-brands a,.header-language a,.menu-toggle):hover{background:rgba(255,255,255,.08)}
+body .bar-brands a[aria-current="page"]{background:#FAFAF9;color:#08090C;box-shadow:none}
+@media (prefers-reduced-transparency:reduce){body .header.bar{background:rgba(17,18,21,.97)}}
+@media (forced-colors:active){.observatory,.inspector,dialog{background:Canvas;color:CanvasText}}
