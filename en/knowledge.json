@@ -1,5 +1,5 @@
 {
-  "version": "2026-09-15-selected-experiences-copy-9bfc4e4ce8-rhythm-20261001-copy-3910676d01-release-copy-3e4ed3be6d-en-002b14631325-bm-platform-20261007-a885b0d303",
+  "version": "2026-09-15-selected-experiences-copy-9bfc4e4ce8-rhythm-20261001-copy-3910676d01-release-copy-3e4ed3be6d-en-002b14631325-bm-platform-20261007-a885b0d303-travel-20261007-ce148dd860",
   "updatedAt": "2026-10-07",
   "docs": [
     {
@@ -46,7 +46,7 @@
         "Travel and food — Where to go, what to eat. Explore a day that fits your tastes and plans.",
         "Learning and everyday life — Enjoy Korean games and useful personalized tools at your own pace.",
         "Your preferences, remembered — The preferences and feedback you share help future recommendations and guidance fit you better.",
-        "New programs, including travel and food, will be released in stages. The records used for personalization and how they are saved vary by program.",
+        "The Seoul travel experience uses fictional examples to compare your preferences. New programs will be released in stages. The records used for personalization and how they are stored vary by program.",
         "Atlas is the personalization engine SYNK builds, and the name for its eight engines together. They share the work, from deciding what a person needs to ordering what to learn, giving explanations and hints, shaping screens and sound, and checking whether the help worked. LAB, SHIFT, PULSE, and PATH each pick the engines they need and fit them to their own services.",
         "The same person needs different practice as their goals change. The expressions you need when preparing to study in Korea, working with a Korean company, or talking with family are not the same. We are developing Atlas to adjust tasks and explanations to the goals you set and your recent results, not to your age.",
         "Core — Judging what is needed now. It looks at what the person is trying to do and where they get stuck, and decides what to do next and what help is needed. It also sets out the reasons for what it recommends and leaves out.",
@@ -4168,7 +4168,7 @@
         "Does the SYNK platform become more personal as I use it?",
         "Are there programs for travel and food?"
       ],
-      "answer": "From travel and food to learning and everyday life, explore free programs and discover what fits you.\n\nTravel and food — Where to go, what to eat. Explore a day that fits your tastes and plans.\n\nLearning and everyday life — Enjoy Korean games and useful personalized tools at your own pace.\n\nYour preferences, remembered — The preferences and feedback you share help future recommendations and guidance fit you better.\n\nNew programs, including travel and food, will be released in stages. The records used for personalization and how they are saved vary by program.",
+      "answer": "From travel and food to learning and everyday life, explore free programs and discover what fits you.\n\nTravel and food — Where to go, what to eat. Explore a day that fits your tastes and plans.\n\nLearning and everyday life — Enjoy Korean games and useful personalized tools at your own pace.\n\nYour preferences, remembered — The preferences and feedback you share help future recommendations and guidance fit you better.\n\nThe Seoul travel experience uses fictional examples to compare your preferences. New programs will be released in stages. The records used for personalization and how they are stored vary by program.",
       "relatedIds": [
         "synk-stage",
         "guide-contact"
