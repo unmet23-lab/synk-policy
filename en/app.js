@@ -1,5 +1,5 @@
-import {createKnowledgeEngine} from '/en/knowledge-engine.js??v=efc39fca2e79';
-import {appendPublicActions} from '/public-actions.js??v=efc39fca2e79';
+import {createKnowledgeEngine} from '/en/knowledge-engine.js?v=b0f1a96591a0';
+import {appendPublicActions} from '/public-actions.js?v=6beb679f3b34';
 const $=s=>document.querySelector(s);
 const conversation=$('#questions'),form=$('#question-form'),input=$('#question'),send=$('#send'),messages=$('#messages'),dialog=$('#document-dialog');
 const initialContext=()=>({brand:['lab','shift','pulse','path'].includes(document.body.dataset.site)?document.body.dataset.site:'synk'});
@@ -20,7 +20,7 @@ function paragraphs(parent,text){String(text).split(/\n\n/).forEach(p=>parent.ap
 let pending=null;
 function startKnowledge(){
  if(pending)return pending;
- pending=fetch('/en/knowledge.json??v=efc39fca2e79').then(r=>{if(!r.ok)throw new Error("Public information could not be loaded.");return r.json();}).then(data=>{
+ pending=fetch('/en/knowledge.json?v=e03acbe66d16').then(r=>{if(!r.ok)throw new Error("Public information could not be loaded.");return r.json();}).then(data=>{
   engine=createKnowledgeEngine(data);return engine;
 }).catch(error=>{console.error('Public notes unavailable');$('#answer-note').textContent="Public information could not be loaded. Send a question to try again.";throw error;});
  // A background failure should not become an unhandled rejection before anyone asks.
@@ -30,14 +30,14 @@ function startKnowledge(){
 if(document.body.dataset.site!=='synk'||document.documentElement.dataset.entryView!=='intro')startKnowledge();
 else document.addEventListener('synk:company-view',startKnowledge,{once:true});
 
-async function getEngine(){if(engine)return engine;try{return await startKnowledge();}catch{const r=await fetch('/en/knowledge.json??v=efc39fca2e79',{cache:'reload'});if(!r.ok)throw new Error("Public information could not be loaded. Please try again shortly.");engine=createKnowledgeEngine(await r.json());$('#answer-note').textContent=readyNote;return engine;}}
+async function getEngine(){if(engine)return engine;try{return await startKnowledge();}catch{const r=await fetch('/en/knowledge.json?v=e03acbe66d16',{cache:'reload'});if(!r.ok)throw new Error("Public information could not be loaded. Please try again shortly.");engine=createKnowledgeEngine(await r.json());$('#answer-note').textContent=readyNote;return engine;}}
 function showAnswers(){document.dispatchEvent(new Event('synk:show-answers'));}
 function enterChat(){showAnswers();conversation.classList.add('is-chatting');$('#introduction').hidden=true;$('#chat-area').hidden=false;}
 function focusQuestion(){showAnswers();input.focus({preventScroll:true});if(!conversation.closest('.orb-help'))(conversation.closest('.help-frame')||conversation).scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth',block:'start'});}
 function reset(){context=initialContext();messages.replaceChildren();conversation.classList.remove('is-chatting');$('#introduction').hidden=false;$('#chat-area').hidden=true;input.value='';syncInput();input.focus({preventScroll:true});document.dispatchEvent(new CustomEvent('synk:orb-state',{detail:'idle'}));}
 function appendAnswer(result){
   const article=element('article','message-assistant');article.dataset.status=result.status;
-  const label=element('div','message-label');const mark=element('img','answer-wordmark');mark.src='/assets/brand-synk.webp??v=efc39fca2e79';mark.alt='SYNK';mark.width=744;mark.height=360;label.append(mark,element('span','',result.status==='restricted'?"Public information":result.status==='needs_confirmation'?"Please contact us to confirm":"SYNK guide"));article.append(label);
+  const label=element('div','message-label');const mark=element('img','answer-wordmark');mark.src='/assets/brand-synk.webp?v=602ab698b7e0';mark.alt='SYNK';mark.width=744;mark.height=360;label.append(mark,element('span','',result.status==='restricted'?"Public information":result.status==='needs_confirmation'?"Please contact us to confirm":"SYNK guide"));article.append(label);
   const body=element('div','answer-text');
   if(result.message)paragraphs(body,result.message);
   for(const record of result.records){

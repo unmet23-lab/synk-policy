@@ -1,5 +1,5 @@
 {
-  "version": "2026-09-15-selected-experiences-copy-9bfc4e4ce8-rhythm-20261001-copy-3910676d01-release-copy-3e4ed3be6d-en-3ff8f59cd76e",
+  "version": "2026-09-15-selected-experiences-copy-9bfc4e4ce8-rhythm-20261001-copy-3910676d01-release-copy-3e4ed3be6d-en-002b14631325",
   "updatedAt": "2026-10-06",
   "docs": [
     {
@@ -29,14 +29,14 @@
         "Meet Mongle, with a coral-colored body and stitching; Kkamong, with green eyes and brown fur; and Marin, with a navy helmet and yellow eyes.",
         "I wanted to care for each student properly. When I worked at an academy in Mongolia, I knew each student needed different help, but I never had the time to tailor it to every one of them. I started SYNK to do that work with technology.",
         "On SHIFT, the founder shares the process of building a company with AI and the decisions made along the way. We publish the approaches tried, failures, and reasons for revisions so others can draw on them in their own work.",
-        "Check whether the service meets your needs, what you will receive, and the terms of use. The website explains the scope and development status of each business.",
-        "LAB prepares tasks and feedback for learners’ needs. SHIFT develops methods and support for work and careers, while PULSE makes music and creative work to enjoy.",
-        "Explore the Korean learning demos and K-LOFI information. These examples alone do not establish results for customers or students, or prove that SYNK is better than another company.",
+        "Start by writing down what you need right now. Where to look depends on whether you want to learn Korean, put AI to work in your company, need a video or music, or are preparing to study or work in Korea.",
+        "LAB covers Korean education; SHIFT covers company-specific AI services and AI training and branding; PULSE covers ad and model videos, music and characters; PATH covers preparing to study and work in Korea. Each page separates what you can use now from what is in preparation, and says what you receive and on what terms.",
+        "The examples and introductions on this site do not claim proven results, or that we are better than another company. If you have a question, use the enquiry form or hello@synk.im and we will tell you what is possible right now.",
         "We are currently preparing a new business registration. Once it is complete, we will provide the actual registration details.",
         "The “© 2026 SYNK. All rights reserved.” notice in the footer is SYNK’s copyright notice. Please check separately which uses of individual works, logos, and characters are permitted.",
         "SYNK’s founder is Yuho Yang. Yuho studied architecture and psychology and worked as a performer on stage and on screen.",
         "When I worked at an academy in Mongolia, I knew each student needed different help, but I never had the time to tailor it to every one of them. I started SYNK to do that work with technology.",
-        "The creator introduced on this website and in SHIFT content is the founder. He sets the company’s direction, decides which tasks to delegate to AI and which results to review personally, and shares the actual production process and the reasons for revisions.",
+        "Setting the company’s direction, and deciding what to hand to AI and what to check in person, is also the founder’s job. The making process and the reasons for changes introduced on this site and in SHIFT are what the founder went through.",
         "Founder Yuho Yang’s education: Department of Architecture, Howon University · Department of Psychology, Chung-Ang University.",
         "Education · Operations — 2026 Former Deputy Director, Skyline Edu, Mongolia (Student advising, class operations, and online promotion)",
         "Performance · Projects — 2023 RCA · Royal College of Art (Royal College of Art graduate project · Main Performer), 2023 TV series “Bora! Deborah” · Netflix (Appearance in the opening sequence of Episode 1), 2014 LOEN Entertainment (Performer)",
@@ -73,10 +73,10 @@
         "SYNK LAB is an edtech company developing Korean textbooks, learning games, and a learning app built on Atlas, our personalization engine. We are preparing a one-year, in-person program targeting TOPIK Level 4, along with conversation classes with native Korean teachers and global English classes. Our approach connects cultural experiences, AI use, and collaborative projects to prepare learners for studying and living in Korea.",
         "Learn Korean and learn to think for yourself. LAB prepares learners for studying in Korea and for life beyond it. TOPIK Level 4 is a clear goal, supported by experience using Korean in real situations. Learners use AI while building the ability to explain their own thinking and judge the results.",
         "We are preparing education for everyone who wants to learn Korean. We look at the Korean learners need in daily life, study, and work, and are developing the curriculum, textbooks, and student app as we prepare to open.",
-        "Learners’ own sentences and choices shape their next tasks and feedback. Participation requirements and schedules will be announced separately for each program. Learning outcomes are not guaranteed.",
+        "What students write and the answers they choose feed into the next task and feedback. The conditions and schedule for each course are announced separately, and learning results are not guaranteed.",
         "Edtech for personalized Korean learning",
-        "LAB is preparing education for everyone who wants to learn Korean. Eligibility is not limited by nationality or place of residence. We research lessons based on how learners want to use Korean and their current ability.",
-        "We are currently developing the curriculum, textbooks, and student app as we prepare to open. Check each online or in-person program’s information for its intended learners, starting level, and participation requirements.",
+        "LAB is preparing Korean education for anyone who wants to learn the language, with no limit by nationality or where you live. Lessons are planned around where you want to use Korean and how much you can do now.",
+        "We are developing the curriculum, textbooks, and student app while preparing to open. Who each online or in-person course is for, its starting level, and the conditions for joining are announced course by course.",
         "We first explore what learners want to do in Korean and what they find difficult. We are preparing classes in which students use what they have learned in real situations, receive feedback, and practice again in the next task.",
         "Practice includes asking questions in university classes, explaining what you enjoy, and sharing opinions in team activities. We are preparing different ways to participate, including planning and editing as well as speaking and writing.",
         "The classroom scenes on this website are examples explaining our approach. They are not actual student records or verified learning outcomes. Each student’s learning outcomes must be assessed through actual classes and experience.",
@@ -229,9 +229,11 @@
         "Support and staff training,\nas your own AI service",
         "SYNK SHIFT puts your product information, manuals, and service standards into Atlas, the personalization engine SYNK built itself, and makes a service that is your company’s own. We also provide AI training, consulting, and branding. The four services below are in development; we set the scope and schedule with you when you enquire.",
         "These services are for companies and organizations that need staff training, AI in their work, or branding, and for companies that need guidance fitted to each customer or employee. We are developing buying advice for companies that sell products, usage guidance for software companies, coaching for instructors and consultants, and response training for sales and customer-service teams.",
-        "We cover both approaches you can try in your own work and the results they produce. Depending on the training, practice, business application, or branding project, we organize source materials, usage guidance, and next steps. The actual delivery scope is agreed in the contract.",
-        "We share how we use AI to build SYNK's actual operations and content. We explain the problem we wanted to solve, what we asked AI to do, and why a person reviewed and revised the result.",
-        "We share how to use tools we have tried and what to watch for, and we are preparing related training and practical support. We do not present features still being tested as proven results.",
+        "We start by checking, with you, the problem your company actually needs to solve. Then we decide whether what you need is staff training, workflow automation or branding, or a service of your own for your customers and staff.",
+        "In training and practice, participants make results they will use in their own work and take them with them. Consulting and branding hand over the deliverables, editable source files, and instructions. The four company-specific services are in development; the actual scope and schedule are set by contract in an adoption consultation.",
+        "We show, as it happened, how SYNK makes its own work and content with AI: what problem we were trying to solve, what we asked the AI, and why a person changed the result after reviewing it.",
+        "We share how to use the tools we have actually used and what to watch out for, and help with training and putting them to work the same way. We do not present features still under test as proven results.",
+        "Alongside AI training, consulting, automation, and branding for companies and institutions, we are developing company-specific personalized services built from a company’s own materials.",
         "Beyond AI training, consulting, automation, and branding for companies and organizations, we are developing personalized services built for each company.",
         "The finished result alone does not explain how it was made. SHIFT shares the approaches tried, what failed, and the reasons behind revisions and decisions so you can draw on them in your own work.",
         "For example, adding decorative stitching to both the SYNK wordmark and the business names made the website logos difficult to read. We kept the soft texture but reduced the stitching on SYNK so the colors and details of LAB, SHIFT, and PULSE could stand out.",
@@ -698,7 +700,7 @@
         "What kind of education does LAB offer?",
         "Is LAB a Korean language academy?"
       ],
-      "answer": "SYNK LAB is an edtech company developing Korean textbooks, learning games, and a learning app built on Atlas, our personalization engine. We are preparing a one-year, in-person program targeting TOPIK Level 4, along with conversation classes with native Korean teachers and global English classes. Our approach connects cultural experiences, AI use, and collaborative projects to prepare learners for studying and living in Korea.\n\nLearn Korean and learn to think for yourself. LAB prepares learners for studying in Korea and for life beyond it. TOPIK Level 4 is a clear goal, supported by experience using Korean in real situations. Learners use AI while building the ability to explain their own thinking and judge the results.\n\nWe are preparing education for everyone who wants to learn Korean. We look at the Korean learners need in daily life, study, and work, and are developing the curriculum, textbooks, and student app as we prepare to open.\n\nLearners’ own sentences and choices shape their next tasks and feedback. Participation requirements and schedules will be announced separately for each program. Learning outcomes are not guaranteed.",
+      "answer": "SYNK LAB is an edtech company developing Korean textbooks, learning games, and a learning app built on Atlas, our personalization engine. We are preparing a one-year, in-person program targeting TOPIK Level 4, along with conversation classes with native Korean teachers and global English classes. Our approach connects cultural experiences, AI use, and collaborative projects to prepare learners for studying and living in Korea.\n\nLearn Korean and learn to think for yourself. LAB prepares learners for studying in Korea and for life beyond it. TOPIK Level 4 is a clear goal, supported by experience using Korean in real situations. Learners use AI while building the ability to explain their own thinking and judge the results.\n\nWe are preparing education for everyone who wants to learn Korean. We look at the Korean learners need in daily life, study, and work, and are developing the curriculum, textbooks, and student app as we prepare to open.\n\nWhat students write and the answers they choose feed into the next task and feedback. The conditions and schedule for each course are announced separately, and learning results are not guaranteed.",
       "sourceId": "lab",
       "relatedIds": [
         "lab-vision",
@@ -777,7 +779,7 @@
         "Is LAB for all international learners?",
         "Is LAB only for students from certain countries?"
       ],
-      "answer": "LAB is preparing education for everyone who wants to learn Korean. Eligibility is not limited by nationality or place of residence. We research lessons based on how learners want to use Korean and their current ability.\n\nWe are currently developing the curriculum, textbooks, and student app as we prepare to open. Check each online or in-person program’s information for its intended learners, starting level, and participation requirements.",
+      "answer": "LAB is preparing Korean education for anyone who wants to learn the language, with no limit by nationality or where you live. Lessons are planned around where you want to use Korean and how much you can do now.\n\nWe are developing the curriculum, textbooks, and student app while preparing to open. Who each online or in-person course is for, its starting level, and the conditions for joining are announced course by course.",
       "sourceId": "lab",
       "relatedIds": [
         "lab-learning",
@@ -788,7 +790,7 @@
         "label": "Explore LAB",
         "href": "/en/lab/"
       },
-      "reviewedAt": "2026-09-15",
+      "reviewedAt": "2026-10-06",
       "aliases": [
         "LAB은 누구를 위한 곳인가요?",
         "한국어를 배우고 싶은 누구나 LAB 대상인가요?",
@@ -1229,7 +1231,7 @@
         "Can I apply what I learn to my work?",
         "I'd like to understand the approach to lessons and practice"
       ],
-      "answer": "We cover both approaches you can try in your own work and the results they produce. Depending on the training, practice, business application, or branding project, we organize source materials, usage guidance, and next steps. The actual delivery scope is agreed in the contract.",
+      "answer": "We start by checking, with you, the problem your company actually needs to solve. Then we decide whether what you need is staff training, workflow automation or branding, or a service of your own for your customers and staff.\n\nIn training and practice, participants make results they will use in their own work and take them with them. Consulting and branding hand over the deliverables, editable source files, and instructions. The four company-specific services are in development; the actual scope and schedule are set by contract in an adoption consultation.",
       "sourceId": "shift",
       "relatedIds": [
         "shift-ai",
@@ -1267,7 +1269,7 @@
         "How does SHIFT approach AI tools?",
         "Is the AI training relevant to real work?"
       ],
-      "answer": "We share how we use AI to build SYNK's actual operations and content. We explain the problem we wanted to solve, what we asked AI to do, and why a person reviewed and revised the result.\n\nWe share how to use tools we have tried and what to watch for, and we are preparing related training and practical support. We do not present features still being tested as proven results.\n\nBeyond AI training, consulting, automation, and branding for companies and organizations, we are developing personalized services built for each company.",
+      "answer": "We show, as it happened, how SYNK makes its own work and content with AI: what problem we were trying to solve, what we asked the AI, and why a person changed the result after reviewing it.\n\nWe share how to use the tools we have actually used and what to watch out for, and help with training and putting them to work the same way. We do not present features still under test as proven results.\n\nAlongside AI training, consulting, automation, and branding for companies and institutions, we are developing company-specific personalized services built from a company’s own materials.\n\nBeyond AI training, consulting, automation, and branding for companies and organizations, we are developing personalized services built for each company.",
       "sourceId": "shift",
       "relatedIds": [
         "shift-takeaway",
@@ -1907,8 +1909,8 @@
         "label": "Explore featured experiences",
         "href": "/en/#worlds"
       },
-      "answer": "Check whether the service meets your needs, what you will receive, and the terms of use. The website explains the scope and development status of each business.\n\nLAB prepares tasks and feedback for learners’ needs. SHIFT develops methods and support for work and careers, while PULSE makes music and creative work to enjoy.\n\nExplore the Korean learning demos and K-LOFI information. These examples alone do not establish results for customers or students, or prove that SYNK is better than another company.",
-      "reviewedAt": "2026-10-05",
+      "answer": "Start by writing down what you need right now. Where to look depends on whether you want to learn Korean, put AI to work in your company, need a video or music, or are preparing to study or work in Korea.\n\nLAB covers Korean education; SHIFT covers company-specific AI services and AI training and branding; PULSE covers ad and model videos, music and characters; PATH covers preparing to study and work in Korea. Each page separates what you can use now from what is in preparation, and says what you receive and on what terms.\n\nThe examples and introductions on this site do not claim proven results, or that we are better than another company. If you have a question, use the enquiry form or hello@synk.im and we will tell you what is possible right now.",
+      "reviewedAt": "2026-10-06",
       "aliases": [
         "SYNK의 강점은 무엇인가요?",
         "SYNK의 차별점이 궁금해요",
@@ -1950,7 +1952,7 @@
       "sourceId": "company",
       "brand": "synk",
       "title": "Who is building SYNK?",
-      "answer": "SYNK’s founder is Yuho Yang. Yuho studied architecture and psychology and worked as a performer on stage and on screen.\n\nWhen I worked at an academy in Mongolia, I knew each student needed different help, but I never had the time to tailor it to every one of them. I started SYNK to do that work with technology.\n\nThe creator introduced on this website and in SHIFT content is the founder. He sets the company’s direction, decides which tasks to delegate to AI and which results to review personally, and shares the actual production process and the reasons for revisions.",
+      "answer": "SYNK’s founder is Yuho Yang. Yuho studied architecture and psychology and worked as a performer on stage and on screen.\n\nWhen I worked at an academy in Mongolia, I knew each student needed different help, but I never had the time to tailor it to every one of them. I started SYNK to do that work with technology.\n\nSetting the company’s direction, and deciding what to hand to AI and what to check in person, is also the founder’s job. The making process and the reasons for changes introduced on this site and in SHIFT are what the founder went through.",
       "questionExamples": [
         "Who is building SYNK?",
         "What is the founder’s name?",
