@@ -138,6 +138,13 @@
       "redirectUris": [
         "http://127.0.0.1:4292/"
       ]
+    },
+    {
+      "product": "platform",
+      "clientId": "84da5218-9e25-4ee9-a18b-e215895e182f",
+      "redirectUris": [
+        "https://synk.im/care/"
+      ]
     }
   ],
   "clients": {
