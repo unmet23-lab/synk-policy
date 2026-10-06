@@ -1,4 +1,4 @@
-import {TRACKS} from './core.js?v=20261002-flow';
+import {TRACKS} from './core.js';
 const SKILLS=[['detail','detail','negation','negation','detail'],['reason','negation','reason','detail','reason'],['condition','detail','main','detail','main']];
 // The TOPIK I grammar (strata/topik-i.grammar.json) each spoken passage uses, as Strata's grammarIn
 // (strata/topik-i-forms.js) reads it: [passage, recall passage] per question. What is understood is the
