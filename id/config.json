@@ -19,6 +19,20 @@
         "https://synk.im/brief/computer/",
         "https://synk.im/brief/meeting/"
       ]
+    },
+    {
+      "product": "platform",
+      "clientId": "adec83c7-79d3-4685-b350-7bd0bd37e824",
+      "redirectUris": [
+        "http://127.0.0.1:4299/"
+      ]
+    },
+    {
+      "product": "platform",
+      "clientId": "88ecd6c3-7b11-4630-853d-4be21f321af9",
+      "redirectUris": [
+        "http://127.0.0.1:43825/synk/oauth/fortune/callback"
+      ]
     }
   ],
   "clients": {
