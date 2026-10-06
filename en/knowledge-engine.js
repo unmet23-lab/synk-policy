@@ -167,11 +167,15 @@ export function createKnowledgeEngine(data){
   if(exact.has(q)){const ids=exact.get(q);const local=ids.filter(id=>records.get(id).brand===brand);return from(local.length?local:ids);}
   // Published planned-service scope precedes generic shopping and accommodation fallbacks.
   const plannedService=[
+   ['shift-intro',/\bplatform\b/.test(q)&&/\b(?:introduc\w*|deploy\w*|compan\w*|corporate|business|employees?)\b/.test(q)&&(brand==='shift'||/\bshift\b/.test(q))&&!/\b(?:free|try|trial)\b/.test(q)],
+   ['shift-delivery',/\b(?:apis?|systems?)\b/.test(q)&&/\b(?:integrat\w*|connect\w*)\b/.test(q)&&(brand==='shift'||/\bshift\b/.test(q))],
+   ['shift-contract',/\b(?:setup|operating|operation|additional development)\b/.test(q)&&/\b(?:fees?|cost|charges?|pricing)\b/.test(q)&&(brand==='shift'||/\bshift\b/.test(q))],
+   ['pulse-profile',/\b(?:profile|presentation|ppt)\b/.test(q)&&(brand==='pulse'||/\bpulse\b/.test(q))],
    ['shift-research',/\b(?:market research|consumer research|user testing|usability testing|product testing)\b/.test(q)],
    ['pulse-rental',/\b(?:studio|production space|equipment|camera|audio equipment)\b.{0,30}\b(?:hire|rent|rental|book)|\b(?:hire|rent|rental|book)\b.{0,30}\b(?:studio|production space|equipment|camera)\b/.test(q)],
-   ['path-settle',/\b(?:housing|settling in|move in|accommodation|somewhere to live)\b/.test(q)&&(brand==='path'||/\b(?:path|study|studying|student)\b/.test(q))],
-   ['path-visit',/\b(?:visit|cultural experience)\w*\b/.test(q)&&(brand==='path'||/\bpath\b/.test(q))],
-   ['synk-products',/\bsynk products?\b|\bproduct (?:sales|orders|shipping|suppliers)\b/.test(q)&&!/\b(?:coaching|personalization|buying advice)\b/.test(q)]
+   ['path-settle',/\b(?:housing|settling in|move in|accommodation|somewhere to live)\b/.test(q)&&(brand==='path'||/\b(?:path|study|studying|student)\b/.test(q))&&!/\b(?:travel|trip|food)\b/.test(q)],
+   ['path-visit',/\b(?:visit|cultural experience|travel|trip|food recommendations)\w*\b/.test(q)&&(brand==='path'||/\bpath\b/.test(q))],
+   ['synk-products',/\bplatform\b/.test(q)&&/\bsynk\b|\bfree\b|\btry\b|\bpersonal\w*|\bpreferences?\b/.test(q)&&(brand!=='shift'||/\b(?:free|try)\b|\bsynk platform\b/.test(q))]
   ].filter(([id,hit])=>hit&&records.has(id)).map(([id])=>id);
   if(plannedService.length){
   if(/\bprivacy|\bcookies?\b|\b(?:save|store|retain|record|collect|track|keep|log|send|sent|upload|transmit)(?:s|ed|ing)?\b.*\b(?:chats?|conversations?|questions?|data|what (?:i|she|he|they|we|my \w+) (?:listen|type|ask|write|say|enter)\w*|anything (?:i|she|he|they|we) (?:type|write|say)\w*|somewhere|servers?|cloud|third part\w*|here)\b|\b(?:chat|conversation|data|anything (?:i|she|he|they) type\w*|what (?:i|she|he) type\w*)\b.*\b(?:saved|stored|collected|tracked|kept|logged|sent)\b/.test(q)&&!/consultation|chat ?gpt|chatbot|brief|proposal|files?/.test(q))return from(['guide-privacy']);
@@ -180,7 +184,8 @@ export function createKnowledgeEngine(data){
     }
   // Explain a brand's application of Atlas before generic engine, agency and comparison rules.
   // Commercial terms, evidence and technical details retain their existing routes.
-  const atlasValueId=named.length<=1&&['shift','pulse'].includes(brand)?brand+'-atlas-value':null;
+  if(records.has('shift-expansion')&&/\b(?:api|engine licen\w*|repeatable delivery|expansion|expand\w*)\b/.test(q)&&(brand==='shift'||/\b(?:shift|atlas|engine)\b/.test(q)))return from(['shift-expansion']);
+    const atlasValueId=named.length<=1&&['shift','pulse'].includes(brand)?brand+'-atlas-value':null;
   const atlasApplication=/\b(?:atlas|engines?)\b/.test(q)&&/\b(?:use|uses|using|used|apply|applies|applied|applying|application|integrat\w*|connect\w*|contribut\w*)\b/.test(q);
   const serviceComparison=/\b(?:sets? .{0,30}apart|what makes .{0,30}(?:different|special|unique)|differenti\w*|your (?:edge|advantage|usp)|unique selling|why (?:should (?:i|we) )?(?:choose|pick))\b/.test(q)||(/\b(?:chatbots?|generic|general|regular|ordinary|typical|traditional|other (?:companies|agencies|providers)|production (?:compan\w*|agenc\w*)|agenc\w*)\b/.test(q)&&/\b(?:differ\w*|compar\w*|versus|vs|same|better than|instead of)\b/.test(q));
   const atlasValueBoundary=/\b(?:privacy|private|personal|collect\w*|stor(?:e[ds]?|ing|age)|retain\w*|retention|consent|delet\w*|records?|price\w*|cost\w*|fees?|quote|budget|charge\w*|how much|free|refund|pay\w*|discount|contract|enrol\w*|register\w*|launch\w*|schedule|dates?|when|now|available|guarantee\w*|promise\w*|results?|revenue|profit|metrics|statistics|evidence|proof|data|patent\w*|source|algorithm|implementation|programming|language model|model name|tech stack|framework|written in|coded in|built (?:with|in|on))\b/.test(q);

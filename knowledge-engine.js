@@ -272,11 +272,15 @@ export function createKnowledgeEngine(data){
     // Planned services keep their reviewed scope even when someone asks about booking or price.
     // These routes follow the private-data guards and precede general purchasing/off-topic rules.
     const plannedService=[
+      ['shift-intro',/플랫폼/.test(c)&&/도입|기업|회사|고객사|직원/.test(c)&&(brand==='shift'||/shift|시프트/.test(c))&&!/무료|체험/.test(c)],
+      ['shift-delivery',/api|시스템/.test(c)&&/연동|연결/.test(c)&&(brand==='shift'||/shift|시프트/.test(c))],
+      ['shift-contract',/(?:도입비|운영료|추가사용|추가개발)/.test(c)&&(/shift|시프트|개인화/.test(c)||brand==='shift')],
+      ['pulse-profile',/(?:AI프로필|ai프로필|소개ppt|소개자료|프로필사진)/.test(c)&&(/pulse|펄스/.test(c)||brand==='pulse')],
       ['shift-research',/시장조사|소비자(?:반응|조사)|제품테스트|사용자테스트|사용성테스트/.test(c)],
       ['pulse-rental',/(?:스튜디오|촬영공간|행사공간|장비|카메라|음향|조명).{0,12}(?:대여|대관|빌리|빌릴|렌탈)|(?:대여|대관|렌탈).{0,8}(?:스튜디오|장비)/.test(c)],
-      ['path-settle',/주거|정착지원|입주/.test(c)||((brand==='path'||/한국.*유학/.test(c))&&/숙소|살곳|집구|집을구|기숙사/.test(c))],
-      ['path-visit',/방문.*문화체험/.test(c)||(brand==='path'&&/방문|문화체험/.test(c))],
-      ['synk-products',/입점|(?:synk|싱크).{0,10}상품|상품(?:판매|주문|결제|배송)|^(?:상품|스토어)$/.test(c)&&!/코칭|구매상담|개인화|가상상품/.test(c)]
+      ['path-settle',/주거|정착지원|입주/.test(c)||((brand==='path'||/한국.*유학/.test(c))&&/숙소|살곳|집구|집을구|기숙사/.test(c)&&!/여행|맛집|휴가/.test(c))],
+      ['path-visit',records.get('path-visit')?.questionExamples.some(ex=>compact(normalizeQuery(ex))===c)||/방문.*문화체험/.test(c)||((brand==='path'||/path|패스/.test(c))&&/개인화여행|여행|맛집|문화체험|방문/.test(c))],
+      ['synk-products',records.get('synk-products')?.questionExamples.some(ex=>compact(normalizeQuery(ex))===c)||(/플랫폼/.test(c)&&/synk|무료|체험|개인화|취향|쓸수록/.test(c)&&(brand!=='shift'||/무료|체험|synk플랫폼/.test(c)))]
     ].filter(([id,hit])=>hit&&records.has(id)).map(([id])=>id);
     if(plannedService.length){
     if(/(?:지난번|예전|이전|어제|저번)(?:에)?.{0,8}(?:대화|질문|채팅)/.test(c)&&/다시|볼수|확인|찾|보여|남아|있어/.test(c))return from(['guide-privacy']);
@@ -288,6 +292,7 @@ export function createKnowledgeEngine(data){
     }
     // Brand applications of Atlas have their own public scope, separate from the engine overview.
     // Keep prices, evidence and implementation details on their existing routes below.
+    if(records.has('shift-expansion')&&(/(?:^|[^a-z])apis?(?:[^a-z]|$)/.test(q)||/엔진라이선스|엔진라이센스|반복공급|확장순서|사업.{0,5}(?:순서|넓히)/.test(c))&&(/shift|시프트|아틀라스|atlas|엔진/.test(c)||brand==='shift'))return from(['shift-expansion']);
     const atlasValueId=brands.length<=1&&['shift','pulse'].includes(brand)?brand+'-atlas-value':null;
     const atlasApplication=/아틀라스|atlas|엔진/.test(c)&&/활용|적용|사용|쓰(?:나|는|이|게|고|나요)|써(?:요|서|야)|연결|기여/.test(c);
     const serviceComparison=/차별|강점|차이점|왜선택|선택할이유/.test(c)||(/챗봇|일반|보통|다른(?:곳|회사|업체|제작사|대행사)|제작사|대행사/.test(c)&&/차이|비교|다르|다른(?:가|지|점)|달라|똑같|같은/.test(c));

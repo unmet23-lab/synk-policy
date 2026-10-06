@@ -1,4 +1,4 @@
-import {createKnowledgeEngine} from '/en/knowledge-engine.js?v=b0f1a96591a0';
+import {createKnowledgeEngine} from '/en/knowledge-engine.js?v=1208ad554799';
 import {appendPublicActions} from '/public-actions.js?v=6beb679f3b34';
 const $=s=>document.querySelector(s);
 const conversation=$('#questions'),form=$('#question-form'),input=$('#question'),send=$('#send'),messages=$('#messages'),dialog=$('#document-dialog');
@@ -20,7 +20,7 @@ function paragraphs(parent,text){String(text).split(/\n\n/).forEach(p=>parent.ap
 let pending=null;
 function startKnowledge(){
  if(pending)return pending;
- pending=fetch('/en/knowledge.json?v=e03acbe66d16').then(r=>{if(!r.ok)throw new Error("Public information could not be loaded.");return r.json();}).then(data=>{
+ pending=fetch('/en/knowledge.json?v=f01184d9f075').then(r=>{if(!r.ok)throw new Error("Public information could not be loaded.");return r.json();}).then(data=>{
   engine=createKnowledgeEngine(data);return engine;
 }).catch(error=>{console.error('Public notes unavailable');$('#answer-note').textContent="Public information could not be loaded. Send a question to try again.";throw error;});
  // A background failure should not become an unhandled rejection before anyone asks.
@@ -30,7 +30,7 @@ function startKnowledge(){
 if(document.body.dataset.site!=='synk'||document.documentElement.dataset.entryView!=='intro')startKnowledge();
 else document.addEventListener('synk:company-view',startKnowledge,{once:true});
 
-async function getEngine(){if(engine)return engine;try{return await startKnowledge();}catch{const r=await fetch('/en/knowledge.json?v=e03acbe66d16',{cache:'reload'});if(!r.ok)throw new Error("Public information could not be loaded. Please try again shortly.");engine=createKnowledgeEngine(await r.json());$('#answer-note').textContent=readyNote;return engine;}}
+async function getEngine(){if(engine)return engine;try{return await startKnowledge();}catch{const r=await fetch('/en/knowledge.json?v=f01184d9f075',{cache:'reload'});if(!r.ok)throw new Error("Public information could not be loaded. Please try again shortly.");engine=createKnowledgeEngine(await r.json());$('#answer-note').textContent=readyNote;return engine;}}
 function showAnswers(){document.dispatchEvent(new Event('synk:show-answers'));}
 function enterChat(){showAnswers();conversation.classList.add('is-chatting');$('#introduction').hidden=true;$('#chat-area').hidden=false;}
 function focusQuestion(){showAnswers();input.focus({preventScroll:true});if(!conversation.closest('.orb-help'))(conversation.closest('.help-frame')||conversation).scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth',block:'start'});}
