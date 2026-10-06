@@ -12,9 +12,19 @@
 <link rel="icon" type="image/png" sizes="48x48" href="/assets/favicon-synk-20260919-48.png">
 <link rel="icon" type="image/svg+xml" sizes="any" media="(prefers-color-scheme: dark)" href="/assets/favicon-synk-dark-20260919.svg">
 <link rel="canonical" href="https://synk.im/atlas/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="SYNK">
+<meta property="og:title" content="Atlas · SYNK의 초개인화 엔진">
+<meta property="og:description" content="SYNK가 만드는 개인화 엔진 Atlas. 여덟 엔진이 목표와 실제로 해 본 결과를 보고, 지금 나에게 가장 맞는 다음 걸음을 제안합니다.">
+<meta property="og:url" content="https://synk.im/atlas/">
+<meta property="og:image" content="https://synk.im/assets/companions-scene.webp?v=20260915-felt-seoul">
+<meta property="og:image:width" content="1586">
+<meta property="og:image:height" content="992">
+<meta property="og:image:alt" content="함께 모인 SYNK의 세 친구, 몽글·까몽·마린">
+<meta name="twitter:card" content="summary_large_image">
   <style data-synk-폰트="SUIT">@font-face{font-family:'SUIT Variable';font-weight:100 900;font-display:swap;src:url(/assets/suit.woff2) format('woff2-variations');}</style><style>@font-face{font-family:'Inter Tight';font-weight:500;font-display:swap;src:url(/assets/inter-tight-medium.woff2) format('woff2')}@font-face{font-family:'DM Mono';font-weight:400;font-display:swap;src:url(/assets/dm-mono.woff2) format('woff2')}</style>
 
-  <link rel="stylesheet" href="/atlas-editorial.css?v=3b4fda96a597">
+  <link rel="stylesheet" href="/atlas-editorial.css?v=dcdc3f151754">
 <link rel="stylesheet" href="/site-bar.css?v=18bc7b0ed4f8"><script type="module" src="/site-bar.js?v=9ad7e89b8617"></script><script>(function(){try{const raw=sessionStorage.getItem('synk-atlas-handoff');sessionStorage.removeItem('synk-atlas-handoff');if(!raw)return;const v=JSON.parse(raw);if(Date.now()-v.time>8000||![v.x,v.y,v.size].every(Number.isFinite)||v.size<20||v.size>1000)return;const root=document.documentElement;root.dataset.atlasArrival='pending';root.style.setProperty('--arrival-x',v.x+'px');root.style.setProperty('--arrival-y',v.y+'px');root.style.setProperty('--arrival-size',v.size+'px');setTimeout(()=>root.removeAttribute('data-atlas-arrival'),3000)}catch{}})();</script><link rel="stylesheet" href="/atlas-portal-arrival.css?v=46648932114c"><script defer src="/atlas-portal-arrival.js?v=2e853f0eb027"></script></head>
 <body data-site="synk"><div class="atlas-arrival" aria-hidden="true"><div class="atlas-arrival-orb"></div></div>
   <a class="skip-link" href="#engine-nav">엔진 선택으로 건너뛰기</a>
@@ -29,7 +39,7 @@
         </div>
         <div class="intro-statement">
           <h2>SYNK는 개인화 엔진<br>Atlas를 만듭니다</h2>
-          <p class="intro-copy">목표와 조건에 맞는 다음 선택부터,<br>기업용 도구와 콘텐츠 제작까지.</p>
+          <p class="intro-copy">목표와 해 본 결과를 보고,<br>지금 나에게 가장 맞는 다음 걸음을 제안합니다.</p>
         </div>
       </div>
 
@@ -83,7 +93,7 @@
     </section>
 
     <section class="adaptation" id="atlas-goals" aria-labelledby="atlas-goals-title">
-      <div class="section-heading"><p class="section-index mono">03 / ADAPTATION</p><h2 id="atlas-goals-title">목표가 바뀌면,<br>연습도 바뀝니다</h2><p class="section-lead">유학 준비, 회사 회의, 면접, 가족과의 대화처럼 목표가 다르면 필요한 연습도 다릅니다. 아틀라스는 나이가 아니라 본인이 정한 목표와 최근 결과를 보고 연습을 바꾸도록 개발하고 있습니다.</p></div>
+      <div class="section-heading"><p class="section-index mono">03 / ADAPTATION</p><h2 id="atlas-goals-title">목표가 바뀌면,<br>연습도 바뀝니다</h2><p class="section-lead">유학 준비, 회사 회의, 면접, 가족과의 대화처럼 목표가 다르면 필요한 연습도 다릅니다. Atlas는 나이가 아니라 본인이 정한 목표와 최근 결과를 보고 연습을 바꾸도록 개발하고 있습니다.</p></div>
       <div class="example-explorer" data-scene-explorer data-prefetch-scenes>
         <div class="example-nav" data-scene-nav hidden aria-label="목표별 연습 예시"><button type="button" id="atlas-goal-choice-study" data-scene-choice><span class="mono">01</span>유학 준비</button><button type="button" id="atlas-goal-choice-work" data-scene-choice><span class="mono">02</span>회사 일</button><button type="button" id="atlas-goal-choice-interview" data-scene-choice><span class="mono">03</span>취업 면접</button><button type="button" id="atlas-goal-choice-family" data-scene-choice><span class="mono">04</span>가족과 이웃</button></div>
         <section class="goal-panel" data-scene-panel id="atlas-goal-study" aria-label="유학 준비 예시">
@@ -100,18 +110,18 @@
           <ol class="goal-steps"><li><span class="mono">01</span><h4>지금 수준 확인</h4><p>인사와 안부를 말해 보고, 높임말을 고르는 곳에서 막히는지 봅니다.</p></li><li><span class="mono">02</span><h4>필요한 연습</h4><p>상대에 맞는 말투로 요즘 일을 두세 문장으로 말해 봅니다.</p></li><li><span class="mono">03</span><h4>다시 해 보기</h4><p>상대가 되물어도 이어서 답할 수 있는지 확인합니다.</p></li></ol>
         </section>
       </div>
-      <p class="scope-note">목표에 따라 연습이 달라지는 방식을 보여주는 예시입니다.</p>
+      <p class="scope-note">목표에 따라 연습이 어떻게 달라지는지 보여 주는 예시입니다.</p>
     </section>
 
     <section class="applications" id="applications" aria-labelledby="applications-title">
       <div class="section-heading"><p class="section-index mono">04 / BUILT WITH ATLAS</p><h2 id="applications-title">Atlas가<br>쓰이는 곳</h2><p class="section-lead">서비스마다 목적에 맞는<br>엔진을 골라 씁니다.</p></div>
       <ul class="application-list">
         <li><a class="application-link" data-service="lab" href="/lab/" target="_top"><span class="application-name">LAB</span><span class="application-detail">목표와 해 본 결과에 맞춘 한국어 연습·게임과 힌트</span><span class="arrow-icon" aria-hidden="true"></span></a></li>
-        <li><a class="application-link" data-service="shift" href="/shift/" target="_top"><span class="application-name">SHIFT</span><span class="application-detail">맞춤 구매 상담·제품 사용지원·코칭·직원 훈련 개발</span><span class="arrow-icon" aria-hidden="true"></span></a></li>
-        <li><a class="application-link" data-service="pulse" href="/pulse/" target="_top"><span class="application-name">PULSE</span><span class="application-detail">Loom·Reed를 활용한 광고·모델 영상과 오리지널 콘텐츠 제작</span><span class="arrow-icon" aria-hidden="true"></span></a></li>
+        <li><a class="application-link" data-service="shift" href="/shift/" target="_top"><span class="application-name">SHIFT</span><span class="application-detail">회사 자료로 만드는 구매 상담·사용 안내·코칭·직원 훈련</span><span class="arrow-icon" aria-hidden="true"></span></a></li>
+        <li><a class="application-link" data-service="pulse" href="/pulse/" target="_top"><span class="application-name">PULSE</span><span class="application-detail">Loom과 Reed로 만드는 광고·모델 영상, 음악과 캐릭터 콘텐츠</span><span class="arrow-icon" aria-hidden="true"></span></a></li>
         <li><a class="application-link" data-service="path" href="/path/" target="_top"><span class="application-name">PATH</span><span class="application-detail">희망 전공과 진로에 맞춘 유학·면접 연습</span><span class="arrow-icon" aria-hidden="true"></span></a></li>
       </ul>
-      <p class="scope-note">학습·업무 실습·상담 도구에 연결하며 개발하고 있습니다. 신규 서비스와 제작물의 적용 범위는 각 브랜드에서 확인하세요.</p>
+      <p class="scope-note">지금은 한국어 학습 게임과 학습 앱에 먼저 연결하며 개발하고 있습니다. 기업용 서비스와 영상 제작에 쓰는 범위는 각 브랜드 페이지에서 안내합니다.</p>
     </section>
     <footer class="colophon"><p><span class="mono">SYNK / ATLAS</span><span class="footer-dot">·</span>쓸수록 나에게 맞춰지는 엔진을 만듭니다.</p><button type="button" id="about-open">개발 범위 <span class="arrow-icon" aria-hidden="true"></span></button></footer>
   </main>
@@ -119,11 +129,11 @@
     <p class="eyebrow mono">BEHIND THE CONNECTIONS</p>
     <h2 id="about-title">Atlas의 개발 범위</h2>
     <p>Atlas는 Core·Strata·Loom·Vellum·Trail·Prism·Temper·Reed, 여덟 엔진을 함께 부르는 이름입니다. 엔진마다 맡은 일을 나눠, 목표와 상황에 맞는 연습과 설명을 함께 준비합니다.</p>
-    <p>지금은 한국어 학습 게임과 학습 앱에 먼저 연결하며 개발하고 있습니다. SHIFT·PULSE·PATH는 서비스에 필요한 엔진을 골라 씁니다. 소개에는 개발 중인 기능이 포함됩니다.</p>
-    <p>연결망은 현재 엔진 설계의 관계를 표현한 시각화입니다. 실제 이용자 수나 실시간 처리량, 전체 연결의 라이브 운영을 뜻하지 않습니다.</p>
+    <p>지금은 한국어 학습 게임과 학습 앱에 먼저 연결하며 개발하고 있습니다. SHIFT·PULSE·PATH는 서비스에 필요한 엔진을 골라 씁니다. 소개에는 아직 개발 중인 기능도 들어 있습니다.</p>
+    <p>이 지도는 여덟 엔진이 설계에서 어떻게 이어지는지를 그린 그림입니다. 실제 이용자 수나 처리량을 보여 주는 화면이 아니고, 모든 연결이 지금 운영 중이라는 뜻도 아닙니다.</p>
     <button type="button" id="about-close">닫기</button>
   </dialog>
-  <noscript><p class="no-script">이 시각화에는 JavaScript가 필요합니다. Atlas는 Core·Strata·Loom·Vellum·Trail·Prism·Temper·Reed를 연결해 한 사람의 목표에 맞는 연습과 설명을 준비합니다.</p></noscript>
+  <noscript><p class="no-script">이 지도는 JavaScript를 켜야 보입니다. Atlas는 Core·Strata·Loom·Vellum·Trail·Prism·Temper·Reed를 연결해 한 사람의 목표에 맞는 연습과 설명을 준비합니다.</p></noscript>
   <script>/*
  * Atlas constellation — curated architecture and designed experience examples.
  * These links express documented responsibilities, not live telemetry or a claim
@@ -159,7 +169,7 @@ window.ATLAS_DATA = {
       concepts: ['본인 말과 실제 기록 구분', '아니라고 한 짐작 빼기', '좋았던 도움 방식 반영', '오래된 기록 다시 안 쓰기', '고른 이유 남기기']
     },
     {
-      id: 'strata', name: 'Strata', role: '배움의 지도', color: '#7DB45A', threadHighlight: '#D3E8BE', threadShadow: '#3F6B2E',
+      id: 'strata', name: 'Strata', role: '배울 내용의 지도', color: '#7DB45A', threadHighlight: '#D3E8BE', threadShadow: '#3F6B2E',
       description: '지금 있는 어휘·문법·수업 회차 자료를 하나의 학습 지도로 잇는 설계입니다.',
       concepts: ['처음·다시 배우는 급수', '틀린 유형과 학습 기술 연결', '문법과 학습 기술 연결', '수업 회차별 문법', '상황별 과제 구성']
     },
@@ -248,7 +258,7 @@ window.ATLAS_DATA = {
         { engine: 'trail', label: '도움 전후 기록 잇기', description: '어떤 도움을 받았는지와 그 뒤에 한 연습을 시간 순서로 잇습니다.' },
         { engine: 'temper', label: '결과 확인', description: '혼자 해낸 결과와 도움받은 결과를 구분하고 아직 잴 수 없는 것은 남겨 둡니다.' },
         { engine: 'core', label: '다음 선택 조정', description: '확인한 결과와 본인의 의견을 보고 다음 도움을 고릅니다.' },
-        { engine: 'strata', label: '이어갈 배움 찾기', description: '다음 연습이 지금까지 배운 내용에서 자연스럽게 이어지도록 고릅니다.' },
+        { engine: 'strata', label: '이어서 배울 내용 찾기', description: '다음 연습이 지금까지 배운 내용에서 자연스럽게 이어지도록 고릅니다.' },
         { engine: 'vellum', label: '바꾼 이유 알리기', description: '무엇을 보고 다음 연습을 바꿨는지 알기 쉬운 말로 전합니다.' }
       ],
       result: '받은 도움과 그 결과를 보고 다음 연습을 준비합니다.'
@@ -994,7 +1004,7 @@ window.ATLAS_DATA = {
   'use strict';
   const data = window.ATLAS_DATA;
   const $ = id => document.getElementById(id);
-  const labels = { core:'이해와 판단', strata:'배움의 지도', loom:'화면과 움직임', vellum:'말과 반응', trail:'기록과 변화', prism:'여러 사람의 결과', temper:'결과 확인', reed:'목소리와 소리' };
+  const labels = { core:'이해와 판단', strata:'배울 내용의 지도', loom:'화면과 움직임', vellum:'말과 반응', trail:'기록과 변화', prism:'여러 사람의 결과', temper:'결과 확인', reed:'목소리와 소리' };
   const state = { view:'explore', selected:null, scenario:null, step:0, paused:false };
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');
   let graph,preloadPaused=false;

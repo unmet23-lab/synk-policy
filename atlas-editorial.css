@@ -111,7 +111,7 @@ button:disabled{cursor:default;opacity:.4}
 .section-index::after{content:'';flex:1;height:1px;background:currentColor;opacity:.45}
 .section-heading h2{margin:0;font:300 var(--t-section)/1.12 var(--suit);letter-spacing:-.05em;color:var(--ink);word-break:keep-all}
 .section-heading h2::first-line{font-weight:900}
-.section-lead{max-width:36em;margin:24px 0 0;font:500 var(--t-lead)/1.7 var(--suit);letter-spacing:-.02em;color:var(--ink-2);word-break:keep-all}
+.section-lead{max-width:36em;margin:24px 0 0;font:500 var(--t-lead)/1.7 var(--suit);letter-spacing:-.02em;color:var(--ink-2);word-break:keep-all;text-wrap:pretty}
 .system-flow{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));margin:64px 0 0;padding:0;list-style:none;border-top:1px solid var(--ink)}
 .system-flow li{display:flex;flex-direction:column;min-width:0;padding:28px 28px 8px 0}
 .system-flow li+li{padding-left:28px;border-left:1px solid var(--line)}
@@ -137,7 +137,8 @@ button:disabled{cursor:default;opacity:.4}
 .goal-context{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);column-gap:56px;align-items:center}
 /* The felt object on a soft plate: the photo's white paper takes the plate's grey. */
 .goal-art{display:block;width:100%;max-width:400px;aspect-ratio:1;padding:6%;border-radius:24px;background:var(--soft);isolation:isolate}
-.goal-art img{display:block;width:100%;height:100%;object-fit:contain;mix-blend-mode:multiply}
+/* The picture's ground is a shade under white; a 2% lift lets it melt into the soft panel (2026-10-05). */
+.goal-art img{display:block;width:100%;height:100%;object-fit:contain;mix-blend-mode:multiply;filter:brightness(1.02)}
 .goal-context h3{margin:8px 0 0;font:800 var(--t-item)/1.35 var(--suit);letter-spacing:-.035em;word-break:keep-all}
 .goal-context p:not(.example-label){margin:14px 0 0;font:500 var(--t-body)/1.75 var(--suit);letter-spacing:-.02em;color:var(--ink-2);word-break:keep-all}
 .goal-steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));margin:40px 0 0;padding:0;list-style:none;border-top:1px solid var(--ink)}
@@ -223,6 +224,9 @@ dialog>p:not(.eyebrow){margin:0 0 12px;font:500 var(--t-ui)/1.75 var(--suit);let
   .system-flow,.example-explorer,.application-list{margin-top:36px}
   .example-nav{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);width:100%}
   .example-nav button{justify-content:center;gap:6px;padding:0 8px}
+  /* Four goals did not fit one row: the words broke in the middle (유학 준/비). Two rows of two. */
+  .example-nav:not(.example-nav--help){grid-auto-flow:row;grid-template-columns:repeat(2,minmax(0,1fr));border-radius:24px}
+  .example-nav:not(.example-nav--help) button{white-space:nowrap}
   .goal-panel{margin-top:28px}
   .goal-art{max-width:240px}
   .application-link{padding:20px 0}

@@ -1071,7 +1071,6 @@ html[lang="en"] .visual-explainer--cards .visual-scene-name{font:400 11px/1.4 va
  /* On a phone the label sits at the very top of the field, under the light: the white-text fields drop it there. */
  :is(body[data-site="shift"],body[data-site="pulse"],body[data-site="path"]) .orb-chamber{background:var(--field-grain),radial-gradient(110% 90% at 88% 108%,rgba(0,0,0,.17),rgba(0,0,0,0) 58%),var(--field)}
 }
-}
 @media (max-width:640px){
  .world-directory{gap:10px}
  .world-directory>a{height:clamp(250px,74vw,300px);grid-template-rows:56% minmax(0,1fr)}
@@ -1099,103 +1098,168 @@ html[lang="en"] .visual-explainer--cards .visual-scene-name{font:400 11px/1.4 va
  :is(#lab.lab-bento,#shift.shift-hero,#pulse.world-pulse,#path.path-hero){border:1px solid CanvasText;background:Canvas}
 }
 
-/* Enterprise pages: the product, its deliverable and an application example share the first view. */
-:is(#shift,#pulse).business-hero{grid-template-rows:auto auto auto auto auto;row-gap:22px;min-height:0;padding-bottom:54px}
-:is(#shift,#pulse).business-hero>.stage-label{grid-column:1/-1;grid-row:1;margin:0}
-:is(#shift,#pulse).business-hero>h1{grid-column:1/-1;grid-row:2;max-width:none;font-size:clamp(42px,5.4vw,82px);line-height:1.1;margin-bottom:16px}
-:is(#shift,#pulse).business-hero>.business-hero-intro{display:block;grid-column:1/span 6;grid-row:3;max-width:34em;align-self:start}
-:is(#shift,#pulse).business-hero .hero-lead,:is(#shift,#pulse).business-hero .hero-more{display:block;max-width:none;margin:0;font-size:inherit;line-height:1.7;font-weight:400;color:inherit}
-:is(#shift,#pulse).business-hero>.world-links{grid-column:1/span 6;grid-row:4;margin-top:0;align-self:start}
-:is(#shift,#pulse).business-hero>.business-hero-state{grid-column:1/span 6;grid-row:5;max-width:34em;font-size:14px;line-height:1.65;color:var(--on-field-2)}
-.business-hero-proof{grid-column:8/-1;grid-row:3/span 3;align-self:start;border-top:1px solid var(--on-field-line);padding-top:22px}
-.hero-proof-heading{display:flex;align-items:center;gap:18px;margin-bottom:22px}
-.hero-proof-heading img{width:88px;height:88px;object-fit:contain}
-.hero-proof-heading h2{font-size:clamp(22px,2.2vw,30px);line-height:1.25;color:var(--on-field);margin-top:8px}
-.business-hero-proof .small-label{font-size:12px;color:var(--on-field-2)}
-.business-hero-proof dl{display:grid;gap:16px;margin:0}
-.business-hero-proof dt{font-size:12px;color:var(--on-field-3);margin-bottom:5px}
-.business-hero-proof dd{margin:0;font-size:16px;line-height:1.6;color:var(--on-field)}
-.business-hero-proof>p{margin-top:18px;font-size:13px;line-height:1.6;color:var(--on-field-2)}
-.business-products>.story-heading{max-width:1000px}
-.business-products>.story-heading>p{max-width:42em}
-.business-offers{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:48px;margin-top:48px}
-.business-offer{padding:30px 0 36px;border-top:1px solid currentColor;display:flex;flex-direction:column;gap:20px;min-width:0}
-.business-offer>header{display:grid;grid-template-columns:auto 1fr;gap:10px 14px;align-items:center}
-.business-offer .offer-who{font-size:13px;line-height:1.5;color:inherit;opacity:.75}
-.business-offer h3{grid-column:1/-1;font-size:clamp(24px,2.1vw,30px);line-height:1.3;color:inherit}
-.business-offer .offer-value{max-width:38em;font-size:17px;line-height:1.7;color:inherit}
-.offer-deliverable{margin:0;padding-top:16px;border-top:1px solid color-mix(in srgb,currentColor 20%,transparent)}
-.offer-deliverable dt{font-size:12px;opacity:.7;margin-bottom:8px}
-.offer-deliverable dd{font-size:16px;line-height:1.6;margin:0;font-weight:600}
-.offer-deliverable dt:not(:first-child){margin-top:22px}
-.offer-deliverable .offer-benefit{font-weight:400;line-height:1.75}
-.offer-example{margin-top:auto;padding:18px 0 0;border-top:1px solid color-mix(in srgb,currentColor 20%,transparent)}
-.offer-example .small-label{font-size:11px;color:inherit;opacity:.7}
-.offer-example p{font-size:15px;line-height:1.65;margin-top:8px;color:inherit}
-.offer-arrow{display:block;margin-top:8px;opacity:.55}
-.offer-example .offer-result{margin-top:8px;font-weight:600}
-.business-atlas{border-top:1px solid color-mix(in srgb,currentColor 25%,transparent);margin-top:64px;padding-top:36px}
-.business-atlas>header{max-width:50em}
-.business-atlas .small-label{color:inherit;opacity:.7}
-.business-atlas h3{font-size:clamp(28px,3vw,42px);line-height:1.2;color:inherit;margin:18px 0}
-.business-atlas p{font-size:16px;line-height:1.7;color:inherit}
-.atlas-value-steps{list-style:none;padding:0;margin:30px 0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:30px}
-.atlas-value-steps li{border-top:1px solid color-mix(in srgb,currentColor 25%,transparent);padding-top:18px}
-.atlas-value-steps h4{font-size:19px;margin:12px 0;color:inherit}
-.business-atlas .story-note,.offer-note{font-size:13px;line-height:1.7;opacity:.8}
-#pulse-studio .business-offer,#pulse-studio .business-atlas{color:var(--on-field)}
-#pulse-studio .business-offer .story-index,#pulse-studio .business-atlas .story-index{color:var(--on-field-2)}
-@media(max-width:760px){
- :is(#shift,#pulse).business-hero{row-gap:20px;padding-bottom:30px}
- :is(#shift,#pulse).business-hero>h1{font-size:clamp(29px,8.3vw,48px);line-height:1.2;grid-column:1/-1;grid-row:auto;margin:0}
- :is(#shift,#pulse).business-hero>.business-hero-intro,:is(#shift,#pulse).business-hero>.world-links,:is(#shift,#pulse).business-hero>.business-hero-state{grid-column:1/-1;grid-row:auto;order:3}
- :is(#shift,#pulse).business-hero>.world-links{order:4}
- :is(#shift,#pulse).business-hero>.business-hero-state{order:5;font-size:12px}
- .business-hero-proof{grid-column:1/-1;grid-row:auto;order:6;margin-top:8px}
- .hero-proof-heading img{width:68px;height:68px}
- .business-offers{grid-template-columns:1fr;gap:0;margin-top:32px}
- .business-offer{padding:24px 0 32px;gap:18px}
- .business-offer .offer-value{font-size:16px}
- .business-atlas{margin-top:40px;padding-top:28px}
- .atlas-value-steps{grid-template-columns:1fr;gap:20px}
+/* ── What SHIFT and PULSE sell (2026-10-06) ────────────────────────────── */
+/* The first screen lists the services under the lead: four lines, each going to its card or section. The words
+   keep the business heroes' own grid; the list takes the row between the lead and the buttons. */
+:is(#shift,#pulse).hero--services{grid-template-rows:auto auto clamp(22px,3.2vh,40px) auto auto auto minmax(24px,1fr) auto}
+#shift-title{--hero-measure:12em;--hero-size:clamp(38px,6.3vw,104px)}
+#pulse-title{--hero-measure:11em}
+html[lang="en"] #shift-title{--hero-measure:15em;--hero-size:clamp(34px,5.2vw,84px)}
+html[lang="en"] #pulse-title{--hero-measure:14em;--hero-size:clamp(34px,5.6vw,92px)}
+:is(#shift,#pulse).hero--services .hero-lead{grid-column:1/span 6;max-width:27em}
+:is(#shift,#pulse).hero--services .hero-services{grid-column:1/span 6;grid-row:5;margin-top:clamp(20px,2.8vh,30px)}
+:is(#shift,#pulse).hero--services .world-links{grid-column:1/span 6;grid-row:6;margin-top:24px}
+:is(#shift,#pulse).hero--services .hero-more{grid-column:1/span 6;grid-row:8}
+.hero-services{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:clamp(16px,2vw,28px);border-bottom:var(--hair) solid var(--on-field-line)}
+.hero-services>a{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:start;gap:12px;padding:14px 0 15px;border-top:var(--hair) solid var(--on-field-line);color:var(--on-field)}
+.hero-service-copy{display:grid;gap:4px;min-width:0}
+.hero-service-title{display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 8px}
+.hero-services strong{font:650 clamp(16px,1.25vw,18px)/1.3 var(--sans);letter-spacing:-.02em;color:inherit;text-decoration:underline transparent 1px;text-underline-offset:4px;transition:text-decoration-color var(--fast) var(--ease)}
+.hero-service-status{font:500 12px/1.4 var(--sans);color:var(--on-field-2)}
+.hero-service-note{font-size:13.5px;line-height:1.5;color:var(--on-field-2);word-break:keep-all}
+.hero-service-arrow{font-size:14px;line-height:1.6;color:var(--on-field-3);transition:transform var(--fast) var(--ease)}
+.hero-services>a:hover strong,.hero-services>a:focus-visible strong{text-decoration-color:currentColor}
+.hero-services>a:hover .hero-service-arrow{transform:translateY(2px)}
+.hero-services>a:focus-visible{outline:2px solid var(--on-field);outline-offset:2px;border-radius:4px}
+/* PULSE shows two of its models where the other pages stand their felt object. */
+#pulse .pulse-hero-work{grid-column:8/-1;width:100%;max-width:520px;justify-items:stretch;gap:14px}
+.pulse-hero-models{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--field-gap)}
+.pulse-hero-models img{display:block;width:100%;height:auto;aspect-ratio:3/4;object-fit:cover;border-radius:var(--radius-s);background:rgba(0,0,0,.12);box-shadow:0 26px 40px -26px rgba(30,4,16,.65)}
+#pulse .pulse-hero-work figcaption{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:6px 16px;text-align:left;font-size:13px}
+#pulse .pulse-hero-work figcaption .quiet-link{font-size:13px}
+
+/* One card per service: who it is for, what it does, an example, what the company receives and what changes.
+   The same paper card as the scene cards, so it reads the same on a white page and on a colour field. */
+.offer-section>.story-heading{max-width:1000px}
+.offer-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--field-gap);margin-top:clamp(40px,4.4vw,64px)}
+.business-offer{display:flex;flex-direction:column;gap:20px;min-width:0;padding:clamp(22px,2.3vw,34px);border-radius:var(--radius);background:var(--paper);box-shadow:inset 0 0 0 var(--hair) var(--line);color:var(--ink);scroll-margin-top:calc(var(--site-header-height,76px) + 20px)}
+.offer-heading{display:grid;grid-template-columns:auto minmax(0,1fr);align-items:baseline;gap:8px 12px}
+.business-offer .story-index,#pulse-studio .business-offer .story-index{color:var(--ink-3)}
+.offer-heading h3{font-size:clamp(22px,1.95vw,27px);line-height:1.25;letter-spacing:-.035em;color:var(--ink)}
+.offer-who{grid-column:2;font-size:14px;line-height:1.6;color:var(--ink-3)}
+.offer-what{font-size:clamp(16px,1.2vw,17.5px);line-height:1.7;color:var(--ink)}
+.offer-example{display:grid;gap:10px;padding:16px 18px 18px;border-radius:var(--radius-s);background:var(--wash)}
+.offer-example-label{font:600 12px/1.4 var(--sans);color:var(--accent-ink)}
+.offer-example-input{font-size:15px;line-height:1.6;font-weight:600;color:var(--ink)}
+.offer-example-steps{display:grid;gap:5px;margin:0;padding:0;list-style:none}
+.offer-example-steps li{display:grid;grid-template-columns:18px minmax(0,1fr);gap:6px;font-size:14.5px;line-height:1.6;color:var(--ink-2)}
+.offer-example-steps li::before{content:"→";color:var(--accent-ink)}
+.offer-facts{display:grid;gap:12px;margin:auto 0 0;padding-top:18px;border-top:var(--hair) solid var(--line)}
+.offer-facts>div{display:grid;grid-template-columns:7.4em minmax(0,1fr);gap:2px 14px;align-items:baseline}
+.offer-facts dt{font:600 13px/1.65 var(--sans);color:var(--ink-3)}
+.offer-facts dd{margin:0;font-size:15px;line-height:1.65;color:var(--ink)}
+.offer-note{margin-top:20px}
+
+/* What Atlas does in these services: a short statement and three steps, set like the other step rows. */
+.offer-engine{margin-top:clamp(56px,6vw,92px)}
+.offer-engine-heading{display:grid;gap:14px;max-width:46em}
+.offer-engine-heading>.small-label{display:flex;align-items:center;gap:16px}
+.offer-engine-heading>.small-label::after{content:"";flex:1;border-top:var(--hair) solid var(--line)}
+.offer-engine-heading h3{font-size:clamp(26px,3vw,42px);line-height:1.18;letter-spacing:-.04em;font-weight:300}
+.offer-engine-heading h3::first-line{font-weight:700}
+.offer-engine-heading p{max-width:40em;color:var(--ink-2)}
+.offer-engine .story-items{margin-top:clamp(28px,3vw,44px)}
+.story-items>article h4{font-size:20px;line-height:1.35;letter-spacing:-.03em;font-weight:650;color:var(--ink)}
+#pulse-studio .offer-engine-heading>.small-label{color:var(--on-field-3)}
+#pulse-studio .offer-engine-heading>.small-label::after{border-color:var(--on-field-line)}
+#pulse-studio .offer-engine-heading h3,#pulse-studio .story-items h4{color:var(--on-field)}
+#pulse-studio .offer-engine-heading p{color:var(--on-field-2)}
+#pulse-studio .offer-note,#pulse-studio .offer-engine>.story-note{color:var(--on-field-3)}
+@media (max-width:1100px){
+ :is(#shift,#pulse).hero--services :is(.hero-lead,.hero-services,.world-links,.hero-more){grid-column:1/span 7}
+ #pulse .pulse-hero-work{grid-column:9/-1}
+}
+@media (max-width:900px){
+ .offer-grid{grid-template-columns:1fr}
+}
+@media (max-width:760px){
+ :is(#shift,#pulse).hero--services{grid-template-rows:none}
+ :is(#shift,#pulse).hero--services :is(.hero-lead,.hero-services,.world-links,.hero-more){grid-column:1/-1;grid-row:auto}
+ :is(#shift,#pulse).hero--services .hero-services{order:4;grid-template-columns:1fr;margin-top:22px}
+ :is(#shift,#pulse).hero--services .world-links{order:4;margin-top:22px}
+ .hero-services>a{padding:13px 0}
+ .hero-service-note{display:none}
+ #pulse .pulse-hero-work{grid-column:1/-1;max-width:440px;justify-items:stretch}
+ #pulse .pulse-hero-work figcaption{justify-content:space-between;text-align:left}
+ .business-offer{gap:18px;padding:22px 20px 24px;border-radius:22px}
+ .offer-facts>div{grid-template-columns:1fr}
+ .offer-engine{margin-top:44px}
 }
 
-/* PULSE's first screen introduces all four service areas before the work below. */
-#pulse.pulse-services-hero{grid-template-rows:auto auto 24px auto auto auto auto;align-content:start}
-#pulse.pulse-services-hero #pulse-title{font-size:clamp(40px,6.8vw,104px);max-width:13em}
-#pulse.pulse-services-hero .hero-lead{grid-column:1/span 6;max-width:28em}
-#pulse.pulse-services-hero .hero-more{grid-column:1/span 6;grid-row:7;max-width:38em;margin-top:22px}
-#pulse .pulse-hero-services{grid-column:1/span 6;grid-row:5;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 22px;margin-top:24px}
-#pulse .pulse-hero-services>a{display:grid;grid-template-columns:20px minmax(0,1fr) 15px;gap:9px;align-items:start;padding:16px 0;border-top:var(--hair) solid var(--on-field-line);color:var(--on-field);text-decoration:none;min-width:0}
-#pulse .pulse-hero-services>a:hover strong{text-decoration:underline;text-underline-offset:4px}
-#pulse .pulse-service-index{font:400 10px/2 var(--mono);color:var(--on-field-3)}
-#pulse .pulse-hero-services strong{display:inline;font-size:18px;line-height:1.3;letter-spacing:-.02em;font-weight:700;color:var(--on-field)}
-#pulse .pulse-service-description{display:block;margin-top:7px;font-size:13px;line-height:1.5;color:var(--on-field-2);word-break:keep-all}
-#pulse .pulse-service-status{display:inline-block;margin-left:7px;font-size:11px;line-height:1.4;color:var(--on-field-2)}
-#pulse.pulse-services-hero .world-links{grid-column:1/span 6;grid-row:6;margin-top:18px}
-#pulse .pulse-hero-work{grid-column:8/-1;grid-row:4/8;align-self:center;justify-self:end;width:100%;max-width:520px;gap:16px}
-#pulse .pulse-hero-models{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;width:100%}
-#pulse .pulse-hero-models img{display:block;width:100%;height:auto;aspect-ratio:3/4;object-fit:cover;border-radius:12px}
-#pulse .pulse-hero-work figcaption{display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px 14px;width:100%;font-size:12px;text-align:left}
-#pulse .pulse-hero-work figcaption .quiet-link{font-size:12px}
-@media(max-width:1100px) and (min-width:761px){
- #pulse .pulse-hero-work{grid-column:8/-1}
- #pulse .pulse-hero-services{gap:0 14px}
- #pulse .pulse-hero-services>a{grid-template-columns:minmax(0,1fr) 13px;gap:8px}
- #pulse .pulse-service-index{display:none}
- #pulse .pulse-hero-services strong{font-size:16px}
+/* ── Finish pass (2026-10-05) ──────────────────────────────────────────── */
+/* A second look at the edges, made together with the wording review: how two-part titles break, where the
+   words start inside cards, the ground of studio pictures, labels that mix a number with Hangul, the
+   last row of the site list on a phone, and touch sizes. (The phone rules for the four business tiles had
+   never applied: a stray closing brace above them made the browser drop that whole block. It is removed.) */
+
+/* Two-part titles: each part is a block of its own. A forced break inside one block keeps the browser from
+   balancing it, which left a title ending on one word (기릅니다, 줍니다). */
+:where(#top) :is(h1,h2,h3)>.title-lead{display:block}
+:where(#top) :is(h1,h2,h3)>.title-lead+br{display:none}
+/* The opening statement of a business page may use the whole measure, so its second part fits one line on a
+   wide window. */
+.story-purpose>h2{grid-column:1/-1}
+
+/* Scene cards: the words start at the same edge in every card. They were centred as a block, so a card with
+   a short line began further in than its neighbour. */
+.visual-explainer--cards .visual-scene{align-items:stretch}
+
+/* Studio pictures: their grounds are a shade under white (253), which drew a faint box on the page and
+   inside white cards. A 2% lift brings the ground to the page white; the felt keeps its colour. */
+:is(.visual-scene-art:not(.visual-scene-art--landscape),.story-visual,.pulse-advertising-visual)>img{filter:brightness(1.02)}
+
+/* Numbered points: the hairline under a row runs unbroken from the first column to the last. */
+.story-items,.lab-benefits,.pulse-brief-steps,.pulse-advertising-options,.story-evidence-grid{column-gap:0}
+
+/* A label that joins a number and Hangul: the number keeps the mono face, the words are set in the text
+   face. (DM Mono has no Hangul, and its wide space spread the words apart.) */
+.lab-step{display:flex;align-items:baseline;gap:10px;font:600 13px/1.4 var(--sans);letter-spacing:-.01em;color:var(--accent-ink)}
+.lab-step-number{font:400 11px/1.4 var(--mono);letter-spacing:.08em;color:var(--ink-3)}
+html[lang="en"] .lab-step{font:400 11px/1.4 var(--mono);letter-spacing:.08em;color:var(--ink-3)}
+
+/* Patent note: the schedule sits under the title it belongs to, not under the label. */
+.lab-patent>p{grid-column:2}
+
+/* PULSE radio: the picture keeps its round corners, and the caption under it is no longer cut by them. */
+#pulse-content .pulse-content-radio{overflow:visible;border-radius:0}
+#pulse-content .pulse-content-radio img{border-radius:var(--radius)}
+
+/* PATH practice note: the memo field and the checklist are drawn with the page's own line and radius. */
+.scene-draft{display:block;width:100%;min-height:104px;padding:14px 16px;border:0;border-radius:14px;background:var(--wash);box-shadow:inset 0 0 0 var(--hair) var(--line);font-size:15px;line-height:1.6;color:var(--ink);resize:vertical}
+.scene-draft::placeholder{color:var(--ink-3)}
+.scene-draft:focus{outline:2px solid var(--ink);outline-offset:2px}
+.scene-check{border-top:var(--hair) solid var(--line);font-size:14.5px;color:var(--ink-2)}
+.scene-check>summary{display:flex;justify-content:space-between;align-items:center;gap:16px;min-height:48px;cursor:pointer;list-style:none;font-weight:600;color:var(--ink)}
+.scene-check>summary::-webkit-details-marker{display:none}
+.scene-check>summary>span{flex:none;display:grid;place-items:center;width:28px;height:28px;border-radius:999px;background:var(--plate);font-size:15px;line-height:1;color:var(--ink-2);transition:transform var(--fast) var(--ease),background-color var(--fast) var(--ease)}
+.scene-check[open]>summary>span{transform:rotate(45deg);background:var(--ink);color:#fff}
+.scene-check ul{display:grid;gap:4px;padding:0 0 8px}
+.scene-check label{display:flex;align-items:center;gap:10px;min-height:36px}
+.scene-check input[type="checkbox"]{flex:none;width:18px;height:18px;margin:0;accent-color:var(--accent-ink)}
+.scene-check>p{padding-bottom:14px;font-size:13.5px;color:var(--ink-3)}
+
+/* Company values: number, title and text of the five columns share their rows, so the texts start on one
+   line even where a title takes two. The note under them has the full width and its own hairline. */
+@media (min-width:1101px){
+ .principles{grid-template-rows:auto auto 1fr auto;border-bottom:0}
+ .principle-row{grid-row:span 3;grid-template-rows:subgrid;row-gap:14px}
+ .principles>.company-scope-note{grid-column:1/-1;max-width:none;padding-top:20px;border-top:var(--hair) solid var(--line)}
 }
-@media(max-width:760px){
- #pulse.pulse-services-hero{grid-template-rows:none}
- #pulse.pulse-services-hero #pulse-title{font-size:clamp(34px,10vw,48px)}
- #pulse.pulse-services-hero .hero-lead{grid-column:1/-1;grid-row:auto;order:3;font-size:17px}
- #pulse .pulse-hero-services{grid-column:1/-1;grid-row:auto;order:4;gap:0 16px;margin-top:22px}
- #pulse .pulse-hero-services>a{grid-template-columns:minmax(0,1fr) 12px;gap:5px;padding:13px 0}
- #pulse .pulse-service-index{display:none}
- #pulse .pulse-hero-services strong{font-size:16px}
- #pulse .pulse-service-description{font-size:12px;margin-top:6px}
- #pulse .pulse-service-status{display:block;margin:5px 0 0}
- #pulse.pulse-services-hero .world-links{grid-column:1/-1;grid-row:auto;order:5;margin-top:10px}
- #pulse .pulse-hero-work{grid-column:1/-1;grid-row:auto;order:6;max-width:480px;margin:28px 0 0}
- #pulse.pulse-services-hero .hero-more{grid-column:1/-1;grid-row:auto;order:7;margin-top:24px;font-size:14px}
+
+/* The five sites at the foot of a page: no half-empty last row on a tablet or a phone. */
+@media (min-width:641px) and (max-width:1100px){
+ .site-family{grid-template-columns:repeat(6,minmax(0,1fr))}
+ .site-family a{grid-column:span 2}
+ .site-family a:nth-child(n+4){grid-column:span 3}
+}
+@media (max-width:760px){
+ .lab-patent>p{grid-column:auto}
+}
+@media (max-width:640px){
+ .site-family a:last-child{grid-column:1/-1}
+ /* Small links at the foot of the page are tall enough for a thumb. */
+ .footer-bottom{row-gap:6px}
+ .footer-links{gap:0 22px}
+ .footer-links a,.back-chat,.footer-info button{display:inline-flex;align-items:center;min-height:44px}
+ .scene-check>summary{min-height:44px}
 }

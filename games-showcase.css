@@ -67,9 +67,11 @@
 .game-note a{color:inherit;text-decoration:underline;text-decoration-thickness:var(--hair);text-underline-offset:3px}
 
 .game-research{border-top:var(--hair) solid var(--line);border-bottom:var(--hair) solid var(--line)}
-.game-research summary{display:flex;justify-content:space-between;align-items:center;gap:14px;padding:18px 0;cursor:pointer;list-style:none;font:600 15px/1.5 var(--sans)}
+.game-research summary{display:flex;justify-content:space-between;align-items:center;gap:16px;min-height:64px;cursor:pointer;list-style:none;font:600 16px/1.5 var(--sans);letter-spacing:-.02em}
 .game-research summary::-webkit-details-marker{display:none}
-.game-research[open] summary>span{transform:rotate(45deg)}
+/* The same round plus as the other folds of the page (2026-10-05). */
+.game-research summary>span{flex:none;display:grid;place-items:center;width:28px;height:28px;border-radius:999px;background:var(--plate);font-size:15px;line-height:1;color:var(--ink-2);transition:transform var(--fast) var(--ease),background-color var(--fast) var(--ease)}
+.game-research[open] summary>span{transform:rotate(45deg);background:var(--ink);color:#fff}
 .game-research h4{margin:2px 0 18px;font:700 clamp(19px,1.7vw,23px)/1.4 var(--display);letter-spacing:-.02em}
 .game-research-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--gap);padding-bottom:18px}
 .game-research-grid article{display:grid;align-content:start;gap:8px}
