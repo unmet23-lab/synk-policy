@@ -74,11 +74,14 @@ export function recommendCareFocus({ state, now = new Date() } = {}) {
   const plannedPeople = new Set(usable.followups.filter(item => item.status === 'pending' && item.dueOn > date).map(item => item.personId));
   for (const person of people.values()) {
     if (quietPeople.has(person.id) || plannedPeople.has(person.id)) continue;
+    const interval = person.checkinIntervalDays ?? 30;
+    if (interval === 0) continue;
     const last = latest.get(person.id), days = last ? Math.round((dayNumber(date) - dayNumber(last)) / DAY) : null;
-    if (days !== null && days < 30) continue;
+    if (days !== null && days < interval) continue;
+    const intervalReason = Object.hasOwn(person, 'checkinIntervalDays') ? ` 직접 정한 ${interval}일 간격으로 안부를 살펴보고 있어요.` : '';
     add({ key: `checkin:${person.id}`, personId: person.id, personName: person.name, kind: 'checkin', eventId: '', followupId: '', occurrenceId: '',
       title: '가볍게 안부를 준비해 볼까요?',
-      reason: last ? `수첩에 마지막으로 남긴 챙김은 ${last}(${days}일 전)이에요. 실제로 나눈 연락과 다를 수 있어요.` : '아직 이 사람의 챙김 기록을 남기지 않았어요. 첫 안부부터 준비해 볼 수 있어요.',
+      reason: (last ? `수첩에 마지막으로 남긴 챙김은 ${last}(${days}일 전)이에요. 실제로 나눈 연락과 다를 수 있어요.` : '아직 이 사람의 챙김 기록을 남기지 않았어요. 첫 안부부터 준비해 볼 수 있어요.') + intervalReason,
       detail: detail(person), actionLabel: '오늘 안부 준비', quiet: false }, last ? 400 + Math.min(days, 3650) / 100 : 200);
   }
   // 한 사람의 여러 일감은 가장 가까운 제안 하나로 묶는다. 연락 횟수를 늘리기 위한 순위가 아니다.

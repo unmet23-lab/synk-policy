@@ -21,6 +21,7 @@ let state = emptyState(), selectedId = null, persist = false, saveFailed = false
 let audioFile = null, audioURL = null, transcribing = false, capabilities = null, currentDraft = null, toastTimer;
 let calendarMonth = '', calendarDay = '', captureReview = null, logOccurrence = null;
 let accountStatus = { configured: false, signedIn: false, status: 'loading' }, accountStarting = true, syncStatus = { status: 'idle' }, accountId = null, guestSnapshot = null, authEpoch = 0;
+let personDialogContext = null;
 let sync = null, account = null;
 const carePush = createCarePush({ request: (action, body) => account.requestPush(action, body), onState: () => renderPushSettings() });
 let preparationKey = '', preparationInputs = { attendance: 'undecided', timeMinutes: null, budgetWon: null }, preparationResult = null, preparationLogId = null, preparationLogError = '';
@@ -173,11 +174,12 @@ function renderWorkspace(restore = false) {
   const selected = person();
   $('empty-state').hidden = !!selected; $('person-workspace').hidden = !selected;
   if (!selected) {
-    clearConversationFields(); $('person-name').textContent = ''; $('person-relationship').textContent = '';
+    clearConversationFields(); $('person-name').textContent = ''; $('person-relationship').textContent = ''; $('person-checkin-summary').textContent = '';
     $('event-list').textContent = ''; $('draft-event').textContent = ''; $('preference-form').reset();
     return;
   }
   $('person-name').textContent = selected.name; $('person-relationship').textContent = selected.relationship || '소중한 사람';
+  $('person-checkin-summary').textContent = checkinSummary(selected);
   if (restore) restoreConversation();
   renderEvents(); renderMessageOptions();
 }
@@ -483,6 +485,7 @@ async function saveCapture() {
   notify(`일정 ${events.length}개와 기억 ${memories.length}개, 원문을 함께 보관했어요. 다음 마음을 준비할 때 다시 꺼내 볼 수 있어요.`);
 }
 function replaceState(next) {
+  personDialogContext = null; $('person-dialog').close(); $('person-form').reset();
   followupContext = null;
   focusKey = ''; focusEpoch = authEpoch;focusOperation = null;
   resetPersonalMemory(); checkinMode=false; followupCalendar=null; $('followup-calendar-dialog').close();
@@ -648,12 +651,34 @@ async function choosePerson(id, tab = 'events') {
 }
 function openPersonDialog(edit = false) {
   const target = edit ? person() : null;
+  personDialogContext = { epoch: authEpoch, id: target?.id ?? '', fingerprint: target ? JSON.stringify(target) : null };
   $('person-form').reset(); $('person-edit-id').value = target?.id ?? '';
   $('person-dialog-title').textContent = edit ? '챙길 사람 수정' : '챙길 사람 추가';
   $('new-person-name').value = target?.name ?? ''; $('new-person-relationship').value = target?.relationship ?? ''; $('new-person-notes').value = target?.notes ?? '';
   $('new-person-group').value = target?.group || 'other';
+  const interval = target?.checkinIntervalDays ?? 30;
+  $('new-person-checkin').value = [0, 7, 14, 30, 60, 90].includes(interval) ? String(interval) : 'custom';
+  $('new-person-checkin-days').value = String(interval || 30);
+  updateCheckinInput();
   $('quick-event-fields').hidden = !!target;
   $('delete-person').hidden = !target; $('person-dialog').showModal();
+}
+function checkinSummary(target) {
+  const days = target.checkinIntervalDays ?? 30;
+  return days === 0 ? '일반 안부 추천 꺼짐' : `안부 추천 기준 · 마지막 챙김 후 ${days}일`;
+}
+function updateCheckinInput() {
+  const custom = $('new-person-checkin').value === 'custom';
+  $('new-person-checkin-custom').hidden = !custom;
+  $('new-person-checkin-days').disabled = !custom;
+  $('new-person-checkin-days').required = custom;
+}
+function checkinInput(old) {
+  const selected = $('new-person-checkin').value;
+  const raw = selected === 'custom' ? $('new-person-checkin-days').value.trim() : selected;
+  if (!/^\d+$/.test(raw) || !Number.isInteger(Number(raw)) || Number(raw) > 365 || Number(raw) < (selected === 'custom' ? 1 : 0)) throw Error('안부 간격은 1일부터 365일까지 정수로 입력해 주세요.');
+  const days = Number(raw);
+  return days === 30 && !Object.hasOwn(old ?? {}, 'checkinIntervalDays') ? {} : { checkinIntervalDays: days };
 }
 async function confirmDelete(message, title = '자료 삭제', button = '삭제') {
   const epoch = authEpoch;
@@ -1060,15 +1085,19 @@ on('clear-personal-memory','click',async()=>{const epoch=authEpoch,owner=selecte
 on('close-followup-calendar','click',()=>{$('followup-calendar-dialog').close();followupCalendar=null;});
 on('followup-calendar-time','input',()=>{const empty=!$('followup-calendar-time').value;$('followup-calendar-alarm').disabled=empty;if(empty)$('followup-calendar-alarm').checked=false;});
 on('followup-calendar-form','submit',e=>{e.preventDefault();const item=followupCalendar&&state.followups.find(row=>row.id===followupCalendar.id);if(!item||followupCalendar.epoch!==authEpoch||followupCalendar.fingerprint!==JSON.stringify(item))throw Error('챙길 날짜나 계정이 바뀌었어요. 달력 저장을 다시 열어 주세요.');download(toFollowupICS(state,item.id,{time:$('followup-calendar-time').value,reminderMinutes:$('followup-calendar-alarm').checked?[0]:[]}), 'synk-care.ics','text/calendar');$('followup-calendar-dialog').close();followupCalendar=null;notify('달력 파일을 저장했어요. 달력 앱에 추가한 뒤 알림을 확인해 주세요.');});
-on('close-person-dialog', 'click', () => $('person-dialog').close());
+on('new-person-checkin', 'change', updateCheckinInput);
+on('close-person-dialog', 'click', () => { $('person-dialog').close(); personDialogContext = null; });
 on('person-form', 'submit', async e => {
   e.preventDefault(); const old = state.people.find(item => item.id === $('person-edit-id').value);
-  const value = makePerson({ ...old, name: $('new-person-name').value, relationship: $('new-person-relationship').value, group: $('new-person-group').value, notes: $('new-person-notes').value });
+  const context = personDialogContext;
+  if (!context || context.epoch !== authEpoch || context.id !== $('person-edit-id').value || context.fingerprint !== (old ? JSON.stringify(old) : null)) throw Error('계정이나 사람 정보가 바뀌었어요. 정보 수정을 다시 열어 주세요.');
+  const value = makePerson({ ...old, ...checkinInput(old), name: $('new-person-name').value, relationship: $('new-person-relationship').value, group: $('new-person-group').value, notes: $('new-person-notes').value });
   const event = !old && $('quick-event-date').value ? makeEvent({ personId: value.id, type: $('quick-event-type').value, date: $('quick-event-date').value }) : null;
   if (old) state.people = state.people.map(item => item.id === old.id ? value : item); else state.people.push(value);
   if (event) state.events.push(event);
-  save(); renderPeople(); renderHome();
-  $('person-dialog').close(); if(await choosePerson(value.id)&&event)await prepareEvent(event.id);
+  const saved = save(); renderPeople(); renderHome();
+  $('person-dialog').close(); personDialogContext = null; if(await choosePerson(value.id)&&event)await prepareEvent(event.id);
+  if (!saved || saveFailed || context.epoch !== authEpoch) return;
   notify(old ? '사람 정보를 수정했어요.' : event ? '이름과 날짜를 기억했어요. 첫 인사를 바로 준비했어요.' : '수첩에 기억했어요. 날짜 없이 오늘 안부도 준비할 수 있어요.');
 });
 on('people-list', 'click', async e => { const button = e.target.closest('[data-person]'); if (button) await choosePerson(button.dataset.person); });

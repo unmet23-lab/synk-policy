@@ -173,11 +173,13 @@ function tone(input) {
 
 /** 사람 한 명. selfTone은 관찰, recipientPreference는 사용자가 직접 확인한 선호를 따로 보관한다. */
 export function makePerson(input = {}) {
+  if (Object.hasOwn(input, 'checkinIntervalDays') && (!Number.isInteger(input.checkinIntervalDays) || input.checkinIntervalDays < 0 || input.checkinIntervalDays > 365)) throw new Error('안부 주기는 0~365일 사이의 정수로 골라 주세요. 0일은 일반 안부 추천 끄기예요.');
   return {
     id: id(input.id, 'person'), name: clean(input.name, '이름', 80, true), relationship: clean(input.relationship, '관계', 80),
     group: choose(input.group, ['family', 'friend', 'work', 'other'], 'other', '사람 모음'),
     selfTone: tone(input.selfTone), recipientPreference: preference(input.recipientPreference), notes: clean(input.notes, '메모'), savedMessages: savedMessages(input.savedMessages),
     ...(Object.hasOwn(input, 'messageLibrary') ? { messageLibrary: messageLibrary(input.messageLibrary) } : {}),
+    ...(Object.hasOwn(input, 'checkinIntervalDays') ? { checkinIntervalDays: input.checkinIntervalDays } : {}),
   };
 }
 
