@@ -21,20 +21,21 @@
     <nav class="header-actions" aria-label="플레저 메뉴"><button id="show-home" class="quiet-button home-link" type="button" aria-current="page">오늘</button><button id="notification-button" class="quiet-button" type="button">알림 설정</button></nav>
   </header>
 
-  <main id="main-content" class="app-shell" tabindex="-1">
+  <main id="main-content" class="app-shell" tabindex="-1" aria-busy="true">
     <section class="intro" aria-labelledby="page-title">
       <div><p class="eyebrow">A LITTLE CARE, EVERY DAY</p><h1 id="page-title">오늘, <span class="underline">누가 떠오르나요?</span></h1><p class="intro-copy">기억해 둔 날을 살펴보고, 나다운 한마디를 준비해요.</p></div>
       <div class="intro-art" aria-hidden="true"><img class="envelope" src="assets/sticker-envelope.webp" alt=""><img class="time-sticker" src="assets/sticker-time.webp" alt=""></div>
-      <div class="summary" aria-label="플레저 현황"><div><strong id="person-count">0</strong><span>챙길 사람</span></div><div><strong id="upcoming-count">0</strong><span>30일 안의 일정</span></div><div><strong id="complete-count">0</strong><span>챙긴 마음</span></div></div>
+      <div class="summary" aria-label="플레저 현황"><div><strong id="person-count">—</strong><span>챙길 사람</span></div><div><strong id="upcoming-count">—</strong><span>30일 안의 일정</span></div><div><strong id="complete-count">—</strong><span>챙긴 마음</span></div></div>
     </section>
 
     <div id="sample-banner" class="sample-banner" hidden>지금은 예시 자료를 보고 있어요. 실제 인물이나 대화가 아닙니다.<button class="text-button" id="clear-sample" type="button">예시 지우기</button></div>
-    <section id="account-panel" class="account-panel" aria-labelledby="account-title">
-      <div class="account-copy"><p class="mini-label" id="account-title">내 SYNK 계정</p><p id="account-status" class="account-status" role="status">계정 연결 상태를 확인하고 있어요.</p><p id="account-detail" class="account-detail">로그인하면 내 수첩을 계정에 보관하고 다른 기기에서 이어 볼 수 있어요.</p></div>
-      <div class="account-actions"><button id="account-signin" class="soft-button" type="button">SYNK 계정 연결</button><button id="account-import-device" class="text-button" type="button" hidden>이 기기의 수첩을 계정으로 옮기기</button><button id="account-refresh" class="text-button" type="button" hidden>계정 자료 새로고침</button><button id="account-signout" class="text-button" type="button" hidden>로그아웃</button></div>
+    <section id="account-panel" class="account-panel" aria-labelledby="account-title" data-kind="pending">
+      <div class="account-copy"><p class="mini-label" id="account-title">내 SYNK 계정</p><p id="account-status" class="account-status" role="status">계정 연결 상태를 확인하고 있어요.</p><p id="account-detail" class="account-detail">저장한 수첩을 확인하는 동안 잠시 기다려 주세요.</p></div>
+      <div class="account-actions"><button id="account-signin" class="soft-button" type="button" disabled>계정 확인 중…</button><button id="account-import-device" class="text-button" type="button" hidden>이 기기의 수첩을 계정으로 옮기기</button><button id="account-refresh" class="text-button" type="button" hidden>계정 자료 새로고침</button><button id="account-signout" class="text-button" type="button" hidden>로그아웃</button></div>
       <div id="account-conflict" class="account-conflict" hidden><p>다른 기기에서 수첩이 바뀌었어요. 확인할 자료를 골라 주세요.</p><div class="action-row"><button id="account-conflict-load" class="soft-button" type="button">계정 자료 불러오기</button><button id="account-conflict-retry" class="text-button" type="button">내 변경 다시 저장</button></div></div>
     </section>
-    <div class="main-grid">
+    <section id="notebook-loading" class="notebook-loading" aria-labelledby="notebook-loading-title"><img src="assets/sticker-envelope.webp" alt="" aria-hidden="true"><div><h2 id="notebook-loading-title">내 수첩을 준비하고 있어요.</h2><p id="notebook-loading-detail">불러오기가 끝나면 사람과 기록이 나타나요. 잠시 기다려 주세요.</p></div></section>
+    <div class="main-grid" hidden inert>
       <aside class="people-panel" aria-labelledby="people-title">
         <div class="section-heading"><h2 id="people-title">사람 수첩</h2><button id="add-person" class="add-button" aria-label="챙길 사람 추가" type="button">+</button></div>
         <p class="section-description">함께한 날과 나눈 마음이 쌓이는 곳.</p>
@@ -46,6 +47,13 @@
 
       <section id="home-view" class="home-view" aria-labelledby="home-title" tabindex="-1">
         <div class="home-heading"><div><p class="eyebrow">YOUR LITTLE REMINDERS</p><h2 id="home-title">오늘부터 이번 주까지</h2><p>가까운 날부터, 마음을 하나씩 준비해요.</p></div><button id="home-add-person" class="soft-button" type="button">사람과 날짜 추가</button></div>
+        <section id="care-focus" class="care-focus" aria-labelledby="care-focus-title" hidden>
+          <div class="care-focus-heading"><img src="assets/sticker-person.webp" alt="" aria-hidden="true"><h3 id="care-focus-title">오늘 챙길 한 사람</h3></div>
+          <h4 id="care-focus-person"></h4><p id="care-focus-subtitle" class="care-focus-subtitle"></p>
+          <p id="care-focus-reason" class="care-focus-reason"></p><p id="care-focus-detail" class="care-focus-detail"></p>
+          <div class="care-focus-actions"><button id="care-focus-action" class="felt-button" type="button">마음 준비하기</button><button id="care-focus-history" class="text-button" type="button">우리의 기록</button><button id="care-focus-next" class="text-button" type="button">다른 사람 보기</button></div>
+          <details class="care-focus-basis"><summary>이 사람을 보여드린 기준</summary><p id="care-focus-basis"></p></details>
+        </section>
         <section class="checkin-panel" aria-labelledby="checkin-title"><div><p class="eyebrow">NO SPECIAL OCCASION NEEDED</p><h3 id="checkin-title">오늘, 그냥 안부가 생각났다면.</h3><p class="helper">특별한 날이 없어도 좋아요. 한 사람에게 전할 짧은 말을 준비해요.</p></div><div class="checkin-controls"><label>누구에게 전할까요?<select id="checkin-person"></select></label><button id="start-checkin" type="button" class="soft-button">오늘 안부 준비</button></div></section>
         <section id="followup-home" class="followup-section" aria-labelledby="followup-home-title" hidden><div class="home-section-heading"><h3 id="followup-home-title">오늘 다시 챙길 마음</h3><span>내가 정한 후속 챙김</span></div><div id="followup-list" class="followup-list"></div></section><p id="preparation-summary" class="helper preparation-summary" hidden></p><div class="schedule-toolbar"><label for="schedule-view">일정 보기</label><select id="schedule-view"><option value="upcoming">다가오는 날</option><option value="calendar">월별 달력</option><option value="overdue">지난 미처리 일정</option></select></div>
         <div id="schedule-upcoming">

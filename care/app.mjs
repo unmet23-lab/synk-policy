@@ -6,6 +6,8 @@ import { compareDraftEdits, applyPreferenceCandidate, reviewMessage, extractFoll
 import { preparationSummary } from './care-outcomes.mjs';
 import { createMemoryCard } from './memory-card.mjs';
 import { prepareCare } from './care-planner.mjs';
+import { careAccountView, resumeCareLoginNavigation } from './care-account-view.mjs';
+import { recommendCareFocus } from './care-focus.mjs';
 
 const $ = id => document.getElementById(id);
 const PUBLIC_WEB = document.querySelector('meta[name="synk-care-runtime"]')?.content === 'public-web';
@@ -15,11 +17,12 @@ const escapeHTML = value => String(value ?? '').replace(/[&<>"']/g, char => ({ '
 let state = emptyState(), selectedId = null, persist = false, saveFailed = false, sampleMode = false, activeTab = 'events', activeView = 'home';
 let audioFile = null, audioURL = null, transcribing = false, capabilities = null, currentDraft = null, toastTimer;
 let calendarMonth = '', calendarDay = '', captureReview = null, logOccurrence = null;
-let accountStatus = { configured: false, signedIn: false }, syncStatus = { status: 'idle' }, accountId = null, guestSnapshot = null, authEpoch = 0;
+let accountStatus = { configured: false, signedIn: false, status: 'loading' }, accountStarting = true, syncStatus = { status: 'idle' }, accountId = null, guestSnapshot = null, authEpoch = 0;
 let sync = null, account = null;
 let preparationKey = '', preparationInputs = { attendance: 'undecided', timeMinutes: null, budgetWon: null }, preparationResult = null, preparationLogId = null, preparationLogError = '';
 let expressionReview = null, preferenceCandidates = [], preferenceContext = null, cardURL = null, cardFilename = '', cardGeneration = 0, cardItemsKey = '';
 let memoryChoice = null, followupCalendar = null, checkinMode = false;
+let focusKey = '', focusEpoch = 0, focusOperation = null;
 const ACTIONS = { contact: '연락', attend: '참석', gift: '선물', money: '경조금', remember: '조용히 기억' };
 const won = value => value === null || value === undefined ? '' : `${value.toLocaleString('ko-KR')}원`;
 const conversations = new Map(), sessionDrafts = new Map(), notified = new Set();
@@ -29,6 +32,7 @@ const currentRows = () => rows().filter(item => item.person.id === selectedId);
 const today = () => new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Seoul', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date());
 const hasUnsubmittedAccountInput = () => ['draft-text', 'capture-source', 'followup-title', 'memory-card-title', 'memory-card-message', 'personal-memory'].some(id => $(id)?.value.trim()) || !!$('memory-card-photo')?.files.length || !!document.querySelector('[data-card-selected]:checked');
 const hasPersonalizationInput = () => !!memoryChoice || !!$('personal-memory').value || (currentDraft?.eventType === 'checkin' && !!$('draft-text').value.trim());
+const notebookView = () => careAccountView({ starting: accountStarting, account: accountStatus, sync: syncStatus, connected: !!accountId, currentAccountId: accountId });
 
 function memoryFingerprint(id) {
   const memory = state.memories.find(item => item.id === id && item.personId === selectedId), source = memory && state.sources.find(item => item.id === memory.sourceId && item.personId === selectedId);
@@ -68,7 +72,10 @@ function notify(message) {
   toastTimer = setTimeout(() => { $('toast').hidden = true; }, 4400);
 }
 function on(id, event, fn) {
-  $(id).addEventListener(event, async e => { try { await fn(e); } catch (error) { notify(error.message || '처리하지 못했어요. 다시 확인해 주세요.'); } });
+  $(id).addEventListener(event, async e => { try {
+    if (notebookView().locked && e.target.closest('.main-grid, #person-dialog, #followup-calendar-dialog')) { e.preventDefault();notify(notebookView().detail);return; }
+    await fn(e);
+  } catch (error) { notify(error.message || '처리하지 못했어요. 다시 확인해 주세요.'); } });
 }
 function save() {
   if (accountId) { sync.change(state); updateStorageLabel(); return true; }
@@ -143,10 +150,14 @@ function renderTone() {
   $('tone-result').hidden = !result;
   if (result) $('tone-result').innerHTML = `<strong>${escapeHTML(result.label)}</strong><ul>${result.observations.map(item => `<li>${escapeHTML(item)}</li>`).join('')}</ul><p class="helper">관찰에 쓴 대화 원문은 새로고침 후 보관하지 않아요.</p>`;
 }
+function renderSummary() {
+  const concealed = notebookView().concealNotebook;
+  $('person-count').textContent = concealed ? '—' : state.people.length;
+  $('upcoming-count').textContent = concealed ? '—' : rows().filter(item => item.occurrence.daysUntil <= 30).length;
+  $('complete-count').textContent = concealed ? '—' : state.completions.length + (state.activities ?? []).length;
+}
 function renderPeople() {
-  $('person-count').textContent = state.people.length;
-  $('upcoming-count').textContent = rows().filter(item => item.occurrence.daysUntil <= 30).length;
-  $('complete-count').textContent = state.completions.length + (state.activities ?? []).length;
+  renderSummary();
   const filtered = filterPeople(state.people.map(item => ({ ...item, memories: (state.memories ?? []).filter(memory => memory.personId === item.id) })), { query: $('people-search').value, group: $('people-group-filter').value });
   $('people-result-status').textContent = state.people.length ? `${state.people.length}명 중 ${filtered.length}명` : '';
   $('people-list').innerHTML = filtered.length ? filtered.map(item => `<button type="button" class="person-card${item.id === selectedId ? ' active' : ''}" data-person="${escapeHTML(item.id)}" aria-pressed="${item.id === selectedId}"><span class="person-avatar" aria-hidden="true">${escapeHTML([...item.name][0])}</span><span><strong>${escapeHTML(item.name)}</strong><small>${escapeHTML(item.relationship || PEOPLE_GROUPS[item.group] || '소중한 사람')}</small></span></button>`).join('') : `<p class="people-empty">${state.people.length ? '찾는 사람이 없어요. 검색어나 분류를 바꿔 보세요.' : '아직 등록한 사람이 없어요.<br>이름 하나로 시작해 보세요.'}</p>`;
@@ -184,6 +195,7 @@ function updateMood() {
 function showHome() { stashConversation(); stashDraft(); activeView = 'home'; render(); }
 function eventDistance(row) { return row.occurrence.daysUntil === 0 ? '오늘' : row.occurrence.daysUntil === 1 ? '내일' : `${row.occurrence.daysUntil}일 뒤`; }
 function renderHome() {
+  renderCareFocus();
   const checkinPerson=$('checkin-person').value;
   $('checkin-person').innerHTML=state.people.length?'<option value="">사람을 골라 주세요</option>'+state.people.map(item=>`<option value="${escapeHTML(item.id)}">${escapeHTML(item.name)}</option>`).join(''):'<option value="">먼저 사람을 기억해 주세요</option>';
   if(state.people.some(item=>item.id===checkinPerson))$('checkin-person').value=checkinPerson;
@@ -210,6 +222,56 @@ function renderHome() {
   $('home-upcoming-section').hidden = upcoming.length === 0;
   $('home-later-section').hidden = later.length === 0;
   renderSchedule(); renderFollowups(); renderPreparationSummary();
+}
+function careFocusOptions(result = recommendCareFocus({ state })) {
+  return [result.recommendation, ...result.alternatives].filter(Boolean);
+}
+function renderCareFocus() {
+  const panel = $('care-focus');
+  if (notebookView().concealNotebook) { panel.hidden = true;panel.removeAttribute('data-key');return; }
+  if (focusEpoch !== authEpoch) { focusEpoch = authEpoch;focusKey = ''; }
+  const result = recommendCareFocus({ state }), options = careFocusOptions(result);
+  panel.hidden = result.status === 'empty';
+  const selected = options.find(item => item.key === focusKey) || result.recommendation;
+  focusKey = selected?.key || '';panel.dataset.key = focusKey;panel.dataset.epoch = String(authEpoch);
+  panel.dataset.mood = selected?.quiet ? 'quiet' : 'celebrate';
+  $('care-focus-person').textContent = selected?.personName || '오늘은 내 속도로 챙겨요.';
+  $('care-focus-subtitle').textContent = selected?.title || '';
+  $('care-focus-reason').textContent = selected?.reason || '지금 먼저 제안할 사람이 없어요.';
+  $('care-focus-detail').textContent = selected?.detail || '가까운 일정과 내가 정한 후속 챙김을 살폈어요. 원하면 아래에서 직접 안부를 준비해요.';
+  $('care-focus-basis').textContent = result.basisPolicy;
+  $('care-focus-action').hidden = $('care-focus-history').hidden = !selected;
+  $('care-focus-action').textContent = selected?.actionLabel || '마음 준비하기';
+  $('care-focus-next').hidden = options.length < 2;
+  $('care-focus-next').textContent = '다른 사람 보기';
+}
+async function openCareFocus(action) {
+  if (notebookView().locked || focusOperation) return;
+  const epoch = authEpoch, key = $('care-focus').dataset.key;
+  const options = careFocusOptions(), selected = options.find(item => item.key === key);
+  if (Number($('care-focus').dataset.epoch) !== epoch || !selected) { renderCareFocus();notify('수첩이나 날짜가 바뀌었어요. 새로 표시한 사람을 확인해 주세요.');return; }
+  if (action === 'next') { focusKey = options[(options.findIndex(item => item.key === key) + 1) % options.length].key;renderCareFocus();return; }
+  const operation = {};focusOperation = operation;
+  try {
+    if (action === 'history' || selected.kind === 'followup') {
+      if (!await choosePerson(selected.personId, 'history') || epoch !== authEpoch) return;
+      if (selected.kind === 'followup' && action !== 'history') {
+        const item = state.followups.find(row => row.id === selected.followupId && row.personId === selected.personId && row.status === 'pending');
+        if (!item) { renderCareFocus();notify('이 후속 챙김이 바뀌었어요. 현재 기록을 확인해 주세요.');return; }
+        const card = [...$('person-followups').querySelectorAll('[data-followup]')].find(node => node.dataset.followup === item.id);
+        card?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      } else $('workspace').scrollIntoView({ behavior: 'smooth', block: 'start' });
+      return;
+    }
+    const targetEvent = selected.kind === 'event' ? selected.eventId : '';
+    if (selected.personId === selectedId && $('draft-text').value.trim() && ($('draft-event').value !== targetEvent || memoryChoice)) {
+      if (!await confirmDelete('지금 다듬고 있는 문구가 있어요. 오늘 추천으로 새 문구를 준비하려면 필요한 내용을 먼저 복사해 주세요.', '새 마음 준비하기', '추천으로 준비')) return;
+    }
+    if (epoch !== authEpoch || notebookView().locked || !careFocusOptions().some(item => item.key === key)) { renderCareFocus();return; }
+    if (memoryChoice && selected.personId === selectedId) resetPersonalMemory();
+    if (selected.kind === 'event') await prepareEvent(selected.eventId);
+    else await beginCheckin(selected.personId);
+  } finally { if (focusOperation === operation) focusOperation = null; }
 }
 function renderHistory() {
   const selected = person(); if (!selected) { $('person-history').textContent = ''; return; }
@@ -282,7 +344,7 @@ async function followupAction(event) {
   if (field === 'followupNow') { planFollowupAction(item,{action:'now',today:today()}); if(!await choosePerson(item.personId,'history'))return; $('care-log-kind').value='contact'; $('care-log-note').value=item.title; $('care-log-form').scrollIntoView({behavior:'smooth',block:'center'}); notify('직접 챙긴 뒤 기록을 남겨 주세요. 아직 완료로 표시하지 않았어요.'); return; }
   if (field === 'followupStop' && !await confirmDelete('이 후속 챙김을 더 이상 표시하지 않을까요? 남겨 둔 일정과 기억은 유지해요.','후속 챙김 멈추기','이제 그만')) return;
   if (epoch !== authEpoch) return;
-  const decision=planFollowupAction(item,{action:field==='followupDone'?'done':'dismiss',today:today()}); state=updateFollowup(state,id,decision.patch); save(); renderFollowups(); notify(field==='followupDone'?'직접 챙긴 마음을 표시했어요.':'이 후속 챙김은 이제 보여드리지 않아요.');
+  const decision=planFollowupAction(item,{action:field==='followupDone'?'done':'dismiss',today:today()}); state=updateFollowup(state,id,decision.patch); save(); renderFollowups(); renderCareFocus(); notify(field==='followupDone'?'직접 챙긴 마음을 표시했어요.':'이 후속 챙김은 이제 보여드리지 않아요.');
 }
 function invalidateMessageReview() {
   expressionReview = null; preferenceCandidates = []; preferenceContext = null;
@@ -413,6 +475,7 @@ async function saveCapture() {
   notify(`일정 ${events.length}개와 기억 ${memories.length}개, 원문을 함께 보관했어요. 다음 마음을 준비할 때 다시 꺼내 볼 수 있어요.`);
 }
 function replaceState(next) {
+  focusKey = ''; focusEpoch = authEpoch;focusOperation = null;
   resetPersonalMemory(); checkinMode=false; followupCalendar=null; $('followup-calendar-dialog').close();
   resetMemoryCard(); $('followup-form').reset(); preparationKey = '';
   state = importBackup(next || emptyState()); selectedId = null; activeView = 'home'; sampleMode = false;
@@ -421,20 +484,29 @@ function replaceState(next) {
   clearAudio(); clearConversationFields(); resetDraft(); resetEventForm(); render();
 }
 function renderAccount() {
-  const connected = !!accountId, configured = accountStatus.configured === true;
+  const connected = !!accountId;
+  const presentation = notebookView(), main = document.querySelector('.main-grid');
   const local = syncStatus.localRecords || { count: 0, pending: 0, corrupt: 0 };
-  $('account-signin').hidden = connected; $('account-signin').disabled = !configured || accountStatus.status === 'restoring';
-  $('account-signin').textContent = configured ? 'SYNK 계정 연결' : '계정 연결 준비 중';
+  $('account-signin').hidden = connected; $('account-signin').disabled = presentation.signInDisabled;
+  $('account-signin').textContent = presentation.signInLabel;
   $('account-signout').hidden = !connected && !accountStatus.signedIn;
   $('account-refresh').hidden = !connected;
+  $('account-refresh').disabled = !presentation.canRetryNotebook;
+  $('account-refresh').textContent = presentation.concealNotebook && !presentation.loading ? '계정 자료 다시 불러오기' : '계정 자료 새로고침';
   $('account-import-device').hidden = !connected || !guestSnapshot?.state.people.length;
+  $('account-import-device').disabled = !presentation.canImportDevice;
   $('account-conflict').hidden = !connected || !['conflict','local-conflict'].includes(syncStatus.status);
   $('account-conflict-retry').hidden = syncStatus.status === 'local-conflict';
-  document.querySelector('.main-grid').inert = connected && (['loading', 'local-conflict'].includes(syncStatus.status) || accountStatus.status === 'restoring');
+  main.inert = presentation.locked; main.hidden = presentation.concealNotebook;
+  $('main-content').setAttribute('aria-busy', String(presentation.loading));
+  $('account-panel').dataset.kind = presentation.kind;
+  $('notebook-loading').hidden = !presentation.concealNotebook;
+  $('notebook-loading-title').textContent = presentation.title;
+  $('notebook-loading-detail').textContent = presentation.detail;
   const labels = { loading: '내 수첩을 불러오고 있어요', synced: 'SYNK 계정에 저장했어요', saving: '계정에 저장하고 있어요', offline: '연결을 기다리는 변경이 있어요', conflict: '다른 기기의 변경과 확인이 필요해요', 'local-conflict': '이 기기의 미저장 수첩을 골라 주세요', 'storage-error': '이 기기에 변경을 보관하지 못했어요', error: '계정 수첩 연결을 확인해 주세요' };
-  $('account-status').textContent = connected ? labels[syncStatus.status] || '내 SYNK 계정에 연결됨' : configured ? 'SYNK 계정으로 수첩 이어 보기' : '이 환경의 SYNK 로그인 설정이 아직 준비되지 않았어요';
-  $('account-detail').textContent = connected ? syncStatus.error?.message || (typeof syncStatus.error === 'string' ? syncStatus.error : '') || (syncStatus.pending ? '현재 변경은 이 기기에 대기 중이에요. 다시 연결되면 저장해요.' : '보관한 원문·사람·일정·주고받은 기록을 같은 계정에서 꺼내 볼 수 있어요.') : configured ? accountStatus.error?.message || accountStatus.error || '연결 후에는 계정 수첩을 불러와요. 지금 기기의 수첩은 직접 골라 옮길 수 있어요.' : '지금은 이 기기에서 사용할 수 있어요. 운영 계정 연결이 준비되면 로그인과 기기 간 저장을 사용할 수 있어요.';
-  if (!connected && syncStatus.error) $('account-detail').textContent = syncStatus.error.message;
+  $('account-status').textContent = presentation.locked ? presentation.title : connected ? labels[syncStatus.status] || '내 SYNK 계정에 연결됨' : presentation.title;
+  $('account-detail').textContent = presentation.locked ? presentation.detail : connected ? syncStatus.error?.message || (typeof syncStatus.error === 'string' ? syncStatus.error : '') || (syncStatus.pending ? '현재 변경은 이 기기에 대기 중이에요. 다시 연결되면 저장해요.' : '보관한 원문·사람·일정·주고받은 기록을 같은 계정에서 꺼내 볼 수 있어요.') : presentation.detail;
+  if (!connected && syncStatus.error && !presentation.concealNotebook) $('account-detail').textContent = syncStatus.error.message;
   const localNoticeCode = syncStatus.warning?.code || (local.corrupt ? 'INVALID_LOCAL_CACHE' : null);
   $('account-local-note').hidden = !local.count && !local.unknown && !syncStatus.warning || !local.unknown && !!localNoticeCode && syncStatus.error?.code === localNoticeCode;
   $('account-local-note').textContent = (syncStatus.warning?.message || (local.corrupt ? '읽지 못한 이 계정의 임시기록 원본을 보존했어요. 복구 파일로 내보낸 뒤 직접 지울 수 있어요.' : connected ? '계정에 보내지 못한 변경만 이 기기에 임시 보관해요. 저장이 끝나면 기기 사본을 지워요.' : `미저장 계정 임시기록 ${local.count}개가 이 기기에 남아 있어요. 기록을 남긴 계정으로 로그인하면 이어 사용할 수첩을 고르거나 복구 파일로 내보내고 지울 수 있어요.`)) + (local.unknown ? ' 계정을 확인할 수 없는 손상 원본은 그대로 보존하며 이 화면에서 내보내거나 지우지 않아요.' : '');
@@ -450,6 +522,7 @@ function renderAccount() {
       button.textContent = `기록 ${index + 1} · ${created} 열기`; button.disabled = syncStatus.status === 'loading'; choices.append(button);
     }
   }
+  renderSummary(); renderCareFocus();
 }
 async function handleAccountStatus(status) {
   accountStatus = status;
@@ -477,7 +550,8 @@ async function startAccount() {
   if (syncStatus.localRecords.error) syncStatus.error = syncStatus.localRecords.error;
   account = createCareAccount({ ...(PUBLIC_WEB ? { configUrl: './config.json' } : {}), onStatus: status => { handleAccountStatus(status).catch(error => notify(error.message)); } });
   try { const status = await account.start(); if (status) await handleAccountStatus(status); }
-  catch (error) { notify(error.message || '로그인 연결을 확인하지 못했어요.'); renderAccount(); }
+  catch (error) { accountStatus = { ...accountStatus, status: 'error', error };notify(error.message || '로그인 연결을 확인하지 못했어요.'); }
+  finally { accountStarting = false;renderAccount(); }
 }
 function switchTab(name) {
   activeTab = name;
@@ -497,7 +571,10 @@ function clearAudio() {
   audioURL = null; audioFile = null; $('audio-file').value = ''; $('audio-player').removeAttribute('src'); $('audio-player').load(); $('audio-detail').hidden = true; $('transcript-wrap').hidden = true; $('transcript-text').value = ''; $('audio-consent').checked = false;
 }
 async function choosePerson(id, tab = 'events') {
+  const epoch = authEpoch;
+  if (notebookView().locked) return false;
   if (id !== selectedId && hasPersonalizationInput() && !await confirmDelete('지금 고른 기억과 아직 보관하지 않은 안부 초안이 있어요. 다른 사람을 열면 이 선택을 해제해요. 필요한 문구를 먼저 복사해 주세요.', '다른 사람의 수첩', '다른 사람 열기')) return false;
+  if (epoch !== authEpoch || notebookView().locked || id && !state.people.some(item => item.id === id)) return false;
   if (id !== selectedId) { resetPersonalMemory(); checkinMode=false; resetMemoryCard(); $('followup-form').reset(); $('care-log-form').reset(); logOccurrence = null; }
   stashConversation(); stashDraft(); selectedId = id; activeView = id ? 'person' : 'home'; resetDraft(); resetEventForm(); clearAudio(); $('text-file').value = ''; render(true); restoreDraft(); switchTab(tab); save();
   return true;
@@ -583,8 +660,10 @@ function generateDraft({ silent = false } = {}) {
   if (!silent) notify(draft.needsComposition ? '피할 표현을 뺐어요. 전하고 싶은 말을 직접 적어 주세요.' : '초안을 준비했어요. 보내기 전에 내 말처럼 다듬어 주세요.');
 }
 async function prepareEvent(eventId) {
-  const event = state.events.find(item => item.id === eventId); if (!event) throw Error('일정을 다시 확인해 주세요.');
+  const epoch = authEpoch;let event = state.events.find(item => item.id === eventId); if (!event) throw Error('일정을 다시 확인해 주세요.');
   if ((selectedId !== event.personId || activeView !== 'person') && !await choosePerson(event.personId, 'events')) return;
+  if (epoch !== authEpoch || notebookView().locked) return;
+  event = state.events.find(item => item.id === eventId && item.personId === selectedId);if (!event) return;
   checkinMode=false;
   $('draft-event').value = eventId;
   renderBrief();
@@ -596,6 +675,17 @@ async function prepareEvent(eventId) {
   }
   updateMood();
   $('workspace').scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' });
+}
+async function beginCheckin(id) {
+  const epoch = authEpoch;
+  if (!state.people.length) { openPersonDialog();return; }
+  if (!id) throw Error('안부를 전할 사람을 골라 주세요.');
+  if (!await choosePerson(id, 'events') || epoch !== authEpoch || notebookView().locked) return;
+  checkinMode = true;$('draft-event').value = '';renderBrief();switchTab('message');
+  if (currentDraft?.eventType !== 'checkin' || !$('draft-text').value.trim()) {
+    $('draft-style').value = person().savedMessages?.checkin ? 'saved' : 'warm';generateDraft({ silent: true });
+  }
+  $('workspace').scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 function exportEvent(button) {
   const row = rows().find(item => item.event.id === button.dataset.ics);
@@ -693,7 +783,10 @@ for (const [id, label] of [['account-export-local', '계정 임시기록 복구 
 on('account-export-local', 'click', () => { const file = new Blob([JSON.stringify(sync.exportLocalRecords(), null, 2)], { type: 'application/json' }); const url = URL.createObjectURL(file), link = document.createElement('a'); link.href = url; link.download = 'synk-care-local-recovery.json'; link.click(); setTimeout(() => URL.revokeObjectURL(url), 1000); });
 on('account-clear-local', 'click', async () => { const expected=authEpoch; if (!accountId || syncStatus.pending || !await confirmDelete('로그인한 이 계정이 플레저에 남긴 임시기록을 지울까요? 미저장 변경과 읽지 못한 원본은 복구할 수 없어요. 다른 계정의 임시기록, 계정 서버의 수첩, 로그인 전 기기 수첩은 그대로예요. 필요한 복구 파일을 실제로 저장했는지 먼저 확인해 주세요.', '이 계정의 임시기록 삭제', '기기 임시기록 지우기') || expected!==authEpoch) return; if (sync.clearLocalRecords()) notify('이 계정의 기기 임시기록을 지웠어요. 계정 서버의 수첩은 그대로예요.'); });
 on('people-search', 'input', renderPeople); on('people-group-filter', 'change', renderPeople);
-on('account-signin', 'click', () => account.signIn());
+on('account-signin', 'click', async () => {
+  try { await account.signIn(); }
+  catch (error) { accountStatus = resumeCareLoginNavigation(accountStatus, true);renderAccount();throw error; }
+});
 on('account-signout', 'click', async () => {
   const pendingNotice = syncStatus.pendingStored === false ? '현재 변경을 계정에 저장하지 못했고 기기 임시보관도 확인하지 못했어요. 현재 수첩을 내보내지 않고 로그아웃할까요?' : '아직 계정에 반영되지 않은 변경이 있어요. 이 기기에 저장한 대기본은 같은 계정으로 다시 로그인한 뒤 직접 골라 이어 저장할 수 있어요. 지금 로그아웃할까요?';
   const notice = hasUnsubmittedAccountInput() ? '아직 수첩에 보관하지 않은 메시지·대화·후속 챙김·카드 입력이 있어요. 입력을 복사해 두지 않고 로그아웃하면 사라져요. 로그아웃할까요?' : pendingNotice;
@@ -714,9 +807,10 @@ on('account-conflict-retry', 'click', async () => {
 });
 on('account-import-device', 'click', async () => {
   if (!guestSnapshot || !accountId) return;
-  const source = importBackup(guestSnapshot.state), targetId = accountId;
+  if (!notebookView().canImportDevice) { notify(notebookView().detail);return; }
+  const source = importBackup(guestSnapshot.state), targetId = accountId, epoch = authEpoch;
   if (!await confirmDelete(`이 기기에 있던 사람 ${source.people.length}명의 수첩을 계정에 추가해요. 이미 같은 식별자의 사람이 있으면 계정 자료를 유지하고 건너뛰어요.`, '기기의 수첩 가져오기', '계정 수첩에 추가')) return;
-  if (accountId !== targetId) return;
+  if (accountId !== targetId || authEpoch !== epoch || !notebookView().canImportDevice) return;
   const added = new Set(source.people.filter(item => !state.people.some(old => old.id === item.id)).map(item => item.id));
   const events = source.events.filter(item => added.has(item.personId)), eventIds = new Set(events.map(item => item.id));
   state = importBackup({ ...state, people: [...state.people, ...source.people.filter(item => added.has(item.id))], events: [...state.events, ...events], drafts: [...state.drafts, ...source.drafts.filter(item => added.has(item.personId))].slice(-200), completions: [...state.completions, ...source.completions.filter(item => eventIds.has(item.eventId))], sources: [...state.sources, ...source.sources.filter(item => added.has(item.personId))], memories: [...state.memories, ...source.memories.filter(item => added.has(item.personId))], activities: [...state.activities, ...source.activities.filter(item => added.has(item.personId))], followups: [...(state.followups || []), ...(source.followups || []).filter(item=>added.has(item.personId))], preparations: [...(state.preparations || []), ...(source.preparations || []).filter(item=>added.has(item.personId))].slice(-500) });
@@ -764,7 +858,8 @@ on('person-history', 'click', async e => {
 on('add-person', 'click', () => openPersonDialog()); on('empty-add', 'click', () => openPersonDialog()); on('edit-person', 'click', () => openPersonDialog(true));
 on('home-add-person', 'click', () => openPersonDialog()); on('home-empty-add', 'click', async () => { if (state.people.length) { if(!await choosePerson(selectedId || state.people[0].id, 'events'))return; $('event-form').scrollIntoView({ behavior: 'smooth', block: 'start' }); } else openPersonDialog(); }); on('show-home', 'click', showHome);
 on('home-view', 'click', async e => { const button = e.target.closest('button'); if (!button) return; if (button.dataset.homeDraft) await prepareEvent(button.dataset.homeDraft); if (button.dataset.homePerson) await choosePerson(button.dataset.homePerson, 'history'); if (button.dataset.ics) exportEvent(button); if (button.dataset.logEvent) await openCareLog(button.dataset.logEvent, button.dataset.logDate); });
-on('start-checkin','click',async()=>{if(!state.people.length){openPersonDialog();return;} const id=$('checkin-person').value;if(!id)throw Error('안부를 전할 사람을 골라 주세요.');if(!await choosePerson(id,'events'))return;checkinMode=true;$('draft-event').value='';renderBrief();switchTab('message');$('draft-style').value=person().savedMessages?.checkin?'saved':'warm';generateDraft({silent:true});$('workspace').scrollIntoView({behavior:'smooth',block:'start'});});
+on('start-checkin','click',()=>beginCheckin($('checkin-person').value));
+on('care-focus-action','click',()=>openCareFocus('prepare'));on('care-focus-history','click',()=>openCareFocus('history'));on('care-focus-next','click',()=>openCareFocus('next'));
 on('personal-memory','change',()=>{renderMemoryEvidence();$('personal-memory-status').textContent='원문과 용도를 확인한 뒤 “이 기억으로 준비”를 눌러 주세요.';});
 on('personal-memory-use','change',()=>{$('personal-memory-status').textContent='바꾼 용도를 확인한 뒤 “이 기억으로 준비”를 눌러 주세요.';});
 on('apply-personal-memory','click',async()=>{
@@ -881,9 +976,9 @@ on('draft-preference-review','click',e=>{
 });
 for(const id of ['followup-list','person-followups']) {
   on(id,'click',followupAction);
-  on(id,'submit',e=>{const form=e.target.closest('[data-followup-delay]');if(!form)return;e.preventDefault();const item=state.followups.find(row=>row.id===form.dataset.followupDelay);const decision=planFollowupAction(item,{action:'later',today:today(),dueOn:form.querySelector('input').value});state=updateFollowup(state,item.id,decision.patch);save();renderFollowups();notify('내가 고른 날 다시 보여드릴게요.');});
+  on(id,'submit',e=>{const form=e.target.closest('[data-followup-delay]');if(!form)return;e.preventDefault();const item=state.followups.find(row=>row.id===form.dataset.followupDelay);const decision=planFollowupAction(item,{action:'later',today:today(),dueOn:form.querySelector('input').value});state=updateFollowup(state,item.id,decision.patch);save();renderFollowups();renderCareFocus();notify('내가 고른 날 다시 보여드릴게요.');});
 }
-on('followup-form','submit',e=>{e.preventDefault();state=addFollowup(state,{personId:selectedId,title:$('followup-title').value,dueOn:$('followup-date').value});$('followup-form').reset();save();renderFollowups();notify('다음에 다시 챙길 마음을 기억했어요.');});
+on('followup-form','submit',e=>{e.preventDefault();state=addFollowup(state,{personId:selectedId,title:$('followup-title').value,dueOn:$('followup-date').value});$('followup-form').reset();save();renderFollowups();renderCareFocus();notify('다음에 다시 챙길 마음을 기억했어요.');});
 on('preview-memory-card','click',previewMemoryCard);
 for (const type of ['input', 'change']) on('memory-card-builder', type, () => { releaseMemoryCard(); $('preview-memory-card').disabled = false; $('memory-card-status').textContent = '선택한 내용으로 미리보기를 다시 만들 수 있어요.'; });
 on('close-memory-card','click',()=>{$('memory-card-dialog').close();});
@@ -960,5 +1055,6 @@ setInterval(() => { try { renderPeople(); renderHome(); renderEvents(); checkRem
 document.addEventListener('visibilitychange', () => { if (!document.hidden) { notificationStatus(); renderHome(); checkReminders(); } });
 window.addEventListener('beforeunload', event => { if (accountId && (syncStatus.pending || hasUnsubmittedAccountInput())) { event.preventDefault(); event.returnValue = ''; } });
 window.addEventListener('pagehide', () => { releaseMemoryCard(); if (audioURL) URL.revokeObjectURL(audioURL); });
+window.addEventListener('pageshow', event => { const restored = resumeCareLoginNavigation(accountStatus, event.persisted); if (restored !== accountStatus && !accountId) { accountStatus = restored;renderAccount(); } });
 window.addEventListener('online', () => { if (accountId && syncStatus.pending) void sync.flush(); });
 document.documentElement.dataset.ready = 'true';
