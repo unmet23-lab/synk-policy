@@ -10,6 +10,7 @@ import { careAccountView, resumeCareLoginNavigation } from './care-account-view.
 import { recommendCareFocus } from './care-focus.mjs';
 import { buildCareContext } from './care-context.mjs';
 import { createCarePush, carePushAccountIdentity, careLogoutNotice } from './care-push.mjs';
+import { CHECKIN_INTENTS, listSavedMessages, toggleMessageFavorite, removeSavedMessage } from './model.mjs';
 
 const $ = id => document.getElementById(id);
 const PUBLIC_WEB = document.querySelector('meta[name="synk-care-runtime"]')?.content === 'public-web';
@@ -279,7 +280,7 @@ function renderHistory() {
   const completedFollowups=followupRows(state,{today:today(),personId:selected.id}).completed.map(item=>({id:item.id,kind:'followup-completed',eventTitle:item.title,createdAt:item.updatedAt}));
   const timeline = [...personTimeline(state, selected.id),...completedFollowups].sort((a,b)=>b.createdAt.localeCompare(a.createdAt)||a.id.localeCompare(b.id));
   const pref = selected.recipientPreference;
-  const saved = Object.keys(selected.savedMessages || {}).map(type => EVENT_TYPES[type]).filter(Boolean);
+  const saved = [...new Set(listSavedMessages(selected).map(libraryLabel))];
   const memory = [selected.notes, pref.confirmed && pref.salutation ? `부르는 호칭: ${pref.salutation}` : '', pref.confirmed && pref.avoidPhrases?.length ? `피할 표현: ${pref.avoidPhrases.join(', ')}` : '', pref.confirmed && pref.noReplyPressure ? '답장을 재촉하지 않기' : '', saved.length ? `다시 쓸 내 문구: ${saved.join(' · ')}` : ''].filter(Boolean);
   const top = memory.length ? `<aside class="person-memory"><h4>직접 남긴 기억</h4>${memory.map(line => `<p>${escapeHTML(line)}</p>`).join('')}</aside>` : '';
   const confirmed = (state.memories ?? []).filter(item => item.personId === selectedId);
@@ -577,10 +578,59 @@ function renderDraftNotice() {
   renderSavedDraft();
 }
 function renderSavedDraft() {
-  const event = state.events.find(item => item.id === $('draft-event').value), saved = person()?.savedMessages?.[event?.type || 'checkin'];
-  $('saved-draft-preview').hidden = !saved;
-  $('saved-draft-text').textContent = saved?.text || '';
-  $('draft-save-status').textContent = saved && saved.text === $('draft-text').value.trim() ? saveFailed ? '기기 저장에 실패해 이번 화면에만 남아 있어요. 새로고침 전에 백업을 내보내 주세요.' : '지금 문구를 기억하고 있어요. 복사나 연락 완료 기록은 별도예요.' : '';
+  const owner = person(), type = libraryType(), all = owner ? listSavedMessages(owner, { type }) : [];
+  const items = libraryItems(), select = $('saved-message-select');
+  const scopeKey = JSON.stringify([authEpoch, selectedId, type, $('draft-intent').value, $('library-scope').value]);
+  const previous = select.dataset.scopeKey === scopeKey ? select.value : currentDraft?.savedMessageId;
+  select.dataset.scopeKey = scopeKey;
+  select.innerHTML = '<option value="">보관한 문구를 골라 주세요</option>' + items.map(item => '<option value="' + escapeHTML(item.id) + '">' + escapeHTML((item.favorite ? '★ ' : '') + libraryLabel(item) + ' · ' + item.text.slice(0, 32) + (item.text.length > 32 ? '…' : '')) + '</option>').join('');
+  select.value = items.some(item => item.id === previous) ? previous : items[0]?.id || '';
+  select.disabled = !items.length;
+  $('saved-draft-preview').hidden = !owner;
+  $('library-scope-wrap').hidden = type !== 'checkin';
+  $('library-title').textContent = '내 문구 보관함 · ' + all.length + '개';
+  $('library-empty').hidden = !!items.length;
+  $('library-empty').textContent = all.length ? '이 목적에 보관한 문구가 없어요. 안부 전체에서 이전 문구도 찾아볼 수 있어요.' : '다듬은 문구를 기억하면 이곳에 쌓여요. 이전 문구도 다시 꺼낼 수 있어요.';
+  const remembered = all.some(item => item.text === $('draft-text').value.trim() && (type !== 'checkin' || item.checkinIntent === $('draft-intent').value));
+  $('draft-save-status').textContent = saveFailed ? '기기 저장에 실패해 이번 화면의 변경만 남아 있어요. 새로고침 전에 백업을 내보내 주세요.' : remembered ? '지금 문구를 보관하고 있어요. 복사나 연락 완료 기록은 별도예요.' : '';
+  renderLibrarySelection();
+}
+function libraryType() { return state.events.find(item => item.id === $('draft-event').value)?.type || 'checkin'; }
+function libraryItems() {
+  if (!person()) return [];
+  const type = libraryType();
+  return listSavedMessages(person(), { type, ...(type === 'checkin' && $('library-scope').value !== 'type' ? { checkinIntent: $('draft-intent').value || 'everyday' } : {}) });
+}
+function libraryLabel(item) { return item.type === 'checkin' ? CHECKIN_INTENTS[item.checkinIntent] : EVENT_TYPES[item.type]; }
+function renderLibrarySelection() {
+  const item = libraryItems().find(row => row.id === $('saved-message-select').value);
+  $('saved-draft-text').textContent = item?.text || '';
+  $('library-meta').textContent = item ? libraryLabel(item) + ' · ' + new Intl.DateTimeFormat('ko-KR', { timeZone: 'Asia/Seoul', dateStyle: 'medium', timeStyle: 'short' }).format(new Date(item.savedAt)) : '';
+  $('library-actions').hidden = !item;
+  $('favorite-saved-message').textContent = item?.favorite ? '즐겨찾기 해제' : '즐겨찾기';
+  $('favorite-saved-message').setAttribute('aria-pressed', String(!!item?.favorite));
+}
+async function loadSavedMessage() {
+  const item = libraryItems().find(row => row.id === $('saved-message-select').value);
+  if (!item) throw Error('다시 꺼낼 문구를 골라 주세요.');
+  const epoch = authEpoch, owner = selectedId, eventId = $('draft-event').value, draft = currentDraft, text = $('draft-text').value, fingerprint = JSON.stringify(item);
+  if (text.trim() && text !== (draft?.originalText || '') && text.trim() !== item.text && !await confirmDelete('직접 다듬은 문구를 보관함의 문구로 바꿀까요? 남겨 두려면 취소한 뒤 먼저 문구를 기억해 주세요.', '이전 문구 불러오기', '이 문구로 준비')) return;
+  if (epoch !== authEpoch || owner !== selectedId || eventId !== $('draft-event').value || draft !== currentDraft || text !== $('draft-text').value || notebookView().locked) return;
+  if (JSON.stringify(libraryItems().find(row => row.id === item.id)) !== fingerprint) throw Error('보관한 문구가 바뀌었어요. 다시 골라 주세요.');
+  if (item.type === 'checkin' && item.checkinIntent !== 'unspecified') $('draft-intent').value = item.checkinIntent;
+  resetPersonalMemory(); $('draft-style').value = 'saved';
+  generateDraft({ silent: true, savedMessageId: item.id }); stashDraft();
+  notify('이전 문구로 다시 준비했어요. 피할 표현을 확인했고, 복사하거나 보내지는 않았어요.');
+}
+async function deleteSavedMessage() {
+  const item = libraryItems().find(row => row.id === $('saved-message-select').value);
+  if (!item) throw Error('삭제할 문구를 골라 주세요.');
+  const epoch = authEpoch, owner = selectedId, fingerprint = JSON.stringify(item);
+  if (!await confirmDelete('이 문구 한 개를 보관함에서 지울까요? 다른 문구와 작성 중인 초안은 남아요. 삭제한 문구는 되돌릴 수 없어요.', '보관한 문구 삭제', '문구 삭제')) return;
+  if (epoch !== authEpoch || owner !== selectedId || notebookView().locked) return;
+  if (JSON.stringify(listSavedMessages(person()).find(row => row.id === item.id)) !== fingerprint) throw Error('문구가 바뀌었어요. 다시 확인해 주세요.');
+  state = removeSavedMessage(state, { personId: owner, messageId: item.id });
+  const saved = save(); renderSavedDraft(); renderHistory(); if (saved) notify('선택한 문구만 보관함에서 지웠어요. 작성 중인 초안은 그대로예요.');
 }
 function resetDraft({ preserveIntent = false } = {}) { invalidateMessageReview(); currentDraft = null; $('draft-text').value = ''; if (!preserveIntent) $('draft-intent').value = 'everyday'; $('draft-confirm').checked = false; $('remember-draft').checked = false; $('draft-basis').textContent = '직접 확인한 표현과 상황별 문장 틀로 준비해요.'; renderDraftNotice(); }
 function clearAudio() {
@@ -660,17 +710,18 @@ function renderMessageOptions() {
   if (available.some(row => row.event.id === previous)) $('draft-event').value = previous;
   else if(!checkinMode&&available.length)$('draft-event').value=available[0].event.id;
   if (currentDraft && (currentDraft.eventId !== $('draft-event').value || currentDraft.occurrenceId !== $('draft-event').selectedOptions[0]?.dataset.occurrenceId)) resetDraft();
-  if (!currentDraft && person()) $('draft-style').value = defaultDraftApproach(person(), state.events.find(item => item.id === $('draft-event').value)?.type || 'checkin');
+  if (!currentDraft && person()) $('draft-style').value = defaultDraftApproach(person(), state.events.find(item => item.id === $('draft-event').value)?.type || 'checkin', { checkinIntent: $('draft-intent').value });
   renderSavedDraft();
   updateMood();
   renderBrief();
 }
-function generateDraft({ silent = false } = {}) {
+function generateDraft({ silent = false, savedMessageId } = {}) {
   if(!person())throw Error('먼저 안부를 전할 사람을 골라 주세요.');
-  const event = state.events.find(item => item.id === $('draft-event').value), options={approach:$('draft-style').value,checkinIntent:$('draft-intent').value,state,memorySelection:selectedMemory()};
+  const event = state.events.find(item => item.id === $('draft-event').value), options={approach:$('draft-style').value,checkinIntent:$('draft-intent').value,state,memorySelection:selectedMemory(), ...(savedMessageId ? {savedMessageId} : {})};
   const draft = event ? draftMessage(person(), event, options) : generateCheckinDraft(person(),options), row = event&&currentRows().find(item => item.event.id === event.id);
   if (event && row?.occurrence.occurrenceId !== $('draft-event').selectedOptions[0]?.dataset.occurrenceId) { renderMessageOptions(); throw Error('날짜가 바뀌었어요. 새로 표시한 일정을 확인해 주세요.'); }
   currentDraft = { ...draft, personId: selectedId, eventId: event?.id||'', eventType:event?.type||'checkin', occurrenceId: row?.occurrence.occurrenceId, originalText: draft.text };
+  $('saved-message-select').dataset.scopeKey = '';
   $('draft-text').value = draft.text; $('draft-confirm').checked = false; invalidateMessageReview();
   $('draft-basis').textContent = [...draft.basis, ...draft.cautions, person().recipientPreference.note ? `기억할 점: ${person().recipientPreference.note}` : ''].filter(Boolean).join(' ');
   renderDraftNotice();
@@ -688,7 +739,7 @@ async function changeDraft({ intentChanged = false } = {}) {
   }
   if (epoch !== authEpoch || owner !== selectedId || notebookView().locked) return;
   $('draft-intent').value = intent;
-  $('draft-style').value = intentChanged && approach === 'saved' ? defaultDraftApproach(person(), 'checkin', { preferSaved: false }) : approach;
+  $('draft-style').value = intentChanged && approach === 'saved' ? defaultDraftApproach(person(), 'checkin', { checkinIntent: intent }) : approach;
   generateDraft({ silent: true });
 }
 function checkedDraftInput({ rememberOnly = false } = {}) {
@@ -703,7 +754,7 @@ function checkedDraftInput({ rememberOnly = false } = {}) {
   if (currentDraft.eventId && event?.type !== currentDraft.eventType) throw Error('일정이 바뀌었어요. 작성한 문구를 남겨 뒀으니 현재 일정을 확인해 주세요.');
   const row = currentRows().find(item => item.event.id === currentDraft.eventId);
   if (!rememberOnly && currentDraft.eventId && row?.occurrence.occurrenceId !== currentDraft.occurrenceId) throw Error('날짜가 바뀌었어요. 작성한 문구를 남겨 뒀으니 문구를 기억한 뒤 현재 일정을 확인해 주세요.');
-  return { personId: selectedId, eventId: currentDraft.eventId, eventType: currentDraft.eventType, occurrenceId: currentDraft.occurrenceId, originalText: currentDraft.originalText, text, preferenceNote: person().recipientPreference.note, memorySelection: selectedMemory() };
+  return { personId: selectedId, eventId: currentDraft.eventId, eventType: currentDraft.eventType, checkinIntent: currentDraft.checkinIntent, occurrenceId: currentDraft.occurrenceId, originalText: currentDraft.originalText, text, preferenceNote: person().recipientPreference.note, memorySelection: selectedMemory() };
 }
 async function prepareEvent(eventId) {
   const epoch = authEpoch;let event = state.events.find(item => item.id === eventId); if (!event) throw Error('일정을 다시 확인해 주세요.');
@@ -917,7 +968,7 @@ on('account-conflict-load', 'click', async () => {
   await sync.resolveRemote();
 });
 on('account-conflict-retry', 'click', async () => {
-  if (!await confirmDelete('계정의 최신 내용을 현재 화면의 수첩으로 바꿉니다. 다른 기기에서 추가한 내용이 빠질 수 있어요.', '내 변경 저장', '현재 수첩으로 저장')) return;
+  if (!await confirmDelete('계정의 최신 내용을 현재 화면의 수첩으로 바꿉니다. 현재 수첩에 없는 이전 문구·즐겨찾기·다른 기기의 기록은 사라질 수 있어요. 필요한 내용은 먼저 백업해 주세요.', '내 변경 저장', '현재 수첩으로 저장')) return;
   await sync.resolveLocal();
 });
 on('account-import-device', 'click', async () => {
@@ -965,7 +1016,7 @@ on('care-log-form', 'submit', e => {
 on('person-history', 'click', async e => {
   const button = e.target.closest('button'); if (!button) return;
   const owner = selectedId, epoch = authEpoch;
-  const countMessages = value => value.people.reduce((count, item) => count + Object.keys(item.savedMessages).length, 0);
+  const countMessages = value => value.people.reduce((count, item) => count + listSavedMessages(item).length, 0);
   const removalNotice = next => `다시 쓸 문구·복사 기록(문구 ${countMessages(state) - countMessages(next)}개, 복사 ${state.drafts.length - next.drafts.length}개)`;
   if (button.dataset.deleteMemory) {
     const before = state, next = revokeCareMemory(state, { memoryId: button.dataset.deleteMemory });
@@ -1119,8 +1170,17 @@ on('save-draft-only', 'click', () => {
   const input = checkedDraftInput({ rememberOnly: true }); if (!input) return;
   state = rememberDraft(state, input); const saved = save(); renderHistory(); renderSavedDraft(); stashDraft();
   if (!saved) return;
-  notify('다음에 다시 쓸 내 문구로 기억했어요. 복사하거나 연락 완료로 기록하지는 않았어요.');
+  notify('보관함에 기억했어요. 이전 문구도 남아 있어요. 복사나 연락 완료는 별도예요.');
 });
+on('library-scope', 'change', () => renderSavedDraft());
+on('saved-message-select', 'change', () => renderLibrarySelection());
+on('load-saved-message', 'click', () => loadSavedMessage());
+on('favorite-saved-message', 'click', () => {
+  const item = libraryItems().find(row => row.id === $('saved-message-select').value); if (!item) throw Error('보관한 문구를 골라 주세요.');
+  state = toggleMessageFavorite(state, { personId: selectedId, messageId: item.id });
+  const saved = save(); renderSavedDraft(); renderHistory(); if (saved) notify(item.favorite ? '즐겨찾기를 해제했어요.' : '즐겨찾기에 넣었어요. 다음에 먼저 찾아볼 수 있어요.');
+});
+on('delete-saved-message', 'click', () => deleteSavedMessage());
 on('copy-draft', 'click', async () => {
   const input = checkedDraftInput(); if (!input) return;
   const text = input.text;

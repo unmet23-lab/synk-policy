@@ -82,11 +82,13 @@ export function createProductAccount({
   }
   function requestBody(operation, values = {}) {
     if (!OPERATIONS.has(operation) || !values || typeof values !== 'object' || Array.isArray(values)) throw fault('INVALID_REQUEST', '제품 계정 요청을 확인해 주세요.');
-    const allowed = operation === operations.load ? [] : operation === operations.save ? ['expected_revision', 'state'] : ['expected_revision'];
+    const careLibrarySave = clientKey === 'care' && endpoint === 'synk-care' && resource === null && operation === operations.save;
+    const allowed = operation === operations.load ? [] : operation === operations.save ? ['expected_revision', 'state', ...(careLibrarySave ? ['messageLibraryVersion'] : [])] : ['expected_revision'];
     if (Object.keys(values).some(key => !allowed.includes(key))) throw fault('INVALID_REQUEST', '제품 계정 요청을 확인해 주세요.');
+    if (Object.hasOwn(values, 'messageLibraryVersion') && (!careLibrarySave || values.messageLibraryVersion !== 1)) throw fault('INVALID_REQUEST', '문구 보관함의 저장 계약을 확인해 주세요.');
     if (operation === operations.load) return undefined;
     if (!Number.isSafeInteger(values.expected_revision) || values.expected_revision < 0) throw fault('INVALID_REQUEST', '저장할 자료의 버전을 확인해 주세요.');
-    return { action: operation === operations.save ? 'save' : 'delete', expected_revision: values.expected_revision, ...(operation === operations.save ? { state: validateState(values.state) } : {}) };
+    return { action: operation === operations.save ? 'save' : 'delete', expected_revision: values.expected_revision, ...(operation === operations.save ? { state: validateState(values.state) } : {}), ...(Object.hasOwn(values, 'messageLibraryVersion') ? { messageLibraryVersion: 1 } : {}) };
   }
   function validateResponse(data, ownerId) {
     if (data?.ok !== true) throw fault(data?.error?.code || 'ACCOUNT_UNAVAILABLE', data?.error?.message || '계정 자료를 확인하지 못했어요.', { retryable: data?.error?.retryable === true, status: data?.error?.status, revision: data?.revision, ...missingAsset(data?.error) });
@@ -98,7 +100,7 @@ export function createProductAccount({
     const body = requestBody(operation, values); guard(expected);
     let data;
     if (native) {
-      const params = operation === operations.load ? {} : operation === operations.save ? { expected_revision: body.expected_revision, state: body.state } : { expected_revision: body.expected_revision };
+      const params = operation === operations.load ? {} : operation === operations.save ? { expected_revision: body.expected_revision, state: body.state, ...(Object.hasOwn(body, 'messageLibraryVersion') ? { messageLibraryVersion: body.messageLibraryVersion } : {}) } : { expected_revision: body.expected_revision };
       data = await bridgeRequest.call(bridge, operation, params); guard(expected);
     } else {
       if (!session?.access_token) throw fault('AUTH_REQUIRED', 'SYNK ID로 로그인해 주세요.');

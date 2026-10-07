@@ -123,7 +123,21 @@
               <div class="draft-controls"><label for="draft-style">어떤 느낌으로 전할까요?<select id="draft-style"><option value="short">짧은 한마디</option><option value="warm">마음을 조금 더 담아</option><option value="saved">기억해 둔 내 문구로</option></select></label><button id="generate-draft" class="soft-button" type="button">초안 준비하기</button></div>
               <div class="draft-window"><div class="draft-titlebar"><span>보내기 전, 내 말처럼 다듬기</span><span>메시지 초안</span></div><textarea id="draft-text" rows="7" placeholder="초안을 준비한 뒤, 내 마음을 한 줄 더해 주세요." aria-label="보낼 메시지 초안"></textarea><p id="draft-notice" class="helper draft-notice" role="status">직접 확인한 표현과 상황에 맞춰 준비해요.</p><details class="draft-details"><summary>반영한 표현과 확인할 점</summary><div id="draft-basis" class="draft-basis">직접 확인한 표현과 상황에 맞춰 준비해요.</div></details></div>
               <section class="message-check"><div class="section-heading"><h4>전하기 전, 한 번 더</h4><button id="review-message" class="soft-button" type="button">표현 점검하기</button></div><div id="message-review" class="message-review" role="status"><p class="helper">이름·날짜·약속과 직접 확인한 표현을 살펴봐요.</p></div><div id="draft-preference-review" class="draft-preference-review" hidden></div></section><label class="check-label"><input id="draft-confirm" type="checkbox"><span>관계와 상황에 어울리는지 확인하고 직접 수정했어요.</span></label>
-              <section class="draft-memory-tools" aria-label="내 문구 기억"><label class="check-label remember-draft"><input id="remember-draft" type="checkbox"><span>복사할 때, 이 행사에 다시 쓸 내 문구로 기억</span></label><button id="save-draft-only" class="soft-button" type="button">복사 없이 문구 기억</button><p class="helper">이 사람의 같은 종류 문구 한 개를 기억해요. 다시 기억하면 이전 문구를 바꿔요.</p><p id="draft-save-status" class="helper" role="status"></p><details id="saved-draft-preview" hidden><summary>지금 기억한 내 문구 보기</summary><p id="saved-draft-text"></p></details></section>
+              <section class="draft-memory-tools" aria-label="내 문구 기억">
+                <label class="check-label remember-draft"><input id="remember-draft" type="checkbox"><span>복사할 때, 이 행사에 다시 쓸 내 문구로 기억</span></label>
+                <button id="save-draft-only" class="soft-button" type="button">복사 없이 문구 기억</button>
+                <p class="helper">새 문구를 기억해도 이전 문구는 남아요. 같은 목적의 같은 문구는 중복으로 쌓지 않아요.</p>
+                <p id="draft-save-status" class="helper" role="status"></p>
+                <details id="saved-draft-preview" hidden><summary id="library-title">내 문구 보관함</summary>
+                  <div class="library-filters">
+                    <label id="library-scope-wrap">찾아볼 범위<select id="library-scope"><option value="context">이번 안부 목적</option><option value="type">안부 전체</option></select></label>
+                    <label>다시 꺼낼 문구<select id="saved-message-select"><option value="">보관한 문구를 골라 주세요</option></select></label>
+                  </div>
+                  <p id="library-empty" class="helper"></p><p id="library-meta" class="helper"></p><p id="saved-draft-text"></p>
+                  <div id="library-actions" class="action-row" hidden><button id="load-saved-message" class="soft-button" type="button">이 문구로 다시 준비</button><button id="favorite-saved-message" class="soft-button" type="button" aria-pressed="false">즐겨찾기</button><button id="delete-saved-message" class="text-button danger" type="button">문구 삭제</button></div>
+                  <p class="helper">즐겨찾기를 먼저, 나머지는 최근 순으로 보여 드려요. 예전에 기억한 안부는 ‘목적 미지정’으로 찾아볼 수 있어요.</p>
+                </details>
+              </section>
               <div class="action-row draft-actions"><button id="copy-draft" class="felt-button" type="button">확인한 메시지 복사</button><button id="complete-event" class="soft-button" type="button">챙김 완료</button><button id="remember-event" class="soft-button" type="button" hidden>조용히 기억했어요</button></div><p class="helper">메시지는 직접 전해 주세요. ‘챙김 완료’는 연락하거나 챙긴 뒤에, ‘조용히 기억했어요’는 연락 없이 마음에 담은 날에 남기는 기록이에요.</p>
             </div>
           </section>

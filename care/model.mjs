@@ -3,6 +3,7 @@ import { LUNAR_RANGE, normalizeLunarDate, lunarDateInYear, lunarToSolar, solarTo
 import { resolveCareMemory } from './care-personalization.mjs';
 export const EVENT_TYPES = Object.freeze({ birthday: '생일', wedding: '결혼', condolence: '부고', memorial: '기일', anniversary: '기념일' });
 export const MESSAGE_TYPES = Object.freeze({ ...EVENT_TYPES, checkin: '오늘 그냥 안부' });
+export const CHECKIN_INTENTS = Object.freeze({ everyday: '일상 안부', reconnect: '오랜만의 안부', thanks: '감사 인사', unspecified: '목적 미지정' });
 const DAY = 86_400_000;
 const MAX_TEXT = 50_000;
 const choose = (value, options, fallback, label) => {
@@ -104,6 +105,52 @@ function savedMessages(input = {}) {
   }
   return result;
 }
+function messageLibrary(input) {
+  const seen = new Set();
+  return backupList(input, 100, '한 사람의 보관 문구').map(value => {
+    exactKeys(value, ['id', 'type', 'checkinIntent', 'text', 'savedAt', 'favorite'], '보관 문구');
+    if (!Object.hasOwn(MESSAGE_TYPES, value.type)) throw new Error('보관 문구의 종류를 확인해 주세요.');
+    const item = { id: requireId(value.id, '보관 문구 식별자'), type: value.type,
+      text: clean(value.text, '보관 문구', 5000, true), savedAt: timestamp(value.savedAt, '문구를 보관한 시간'), favorite: value.favorite === true };
+    uniqueId(item.id, seen, '보관 문구');
+    if (value.favorite !== undefined && typeof value.favorite !== 'boolean') throw new Error('문구 즐겨찾기 여부를 확인해 주세요.');
+    if (item.type === 'checkin') item.checkinIntent = choose(value.checkinIntent, Object.keys(CHECKIN_INTENTS), 'unspecified', '보관한 안부의 목적');
+    else if (value.checkinIntent !== undefined) throw new Error('행사 문구에는 안부 목적을 저장할 수 없어요.');
+    return item;
+  });
+}
+function legacyMessageId(personId, type, saved) {
+  // 구자료를 읽을 때마다 같은 ID를 제공한다. 사람과 종류도 포함해 다른 사람의 선택을 받지 않는다.
+  const source = JSON.stringify([personId, type, saved.text, saved.savedAt]);
+  let first = 2166136261, second = 5381;
+  for (let index = 0; index < source.length; index++) {
+    first = Math.imul(first ^ source.charCodeAt(index), 16777619);
+    second = Math.imul(second, 33) ^ source.charCodeAt(index);
+  }
+  return `legacy_${type}_${(first >>> 0).toString(36)}_${(second >>> 0).toString(36)}`;
+}
+function personMessageLibrary(person) {
+  // 명시 배열은 빈 배열이어도 삭제 결과다. 옛 mirror로 다시 채우지 않는다.
+  if (Object.hasOwn(person, 'messageLibrary')) return person.messageLibrary;
+  return Object.entries(person.savedMessages).map(([type, saved]) => ({
+    id: legacyMessageId(person.id, type, saved), type, ...saved, favorite: false,
+    ...(type === 'checkin' ? { checkinIntent: 'unspecified' } : {}),
+  }));
+}
+function sortedMessages(items, favoritesFirst = true) {
+  return items.map((item, index) => ({ item, index })).sort((a, b) =>
+    (favoritesFirst ? Number(b.item.favorite) - Number(a.item.favorite) : 0) || b.item.savedAt.localeCompare(a.item.savedAt) || b.index - a.index
+  ).map(({ item }) => ({ ...item }));
+}
+/** 같은 사람의 보관함. 안부 목적을 고르면 해당 목적과 목적 미지정 구자료만 보여 준다. */
+export function listSavedMessages(personInput, { type, checkinIntent } = {}) {
+  const person = makePerson(personInput);
+  if (type !== undefined && !Object.hasOwn(MESSAGE_TYPES, type)) throw new Error('보관 문구의 종류를 확인해 주세요.');
+  if (checkinIntent !== undefined && (type !== 'checkin' || !Object.hasOwn(CHECKIN_INTENTS, checkinIntent))) throw new Error('보관한 안부의 목적을 확인해 주세요.');
+  return sortedMessages(personMessageLibrary(person).filter(item =>
+    (type === undefined || item.type === type) && (checkinIntent === undefined || item.checkinIntent === checkinIntent || item.checkinIntent === 'unspecified')
+  ));
+}
 function timestamp(value, label) {
   const text = clean(value, label, 40, true);
   if (!/^\d{4}-\d{2}-\d{2}T(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d{1,3})?(?:Z|[+-](?:0\d|1[0-4]):[0-5]\d)$/.test(text)) throw new Error(`${label}을 확인해 주세요.`);
@@ -130,6 +177,7 @@ export function makePerson(input = {}) {
     id: id(input.id, 'person'), name: clean(input.name, '이름', 80, true), relationship: clean(input.relationship, '관계', 80),
     group: choose(input.group, ['family', 'friend', 'work', 'other'], 'other', '사람 모음'),
     selfTone: tone(input.selfTone), recipientPreference: preference(input.recipientPreference), notes: clean(input.notes, '메모'), savedMessages: savedMessages(input.savedMessages),
+    ...(Object.hasOwn(input, 'messageLibrary') ? { messageLibrary: messageLibrary(input.messageLibrary) } : {}),
   };
 }
 
@@ -375,7 +423,7 @@ export function draftMessage(personInput, eventInput, options = {}) {
   let person = makePerson(personInput);
   let event = makeEvent(eventInput);
   if (person.id !== event.personId) throw new Error('일정과 사람이 일치하지 않아요.');
-  if (options.memorySelection != null) {
+  if (options.memorySelection != null || options.savedMessageId != null && options.state != null) {
     const current = importBackup(options.state);
     person = current.people.find(item => item.id === person.id);
     event = current.events.find(item => item.id === event.id);
@@ -388,7 +436,7 @@ export function draftMessage(personInput, eventInput, options = {}) {
 /** 날짜나 가짜 행사를 만들지 않는 일상 안부. 원문을 쓸 때는 현재 수첩을 함께 검증한다. */
 export function generateCheckinDraft(personInput, options = {}) {
   let person = makePerson(personInput);
-  if (options.memorySelection != null) {
+  if (options.memorySelection != null || options.savedMessageId != null && options.state != null) {
     const current = importBackup(options.state);
     person = current.people.find(item => item.id === person.id);
     if (!person) throw new Error('현재 수첩에서 사람을 다시 선택해 주세요.');
@@ -399,10 +447,11 @@ export function generateCheckinDraft(personInput, options = {}) {
 }
 
 /** 화면의 첫 초안 선택. 확인한 길이와 같은 종류에 직접 기억한 문구만 사용한다. */
-export function defaultDraftApproach(personInput, type, { preferSaved = true } = {}) {
+export function defaultDraftApproach(personInput, type, { preferSaved = true, checkinIntent = 'everyday' } = {}) {
   const person = makePerson(personInput);
   if (!Object.hasOwn(MESSAGE_TYPES, type)) throw new Error('초안의 종류를 확인해 주세요.');
-  if (preferSaved && person.savedMessages[type]) return 'saved';
+  const available = listSavedMessages(person, { type, ...(type === 'checkin' ? { checkinIntent } : {}) });
+  if (preferSaved && available.some(item => type !== 'checkin' || item.checkinIntent === checkinIntent)) return 'saved';
   return person.recipientPreference.confirmed && person.recipientPreference.length === 'short' ? 'short' : 'warm';
 }
 
@@ -412,7 +461,8 @@ function composeDraft(person, type, options) {
   const memory = resolveCareMemory({ state: options.state, personId: person.id, eventType: type, memorySelection: options.memorySelection });
   const observedCasual = person.selfTone?.formality === 'casual';
   const casual = !sensitive && (pref.confirmed && pref.formality !== 'auto' ? pref.formality === 'casual' : observedCasual);
-  const approach = choose(options.approach, ['short', 'warm', 'saved'], pref.confirmed && pref.length === 'balanced' ? 'warm' : 'short', '초안 방식');
+  const selectedId = options.savedMessageId == null || options.savedMessageId === '' ? '' : requireId(options.savedMessageId, '불러올 문구 식별자');
+  const approach = selectedId ? 'saved' : choose(options.approach, ['short', 'warm', 'saved'], pref.confirmed && pref.length === 'balanced' ? 'warm' : 'short', '초안 방식');
   const longer = approach === 'warm';
   const customSalutation = pref.confirmed ? pref.salutation : '';
   const casualName = customSalutation || person.name;
@@ -431,7 +481,10 @@ function composeDraft(person, type, options) {
     anniversary: casual ? `${casualName}, 기념일 축하해!${longer ? ' 좋은 기억이 남는 하루 보내.' : ''}` : `${honorific}, 기념일 축하드려요.${longer ? ' 소중한 기억이 남는 하루 보내세요.' : ''}`,
     checkin: checkinTexts[checkinIntent],
   };
-  const saved = approach === 'saved' ? person.savedMessages[type] : null;
+  const available = approach === 'saved' ? listSavedMessages(person, { type, ...(type === 'checkin' ? { checkinIntent } : {}) }) : [];
+  const saved = selectedId ? available.find(item => item.id === selectedId) :
+    (available.find(item => type !== 'checkin' || item.checkinIntent === checkinIntent) || available[0]);
+  if (selectedId && !saved) throw new Error('불러올 문구가 삭제되었거나 사람·상황이 바뀌었어요. 보관함에서 다시 골라 주세요.');
   const method = saved ? 'saved' : 'template';
   let text = saved ? saved.text : texts[type];
   if (!saved && !sensitive && customSalutation && !['birthday', 'anniversary', 'checkin'].includes(type)) text = `${customSalutation}, ${text}`;
@@ -487,7 +540,7 @@ function composeDraft(person, type, options) {
   }
   if (!text) cautions.push('남은 문구가 없어요. 상황에 맞는 말을 직접 적어 주세요.');
   if (pref.note) cautions.push('자유롭게 적은 선호 메모는 문구에 자동 반영되지 않아요. 직접 대조해 주세요.');
-  return { text, basis, cautions, needsReview: true, needsComposition: !text, method, approach, removedPhrases, memory };
+  return { text, basis, cautions, needsReview: true, needsComposition: !text, method, approach, savedMessageId: saved?.id ?? null, removedPhrases, memory };
 }
 
 /** 현재 보이는 다음 미완료 회차를 완료 처리한 새 상태. 미래 연간 회차는 기록을 공유하지 않는다. */
@@ -530,14 +583,54 @@ export function recordDraft(state, input, now = new Date()) {
 
 /** 별도 버튼으로 요청한 문구만 다음 같은 종류 일정에 사용할 수 있게 기억한다. */
 export function rememberDraft(state, input, now = new Date()) {
-  const person = (state.people ?? []).find(item => item.id === input.personId);
-  const event = (state.events ?? []).find(item => item.id === input.eventId);
+  const current = importBackup(state);
+  const person = current.people.find(item => item.id === input.personId);
+  const event = current.events.find(item => item.id === input.eventId);
   const checkin = input.eventId === '' && input.eventType === 'checkin';
   if (!person || (!checkin && (!event || event.personId !== person.id)) || (event && input.eventType === 'checkin')) throw new Error('문구를 기억할 사람과 일정을 확인해 주세요.');
-  if (input.memorySelection != null) resolveCareMemory({ state: importBackup(state), personId: person.id, eventType: checkin ? 'checkin' : event.type, memorySelection: input.memorySelection });
-  const value = { text: clean(input.text, '기억할 문구', 5000, true), savedAt: clock(now).toISOString() };
-  const updated = makePerson({ ...person, savedMessages: { ...person.savedMessages, [checkin ? 'checkin' : event.type]: value } });
-  return importBackup({ ...state, people: state.people.map(item => item.id === person.id ? updated : item) });
+  if (input.memorySelection != null) resolveCareMemory({ state: current, personId: person.id, eventType: checkin ? 'checkin' : event.type, memorySelection: input.memorySelection });
+  const type = checkin ? 'checkin' : event.type;
+  const checkinIntent = checkin ? choose(input.checkinIntent, ['everyday', 'reconnect', 'thanks'], 'everyday', '안부의 목적') : undefined;
+  if (!checkin && input.checkinIntent !== undefined) throw new Error('행사 문구에는 안부 목적을 저장할 수 없어요.');
+  const text = clean(input.text, '기억할 문구', 5000, true), savedAt = clock(now).toISOString();
+  const library = personMessageLibrary(person);
+  const existing = library.find(item => item.type === type && item.checkinIntent === checkinIntent && item.text === text);
+  if (!existing && library.length >= 100) throw new Error('한 사람에게 문구를 최대 100개까지 보관할 수 있어요. 필요 없는 문구를 지운 뒤 저장해 주세요.');
+  const entry = existing ?? { id: id(undefined, 'message'), type, ...(checkin ? { checkinIntent } : {}), text, savedAt, favorite: false };
+  const updated = makePerson({ ...person, messageLibrary: existing ? library : [...library, entry], savedMessages: { ...person.savedMessages, [type]: { text: entry.text, savedAt: entry.savedAt } } });
+  return importBackup({ ...current, people: current.people.map(item => item.id === person.id ? updated : item) });
+}
+
+function storedMessageTarget(state, { personId, messageId }) {
+  const current = importBackup(state), person = current.people.find(item => item.id === personId);
+  const library = person ? personMessageLibrary(person) : [];
+  const entry = library.find(item => item.id === messageId);
+  if (!person || !entry) throw new Error('보관 문구가 삭제되었거나 사람이 바뀌었어요. 보관함에서 다시 골라 주세요.');
+  return { current, person, library, entry };
+}
+/** 문구 원문과 저장 시각은 유지하고 즐겨찾기 여부만 바꾼다. */
+export function toggleMessageFavorite(state, input) {
+  const { current, person, library, entry } = storedMessageTarget(state, input);
+  const updated = { ...person, messageLibrary: library.map(item => item.id === entry.id ? { ...item, favorite: !item.favorite } : item) };
+  return importBackup({ ...current, people: current.people.map(item => item.id === person.id ? updated : item) });
+}
+/** 선택한 버전만 지운다. 이전 버전은 그대로 남기며 옛 mirror에서도 삭제를 반영한다. */
+export function removeSavedMessage(state, input) {
+  const { current, person, library, entry } = storedMessageTarget(state, input);
+  if (!Object.hasOwn(person, 'messageLibrary')) {
+    // 삭제만으로 남은 구자료를 새 배열로 이관하면 전체 보관 한도에 막힐 수 있다.
+    const savedMessages = { ...person.savedMessages };
+    delete savedMessages[entry.type];
+    return importBackup({ ...current, people: current.people.map(item => item.id === person.id ? { ...person, savedMessages } : item) });
+  }
+  const remaining = library.filter(item => item.id !== entry.id), savedMessages = { ...person.savedMessages };
+  if (savedMessages[entry.type]?.text === entry.text) {
+    const next = sortedMessages(remaining.filter(item => item.type === entry.type), false)[0];
+    if (next) savedMessages[entry.type] = { text: next.text, savedAt: next.savedAt };
+    else delete savedMessages[entry.type];
+  }
+  const updated = { ...person, messageLibrary: remaining, savedMessages };
+  return importBackup({ ...current, people: current.people.map(item => item.id === person.id ? updated : item) });
 }
 
 /** 철회한 기억의 문구가 저장 초안에서 다시 자동 사용되지 않게 함께 지운다. */
@@ -555,6 +648,7 @@ export function revokeCareMemory(state, { sourceId, memoryId }) {
     followups: sourceId ? current.followups.filter(item => item.sourceId !== sourceId) : current.followups,
     people: current.people.map(person => person.id !== target.personId ? person : { ...person,
       savedMessages: Object.fromEntries(Object.entries(person.savedMessages).filter(([, saved]) => !contains(saved.text))),
+      ...(Object.hasOwn(person, 'messageLibrary') ? { messageLibrary: person.messageLibrary.filter(item => !contains(item.text)) } : {}),
     }),
     drafts: current.drafts.filter(item => item.personId !== target.personId || !contains(item.text) && !contains(item.originalText)),
   });
@@ -610,6 +704,7 @@ export function importBackup(raw) {
     recordObject(input, '사람'); requireId(input.id, '사람 식별자');
     const item = makePerson(input); uniqueId(item.id, peopleIds, '사람'); return item;
   });
+  if (people.reduce((sum, person) => sum + (person.messageLibrary?.length ?? 0), 0) > 1000) throw new Error('수첩 전체에 문구를 최대 1,000개까지 보관할 수 있어요. 필요 없는 문구를 지운 뒤 저장해 주세요.');
   const events = backupList(data.events, 5000, '일정').map(input => {
     recordObject(input, '일정'); requireId(input.id, '일정 식별자');
     const item = makeEvent(input); uniqueId(item.id, eventIds, '일정');
