@@ -394,7 +394,16 @@ export function generateCheckinDraft(personInput, options = {}) {
     if (!person) throw new Error('현재 수첩에서 사람을 다시 선택해 주세요.');
     options = { ...options, state: current };
   }
-  return { ...composeDraft(person, 'checkin', options), eventId: '', eventType: 'checkin', eventTitle: MESSAGE_TYPES.checkin };
+  const checkinIntent = choose(options.checkinIntent, ['everyday', 'reconnect', 'thanks'], 'everyday', '안부의 목적');
+  return { ...composeDraft(person, 'checkin', { ...options, checkinIntent }), eventId: '', eventType: 'checkin', eventTitle: MESSAGE_TYPES.checkin, checkinIntent };
+}
+
+/** 화면의 첫 초안 선택. 확인한 길이와 같은 종류에 직접 기억한 문구만 사용한다. */
+export function defaultDraftApproach(personInput, type, { preferSaved = true } = {}) {
+  const person = makePerson(personInput);
+  if (!Object.hasOwn(MESSAGE_TYPES, type)) throw new Error('초안의 종류를 확인해 주세요.');
+  if (preferSaved && person.savedMessages[type]) return 'saved';
+  return person.recipientPreference.confirmed && person.recipientPreference.length === 'short' ? 'short' : 'warm';
 }
 
 function composeDraft(person, type, options) {
@@ -408,33 +417,44 @@ function composeDraft(person, type, options) {
   const customSalutation = pref.confirmed ? pref.salutation : '';
   const casualName = customSalutation || person.name;
   const honorific = customSalutation || (/(?:님|씨)$/.test(person.name) ? person.name : `${person.name}님`);
+  const checkinIntent = options.checkinIntent || 'everyday';
+  const checkinTexts = {
+    everyday: casual ? `${casualName}, 문득 생각나서 안부 전해.${longer ? ' 편안하게 잘 지내길 바라.' : ''}` : `${honorific}, 문득 생각나 안부 전해요.${longer ? ' 편안하게 잘 지내시길 바라요.' : ''}`,
+    reconnect: casual ? `${casualName}, 오랜만이야. 잘 지내?${longer ? ' 어떻게 지내는지 궁금해서 연락했어.' : ''}` : `${honorific}, 오랜만에 인사드려요. 잘 지내세요?${longer ? ' 어떻게 지내시는지 궁금해 안부 전해요.' : ''}`,
+    thanks: casual ? `${casualName}, 고마워.${longer ? ' 이 말은 꼭 전하고 싶었어.' : ''}` : `${honorific}, 감사합니다.${longer ? ' 감사한 마음을 꼭 전하고 싶었어요.' : ''}`,
+  };
   const texts = {
-    birthday: casual ? `${casualName}, 생일 축하해!${longer ? ' 오늘 좋아하는 것들로 가득한 하루 보내.' : ''}` : `${honorific}, 생일 축하드려요.${longer ? ' 기분 좋은 일들이 가득한 하루 보내세요.' : ''}`,
+    birthday: casual ? `${casualName}, 생일 축하해!${longer ? ' 좋아하는 것들로 가득한 하루 보내.' : ''}` : `${honorific}, 생일 축하드려요.${longer ? ' 기분 좋은 일들이 가득한 하루 보내세요.' : ''}`,
     wedding: casual ? `결혼 진심으로 축하해!${longer ? ' 두 사람의 앞날에 행복이 가득하길 바라.' : ''}` : `결혼 진심으로 축하드려요.${longer ? ' 두 분의 앞날에 행복이 가득하길 바랍니다.' : ''}`,
-    condolence: `삼가 고인의 명복을 빕니다.${longer ? ' 깊은 위로의 마음을 전합니다.' : ''}`,
-    memorial: `오늘 고인을 기억하며 마음을 함께합니다.${longer ? ' 조용히 위로의 마음을 전합니다.' : ''}`,
-    anniversary: casual ? `${casualName}, 기념일 축하해!${longer ? ' 오늘도 좋은 기억이 남는 하루 보내.' : ''}` : `${honorific}, 기념일 축하드려요.${longer ? ' 소중한 기억이 남는 하루 보내세요.' : ''}`,
-    checkin: casual ? `${casualName}, 문득 생각나서 안부 전해.${longer ? ' 오늘 편안한 하루 보내.' : ''}` : `${honorific}, 문득 생각나 안부 전해요.${longer ? ' 오늘도 편안한 하루 보내세요.' : ''}`,
+    condolence: `깊은 위로의 마음을 전합니다.${longer ? ' 마음으로 함께하겠습니다.' : ''}`,
+    memorial: `고인을 기억하며 마음을 함께합니다.${longer ? ' 조용히 위로의 마음을 전합니다.' : ''}`,
+    anniversary: casual ? `${casualName}, 기념일 축하해!${longer ? ' 좋은 기억이 남는 하루 보내.' : ''}` : `${honorific}, 기념일 축하드려요.${longer ? ' 소중한 기억이 남는 하루 보내세요.' : ''}`,
+    checkin: checkinTexts[checkinIntent],
   };
   const saved = approach === 'saved' ? person.savedMessages[type] : null;
   const method = saved ? 'saved' : 'template';
   let text = saved ? saved.text : texts[type];
-  if (!saved && customSalutation && !['birthday', 'anniversary', 'checkin'].includes(type)) text = `${customSalutation}, ${text}`;
+  if (!saved && !sensitive && customSalutation && !['birthday', 'anniversary', 'checkin'].includes(type)) text = `${customSalutation}, ${text}`;
   const basis = saved ? ['이 사람의 같은 종류 일정에 직접 기억해 둔 문구를 가져왔어요. 자동으로 학습한 결과가 아니에요.'] : [sensitive ? '부고·기일에는 차분하고 정중한 표현을 사용했어요.' : pref.confirmed && pref.formality !== 'auto' ? '직접 확인한 상대의 말투 선호를 반영했어요.' : observedCasual ? '본인 발화에서 관찰한 편한 말투를 참고했어요.' : '확인된 단서가 부족해 정중한 표현을 사용했어요.', '만남·선물·송금 약속은 임의로 넣지 않았어요.'];
   const cautions = [saved ? '지난 문구의 호칭·날짜·약속이 지금도 맞는지 확인해 주세요.' : '규칙과 문구 틀로 만든 초안이에요. 보내기 전에 직접 확인해 주세요.'];
   if (approach === 'saved' && !saved) cautions.push('이 종류의 일정에 기억해 둔 문구가 없어 짧은 초안부터 준비했어요.');
-  if (customSalutation && !saved) basis.push('직접 정한 호칭을 사용했어요.');
+  if (customSalutation && !saved && !sensitive) basis.push('직접 정한 호칭을 사용했어요.');
+  if (type === 'checkin') {
+    if (saved) cautions.push('기억해 둔 안부 문구를 가져왔어요. 이번에 고른 안부 목적에 맞춰 문구를 자동으로 바꾸지 않았어요.');
+    else if (checkinIntent !== 'everyday') basis.push(checkinIntent === 'reconnect' ? '이번에 직접 고른 오랜만의 안부를 반영했어요. 마지막 연락일을 추정한 결과가 아니에요.' : '이번에 직접 고른 감사 인사를 반영했어요. 고마웠던 이유는 임의로 넣지 않았어요.');
+  }
+  if (sensitive && (customSalutation || pref.confirmed && pref.closingLine)) cautions.push('조심스러운 날에는 평소 호칭과 덧붙일 말을 자동으로 연결하지 않았어요. 상황에 맞는 표현을 직접 더해 주세요.');
   const append = (addition, explanation) => {
     if (text.length + addition.length > 5000) { cautions.push('5,000자를 넘는 덧붙임은 넣지 않았어요. 문구를 줄인 뒤 다시 준비해 주세요.'); return false; }
     text += addition; basis.push(explanation); return true;
   };
-  if (pref.confirmed && pref.closingLine && !text.includes(pref.closingLine)) append(`\n${pref.closingLine}`, '직접 쓴 덧붙일 말을 연결했어요.');
+  if (!saved && !sensitive && pref.confirmed && pref.closingLine && !text.includes(pref.closingLine)) append(`\n${pref.closingLine}`, '직접 쓴 덧붙일 말을 연결했어요.');
   if (!saved && !sensitive && pref.confirmed && pref.allowEmoji) append(type === 'birthday' ? ' 🎂' : type === 'checkin' ? ' 🙂' : ' 💐', '직접 확인한 이모지 선호를 반영했어요.');
   if (pref.confirmed && pref.noReplyPressure) {
     const replyLine = casual ? '답장은 편할 때 해도 괜찮아.' : '답장은 편하실 때 하셔도 괜찮아요.';
     const pressure = [...new Set(text.match(/(?:꼭|반드시|빨리|바로)[^.!?\n]{0,12}(?:답장|연락|회신)|(?:답장|연락|회신)[^.!?\n]{0,12}(?:꼭|반드시|빨리|바로|해\s?줘|주세요|부탁)/gu) ?? [])];
     if (pressure.length) { text = removeSentences(text, pressure).text; cautions.push('답장을 재촉하는 표현이 있는 문장을 제외했어요. 문맥을 확인해 주세요.'); }
-    if (!text.includes(replyLine)) append(`\n${replyLine}`, '답장을 재촉하지 않는 한 줄을 더했어요.');
+    if (!saved && !text.includes(replyLine)) append(`\n${replyLine}`, '답장을 재촉하지 않는 한 줄을 더했어요.');
   }
   if (sensitive) {
     const quiet = quietText(text); text = quiet.text;

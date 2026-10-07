@@ -47,6 +47,9 @@ export function applyPreferenceCandidate(personInput, candidate, { confirmed = f
     }
   }
   const recipientPreference = { ...person.recipientPreference, confirmed: true };
+  // The unconfirmed UI defaults to warm. Confirming an unrelated edit must not
+  // turn the schema's legacy short default into an explicit length preference.
+  if (!person.recipientPreference.confirmed && fresh.kind !== 'shorter') recipientPreference.length = 'balanced';
   if (fresh.kind === 'shorter') recipientPreference.length = 'short';
   else if (fresh.kind === 'no-emoji') recipientPreference.allowEmoji = false;
   else recipientPreference.avoidPhrases = [...new Set([...recipientPreference.avoidPhrases, fresh.patch.avoidPhrase])];
@@ -73,10 +76,13 @@ function dateMentions(text, today, expectedDate = null) {
   return dates;
 }
 function promiseMentions(text) {
-  // Deliberately narrow first-person future endings. A marker is a review cue,
-  // never proof the speaker committed or that their promise is unconfirmed.
-  const pattern = /(?<![가-힣])(?:꼭\s*)?(?:찾아갈게|갈게|참석할게|보내줄게|보낼게|송금할게|사줄게|도와줄게|전화할게|연락할게|챙겨줄게)(?:요)?(?![가-힣])/gu;
-  return [...text.matchAll(pattern)].map(match => ({ quote: match[0], start: match.index, end: match.index + match[0].length }));
+  // Explicit endings only, including common polite commitments. A marker is a
+  // review cue, never proof of intent or speaker identity (including quotations).
+  // Direct 안/못 and question endings are excluded; this is not a negation parser.
+  const pattern = /(?<![가-힣])(?:(안|못)[ \t]+)?(?:꼭[ \t]*)?(?:(?:찾아갈|갈|참석할|보내줄|보낼|송금할|사줄|도와줄|전화할|연락할|챙겨줄)게(?:요)?|(?:찾아뵐|(?:보내|사|도와|전화|연락|챙겨)[ \t]*드릴)게(?:요)?|(?:찾아가|가|찾아뵙|참석하|보내|송금하|전화하|연락하|(?:보내|사|도와|전화|연락|챙겨)[ \t]*드리)겠습니다)(?![가-힣])/gu;
+  return [...text.matchAll(pattern)]
+    .filter(match => !match[1] && !/^[ \t]*[?？]/u.test(text.slice(match.index + match[0].length)))
+    .map(match => ({ quote: match[0], start: match.index, end: match.index + match[0].length }));
 }
 
 /** The product supplies date/recipient meaning; Vellum compares exact observed spans. */
