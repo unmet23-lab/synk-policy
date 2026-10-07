@@ -8,6 +8,7 @@ import { createMemoryCard } from './memory-card.mjs';
 import { prepareCare } from './care-planner.mjs';
 import { careAccountView, resumeCareLoginNavigation } from './care-account-view.mjs';
 import { recommendCareFocus } from './care-focus.mjs';
+import { createCarePush, carePushAccountIdentity, careLogoutNotice } from './care-push.mjs';
 
 const $ = id => document.getElementById(id);
 const PUBLIC_WEB = document.querySelector('meta[name="synk-care-runtime"]')?.content === 'public-web';
@@ -19,6 +20,7 @@ let audioFile = null, audioURL = null, transcribing = false, capabilities = null
 let calendarMonth = '', calendarDay = '', captureReview = null, logOccurrence = null;
 let accountStatus = { configured: false, signedIn: false, status: 'loading' }, accountStarting = true, syncStatus = { status: 'idle' }, accountId = null, guestSnapshot = null, authEpoch = 0;
 let sync = null, account = null;
+const carePush = createCarePush({ request: (action, body) => account.requestPush(action, body), onState: () => renderPushSettings() });
 let preparationKey = '', preparationInputs = { attendance: 'undecided', timeMinutes: null, budgetWon: null }, preparationResult = null, preparationLogId = null, preparationLogError = '';
 let expressionReview = null, preferenceCandidates = [], preferenceContext = null, cardURL = null, cardFilename = '', cardGeneration = 0, cardItemsKey = '';
 let memoryChoice = null, followupCalendar = null, checkinMode = false;
@@ -529,6 +531,8 @@ async function handleAccountStatus(status) {
   // A token refresh is still the same account. Do not put its data into the guest notebook.
   if (accountId && status.status === 'restoring') { renderAccount(); return; }
   const nextId = status.signedIn ? status.accountId || status.account?.synk_user_id : null;
+  const pushAccountId = carePushAccountIdentity(status, accountStarting);
+  if (pushAccountId !== undefined) void carePush.setAccount(pushAccountId);
   if (nextId === accountId) { renderAccount(); return; }
   const hadAccount = !!accountId;
   const epoch = ++authEpoch;
@@ -551,7 +555,7 @@ async function startAccount() {
   account = createCareAccount({ ...(PUBLIC_WEB ? { configUrl: './config.json' } : {}), onStatus: status => { handleAccountStatus(status).catch(error => notify(error.message)); } });
   try { const status = await account.start(); if (status) await handleAccountStatus(status); }
   catch (error) { accountStatus = { ...accountStatus, status: 'error', error };notify(error.message || '로그인 연결을 확인하지 못했어요.'); }
-  finally { accountStarting = false;renderAccount(); }
+  finally { accountStarting = false; renderAccount(); const pushAccountId = carePushAccountIdentity(accountStatus, false); if (pushAccountId !== undefined) void carePush.setAccount(pushAccountId); }
 }
 function switchTab(name) {
   activeTab = name;
@@ -763,18 +767,43 @@ async function transcribe() {
   finally { transcribing = false; $('transcribe-button').disabled = !capabilities?.transcription?.available; $('transcribe-button').textContent = '녹음을 텍스트로 바꾸기'; }
 }
 function notificationStatus() {
+  const push = carePush.snapshot();
+  if (push.enabled) { $('notification-status').textContent = push.scheduleKnown ? `기기 알림 켜짐 · ${String(push.hour).padStart(2, '0')}:${String(push.minute).padStart(2, '0')} 한국 시간` : '기기 알림 · 저장된 시간 다시 확인 필요'; return; }
+  if (!push.signedIn && (PUBLIC_WEB || accountStatus.configured) && !window.synkProduct?.authStatus) { $('notification-status').textContent = '기기 알림 설정은 로그인 후 확인'; return; }
   if (!('Notification' in window)) { $('notification-status').textContent = '이 환경은 웹 알림을 지원하지 않아요 · 달력 저장을 이용해 주세요'; return; }
   const permission = Notification.permission;
   $('notification-status').textContent = permission === 'granted' ? '알림 켜짐 · 앱이 열려 있을 때만' : permission === 'denied' ? '알림 권한이 꺼져 있어요 · 달력 저장을 이용해 주세요' : '앱이 열려 있을 때 알림 · 권한 설정 필요';
 }
 function checkReminders() {
+  if (notebookView().locked || carePush.snapshot().suppressOpenReminders) return;
   if (!('Notification' in window) || Notification.permission !== 'granted') return;
   for (const row of rows().filter(item => item.reminderDue)) {
     const key = `${row.occurrence.occurrenceId}:${today()}`; if (notified.has(key)) continue;
-    try { new Notification(`${row.person.name} · ${row.event.title}`, { body: row.occurrence.daysUntil === 0 ? '오늘 챙길 날이에요. 마음을 준비해 보세요.' : `${row.occurrence.daysUntil}일 뒤예요. 미리 마음을 준비해 보세요.`, tag: key, icon: 'assets/sticker-envelope.webp' }); notified.add(key); save(); }
+    try { new Notification('SYNK 플레저', { body: '오늘 챙길 일이 있어요. 수첩에서 확인해 주세요.', tag: key, icon: 'assets/sticker-envelope.webp' }); notified.add(key); save(); }
     catch { $('notification-status').textContent = '이 환경에서 알림을 표시하지 못했어요 · 달력 저장을 이용해 주세요'; break; }
   }
 }
+
+function renderPushSettings() {
+  const push = carePush.snapshot(), time = `${String(push.hour).padStart(2, '0')}:${String(push.minute).padStart(2, '0')}`;
+  $('push-status').textContent = push.message;
+  $('push-status').dataset.kind = ['error', 'unavailable', 'denied'].includes(push.phase) ? 'error' : push.enabled ? 'success' : 'info';
+  $('push-settings').setAttribute('aria-busy', String(push.busy));
+  $('push-time').disabled = push.busy || !push.signedIn || !['ready', 'enabled', 'error'].includes(push.phase);
+  if (document.activeElement !== $('push-time')) $('push-time').value = time;
+  $('push-enable').hidden = push.enabled || !push.signedIn || !['ready', 'error', 'enabling'].includes(push.phase);
+  $('push-enable').disabled = push.busy;
+  $('push-enable').textContent = push.phase === 'enabling' ? '알림을 연결하고 있어요…' : '이 기기에 알림 켜기';
+  $('push-save').hidden = !push.enabled || !push.scheduleKnown; $('push-save').disabled = push.busy;
+  $('push-disable').hidden = !push.enabled; $('push-disable').disabled = push.busy;
+  $('push-retry').hidden = !push.signedIn || !['unavailable', 'denied', 'unsupported', 'needs-install'].includes(push.phase);
+  $('push-signin').hidden = push.signedIn;
+  $('push-signin').disabled = push.busy || accountStarting || !accountStatus.configured;
+  $('push-open-only').hidden = push.enabled;
+  $('push-open-only').disabled = !('Notification' in window) || Notification.permission === 'denied';
+  notificationStatus();
+}
+function pushTime() { const [hour, minute] = $('push-time').value.split(':').map(Number); return [hour, minute]; }
 
 const accountLocalNote = document.createElement('p'); accountLocalNote.id = 'account-local-note'; accountLocalNote.className = 'helper'; accountLocalNote.setAttribute('role', 'status'); accountLocalNote.hidden = true; $('account-panel').append(accountLocalNote);
 const accountLocalDrafts = document.createElement('div'); accountLocalDrafts.id = 'account-local-drafts'; accountLocalDrafts.hidden = true; $('account-panel').append(accountLocalDrafts);
@@ -791,7 +820,9 @@ on('account-signout', 'click', async () => {
   const pendingNotice = syncStatus.pendingStored === false ? '현재 변경을 계정에 저장하지 못했고 기기 임시보관도 확인하지 못했어요. 현재 수첩을 내보내지 않고 로그아웃할까요?' : '아직 계정에 반영되지 않은 변경이 있어요. 이 기기에 저장한 대기본은 같은 계정으로 다시 로그인한 뒤 직접 골라 이어 저장할 수 있어요. 지금 로그아웃할까요?';
   const notice = hasUnsubmittedAccountInput() ? '아직 수첩에 보관하지 않은 메시지·대화·후속 챙김·카드 입력이 있어요. 입력을 복사해 두지 않고 로그아웃하면 사라져요. 로그아웃할까요?' : pendingNotice;
   if ((syncStatus.pending || hasUnsubmittedAccountInput()) && !await confirmDelete(notice, '로그아웃', '로그아웃')) return;
-  const result = await account.signOut(); if (result?.serverRevoked === false) notify('이 기기의 로그인은 종료했어요. 서버의 세션 종료는 확인하지 못했어요.');
+  const pushResult = await carePush.logout();
+  const result = await account.signOut(), logoutNotice = careLogoutNotice(result, pushResult);
+  if (logoutNotice) notify(logoutNotice);
 });
 on('account-refresh', 'click', async () => {
   if (hasUnsubmittedAccountInput() && !await confirmDelete('아직 보관하지 않은 입력이 있어요. 계정 자료가 바뀌었다면 현재 입력 화면이 초기화될 수 있어요.', '계정 새로고침', '새로고침')) return;
@@ -1027,7 +1058,7 @@ on('import-data', 'change', async () => {
 async function deleteAll(message) {
   const epoch = authEpoch;
   if (!await confirmDelete(message) || epoch !== authEpoch) return;
-  if (accountId) { if (!await sync.remove()) throw Error('계정 자료를 삭제하지 못했어요. 연결 상태와 충돌 안내를 확인해 주세요.'); notify('계정의 플레저 수첩을 삭제했어요. 다른 기기도 다음 연결 때 반영돼요.'); return; }
+  if (accountId) { if (!await sync.remove()) throw Error('계정 자료를 삭제하지 못했어요. 연결 상태와 충돌 안내를 확인해 주세요.'); await carePush.prepare(); notify('계정의 플레저 수첩을 삭제했어요. 다른 기기도 다음 연결 때 반영돼요.'); return; }
   state = emptyState(); selectedId = null; activeView = 'home'; sampleMode = false; persist = false; saveFailed = false; conversations.clear(); sessionDrafts.clear(); notified.clear(); resetDraft(); resetEventForm(); clearAudio(); clearConversationFields(); $('text-file').value = ''; $('person-form').reset(); invalidateCapture(); $('capture-source').value = ''; $('capture-title').value = ''; $('care-log-form').reset();
   try { localStorage.removeItem(STORAGE_KEY); } catch { persist = true; saveFailed = true; notify('화면 자료를 지웠지만 브라우저 저장은 지우지 못했어요. 사이트 데이터에서 삭제해 주세요.'); render(); return; }
   render(); notify('이 앱의 자료를 삭제했어요. 이미 내보낸 파일은 별도로 삭제해 주세요.');
@@ -1042,17 +1073,24 @@ on('sample-button', 'click', () => {
   state.people.push(quiet); state.events.push(makeEvent({ personId: quiet.id, type: 'memorial', date: today(), title: '아버님 기일', repeat: 'yearly' }));
   conversations.set(sample.id, { text: '나: 생일 축하해! 오늘 좋아하는 거 먹어 😊\n상대: 고마워! 기억해 줘서 좋다.', selfText: '생일 축하해! 오늘 좋아하는 거 먹어 😊', otherText: '고마워! 기억해 줘서 좋다.', verified: true }); sampleMode = true; showHome(); save(); notify('가상의 두 사람과 예시 일정이에요. 실제 자료를 넣기 전에는 예시를 지워 주세요.');
 });
-on('notification-button', 'click', async () => {
+on('notification-button', 'click', () => { renderPushSettings(); $('notification-dialog').showModal(); void carePush.prepare(); });
+on('close-notification-dialog', 'click', () => $('notification-dialog').close());
+on('push-signin', 'click', async () => { $('notification-dialog').close(); try { await account.signIn(); } catch (error) { accountStatus = resumeCareLoginNavigation(accountStatus, true); renderAccount(); throw error; } });
+on('push-retry', 'click', () => carePush.prepare());
+on('push-enable', 'click', () => carePush.enable(...pushTime()));
+on('push-save', 'click', () => carePush.update(...pushTime()));
+on('push-disable', 'click', () => carePush.disable());
+on('push-open-only', 'click', async () => {
   if (!('Notification' in window)) { notificationStatus(); throw Error('이 환경은 웹 알림을 지원하지 않아요. 달력 저장을 이용해 주세요.'); }
   const permission = await Notification.requestPermission(); notificationStatus();
-  if (permission === 'granted') { checkReminders(); notify('앱이 열려 있을 때 미리 알려드려요. 닫아도 알림이 필요하면 달력에 저장해 주세요.'); }
+  if (permission === 'granted') { checkReminders(); notify('앱을 열어 둔 동안 알림을 표시해요. 앱을 닫아도 받으려면 이 기기에 알림 켜기를 선택해 주세요.'); }
   else notify('알림 권한을 받지 못했어요. 다음 일정을 달력에 저장하면 달력 앱에서 알림을 설정할 수 있어요.');
 });
 if (window.synkProduct?.openInBrowser) { $('open-browser').hidden = false; on('open-browser', 'click', async () => { const result = await window.synkProduct.openInBrowser(); if (result?.ok === false) throw Error('브라우저를 열지 못했어요. http://127.0.0.1:4296/ 로 접속해 주세요.'); }); }
 
 load(); render(true); switchTab('events'); updateEventType(); notificationStatus(); checkCapabilities(); checkReminders(); startAccount();
 setInterval(() => { try { renderPeople(); renderHome(); renderEvents(); checkReminders(); } catch { /* 잘못된 상태는 다음 사용자 행동에서 확인한다. */ } }, 60_000);
-document.addEventListener('visibilitychange', () => { if (!document.hidden) { notificationStatus(); renderHome(); checkReminders(); } });
+document.addEventListener('visibilitychange', () => { if (!document.hidden) { notificationStatus(); renderHome(); if (accountId) void carePush.prepare(); checkReminders(); } });
 window.addEventListener('beforeunload', event => { if (accountId && (syncStatus.pending || hasUnsubmittedAccountInput())) { event.preventDefault(); event.returnValue = ''; } });
 window.addEventListener('pagehide', () => { releaseMemoryCard(); if (audioURL) URL.revokeObjectURL(audioURL); });
 window.addEventListener('pageshow', event => { const restored = resumeCareLoginNavigation(accountStatus, event.persisted); if (restored !== accountStatus && !accountId) { accountStatus = restored;renderAccount(); } });

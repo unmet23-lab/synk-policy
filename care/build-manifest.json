@@ -5,15 +5,15 @@
   "sourceFiles": [
     {
       "file": "experiences/relationship-care/index.html",
-      "sha256": "442068f22bd803c7847425364225617a236cd73ca2aa4a252fdc5b23a84f2b7c"
+      "sha256": "d4d76b23b3f900ab5f6fb24abb585c23faa9a04c5e680dc1741895abe0db542b"
     },
     {
       "file": "experiences/relationship-care/style.css",
-      "sha256": "a1bdf72dc09af59a03de7bbc7832f6d2513cbf1223896f86631f17afc69963ef"
+      "sha256": "c506687f58c33e85a6289253f772a1f303c1378a47dc69ae12b6fc419b0ef377"
     },
     {
       "file": "experiences/relationship-care/app.mjs",
-      "sha256": "5d3c967ab8519c4d27b863f7d1df6cfd2e4f2a6e4fc013d5c83e6a456941538a"
+      "sha256": "093d38f419801ff6e3fd054d7c64c3024f42f4214f601aa1cd121a74113b3655"
     },
     {
       "file": "experiences/relationship-care/model.mjs",
@@ -44,6 +44,18 @@
       "sha256": "8dd28136052853ba71bea15329600499778a667409e999b5016699dffffc5cde"
     },
     {
+      "file": "experiences/relationship-care/care-push.mjs",
+      "sha256": "b05792173d4328cc6f47a9978c128e4a79371e8f5bd0ab4f5ceec86186ab3a19"
+    },
+    {
+      "file": "experiences/relationship-care/care-sw.js",
+      "sha256": "56cdde3502eb7c602abe64088561491afab927c53e89ac8e2a5069cf4bd909d3"
+    },
+    {
+      "file": "experiences/relationship-care/manifest.webmanifest",
+      "sha256": "ad8120283e9116e58791dbdbbe57114017c880667928ae54498390e8bc194603"
+    },
+    {
       "file": "experiences/relationship-care/care-planner.mjs",
       "sha256": "d0bc73baa6cecd141a8fe720ad0329b62929bae911cca9786578bfa3001080fe"
     },
@@ -66,6 +78,18 @@
     {
       "file": "experiences/relationship-care/memory-theme.mjs",
       "sha256": "e1796bc47147001e61f3bdd1e19d12659c11158fd657efc1d6aa8feb6b1150f8"
+    },
+    {
+      "file": "experiences/relationship-care/assets/icon192.png",
+      "sha256": "5f9db4b6f9723b48e24569fbb47203c8c694f40c264de6173144ac82c0fdf460"
+    },
+    {
+      "file": "experiences/relationship-care/assets/icon512.png",
+      "sha256": "07089c488f74e914b018be120319c1372d09eb7e5d86827cbd533ae8d4163888"
+    },
+    {
+      "file": "experiences/relationship-care/assets/apple-touch-icon180.png",
+      "sha256": "39929adee1879e827752ffe3d4b3c2e9f32beea1dc174e1f95438049781be230"
     },
     {
       "file": "experiences/relationship-care/assets/badge-check.webp",
@@ -153,7 +177,7 @@
     },
     {
       "file": "experiences/synk-account/src/product-account.mjs",
-      "sha256": "b1d2d5a4c58e24d4d673b25b6a168eade10b48202387c9898839edfc2c320715"
+      "sha256": "3f0fdba8efa06161f10e0d9f52a84745b8c2211d7e904f064bc6156e486a2d76"
     },
     {
       "file": "experiences/synk-account/src/document-sync.mjs",
@@ -163,18 +187,18 @@
   "files": [
     {
       "name": "index.html",
-      "bytes": 39554,
-      "sha256": "dc91d75d7653d0e7716aaf6b29142e50c83f5072859cee5e18ddee31e363474c"
+      "bytes": 41812,
+      "sha256": "570a4cf44017ec6ab5e10853f2d1d1489e850fee718b53e54e82895fe3df7bfb"
     },
     {
       "name": "style.css",
-      "bytes": 48767,
-      "sha256": "a1bdf72dc09af59a03de7bbc7832f6d2513cbf1223896f86631f17afc69963ef"
+      "bytes": 50492,
+      "sha256": "c506687f58c33e85a6289253f772a1f303c1378a47dc69ae12b6fc419b0ef377"
     },
     {
       "name": "app.mjs",
-      "bytes": 123821,
-      "sha256": "5d3c967ab8519c4d27b863f7d1df6cfd2e4f2a6e4fc013d5c83e6a456941538a"
+      "bytes": 127150,
+      "sha256": "093d38f419801ff6e3fd054d7c64c3024f42f4214f601aa1cd121a74113b3655"
     },
     {
       "name": "model.mjs",
@@ -212,6 +236,21 @@
       "sha256": "e6be520fff3aa6662a46b1dc41a5603c3a6d7e748a24528ddf0b18068abd1fca"
     },
     {
+      "name": "care-push.mjs",
+      "bytes": 17196,
+      "sha256": "b05792173d4328cc6f47a9978c128e4a79371e8f5bd0ab4f5ceec86186ab3a19"
+    },
+    {
+      "name": "care-sw.js",
+      "bytes": 1355,
+      "sha256": "56cdde3502eb7c602abe64088561491afab927c53e89ac8e2a5069cf4bd909d3"
+    },
+    {
+      "name": "manifest.webmanifest",
+      "bytes": 496,
+      "sha256": "ad8120283e9116e58791dbdbbe57114017c880667928ae54498390e8bc194603"
+    },
+    {
       "name": "care-planner.mjs",
       "bytes": 11794,
       "sha256": "4670b159d2e1f65179a16c2717ca1498a02d35f15894d5ca505a2849467e7b2f"
@@ -240,6 +279,21 @@
       "name": "memory-theme.mjs",
       "bytes": 383,
       "sha256": "e1796bc47147001e61f3bdd1e19d12659c11158fd657efc1d6aa8feb6b1150f8"
+    },
+    {
+      "name": "assets/icon192.png",
+      "bytes": 11168,
+      "sha256": "5f9db4b6f9723b48e24569fbb47203c8c694f40c264de6173144ac82c0fdf460"
+    },
+    {
+      "name": "assets/icon512.png",
+      "bytes": 58212,
+      "sha256": "07089c488f74e914b018be120319c1372d09eb7e5d86827cbd533ae8d4163888"
+    },
+    {
+      "name": "assets/apple-touch-icon180.png",
+      "bytes": 10121,
+      "sha256": "39929adee1879e827752ffe3d4b3c2e9f32beea1dc174e1f95438049781be230"
     },
     {
       "name": "assets/badge-check.webp",
@@ -348,8 +402,8 @@
     },
     {
       "name": "vendor/account/product-account.mjs",
-      "bytes": 20577,
-      "sha256": "b1d2d5a4c58e24d4d673b25b6a168eade10b48202387c9898839edfc2c320715"
+      "bytes": 24551,
+      "sha256": "3f0fdba8efa06161f10e0d9f52a84745b8c2211d7e904f064bc6156e486a2d76"
     },
     {
       "name": "vendor/account/document-sync.mjs",
@@ -364,7 +418,7 @@
   ],
   "limitations": {
     "transcription": "PC local app only",
-    "pushWhenClosed": false,
+    "pushWhenClosed": "Requires deployed push service, account opt-in, browser permission and supported device",
     "realLoginVerified": false
   }
 }
