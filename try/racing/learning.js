@@ -6,6 +6,12 @@ export const WORD_BY_ID = {...Object.fromEntries(WORDS.map(w => [w.id,w])),...CH
 const QUESTION_BY_ID = {...CHALLENGE_BY_ID,...FINALE_QUESTION_BY_ID};
 const RECORDED_STAGES = [...STAGES,...CAMPAIGN,...FINALES];
 export const PROGRESS_KEY = 'SYNK_LAB_PLAY_PROGRESS_V1';
+/** 받침에 맞는 조사: 끝 음절에 받침이 있으면 앞의 것, 없으면 뒤의 것(병원이에요·우유예요, 코랄을·민트를). 끝의 물음표·마침표 같은 기호는 건너뛴다. */
+export function josa(word,withBatchim,without){
+  const s=String(word);
+  for(let i=s.length-1;i>=0;i--){const c=s.charCodeAt(i)-0xac00;if(c>=0&&c<=11171)return c%28?withBatchim:without;}
+  return without;
+}
 const shuffle = (items,rng) => { const a=[...items]; for(let i=a.length-1;i>0;i--){const j=Math.floor(rng()*(i+1));[a[i],a[j]]=[a[j],a[i]];} return a; };
 export function makeQuestions(stage,rng=Math.random) {
   if(stage.campaign)return stage.items.map(q=>({...q,options:shuffle(q.options,rng)}));
