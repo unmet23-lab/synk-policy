@@ -81,15 +81,15 @@
     },
     {
       "file": "experiences/relationship-care/assets/icon192.png",
-      "sha256": "5f9db4b6f9723b48e24569fbb47203c8c694f40c264de6173144ac82c0fdf460"
+      "sha256": "2f109a2b463ba8402d9c86aa1cc3f7c97c26ac214c39a80400b1710d1d74a2d2"
     },
     {
       "file": "experiences/relationship-care/assets/icon512.png",
-      "sha256": "07089c488f74e914b018be120319c1372d09eb7e5d86827cbd533ae8d4163888"
+      "sha256": "2b741257987f1a193fd616648084d83a8f4096c324670792a970aac37b382309"
     },
     {
       "file": "experiences/relationship-care/assets/apple-touch-icon180.png",
-      "sha256": "39929adee1879e827752ffe3d4b3c2e9f32beea1dc174e1f95438049781be230"
+      "sha256": "798397a679c978d276fa976d0bb60be89eae5d744ec30ea1138dfaa203cfcac0"
     },
     {
       "file": "experiences/relationship-care/assets/badge-check.webp",
@@ -282,18 +282,18 @@
     },
     {
       "name": "assets/icon192.png",
-      "bytes": 11168,
-      "sha256": "5f9db4b6f9723b48e24569fbb47203c8c694f40c264de6173144ac82c0fdf460"
+      "bytes": 10272,
+      "sha256": "2f109a2b463ba8402d9c86aa1cc3f7c97c26ac214c39a80400b1710d1d74a2d2"
     },
     {
       "name": "assets/icon512.png",
-      "bytes": 58212,
-      "sha256": "07089c488f74e914b018be120319c1372d09eb7e5d86827cbd533ae8d4163888"
+      "bytes": 54531,
+      "sha256": "2b741257987f1a193fd616648084d83a8f4096c324670792a970aac37b382309"
     },
     {
       "name": "assets/apple-touch-icon180.png",
-      "bytes": 10121,
-      "sha256": "39929adee1879e827752ffe3d4b3c2e9f32beea1dc174e1f95438049781be230"
+      "bytes": 9280,
+      "sha256": "798397a679c978d276fa976d0bb60be89eae5d744ec30ea1138dfaa203cfcac0"
     },
     {
       "name": "assets/badge-check.webp",
