@@ -582,7 +582,7 @@ function renderDraftNotice() {
 }
 function renderSavedDraft() {
   const owner = person(), type = libraryType(), all = owner ? listSavedMessages(owner, { type }) : [];
-  const items = libraryItems(), select = $('saved-message-select');
+  const items = libraryItems(), scoped = libraryContextItems(), filters = libraryFilterState(), select = $('saved-message-select');
   const scopeKey = JSON.stringify([authEpoch, selectedId, type, $('draft-intent').value, $('library-scope').value]);
   const previous = select.dataset.scopeKey === scopeKey ? select.value : currentDraft?.savedMessageId;
   select.dataset.scopeKey = scopeKey;
@@ -592,17 +592,33 @@ function renderSavedDraft() {
   $('saved-draft-preview').hidden = !owner;
   $('library-scope-wrap').hidden = type !== 'checkin';
   $('library-title').textContent = '내 문구 보관함 · ' + all.length + '개';
+  $('library-result-count').textContent = '이 범위의 ' + scoped.length + '개 중 ' + items.length + '개';
+  $('library-reset').disabled = !$('library-search').value && !filters.favoritesOnly;
   $('library-empty').hidden = !!items.length;
-  $('library-empty').textContent = all.length ? '이 목적에 보관한 문구가 없어요. 안부 전체에서 이전 문구도 찾아볼 수 있어요.' : '다듬은 문구를 기억하면 이곳에 쌓여요. 이전 문구도 다시 꺼낼 수 있어요.';
+  $('library-empty').textContent = !all.length ? '다듬은 문구를 기억하면 이곳에 쌓여요. 이전 문구도 다시 꺼낼 수 있어요.' : !scoped.length ? '이 목적에 보관한 문구가 없어요. 안부 전체에서 이전 문구도 찾아볼 수 있어요.' : filters.query && filters.favoritesOnly ? '즐겨찾기한 문구 중 검색어와 맞는 문구가 없어요. 검색어를 바꾸거나 필터를 초기화해 보세요.' : filters.query ? '검색어와 맞는 문구가 없어요. 다른 단어로 찾아보세요.' : '이 범위에 즐겨찾기한 문구가 없어요. 필터를 초기화하면 다른 문구도 볼 수 있어요.';
   const remembered = all.some(item => item.text === $('draft-text').value.trim() && (type !== 'checkin' || item.checkinIntent === $('draft-intent').value));
   $('draft-save-status').textContent = saveFailed ? '기기 저장에 실패해 이번 화면의 변경만 남아 있어요. 새로고침 전에 백업을 내보내 주세요.' : remembered ? '지금 문구를 보관하고 있어요. 복사나 연락 완료 기록은 별도예요.' : '';
   renderLibrarySelection();
 }
 function libraryType() { return state.events.find(item => item.id === $('draft-event').value)?.type || 'checkin'; }
-function libraryItems() {
+function librarySearchText(value) { return String(value || '').normalize('NFC').trim().toLowerCase(); }
+function libraryFilterState() {
+  const search = $('library-search'), favorites = $('library-favorites-only');
+  const contextKey = JSON.stringify([authEpoch, selectedId, libraryType(), $('draft-intent').value]);
+  if (search.dataset.contextKey !== contextKey) {
+    search.dataset.contextKey = contextKey;
+    search.value = ''; favorites.checked = false;
+  }
+  return { query: librarySearchText(search.value.slice(0, 100)), favoritesOnly: favorites.checked };
+}
+function libraryContextItems() {
   if (!person()) return [];
   const type = libraryType();
   return listSavedMessages(person(), { type, ...(type === 'checkin' && $('library-scope').value !== 'type' ? { checkinIntent: $('draft-intent').value || 'everyday' } : {}) });
+}
+function libraryItems() {
+  const { query, favoritesOnly } = libraryFilterState();
+  return libraryContextItems().filter(item => (!favoritesOnly || item.favorite) && (!query || librarySearchText(item.text).includes(query)));
 }
 function libraryLabel(item) { return item.type === 'checkin' ? CHECKIN_INTENTS[item.checkinIntent] : EVENT_TYPES[item.type]; }
 function renderLibrarySelection() {
@@ -656,12 +672,22 @@ function openPersonDialog(edit = false) {
   $('person-dialog-title').textContent = edit ? '챙길 사람 수정' : '챙길 사람 추가';
   $('new-person-name').value = target?.name ?? ''; $('new-person-relationship').value = target?.relationship ?? ''; $('new-person-notes').value = target?.notes ?? '';
   $('new-person-group').value = target?.group || 'other';
+  $('person-details').open = !!target;
+  $('person-start-hint').hidden = !!target;
+  $('quick-event-fields').open = false;
   const interval = target?.checkinIntervalDays ?? 30;
   $('new-person-checkin').value = [0, 7, 14, 30, 60, 90].includes(interval) ? String(interval) : 'custom';
   $('new-person-checkin-days').value = String(interval || 30);
   updateCheckinInput();
   $('quick-event-fields').hidden = !!target;
+  updatePersonSubmit();
   $('delete-person').hidden = !target; $('person-dialog').showModal();
+}
+function updatePersonSubmit() {
+  $('person-submit').textContent = $('person-edit-id').value ? '수정 내용 저장' : $('quick-event-date').value ? '기억하고 마음 준비' : '기억하고 첫 안부 준비';
+}
+function revealPersonInvalidField(event) {
+  for (const id of ['person-details', 'quick-event-fields']) if ($(id).contains(event.target)) $(id).open = true;
 }
 function checkinSummary(target) {
   const days = target.checkinIntervalDays ?? 30;
@@ -786,17 +812,19 @@ async function prepareEvent(eventId) {
   if ((selectedId !== event.personId || activeView !== 'person') && !await choosePerson(event.personId, 'events')) return;
   if (epoch !== authEpoch || notebookView().locked) return;
   event = state.events.find(item => item.id === eventId && item.personId === selectedId);if (!event) return;
+  const occurrence = currentRows().find(row => row.event.id === eventId)?.occurrence;
+  if (!occurrence) return false;
   followupContext=null;checkinMode=false;
   $('draft-event').value = eventId;
   renderBrief();
   switchTab('message');
-  const occurrence = currentRows().find(row => row.event.id === eventId)?.occurrence;
   if (currentDraft?.eventId !== eventId || currentDraft?.occurrenceId !== occurrence?.occurrenceId) {
     $('draft-style').value = defaultDraftApproach(person(), event.type);
     generateDraft({ silent: true });
   }
   updateMood();
   $('workspace').scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' });
+  return true;
 }
 async function beginCheckin(id, { followupId = '', fingerprint = '' } = {}) {
   const epoch = authEpoch;
@@ -1086,6 +1114,8 @@ on('close-followup-calendar','click',()=>{$('followup-calendar-dialog').close();
 on('followup-calendar-time','input',()=>{const empty=!$('followup-calendar-time').value;$('followup-calendar-alarm').disabled=empty;if(empty)$('followup-calendar-alarm').checked=false;});
 on('followup-calendar-form','submit',e=>{e.preventDefault();const item=followupCalendar&&state.followups.find(row=>row.id===followupCalendar.id);if(!item||followupCalendar.epoch!==authEpoch||followupCalendar.fingerprint!==JSON.stringify(item))throw Error('챙길 날짜나 계정이 바뀌었어요. 달력 저장을 다시 열어 주세요.');download(toFollowupICS(state,item.id,{time:$('followup-calendar-time').value,reminderMinutes:$('followup-calendar-alarm').checked?[0]:[]}), 'synk-care.ics','text/calendar');$('followup-calendar-dialog').close();followupCalendar=null;notify('달력 파일을 저장했어요. 달력 앱에 추가한 뒤 알림을 확인해 주세요.');});
 on('new-person-checkin', 'change', updateCheckinInput);
+on('quick-event-date', 'input', updatePersonSubmit);
+$('person-form').addEventListener('invalid', revealPersonInvalidField, true);
 on('close-person-dialog', 'click', () => { $('person-dialog').close(); personDialogContext = null; });
 on('person-form', 'submit', async e => {
   e.preventDefault(); const old = state.people.find(item => item.id === $('person-edit-id').value);
@@ -1096,9 +1126,19 @@ on('person-form', 'submit', async e => {
   if (old) state.people = state.people.map(item => item.id === old.id ? value : item); else state.people.push(value);
   if (event) state.events.push(event);
   const saved = save(); renderPeople(); renderHome();
-  $('person-dialog').close(); personDialogContext = null; if(await choosePerson(value.id)&&event)await prepareEvent(event.id);
+  $('person-dialog').close(); personDialogContext = null;
+  if (old) {
+    renderWorkspace(); renderHistory(); renderCapturePeople(); renderBrief();
+    if (saved && !saveFailed) notify('사람 정보를 수정했어요. 작성 중인 문구는 그대로예요.');
+    return;
+  }
   if (!saved || saveFailed || context.epoch !== authEpoch) return;
-  notify(old ? '사람 정보를 수정했어요.' : event ? '이름과 날짜를 기억했어요. 첫 인사를 바로 준비했어요.' : '수첩에 기억했어요. 날짜 없이 오늘 안부도 준비할 수 있어요.');
+  const selected = await choosePerson(value.id);
+  if (context.epoch !== authEpoch || notebookView().locked || saveFailed) return;
+  if (!selected || selectedId !== value.id) { notify('수첩에 기억했어요. 사람 목록에서 새 수첩을 열 수 있어요.'); return; }
+  const prepared = event ? await prepareEvent(event.id) : await beginCheckin(value.id);
+  if (context.epoch !== authEpoch || selectedId !== value.id || notebookView().locked || saveFailed) return;
+  notify(prepared ? '첫 문구를 준비했어요. 내 말로 다듬어 전해 보세요.' : event ? '이름과 날짜를 기억했어요. 지난 일정은 ‘기억할 날’에서 확인할 수 있어요.' : '수첩에 기억했어요. 마음 전하기에서 안부를 준비할 수 있어요.');
 });
 on('people-list', 'click', async e => { const button = e.target.closest('[data-person]'); if (button) await choosePerson(button.dataset.person); });
 on('delete-person', 'click', async () => {
@@ -1202,6 +1242,12 @@ on('save-draft-only', 'click', () => {
   notify('보관함에 기억했어요. 이전 문구도 남아 있어요. 복사나 연락 완료는 별도예요.');
 });
 on('library-scope', 'change', () => renderSavedDraft());
+on('library-search', 'input', () => renderSavedDraft());
+on('library-favorites-only', 'change', () => renderSavedDraft());
+on('library-reset', 'click', () => {
+  $('library-search').value = ''; $('library-favorites-only').checked = false;
+  renderSavedDraft(); $('library-search').focus();
+});
 on('saved-message-select', 'change', () => renderLibrarySelection());
 on('load-saved-message', 'click', () => loadSavedMessage());
 on('favorite-saved-message', 'click', () => {
