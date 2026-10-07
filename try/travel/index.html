@@ -11,9 +11,9 @@
   <link rel="icon" href="./assets/logo-synk.webp" type="image/webp">
   <title>서울 여행 취향 체험 · SYNK PATH</title>
   <link rel="stylesheet" href="./assets/scrapbook.css">
-  <link rel="stylesheet" href="./style.css">
+  <link rel="stylesheet" href="./style.css?v=20261007-feedback1">
   <script type="module" src="./app.mjs"></script>
-  <script type="module" src="./real-ui.mjs"></script>
+  <script type="module" src="./real-ui.mjs?v=20261007-feedback1"></script>
 </head>
 <body class="sb-page">
   <a class="skip-link" href="#travel-modes">여행 체험으로 건너뛰기</a>
@@ -50,9 +50,11 @@
     </section>
 
     <section id="real-guide" class="real-guide" aria-labelledby="real-title">
-      <div class="section-heading"><p class="eyebrow">JONGNO / PLACES TO KEEP</p><h2 id="real-title">오늘, 마음이 가는 곳.</h2><p>관심 분야를 골라 후보를 좁혀 보세요. 마음에 드는 장소는 직접 담아 둘 수 있어요.</p></div>
+      <div class="section-heading"><p class="eyebrow">JONGNO / PLACES TO KEEP</p><h2 id="real-title">오늘, 마음이 가는 곳.</h2><p>관심 있는 곳, 다녀와서 좋았던 곳.<br>직접 남긴 반응을 다음 선택에도 이어 보세요.</p></div>
       <fieldset class="real-interest-fieldset"><legend>이번에 즐기고 싶은 것 <span>여러 개 선택</span></legend><div id="real-interests" class="real-interests"></div><button class="text-button" type="button" id="real-show-all">전체 다시 보기</button></fieldset>
-      <p class="real-guide-note">공식 안내를 확인해 모은 일부 장소입니다. 영업·휴관·메뉴 가격·객실 요금은 방문일에 다시 확인해 주세요. 관심 분야로 목록을 좁히며 예산·대기·이동시간이나 취향 적합도를 계산하지 않습니다.</p>
+      <div class="real-order-tools"><p id="real-feedback-note">아직 남긴 반응이 없어 기본 순서로 보여드려요.</p><label for="real-sort">보는 순서<select id="real-sort"><option value="personalized">내 취향 순</option><option value="original">기본 순</option></select></label></div>
+      <details class="real-history"><summary id="real-history-title">내 취향과 방문 기록 · 0개</summary><p>방문 평가에 가장 큰 비중을 두고, 관심과 분야 선호를 함께 반영해요. 목록에 담는 것만으로 취향이나 방문 여부를 판단하지 않습니다. 각 기록은 수정하거나 지울 수 있어요.</p><div id="real-history-items"></div><button id="real-feedback-clear" class="text-button" type="button" disabled>취향·방문 기록 모두 지우기</button></details>
+      <p class="real-guide-note">공식 안내를 확인해 모은 일부 장소입니다. 직접 남긴 반응으로 보는 순서를 바꾸며, 분야 선호는 따로 선택했을 때만 다른 장소에도 적용해요. 영업·휴관은 방문일에 다시 확인해 주세요. 실시간 영업 여부·이동시간·총예산을 계산한 일정은 아닙니다.</p>
       <div class="real-catalog-meta"><p id="real-count"></p><p id="real-checked"></p></div>
       <div id="real-cards" class="real-cards"></div>
       <noscript><p>장소 목록을 고르려면 브라우저에서 JavaScript를 켜 주세요.</p></noscript>
@@ -62,7 +64,7 @@
         <p id="real-empty" class="real-empty">마음에 드는 장소에서 ‘내 방문 목록에 담기’를 눌러 보세요.</p>
         <ol id="real-picked" class="real-picked"></ol>
         <button type="button" id="real-export" class="felt-button" disabled>방문 목록 메모 보기·저장</button>
-        <div class="real-storage"><label class="consent"><input id="real-consent" type="checkbox"><span>관심 분야와 담은 장소를 이 브라우저에 저장할게요</span></label><p id="real-storage-status">동의 전에는 새로고침하면 선택이 초기화됩니다.</p><p>동의를 끄면 저장 기록만 지워집니다. 화면의 선택까지 지우려면 아래에서 초기화해 주세요. 가상 일정의 저장 내용과는 별도로 관리합니다.</p><button type="button" id="real-reset" class="text-button">관심 분야와 방문 목록 초기화</button></div>
+        <div class="real-storage"><label class="consent"><input id="real-consent" type="checkbox"><span>관심 분야와 담은 장소를 이 브라우저에 저장할게요</span></label><label class="consent real-feedback-consent"><input id="real-feedback-consent" type="checkbox" disabled><span>취향·방문 기록과 분야 선호도 함께 저장할게요</span></label><p id="real-storage-status" role="status" aria-live="polite">동의 전에는 새로고침하면 선택과 반응이 초기화됩니다.</p><p>취향 기록은 별도로 동의해야 다음 방문에도 이어집니다. 동의를 끄면 저장된 해당 기록을 지우고 현재 화면은 유지해요. 계정·다른 기기·가상 일정과 공유하지 않습니다.</p><button type="button" id="real-reset" class="text-button">실제 장소 선택과 기록 모두 초기화</button></div>
         <p id="real-status" class="real-status" role="status" aria-live="polite"></p>
       </section>
     </section>
@@ -160,6 +162,16 @@
     <div class="preference-editor-actions"><button id="preference-remove" type="button" class="text-button">이 조건 지우기</button><button id="preference-apply" type="button" class="felt-button">취향 반영해 다시 비교</button></div>
     <p class="preference-editor-note">‘상관없음’은 직접 고른 판단입니다. 아직 모르겠다면 저장하지 않고 닫아도 괜찮아요.</p>
     <p class="preference-editor-note">조건 삭제는 추천 반영만 중단합니다. 확인한 문장까지 지우려면 체험 안내에서 ‘저장된 조건 지우고 처음으로’를 눌러 주세요.</p>
+  </dialog>
+  <dialog id="real-feedback-dialog" class="memo-dialog real-feedback-dialog" aria-labelledby="real-feedback-title" aria-describedby="real-feedback-help">
+    <div class="memo-header"><div><p class="eyebrow">A LITTLE MORE YOU</p><h2 id="real-feedback-title">내 취향 남기기</h2></div><button id="real-feedback-close" type="button" class="felt-choice">닫기</button></div>
+    <p id="real-feedback-help">직접 남긴 반응만 보는 순서에 반영해요. 방문 평가는 나의 경험이며 업체에 대한 공식 정보가 아닙니다.</p>
+    <label class="field" for="real-reaction"><span>이 장소에 관심이 있나요?</span><select id="real-reaction"><option value="">아직 정하지 않았어요</option><option value="interested">관심 있어요</option><option value="less">덜 보고 싶어요</option></select></label>
+    <label class="field" for="real-visit"><span>직접 다녀오셨나요?</span><select id="real-visit"><option value="">방문 평가 없음</option><option value="liked">다녀왔고, 좋았어요</option><option value="disliked">다녀왔고, 아쉬웠어요</option></select></label>
+    <fieldset id="real-visit-reasons" class="real-visit-reasons" hidden><legend>어떤 점이 그랬나요? <span>선택 사항 · 여러 개 가능</span></legend><div id="real-reason-options"></div></fieldset>
+    <label class="field" for="real-category-preference"><span id="real-category-label">이 분야는 다음에도</span><select id="real-category-preference"><option value="">따로 정하지 않을게요</option><option value="more">더 보여주세요</option><option value="less">덜 보여주세요</option></select></label>
+    <p id="real-category-help" class="real-feedback-help"></p><p id="real-feedback-save-note" class="real-feedback-help"></p>
+    <div class="real-feedback-actions"><button id="real-feedback-remove" type="button" class="text-button">이 장소의 반응 지우기</button><button id="real-feedback-apply" type="button" class="felt-button">반영해서 다시 보기</button></div>
   </dialog>
   <dialog id="memo-dialog" class="memo-dialog" aria-labelledby="memo-title" aria-describedby="memo-help">
     <div class="memo-header"><div><p class="eyebrow">YOUR SEOUL · TRAVEL NOTE</p><h2 id="memo-title">내 서울 일정 메모</h2></div><button id="memo-close" type="button" class="felt-choice">닫기</button></div>

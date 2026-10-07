@@ -18,7 +18,12 @@ export const REAL_PLACES = Object.freeze([
     "sourceLabel": "서울관광재단 Visit Seoul",
     "sourceUrl": "https://korean.visitseoul.net/restaurants/%EA%B6%81/KOP011155",
     "costNote": "메뉴별 가격은 공식 안내에서 확인",
-    "visitNote": "영업시간·쉬는 시간·휴무일을 확인해 주세요."
+    "visitNote": "영업시간·쉬는 시간·휴무일을 확인해 주세요.",
+    "openingNote": "일·월·화 11:30~20:00, 수·목·금·토 11:30~21:00. 평일 쉬는 시간 15:00~16:00. 명절 휴무.",
+    "accessNote": "3호선 안국역 5번 출구에서 인사동10길로 이동해요.",
+    "accessSourceUrl": "https://korean.visitseoul.net/restaurants/%EA%B6%81/KOP011155",
+    "visitSourceUrl": "https://korean.visitseoul.net/restaurants/%EA%B6%81/KOP011155",
+    "verifiedAt": "2026-10-07"
   },
   {
     "id": "balwoo-gongyang",
@@ -30,7 +35,12 @@ export const REAL_PLACES = Object.freeze([
     "sourceLabel": "서울관광재단 Visit Seoul",
     "sourceUrl": "https://korean.visitseoul.net/restaurants/BalwooGongyang/KOP4vpx7k",
     "costNote": "메뉴별 가격은 공식 안내에서 확인",
-    "visitNote": "예약·운영시간과 원하는 메뉴의 제공 조건을 확인해 주세요."
+    "visitNote": "예약·운영시간과 원하는 메뉴의 제공 조건을 확인해 주세요.",
+    "openingNote": "서울 공식 관광 안내는 11:30~21:00, 쉬는 시간 15:00~18:00, 마지막 주문 19:40으로 소개해요. 정기휴무는 공식 본문에서 확인하지 못했어요. 방문 전 매장 확인이 필요해요.",
+    "accessNote": "1호선 종각역 3-1번 출구 또는 3호선 안국역 6번 출구. 템플스테이 통합정보센터 5층이에요.",
+    "accessSourceUrl": "https://korean.visitseoul.net/restaurants/BalwooGongyang/KOP4vpx7k",
+    "visitSourceUrl": "https://korean.visitseoul.net/restaurants/BalwooGongyang/KOP4vpx7k",
+    "verifiedAt": "2026-10-07"
   },
   {
     "id": "kyungin-traditional-teahouse",
@@ -42,7 +52,12 @@ export const REAL_PLACES = Object.freeze([
     "sourceLabel": "서울관광재단 Visit Seoul",
     "sourceUrl": "https://korean.visitseoul.net/restaurants/%EA%B2%BD%EC%9D%B8%EB%AF%B8%EC%88%A0%EA%B4%80%EC%A0%84%ED%86%B5%EB%8B%A4%EC%9B%90/KOP010878",
     "costNote": "메뉴별 가격은 공식 안내에서 확인",
-    "visitNote": "영업시간·쉬는 시간·휴무일을 확인해 주세요."
+    "visitNote": "영업시간·쉬는 시간·휴무일을 확인해 주세요.",
+    "openingNote": "매일 11:00~21:20. 신정·설·추석 휴무 안내가 있어요. 미술관 전시 관람시간과는 별개예요.",
+    "accessNote": "3호선 안국역 5번 출구. 인사동10길 경인미술관 안에 있어요.",
+    "accessSourceUrl": "https://korean.visitseoul.net/restaurants/%EA%B2%BD%EC%9D%B8%EB%AF%B8%EC%88%A0%EA%B4%80%EC%A0%84%ED%86%B5%EB%8B%A4%EC%9B%90/KOP010878",
+    "visitSourceUrl": "https://korean.visitseoul.net/restaurants/%EA%B2%BD%EC%9D%B8%EB%AF%B8%EC%88%A0%EA%B4%80%EC%A0%84%ED%86%B5%EB%8B%A4%EC%9B%90/KOP010878",
+    "verifiedAt": "2026-10-07"
   },
   {
     "id": "osulloc-bukchon",
@@ -54,7 +69,12 @@ export const REAL_PLACES = Object.freeze([
     "sourceLabel": "오설록",
     "sourceUrl": "https://www.osulloc.com/kr/ko/store-introduction/312",
     "costNote": "메뉴별 가격은 공식 안내에서 확인",
-    "visitNote": "시즌별 메뉴와 티코스 예약 조건을 확인해 주세요."
+    "visitNote": "시즌별 메뉴와 티코스 예약 조건을 확인해 주세요.",
+    "openingNote": "월~목 11:00~20:00, 금~일 11:00~21:00. 정기휴무는 공식 매장 본문에 따로 안내되어 있지 않아 확인이 필요해요.",
+    "accessNote": "북촌로 45. 공식 매장 소개의 지도보기를 확인해 주세요. 역·출구 안내는 해당 본문에서 확인하지 못했어요.",
+    "accessSourceUrl": "https://www.osulloc.com/kr/ko/store-introduction/312",
+    "visitSourceUrl": "https://www.osulloc.com/kr/ko/store-introduction/312",
+    "verifiedAt": "2026-10-07"
   },
   {
     "id": "nine-tree-insadong",
@@ -66,7 +86,12 @@ export const REAL_PLACES = Object.freeze([
     "sourceLabel": "나인트리 바이 파르나스",
     "sourceUrl": "https://www.ninetreehotels.com/ko/insadong",
     "costNote": "날짜·객실·인원별 요금 확인 · 세금·취소 조건 별도 확인",
-    "visitNote": "객실 구성·투숙 인원·예약 가능 여부를 확인해 주세요."
+    "visitNote": "객실 구성·투숙 인원·예약 가능 여부를 확인해 주세요.",
+    "openingNote": "공식 객실 안내 기준 체크인 15:00, 체크아웃 12:00. 예약 상품의 별도 이용 조건을 확인해 주세요.",
+    "accessNote": "3호선 안국역 6번 출구. 공식 호텔찾기에서 서울 인사동 지점을 확인해 주세요.",
+    "accessSourceUrl": "https://www.ninetreehotels.com/ko/hub/hotel-find",
+    "visitSourceUrl": "https://www.ninetreehotels.com/ko/insadong/room/standard-double",
+    "verifiedAt": "2026-10-07"
   },
   {
     "id": "orakai-insadong-suites",
@@ -78,7 +103,12 @@ export const REAL_PLACES = Object.freeze([
     "sourceLabel": "오라카이 인사동 스위츠",
     "sourceUrl": "https://insa.orakaihotels.com/kr/default.asp",
     "costNote": "날짜·객실·인원별 요금 확인 · 세금·취소 조건 별도 확인",
-    "visitNote": "객실 구성·투숙 인원·예약 가능 여부를 확인해 주세요."
+    "visitNote": "객실 구성·투숙 인원·예약 가능 여부를 확인해 주세요.",
+    "openingNote": "체크인 16:00부터, 체크아웃 11:00까지. 이른 입실·늦은 퇴실은 객실 상황과 추가 요금 조건을 따로 확인해 주세요.",
+    "accessNote": "1·3·5호선 종로3가역 5번 출구. 공식 교통 안내는 짐이 많을 때 4번 출구 에스컬레이터도 안내해요.",
+    "accessSourceUrl": "https://insa.orakaihotels.com/kr/about/location.asp",
+    "visitSourceUrl": "https://insa.orakaihotels.com/kr/about/guest_info.asp?mCode=1",
+    "verifiedAt": "2026-10-07"
   },
   {
     "id": "seoul-museum-craft-art",
@@ -90,7 +120,12 @@ export const REAL_PLACES = Object.freeze([
     "sourceLabel": "서울공예박물관",
     "sourceUrl": "https://craftmuseum.seoul.go.kr/preview/visit",
     "costNote": "일반 관람 무료 · 대관전시 유료 가능",
-    "visitNote": "전시동별 운영시간·부분 휴관 공지를 확인해 주세요. 어린이박물관은 예약 안내를 확인해 주세요."
+    "visitNote": "전시동별 운영시간·부분 휴관 공지를 확인해 주세요. 어린이박물관은 예약 안내를 확인해 주세요.",
+    "openingNote": "전시실 기본 10:00~18:00, 입장마감은 종료 30분 전. 월요일·1월 1일 휴관(공휴일인 월요일은 일반 전시 운영, 어린이박물관은 모든 월요일 휴관). 2026.9.15~11.30 화·수·금·토·일에는 전시실 가운데 전시1동 1~2층만 21:00까지 연장해요.",
+    "accessNote": "3호선 안국역 1번 출구. 일반 관람객용 주차장은 운영하지 않아요.",
+    "accessSourceUrl": "https://craftmuseum.seoul.go.kr/preview/visit",
+    "visitSourceUrl": "https://craftmuseum.seoul.go.kr/introduce/news_view/NTT_0000000444",
+    "verifiedAt": "2026-10-07"
   },
   {
     "id": "unhyeongung",
@@ -102,6 +137,11 @@ export const REAL_PLACES = Object.freeze([
     "sourceLabel": "서울 공식 관광정보 Visit Seoul",
     "sourceUrl": "https://korean.visitseoul.net/attractions/%EC%9A%B4%ED%98%84%EA%B6%81_/471",
     "costNote": "일반 관람 무료",
-    "visitNote": "휴관일과 계절별·특별 운영시간을 확인해 주세요. 유료 행사는 별도입니다."
+    "visitNote": "휴관일과 계절별·특별 운영시간을 확인해 주세요. 유료 행사는 별도입니다.",
+    "openingNote": "확인일 기준 일반 09:00~19:00(입장마감 18:30). 월요일 휴관, 공휴일인 월요일은 개장 안내예요. 2026.9.1~11.29 화·수·금·토·일에는 21:00까지(입장마감 20:30) 야간 개방해요. 동절기 시간은 별도 확인해 주세요.",
+    "accessNote": "3호선 안국역 4번 출구. 삼일대로 464의 운현궁 입구를 지도에서 확인해 주세요.",
+    "accessSourceUrl": "https://korean.visitseoul.net/attractions/%EC%9A%B4%ED%98%84%EA%B6%81_/471",
+    "visitSourceUrl": "https://korean.visitseoul.net/attractions/%EC%9A%B4%ED%98%84%EA%B6%81_/471",
+    "verifiedAt": "2026-10-07"
   }
 ].map(place => Object.freeze(place)));
