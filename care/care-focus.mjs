@@ -60,7 +60,7 @@ export function recommendCareFocus({ state, now = new Date() } = {}) {
     if (!followup.person || followup.daysUntil > 0) continue;
     add({ key: `followup:${followup.id}`, personId: followup.person.id, personName: followup.person.name, kind: 'followup', eventId: '', followupId: followup.id, occurrenceId: '',
       title: followup.title, reason: `내가 다시 챙기기로 정한 날은 ${followup.dueOn}이에요.${followup.daysUntil < 0 ? ' 지금도 필요한지 먼저 확인해 주세요.' : ''}`,
-      detail: '남겨 둔 내용을 확인하고, 챙기기·날짜 미루기·그만 챙기기 중에서 골라요.', actionLabel: '남겨 둔 챙김 보기', quiet: true }, followup.daysUntil === 0 ? 900 : 850 + Math.min(30, Math.abs(followup.daysUntil)));
+      detail: '남겨 둔 내용과 지난 이야기를 보며 안부를 준비해요. 날짜를 바꾸거나 그만 챙기려면 우리의 기록을 열어 주세요.', actionLabel: '이 안부 준비하기', quiet: true }, followup.daysUntil === 0 ? 900 : 850 + Math.min(30, Math.abs(followup.daysUntil)));
   }
   const quietPeople = new Set();
   // 기일·부고 주변에는 기록 간격만으로 평범한 안부를 권하지 않는다.

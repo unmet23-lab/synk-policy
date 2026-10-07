@@ -8,6 +8,7 @@ import { createMemoryCard } from './memory-card.mjs';
 import { prepareCare } from './care-planner.mjs';
 import { careAccountView, resumeCareLoginNavigation } from './care-account-view.mjs';
 import { recommendCareFocus } from './care-focus.mjs';
+import { buildCareContext } from './care-context.mjs';
 import { createCarePush, carePushAccountIdentity, careLogoutNotice } from './care-push.mjs';
 
 const $ = id => document.getElementById(id);
@@ -24,6 +25,7 @@ const carePush = createCarePush({ request: (action, body) => account.requestPush
 let preparationKey = '', preparationInputs = { attendance: 'undecided', timeMinutes: null, budgetWon: null }, preparationResult = null, preparationLogId = null, preparationLogError = '';
 let expressionReview = null, preferenceCandidates = [], preferenceContext = null, cardURL = null, cardFilename = '', cardGeneration = 0, cardItemsKey = '';
 let memoryChoice = null, followupCalendar = null, checkinMode = false;
+let followupContext = null;
 let focusKey = '', focusEpoch = 0, focusOperation = null;
 const ACTIONS = { contact: '연락', attend: '참석', gift: '선물', money: '경조금', remember: '조용히 기억' };
 const won = value => value === null || value === undefined ? '' : `${value.toLocaleString('ko-KR')}원`;
@@ -156,7 +158,7 @@ function renderSummary() {
   const concealed = notebookView().concealNotebook;
   $('person-count').textContent = concealed ? '—' : state.people.length;
   $('upcoming-count').textContent = concealed ? '—' : rows().filter(item => item.occurrence.daysUntil <= 30).length;
-  $('complete-count').textContent = concealed ? '—' : state.completions.length + (state.activities ?? []).length;
+  $('complete-count').textContent = concealed ? '—' : state.completions.length + (state.activities ?? []).length + (state.followups ?? []).filter(item=>item.status==='done').length;
 }
 function renderPeople() {
   renderSummary();
@@ -191,7 +193,7 @@ function updateMood() {
   const quiet = activeView === 'person' && activeTab === 'message' && ['condolence', 'memorial'].includes(event?.type);
   document.body.dataset.mood = quiet ? 'quiet' : 'celebrate';
   $('remember-event').hidden = !quiet;
-  $('complete-event').textContent = !event ? '직접 안부 전했어요' : quiet ? '마음을 전했어요' : '챙김 완료';
+  $('complete-event').textContent = !event ? currentFollowupContext() ? '직접 챙겼어요 · 이 챙김 완료' : '직접 안부 전했어요' : quiet ? '마음을 전했어요' : '챙김 완료';
   $('remember-draft').nextElementSibling.textContent=event?'복사할 때, 이 행사에 다시 쓸 내 문구로 기억':'복사할 때, 안부에 다시 쓸 내 문구로 기억';
 }
 function showHome() { stashConversation(); stashDraft(); activeView = 'home'; render(); }
@@ -255,29 +257,26 @@ async function openCareFocus(action) {
   if (action === 'next') { focusKey = options[(options.findIndex(item => item.key === key) + 1) % options.length].key;renderCareFocus();return; }
   const operation = {};focusOperation = operation;
   try {
-    if (action === 'history' || selected.kind === 'followup') {
+    if (selected.kind === 'followup' && action !== 'history') { await beginFollowup(selected.followupId);return; }
+    if (action === 'history') {
       if (!await choosePerson(selected.personId, 'history') || epoch !== authEpoch) return;
-      if (selected.kind === 'followup' && action !== 'history') {
-        const item = state.followups.find(row => row.id === selected.followupId && row.personId === selected.personId && row.status === 'pending');
-        if (!item) { renderCareFocus();notify('이 후속 챙김이 바뀌었어요. 현재 기록을 확인해 주세요.');return; }
-        const card = [...$('person-followups').querySelectorAll('[data-followup]')].find(node => node.dataset.followup === item.id);
-        card?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      } else $('workspace').scrollIntoView({ behavior: 'smooth', block: 'start' });
+      $('workspace').scrollIntoView({ behavior: 'smooth', block: 'start' });
       return;
     }
+    if (selected.kind !== 'event') { await beginCheckin(selected.personId);return; }
     const targetEvent = selected.kind === 'event' ? selected.eventId : '';
     if (selected.personId === selectedId && $('draft-text').value.trim() && ($('draft-event').value !== targetEvent || memoryChoice)) {
       if (!await confirmDelete('지금 다듬고 있는 문구가 있어요. 오늘 추천으로 새 문구를 준비하려면 필요한 내용을 먼저 복사해 주세요.', '새 마음 준비하기', '추천으로 준비')) return;
     }
     if (epoch !== authEpoch || notebookView().locked || !careFocusOptions().some(item => item.key === key)) { renderCareFocus();return; }
     if (memoryChoice && selected.personId === selectedId) resetPersonalMemory();
-    if (selected.kind === 'event') await prepareEvent(selected.eventId);
-    else await beginCheckin(selected.personId);
+    await prepareEvent(selected.eventId);
   } finally { if (focusOperation === operation) focusOperation = null; }
 }
 function renderHistory() {
   const selected = person(); if (!selected) { $('person-history').textContent = ''; return; }
-  const timeline = personTimeline(state, selected.id);
+  const completedFollowups=followupRows(state,{today:today(),personId:selected.id}).completed.map(item=>({id:item.id,kind:'followup-completed',eventTitle:item.title,createdAt:item.updatedAt}));
+  const timeline = [...personTimeline(state, selected.id),...completedFollowups].sort((a,b)=>b.createdAt.localeCompare(a.createdAt)||a.id.localeCompare(b.id));
   const pref = selected.recipientPreference;
   const saved = Object.keys(selected.savedMessages || {}).map(type => EVENT_TYPES[type]).filter(Boolean);
   const memory = [selected.notes, pref.confirmed && pref.salutation ? `부르는 호칭: ${pref.salutation}` : '', pref.confirmed && pref.avoidPhrases?.length ? `피할 표현: ${pref.avoidPhrases.join(', ')}` : '', pref.confirmed && pref.noReplyPressure ? '답장을 재촉하지 않기' : '', saved.length ? `다시 쓸 내 문구: ${saved.join(' · ')}` : ''].filter(Boolean);
@@ -289,7 +288,7 @@ function renderHistory() {
   $('person-history').innerHTML = top + remembered + originals + (timeline.length ? timeline.map(entry => {
     const date = new Intl.DateTimeFormat('ko-KR', { timeZone: 'Asia/Seoul', year: 'numeric', month: 'long', day: 'numeric' }).format(new Date(entry.createdAt));
     if (entry.kind === 'activity') return `<article class="history-entry" data-kind="activity"><div><h4>${escapeHTML(ACTIONS[entry.activityKind])} · ${entry.direction === 'received' ? '받은 마음' : '전한 마음'} ${won(entry.amountWon)}</h4><time>${escapeHTML(entry.occurredOn)}</time></div><p>${escapeHTML(entry.eventTitle)}</p><p class="history-text">${escapeHTML(entry.note)}</p><button type="button" class="text-button danger" data-delete-activity="${escapeHTML(entry.id)}">이 기록 삭제</button></article>`;
-    const label = entry.kind === 'copied' ? '복사한 문구' : entry.action === 'remembered' ? '조용히 기억한 날' : '챙김 완료';
+    const label = entry.kind === 'copied' ? '복사한 문구' : entry.kind === 'followup-completed' ? '후속 챙김 완료' : entry.action === 'remembered' ? '조용히 기억한 날' : '챙김 완료';
     return `<article class="history-entry" data-kind="${entry.kind}"><div><h4>${label} · ${escapeHTML(entry.eventTitle || EVENT_TYPES[entry.eventType] || '기억할 날')}</h4><time datetime="${escapeHTML(entry.createdAt)}">${escapeHTML(date)}</time></div>${entry.kind === 'copied' ? `<p class="history-text">${escapeHTML(entry.text)}</p><p class="helper">복사 기록이에요. 실제 전달 여부는 챙김 완료 기록으로 구분해요.</p>` : `<p>${entry.action === 'remembered' ? '연락 대신 기억하는 마음을 남겼어요.' : '직접 챙겼다고 표시한 기록이에요.'}</p>`}</article>`;
   }).join('') : '<div class="history-empty"><img src="assets/sticker-envelope.webp" alt=""><p>처음 전할 마음부터<br>여기에 차곡차곡 남겨요.</p><p class="helper">복사한 문구와 실제로 챙긴 날을 구분해서 기억해요.</p></div>');
   const chosen = $('care-log-event').value;
@@ -343,10 +342,10 @@ async function followupAction(event) {
   const id = button.dataset[field], item = state.followups.find(row=>row.id===id), epoch=authEpoch; if (!item) return;
   if (field === 'followupLater') { button.closest('.followup-card').querySelector('form').hidden = false; return; }
   if (field === 'followupCalendar') { followupCalendar={id,epoch,fingerprint:JSON.stringify(item)}; $('followup-calendar-form').reset(); $('followup-calendar-alarm').disabled=true; $('followup-calendar-title').textContent=`${item.dueOn} · ${state.people.find(row=>row.id===item.personId)?.name||''} · ${item.title}`; $('followup-calendar-dialog').showModal(); return; }
-  if (field === 'followupNow') { planFollowupAction(item,{action:'now',today:today()}); if(!await choosePerson(item.personId,'history'))return; $('care-log-kind').value='contact'; $('care-log-note').value=item.title; $('care-log-form').scrollIntoView({behavior:'smooth',block:'center'}); notify('직접 챙긴 뒤 기록을 남겨 주세요. 아직 완료로 표시하지 않았어요.'); return; }
+  if (field === 'followupNow') { await beginFollowup(id);return; }
   if (field === 'followupStop' && !await confirmDelete('이 후속 챙김을 더 이상 표시하지 않을까요? 남겨 둔 일정과 기억은 유지해요.','후속 챙김 멈추기','이제 그만')) return;
   if (epoch !== authEpoch) return;
-  const decision=planFollowupAction(item,{action:field==='followupDone'?'done':'dismiss',today:today()}); state=updateFollowup(state,id,decision.patch); save(); renderFollowups(); renderCareFocus(); notify(field==='followupDone'?'직접 챙긴 마음을 표시했어요.':'이 후속 챙김은 이제 보여드리지 않아요.');
+  const decision=planFollowupAction(item,{action:field==='followupDone'?'done':'dismiss',today:today()}); state=updateFollowup(state,id,decision.patch); save();renderSummary();renderFollowups();renderHistory();renderBrief();renderCareFocus(); notify(field==='followupDone'?'직접 챙긴 마음을 표시했어요.':'이 후속 챙김은 이제 보여드리지 않아요.');
 }
 function invalidateMessageReview() {
   expressionReview = null; preferenceCandidates = []; preferenceContext = null;
@@ -406,15 +405,20 @@ function renderBrief() {
   renderMemoryPicker();
   renderPreparation();
   const who = person(), event = state.events.find(item => item.id === $('draft-event').value);
-  if (!who) { $('care-brief').hidden = true; return; }
-  const activities = (state.activities ?? []).filter(item => item.personId === who.id).sort((a, b) => b.occurredOn.localeCompare(a.occurredOn));
-  const contact = activities.find(item => item.kind === 'contact' || item.kind === 'attend');
-  const exchange = activities.filter(item => item.kind === 'gift' || item.kind === 'money').slice(0, 3);
-  const memories = (state.memories ?? []).filter(item => item.personId === who.id).slice(-5).reverse();
-  const plan = event?.carePlan || {}, previous = state.drafts.filter(item => item.personId === who.id && item.eventType === (event?.type||'checkin')).at(-1);
-  const details = [contact ? `최근 ${ACTIONS[contact.kind]} · ${contact.occurredOn}${contact.note ? ` · ${contact.note}` : ''}` : '', ...exchange.map(item => `${item.occurredOn} · ${item.direction === 'received' ? '받은' : '전한'} ${ACTIONS[item.kind]} ${won(item.amountWon)}${item.note ? ` · ${item.note}` : ''}`), ...memories.map(item => item.text)].filter(Boolean);
+  if (!who || notebookView().concealNotebook) { $('care-brief').hidden = true;$('care-brief').replaceChildren();return; }
+  const chosen=currentFollowupContext(), context=buildCareContext(state,{personId:who.id,today:today(),eventType:event?.type||'checkin',followupId:chosen?.id||''});
+  const {lastCare,memories,exchanges,previousDraft:previous}=context, plan=event?.carePlan;
+  const excerpt=text=>text.length>160?`<p>${escapeHTML(text.slice(0,160))}…</p><details><summary>이야기 전체 보기</summary><p class="context-text">${escapeHTML(text)}</p></details>`:`<p class="context-text">${escapeHTML(text)}</p>`;
+  const evidence=item=>item.sourceQuote?`<details><summary>남겨 둔 근거 보기</summary><p class="context-meta">${escapeHTML(item.sourceTitle)}</p><blockquote>${escapeHTML(item.sourceQuote)}</blockquote></details>`:'';
+  const last=lastCare?`<div class="context-last"><span class="context-label">최근 챙김 기록</span><p class="context-meta">${lastCare.sourceKind==='completion'?'완료로 표시한 날 · ':''}${escapeHTML(lastCare.date)} · ${escapeHTML(lastCare.label)}</p>${excerpt(lastCare.note||lastCare.title||lastCare.eventTitle||'이날 나눈 마음을 기록했어요.')}</div>`:'<p class="helper">아직 실제로 챙긴 기록이 없어요. 안부를 전한 뒤 첫 기록을 남겨 보세요.</p>';
+  const selected=chosen?`<section class="context-selected" aria-label="지금 챙길 내용"><span class="context-label">지금 챙길 내용</span><h4>${escapeHTML(chosen.title)}</h4><p class="context-meta">내가 정한 날 · ${escapeHTML(chosen.dueOn)}${chosen.phase==='overdue'?' · 날짜가 지난 챙김':''}</p>${evidence(chosen)}<p class="helper">이 내용을 보며 아래 문구를 다듬어 주세요. 복사해도 완료되지 않아요. 실제로 챙긴 뒤 ‘이 챙김 완료’를 눌러 주세요.</p><button type="button" class="text-button" data-context-clear>이 챙김과 연결 해제</button></section>`:'';
+  const pending=context.followups.filter(item=>item.id!==chosen?.id);
+  const pendingHTML=pending.length?`<details class="context-more"><summary>다음에 챙기기로 한 일 · ${pending.length}</summary>${pending.map(item=>`<article class="context-item"><p class="context-meta">${escapeHTML(item.dueOn)} · ${item.phase==='today'?'오늘':item.phase==='overdue'?'날짜가 지난 챙김':'다가오는 챙김'}</p><p>${escapeHTML(item.title)}</p>${evidence(item)}<button class="soft-button" type="button" data-context-followup="${escapeHTML(item.id)}">이 일로 안부 준비</button></article>`).join('')}</details>`:'';
+  const memoryHTML=memories.length?`<details class="context-more"><summary>함께 기억할 이야기 · ${memories.length}</summary>${memories.map(item=>`<article class="context-item"><p class="context-meta">${escapeHTML(item.date)}에 남긴 ${escapeHTML(item.label)}</p>${excerpt(item.text)}${evidence(item)}<button type="button" class="soft-button" data-context-memory="${escapeHTML(item.id)}">이 기억을 문구에 담기</button></article>`).join('')}</details>`:'';
+  const exchangeHTML=exchanges.length?`<details class="context-more"><summary>지난 선물과 경조금</summary>${exchanges.map(item=>`<article class="context-item"><p class="context-meta">${escapeHTML(item.date)} · ${escapeHTML(item.label)}${item.amountWon!=null?` · ${escapeHTML(won(item.amountWon))}`:''}</p>${item.note?excerpt(item.note):''}</article>`).join('')}</details>`:'';
   $('care-brief').hidden = false;
-  $('care-brief').innerHTML = `<h3>이번에 챙기기 전, 우리 사이의 맥락</h3><p><strong>이번 계획</strong> · ${escapeHTML(ACTIONS[plan.action] || '연락')}${plan.amountWon != null ? ` · 준비 예산 ${won(plan.amountWon)}` : ''}${plan.note ? ` · ${escapeHTML(plan.note)}` : ''}</p>${details.length ? `<ul>${details.map(item => `<li>${escapeHTML(item)}</li>`).join('')}</ul>` : '<p>함께한 기억과 실제로 주고받은 마음을 남기면, 다음에 이 자리에서 다시 꺼내 보여드려요.</p>'}${previous ? `<details><summary>지난번 내가 고친 문구</summary><p class="history-text">${escapeHTML(previous.text)}</p><p class="helper">복사한 문구이며 전달 여부를 뜻하지 않아요.</p></details>` : ''}<button type="button" class="text-button" data-brief-history>기록 더 보기 · 새 마음 남기기</button>`;
+  $('care-brief').innerHTML = `<h3>연락 전에, 우리 이야기</h3>${selected}${last}${pendingHTML}${memoryHTML}${exchangeHTML}${plan?`<details class="context-more"><summary>이번에 세운 계획</summary><p>${escapeHTML(ACTIONS[plan.action]||'연락')}${plan.amountWon!=null?` · 준비 예산 ${escapeHTML(won(plan.amountWon))}`:''}</p>${plan.note?excerpt(plan.note):''}</details>`:''}${previous?`<details class="context-more"><summary>지난번 복사한 문구</summary><p class="context-text">${escapeHTML(previous.text)}</p><p class="helper">${escapeHTML(previous.date)}에 복사했어요. 실제로 전한 기록과는 구분해요.</p></details>`:''}<button type="button" class="text-button" data-brief-history>우리의 기록 모두 보기</button>`;
+  updateMood();
 }
 function scheduleCard(row) {
   const { event, person: who, occurrence, status } = row;
@@ -477,6 +481,7 @@ async function saveCapture() {
   notify(`일정 ${events.length}개와 기억 ${memories.length}개, 원문을 함께 보관했어요. 다음 마음을 준비할 때 다시 꺼내 볼 수 있어요.`);
 }
 function replaceState(next) {
+  followupContext = null;
   focusKey = ''; focusEpoch = authEpoch;focusOperation = null;
   resetPersonalMemory(); checkinMode=false; followupCalendar=null; $('followup-calendar-dialog').close();
   resetMemoryCard(); $('followup-form').reset(); preparationKey = '';
@@ -579,7 +584,7 @@ async function choosePerson(id, tab = 'events') {
   if (notebookView().locked) return false;
   if (id !== selectedId && hasPersonalizationInput() && !await confirmDelete('지금 고른 기억과 아직 보관하지 않은 안부 초안이 있어요. 다른 사람을 열면 이 선택을 해제해요. 필요한 문구를 먼저 복사해 주세요.', '다른 사람의 수첩', '다른 사람 열기')) return false;
   if (epoch !== authEpoch || notebookView().locked || id && !state.people.some(item => item.id === id)) return false;
-  if (id !== selectedId) { resetPersonalMemory(); checkinMode=false; resetMemoryCard(); $('followup-form').reset(); $('care-log-form').reset(); logOccurrence = null; }
+  if (id !== selectedId) { followupContext=null;resetPersonalMemory(); checkinMode=false; resetMemoryCard(); $('followup-form').reset(); $('care-log-form').reset(); logOccurrence = null; }
   stashConversation(); stashDraft(); selectedId = id; activeView = id ? 'person' : 'home'; resetDraft(); resetEventForm(); clearAudio(); $('text-file').value = ''; render(true); restoreDraft(); switchTab(tab); save();
   return true;
 }
@@ -668,7 +673,7 @@ async function prepareEvent(eventId) {
   if ((selectedId !== event.personId || activeView !== 'person') && !await choosePerson(event.personId, 'events')) return;
   if (epoch !== authEpoch || notebookView().locked) return;
   event = state.events.find(item => item.id === eventId && item.personId === selectedId);if (!event) return;
-  checkinMode=false;
+  followupContext=null;checkinMode=false;
   $('draft-event').value = eventId;
   renderBrief();
   switchTab('message');
@@ -680,16 +685,51 @@ async function prepareEvent(eventId) {
   updateMood();
   $('workspace').scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' });
 }
-async function beginCheckin(id) {
+async function beginCheckin(id, { followupId = '', fingerprint = '' } = {}) {
   const epoch = authEpoch;
   if (!state.people.length) { openPersonDialog();return; }
   if (!id) throw Error('안부를 전할 사람을 골라 주세요.');
-  if (!await choosePerson(id, 'events') || epoch !== authEpoch || notebookView().locked) return;
+  if (epoch !== authEpoch || notebookView().locked) return false;
+  if (id !== selectedId) { if (!await choosePerson(id, 'message')) return false; }
+  else { activeView='person';updateView(); }
+  if (epoch !== authEpoch || notebookView().locked) return false;
+  // Check after restoring this person's stashed draft as well as direct entry.
+  if ($('draft-event').value && $('draft-text').value.trim()) {
+    if (!await confirmDelete('다듬고 있는 일정 문구가 있어요. 새 안부를 준비하려면 필요한 내용을 먼저 복사해 주세요.', '새 안부 준비하기', '안부 준비')) return false;
+  }
+  if (epoch !== authEpoch || selectedId!==id || notebookView().locked) return false;
+  followupContext=null;
+  if (followupId) {
+    const fresh=buildCareContext(state,{personId:id,today:today(),followupId}).selectedFollowup;
+    if (!fresh||fingerprint!==followupFingerprint(followupId)) throw Error('이 챙김이 바뀌었어요. 현재 기록에서 다시 선택해 주세요.');
+    followupContext={id:followupId,personId:id,epoch,fingerprint:followupFingerprint(followupId)};
+  }
   checkinMode = true;$('draft-event').value = '';renderBrief();switchTab('message');
   if (currentDraft?.eventType !== 'checkin' || !$('draft-text').value.trim()) {
     $('draft-style').value = person().savedMessages?.checkin ? 'saved' : 'warm';generateDraft({ silent: true });
   }
   $('workspace').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  return true;
+}
+function followupFingerprint(id) {
+  const item=state.followups.find(row=>row.id===id),source=item?.sourceId?state.sources.find(row=>row.id===item.sourceId&&row.personId===item.personId):null;
+  return item?JSON.stringify([item,source]):'';
+}
+function currentFollowupContext() {
+  if (!followupContext) return null;
+  const current=followupContext;
+  if (current.epoch!==authEpoch||current.personId!==selectedId||$('draft-event').value||current.fingerprint!==followupFingerprint(current.id)) {
+    followupContext=null;return null;
+  }
+  const item=buildCareContext(state,{personId:selectedId,today:today(),followupId:current.id}).selectedFollowup;
+  if (!item) followupContext=null;
+  return item;
+}
+async function beginFollowup(id) {
+  const item=state.followups.find(row=>row.id===id&&row.status==='pending');
+  if (!item||notebookView().locked) throw Error('현재 남아 있는 챙김에서 다시 선택해 주세요.');
+  planFollowupAction(item,{action:'now',today:today()});
+  if (await beginCheckin(item.personId,{followupId:id,fingerprint:followupFingerprint(id)})) notify('챙길 내용을 보며 안부를 다듬어 주세요. 문구 복사와 챙김 완료는 따로 기록해요.');
 }
 function exportEvent(button) {
   const row = rows().find(item => item.event.id === button.dataset.ics);
@@ -698,7 +738,14 @@ function exportEvent(button) {
   notify('양력으로 변환한 다음 1회 일정을 내보냈어요. 달력 앱에서 가져와 알림을 확인해 주세요.');
 }
 function finishEvent(action) {
+  if (activeView!=='person'||activeTab!=='message') return;
   if(!$('draft-event').value) {
+    if (followupContext) {
+      const item=currentFollowupContext();
+      if (!item) { renderBrief();throw Error('챙길 내용이 바뀌었어요. 현재 기록을 다시 확인해 주세요.'); }
+      state=updateFollowup(state,item.id,planFollowupAction(state.followups.find(row=>row.id===item.id),{action:'done',today:today()}).patch);
+      followupContext=null;resetDraft();sessionDrafts.delete(selectedId);save();render();switchTab('history');notify('이 챙김을 직접 마친 기록으로 남겼어요.');return;
+    }
     state=recordCareAction(state,{personId:selectedId,kind:'contact',occurredOn:today(),note:'오늘 안부를 직접 전했어요.'}); resetDraft(); sessionDrafts.delete(selectedId);save();render();switchTab('history');notify('직접 안부를 전한 날로 기록했어요.');return;
   }
   const row = currentRows().find(item => item.event.id === $('draft-event').value), displayedId = $('draft-event').selectedOptions[0]?.dataset.occurrenceId;
@@ -854,13 +901,28 @@ on('calendar-today', 'click', () => { calendarMonth = today().slice(0, 7); calen
 on('calendar-grid', 'click', e => { const button = e.target.closest('[data-calendar-date]'); if (!button) return; calendarDay = button.dataset.calendarDate; calendarMonth = calendarDay.slice(0, 7); renderSchedule(); });
 for (const id of ['capture-source', 'capture-person', 'capture-source-kind']) on(id, 'input', invalidateCapture);
 on('capture-extract', 'click', extractCapture); on('capture-save', 'click', saveCapture);
-on('care-brief', 'click', e => { if (e.target.closest('[data-brief-history]')) switchTab('history'); });
+on('care-brief', 'click', async e => {
+  if (e.target.closest('[data-brief-history]')) { switchTab('history');return; }
+  const followup=e.target.closest('[data-context-followup]');
+  if (followup) { await beginFollowup(followup.dataset.contextFollowup);return; }
+  if (e.target.closest('[data-context-clear]')) { followupContext=null;renderBrief();updateMood();return; }
+  const memory=e.target.closest('[data-context-memory]');
+  if (memory) {
+    const fresh=buildCareContext(state,{personId:selectedId,today:today()}).memories.find(item=>item.id===memory.dataset.contextMemory);
+    if (!fresh) { renderBrief();throw Error('기억이 바뀌었어요. 현재 기록에서 다시 골라 주세요.'); }
+    $('personal-memory').value=fresh.id;renderMemoryEvidence();$('memory-personalization').open=true;
+    $('personal-memory-status').textContent='원문과 용도를 확인한 뒤 “이 기억으로 준비”를 눌러 주세요. 아직 문구를 바꾸지 않았어요.';
+    $('personal-memory-use').focus({preventScroll:true});
+    $('memory-personalization').scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'center'});
+  }
+});
 on('care-log-event', 'change', () => { logOccurrence = null; });
 on('care-log-form', 'submit', e => {
   e.preventDefault();
   const kind = $('care-log-kind').value, direction = $('care-log-direction').value, eventId = $('care-log-event').value;
-  let next = recordCareAction(state, { personId: selectedId, eventId, kind, direction, occurredOn: $('care-log-date').value, amountWon: $('care-log-amount').value === '' ? null : Number($('care-log-amount').value), note: $('care-log-note').value });
-  if (logOccurrence?.startsWith(`${eventId}:`) && direction === 'sent') next = completeEvent(next, eventId, new Date(), logOccurrence, { allowPast: true, action: kind === 'remember' ? 'remembered' : 'contacted' });
+  const recordedAt=new Date();
+  let next = recordCareAction(state, { personId: selectedId, eventId, kind, direction, occurredOn: $('care-log-date').value, amountWon: $('care-log-amount').value === '' ? null : Number($('care-log-amount').value), note: $('care-log-note').value },recordedAt);
+  if (logOccurrence?.startsWith(`${eventId}:`) && direction === 'sent') next = completeEvent(next, eventId, recordedAt, logOccurrence, { allowPast: true, action: kind === 'remember' ? 'remembered' : 'contacted' });
   state = next; logOccurrence = null; $('care-log-form').reset(); save(); render(); notify('실제로 나눈 마음을 남겼어요. 다음에 준비할 때 함께 꺼내 보여드려요.');
 });
 on('person-history', 'click', async e => {
@@ -1014,7 +1076,7 @@ on('preview-memory-card','click',previewMemoryCard);
 for (const type of ['input', 'change']) on('memory-card-builder', type, () => { releaseMemoryCard(); $('preview-memory-card').disabled = false; $('memory-card-status').textContent = '선택한 내용으로 미리보기를 다시 만들 수 있어요.'; });
 on('close-memory-card','click',()=>{$('memory-card-dialog').close();});
 on('download-memory-card','click',()=>{if(!cardURL)throw Error('카드 미리보기를 다시 만들어 주세요.');const link=document.createElement('a');link.href=cardURL;link.download=cardFilename;link.click();});
-on('go-events', 'click', () => switchTab('events')); on('generate-draft', 'click', generateDraft); on('draft-event', 'change', () => { checkinMode=!$('draft-event').value;resetDraft(); updateMood(); renderBrief(); }); on('draft-style', 'change', () => generateDraft({ silent: true })); on('draft-text', 'input', () => { $('draft-confirm').checked = false; invalidateMessageReview(); });
+on('go-events', 'click', () => switchTab('events')); on('generate-draft', 'click', generateDraft); on('draft-event', 'change', () => { followupContext=null;checkinMode=!$('draft-event').value;resetDraft(); updateMood(); renderBrief(); }); on('draft-style', 'change', () => generateDraft({ silent: true })); on('draft-text', 'input', () => { $('draft-confirm').checked = false; invalidateMessageReview(); });
 on('copy-draft', 'click', async () => {
   selectedMemory();
   if (!currentDraft) throw Error('먼저 초안을 만들어 주세요.');
