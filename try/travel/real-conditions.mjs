@@ -65,7 +65,7 @@ function partialAt(hours, query, weekday) {
   }
   return partial;
 }
-function scheduleCheck(place, query, today, calendar) {
+function scheduleCheck(place, query, today, calendar, stayMinutes = null) {
   if (!query.date && !query.time) return check('none', '방문 날짜·시간 조건을 고르지 않았어요.');
   if (!query.date) return check('unknown', '시간만으로는 운영 요일·공휴일을 확인할 수 없어요. 방문 날짜도 골라 주세요.');
   if (day(query.date) < day(today)) return check('unknown', '지난 날짜의 방문 계획은 현재 안내로 확정할 수 없어요.');
@@ -110,11 +110,36 @@ function scheduleCheck(place, query, today, calendar) {
   if (!query.time) return check('matched', '해당 날짜는 안내상 운영일이에요. 방문 시각과 당일 변동은 별도로 확인해 주세요.', { sourceUrl });
   const current = minute(query.time);
   const matchingSlot = slots.find(slot => current >= minute(slot.open) && current < minute(slot.lastEntry ?? slot.close));
+  if (matchingSlot && stayMinutes !== null) {
+    const end = current + stayMinutes;
+    if (end > 1440) return check('unknown', '체류 종료가 자정을 넘어 당일 운영 안내로 연결할 수 없어요.', { sourceUrl });
+    if (end > minute(matchingSlot.close)) {
+      const extension = hours.partialExtensions?.find(row => day(query.date) >= day(row.from) && day(query.date) <= day(row.through)
+        && row.weekdays.includes(weekday) && row.slots.some(slot => minute(slot.open) <= minute(matchingSlot.close) && end <= minute(slot.close)));
+      if (extension) return check('unknown', '체류 중 일반 운영시간이 끝나 일부 공간의 연장 운영 대상인지 확인이 필요해요.', { sourceUrl: extension.sourceUrl ?? sourceUrl });
+      return check('unmatched', '입장은 가능한 시각이지만 입력한 체류가 운영 종료나 쉬는 시간을 넘어요.', { sourceUrl });
+    }
+    return check('matched', matchingSlot.lastEntry
+      ? '도착은 안내된 입장·운영시간 안이고 입력한 체류도 같은 운영 구간 안에 끝나요. 당일 변동은 확인해 주세요.'
+      : '도착과 입력한 체류가 같은 운영 구간 안에 있어요. 입장·주문 마감과 당일 변동은 별도로 확인해 주세요.', { sourceUrl });
+  }
   if (matchingSlot) return check('matched', matchingSlot.lastEntry
     ? '고른 시각은 공식 안내의 운영시간과 입장 마감 안에 있어요. 당일 변동은 확인해 주세요.'
     : '고른 시각은 공식 안내의 운영시간 안이에요. 입장·주문 마감과 당일 변동은 별도로 확인해 주세요.', { sourceUrl });
   if (partial) return check('unknown', '고른 시각에는 일부 공간의 연장 운영만 안내되어 있어요. 대상 공간과 입장 조건을 확인해 주세요.', { sourceUrl: partial.sourceUrl ?? sourceUrl });
   return check('unmatched', '고른 시각은 공식 안내의 운영시간·입장 마감 밖이에요.', { sourceUrl });
+}
+// Shared by the course builder: departure is bounded by closing, not by the
+// earlier admission cutoff. Reuse every date/holiday/freshness/partial rule.
+export function evaluateRealStay(place, input = {}, { now, calendar } = {}) {
+  if (!plain(input) || Object.keys(input).some(key => !['date', 'time', 'stayMinutes'].includes(key))) invalid('stay', '방문과 체류 조건을 확인해 주세요.');
+  const { date = '', time = '', stayMinutes = null } = input;
+  const query = normalizeRealQuery({ date, time });
+  if (stayMinutes !== null && (!Number.isSafeInteger(stayMinutes) || stayMinutes < 1 || stayMinutes > 1440)) invalid('stayMinutes', '체류 시간은 1~1,440분 정수로 입력해 주세요.');
+  const result = scheduleCheck(place, query, koreanToday(now), calendar, stayMinutes);
+  if (result.status === 'unmatched' || result.status === 'unknown') return result;
+  if (!date || !time || stayMinutes === null) return check('unknown', '날짜·도착 시각·체류 시간을 모두 입력해야 방문 시간을 비교할 수 있어요.', result.sourceUrl ? { sourceUrl: result.sourceUrl } : {});
+  return result;
 }
 const amountValid = value => Number.isSafeInteger(value) && value >= 0;
 const won = value => value.toLocaleString('ko-KR') + '원';

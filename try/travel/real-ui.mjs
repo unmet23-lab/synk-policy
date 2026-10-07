@@ -1,15 +1,17 @@
-import { REAL_PLACES, REAL_META, REAL_CONDITION_CALENDAR } from './real-places.mjs?v=20261007-conditions1';
-import { normalizeRealQuery, evaluateRealConditions } from './real-conditions.mjs?v=20261007-conditions1';
+import { REAL_PLACES, REAL_META, REAL_CONDITION_CALENDAR } from './real-places.mjs?v=20261007-halfday1';
+import { createRealCourseUI } from './real-course-ui.mjs?v=20261007-halfday1';
+import { normalizeRealQuery, evaluateRealConditions } from './real-conditions.mjs?v=20261007-halfday1';
 import {
   CATEGORIES, REAL_STORAGE_KEY, VISIT_REASONS, normalizeRealState, rankRealPlaces,
   readRealState, serializeRealState, mapLink, exportRealMemo, formatRealQuery,
   setRealReaction, setRealVisit, setRealCategoryPreference, clearRealFeedback,
-} from './real-guide.mjs?v=20261007-conditions1';
+} from './real-guide.mjs?v=20261007-halfday1';
 
 const $ = selector => document.querySelector(selector);
 const byId = new Map(REAL_PLACES.map(item => [item.id, item]));
 const categoryLabel = id => CATEGORIES.find(item => item.id === id).label;
 let state = normalizeRealState();
+const course = createRealCourseUI({ getSelected: () => [...state.selected], getState: () => state });
 // This trip's comparison is deliberately separate from saved personal opinions.
 let query = normalizeRealQuery();
 let editingId = null;
@@ -94,6 +96,7 @@ function renderHistory() {
   $('#real-history-items').replaceChildren(...(rows.length ? rows : [node('p', 'real-history-empty', '아직 직접 남긴 반응이 없어요. 장소의 ‘취향·방문 기록’에서 시작해 보세요.')]));
 }
 function render() {
+  course.updateSelection();
   feedbackConsent.disabled = !consent.checked;
   feedbackConsent.checked = state.feedbackConsent && consent.checked;
   for (const item of CATEGORIES) $('#real-interest-' + item.id).setAttribute('aria-pressed', String(state.interests.includes(item.id)));
@@ -233,6 +236,7 @@ feedbackConsent.addEventListener('change', () => { save(); render(); });
 $('#real-reset').addEventListener('click', () => {
   state = normalizeRealState(); consent.checked = false; feedbackConsent.checked = false;
   resetConditions();
+  course.reset();
   try { localStorage.removeItem(REAL_STORAGE_KEY); status.textContent = '실제 장소의 선택과 모든 취향·방문 기록을 지웠어요.'; }
   catch { status.textContent = '화면은 초기화했지만 저장 기록은 지우지 못했어요. 브라우저 사이트 데이터를 확인해 주세요.'; }
   $('#real-memo-content').value = ''; render(); announce('실제 장소 선택과 기록을 모두 초기화했어요.');
