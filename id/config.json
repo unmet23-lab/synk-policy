@@ -109,7 +109,8 @@
       "product": "messenger",
       "clientId": "040530fe-6181-45fd-ba85-51a31872edbf",
       "redirectUris": [
-        "http://127.0.0.1:4191/api/synk-id/callback"
+        "http://127.0.0.1:4191/api/synk-id/callback",
+        "https://workspace.synk.im/api/synk-id/callback"
       ]
     },
     {
@@ -145,6 +146,13 @@
       "clientId": "84da5218-9e25-4ee9-a18b-e215895e182f",
       "redirectUris": [
         "https://synk.im/care/"
+      ]
+    },
+    {
+      "product": "platform",
+      "clientId": "88d14e4c-a98c-4791-a444-0ccbef2dfd5e",
+      "redirectUris": [
+        "https://workspace.synk.im/api/customer/synk-id/callback"
       ]
     }
   ],
