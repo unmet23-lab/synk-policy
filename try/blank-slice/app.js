@@ -2,7 +2,8 @@
 // 손맛: 베는 순간의 소리·진동·점수 튀기는 여기서, 멈칫·칼빛·부스러기는 stage.js에서 같은 순간에 낸다.
 // 맞힌 낱말이 빈칸에 끼워지는 순간에는 ‘톡’과 사운드킷 ‘획득’(픽), 빈칸 눌림, 반짝이, 점수 올라가기가 함께 온다.
 import { ITEMS, PRACTICE, SKILL_LABEL, KIND_LABEL } from './content.js';
-import { parts, filled, josa, readBlank, shuffled, composeRound, pointsFor, scoreRound, hangTime, readDelay } from './core.js';
+import { parts, filled, readBlank, shuffled, composeRound, pointsFor, scoreRound, hangTime, readDelay } from './core.js';
+import { josa } from './kit/josa.js';
 import { GAME_ID, rankItems, createReadingConfirmation, skillReport, assignmentItems, assignmentLabel, FLOW_SLICE, FLOW_WORDS, sliceObservation } from './learning.js';
 import * as sound from './audio.js';
 import { swingPower } from './sfx.js';
