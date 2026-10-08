@@ -1,4 +1,4 @@
-export const PRODUCTS = Object.freeze({ platform: 'SYNK 플랫폼', world: 'SYNK WORLD', messenger: 'SYNK 사내 메신저', care: 'SYNK 플레저', path: 'SYNK PATH', rehearsal: '중요한 대화 리허설', 'family-album': '가족 이야기 앨범' });
+export const PRODUCTS = Object.freeze({ platform: 'SYNK 플랫폼', world: 'SYNK WORLD', messenger: 'SYNK 사내 메신저', care: 'SYNK 플레저', path: 'SYNK PATH', 'path-travel': 'SYNK PATH 여행', rehearsal: '중요한 대화 리허설', 'family-album': '가족 이야기 앨범' });
 const nativeSchemes = new Set(['synktalk:', 'im.synk.platform:', 'im.synk.world:', 'im.synk.messenger:', 'im.synk.care:']);
 function callbackUrl(value) {
   const url = new URL(value);
@@ -117,6 +117,19 @@ export function trustedConsentRedirect(value, config, clientId) {
 export function authorizationProduct(clientId, config) {
   return Object.entries(config.clients).find(([, client]) => client.clientId && client.clientId === clientId)?.[0]
     || config.authorizationClients.find(client => client.clientId && client.clientId === clientId)?.product || null;
+}
+export function firstPartyAuthorization(details, config) {
+  const clientId = details?.client?.id;
+  const product = typeof clientId === 'string' && clientId ? authorizationProduct(clientId, config) : null;
+  if (!product) throw new Error('등록된 SYNK 서비스의 로그인 요청인지 확인하지 못했어요.');
+  const destination = trustedConsentRedirect(details.redirect_uri, config, clientId);
+  const clients = [...Object.values(config.clients), ...config.authorizationClients].filter(client => client.clientId === clientId);
+  if (!clients.some(client => [client.redirectUri, ...(client.redirectUris || [])].filter(Boolean).some(uri => new URL(uri).href === destination)))
+    throw new Error('등록한 SYNK 서비스의 로그인 도착 주소와 달라요.');
+  const scopes = typeof details.scope === 'string' ? details.scope.trim().split(/\s+/) : [];
+  if (!scopes.includes('openid') || new Set(scopes).size !== scopes.length || scopes.some(scope => !['openid', 'email', 'profile'].includes(scope)))
+    throw new Error('SYNK 로그인에 필요한 기본 계정 정보만 연결할 수 있어요.');
+  return Object.freeze({ clientId, product, destination, scopes: Object.freeze(scopes) });
 }
 export function scopedStorage(storage, accountKey, revision, guard) {
   const prefix = `synk.account.${accountKey}.r${revision}.`;

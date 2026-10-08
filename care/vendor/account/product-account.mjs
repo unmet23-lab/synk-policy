@@ -1,4 +1,4 @@
-
+import { createPlatformEntry } from './platform-entry.mjs';
 const AUTH_ERRORS = new Set(['AUTH_REQUIRED', 'AUTH_SESSION_MISSING', 'SESSION_REVOKED']);
 const fault = (code, message, extra = {}) => Object.assign(new Error(message), { code, ...extra });
 const missingAsset = error => ['ASSET_NOT_FOUND','ASSET_NOT_CONFIRMED'].includes(error?.code) && typeof error?.assetId === 'string' && /^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/i.test(error.assetId) ? { assetId:error.assetId } : {};
@@ -20,12 +20,14 @@ export function createProductAccount({
   navigate = url => globalThis.location.assign(url),
   loadCore = () => import('./core.mjs'), now = Date.now, cryptoAPI,
 } = {}) {
-  if (!['care', 'path', 'rehearsal', 'family-album'].includes(clientKey) || !['synk-care', 'synk-personal'].includes(endpoint) || typeof validateState !== 'function') throw new TypeError('제품 계정 계약을 확인해 주세요.');
+  if (!['care', 'path', 'path-travel', 'rehearsal', 'family-album'].includes(clientKey) || !['synk-care', 'synk-personal'].includes(endpoint) || typeof validateState !== 'function') throw new TypeError('제품 계정 계약을 확인해 주세요.');
   const LIMIT = (resource === 'family-album' ? 32 : 4) * 1024 * 1024 + 32768;
   const SESSION_KEY = `synk.oauth.session.${clientKey}`;
   const OPERATIONS = new Set(Object.values(operations));
   const bridgeRequest = bridge?.accountRequest || bridge?.request;
   const native = typeof bridgeRequest === 'function' && typeof bridge?.authStatus === 'function';
+  const platformEntry = native ? null : createPlatformEntry({ clientKey, getUrl, replaceUrl });
+  let automaticNavigations = 0;
   let snapshot = { configured: false, signedIn: false, status: 'unconfigured', accountId: null, account: null, sessionGeneration: 0, error: null };
   let config, core, session = null, pendingExchange = null, epoch = 0, loginIntent = 0, disposed = false, starting, started = false, refreshing, unsubscribe, nativeIdentity = null, nativeLoad = null, nativeGeneration = -1;
   const controllers = new Set();
@@ -173,6 +175,7 @@ export function createProductAccount({
   }
   async function begin() {
     const expected = epoch;
+    platformEntry?.capture(storage);
     if (native) {
       const environment = await bridge.getEnvironment();
       guard(expected);
@@ -203,8 +206,11 @@ export function createProductAccount({
     // A saved session or callback is still being checked. Consumers must not
     // discard their account drafts as if the user explicitly signed out.
     emit({ configured: true, status: 'restoring', error: null });
+    platformEntry.restore(storage);
+    if (platformEntry.isCancelled()) { session = null;pendingExchange = null;return emit({ signedIn: false, status: 'signed-out', accountId: null, account: null, error: null }); }
     const url = new URL(getUrl());
     if (url.searchParams.has('code') || url.searchParams.has('error')) {
+      platformEntry.stop();
       try { pendingExchange = { fields: core.consumeCallback({ config, product: clientKey, url: url.href, storage, now: now() }), configKey: binding() }; }
       finally { for (const key of ['code', 'state', 'error', 'error_description']) url.searchParams.delete(key); replaceUrl(url.href); }
     }
@@ -225,10 +231,25 @@ export function createProductAccount({
         }
       } catch { storage.removeItem(SESSION_KEY); session = null; }
     }
-    if (!session) return emit({ signedIn: false, status: 'signed-out', accountId: null, account: null, error: null });
+    if (!session) return await automaticSignIn(expected) || emit({ signedIn: false, status: 'signed-out', accountId: null, account: null, error: null });
     emit({ status: 'restoring' });
-    const data = await dispatch(operations.load, {}, expected, null); guard(expected);
+    let data;
+    try { data = await dispatch(operations.load, {}, expected, platformEntry.accountId());guard(expected); }
+    catch (error) {
+      guard(expected);
+      if (!platformEntry.accountId() || ![...AUTH_ERRORS, 'ACCOUNT_CHANGED'].includes(error.code)) throw error;
+      session = null;storage.removeItem(SESSION_KEY);
+      const redirected = await automaticSignIn(expected);if (redirected) return redirected;
+      platformEntry.assertAccount(null);throw error;
+    }
+    platformEntry.assertAccount(data.accountId);platformEntry.stop();
     return emit({ signedIn: true, status: 'signed-in', accountId: data.accountId, account: { synk_user_id: data.accountId, display_name: '' }, error: null });
+  }
+  async function automaticSignIn(expected) {
+    if (!platformEntry.beginAttempt()) return null;
+    emit({ signedIn: false, accountId: null, account: null, status: 'signing-in', error: null });
+    const url = await core.beginOAuth({ config, product: clientKey, storage, now: now(), cryptoAPI });guard(expected);
+    automaticNavigations++;navigate(url);return status();
   }
   async function start() {
     if (disposed) throw fault('ACCOUNT_CHANGED', '계정 연결이 종료됐어요.');
@@ -250,9 +271,10 @@ export function createProductAccount({
   }
   async function signIn() {
     const intent = ++loginIntent;
+    const before = automaticNavigations;
     await start();
     if (disposed || intent !== loginIntent) throw fault('ACCOUNT_CHANGED', '계정 연결이 바뀌었어요.');
-    if (snapshot.signedIn) return status();
+    if (snapshot.signedIn || automaticNavigations !== before) return status();
     if (native && snapshot.error?.retryable) {
       // authStatus is read-only; load asks main to retry its private saved token.
       // authSignIn would discard that token and start a new OAuth transaction.
@@ -273,13 +295,15 @@ export function createProductAccount({
     if (!snapshot.configured) throw fault('AUTH_CONFIG', 'SYNK ID 연결 설정을 준비하고 있어요. 지금은 이 기기의 수첩을 사용할 수 있어요.');
     if (native) { const result = await bridge.authSignIn(); if (disposed || intent !== loginIntent) throw fault('ACCOUNT_CHANGED', '계정 연결이 바뀌었어요.'); if (result?.ok === false) throw Object.assign(new Error(result.error?.message), result.error); return nativeStatus(result); }
     const expected = epoch;
+    platformEntry.resume();
     const url = await core.beginOAuth({ config, product: clientKey, storage, now: now(), cryptoAPI }); guard(expected);
     if (intent !== loginIntent) throw fault('ACCOUNT_CHANGED', '계정 연결이 바뀌었어요.');
     emit({ status: 'signing-in', error: null }); navigate(url); return status();
   }
   async function signOut() {
     loginIntent++;
-    const old = session; clearSession();
+    let entryError;try { platformEntry?.cancel(); } catch (error) { entryError = error; }
+    const old = session; clearSession(entryError);
     if (native) { const result = await bridge.authSignOut(); await nativeStatus(await bridge.authStatus()); return result; }
     let serverSessionRevoked = !old, refreshRevoked = !old;
     if (old?.access_token && config) {

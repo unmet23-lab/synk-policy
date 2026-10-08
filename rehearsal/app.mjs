@@ -439,6 +439,7 @@ __export(core_exports, {
   beginOAuth: () => beginOAuth,
   consumeCallback: () => consumeCallback,
   createPKCE: () => createPKCE,
+  firstPartyAuthorization: () => firstPartyAuthorization,
   isLoopback: () => isLoopback,
   publicUrl: () => publicUrl,
   readConfig: () => readConfig,
@@ -579,6 +580,19 @@ function trustedConsentRedirect(value, config, clientId) {
 function authorizationProduct(clientId, config) {
   return Object.entries(config.clients).find(([, client]) => client.clientId && client.clientId === clientId)?.[0] || config.authorizationClients.find((client) => client.clientId && client.clientId === clientId)?.product || null;
 }
+function firstPartyAuthorization(details, config) {
+  const clientId = details?.client?.id;
+  const product = typeof clientId === "string" && clientId ? authorizationProduct(clientId, config) : null;
+  if (!product) throw new Error("등록된 SYNK 서비스의 로그인 요청인지 확인하지 못했어요.");
+  const destination = trustedConsentRedirect(details.redirect_uri, config, clientId);
+  const clients = [...Object.values(config.clients), ...config.authorizationClients].filter((client) => client.clientId === clientId);
+  if (!clients.some((client) => [client.redirectUri, ...client.redirectUris || []].filter(Boolean).some((uri) => new URL(uri).href === destination)))
+    throw new Error("등록한 SYNK 서비스의 로그인 도착 주소와 달라요.");
+  const scopes = typeof details.scope === "string" ? details.scope.trim().split(/\s+/) : [];
+  if (!scopes.includes("openid") || new Set(scopes).size !== scopes.length || scopes.some((scope) => !["openid", "email", "profile"].includes(scope)))
+    throw new Error("SYNK 로그인에 필요한 기본 계정 정보만 연결할 수 있어요.");
+  return Object.freeze({ clientId, product, destination, scopes: Object.freeze(scopes) });
+}
 function scopedStorage(storage2, accountKey, revision, guard) {
   const prefix = `synk.account.${accountKey}.r${revision}.`;
   return Object.freeze(Object.fromEntries(["getItem", "setItem", "removeItem"].map((method) => [method, (key, ...args) => {
@@ -589,7 +603,7 @@ function scopedStorage(storage2, accountKey, revision, guard) {
 var PRODUCTS, nativeSchemes, isLoopback, base64url;
 var init_core = __esm({
   "experiences/synk-account/src/core.mjs"() {
-    PRODUCTS = Object.freeze({ platform: "SYNK 플랫폼", world: "SYNK WORLD", messenger: "SYNK 사내 메신저", care: "SYNK 플레저", path: "SYNK PATH", rehearsal: "중요한 대화 리허설", "family-album": "가족 이야기 앨범" });
+    PRODUCTS = Object.freeze({ platform: "SYNK 플랫폼", world: "SYNK WORLD", messenger: "SYNK 사내 메신저", care: "SYNK 플레저", path: "SYNK PATH", "path-travel": "SYNK PATH 여행", rehearsal: "중요한 대화 리허설", "family-album": "가족 이야기 앨범" });
     nativeSchemes = /* @__PURE__ */ new Set(["synktalk:", "im.synk.platform:", "im.synk.world:", "im.synk.messenger:", "im.synk.care:"]);
     isLoopback = (hostname) => ["localhost", "127.0.0.1", "[::1]"].includes(hostname);
     base64url = (bytes) => btoa(String.fromCharCode(...bytes)).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
@@ -749,7 +763,7 @@ var init_model2 = __esm({
 
 // experiences/synk-account/src/platform-library-data.mjs
 function validatePlatformLibrary(value) {
-  if (!exact(value, ["version", "consent", "favorites", "recent", "rememberRecent", "notes"]) || value.version !== 1 || typeof value.consent !== "boolean" || !ids(value.favorites) || typeof value.rememberRecent !== "boolean" || !Array.isArray(value.recent) || value.recent.length > PLATFORM_APP_IDS.length || !Array.isArray(value.notes) || value.notes.length > 60) invalid();
+  if (!exact(value, ["version", "consent", "favorites", "recent", "rememberRecent", "notes"]) || value.version !== 1 || typeof value.consent !== "boolean" || !ids(value.favorites) || typeof value.rememberRecent !== "boolean" || !Array.isArray(value.recent) || value.recent.length > PLATFORM_APP_IDS.length || !Array.isArray(value.notes) || value.notes.length > PLATFORM_NOTE_LIMIT) invalid();
   if (!value.consent && (value.favorites.length || value.recent.length || value.notes.length) || !value.rememberRecent && value.recent.length) invalid();
   const seen = /* @__PURE__ */ new Set();
   for (const row of value.recent) {
@@ -758,15 +772,16 @@ function validatePlatformLibrary(value) {
   }
   seen.clear();
   for (const row of value.notes) {
-    if (!exact(row, ["id", "appId", "title", "done", "createdAt"]) || !text2(row.id, 80) || !/^[a-zA-Z0-9-]+$/.test(row.id) || seen.has(row.id) || !PLATFORM_APP_IDS.includes(row.appId) || !text2(row.title, 240) || typeof row.done !== "boolean" || !stamp2(row.createdAt)) invalid();
+    if (!note(row) || seen.has(row.id)) invalid();
     seen.add(row.id);
   }
   return structuredClone(value);
 }
-var PLATFORM_APP_IDS, object, invalid, exact, stamp2, text2, ids;
+var PLATFORM_APP_IDS, PLATFORM_NOTE_LIMIT, object, invalid, exact, stamp2, text2, ids, note;
 var init_platform_library_data = __esm({
   "experiences/synk-account/src/platform-library-data.mjs"() {
     PLATFORM_APP_IDS = Object.freeze(["world", "messenger", "teacher", "path", "pulse", "partners", "care", "fortune", "rehearsal", "family-album"]);
+    PLATFORM_NOTE_LIMIT = 60;
     object = (value) => value && typeof value === "object" && !Array.isArray(value);
     invalid = () => {
       throw Object.assign(new TypeError("플랫폼 기록 형식을 확인해 주세요."), { code: "INVALID_PERSONAL_STATE" });
@@ -775,6 +790,7 @@ var init_platform_library_data = __esm({
     stamp2 = (value) => Number.isSafeInteger(value) && value > 0 && value <= 864e13;
     text2 = (value, limit) => typeof value === "string" && value.trim().length > 0 && value.length <= limit && !/[\x00-\x1f\x7f]/.test(value);
     ids = (value) => Array.isArray(value) && value.length <= PLATFORM_APP_IDS.length && new Set(value).size === value.length && value.every((id2) => PLATFORM_APP_IDS.includes(id2));
+    note = (row) => exact(row, ["id", "appId", "title", "done", "createdAt"]) && text2(row.id, 80) && /^[a-zA-Z0-9-]+$/.test(row.id) && PLATFORM_APP_IDS.includes(row.appId) && text2(row.title, 240) && typeof row.done === "boolean" && stamp2(row.createdAt);
   }
 });
 
@@ -1145,6 +1161,129 @@ function createBook(sessions2) {
   return html;
 }
 
+// experiences/synk-account/src/platform-entry.mjs
+var PARAM = "synk-platform-account";
+var CANCEL = "synk-platform-cancelled";
+var validId = (value) => typeof value === "string" && /^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/i.test(value);
+var mismatch = () => Object.assign(new Error("플랫폼에서 선택한 SYNK ID와 로그인 계정이 달라요. 플랫폼 계정을 확인한 뒤 다시 열어 주세요."), { code: "PLATFORM_ACCOUNT_MISMATCH" });
+function createPlatformEntry({ clientKey, getUrl, replaceUrl }) {
+  const key = `synk.platform.entry.${clientKey}`;
+  let captured = false, restored = false, invalid3 = false, cancelled = false, intent = null, storage2;
+  function capture(value) {
+    if (captured) return;
+    const url = new URL(getUrl()), params = new URLSearchParams(url.hash.slice(1));
+    if (params.get(CANCEL) === clientKey) {
+      cancelled = true;
+      captured = true;
+      return;
+    }
+    if (!params.has(PARAM)) {
+      captured = true;
+      return;
+    }
+    const values = params.getAll(PARAM), next = values.length === 1 && validId(values[0]) ? { version: 1, accountId: values[0], attempted: false } : { version: 1, invalid: true };
+    try {
+      storage2 = typeof value === "function" ? value() : value;
+      storage2.setItem(key, JSON.stringify(next));
+    } catch {
+      throw Object.assign(new Error("플랫폼의 계정 연결을 이 탭에 보관하지 못했어요. 브라우저 저장 설정을 확인한 뒤 다시 시도해 주세요."), { code: "PLATFORM_ENTRY_STORAGE", retryable: true });
+    }
+    intent = next;
+    invalid3 = next.invalid === true;
+    params.delete(PARAM);
+    url.hash = params.toString();
+    replaceUrl(url.href);
+    captured = true;
+  }
+  function persist() {
+    storage2.setItem(key, JSON.stringify(intent));
+  }
+  return {
+    capture,
+    restore(value) {
+      if (invalid3) throw mismatch();
+      if (restored) return;
+      storage2 = value;
+      const text3 = storage2.getItem(key);
+      if (text3) {
+        try {
+          if (text3.length > 1024) throw mismatch();
+          intent = JSON.parse(text3);
+        } catch {
+          throw mismatch();
+        }
+        if (intent?.version !== 1 || !validId(intent.accountId) && !(intent.cancelled === true && intent.accountId === void 0) || typeof intent.attempted !== "boolean" || intent.cancelled !== void 0 && typeof intent.cancelled !== "boolean") throw mismatch();
+        cancelled ||= intent.cancelled === true;
+      }
+      restored = true;
+    },
+    accountId: () => intent?.accountId || null,
+    assertAccount(id2) {
+      if (intent?.accountId && id2 !== intent.accountId) throw mismatch();
+    },
+    isCancelled: () => cancelled,
+    resume() {
+      if (!cancelled) return;
+      if (intent?.accountId) {
+        intent.cancelled = false;
+        intent.attempted = true;
+        persist();
+      } else {
+        storage2.removeItem(key);
+        if (storage2.getItem(key) !== null) throw mismatch();
+        intent = null;
+      }
+      const url = new URL(getUrl()), params = new URLSearchParams(url.hash.slice(1));
+      params.delete(CANCEL);
+      url.hash = params.toString();
+      replaceUrl(url.href);
+      cancelled = false;
+    },
+    beginAttempt() {
+      if (cancelled || !intent || intent.attempted) return false;
+      intent.attempted = true;
+      persist();
+      return true;
+    },
+    stop() {
+      if (intent) {
+        intent.attempted = true;
+        persist();
+      }
+    },
+    cancel() {
+      if (!intent && !cancelled && !new URLSearchParams(new URL(getUrl()).hash.slice(1)).has(PARAM)) return;
+      cancelled = true;
+      let durable = false;
+      try {
+        intent ||= { version: 1, attempted: true };
+        intent.cancelled = true;
+        intent.attempted = true;
+        persist();
+        durable = true;
+      } catch {
+      }
+      if (!durable) {
+        try {
+          storage2.removeItem(key);
+          if (storage2.getItem(key) !== null) throw mismatch();
+        } catch {
+        }
+      }
+      const url = new URL(getUrl()), params = new URLSearchParams(url.hash.slice(1));
+      params.delete(PARAM);
+      if (!durable) params.set(CANCEL, clientKey);
+      url.hash = params.toString();
+      try {
+        if (url.href !== getUrl()) replaceUrl(url.href);
+      } catch {
+        throw Object.assign(new Error("화면의 로그인은 종료했지만 자동 연결 취소를 저장하지 못했어요. 이 창을 닫아 주세요."), { code: "PLATFORM_ENTRY_STORAGE", retryable: false });
+      }
+    }
+  };
+}
+var PUBLIC = Object.freeze({ care: "https://synk.im/care/", fortune: "https://synk.im/fortune/", rehearsal: "https://synk.im/rehearsal/" });
+
 // experiences/synk-account/src/product-account.mjs
 var AUTH_ERRORS = /* @__PURE__ */ new Set(["AUTH_REQUIRED", "AUTH_SESSION_MISSING", "SESSION_REVOKED"]);
 var fault2 = (code, message, extra = {}) => Object.assign(new Error(message), { code, ...extra });
@@ -1170,12 +1309,14 @@ function createProductAccount({
   now = Date.now,
   cryptoAPI
 } = {}) {
-  if (!["care", "path", "rehearsal", "family-album"].includes(clientKey) || !["synk-care", "synk-personal"].includes(endpoint) || typeof validateState2 !== "function") throw new TypeError("제품 계정 계약을 확인해 주세요.");
+  if (!["care", "path", "path-travel", "rehearsal", "family-album"].includes(clientKey) || !["synk-care", "synk-personal"].includes(endpoint) || typeof validateState2 !== "function") throw new TypeError("제품 계정 계약을 확인해 주세요.");
   const LIMIT = (resource === "family-album" ? 32 : 4) * 1024 * 1024 + 32768;
   const SESSION_KEY = `synk.oauth.session.${clientKey}`;
   const OPERATIONS = new Set(Object.values(operations2));
   const bridgeRequest = bridge?.accountRequest || bridge?.request;
   const native = typeof bridgeRequest === "function" && typeof bridge?.authStatus === "function";
+  const platformEntry = native ? null : createPlatformEntry({ clientKey, getUrl, replaceUrl });
+  let automaticNavigations = 0;
   let snapshot = { configured: false, signedIn: false, status: "unconfigured", accountId: null, account: null, sessionGeneration: 0, error: null };
   let config, core, session = null, pendingExchange = null, epoch = 0, loginIntent = 0, disposed = false, starting, started = false, refreshing, unsubscribe, nativeIdentity = null, nativeLoad = null, nativeGeneration = -1;
   const controllers = /* @__PURE__ */ new Set();
@@ -1402,6 +1543,7 @@ function createProductAccount({
   }
   async function begin() {
     const expected = epoch;
+    platformEntry?.capture(storage2);
     if (native) {
       const environment = await bridge.getEnvironment();
       guard(expected);
@@ -1446,8 +1588,15 @@ function createProductAccount({
       return emit({ configured: false, status: "unconfigured", error: null });
     }
     emit({ configured: true, status: "restoring", error: null });
+    platformEntry.restore(storage2);
+    if (platformEntry.isCancelled()) {
+      session = null;
+      pendingExchange = null;
+      return emit({ signedIn: false, status: "signed-out", accountId: null, account: null, error: null });
+    }
     const url = new URL(getUrl());
     if (url.searchParams.has("code") || url.searchParams.has("error")) {
+      platformEntry.stop();
       try {
         pendingExchange = { fields: core.consumeCallback({ config, product: clientKey, url: url.href, storage: storage2, now: now() }), configKey: binding() };
       } finally {
@@ -1475,11 +1624,34 @@ function createProductAccount({
         session = null;
       }
     }
-    if (!session) return emit({ signedIn: false, status: "signed-out", accountId: null, account: null, error: null });
+    if (!session) return await automaticSignIn(expected) || emit({ signedIn: false, status: "signed-out", accountId: null, account: null, error: null });
     emit({ status: "restoring" });
-    const data = await dispatch(operations2.load, {}, expected, null);
-    guard(expected);
+    let data;
+    try {
+      data = await dispatch(operations2.load, {}, expected, platformEntry.accountId());
+      guard(expected);
+    } catch (error2) {
+      guard(expected);
+      if (!platformEntry.accountId() || ![...AUTH_ERRORS, "ACCOUNT_CHANGED"].includes(error2.code)) throw error2;
+      session = null;
+      storage2.removeItem(SESSION_KEY);
+      const redirected = await automaticSignIn(expected);
+      if (redirected) return redirected;
+      platformEntry.assertAccount(null);
+      throw error2;
+    }
+    platformEntry.assertAccount(data.accountId);
+    platformEntry.stop();
     return emit({ signedIn: true, status: "signed-in", accountId: data.accountId, account: { synk_user_id: data.accountId, display_name: "" }, error: null });
+  }
+  async function automaticSignIn(expected) {
+    if (!platformEntry.beginAttempt()) return null;
+    emit({ signedIn: false, accountId: null, account: null, status: "signing-in", error: null });
+    const url = await core.beginOAuth({ config, product: clientKey, storage: storage2, now: now(), cryptoAPI });
+    guard(expected);
+    automaticNavigations++;
+    navigate(url);
+    return status();
   }
   async function start() {
     if (disposed) throw fault2("ACCOUNT_CHANGED", "계정 연결이 종료됐어요.");
@@ -1503,9 +1675,10 @@ function createProductAccount({
   }
   async function signIn() {
     const intent = ++loginIntent;
+    const before = automaticNavigations;
     await start();
     if (disposed || intent !== loginIntent) throw fault2("ACCOUNT_CHANGED", "계정 연결이 바뀌었어요.");
-    if (snapshot.signedIn) return status();
+    if (snapshot.signedIn || automaticNavigations !== before) return status();
     if (native && snapshot.error?.retryable) {
       let result;
       try {
@@ -1532,6 +1705,7 @@ function createProductAccount({
       return nativeStatus(result);
     }
     const expected = epoch;
+    platformEntry.resume();
     const url = await core.beginOAuth({ config, product: clientKey, storage: storage2, now: now(), cryptoAPI });
     guard(expected);
     if (intent !== loginIntent) throw fault2("ACCOUNT_CHANGED", "계정 연결이 바뀌었어요.");
@@ -1541,8 +1715,14 @@ function createProductAccount({
   }
   async function signOut() {
     loginIntent++;
+    let entryError;
+    try {
+      platformEntry?.cancel();
+    } catch (error2) {
+      entryError = error2;
+    }
     const old = session;
-    clearSession();
+    clearSession(entryError);
     if (native) {
       const result = await bridge.authSignOut();
       await nativeStatus(await bridge.authStatus());
@@ -1662,7 +1842,7 @@ function createDocumentSync({ transport, storage: storage2, onState = () => {
 }, onStatus = () => {
 }, onSaved = () => {
 }, onRemoved = () => {
-}, validateState: validateState2, emptyState, requiresConflictReview = () => false, scope, resource = null, cachePrefix, operations: operations2 = { load: "careLoad", save: "careSave", delete: "careDelete" } }) {
+}, validateState: validateState2, emptyState, requiresConflictReview = () => false, preferRemoteOnOpen = false, scope, resource = null, cachePrefix, operations: operations2 = { load: "careLoad", save: "careSave", delete: "careDelete" } }) {
   if (typeof validateState2 !== "function" || typeof emptyState !== "function" || typeof requiresConflictReview !== "function" || !scope || !cachePrefix) throw new TypeError("제품 기록 계약이 필요해요.");
   const clone = (value) => validateState2(value);
   const PREFIX = cachePrefix;
@@ -1950,6 +2130,16 @@ function createDocumentSync({ transport, storage: storage2, onState = () => {
     const before = context.sequence;
     emit(context, "loading");
     const remote = await request(context, operations2.load);
+    if (mode === "remote" && before !== context.sequence) {
+      context.conflict = true;
+      persist(context);
+      emit(context, "conflict", failure("LOCAL_CHANGED_DURING_REFRESH"));
+      return false;
+    }
+    if (mode === "remote" && context.pending && !persist(context)) {
+      emit(context, "storage-error", failure("LOCAL_STORAGE_UNAVAILABLE"));
+      return false;
+    }
     context.known = true;
     context.revision = remote.revision;
     if (context.localChoice && mode !== "remote") {
@@ -1965,12 +2155,6 @@ function createDocumentSync({ transport, storage: storage2, onState = () => {
       context.conflict = false;
       persist(context);
       return true;
-    }
-    if (mode === "remote" && before !== context.sequence) {
-      context.conflict = true;
-      persist(context);
-      emit(context, "conflict", failure("LOCAL_CHANGED_DURING_REFRESH"));
-      return false;
     }
     if (mode !== "remote" && context.pending) {
       if (context.baseRevision === null && remote.empty && remote.revision === 0) context.baseRevision = 0;
@@ -2070,7 +2254,7 @@ function createDocumentSync({ transport, storage: storage2, onState = () => {
     try {
       const choices = draftGroups(context, true);
       context.invalidCache = [...records.values()].some((record3) => record3.corrupt && record3.accountId === accountId);
-      if (choices.length) context.localChoice = true;
+      if (choices.length && !preferRemoteOnOpen) context.localChoice = true;
     } catch {
       context.storageError = true;
       emit(context, "storage-error");
@@ -2124,7 +2308,13 @@ function createDocumentSync({ transport, storage: storage2, onState = () => {
   function resolveRemote() {
     const context = active;
     stopTimer(context);
-    return enqueue(context, () => load(context, "remote"));
+    return enqueue(context, () => {
+      if (context.pending && !persist(context)) {
+        emit(context, "storage-error", failure("LOCAL_STORAGE_UNAVAILABLE"));
+        return false;
+      }
+      return load(context, "remote");
+    });
   }
   function resolveLocal() {
     const context = active;
@@ -2209,7 +2399,7 @@ function createDocumentSync({ transport, storage: storage2, onState = () => {
 init_personal_data();
 var operations = Object.freeze({ load: "personalLoad", save: "personalSave", delete: "personalDelete" });
 var copy = (value) => structuredClone(value);
-var labels = { loading: "계정 기록 불러오는 중", saving: "계정에 저장 중", synced: "계정에 저장했어요", idle: "계정 저장 대기 중", conflict: "다른 기기의 변경을 확인해 주세요", "local-conflict": "이 기기의 미저장 기록을 골라 주세요", offline: "연결을 기다리고 있어요", error: "계정 기록 확인 필요", "storage-error": "기기 임시 저장 확인 필요" };
+var labels = { loading: "계정 기록 불러오는 중", saving: "계정에 저장하고 있어요", synced: "계정에 저장했어요", idle: "계정 저장 대기 중", conflict: "다른 기기의 변경을 확인해 주세요", "local-conflict": "이 기기의 미저장 기록을 골라 주세요", offline: "연결을 기다리고 있어요", error: "계정 기록 확인 필요", "storage-error": "기기 임시 저장 확인 필요" };
 function createAccountNotebook({
   resource,
   mount,
@@ -2232,23 +2422,27 @@ function createAccountNotebook({
   },
   pendingDescription = "",
   deleteLabel = "",
+  signOutLabel = "로그아웃",
   deleteConfirmation = "이 계정의 앨범 전체와 보관한 사진·음성 원본을 삭제할까요? 다른 기기에서도 다시 불러올 수 없어요. 보관할 앨범은 먼저 파일로 내보내 주세요.",
   bridge = globalThis.synkPersonalAccount,
   accountFactory = createProductAccount,
   syncFactory = createDocumentSync,
+  preferRemoteOnOpen = false,
   storage: storage2 = { getItem: (key) => globalThis.localStorage.getItem(key), setItem: (key, value) => globalThis.localStorage.setItem(key, value), removeItem: (key) => globalThis.localStorage.removeItem(key), key: (index) => globalThis.localStorage.key(index), get length() {
     return globalThis.localStorage.length;
   } }
 } = {}) {
   if (!mount || !getState || !applyState || !emptyDocument) throw new TypeError("계정 기록 화면 계약이 필요해요.");
   const validateState2 = (value) => validatePersonalState(resource, value);
-  let account, sync, owner = null, ownerAccountId = null, generation = 0, stateVersion = 0, conversionVersion = 0, deletionVersion = 0, guest = null, authPaused = false;
+  let account, sync, owner = null, ownerAccountId = null, generation = 0, stateVersion = 0, conversionVersion = 0, deletionVersion = 0, guest = null, authPaused = false, reading = null;
   let auth = { status: "unconfigured", configured: false }, saved = { status: "closed", pending: false };
   let closed = false, switching = false, hydrating = false, converting = false, deleting = false, unsent = null, problem = "", suspended = false, hydrationFailure = null, incomingDocument = null;
   let pageSuspended = false, reconnecting = false, resumePromise = null, resumeVersion = 0, resumeMessage = "", contentWasHidden = false, contentConcealed = false;
   mount.classList.add("account-notebook");
   mount.innerHTML = '<div class="notebook-heading"><div><p class="notebook-eyebrow">SYNK ID</p><h2>내 계정으로 이어가기</h2></div><strong data-notebook-status role="status" aria-live="polite"></strong></div><p data-notebook-detail></p><p class="notebook-description"></p><div class="notebook-actions"><button type="button" data-notebook="signin">SYNK ID로 로그인</button><button type="button" data-notebook="refresh" hidden>다시 불러오기</button><button type="button" data-notebook="retry" hidden>저장 다시 시도</button><button type="button" data-notebook="import" hidden>기기 기록을 계정으로 옮기기</button><button type="button" data-notebook="signout" hidden>로그아웃</button></div><div class="notebook-conflict" hidden><p>서로 다른 기록을 자동으로 합치지 않아요. 사용할 기록을 직접 골라 주세요.</p><button type="button" data-notebook="remote">계정의 기록 사용</button><button type="button" data-notebook="local">이 화면의 기록으로 저장</button></div>';
   mount.querySelector(".notebook-description").textContent = description;
+  mount.querySelector('[data-notebook="signout"]').textContent = signOutLabel;
+  if (preferRemoteOnOpen) mount.querySelector('[data-notebook="remote"]').textContent = "미저장 기록 남기고 계정 기록 열기";
   const pendingNote = document.createElement("p");
   pendingNote.className = "notebook-description";
   pendingNote.dataset.notebookPending = "";
@@ -2279,11 +2473,14 @@ function createAccountNotebook({
   draftChoices.hidden = true;
   mount.append(draftChoices);
   const element = (name) => mount.querySelector(`[data-notebook="${name}"]`);
+  const isReading = () => saved.status === "loading" || reading?.generation === generation;
   function paint() {
     const active = !!owner, pending2 = saved.pending || converting || !!unsent, authPending = active && !auth.signedIn;
+    const saveInProgress = active && pending2 && !authPending && !suspended && !problem && !hydrationFailure && !saved.error && (converting || ["idle", "saving"].includes(saved.status));
     const local = saved.localRecords || { count: 0, pending: 0, corrupt: 0 };
     const missingPendingMedia = hydrationFailure && saved.pending && ["ASSET_NOT_FOUND", "ASSET_NOT_CONFIRMED"].includes(hydrationFailure.code);
-    const working = deleting || hydrating || switching || reconnecting || active && !suspended && saved.status === "loading" && !pending2;
+    const loading = active && !suspended && isReading();
+    const working = deleting || hydrating || switching || reconnecting || loading;
     if (content) {
       content.inert = pageSuspended || working || suspended || saved.status === "local-conflict";
       content.setAttribute("aria-busy", String(working));
@@ -2293,15 +2490,15 @@ function createAccountNotebook({
       else if (contentConcealed) content.hidden = contentWasHidden;
       contentConcealed = conceal;
     }
-    mount.querySelector("[data-notebook-status]").textContent = deleting ? "계정 기록 삭제 중" : authPending ? "로그인 다시 확인 필요" : suspended ? problem ? "기록을 다시 불러와 주세요" : "로그인 다시 확인 중" : converting ? "원본을 계정에 보관 중" : hydrating ? "보관한 원본을 불러오는 중" : active ? problem ? labels.error : labels[saved.status] || "계정 기록 연결 중" : auth.status === "unconfigured" ? "이 기기에서 사용 중" : ["restoring", "signing-in"].includes(auth.status) ? "로그인 확인 중" : "로그인 전";
-    mount.querySelector("[data-notebook-detail]").textContent = problem || auth.error?.message || saved.error?.message || (active ? pending2 ? "아직 계정 저장을 마치지 못했어요. 연결이 돌아오면 다시 시도할 수 있어요." : "로그인한 계정에 저장해요. 다른 기기에서는 다시 불러오기로 최신 기록을 확인하세요." : auth.status === "unconfigured" ? "이 실행 환경의 계정 연결 설정을 준비하고 있어요. 기기 기록은 계속 사용할 수 있어요." : "SYNK ID 하나로 로그인해요. 로그인 전의 기기 기록은 직접 옮길 때만 계정에 저장해요.");
+    mount.querySelector("[data-notebook-status]").textContent = deleting ? "계정 기록 삭제 중" : authPending ? "로그인 다시 확인 필요" : suspended ? problem ? "기록을 다시 불러와 주세요" : "로그인 다시 확인 중" : converting ? "원본을 계정에 보관 중" : hydrating ? "보관한 원본을 불러오는 중" : active ? loading ? labels.loading : problem ? labels.error : saveInProgress ? labels.saving : labels[saved.status] || "계정 기록 연결 중" : auth.status === "unconfigured" ? "이 기기에서 사용 중" : ["restoring", "signing-in"].includes(auth.status) ? "로그인 확인 중" : "로그인 전";
+    mount.querySelector("[data-notebook-detail]").textContent = problem || auth.error?.message || saved.error?.message || (active ? loading ? "계정 기록을 불러오고 있어요. 잠시만 기다려 주세요." : saveInProgress ? "계정에 저장하고 있어요. 저장이 끝나면 알려 드려요." : pending2 ? "아직 계정 저장을 마치지 못했어요. 연결이 돌아오면 다시 시도할 수 있어요." : "로그인한 계정에 저장해요. 다른 기기에서는 다시 불러오기로 최신 기록을 확인하세요." : auth.status === "unconfigured" ? "이 실행 환경의 계정 연결 설정을 준비하고 있어요. 기기 기록은 계속 사용할 수 있어요." : "SYNK ID 하나로 로그인해요. 로그인 전의 기기 기록은 직접 옮길 때만 계정에 저장해요.");
     if (missingPendingMedia) mount.querySelector("[data-notebook-detail]").textContent = "미저장 앨범에 필요한 원본을 찾지 못했어요. 파일이 있는 기기나 내보낸 앨범에서 다시 저장하거나, 미저장 기록을 기기에 남기고 마지막 계정 저장본을 열 수 있어요.";
     if (deleting) mount.querySelector("[data-notebook-detail]").textContent = "계정의 삭제 결과를 확인하고 있어요. 결과가 확인될 때까지 새 기록을 입력할 수 없어요.";
     if (authPending) mount.querySelector("[data-notebook-detail]").textContent = auth.error?.message || "현재 기록을 유지하고 있어요. 계정 연결을 다시 확인해 주세요.";
     pendingNote.hidden = !active || !pending2 || !pendingDescription;
     const localNoticeCode = saved.warning?.code || (local.corrupt ? "INVALID_LOCAL_CACHE" : null);
     localNote.hidden = !local.count && !local.unknown && !saved.warning || !local.unknown && !!localNoticeCode && saved.error?.code === localNoticeCode;
-    localNote.textContent = (saved.warning?.message || (local.corrupt ? "읽지 못한 이 계정의 임시기록 원본을 보존했어요. 복구 파일로 내보낸 뒤 직접 지울 수 있어요." : active ? "계정에 보내지 못한 변경만 이 기기에 임시 보관해요. 저장이 끝나면 기기 사본을 지워요." : `미저장 계정 임시기록 ${local.count}개가 이 기기에 남아 있어요. 기록을 남긴 계정으로 로그인하면 이어 사용할 기록을 고르거나 복구 파일로 내보내고 지울 수 있어요.`)) + (local.unknown ? " 계정을 확인할 수 없는 손상 원본은 그대로 보존하며 이 화면에서 내보내거나 지우지 않아요." : "");
+    localNote.textContent = (saved.warning?.message || (local.corrupt ? "읽지 못한 이 계정의 임시기록 원본을 보존했어요. 복구 파일로 내보낸 뒤 직접 지울 수 있어요." : active ? preferRemoteOnOpen && !pending2 && saved.localDrafts?.length ? "계정 기록을 열었어요. 이전 미저장 기록은 이 기기에 따로 보관했으며 필요할 때 아래에서 열 수 있어요." : "계정에 보내지 못한 변경만 이 기기에 임시 보관해요. 저장이 끝나면 기기 사본을 지워요." : `미저장 계정 임시기록 ${local.count}개가 이 기기에 남아 있어요. 기록을 남긴 계정으로 로그인하면 이어 사용할 기록을 고르거나 복구 파일로 내보내고 지울 수 있어요.`)) + (local.unknown ? " 계정을 확인할 수 없는 손상 원본은 그대로 보존하며 이 화면에서 내보내거나 지우지 않아요." : "");
     element("export-local").hidden = !active || authPending || !local.exportable;
     element("export-local").disabled = !active || authPending || pageSuspended;
     element("clear-local").hidden = !active || !local.exportable;
@@ -2315,7 +2512,7 @@ function createAccountNotebook({
     element("signin").textContent = retryConnection ? "계정 연결 다시 확인" : "SYNK ID로 로그인";
     element("signin").disabled = !auth.configured && !retryConnection || ["restoring", "signing-in"].includes(auth.status);
     for (const action of ["refresh", "import", "signout"]) element(action).hidden = !active;
-    element("retry").hidden = !active || !pending2 && !hydrationFailure && !["offline", "error", "storage-error"].includes(saved.status);
+    element("retry").hidden = !active || saveInProgress || !pending2 && !hydrationFailure && !["offline", "error", "storage-error"].includes(saved.status);
     element("import").disabled = working || converting || authPending || !guest;
     element("refresh").disabled = working || converting || authPending;
     element("retry").disabled = working || converting || authPending;
@@ -2325,9 +2522,9 @@ function createAccountNotebook({
     draftChoices.hidden = !active || !(saved.localDrafts?.length > 0 || saved.status === "local-conflict");
     draftChoices.replaceChildren();
     if (!draftChoices.hidden) {
-      const note = document.createElement("p");
-      note.textContent = "여러 탭이나 이전 사용의 미저장 기록이 있어요. 열 기록을 골라 주세요. 선택하지 않은 기록은 보존돼요.";
-      draftChoices.append(note);
+      const note2 = document.createElement("p");
+      note2.textContent = preferRemoteOnOpen ? "별도로 보관한 미저장 기록이에요. 필요할 때만 열어 보세요. 지금 계정 기록은 계속 사용할 수 있어요." : "여러 탭이나 이전 사용의 미저장 기록이 있어요. 열 기록을 골라 주세요. 선택하지 않은 기록은 보존돼요.";
+      draftChoices.append(note2);
       for (const [index, draft] of (saved.localDrafts || []).entries()) {
         const button2 = document.createElement("button");
         button2.type = "button";
@@ -2482,14 +2679,27 @@ function createAccountNotebook({
     emptyState: emptyDocument,
     scope: "synk-personal",
     resource,
+    preferRemoteOnOpen,
     cachePrefix: `synk.personal.${resource}.v1.`,
     operations,
     transport: async (operation, values) => {
       if (pageSuspended || authPaused || !auth.signedIn) throw Object.assign(new Error("계정 연결을 다시 확인한 뒤 기록을 저장해 주세요. 현재 기록은 유지하고 있어요."), { code: "AUTH_RESTORING" });
-      const expected = generation, inputVersion = conversionVersion, response = await account.request(operation, values);
-      if (expected !== generation) throw Object.assign(new Error("로그인 연결이 바뀌어 이전 요청 결과를 적용하지 않았어요. 다시 시도해 주세요."), { code: "AUTH_RESTORING" });
-      if (operation === operations.load && inputVersion !== conversionVersion) throw Object.assign(new Error("가져오는 동안 새로 수정한 내용이 있어요. 현재 입력을 유지하고 기록을 다시 골라 주세요."), { code: "LOCAL_CHANGED_DURING_REFRESH" });
-      return response;
+      const expected = generation, inputVersion = conversionVersion, read = operation === operations.load ? { generation: expected } : null;
+      if (read) {
+        reading = read;
+        paint();
+      }
+      try {
+        const response = await account.request(operation, values);
+        if (expected !== generation) throw Object.assign(new Error("로그인 연결이 바뀌어 이전 요청 결과를 적용하지 않았어요. 다시 시도해 주세요."), { code: "AUTH_RESTORING" });
+        if (operation === operations.load && inputVersion !== conversionVersion) throw Object.assign(new Error("가져오는 동안 새로 수정한 내용이 있어요. 현재 입력을 유지하고 기록을 다시 골라 주세요."), { code: "LOCAL_CHANGED_DURING_REFRESH" });
+        return response;
+      } finally {
+        if (read && reading === read) {
+          reading = null;
+          paint();
+        }
+      }
     },
     storage: storage2,
     onState: receive,
@@ -2607,8 +2817,9 @@ function createAccountNotebook({
       else if (action === "import" && guest && beforeNavigate() && globalThis.confirm("로그인 전 이 기기의 기록으로 현재 계정 기록을 바꿀까요? 보관할 계정 기록은 먼저 내보내 주세요.")) {
         applyState(copy(guest), { guest: false });
         await change(guest);
-      } else if (action === "remote" && beforeNavigate() && globalThis.confirm("이 화면의 미저장 변경을 버리고 계정 기록을 불러올까요?")) {
-        await sync.resolveRemote();
+      } else if (action === "remote") {
+        if (preferRemoteOnOpen && (unsent || converting)) problem = "아직 기기에 보관하지 못한 입력이 있어 계정 기록으로 바꾸지 않았어요. 저장 다시 시도 후 열어 주세요.";
+        else if (beforeNavigate() && (preferRemoteOnOpen || globalThis.confirm("이 화면의 미저장 변경을 버리고 계정 기록을 불러올까요?"))) await sync.resolveRemote();
       } else if (action === "recover" && hydrationFailure && saved.pending && ["ASSET_NOT_FOUND", "ASSET_NOT_CONFIRMED"].includes(hydrationFailure.code) && globalThis.confirm("미저장 기록은 복구용으로 이 기기에 남겨 두고 마지막 계정 저장본을 열까요? 현재 화면은 저장본으로 바뀌어요. 남긴 기록은 이 계정으로 로그인한 상태에서 직접 지울 수 있어요.")) {
         hydrationFailure = null;
         unsent = null;
@@ -2740,10 +2951,10 @@ function createAccountNotebook({
     // App-owned dialogs can live outside content. They must honor the same
     // account lock before replacing their own in-memory document.
     get canEdit() {
-      return !!owner && !closed && !authPaused && !pageSuspended && !suspended && !deleting && !hydrating && !switching && !reconnecting && saved.status !== "local-conflict" && (saved.status !== "loading" || !!(saved.pending || converting || unsent));
+      return !!owner && !closed && !authPaused && !pageSuspended && !suspended && !deleting && !hydrating && !switching && !reconnecting && !isReading() && saved.status !== "local-conflict";
     },
     get status() {
-      return { ...saved, active: !!owner, hydrating, converting, deleting, error: problem };
+      return { ...saved, status: isReading() ? "loading" : saved.status, active: !!owner, hydrating, converting, deleting, error: problem };
     },
     dispose() {
       closed = true;

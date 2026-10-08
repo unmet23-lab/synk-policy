@@ -12,7 +12,7 @@ const errors = {
 const errorMessage = error => errors[error?.code] || (error?.name === 'NotAllowedError' ? '알림 권한을 받지 못했어요. 브라우저의 사이트 설정에서 허용한 뒤 다시 확인해 주세요.' : '알림 서버에 연결하지 못했어요. 잠시 뒤 다시 확인해 주세요.');
 
 export function pushCapability(env = globalThis) {
-  if (env.synkProduct?.authStatus) return { supported: false, phase: 'unsupported', message: '이 앱의 알림은 웹 브라우저에서 설정해 주세요. 아래의 브라우저에서 열기를 이용할 수 있어요.' };
+  if (env.synkProduct?.authStatus) return { supported: false, phase: 'unsupported', message: '이 앱의 알림은 웹 브라우저에서 설정해 주세요. 알림 설정을 닫고 브라우저에서 열기를 눌러 주세요.' };
   const nav = env.navigator, standalone = nav?.standalone === true || env.matchMedia?.('(display-mode: standalone)')?.matches === true;
   const ios = /iPad|iPhone|iPod/.test(nav?.userAgent || '') || nav?.platform === 'MacIntel' && nav?.maxTouchPoints > 1;
   if (ios && !standalone) return { supported: false, phase: 'needs-install', message: 'iPhone·iPad에서는 Safari의 공유 메뉴 → 홈 화면에 추가를 누른 뒤, 홈 화면의 플레저에서 알림을 켜 주세요.' };
@@ -60,7 +60,7 @@ export function createCarePush({ request, onState = () => {}, env = globalThis, 
   const current = expected => expected === epoch && !!owner && !suspended;
   const guard = expected => { if (!current(expected)) throw Object.assign(new Error('계정이 바뀌었어요.'), { code: 'ACCOUNT_CHANGED' }); };
   const call = async (action, body, expected) => { guard(expected); const result = await request(action, body); guard(expected); if (result?.ok !== true) throw new Error('알림 서버 응답을 확인하지 못했어요.'); return result; };
-  const closeNotifications = async reg => { try { for (const item of await reg?.getNotifications?.({ tag: 'synk-care-daily' }) || []) item.close(); } catch { /* Notification display cleanup is best effort. */ } };
+  const closeNotifications = async reg => { try { for (const item of await bounded(reg?.getNotifications?.({ tag: 'synk-care-daily' })) || []) item.close(); } catch { /* Notification display cleanup is best effort and must not block unsubscribe or the next account. */ } };
   async function removeLocal(sub, reg = registration) {
     let removed = !sub;
     if (sub) { try { removed = await bounded(sub.unsubscribe()); } catch { removed = false; } }
@@ -111,7 +111,7 @@ export function createCarePush({ request, onState = () => {}, env = globalThis, 
     const pending = (async () => {
       try {
         registration = await getReadyRegistration(expected); guard(expected);
-        const candidate = await registration.pushManager.getSubscription(); guard(expected);
+        const candidate = await bounded(registration.pushManager.getSubscription()); guard(expected);
         subscription = candidate;
         const result = await call('status', candidate ? { endpoint: candidate.endpoint } : {}, expected);
         publicKey = decodePushKey(result.publicKey, env.atob || globalThis.atob);

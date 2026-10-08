@@ -5,7 +5,7 @@
   "sourceFiles": [
     {
       "file": "experiences/relationship-care/index.html",
-      "sha256": "0f93a6f51eaeb3d32fa69aabf0a3b80705df35f0aae922a1e01cb1dab254f720"
+      "sha256": "724abcf8910071c39b8cf50c68fa599635f2937383f8427dc5ebd2f65ba6cb60"
     },
     {
       "file": "experiences/relationship-care/style.css",
@@ -49,7 +49,7 @@
     },
     {
       "file": "experiences/relationship-care/care-push.mjs",
-      "sha256": "074db50c878aa3609b476b0edaa6a6a1621553d2b334b80b276db372f4d30728"
+      "sha256": "cd57b5b7c009f367151b64c5e200a6123a3c3a708c534fab5cb58fa201d2e08e"
     },
     {
       "file": "experiences/relationship-care/care-sw.js",
@@ -181,22 +181,26 @@
     },
     {
       "file": "experiences/synk-account/src/core.mjs",
-      "sha256": "7bea11ec944ef594ef68d702dcaa9b3529769e5e600f2fb022dd1d7e7b9dbc4f"
+      "sha256": "29831d6b22d18b613451b78660fc2b22af67a0160f7b08a6f84eafcf6ddf6e9f"
+    },
+    {
+      "file": "experiences/synk-account/src/platform-entry.mjs",
+      "sha256": "ca235034e3e1aa1a079570e6092d8393ef6d631b57cf277e14d9ef4c85dc8833"
     },
     {
       "file": "experiences/synk-account/src/product-account.mjs",
-      "sha256": "993ca1f0f44ac24075727babcf72b9dad2b797d48fcfa20e45edb20748053e87"
+      "sha256": "1eb245e91e60d4307f51977154387b2fbce7f8c130ca9236ed384e6e6db275c2"
     },
     {
       "file": "experiences/synk-account/src/document-sync.mjs",
-      "sha256": "079008faf2dcf73439496a9f9c03733ab5b76904be9d17b264002fc9c26bb655"
+      "sha256": "8ad52f8b8b9b6654dbffcaa7d47397ed4cc450a7fd684ffca468b5ec1c2dd710"
     }
   ],
   "files": [
     {
       "name": "index.html",
-      "bytes": 51609,
-      "sha256": "a0c47d13eea7be2102ab12ac1b153ed46526e2a7ebf72210dbb6b7cedbc2a392"
+      "bytes": 51780,
+      "sha256": "649433e3570b16583546a03e61a6f6b8f5af0fb08c046ae2e92b21bb905b9a0f"
     },
     {
       "name": "style.css",
@@ -250,8 +254,8 @@
     },
     {
       "name": "care-push.mjs",
-      "bytes": 20765,
-      "sha256": "074db50c878aa3609b476b0edaa6a6a1621553d2b334b80b276db372f4d30728"
+      "bytes": 20841,
+      "sha256": "cd57b5b7c009f367151b64c5e200a6123a3c3a708c534fab5cb58fa201d2e08e"
     },
     {
       "name": "care-sw.js",
@@ -415,18 +419,23 @@
     },
     {
       "name": "vendor/account/core.mjs",
-      "bytes": 10411,
-      "sha256": "7bea11ec944ef594ef68d702dcaa9b3529769e5e600f2fb022dd1d7e7b9dbc4f"
+      "bytes": 11655,
+      "sha256": "29831d6b22d18b613451b78660fc2b22af67a0160f7b08a6f84eafcf6ddf6e9f"
+    },
+    {
+      "name": "vendor/account/platform-entry.mjs",
+      "bytes": 6034,
+      "sha256": "ca235034e3e1aa1a079570e6092d8393ef6d631b57cf277e14d9ef4c85dc8833"
     },
     {
       "name": "vendor/account/product-account.mjs",
-      "bytes": 29673,
-      "sha256": "993ca1f0f44ac24075727babcf72b9dad2b797d48fcfa20e45edb20748053e87"
+      "bytes": 31221,
+      "sha256": "1eb245e91e60d4307f51977154387b2fbce7f8c130ca9236ed384e6e6db275c2"
     },
     {
       "name": "vendor/account/document-sync.mjs",
-      "bytes": 27753,
-      "sha256": "079008faf2dcf73439496a9f9c03733ab5b76904be9d17b264002fc9c26bb655"
+      "bytes": 28443,
+      "sha256": "8ad52f8b8b9b6654dbffcaa7d47397ed4cc450a7fd684ffca468b5ec1c2dd710"
     },
     {
       "name": "config.json",

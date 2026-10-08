@@ -12337,7 +12337,7 @@ function getSajuGuide(result) {
 }
 
 // experiences/synk-account/src/core.mjs
-var PRODUCTS = Object.freeze({ platform: "SYNK 플랫폼", world: "SYNK WORLD", messenger: "SYNK 사내 메신저", care: "SYNK 플레저", path: "SYNK PATH", rehearsal: "중요한 대화 리허설", "family-album": "가족 이야기 앨범" });
+var PRODUCTS = Object.freeze({ platform: "SYNK 플랫폼", world: "SYNK WORLD", messenger: "SYNK 사내 메신저", care: "SYNK 플레저", path: "SYNK PATH", "path-travel": "SYNK PATH 여행", rehearsal: "중요한 대화 리허설", "family-album": "가족 이야기 앨범" });
 var nativeSchemes = /* @__PURE__ */ new Set(["synktalk:", "im.synk.platform:", "im.synk.world:", "im.synk.messenger:", "im.synk.care:"]);
 function callbackUrl(value) {
   const url = new URL(value);
@@ -12535,6 +12535,129 @@ function saveReading(state, result, { note = "", completed = false, now = (/* @_
   return validateState({ ...state, entries: [entry, ...state.entries.filter((item) => item.id !== entry.id)] });
 }
 
+// experiences/synk-account/src/platform-entry.mjs
+var PARAM = "synk-platform-account";
+var CANCEL = "synk-platform-cancelled";
+var validId = (value) => typeof value === "string" && /^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/i.test(value);
+var mismatch = () => Object.assign(new Error("플랫폼에서 선택한 SYNK ID와 로그인 계정이 달라요. 플랫폼 계정을 확인한 뒤 다시 열어 주세요."), { code: "PLATFORM_ACCOUNT_MISMATCH" });
+function createPlatformEntry({ clientKey, getUrl, replaceUrl }) {
+  const key = `synk.platform.entry.${clientKey}`;
+  let captured = false, restored = false, invalid = false, cancelled = false, intent = null, storage;
+  function capture(value) {
+    if (captured) return;
+    const url = new URL(getUrl()), params = new URLSearchParams(url.hash.slice(1));
+    if (params.get(CANCEL) === clientKey) {
+      cancelled = true;
+      captured = true;
+      return;
+    }
+    if (!params.has(PARAM)) {
+      captured = true;
+      return;
+    }
+    const values = params.getAll(PARAM), next = values.length === 1 && validId(values[0]) ? { version: 1, accountId: values[0], attempted: false } : { version: 1, invalid: true };
+    try {
+      storage = typeof value === "function" ? value() : value;
+      storage.setItem(key, JSON.stringify(next));
+    } catch {
+      throw Object.assign(new Error("플랫폼의 계정 연결을 이 탭에 보관하지 못했어요. 브라우저 저장 설정을 확인한 뒤 다시 시도해 주세요."), { code: "PLATFORM_ENTRY_STORAGE", retryable: true });
+    }
+    intent = next;
+    invalid = next.invalid === true;
+    params.delete(PARAM);
+    url.hash = params.toString();
+    replaceUrl(url.href);
+    captured = true;
+  }
+  function persist() {
+    storage.setItem(key, JSON.stringify(intent));
+  }
+  return {
+    capture,
+    restore(value) {
+      if (invalid) throw mismatch();
+      if (restored) return;
+      storage = value;
+      const text = storage.getItem(key);
+      if (text) {
+        try {
+          if (text.length > 1024) throw mismatch();
+          intent = JSON.parse(text);
+        } catch {
+          throw mismatch();
+        }
+        if (intent?.version !== 1 || !validId(intent.accountId) && !(intent.cancelled === true && intent.accountId === void 0) || typeof intent.attempted !== "boolean" || intent.cancelled !== void 0 && typeof intent.cancelled !== "boolean") throw mismatch();
+        cancelled ||= intent.cancelled === true;
+      }
+      restored = true;
+    },
+    accountId: () => intent?.accountId || null,
+    assertAccount(id) {
+      if (intent?.accountId && id !== intent.accountId) throw mismatch();
+    },
+    isCancelled: () => cancelled,
+    resume() {
+      if (!cancelled) return;
+      if (intent?.accountId) {
+        intent.cancelled = false;
+        intent.attempted = true;
+        persist();
+      } else {
+        storage.removeItem(key);
+        if (storage.getItem(key) !== null) throw mismatch();
+        intent = null;
+      }
+      const url = new URL(getUrl()), params = new URLSearchParams(url.hash.slice(1));
+      params.delete(CANCEL);
+      url.hash = params.toString();
+      replaceUrl(url.href);
+      cancelled = false;
+    },
+    beginAttempt() {
+      if (cancelled || !intent || intent.attempted) return false;
+      intent.attempted = true;
+      persist();
+      return true;
+    },
+    stop() {
+      if (intent) {
+        intent.attempted = true;
+        persist();
+      }
+    },
+    cancel() {
+      if (!intent && !cancelled && !new URLSearchParams(new URL(getUrl()).hash.slice(1)).has(PARAM)) return;
+      cancelled = true;
+      let durable = false;
+      try {
+        intent ||= { version: 1, attempted: true };
+        intent.cancelled = true;
+        intent.attempted = true;
+        persist();
+        durable = true;
+      } catch {
+      }
+      if (!durable) {
+        try {
+          storage.removeItem(key);
+          if (storage.getItem(key) !== null) throw mismatch();
+        } catch {
+        }
+      }
+      const url = new URL(getUrl()), params = new URLSearchParams(url.hash.slice(1));
+      params.delete(PARAM);
+      if (!durable) params.set(CANCEL, clientKey);
+      url.hash = params.toString();
+      try {
+        if (url.href !== getUrl()) replaceUrl(url.href);
+      } catch {
+        throw Object.assign(new Error("화면의 로그인은 종료했지만 자동 연결 취소를 저장하지 못했어요. 이 창을 닫아 주세요."), { code: "PLATFORM_ENTRY_STORAGE", retryable: false });
+      }
+    }
+  };
+}
+var PUBLIC = Object.freeze({ care: "https://synk.im/care/", fortune: "https://synk.im/fortune/", rehearsal: "https://synk.im/rehearsal/" });
+
 // experiences/daily-fortune/account.mjs
 var changed = () => Object.assign(new Error("로그인 계정이 바뀌었어요. 다시 불러와 주세요."), { code: "ACCOUNT_CHANGED" });
 var networkFailure = () => Object.assign(new Error("계정 서버에 연결하지 못했어요. 연결이 돌아오면 다시 확인해 주세요."), { code: "NETWORK", retryable: true });
@@ -12559,6 +12682,8 @@ function createFortuneAccount({
   let config, session, account, document2 = emptyState(), revision = null, epoch = 0, refreshPromise, unsubscribe, disposed = false, loading, nativeAuthenticated = false, nativeGeneration = -1, starting = null, pendingExchange = null;
   let state = { status: "loading", configured: false, account: null, ready: false, retryable: false, message: "계정 연결을 확인하고 있어요." };
   const key = "synk.oauth.session.fortune";
+  const platformEntry = native ? null : createPlatformEntry({ clientKey: "fortune", getUrl: () => location2.href, replaceUrl: replaceURL });
+  let automaticNavigations = 0;
   const emit = (patch) => {
     state = { ...state, ...patch };
     onState({ ...state });
@@ -12665,7 +12790,7 @@ function createFortuneAccount({
       return data;
     } catch (error) {
       guard(expected);
-      if (expected === epoch && (error.status === 401 || ["AUTH_REQUIRED", "SESSION_REVOKED", "AUTH_SESSION_MISSING"].includes(error.code))) expire(error.message);
+      if (expected === epoch && (error.status === 401 || ["AUTH_REQUIRED", "SESSION_REVOKED", "AUTH_SESSION_MISSING"].includes(error.code)) && !(platformEntry?.accountId() && !account)) expire(error.message);
       else if (expected === epoch && error.code === "ACCOUNT_UNAVAILABLE" && error.status === 403) {
         revision = null;
         emit({ ready: false, message: error.message });
@@ -12694,6 +12819,7 @@ function createFortuneAccount({
       const identity = await invoke("load");
       guard(expected);
       if (typeof identity.account?.synk_user_id !== "string") throw changed();
+      platformEntry?.assertAccount(identity.account.synk_user_id);
       if (account && account.synk_user_id !== identity.account.synk_user_id) {
         expire();
         throw changed();
@@ -12745,6 +12871,8 @@ function createFortuneAccount({
   }
   async function begin() {
     const expected = epoch;
+    platformEntry?.capture(() => storage ||= globalThis.sessionStorage);
+    if (!native && state.status === "signing-in") return snapshot();
     if (native) {
       unsubscribe?.();
       unsubscribe = native.onAuthChanged((next) => {
@@ -12794,9 +12922,17 @@ function createFortuneAccount({
     const callback = new URL(client.redirectUri), here = new URL(location2.href);
     const directory = new URL("./", here).pathname;
     if (callback.origin !== here.origin || ![directory, directory + "index.html"].includes(callback.pathname) || callback.search || callback.hash) throw new Error("이 운세 화면에 등록된 로그인 도착 주소가 필요해요.");
+    platformEntry.restore(storage);
     emit({ configured: true });
+    if (platformEntry.isCancelled()) {
+      session = null;
+      pendingExchange = null;
+      emit({ status: "signed-out", account: null, ready: false, retryable: false, message: "이 화면에서 로그아웃했어요." });
+      return snapshot();
+    }
     const params = here.searchParams;
     if (params.has("code") || params.has("error")) {
+      platformEntry.stop();
       try {
         pendingExchange = { fields: consumeCallback({ config, product: "platform", url: location2.href, storage }), binding: binding() };
       } finally {
@@ -12820,10 +12956,33 @@ function createFortuneAccount({
     }
     if (!session?.access_token) {
       session = null;
+      if (await automaticSignIn(expected)) return snapshot();
       emit({ status: "signed-out", retryable: false, message: "로그인하면 내 정보와 보관함을 이어갈 수 있어요." });
       return snapshot();
     }
-    return load();
+    try {
+      const result = await load();
+      guard(expected);
+      platformEntry.stop();
+      return result;
+    } catch (error) {
+      guard(expected);
+      if (!platformEntry.accountId() || !(error.status === 401 || ["AUTH_REQUIRED", "SESSION_REVOKED", "AUTH_SESSION_MISSING", "PLATFORM_ACCOUNT_MISMATCH"].includes(error.code))) throw error;
+      session = null;
+      storage.removeItem(key);
+      if (await automaticSignIn(expected)) return snapshot();
+      platformEntry.assertAccount(null);
+      throw error;
+    }
+  }
+  async function automaticSignIn(expected) {
+    if (!platformEntry.beginAttempt()) return false;
+    emit({ status: "signing-in", account: null, ready: false, retryable: false, message: "플랫폼의 SYNK ID로 연결하고 있어요." });
+    const destination = await beginOAuth({ config, product: "platform", storage });
+    guard(expected);
+    automaticNavigations++;
+    location2.assign(destination);
+    return true;
   }
   function start() {
     if (disposed) return Promise.reject(changed());
@@ -12846,6 +13005,7 @@ function createFortuneAccount({
   }
   async function signIn() {
     const expected = epoch;
+    const before = automaticNavigations;
     if (native) {
       const next = await native.authSignIn();
       guard(expected);
@@ -12856,18 +13016,26 @@ function createFortuneAccount({
       guard(expected);
       if (account) return snapshot();
     }
+    if (automaticNavigations !== before) return snapshot();
+    platformEntry.resume();
     if (session?.access_token) return load();
     const destination = await beginOAuth({ config, product: "platform", storage });
     guard(expected);
     location2.assign(destination);
   }
   async function signOut() {
+    let entryError;
+    try {
+      platformEntry?.cancel();
+    } catch (error) {
+      entryError = error;
+    }
     const previous = session;
     nativeAuthenticated = false;
     reset();
     session = null;
     pendingExchange = null;
-    emit({ status: "signed-out", account: null, ready: false, retryable: false, message: "이 화면에서 로그아웃했어요." });
+    emit({ status: "signed-out", account: null, ready: false, retryable: false, message: entryError?.message || "이 화면에서 로그아웃했어요." });
     if (native) {
       const result = await native.authSignOut();
       if (!account && (result?.ok === false || result?.serverRevoked === false)) emit({ message: "이 화면에서 로그아웃했어요. 기기 저장과 서버의 로그인 종료는 다시 확인해 주세요." });
@@ -12885,6 +13053,10 @@ function createFortuneAccount({
       } catch {
         emit({ message: "이 화면에서 로그아웃했어요. 서버의 로그인 종료는 다시 확인해 주세요." });
       }
+    }
+    if (entryError) {
+      emit({ message: entryError.message });
+      return { ok: false, error: { code: entryError.code, message: entryError.message } };
     }
   }
   async function save(value) {

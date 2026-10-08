@@ -5,7 +5,7 @@
   "configFile": "account-config.json",
   "builder": {
     "file": "tools/prepare-personal-public.mjs",
-    "sha256": "a17fc6b9c7aadd81556418dcf04000cb1046ff5f2ccba15078748703b4eb02b1",
+    "sha256": "18824bb5648d0128baab0a22b639bd83fd2d374a91ddcb8526be69a13d102615",
     "esbuildVersion": "0.28.2"
   },
   "sourceFiles": [
@@ -15,7 +15,7 @@
     },
     {
       "file": "experiences/daily-fortune/account.mjs",
-      "sha256": "bdc555ae54fbc6814115511f6d61b5c6d6c38ca79a7bc25dff7479d30158dd1a"
+      "sha256": "9894d7192f3c0257e46b920287e88f925c19d5f060306ff6347c2de3a14882e9"
     },
     {
       "file": "experiences/daily-fortune/app.css",
@@ -99,14 +99,18 @@
     },
     {
       "file": "experiences/synk-account/src/core.mjs",
-      "sha256": "7bea11ec944ef594ef68d702dcaa9b3529769e5e600f2fb022dd1d7e7b9dbc4f"
+      "sha256": "29831d6b22d18b613451b78660fc2b22af67a0160f7b08a6f84eafcf6ddf6e9f"
+    },
+    {
+      "file": "experiences/synk-account/src/platform-entry.mjs",
+      "sha256": "ca235034e3e1aa1a079570e6092d8393ef6d631b57cf277e14d9ef4c85dc8833"
     }
   ],
   "files": [
     {
       "name": "app.mjs",
-      "bytes": 570870,
-      "sha256": "8c88aceaea539fe38e0a48b9a823927ca846f0f9cd973e8b039ab283c7d8bbc4"
+      "bytes": 577777,
+      "sha256": "14d81b6e17cbdfe8178b28c35fa4efdbd794ccb296018d41d47fec180adb81f9"
     },
     {
       "name": "app.css",
@@ -181,7 +185,7 @@
     {
       "name": "index.html",
       "bytes": 12603,
-      "sha256": "b3f5a52864cfe00f0703b727f1e176d65db844039e72799247fd7334d7ae2042"
+      "sha256": "e62d5b521f6a090a44c7b517d77e7d902cc33aec74de8dba89a822eccc1907b4"
     }
   ],
   "transformations": [
