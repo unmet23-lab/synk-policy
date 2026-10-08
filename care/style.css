@@ -48,3 +48,4 @@
 .library-search-label{display:grid;gap:8px}.draft-memory-tools #library-search{width:100%;max-width:100%;min-width:0;min-height:48px}
 .library-search-options{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}.library-search-options .check-label{min-height:48px;margin:0;flex:1 1 180px}.draft-memory-tools #library-reset{font-size:16px;min-height:48px;max-width:100%;white-space:normal;line-height:1.7}.draft-memory-tools #library-result-count{margin:0}
 @media(max-width:680px){.library-search-options{display:grid;grid-template-columns:minmax(0,1fr)}.draft-memory-tools #library-reset{width:100%}}
+.push-time-hint{font-size:16px;line-height:1.75;color:var(--muted);margin:0 0 20px;overflow-wrap:anywhere}

@@ -973,22 +973,26 @@ function checkReminders() {
 }
 
 function renderPushSettings() {
-  const push = carePush.snapshot(), time = `${String(push.hour).padStart(2, '0')}:${String(push.minute).padStart(2, '0')}`;
+  const push = carePush.snapshot(), time = `${String(push.inputHour).padStart(2, '0')}:${String(push.inputMinute).padStart(2, '0')}`;
   $('push-status').textContent = push.message;
   $('push-status').dataset.kind = ['error', 'unavailable', 'denied'].includes(push.phase) ? 'error' : push.enabled ? 'success' : 'info';
   $('push-settings').setAttribute('aria-busy', String(push.busy));
   $('push-time').disabled = push.busy || !push.signedIn || !['ready', 'enabled', 'error'].includes(push.phase);
   if (document.activeElement !== $('push-time')) $('push-time').value = time;
+  const timeChanged = push.inputHour !== push.hour || push.inputMinute !== push.minute;
+  $('push-time-hint').hidden = !push.enabled || !push.scheduleKnown || !timeChanged || push.busy;
+  $('push-time-hint').textContent = `현재 알림 시간은 ${String(push.hour).padStart(2, '0')}:${String(push.minute).padStart(2, '0')}로 저장돼 있어요. 위의 변경 시간을 적용하려면 ‘알림 시간 저장’을 눌러 주세요.`;
   $('push-enable').hidden = push.enabled || !push.signedIn || !['ready', 'error', 'enabling'].includes(push.phase);
   $('push-enable').disabled = push.busy;
   $('push-enable').textContent = push.phase === 'enabling' ? '알림을 연결하고 있어요…' : '이 기기에 알림 켜기';
+  $('push-cancel').hidden = !push.canCancelEnable;
   $('push-save').hidden = !push.enabled || !push.scheduleKnown; $('push-save').disabled = push.busy;
   $('push-disable').hidden = !push.enabled; $('push-disable').disabled = push.busy;
-  $('push-retry').hidden = !push.signedIn || !['unavailable', 'denied', 'unsupported', 'needs-install'].includes(push.phase);
+  $('push-retry').hidden = !push.signedIn || !['unavailable', 'denied', 'unsupported', 'needs-install', 'permission-pending'].includes(push.phase);
   $('push-signin').hidden = push.signedIn;
   $('push-signin').disabled = push.busy || accountStarting || !accountStatus.configured;
   $('push-open-only').hidden = push.enabled;
-  $('push-open-only').disabled = !('Notification' in window) || Notification.permission === 'denied';
+  $('push-open-only').disabled = push.permissionPending || !('Notification' in window) || Notification.permission === 'denied';
   notificationStatus();
 }
 function pushTime() { const [hour, minute] = $('push-time').value.split(':').map(Number); return [hour, minute]; }
@@ -1314,6 +1318,7 @@ on('close-notification-dialog', 'click', () => $('notification-dialog').close())
 on('push-signin', 'click', async () => { $('notification-dialog').close(); try { await account.signIn(); } catch (error) { accountStatus = resumeCareLoginNavigation(accountStatus, true); renderAccount(); throw error; } });
 on('push-retry', 'click', () => carePush.prepare());
 on('push-enable', 'click', () => carePush.enable(...pushTime()));
+on('push-cancel', 'click', () => carePush.cancelEnable());
 on('push-save', 'click', () => carePush.update(...pushTime()));
 on('push-disable', 'click', () => carePush.disable());
 on('push-open-only', 'click', async () => {
