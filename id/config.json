@@ -24,7 +24,8 @@
       "product": "platform",
       "clientId": "adec83c7-79d3-4685-b350-7bd0bd37e824",
       "redirectUris": [
-        "http://127.0.0.1:4299/"
+        "http://127.0.0.1:4299/",
+        "https://synk.im/fortune/"
       ]
     },
     {
@@ -124,7 +125,8 @@
       "product": "platform",
       "clientId": "d578f783-64a0-4a97-b780-04246d669f43",
       "redirectUris": [
-        "http://127.0.0.1:4297/"
+        "http://127.0.0.1:4297/",
+        "https://synk.im/rehearsal/"
       ]
     },
     {

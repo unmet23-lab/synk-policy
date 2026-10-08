@@ -24,7 +24,8 @@
       "product": "platform",
       "clientId": "adec83c7-79d3-4685-b350-7bd0bd37e824",
       "redirectUris": [
-        "http://127.0.0.1:4299/"
+        "http://127.0.0.1:4299/",
+        "https://synk.im/fortune/"
       ]
     },
     {
@@ -109,7 +110,8 @@
       "product": "messenger",
       "clientId": "040530fe-6181-45fd-ba85-51a31872edbf",
       "redirectUris": [
-        "http://127.0.0.1:4191/api/synk-id/callback"
+        "http://127.0.0.1:4191/api/synk-id/callback",
+        "https://workspace.synk.im/api/synk-id/callback"
       ]
     },
     {
@@ -123,7 +125,8 @@
       "product": "platform",
       "clientId": "d578f783-64a0-4a97-b780-04246d669f43",
       "redirectUris": [
-        "http://127.0.0.1:4297/"
+        "http://127.0.0.1:4297/",
+        "https://synk.im/rehearsal/"
       ]
     },
     {
@@ -145,6 +148,13 @@
       "clientId": "84da5218-9e25-4ee9-a18b-e215895e182f",
       "redirectUris": [
         "https://synk.im/care/"
+      ]
+    },
+    {
+      "product": "platform",
+      "clientId": "88d14e4c-a98c-4791-a444-0ccbef2dfd5e",
+      "redirectUris": [
+        "https://workspace.synk.im/api/customer/synk-id/callback"
       ]
     }
   ],

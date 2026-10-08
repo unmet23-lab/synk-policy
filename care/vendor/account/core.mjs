@@ -81,10 +81,23 @@ export function consumeCallback({ config, product, url, storage, now = Date.now(
 export async function tokenRequest(config, fields, fetcher = fetch) {
   const abort = new AbortController(), timer = setTimeout(() => abort.abort(), 12000);
   try {
-    const response = await fetcher(new URL('/auth/v1/oauth/token', config.supabaseUrl), { method: 'POST', signal: abort.signal,
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: new URLSearchParams(fields), credentials: 'omit', cache: 'no-store' });
-    const data = await response.json();
-    if (!response.ok || typeof data.access_token !== 'string') throw new Error('로그인 연결을 마치지 못했어요. 다시 시작해 주세요.');
+    let response;
+    try { response = await fetcher(new URL('/auth/v1/oauth/token', config.supabaseUrl), { method: 'POST', signal: abort.signal,
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: new URLSearchParams(fields), credentials: 'omit', cache: 'no-store' }); }
+    catch { throw Object.assign(new Error('로그인 서버에 연결하지 못했어요. 연결이 돌아오면 다시 확인해 주세요.'), { code: 'NETWORK', retryable: true }); }
+    let data;
+    try { data = await response.json(); }
+    catch (error) {
+      // A response body can still lose its connection after successful headers.
+      // Only a completed but malformed JSON document is an invalid response.
+      if (response.ok && error?.name !== 'SyntaxError') throw Object.assign(new Error('로그인 응답을 끝까지 받지 못했어요. 연결이 돌아오면 다시 확인해 주세요.'), { code: 'NETWORK', retryable: true });
+      data = null;
+    }
+    if (!response.ok) {
+      const retryable = response.status === 429 || response.status >= 500;
+      throw Object.assign(new Error(retryable ? '로그인 서버가 잠시 응답하지 않아요. 잠시 뒤 다시 확인해 주세요.' : '로그인 연결을 마치지 못했어요. 다시 로그인해 주세요.'), { code: retryable ? 'AUTH_UNAVAILABLE' : 'AUTH_REQUIRED', status: response.status, retryable });
+    }
+    if (!data || typeof data.access_token !== 'string' || !data.access_token) throw Object.assign(new Error('로그인 응답을 확인하지 못했어요. 다시 로그인해 주세요.'), { code: 'INVALID_RESPONSE' });
     return { access_token: data.access_token, refresh_token: data.refresh_token || null, expires_at: Date.now() + Number(data.expires_in || 3600) * 1000 };
   } finally { clearTimeout(timer); }
 }

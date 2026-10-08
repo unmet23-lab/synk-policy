@@ -181,7 +181,7 @@ export function createDocumentSync({ transport, storage, onState = () => {}, onS
   }
   function reportFailure(context, error) {
     if (!isCurrent(context)) return false;
-    if (error?.code === 'REVISION_CONFLICT') {
+    if (['REVISION_CONFLICT', 'LOCAL_CHANGED_DURING_REFRESH'].includes(error?.code)) {
       context.conflict = true;
       if (validRevision(error.revision)) context.revision = error.revision;
       persist(context); emit(context, 'conflict', error);

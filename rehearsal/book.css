@@ -1,0 +1,24 @@
+
+.growth-book{color:#202837;font-family:SUIT,"Malgun Gothic","Apple SD Gothic Neo",sans-serif;font-size:16px;line-height:1.8;word-break:keep-all;overflow-wrap:anywhere}
+.growth-book *{box-sizing:border-box}
+.growth-book .book-cover{padding:48px 40px;border-top:5px solid #24448c;background:#f5f7fc}
+.growth-book .book-label{font-family:InterTight,'Inter Tight',SUIT,sans-serif;font-size:12px;letter-spacing:.12em;color:#24448c;font-weight:700;margin:0 0 16px}
+.growth-book h2{font-size:34px;line-height:1.35;letter-spacing:-.035em;margin:0 0 24px}
+.growth-book h3{font-size:24px;line-height:1.5;margin:8px 0 20px}
+.growth-book h4{font-size:19px;line-height:1.5;margin:0 0 16px}
+.growth-book p{margin:0 0 16px}
+.growth-book .book-note{font-size:13px;color:#586372}
+.growth-book .book-session{padding:40px 0;border-bottom:1px solid #ccd3df}
+.growth-book .book-meta{display:grid;grid-template-columns:104px minmax(0,1fr);gap:8px 16px;margin:0 0 32px}
+.growth-book dt{color:#586372;font-size:13px}
+.growth-book dd{margin:0;white-space:pre-wrap;overflow-wrap:anywhere}
+.growth-book .book-turn{padding:28px 0;border-top:1px solid #e0e4eb}
+.growth-book .book-role{font-size:12px;color:#24448c;font-weight:700;margin:20px 0 6px}
+.growth-book .book-text{white-space:pre-wrap;overflow-wrap:anywhere;margin:0 0 12px;orphans:3;widows:3}
+.growth-book .book-prompt{border-left:3px solid #cad5eb;padding-left:16px}
+.growth-book .book-feeling{font-size:13px;color:#586372;margin:0 0 20px}
+.growth-book .book-keepsake{padding:24px 0;border-top:2px solid #24448c}
+.growth-book .book-empty{color:#69717e;font-size:14px}
+@media(max-width:480px){.growth-book{font-size:15px}.growth-book .book-cover{padding:28px 20px}.growth-book h2{font-size:29px}.growth-book h3{font-size:22px}.growth-book .book-meta{grid-template-columns:1fr;gap:0}.growth-book dd{margin:0 0 16px}}
+@page{size:A4;margin:18mm 17mm}
+@media print{.growth-book{font-size:10.5pt;color:#111}.growth-book .book-cover{background:none;padding:24mm 0 12mm;border-top:2pt solid #24448c}.growth-book h2{font-size:30pt}.growth-book h3{font-size:20pt}.growth-book h4{font-size:13pt}.growth-book .book-session{break-before:page;padding:0;border:0}.growth-book .book-turn{padding:5mm 0;page-break-inside:avoid;break-inside:avoid-page}.growth-book .book-keepsake{padding:5mm 0;page-break-inside:avoid;break-inside:avoid-page}.growth-book h2,.growth-book h3,.growth-book h4,.growth-book .book-role,.growth-book dt{break-after:avoid}.growth-book .book-meta{display:block}.growth-book dd{margin:0 0 3mm}.growth-book .book-note,.growth-book .book-feeling,.growth-book .book-role,.growth-book dt{font-size:9pt;color:#333}.growth-book .book-text{break-inside:auto}.growth-book .book-cover,.growth-book .book-turn,.growth-book .book-session{overflow:visible}}

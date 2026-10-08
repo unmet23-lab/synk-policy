@@ -1,0 +1,254 @@
+{
+  "version": 1,
+  "product": "rehearsal",
+  "targetUrl": "https://synk.im/rehearsal/",
+  "configFile": "config.json",
+  "builder": {
+    "file": "tools/prepare-personal-public.mjs",
+    "sha256": "a17fc6b9c7aadd81556418dcf04000cb1046ff5f2ccba15078748703b4eb02b1",
+    "esbuildVersion": "0.28.2"
+  },
+  "sourceFiles": [
+    {
+      "file": "atlas/ask.js",
+      "sha256": "5366b49994c61991e46d9b171547b534243120f2ba63cc48f3aa8297eae3d0dd"
+    },
+    {
+      "file": "desktop/assets/launcher/button-soft.webp",
+      "sha256": "84569abd7fed8e954281cd109f19def8288321c41c8bbbe3f8804208fe43f6ac"
+    },
+    {
+      "file": "desktop/assets/launcher/button.webp",
+      "sha256": "d58a4c8912eba6972ef1a38a7f701b7d841970a164524d41f267984949686849"
+    },
+    {
+      "file": "desktop/assets/launcher/chip.webp",
+      "sha256": "184f49c21988368e1a4422a5584785999f8741c1bfc263371d9f62fd8d622457"
+    },
+    {
+      "file": "desktop/assets/launcher/DMMono.ttf",
+      "sha256": "fd327daf461db87b44a87def475d251bf03b997f7c07d9680592d75dbbfaad0b"
+    },
+    {
+      "file": "desktop/assets/launcher/InterTight.woff2",
+      "sha256": "e50c43780f95750d53a434731f49ed14251fd1038a757deabdcb9982b566566e"
+    },
+    {
+      "file": "desktop/assets/launcher/SUIT.woff2",
+      "sha256": "aa894a204d5a6fbae259dac6868d350cbd373a390caee0313f92946af741df23"
+    },
+    {
+      "file": "desktop/assets/launcher/synk.svg",
+      "sha256": "cd4950d57eab280fe14b26d58cb78f416eaf5c1ae1f0fa130986dde9567f61f6"
+    },
+    {
+      "file": "desktop/assets/launcher/teacher-cover.png",
+      "sha256": "747e85e5bb1e2bbb0fd86567c6bbe4b925c43e26a4ae4d8e847ef454a5f78c4f"
+    },
+    {
+      "file": "desktop/assets/launcher/wide-cream.webp",
+      "sha256": "5339e11853bfbba65b0fc0abbb1390de6ac1987979fbfecfb46ba415a811a51d"
+    },
+    {
+      "file": "desktop/assets/launcher/wide-lapis.webp",
+      "sha256": "4c8a9dbfbe26f068ed69ceb661a63f57959967952d9deb9601ddb79588e3d312"
+    },
+    {
+      "file": "docs/브랜드_폰트/DM_Mono/OFL.txt",
+      "sha256": "2bada5ea45c3c63b7f1ea1f88ce9672c9e4f0c42b2c3b7378949084fe55a3066"
+    },
+    {
+      "file": "docs/브랜드_폰트/InterTight/OFL.txt",
+      "sha256": "50240ab035cf1b6b3307940235481d515c4b6de3ab1fa843dbe59e7892cb9d58"
+    },
+    {
+      "file": "docs/브랜드_폰트/SUIT/LICENSE_OFL.txt",
+      "sha256": "30d101ee3c35ef629d622d933d261a27b2f60223e0a3b0f36791e569c2b9daa9"
+    },
+    {
+      "file": "experiences/conversation-rehearsal/app.css",
+      "sha256": "0d0ebf8f440f24d5786ca4a442c5c44ae9a8c9109bbf575c5a174d96ec88dfd5"
+    },
+    {
+      "file": "experiences/conversation-rehearsal/app.mjs",
+      "sha256": "966a8bbf76e35ab976c9fa3efef02135f8674c8725fb98de3faaaf0e4956c12a"
+    },
+    {
+      "file": "experiences/conversation-rehearsal/book.mjs",
+      "sha256": "9e97fc0901d49b1797fb9baac5afe236f31b841b877d93505aac418544b9de64"
+    },
+    {
+      "file": "experiences/conversation-rehearsal/domain.mjs",
+      "sha256": "6d60f39dad629bd98ab0e2a673410ea59dbd95dffcfaa55aa795a9c39d10dea6"
+    },
+    {
+      "file": "experiences/conversation-rehearsal/index.html",
+      "sha256": "de05651576eeabc6b29b6f727b869c6d9c47b99918c36a595ec1e98ac2836ec0"
+    },
+    {
+      "file": "experiences/conversation-rehearsal/storage.mjs",
+      "sha256": "6869a4ae3fc6ad68aed6fce7c364e6e17e15e961b385a7370f7a3e65f513729a"
+    },
+    {
+      "file": "experiences/family-album/model.mjs",
+      "sha256": "4a2ff290570fa2d79a8c7423a5250285dccd5092b291cefe0b158102cb51a49d"
+    },
+    {
+      "file": "experiences/member-book-assets.mjs",
+      "sha256": "b1ea4058b87407ad4bdbf84609f359c0de2fee8bf51bebc08c64f409b2770fac"
+    },
+    {
+      "file": "experiences/path-vr/model.mjs",
+      "sha256": "5a03f5982a8ff5658602974f43b6ead599cd64c0fa6bf5e3f1c73bfca033c9a4"
+    },
+    {
+      "file": "experiences/synk-account/assets/slab-cream-long.webp",
+      "sha256": "84569abd7fed8e954281cd109f19def8288321c41c8bbbe3f8804208fe43f6ac"
+    },
+    {
+      "file": "experiences/synk-account/src/account-notebook.css",
+      "sha256": "263e16f4430d56dc87cd2956d11bd2362c00d3f1fca64cec09a7b34f76bc4b34"
+    },
+    {
+      "file": "experiences/synk-account/src/account-notebook.mjs",
+      "sha256": "f9ea008d22e6f138675179a4b7aed1591bcc20bf82e1845f6bf91cdda02d0c7f"
+    },
+    {
+      "file": "experiences/synk-account/src/core.mjs",
+      "sha256": "7bea11ec944ef594ef68d702dcaa9b3529769e5e600f2fb022dd1d7e7b9dbc4f"
+    },
+    {
+      "file": "experiences/synk-account/src/document-sync.mjs",
+      "sha256": "079008faf2dcf73439496a9f9c03733ab5b76904be9d17b264002fc9c26bb655"
+    },
+    {
+      "file": "experiences/synk-account/src/personal-data.mjs",
+      "sha256": "e77c1b58ec944630cb4a852ed5e362d3e91c5126d62de97ef9d48087b9376f23"
+    },
+    {
+      "file": "experiences/synk-account/src/personal-media.mjs",
+      "sha256": "f38128e15bbd52a3c490e5c31502bd97a20d3242a37e002a7ab702c3ae3bc6e4"
+    },
+    {
+      "file": "experiences/synk-account/src/platform-library-data.mjs",
+      "sha256": "555f575a603ddd79c536f1ce8d373bef2d86cc49b7d2b276f05f83e393fe47bf"
+    },
+    {
+      "file": "experiences/synk-account/src/product-account.mjs",
+      "sha256": "993ca1f0f44ac24075727babcf72b9dad2b797d48fcfa20e45edb20748053e87"
+    }
+  ],
+  "files": [
+    {
+      "name": "app.mjs",
+      "bytes": 1074901,
+      "sha256": "d4eeb4f6ebb7f29178538de307d9d5f408f10150c7b8944fde937fd8d07ec19f"
+    },
+    {
+      "name": "app.css",
+      "bytes": 12101,
+      "sha256": "0d0ebf8f440f24d5786ca4a442c5c44ae9a8c9109bbf575c5a174d96ec88dfd5"
+    },
+    {
+      "name": "assets/synk.svg",
+      "bytes": 10353,
+      "sha256": "cd4950d57eab280fe14b26d58cb78f416eaf5c1ae1f0fa130986dde9567f61f6"
+    },
+    {
+      "name": "assets/SUIT.woff2",
+      "bytes": 624536,
+      "sha256": "aa894a204d5a6fbae259dac6868d350cbd373a390caee0313f92946af741df23"
+    },
+    {
+      "name": "assets/InterTight.woff2",
+      "bytes": 18680,
+      "sha256": "e50c43780f95750d53a434731f49ed14251fd1038a757deabdcb9982b566566e"
+    },
+    {
+      "name": "assets/DMMono.ttf",
+      "bytes": 50360,
+      "sha256": "fd327daf461db87b44a87def475d251bf03b997f7c07d9680592d75dbbfaad0b"
+    },
+    {
+      "name": "assets/teacher-cover.png",
+      "bytes": 1612282,
+      "sha256": "747e85e5bb1e2bbb0fd86567c6bbe4b925c43e26a4ae4d8e847ef454a5f78c4f"
+    },
+    {
+      "name": "assets/button.webp",
+      "bytes": 479152,
+      "sha256": "d58a4c8912eba6972ef1a38a7f701b7d841970a164524d41f267984949686849"
+    },
+    {
+      "name": "assets/button-soft.webp",
+      "bytes": 359780,
+      "sha256": "84569abd7fed8e954281cd109f19def8288321c41c8bbbe3f8804208fe43f6ac"
+    },
+    {
+      "name": "assets/chip.webp",
+      "bytes": 163380,
+      "sha256": "184f49c21988368e1a4422a5584785999f8741c1bfc263371d9f62fd8d622457"
+    },
+    {
+      "name": "assets/wide-cream.webp",
+      "bytes": 330544,
+      "sha256": "5339e11853bfbba65b0fc0abbb1390de6ac1987979fbfecfb46ba415a811a51d"
+    },
+    {
+      "name": "assets/wide-lapis.webp",
+      "bytes": 1323108,
+      "sha256": "4c8a9dbfbe26f068ed69ceb661a63f57959967952d9deb9601ddb79588e3d312"
+    },
+    {
+      "name": "assets/SUIT-LICENSE.txt",
+      "bytes": 4380,
+      "sha256": "30d101ee3c35ef629d622d933d261a27b2f60223e0a3b0f36791e569c2b9daa9"
+    },
+    {
+      "name": "assets/InterTight-LICENSE.txt",
+      "bytes": 4383,
+      "sha256": "50240ab035cf1b6b3307940235481d515c4b6de3ab1fa843dbe59e7892cb9d58"
+    },
+    {
+      "name": "assets/DMMono-LICENSE.txt",
+      "bytes": 4484,
+      "sha256": "2bada5ea45c3c63b7f1ea1f88ce9672c9e4f0c42b2c3b7378949084fe55a3066"
+    },
+    {
+      "name": "assets/slab-cream-long.webp",
+      "bytes": 359780,
+      "sha256": "84569abd7fed8e954281cd109f19def8288321c41c8bbbe3f8804208fe43f6ac"
+    },
+    {
+      "name": "account-notebook.css",
+      "bytes": 1766,
+      "sha256": "552bf46c6fda6454fbb341a9817a62e3317c627945b173fc61d81fa65e206a31"
+    },
+    {
+      "name": "book.css",
+      "bytes": 2785,
+      "sha256": "6b649bf39ee0a764632db1a088b25334172a5592f29d19d3976737664ce35de9"
+    },
+    {
+      "name": "config.json",
+      "bytes": 613,
+      "sha256": "757fdfba117e3b802749d9068e142489e17c77a53228de7b3627055c04b8a4ff"
+    },
+    {
+      "name": "index.html",
+      "bytes": 1862,
+      "sha256": "9baa6fb9be1710766b7ebb1be2ada82a15f2c6f0e53e5812be2faab14d35c698"
+    }
+  ],
+  "transformations": [
+    "bundle canonical modules and preserve Core Ask browser global",
+    "product-account default configUrl=./config.json in bundle only",
+    "relative notebook CSS/assets and external BOOK_STYLES"
+  ],
+  "limitations": {
+    "registrationVerified": false,
+    "realLoginVerified": false,
+    "browserVerified": false,
+    "deployed": false
+  }
+}

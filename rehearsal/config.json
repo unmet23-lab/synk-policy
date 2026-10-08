@@ -1,0 +1,22 @@
+{
+  "version": 1,
+  "supabaseUrl": "https://qiwxeddwwnzkwalpsuty.supabase.co",
+  "supabasePublishableKey": "sb_publishable_g_T9VApp7f7L3girlJW8hA_j__pZjED",
+  "accountApiUrl": "https://qiwxeddwwnzkwalpsuty.supabase.co",
+  "portalUrl": "https://synk.im/id/",
+  "clients": {
+    "rehearsal": {
+      "clientId": "d578f783-64a0-4a97-b780-04246d669f43",
+      "redirectUri": "https://synk.im/rehearsal/"
+    }
+  },
+  "authorizationClients": [
+    {
+      "product": "platform",
+      "clientId": "d578f783-64a0-4a97-b780-04246d669f43",
+      "redirectUris": [
+        "https://synk.im/rehearsal/"
+      ]
+    }
+  ]
+}

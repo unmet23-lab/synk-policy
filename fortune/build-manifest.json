@@ -1,0 +1,196 @@
+{
+  "version": 1,
+  "product": "fortune",
+  "targetUrl": "https://synk.im/fortune/",
+  "configFile": "account-config.json",
+  "builder": {
+    "file": "tools/prepare-personal-public.mjs",
+    "sha256": "a17fc6b9c7aadd81556418dcf04000cb1046ff5f2ccba15078748703b4eb02b1",
+    "esbuildVersion": "0.28.2"
+  },
+  "sourceFiles": [
+    {
+      "file": "experiences/daily-fortune/account-state.mjs",
+      "sha256": "9cd29a9b3951a6c7a91f2c1dc04f6e9d5abe3b3c01a23f04cb190acaae77a9c0"
+    },
+    {
+      "file": "experiences/daily-fortune/account.mjs",
+      "sha256": "bdc555ae54fbc6814115511f6d61b5c6d6c38ca79a7bc25dff7479d30158dd1a"
+    },
+    {
+      "file": "experiences/daily-fortune/app.css",
+      "sha256": "e1020b8c66f8296b34e6c7a6169b228f3cb20d23b1d9f4678b54ebfcade9a9d1"
+    },
+    {
+      "file": "experiences/daily-fortune/app.mjs",
+      "sha256": "35947211bbe1fffb7a1ab40c003ed4973954d239b54e64f1a2c9ceb079bcec30"
+    },
+    {
+      "file": "experiences/daily-fortune/assets/fortune-star.avif",
+      "sha256": "17db6ffb3996b785bfa4c00e9fc904f760f6f3ec4bbde9ca589b1c677b4a54be"
+    },
+    {
+      "file": "experiences/daily-fortune/assets/InterTight-LICENSE.txt",
+      "sha256": "50240ab035cf1b6b3307940235481d515c4b6de3ab1fa843dbe59e7892cb9d58"
+    },
+    {
+      "file": "experiences/daily-fortune/assets/InterTight.woff2",
+      "sha256": "e50c43780f95750d53a434731f49ed14251fd1038a757deabdcb9982b566566e"
+    },
+    {
+      "file": "experiences/daily-fortune/assets/slab-blush-long.webp",
+      "sha256": "8249fb7023fd51806045e8db93999c0ae24ae9ba09d2f57e9f6712d632b9a899"
+    },
+    {
+      "file": "experiences/daily-fortune/assets/slab-coral-long.webp",
+      "sha256": "d58a4c8912eba6972ef1a38a7f701b7d841970a164524d41f267984949686849"
+    },
+    {
+      "file": "experiences/daily-fortune/assets/slab-cream-long.webp",
+      "sha256": "84569abd7fed8e954281cd109f19def8288321c41c8bbbe3f8804208fe43f6ac"
+    },
+    {
+      "file": "experiences/daily-fortune/assets/SUIT-LICENSE.txt",
+      "sha256": "30d101ee3c35ef629d622d933d261a27b2f60223e0a3b0f36791e569c2b9daa9"
+    },
+    {
+      "file": "experiences/daily-fortune/assets/SUIT.woff2",
+      "sha256": "aa894a204d5a6fbae259dac6868d350cbd373a390caee0313f92946af741df23"
+    },
+    {
+      "file": "experiences/daily-fortune/assets/synk-logo.svg",
+      "sha256": "cd4950d57eab280fe14b26d58cb78f416eaf5c1ae1f0fa130986dde9567f61f6"
+    },
+    {
+      "file": "experiences/daily-fortune/assets/wide-butter.webp",
+      "sha256": "1527974a05a2814457ecc92735e22959d8378c032a80c7c682ced57d7f329f8e"
+    },
+    {
+      "file": "experiences/daily-fortune/core.mjs",
+      "sha256": "0b8c0e5278dc8a8149db3a4dd5dad0430163356de44d1066efa64424d77bd44e"
+    },
+    {
+      "file": "experiences/daily-fortune/index.html",
+      "sha256": "97205be795e21b48dcac5cac57c7af194f4c0fe0eff72c3d3fd2e3c6bb35fe7a"
+    },
+    {
+      "file": "experiences/daily-fortune/insights.mjs",
+      "sha256": "1d1b065fb1902adc6c3e9eda09acd714200cae9f6bba8ab996589cb4fcc97e09"
+    },
+    {
+      "file": "experiences/daily-fortune/kit/josa.mjs",
+      "sha256": "fc3217e1396ea5973c1ee32912eee7de623a0fe90fe6df3a84eef958545325c5"
+    },
+    {
+      "file": "experiences/daily-fortune/saju-core.mjs",
+      "sha256": "9a21293d8ad2038b0d18d266bc42071110c83ee635e14c4eb5fb1468893a5432"
+    },
+    {
+      "file": "experiences/daily-fortune/vendor/lunar-javascript-1.7.7/LICENSE",
+      "sha256": "d9210caf1844dcf410095cea464b79800aad30dbd49df092076b9f0ddc015404"
+    },
+    {
+      "file": "experiences/daily-fortune/vendor/lunar-javascript-1.7.7/lunar.mjs",
+      "sha256": "b20ed30863c914ca9cbb041c5570110b13867c3f73c7fc054121f5934dac2ed4"
+    },
+    {
+      "file": "experiences/daily-fortune/vendor/lunar-javascript-1.7.7/provenance.json",
+      "sha256": "a9478347d2ebbcd827eb213bd085a1f3e7130181704537e03def74b438c79b53"
+    },
+    {
+      "file": "experiences/synk-account/src/core.mjs",
+      "sha256": "7bea11ec944ef594ef68d702dcaa9b3529769e5e600f2fb022dd1d7e7b9dbc4f"
+    }
+  ],
+  "files": [
+    {
+      "name": "app.mjs",
+      "bytes": 570870,
+      "sha256": "8c88aceaea539fe38e0a48b9a823927ca846f0f9cd973e8b039ab283c7d8bbc4"
+    },
+    {
+      "name": "app.css",
+      "bytes": 20982,
+      "sha256": "e1020b8c66f8296b34e6c7a6169b228f3cb20d23b1d9f4678b54ebfcade9a9d1"
+    },
+    {
+      "name": "assets/synk-logo.svg",
+      "bytes": 10353,
+      "sha256": "cd4950d57eab280fe14b26d58cb78f416eaf5c1ae1f0fa130986dde9567f61f6"
+    },
+    {
+      "name": "assets/fortune-star.avif",
+      "bytes": 530728,
+      "sha256": "17db6ffb3996b785bfa4c00e9fc904f760f6f3ec4bbde9ca589b1c677b4a54be"
+    },
+    {
+      "name": "assets/SUIT.woff2",
+      "bytes": 624536,
+      "sha256": "aa894a204d5a6fbae259dac6868d350cbd373a390caee0313f92946af741df23"
+    },
+    {
+      "name": "assets/InterTight.woff2",
+      "bytes": 18680,
+      "sha256": "e50c43780f95750d53a434731f49ed14251fd1038a757deabdcb9982b566566e"
+    },
+    {
+      "name": "assets/wide-butter.webp",
+      "bytes": 841862,
+      "sha256": "1527974a05a2814457ecc92735e22959d8378c032a80c7c682ced57d7f329f8e"
+    },
+    {
+      "name": "assets/slab-blush-long.webp",
+      "bytes": 402546,
+      "sha256": "8249fb7023fd51806045e8db93999c0ae24ae9ba09d2f57e9f6712d632b9a899"
+    },
+    {
+      "name": "assets/slab-coral-long.webp",
+      "bytes": 479152,
+      "sha256": "d58a4c8912eba6972ef1a38a7f701b7d841970a164524d41f267984949686849"
+    },
+    {
+      "name": "assets/slab-cream-long.webp",
+      "bytes": 359780,
+      "sha256": "84569abd7fed8e954281cd109f19def8288321c41c8bbbe3f8804208fe43f6ac"
+    },
+    {
+      "name": "assets/SUIT-LICENSE.txt",
+      "bytes": 4380,
+      "sha256": "30d101ee3c35ef629d622d933d261a27b2f60223e0a3b0f36791e569c2b9daa9"
+    },
+    {
+      "name": "assets/InterTight-LICENSE.txt",
+      "bytes": 4383,
+      "sha256": "50240ab035cf1b6b3307940235481d515c4b6de3ab1fa843dbe59e7892cb9d58"
+    },
+    {
+      "name": "licenses/lunar-javascript-LICENSE.txt",
+      "bytes": 1061,
+      "sha256": "d9210caf1844dcf410095cea464b79800aad30dbd49df092076b9f0ddc015404"
+    },
+    {
+      "name": "licenses/lunar-javascript-provenance.json",
+      "bytes": 953,
+      "sha256": "a9478347d2ebbcd827eb213bd085a1f3e7130181704537e03def74b438c79b53"
+    },
+    {
+      "name": "account-config.json",
+      "bytes": 608,
+      "sha256": "ad7df4c7b28a956babdb12d6042243fea74be76239220b514428c6f3c66b607e"
+    },
+    {
+      "name": "index.html",
+      "bytes": 12603,
+      "sha256": "b3f5a52864cfe00f0703b727f1e176d65db844039e72799247fd7334d7ae2042"
+    }
+  ],
+  "transformations": [
+    "bundle canonical modules"
+  ],
+  "limitations": {
+    "registrationVerified": false,
+    "realLoginVerified": false,
+    "browserVerified": false,
+    "deployed": false
+  }
+}
