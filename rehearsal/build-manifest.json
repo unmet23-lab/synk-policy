@@ -83,7 +83,7 @@
     },
     {
       "file": "experiences/conversation-rehearsal/index.html",
-      "sha256": "de05651576eeabc6b29b6f727b869c6d9c47b99918c36a595ec1e98ac2836ec0"
+      "sha256": "9142e96095690b5f8a17c33a7417c3ecec8d0d5fb9b3b6b773fe64664c7239ed"
     },
     {
       "file": "experiences/conversation-rehearsal/storage.mjs",
@@ -236,8 +236,8 @@
     },
     {
       "name": "index.html",
-      "bytes": 1862,
-      "sha256": "9baa6fb9be1710766b7ebb1be2ada82a15f2c6f0e53e5812be2faab14d35c698"
+      "bytes": 1849,
+      "sha256": "88c0d57227d29f5ec53e72dc836a638fcea45ef2d311f6cb9b51a65916a7a3a0"
     }
   ],
   "transformations": [
