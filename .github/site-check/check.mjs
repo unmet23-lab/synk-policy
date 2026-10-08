@@ -7,12 +7,16 @@
 // 3. 페이지 — 주요 페이지를 컴퓨터·휴대폰으로 열어 콘솔 오류·실패한 요청·가로 넘침이 없는지 본다.
 // 4. LAB 게임 — LAB 게임 카드(data-game)마다 /try/<게임>/을 열고 시작 단추가 풀리면 눌러 8초 뒤 오류가 없는지 본다. 카드의 플레이 장면 영상 주소도 받아지는지 본다.
 // 5. 질문창 — LAB 질문창에 하나 물어 답이 나오는지 본다.
+// 정적 GET/HEAD의 502·503·504만 쓰기 없는 시나리오를 새 context에서 한 번 재검사한다.
+// 첫 실패 JSON·화면을 성공 여부와 무관하게 보존하며 복구는 별도 경고로 남긴다.
 // Usage: node .github/site-check/check.mjs   (환경: SITE_BASE=https://synk.im, PLAYWRIGHT_MODULE=플레이라이트 경로, CI=true)
 import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
 import {execFileSync} from 'node:child_process';
 import {pathToFileURL} from 'node:url';
+import {createBrowserProbe} from './browser-probe.mjs';
+import {runScenarioCheck} from './scenario-recovery.mjs';
 
 const base = (process.env.SITE_BASE || 'https://synk.im').replace(/\/$/, '');
 const ci = process.env.CI === 'true';
@@ -20,10 +24,11 @@ const out = 'site-check-artifacts';
 const {chromium} = await import(process.env.PLAYWRIGHT_MODULE ? pathToFileURL(process.env.PLAYWRIGHT_MODULE).href : 'playwright');
 fs.mkdirSync(out, {recursive: true});
 const git = (...a) => execFileSync('git', a, {encoding: 'buffer', maxBuffer: 1 << 30});
-const problems = [], notes = [];
+const problems = [], notes = [], recoveredScenarios = [];
 const fail = (step, text) => { problems.push(`[${step}] ${text}`); console.log(`  ✗ ${text}`); };
 const sha = b => crypto.createHash('sha256').update(b).digest('hex');
 const wait = ms => new Promise(r => setTimeout(r, ms));
+const staticPaths = new Set(git('ls-files', '-z').toString('utf8').split('\0').filter(Boolean));
 async function get(url) {
   try {
     const r = await fetch(url, {headers: {'Cache-Control': 'no-cache'}, redirect: 'follow'});
@@ -117,18 +122,60 @@ const devices = [
   {name: '컴퓨터', viewport: {width: 1440, height: 900}, deviceScaleFactor: 1},
   {name: '휴대폰', viewport: {width: 390, height: 844}, deviceScaleFactor: 2, isMobile: true, hasTouch: true},
 ];
-const shot = async (page, name) => { try { await page.screenshot({path: path.join(out, name.replace(/[^\w.-]+/g, '_') + '.png')}); } catch {} };
-async function open(device, route) {
-  const context = await browser.newContext(device);
-  const failed = [], errors = [];
-  context.on('response', r => { const u = r.url(); if (r.status() >= 400 && u.startsWith(base) && !u.endsWith('/favicon.ico')) failed.push(r.status() + ' ' + u.replace(base, '')); });
-  context.on('requestfailed', r => { const u = r.url(); const why = r.failure()?.errorText || ''; if (u.startsWith(base) && !/ERR_ABORTED/.test(why)) failed.push('실패 ' + u.replace(base, '') + ' ' + why); });
-  const page = await context.newPage();
-  page.on('pageerror', e => errors.push(String(e).slice(0, 160)));
-  // 아이콘 연결이 없는 페이지에서 브라우저가 스스로 찾는 /favicon.ico의 404는 화면과 상관없어 뺀다.
-  page.on('console', m => { if (m.type() === 'error' && !/\/favicon\.ico$/.test(m.location()?.url || '')) errors.push(m.text().slice(0, 160)); });
-  await page.goto(base + route, {waitUntil: 'load', timeout: 90000});
-  return {context, page, failed, errors};
+const shot = async (page, name) => {
+  try { await page.screenshot({path: path.join(out, name.replace(/[^\w.-]+/g, '_') + '.png')}); return null; }
+  catch (error) { return `실패 화면 저장 오류: ${String(error).split('\n')[0]}`; }
+};
+async function open(device, route, readOnly = false) {
+  const probe = await createBrowserProbe({browser, base, device, staticPaths, readOnly});
+  try { await probe.page.goto(base + route, {waitUntil: 'load', timeout: 90000}); }
+  catch (error) { error.probe = probe; throw error; }
+  return probe;
+}
+
+// A transient static read gets one whole-scenario replay, never just a file re-fetch.
+let scenarioId = 0;
+async function checkScenario(step, device, route, exercise) {
+  const id = `${++scenarioId}-${step}-${device.name}-${route}`.replace(/[^\w.-]+/g, '_');
+  const result = await runScenarioCheck({
+    base,
+    run: async attempt => {
+      let probe, exception = null;
+      const assertions = [];
+      try {
+        probe = await open(device, route, attempt > 1);
+        await exercise(probe.page, assertions);
+      } catch (error) {
+        probe ||= error.probe;
+        exception = String(error).split('\n')[0].slice(0, 240);
+      }
+      const observation = probe ? probe.snapshot({assertions, exception}) : {
+        bad: [exception || '브라우저를 열지 못함'], httpFailures: [], requestFailures: [], consoleErrors: [],
+        pageErrors: [], writeRequests: [], assertions, exception: exception || '브라우저를 열지 못함',
+      };
+      if (probe && observation.bad.length) {
+        const screenshotError = await shot(probe.page, `${id}-attempt-${attempt}`);
+        if (screenshotError) { observation.assertions.push(screenshotError); observation.bad.push(screenshotError); }
+      }
+      await probe?.context.close();
+      return observation;
+    },
+    onAttempt: async (observation, attempt) => {
+      if (observation.bad.length || attempt > 1) {
+        fs.writeFileSync(path.join(out, `${id}-attempt-${attempt}.json`), JSON.stringify({step, device: device.name, route, attempt, ...observation}, null, 2) + '\n');
+      }
+    },
+  });
+  if (result.recovered) {
+    const initial = result.attempts[0].httpFailures.map(f => `${f.status} ${new URL(f.url).pathname}`).join(', ');
+    const note = `${device.name} ${route}: 첫 ${initial} → 새 화면 전체 재검사 1회 통과 (첫 실패 증거 보존)`;
+    notes.push(note);
+    recoveredScenarios.push({step, device: device.name, route, evidencePrefix: id, attempts: result.attempts.length});
+    console.log(`  △ ${note}`);
+    if (ci) console.log(`::warning::${note.replace(/%/g, '%25').replace(/\r/g, '%0D').replace(/\n/g, '%0A')}`);
+  } else if (!result.ok) {
+    fail(step, `${device.name} ${route}: ${result.attempts.at(-1).bad.slice(0, 3).join(' | ')}${result.attempts.length > 1 ? ' (재검사도 실패)' : ''}`);
+  }
 }
 
 // 3. 페이지
@@ -139,18 +186,14 @@ const routes = git('ls-files', '-z').toString('utf8').split('\0')
   .filter(f => /^(?:[^/]+\/){0,2}index\.html$/.test(f) && !/^(try|id|id-rehearsal|brief)\//.test(f))
   .map(f => '/' + f.replace(/index\.html$/, ''));
 for (const device of devices) for (const route of routes) {
-  let s;
-  try {
-    s = await open(device, route);
-    const height = await s.page.evaluate(() => document.documentElement.scrollHeight);
-    for (let y = 0; y < height; y += 800) { await s.page.evaluate(v => window.scrollTo(0, v), y); await s.page.waitForTimeout(40); }
-    await s.page.waitForTimeout(800);
-    const wide = await s.page.evaluate(() => ({inner: innerWidth, visual: Math.round(visualViewport.width), scroll: document.documentElement.scrollWidth}));
+  await checkScenario('페이지', device, route, async (page, assertions) => {
+    const height = await page.evaluate(() => document.documentElement.scrollHeight);
+    for (let y = 0; y < height; y += 800) { await page.evaluate(v => window.scrollTo(0, v), y); await page.waitForTimeout(40); }
+    await page.waitForTimeout(800);
+    const wide = await page.evaluate(() => ({inner: innerWidth, visual: Math.round(visualViewport.width), scroll: document.documentElement.scrollWidth}));
     const overflow = wide.scroll > wide.inner + 1 || wide.inner > wide.visual + 1;
-    const bad = [...s.failed, ...s.errors, ...(overflow ? [`가로 넘침 ${wide.scroll}/${wide.inner}/${wide.visual}`] : [])];
-    if (bad.length) { fail('페이지', `${device.name} ${route}: ${bad.slice(0, 3).join(' | ')}`); await shot(s.page, `page-${device.name}-${route}`); }
-  } catch (e) { fail('페이지', `${device.name} ${route}: 열리지 않음 ${String(e).slice(0, 120)}`); }
-  await s?.context.close();
+    if (overflow) assertions.push(`가로 넘침 ${wide.scroll}/${wide.inner}/${wide.visual}`);
+  });
 }
 console.log(`  ${routes.length}쪽 × ${devices.length}기기`);
 
@@ -167,21 +210,16 @@ let games = [];
   for (const g of games) if (!g.videoOk) fail('게임', `LAB 카드 ${g.id}: 플레이 장면 영상 ${g.video || '(주소 없음)'}을 못 받음`);
 }
 for (const device of devices) for (const game of games) {
-  let s;
-  try {
-    s = await open(device, game.href);
-    await s.page.waitForTimeout(1500);
+  await checkScenario('게임', device, game.href, async page => {
+    await page.waitForTimeout(1500);
     const start = startOf[game.id];
     if (!start) notes.push(`${game.id}: 시작 단추를 몰라 열기만 확인함`);
     else {
-      await s.page.waitForSelector(`${start}:not([disabled])`, {state: 'visible', timeout: 90000});
-      await s.page.click(start, {timeout: 10000});
-      await s.page.waitForTimeout(8000);
+      await page.waitForSelector(`${start}:not([disabled])`, {state: 'visible', timeout: 90000});
+      await page.click(start, {timeout: 10000});
+      await page.waitForTimeout(8000);
     }
-    const bad = [...s.failed, ...s.errors];
-    if (bad.length) { fail('게임', `${device.name} ${game.href}: ${bad.slice(0, 3).join(' | ')}`); await shot(s.page, `game-${device.name}-${game.id}`); }
-  } catch (e) { fail('게임', `${device.name} ${game.href}: ${String(e).split('\n')[0].slice(0, 140)}`); if (s) await shot(s.page, `game-${device.name}-${game.id}`); }
-  await s?.context.close();
+  });
 }
 console.log(`  게임 ${games.length}개 × ${devices.length}기기`);
 
@@ -203,7 +241,9 @@ console.log('5. 질문창');
 }
 await browser.close();
 
-const summary = [`## synk.im 배포 점검 ${problems.length ? `— 문제 ${problems.length}개` : '— 문제 없음'}`, '',
+const status = problems.length ? 'failed' : recoveredScenarios.length ? 'transient-recovered' : 'passed';
+fs.writeFileSync(path.join(out, 'result.json'), JSON.stringify({status, checkedAt: new Date().toISOString(), problems, notes, recoveredScenarios}, null, 2) + '\n');
+const summary = [`## synk.im 배포 점검 ${problems.length ? `— 문제 ${problems.length}개` : recoveredScenarios.length ? `— 일시 오류 ${recoveredScenarios.length}개 재검사로 복구` : '— 문제 없음'}`, '',
   ...(problems.length ? problems.map(p => `- ${p}`) : ['- 반영, 도구 이름, 페이지, LAB 게임, 질문창 모두 통과']),
   ...(notes.length ? ['', ...notes.map(n => `- 참고: ${n}`)] : [])].join('\n');
 if (process.env.GITHUB_STEP_SUMMARY) fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY, summary + '\n');

@@ -28,13 +28,15 @@ jobs:
         run: |
           npm install --no-save --no-package-lock playwright@1.62.1
           npx playwright install --with-deps chromium
+      - name: 재검사 규칙 회귀 검사
+        run: node --test .github/site-check/*.test.mjs
       - name: 점검
         run: node .github/site-check/check.mjs
         env:
           SITE_BASE: https://synk.im
           GH_TOKEN: ${{ github.token }}
-      - name: 문제가 난 화면 올리기
-        if: failure()
+      - name: 첫 실패와 재검사 기록 올리기
+        if: always()
         uses: actions/upload-artifact@v7
         with:
           name: site-check-screens
