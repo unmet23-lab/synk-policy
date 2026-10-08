@@ -11,6 +11,9 @@ import { VOICE_LINE_BY_ID, voiceForMission } from './voice-lines.js';
 import { createStoryLearning, skillReport, assignmentMissions, storyTargetLabel, missionMetadata, SKILL_LABELS } from './learning.js';
 import { $, $$, esc, fitText } from './kit/lab.js';
 
+// Restore the verified account before reading progress or enabling play.
+await globalThis.SynkPlayAccount.ready();
+
 const QA = new URLSearchParams(location.search).has('qa');
 const game = new StoryGame(), audio = new StoryAudio();
 const learning = createStoryLearning({ storage: localStorage });
@@ -473,9 +476,9 @@ function accountStatus() {
     local: '이 계정의 학습 기록은 이 기기에 저장해요. 이야기 진행은 이번 창에서 이어가요.',
   }[status.phase] || '이 기기의 연습 기록을 저장해요.');
   if (scope.scope === 'device' && location.port === '5213') $('#account-status').textContent += ' 다른 게임과 함께 보려면 WORLD 입구에서 열어 주세요.';
-  const accountUrl = location.pathname.startsWith('/story-classroom/')
-    ? new URL('../synk-account/client.html?product=world', location.href)
-    : new URL('/lab/#work',location.href);
+  const accountUrl = location.pathname.startsWith('/try/story-classroom/')
+    ? new URL('/account/client.html?product=world', location.href)
+    : new URL('/account/client.html?product=world',location.href);
   $('#account-sign-in').href = accountUrl; $('#account-sign-out').href = accountUrl;
 }
 
@@ -505,7 +508,7 @@ function showResults() {
   $('#r-note').textContent = [`도움 없이 처음 해낸 부탁 ${independent}개`, `힌트 ${hinted}개`, `음성으로 들은 부탁 ${heard}개`].join(' · ');
   renderLog(); renderSkills();
   $('#r-hub').hidden = false;
-  $('#r-hub').href = location.pathname.startsWith('/story-classroom/') ? '/lab/#work' : '/lab/#work';
+  $('#r-hub').href = location.pathname.startsWith('/try/story-classroom/') ? '/try/learning-hub/' : '/try/learning-hub/';
   show('results');
   audio.play('reveal');
   $('#r-title').focus({ preventScroll: true });

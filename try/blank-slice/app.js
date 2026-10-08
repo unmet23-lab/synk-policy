@@ -9,6 +9,10 @@ import * as sound from './audio.js';
 import { swingPower } from './sfx.js';
 import { createStage, FEEL } from './stage.js';
 
+// Restore the verified account before reading progress or enabling play.
+await globalThis.SynkPlayAccount.ready();
+const progressStorage = globalThis.SynkPlayAccount.storage();
+
 const $ = (s) => document.querySelector(s);
 const el = (tag, cls, html) => { const n = document.createElement(tag); if (cls) n.className = cls; if (html != null) n.innerHTML = html; return n; };
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
@@ -26,11 +30,11 @@ const impacts = [];   // 확인용(?qa): 벤 순간의 시각·자리
 const KEY = 'synk.blank-slice.v1';
 let saved = true;
 function load() {
-  try { const p = JSON.parse(localStorage.getItem(KEY) || 'null'); if (p && p.v === 1) return p; } catch { saved = false; }
+  try { const p = JSON.parse(progressStorage.getItem(KEY) || 'null'); if (p && p.v === 1) return p; } catch { saved = false; }
   return { v: 1, plays: 0, practiced: false, slow: false, best: null };
 }
 const progress = load();
-const save = () => { try { localStorage.setItem(KEY, JSON.stringify(progress)); saved = true; } catch { saved = false; } };
+const save = () => { try { progressStorage.setItem(KEY, JSON.stringify(progress)); saved = true; } catch { saved = false; } };
 
 /* ── 아틀라스 ── */
 let coach = null;
@@ -477,7 +481,7 @@ function finish() {
   $('#r-next-reason').textContent = closed ? '이 WORLD 과제는 끝났어요. 이어서 하려면 WORLD에서 다시 열어 주세요.' : target ? `${assignmentLabel(target)}. WORLD에서 읽기 결과와 다음 과제를 확인해요.` : nextLine(next);
   $('#r-again span').textContent = target ? '목표 문장 다시 풀기' : '다음 판 시작';
   $('#r-again').disabled = closed;
-  $('#r-hub').hidden = hosted || !location.pathname.includes('/blank-slice/');
+  $('#r-hub').hidden = hosted || !location.pathname.includes('/try/blank-slice/');
   show('results');
   $('#r-title').focus({ preventScroll: true });
   announce(`${$('#r-title').textContent} ${s.total}문장 중 ${s.correct}개 맞혔어요. 별 ${s.stars}개, ${s.score}점.`);

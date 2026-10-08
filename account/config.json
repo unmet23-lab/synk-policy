@@ -3,7 +3,7 @@
   "supabaseUrl": "https://qiwxeddwwnzkwalpsuty.supabase.co",
   "supabasePublishableKey": "sb_publishable_g_T9VApp7f7L3girlJW8hA_j__pZjED",
   "portalUrl": "https://synk.im/id/",
-  "learningUrl": "https://synk.im/lab/#work",
+  "learningUrl": "https://synk.im/try/learning-hub/",
   "authorizationClients": [
     {
       "product": "world",
@@ -103,7 +103,8 @@
       "product": "world",
       "clientId": "d4f8347e-72a4-4c8c-8d5f-00aece7ac137",
       "redirectUris": [
-        "http://127.0.0.1:4280/synk-account/client.html?product=world"
+        "http://127.0.0.1:4280/synk-account/client.html?product=world",
+        "https://synk.im/account/client.html?product=world"
       ]
     },
     {
@@ -164,8 +165,8 @@
       "redirectUri": "https://synk.im/account/client.html?product=platform"
     },
     "world": {
-      "clientId": "",
-      "redirectUri": ""
+      "clientId": "d4f8347e-72a4-4c8c-8d5f-00aece7ac137",
+      "redirectUri": "https://synk.im/account/client.html?product=world"
     },
     "messenger": {
       "clientId": "",

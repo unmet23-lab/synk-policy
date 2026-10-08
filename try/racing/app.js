@@ -6,12 +6,12 @@
 import * as THREE from 'three';
 import { GLTFLoader } from './vendor/GLTFLoader.js';
 import { DRACOLoader } from './vendor/DRACOLoader.js';
-import { WORDS, STAGES, WORD_BY_ID, PROGRESS_KEY, makeQuestions, loadProgress, recordRound } from './learning.js';
+import { WORDS, STAGES, WORD_BY_ID, PROGRESS_KEY, makeQuestions, loadProgress, recordRound, answerFeedback } from './learning.js';
 import { Narrator } from './narration.js';
 import { LANE_AUDIO, questionNarration } from './question-audio.js';
 import { CAMPAIGN, campaignUnlocked, recommendedStage, medalFor } from './campaign.js';
 import { resolveContact, shieldContact, comboShield } from './driving.js';
-import { racingItem, personalizedStage, FLOW_RACE, FLOW_WORDS, BASE_CRUISE, racePressure, describeRace } from './personalization.js';
+import { racingItem, personalizedStage, racingFollowUp, racingRecheck, linkRacingRecheck, FLOW_RACE, FLOW_WORDS, BASE_CRUISE, racePressure, describeRace } from './personalization.js';
 import { finaleUnlocked } from './finales.js';
 import { VEHICLES, PAINTS, WHEELS, TRAILS, SHOP_ITEMS, loadGarage, saveGarage, dailyMission, awardRace } from './garage.js';
 import { buildAlternativeCar, customizeCar, createGarageStage, setVehicleQuality } from './vehicles.js';
@@ -38,6 +38,10 @@ import { showScreen, currentScreen, openDialog, closeDialog } from './screens.js
 import { wireGameLinks } from './links.js';
 import { bindSoundToggles } from './kit/lab.js';
 import { installQaHook } from './qa-hook.js';
+
+// Restore the verified account before reading progress or enabling play.
+await globalThis.SynkPlayAccount.ready();
+const progressStorage = globalThis.SynkPlayAccount.storage();
 
 const $ = (id) => document.getElementById(id);
 const QA = new URLSearchParams(location.search).has('qa');
@@ -129,13 +133,13 @@ let scenery = {}, contactTimer = 0, collisions = 0, combo = 0, bestCombo = 0, qu
 const clock = new THREE.Clock();
 const sunDirection = new THREE.Vector3(92, 93, 56).normalize();
 let progress;
-try { progress = loadProgress(localStorage); } catch { progress = loadProgress({ getItem: () => null }); }
+try { progress = loadProgress(progressStorage); } catch { progress = loadProgress({ getItem: () => null }); }
 // 처음 여는 사람은 첫 코스, 다시 온 사람은 아직 통과하지 못한(또는 가장 덜 익숙한) 코스부터 보인다.
 let selectedStage = recommendedStage(progress), questionBank = makeQuestions(selectedStage);
 let roundWasDemo = false, starting = false, narrationUnavailable = false, questionExpanded = false;
 let tutorial = null, tutorialVoicePending = false, tutorialDismissed = false, tutorialSaved = true, tutorialBank = null, tutorialIdle = 0, tutorialGoHint = false;
 let tutorialCompleted = false;
-try { tutorialCompleted = loadTutorial(localStorage).completed; } catch { /* 저장 공간이 없으면 연습부터 */ }
+try { tutorialCompleted = loadTutorial(progressStorage).completed; } catch { /* 저장 공간이 없으면 연습부터 */ }
 const TUTORIAL_CLIPS = ['welcome', 'right', 'listen', 'choices', 'retry', 'correct', 'boost', 'finish', 'go'].map((id) => 'tutorial-' + id);
 const tutorialFruits = ['사과', '포도', '바나나'].map((word) => WORDS.find((w) => w.word === word));
 const isUnlocked = (s) => (s.finale ? finaleUnlocked(progress, s) : campaignUnlocked(progress, s));
@@ -168,10 +172,11 @@ const stageClips = (s) => (s.campaign ? s.items.flatMap((q) => [...q.audio, ...q
 
 /* ── 공통 차고(공통 코인·장착) ── */
 function loadGarageSafe() {
-  try { const value = loadGarage(localStorage); garageSaved = true; return value; }
+  try { const value = loadGarage(globalThis.SynkPlayAccount.storage()); garageSaved = true; return value; }
   catch { garageSaved = false; return loadGarage({ getItem: () => null }); }
 }
 function storeGarage(value) {
+  if(globalThis.SynkPlayAccount.status().mode==='account')return false;
   garage = value;
   let saved = false;
   try { saved = saveGarage(value, localStorage); } catch { /* 아래에서 알린다 */ }
@@ -260,7 +265,7 @@ const garageUI = createGarageUI({
   onClose: closeGarage,
   onMission: playMission,
   readProgress: () => progress,
-  readGarage: () => { try { if (localStorage.getItem('SYNK_PLAY_COLLECTION_V1')) garage = loadGarage(localStorage); } catch { /* 지금 가진 것으로 */ } return garage; },
+  readGarage: () => { garage=loadGarageSafe();return garage; },
   writeGarage: storeGarage,
 });
 document.addEventListener('input', (e) => { if (e.target.id === 'garage-angle') garageAngle = Number(e.target.value) * Math.PI / 180; });
@@ -639,7 +644,7 @@ function tutorialTap(direction) {
 function finishTutorial() {
   running = false; finished = true; inputs.left = inputs.right = false; boost = 0; velocity = 0; screenEl.classList.remove('boosting'); screenEl.classList.add('tutorial-done'); silence();
   tutorialCompleted = true;
-  try { tutorialSaved = saveTutorialCompleted(localStorage); } catch { tutorialSaved = false; }
+  try { tutorialSaved = saveTutorialCompleted(progressStorage); } catch { tutorialSaved = false; }
   hud.resetLanes(); renderLobby(); tutorialSpeak(['tutorial-finish'], '좋아! 이제 레이스를 시작해 보자.'); renderTutorial();
 }
 function updateTutorial(dt) {
@@ -792,10 +797,23 @@ function finish(){
   // 마지막 해설은 드라이브 위에서 끝까지 듣는다(라디오는 그 아래로 낮춘다). 여기서 긴 말을 기다리면 차가 길 끝을 넘을 수 있다.
   finished=true;inputs.left=inputs.right=false;screenEl.classList.remove('boosting');const flowEnd=endLive();
   const rank=1+rivals.filter(r=>r.s>playerS).length,total=questionBank.length,passed=correct>=Math.ceil(total*.8);
-  const earned=awardRace(loadGarageSafe(),selectedStage,answers,{automatic:roundWasDemo,beforeProgress:progress,roundId});
-  if(!roundWasDemo)storeGarage(earned.state);
-  progress=recordRound(progress,selectedStage,answers,{automatic:roundWasDemo,collisions});
-  let saved=true;if(!roundWasDemo)try{localStorage.setItem(PROGRESS_KEY,JSON.stringify(progress));}catch{saved=false;}
+  // Adaptive follow-ups can replace an item after the course was selected.
+  // Reward the questions actually played; authored courses keep their canonical list.
+  const completedStage=selectedStage.personalized?{...selectedStage,items:questionBank}:selectedStage;
+  let earned,pendingReward=null;const finishedRound=roundId;
+  const accountRound=!roundWasDemo&&globalThis.SynkPlayAccount.status().mode==='account';
+  if(accountRound){
+    pendingReward=globalThis.SynkPlayAccount.wallet('awardRace',[
+      {id:completedStage.id,...(completedStage.campaign?{questionIds:completedStage.items.map(q=>q.id)}:{wordIds:completedStage.words})},
+      answers.map(a=>({...('id' in a?{id:a.id}:{}),...('answer' in a?{answer:a.answer}:{}),correct:a.correct})),
+      {automatic:false,roundId,collisions}
+    ]);
+    earned={state:loadGarageSafe(),coins:0,breakdown:[],newUnlocks:[],reason:'account-pending'};
+  }else{earned=awardRace(loadGarageSafe(),completedStage,answers,{automatic:roundWasDemo,beforeProgress:progress,roundId});if(!roundWasDemo)storeGarage(earned.state);}
+  // Account rewards and progress are one server transaction. Keep the next-course
+  // UI responsive, but never queue this draft ahead of (or after) that transaction.
+  progress=recordRound(progress,completedStage,answers,{automatic:roundWasDemo,collisions});
+  let saved=true;if(!roundWasDemo&&!accountRound)try{progressStorage.setItem(PROGRESS_KEY,JSON.stringify(progress));}catch{saved=false;}
   const next=nextStage();
   $('next-stage').disabled=!next||!roundWasDemo&&!isUnlocked(next);$('next-stage').hidden=$('next-stage').disabled;
   $('next-stage').firstChild.textContent=next?.finale?'챕터 결승전 달리기':next?.personalized?'맞춤 5문항 달리기':next?'다음 코스 달리기':'마지막 코스예요';
@@ -806,6 +824,38 @@ function finish(){
   $('cruise-next').textContent=next?.finale?'결과 · 다음 챕터':next?'결과 · 다음 코스':'결과 · 다시 달리기';
   $('toast').hidden=true;toastTime=0;laterToast=null;
   syncCoastRadio();
+  const confirmReward=result=>{
+    if(roundId!==finishedRound||!finished)return;
+    // Read the host's current record, including a retried receipt, rather than a
+    // stale result snapshot. An older round must never replace the next round UI.
+    progress=loadProgress(progressStorage);
+    garage=result.state;renderCollection();renderLobby();renderResults(resultSummary({rank,total,passed,earned:result,saved,flowEnd,next}));
+  };
+  if(pendingReward)void pendingReward.then(confirmReward).catch(cause=>{
+    // The host marks only definitive rejections whose full command it preserved.
+    // Unknown/network failures remain pending and can retry the original command.
+    if(roundId!==finishedRound||!finished)return;
+    if(cause.rejected!==true){
+      // Retry can acknowledge the preserved command after this Promise rejected.
+      // Recover only its confirmed receipt; never issue another award command.
+      let unsubscribe,settled=false;
+      const restore=()=>{
+        if(settled)return;
+        if(roundId!==finishedRound||!finished){settled=true;unsubscribe?.();return;}
+        const current=loadGarageSafe(),receipt=current.rewardedRounds[finishedRound];
+        if(!receipt)return;
+        settled=true;unsubscribe?.();
+        confirmReward({state:current,coins:receipt.coins,breakdown:[],newUnlocks:[],reason:null});
+      };
+      unsubscribe=globalThis.SynkPlayAccount.subscribe(restore);
+      if(settled)unsubscribe();
+      return;
+    }
+    progress=loadProgress(progressStorage);garage=loadGarageSafe();saved=false;
+    $('next-stage').disabled=!next||!isUnlocked(next);$('next-stage').hidden=$('next-stage').disabled;
+    renderCollection();renderLobby();
+    renderResults(resultSummary({rank,total,passed,earned:{state:garage,coins:0,breakdown:[],newUnlocks:[],reason:'account-rejected'},saved,flowEnd,next}));
+  });
 }
 // 결과 화면에 줄 것: 맞힌 수·메달·순위·공통 코인·문제 목록·보상·다음 레이스.
 function resultSummary({rank,total,passed,earned,saved,flowEnd,next}){
@@ -814,19 +864,21 @@ function resultSummary({rank,total,passed,earned,saved,flowEnd,next}){
   for(const id of earned.newUnlocks)rewards.push({label:`새 컬렉션 · ${SHOP_ITEMS.find(i=>i.id===id)?.name}`,unlock:true});
   const plain=[];
   if(demo)plain.push('자동 시연은 코인·기록·메달·코스 열기에 넣지 않아요. 직접 달려서 도전해 보세요.');
+  else if(earned.reason==='account-pending')plain.push('보상 기록을 계정에 전송 대기 중이에요. 연결되면 같은 보상을 중복 없이 확인해요.');
+  else if(earned.reason==='account-rejected')plain.push('이번 보상 요청을 처리하지 못했어요. 요청 원본은 이 기기에 보관했으며 다른 게임은 계속할 수 있어요.');
   else if(!earned.coins)plain.push('오늘의 반복 완주 보상을 모두 받았어요.');
   if(!demo&&wishText())plain.push(wishText());
   const tuned=demo?[]:describeRace(flowStart,flowEnd?.settings?.values);
   const learning=demo?'자동 시연이라 학습 기록에 남기지 않았어요.':[`도움·반복·조작 영향을 뺀 새 응답 ${answers.filter(a=>a.learning?.independent).length}개를 맞춤 추천에 참고해요.`,
-    tuned.length?`이번 주행에서 맞춘 것: ${tuned.join(' · ')}.`:'',saved?'직접 달린 기록은 이 브라우저에 저장했어요.':'브라우저 저장이 제한되어 이번 화면에서만 기록을 볼 수 있어요.',learningScope()].filter(Boolean).join(' ');
+    tuned.length?`이번 주행에서 맞춘 것: ${tuned.join(' · ')}.`:'',saved?(globalThis.SynkPlayAccount.status().mode==='account'?'직접 달린 기록을 계정에 이어 저장해요. 위의 저장 상태를 확인해 주세요.':'직접 달린 체험 기록은 이 브라우저에 저장했어요.'):earned.reason==='account-rejected'?'이번 기록은 계정에 반영되지 않았어요. 요청 원본은 이 기기에 보관했어요.':'기록을 보관하지 못했어요. 저장 상태를 확인해 주세요.',learningScope()].filter(Boolean).join(' ');
   const coinText=demo?'자동 시연은 공통 코인을 지급하지 않아요.':earned.coins?`공통 코인 +${earned.coins} · 보유 ${earned.state.coins.toLocaleString('ko-KR')}`
-    :earned.reason==='duplicate-round'?'이번 완주 보상은 이미 차고에 모였어요.':'오늘의 완주 코인 10회분을 모두 받았어요.';
+    :earned.reason==='account-pending'?'보상을 계정에 저장하는 중이에요.':earned.reason==='account-rejected'?'이번 보상은 지급되지 않았어요. 요청 원본은 보관했어요.':earned.reason==='duplicate-round'?'이번 완주 보상은 이미 차고에 모였어요.':'오늘의 완주 코인 10회분을 모두 받았어요.';
   const note=demo?'미리보기로 달렸어요. 기록 없이 체험했어요.':correct===total?'모두 맞혔어요! 메달 셋을 받았어요.':passed?'통과했어요! 메달 둘을 받았어요.'
     :`${need}문제 이상 맞히면 통과예요. 놓친 문제를 다시 들어 봐요.`;
   // 낱말 문제에는 id가 없다: 정답 낱말로 찾는다(예전 결과 화면은 이 경우 첫 문제만 찾았다).
   const questions=answers.map(a=>{const q=questionBank.find(item=>a.id?item.id===a.id:item.answer===a.answer)||{};
     return {prompt:q.id?q.prompt:q.mode==='picture'?'들은 단어의 그림 고르기':'들은 단어 고르기',answer:q.word,chosen:a.correct?null:WORD_BY_ID[a.chosen]?.word,correct:a.correct,
-      why:q.id?[q.passage?`${q.mode==='reading'?'지문':'들은 말'}: ${q.passage.replace(/\n/g,' · ')}`:'',q.explanation||''].filter(Boolean).join(' — '):''};});
+      why:[q.id?[q.passage?`${q.mode==='reading'?'지문':'들은 말'}: ${q.passage.replace(/\n/g,' · ')}`:'',q.explanation||''].filter(Boolean).join(' — '):'',a.recheck?.line].filter(Boolean).join(' ')};});
   const nextReason=!next?'마지막 코스까지 왔어요. 메달을 더 모으거나 어휘 연습을 달려 봐요.':!demo&&!isUnlocked(next)?`${need}문제 이상 맞히면 다음 코스가 열려요. 이 코스를 한 번 더 달려 봐요.`
     :`다음: ${labelStage(next)}`;
   return {kicker:labelStage(selectedStage),demo,correct,total,medal,passed:!demo&&passed,rank,bestCombo,collisions,coinText,note,questions,rewards,plain,learning,nextReason,listen:i=>listenAgain(answers[i])};
@@ -860,10 +912,11 @@ function judgeGate(){
   const lane=clamp(Math.round((playerOffset+3.45)/3.45),0,2),chosen=gate.types[lane],success=chosen===gate.q.answer;
   if(gate.presentationId&&!roundWasDemo){
     const assessable=gate.intentChoice===chosen;
-    gate.learning=answerGate(gate.presentationId,{correct:success,assessable,reason:assessable?undefined:'motor'},
+    gate.learning=answerGate(gate.presentationId,{correct:success,assessable,reason:assessable?undefined:'motor',choice:{selectedId:chosen,correctId:gate.q.answer}},
       assessable?{pressure:racePressure({readyAt:gate.readyAt,choseAt:gate.choseAt,cruise,campaign:!!selectedStage.campaign,roadLeft:gate.readyRoad})}:{outcome:'void'});
   }
-  gate.judged=true;answers.push({id:gate.q.id,prompt:gate.q.prompt,answer:gate.q.answer,chosen,correct:success,learning:gate.learning});
+  gate.recheck=roundWasDemo?null:learn(c=>racingRecheck(c,gate.q,gate.learning));
+  gate.judged=true;answers.push({id:gate.q.id,prompt:gate.q.prompt,answer:gate.q.answer,chosen,correct:success,learning:gate.learning,recheck:gate.recheck});
   $('repeat-question').hidden=true;$('go').hidden=true;setQuestionExpanded(false);laneAim=null;
   hud.markLanes(chosen,gate.q.answer);
   if(success){
@@ -875,8 +928,26 @@ function judgeGate(){
   shield=comboShield(combo,success,shield);
   if(success&&combo%3===0){showToast(`${combo}콤보! 다음 접촉을 막는 보호막이 생겼어요`,3);speak(['shield-ready'],'연속 정답! 보호막이 생겼어.','reward');}
   setText($('combo'),[combo>=2?`${combo}콤보`:'',shield?'보호막':''].filter(Boolean).join(' · '));
-  hud.answerQuestion({ok:success,word:gate.q.word,why:gate.q.explanation||(success?'정답 부스터로 앞차를 따라잡아요.':'소리와 그림을 기억하고, 계속 달려요.')});
+  const needsPractice=!roundWasDemo&&(!success||gate.learning?.assisted);
+  const reviewing=needsPractice||!!gate.recheck?.line;
+  const follow=needsPractice&&gate.learning?.verdict!=='unassessed'?linkRacingRecheck(learn(c=>racingFollowUp(c,{current:gate.q,remaining:questionBank.slice(gateIndex+1),stage:selectedStage,audioAvailable:soundEnabled&&!narrationUnavailable})),gate.learning):null;
+  if(follow)questionBank.splice(gateIndex+1,questionBank.length-gateIndex-1,...follow.remaining);
+  const nextNote=follow?.status==='new'?' 같은 영역의 새 문제로 확인해 봐요.':follow?.status==='unavailable'?' 같은 목표의 새 문제를 확인하지 못해 예정된 코스를 이어가요.':'';
+  hud.answerQuestion({ok:success,word:gate.q.word,why:[answerFeedback(gate.q,chosen),gate.recheck?.line,nextNote].filter(Boolean).join(' '),hold:reviewing?null:4200});
+  gate.reviewing=reviewing;
+  if(reviewing){
+    velocity=0;inputs.left=inputs.right=false;
+    $('question-toggle').hidden=true;$('feedback-continue').hidden=false;
+    $('feedback-continue').textContent=follow?.status==='new'?'새 문제로 확인하기':'확인했어요 · 계속 달리기';
+    $('feedback-continue').focus({preventScroll:true});
+  }
   if(gate.presentationId)learn(c=>c.help(gate.presentationId,'answer'));
+}
+
+function continueFeedback(){
+  if(!running||paused||!gate?.reviewing)return;
+  gate.reviewing=false;inputs.left=inputs.right=false;questionPace.answered(elapsed);
+  hud.hideQuestion();$('question-toggle').hidden=false;silence();clock.getDelta();
 }
 
 /* ── 주행: 접촉·보호막·드라이브·레이스 한 걸음 ── */
@@ -948,6 +1019,7 @@ function updateCoastDrive(dt){
   if(soundEnabled&&audio){motor.frequency.setTargetAtTime(45+velocity*1.8,audio.currentTime,.15);motorGain.gain.setTargetAtTime(narrator.playing?.01:.026,audio.currentTime,.18);windGain.gain.setTargetAtTime(velocity*(narrator.playing?.0002:.00055),audio.currentTime,.18);}
 }
 function updateGame(dt){
+  if(gate?.reviewing){velocity=0;setText($('speed'),0);return;}
   elapsed+=dt;
   if(gate?.announced&&(inputs.left||inputs.right))questionChosen=true;
   if(auto&&gate&&gate.announced&&!gate.judged)aimOffset=LANES[gate.types.indexOf(gate.q.answer)];
@@ -1105,6 +1177,7 @@ window.addEventListener('storage', (e) => {
   garage = loadGarageSafe(); renderCollection();
   if (garageOpen) { garageUI.render(); previewEquipment(garageUI.previewItem); }
 });
+window.addEventListener('synk:collection-change',()=>{garage=loadGarageSafe();renderCollection();if(garageOpen){garageUI.render();previewEquipment(garageUI.previewItem);}});
 $('repeat-question').addEventListener('click', async () => {
   if (!running || paused || gate?.judged) return;
   if (!soundEnabled) { soundEnabled = true; soundTouched = true; updateSoundButton(); setQuestionExpanded(false); }
@@ -1113,6 +1186,7 @@ $('repeat-question').addEventListener('click', async () => {
 $('subtitles').addEventListener('click', () => { subtitlesOn = !subtitlesOn; $('subtitles').setAttribute('aria-pressed', String(subtitlesOn)); displayQuestion(); });
 $('question-toggle').addEventListener('click', () => { if (!running || paused || !gate?.announced || gate.judged) return; setQuestionExpanded(!questionExpanded); });
 $('go').addEventListener('click', chooseCurrentLane);
+$('feedback-continue').addEventListener('click', continueFeedback);
 $('tutorial-replay').addEventListener('click', () => { if (!ready) { lobbyNote('해안도로를 준비하고 있어요. 잠시 뒤에 다시 눌러 주세요.'); return; } startTutorial(); });
 $('tutorial-repeat').addEventListener('click', async () => {
   if (!tutorial || paused) return;

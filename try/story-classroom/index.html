@@ -12,7 +12,6 @@
 <link rel="preload" href="assets/classroom.webp" as="image">
 <link rel="stylesheet" href="kit/lab.css">
 <link rel="stylesheet" href="style.css">
-<style>#account-panel{display:none!important}</style>
 </head>
 <body>
 <p id="sr-live" class="sr" aria-live="polite"></p>
@@ -72,9 +71,9 @@
     <section id="account-panel" class="account" aria-labelledby="account-title">
       <p><b id="account-title">WORLD 학습 기록</b> <span id="account-status" role="status">이 기기의 연습 기록을 저장해요.</span></p>
       <div class="account-actions">
-        <a id="account-sign-in" class="chip-btn" href="/lab/#work">WORLD 계정으로 열기</a>
+        <a id="account-sign-in" class="chip-btn" href="/account/client.html?product=world&amp;game=story-classroom">WORLD 계정으로 열기</a>
         <button id="account-sync" class="chip-btn" type="button" hidden>기록 다시 보내기</button>
-        <a id="account-sign-out" class="chip-btn" href="../synk-account/client.html?product=world" hidden>WORLD 계정 관리</a>
+        <a id="account-sign-out" class="chip-btn" href="/account/client.html?product=world" hidden>WORLD 계정 관리</a>
       </div>
     </section>
   </footer>
@@ -224,7 +223,7 @@
   <button id="journal-close" class="felt-cta cream" type="button"><span>닫기</span><i class="disc" aria-hidden="true"></i></button>
 </dialog>
 
-<script src="./atlas-learning.js?v=43f511c88e01"></script>
+<script src="./atlas-learning.js"></script>
 <script type="module" src="./app.js"></script>
 <script src="./collection.js"></script>
 </body>

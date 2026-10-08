@@ -1,11 +1,18 @@
 import { WORDS, STAGES } from './curriculum.js';
 import { CAMPAIGN, CHALLENGE_BY_ID, CHOICE_BY_ID, medalFor } from './campaign.js';
 import { FINALES, FINALE_QUESTION_BY_ID, FINALE_CHOICE_BY_ID } from './finales.js';
+import { josa } from './kit/josa.js';
 export { WORDS, STAGES };
 export const WORD_BY_ID = {...Object.fromEntries(WORDS.map(w => [w.id,w])),...CHOICE_BY_ID,...FINALE_CHOICE_BY_ID};
 const QUESTION_BY_ID = {...CHALLENGE_BY_ID,...FINALE_QUESTION_BY_ID};
 const RECORDED_STAGES = [...STAGES,...CAMPAIGN,...FINALES];
 export const PROGRESS_KEY = 'SYNK_LAB_PLAY_PROGRESS_V1';
+export function answerFeedback(question,selected){
+  const chosen=WORD_BY_ID[selected]?.word||selected,why=question.explanation||`들은 낱말은 ${question.word}${josa(question.word,'이에요','예요')}.`;
+  if(selected===question.answer)return why;
+  const source=question.passage?`${question.mode==='reading'?'안내문':'들은 말'}: “${question.passage.replace(/\n/g,' · ')}” `:'';
+  return `고른 답은 “${chosen}”${josa(chosen,'이에요','예요')}. ${source}${why}`;
+}
 const shuffle = (items,rng) => { const a=[...items]; for(let i=a.length-1;i>0;i--){const j=Math.floor(rng()*(i+1));[a[i],a[j]]=[a[j],a[i]];} return a; };
 export function makeQuestions(stage,rng=Math.random) {
   if(stage.campaign)return stage.items.map(q=>({...q,options:shuffle(q.options,rng)}));
