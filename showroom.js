@@ -13,7 +13,9 @@ for(const section of document.querySelectorAll('[data-showroom]')){
  }
  for(const button of buttons)button.addEventListener('click',()=>filter(button.dataset.showroomFilter));
  function revealLinkedCase(){
-  const card=cards.find(item=>'#'+item.id===location.hash);
+  let id;
+  try{id=decodeURIComponent(location.hash.slice(1));}catch{return;}
+  const card=cards.find(item=>item.id===id);
   if(!card)return;
   filter('all');
   card.querySelector('details').open=true;
