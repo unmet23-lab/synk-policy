@@ -1,7 +1,7 @@
-import { DEFAULT_PROFILE, PRESETS, normalizeProfile, buildRecommendations, formatMoney, VERSION } from './model.mjs';
-import { loadSavedTrip, saveTrip, clearSavedTrip, exportPlan, STORAGE_KEY } from './storage.mjs';
-import { DETAIL_FIELDS, EXECUTION_FIELDS, createPersonalization, setPreference, removePreference, startNewTrip, summarizePersonalization, validatePersonalization } from './profile.mjs';
-import { prepareConversation, reviewConversation } from './conversation.mjs';
+import { DEFAULT_PROFILE, PRESETS, normalizeProfile, buildRecommendations, formatMoney, VERSION } from './model.mjs?v=d46684a47584';
+import { loadSavedTrip, saveTrip, clearSavedTrip, exportPlan, STORAGE_KEY } from './storage.mjs?v=9390df6f4af9';
+import { DETAIL_FIELDS, EXECUTION_FIELDS, createPersonalization, setPreference, removePreference, startNewTrip, summarizePersonalization, validatePersonalization } from './profile.mjs?v=dcc86f8037d0';
+import { prepareConversation, reviewConversation } from './conversation.mjs?v=3542da88d489';
 
 const $ = selector => document.querySelector(selector);
 const form = $('#preferences-form');

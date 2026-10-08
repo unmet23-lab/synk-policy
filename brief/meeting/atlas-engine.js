@@ -1,18 +1,31 @@
-/* SYNK Atlas. Canonical source: SYNK-appsscript/atlas/engine.js.
- * Pure, portable decision core. No network, model calls or implicit tracking.
+/* SYNK Core decisions and the shared session entry point.
+ * Canonical source: SYNK-appsscript/atlas/engine.js.
+ * Atlas names the eight-engine family, not a separate decision engine.
+ * Core owns understand/decide/choice; the session delegates practice provenance
+ * to Trail. Extend each engine at its own source, not all features in this file.
+ * Ownership: docs/엔진8종_상향설계_v3.md#engine-owner-sources.
+ * SynkAtlas, this file path and atlas-* policy IDs remain compatibility names.
+ * Pure and portable. No network, model calls or implicit tracking.
  * Shared machinery does not grant permission to combine subjects or domains.
- * atlas-2: one loop (remember -> decide -> deliver -> check). Engines plug in levers.
+ * atlas-2: Core selects registered levers; their owner engines deliver and check.
  * The shape and the content of an experience adapt; what an assessment means is never a lever.
  */
 (function (root, factory) {
-  if (typeof module === 'object' && module.exports) module.exports = factory();
-  else root.SynkAtlas = factory();
-})(typeof globalThis !== 'undefined' ? globalThis : this, function () {
+  if (typeof module === 'object' && module.exports) module.exports = factory(() => require('./trail'));
+  else root.SynkAtlas = factory(() => root.SynkAtlasTrail || root.SynkTrail);
+})(typeof globalThis !== 'undefined' ? globalThis : this, function (getTrail) {
   'use strict';
-  const VERSION = 'atlas-2.0.0';
+  const VERSION = 'atlas-2.4.0';
   // Decisions recorded by an earlier policy stay readable; a new plan is always stamped with VERSION.
-  const POLICIES = ['atlas-1.0.0', VERSION];
-  const DOMAINS = ['LAB', 'SHIFT', 'PULSE', 'PATH'];
+  const POLICIES = ['atlas-1.0.0', 'atlas-2.0.0', 'atlas-2.1.0', 'atlas-2.2.0', 'atlas-2.3.0', VERSION];
+  const trail = () => {
+    const module = getTrail();
+    if (!module || typeof module.validate !== 'function' || typeof module.checkLink !== 'function' || typeof module.summarize !== 'function') throw new Error('Atlas: Trail practice module unavailable');
+    return module;
+  };
+  const isPractice = event => typeof event?.type === 'string' && event.type.startsWith('practice.');
+  // SYNK is the shared product context; brand-domain scopes remain independent.
+  const DOMAINS = ['LAB', 'SHIFT', 'PULSE', 'PATH', 'SYNK'];
   const CONTEXT = {
     goal: ['explore', 'study', 'work', 'clarity', 'expression', 'prepare'],
     time: ['short', 'standard', 'unlimited'],
@@ -27,6 +40,12 @@
   const ARMS = ['adapted', 'baseline'];
   const DAY = 86400000, RECENT = 30 * DAY;
   const copy = value => JSON.parse(JSON.stringify(value));
+  const canonical = value => JSON.stringify(value, (_key, entry) => entry && typeof entry === 'object' && !Array.isArray(entry)
+    ? Object.fromEntries(Object.keys(entry).sort().map(key => [key, entry[key]])) : entry);
+  const freeze = value => {
+    if (value && typeof value === 'object' && !Object.isFrozen(value)) { Object.freeze(value); for (const k of Object.keys(value)) freeze(value[k]); }
+    return value;
+  };
   const validId = value => typeof value === 'string' && /^[a-zA-Z0-9_.:-]{1,120}$/.test(value);
   const unit = value => typeof value === 'number' && value >= 0 && value <= 1;
   const flag = value => value == null || typeof value === 'boolean';
@@ -47,7 +66,8 @@
     scopeKey(event.scope); ms(event.at); ms(event.recordedAt);
     if (ms(event.recordedAt) < ms(event.at)) throw new TypeError('Atlas: recorded before occurrence');
     // PULSE does not turn listening/activity into a personal behavioural profile, so it keeps none.
-    if (event.scope.domain === 'PULSE' && ['signal.observed', 'estimate.responded', 'outcome.observed'].includes(event.type)) throw new TypeError('Atlas: PULSE keeps no personal observations');
+    if (event.scope.domain === 'PULSE' && (isPractice(event) || ['signal.observed', 'estimate.responded', 'outcome.observed'].includes(event.type))) throw new TypeError('Atlas: PULSE keeps no personal observations');
+    if (isPractice(event)) return trail().validate(event);
     if (event.type === 'context.set') {
       if (!Object.hasOwn(CONTEXT, event.field) || !(event.value === null || CONTEXT[event.field].includes(event.value))) throw new TypeError('Atlas: invalid context');
       if (event.until != null && ms(event.until) <= ms(event.at)) throw new TypeError('Atlas: invalid expiry');
@@ -68,6 +88,8 @@
       if (!validId(event.line) || !ANSWERS.includes(event.value)) throw new TypeError('Atlas: invalid estimate response');
     } else if (event.type === 'outcome.observed') {
       if (!validId(event.decisionId) || !validId(event.measure) || !WINDOWS.includes(event.window) || !flag(event.assisted)) throw new TypeError('Atlas: invalid outcome');
+      if ((event.attemptId != null || event.targetLine != null)
+        && (!validId(event.attemptId) || !validId(event.targetLine) || !/^(need|due):/.test(event.targetLine))) throw new TypeError('Atlas: outcome proof needs an attempt and target line');
       // No value is neither failure nor zero effect, so it must say why.
       if (!(unit(event.value) && event.reason == null) && !(event.value === null && UNMEASURED.includes(event.reason))) throw new TypeError('Atlas: outcome needs a value or a reason');
     } else if (event.type === 'record.excluded') {
@@ -75,38 +97,81 @@
     } else throw new TypeError('Atlas: unknown event');
     return event;
   }
-  function append(events, event) {
-    validate(event);
-    const previous = events.find(e => e.id === event.id);
+  // Entries a session has admitted: validated once, owned by that session and frozen,
+  // so reading its log again neither re-validates them nor re-parses their times.
+  const admitted = new WeakMap();
+  // Link checks look events up by id. A session answers from its own index; a bare log is scanned.
+  const scan = events => ({
+    byId: id => events.find(e => e.id === id),
+    attempts: presentationId => {
+      const stats = { count: 0, latest: -Infinity };
+      for (const e of events) if (e.type === 'practice.attempted' && e.presentationId === presentationId) { stats.count += 1; stats.latest = Math.max(stats.latest, ms(e.at)); }
+      return stats;
+    },
+    events,
+  });
+  // Check one event against a log without copying the log. False means an exact replay.
+  function admit(events, event) { return admitWith(scan(events), event); }
+  function admitWith(lookup, event) {
+    // An entry another session already admitted is frozen and was validated then; its links
+    // and ids are still checked against this log below.
+    if (!admitted.has(event)) validate(event);
+    // Ids are unique in an admitted log, so "the event with this id, of this type" is one lookup.
+    const find = (id, type) => { const found = lookup.byId(id); return found && (!type || found.type === type) ? found : undefined; };
+    const previous = lookup.byId(event.id);
     if (previous) {
-      if (JSON.stringify(previous) !== JSON.stringify(event)) throw new Error('Atlas: conflicting event id');
-      return copy(events);
+      if (canonical(previous) !== canonical(event)) throw new Error('Atlas: conflicting event id');
+      return false;
+    }
+    if (isPractice(event)) {
+      const t = trail();
+      if (typeof t.link === 'function') t.link(event, lookup.byId(event.type === 'practice.presented' ? event.decisionId : event.presentationId), lookup.attempts(event.presentationId));
+      else t.checkLink(lookup.events, event);
     }
     if (event.type === 'feedback.given') {
-      const completion = events.find(e => e.id === event.completionId && e.type === 'experience.completed');
+      const completion = find(event.completionId, 'experience.completed');
       if (!completion || scopeKey(completion.scope) !== scopeKey(event.scope) || ms(completion.at) > ms(event.at)) throw new Error('Atlas: feedback requires a prior completion in the same scope');
     }
     if (event.type === 'experience.completed') {
-      const decision = events.find(e => e.type === 'decision.made' && e.id === event.decisionId);
+      const decision = find(event.decisionId, 'decision.made');
       if (!decision || scopeKey(decision.scope) !== scopeKey(event.scope) || decision.variant !== event.variant || decision.experienceId !== event.experienceId || ms(decision.at) > ms(event.at)) throw new Error('Atlas: completion requires the delivered decision');
     }
     if (event.type === 'outcome.observed') {
-      const decision = events.find(e => e.type === 'decision.made' && e.id === event.decisionId);
+      const decision = find(event.decisionId, 'decision.made');
       if (!decision || scopeKey(decision.scope) !== scopeKey(event.scope) || ms(decision.at) > ms(event.at)) throw new Error('Atlas: outcome requires a prior decision in the same scope');
+      if (event.attemptId != null) {
+        const attempt = find(event.attemptId, 'practice.attempted');
+        if (!attempt || scopeKey(attempt.scope) !== scopeKey(event.scope) || ms(attempt.at) > ms(event.at)
+          || ms(attempt.recordedAt) > ms(event.recordedAt)) throw new Error('Atlas: outcome proof requires a prior attempt in the same scope');
+      }
     }
     if (event.type === 'record.excluded') {
-      const target = events.find(e => e.id === event.targetId);
+      const target = find(event.targetId);
       if (!target || target.type === 'record.excluded' || scopeKey(target.scope) !== scopeKey(event.scope)) throw new Error('Atlas: invalid exclusion target');
     }
-    return [...copy(events), copy(event)];
+    return true;
+  }
+  function append(events, event) {
+    return admit(events, event) ? [...copy(events), copy(event)] : copy(events);
   }
   // Internal reading. understand() publishes the state; decide() also needs the decision history.
   function read(events, scope, asOf, recordedAsOf = asOf) {
     const key = scopeKey(scope), cutoff = ms(asOf), recordedCutoff = ms(recordedAsOf);
-    const ordered = events.map(validate).filter(e => scopeKey(e.scope) === key && ms(e.at) <= cutoff && ms(e.recordedAt) <= recordedCutoff)
-      // Stable sort preserves the append order when both clocks have the same
-      // millisecond. Random IDs are identity, never a causal ordering clock.
-      .sort((a, b) => ms(a.at) - ms(b.at) || ms(a.recordedAt) - ms(b.recordedAt));
+    // A session's own entries were validated when admitted; anything else is checked in full.
+    const rows = [];
+    let sorted = true, last = null;
+    for (const e of events) {
+      const known = admitted.get(e);
+      if (!known) validate(e);
+      const row = known || { key: scopeKey(e.scope), at: ms(e.at), recordedAt: ms(e.recordedAt) };
+      if (row.key !== key || row.at > cutoff || row.recordedAt > recordedCutoff) continue;
+      if (last && (row.at < last.at || (row.at === last.at && row.recordedAt < last.recordedAt))) sorted = false;
+      rows.push({ e, at: row.at, recordedAt: row.recordedAt }); last = row;
+    }
+    // Stable sort preserves the append order when both clocks have the same
+    // millisecond. Random IDs are identity, never a causal ordering clock.
+    if (!sorted) rows.sort((a, b) => a.at - b.at || a.recordedAt - b.recordedAt);
+    const ordered = rows.map(row => row.e);
     const excluded = new Set(ordered.filter(e => e.type === 'record.excluded').map(e => e.targetId));
     const context = {}, evidence = {}, expired = [], latest = {}, latestSignal = {}, latestAnswer = {}, lines = [];
     // Resolve newest declaration first. Its expiry must not resurrect an older declaration.
@@ -136,24 +201,31 @@
       lines.push({ key: line, kind: event.kind, source: 'observed', strength: event.strength, n: event.n, sufficiency, assisted: event.assisted ?? null, at: event.at, until,
         evidence: [event.id, ...(answer ? [answer.id] : [])], status, usable: !denied && (sufficiency !== 'thin' || status === 'confirmed') });
     }
-    const completed = new Map(ordered.filter(e => e.type === 'experience.completed' && !excluded.has(e.id)).map(e => [e.id, e]));
+    const decisions = new Map(ordered.filter(e => e.type === 'decision.made' && !excluded.has(e.id)).map(e => [e.id, e]));
+    // An excluded decision invalidates its analytical descendants as well.
+    // The original completion still counts as history in `rounds` below.
+    const completed = new Map(ordered.filter(e => e.type === 'experience.completed' && !excluded.has(e.id) && decisions.has(e.decisionId)).map(e => [e.id, e]));
     const responses = new Map();
     if (personal) for (const event of ordered) {
       if (event.type !== 'feedback.given' || !completed.has(event.completionId)) continue;
       if (cutoff - ms(event.at) > RECENT) continue;
       const completion = completed.get(event.completionId);
-      if (ms(completion.at) <= ms(event.at)) responses.set(event.completionId, { ...event, experienceId: completion.experienceId, variant: completion.variant });
+      // A changed answer moves to the end, so the list stays in order of the latest response.
+      if (ms(completion.at) <= ms(event.at)) { responses.delete(event.completionId); responses.set(event.completionId, copy({ ...event, experienceId: completion.experienceId, variant: completion.variant })); }
     }
-    const decisions = new Map(ordered.filter(e => e.type === 'decision.made' && !excluded.has(e.id)).map(e => [e.id, e]));
     const latestOutcome = new Map();
+    // The newest report per decision, measure, window and target line: a proof for one
+    // line is never replaced by a report about another line or by a proofless report.
+    // Resolve the newest report before exclusion, just as for feedback and context:
+    // removing its analytical use must not restore an older success for that group.
     if (personal) for (const event of ordered) {
-      if (event.type === 'outcome.observed' && !excluded.has(event.id) && decisions.has(event.decisionId)) latestOutcome.set(`${event.decisionId}|${event.measure}|${event.window}`, event);
+      if (event.type === 'outcome.observed' && decisions.has(event.decisionId)) latestOutcome.set(`${event.decisionId}|${event.measure}|${event.window}|${event.targetLine ?? ''}`, event);
     }
     // A round is one finished experience. Excluding a completion removes it as evidence, not as history.
     const rounds = {};
     for (const event of ordered) if (event.type === 'experience.completed') rounds[event.experienceId] = (rounds[event.experienceId] || 0) + 1;
     const state = { version: VERSION, scope: copy(scope), asOf, recordedAsOf, context, evidence, expired,
-      feedback: [...responses.values()].filter(e => !excluded.has(e.id)), excluded: [...excluded], lines, outcomes: [...latestOutcome.values()].map(copy), rounds };
+      feedback: [...responses.values()].filter(e => !excluded.has(e.id)), excluded: [...excluded], lines, outcomes: [...latestOutcome.values()].filter(e => !excluded.has(e.id)).map(copy), rounds };
     return { state, cutoff, personal, decisions, completed };
   }
   function understand(events, scope, asOf, recordedAsOf = asOf) { return read(events, scope, asOf, recordedAsOf).state; }
@@ -178,9 +250,11 @@
     // responses and learned weights so the two arms can be compared later; declared settings always hold.
     const share = view.personal ? explore : 0, arm = random(seed)() < share ? 'baseline' : 'adapted', adapted = arm === 'adapted';
     const ids = new Set();
-    const feasible = item => !(c.audio === 'off' && item.requiresAudio) && !(c.time === 'short' && item.minutes > 5);
+    const feasible = item => !(c.audio === 'off' && item.requiresAudio) && !(c.time === 'short' && item.minutes > 5)
+      && !(c.support && item.supports && !item.supports.includes(c.support));
     const eligible = candidates.filter(item => {
-      if (!validId(item.id) || ids.has(item.id) || !Number.isFinite(item.minutes) || item.minutes <= 0 || !['short', 'standard', 'deep'].includes(item.pace)) throw new TypeError('Atlas: invalid candidate');
+      if (!validId(item.id) || ids.has(item.id) || !Number.isFinite(item.minutes) || item.minutes <= 0 || !['short', 'standard', 'deep'].includes(item.pace)
+        || (item.supports != null && (!Array.isArray(item.supports) || !item.supports.length || item.supports.some(value => !CONTEXT.support.includes(value))))) throw new TypeError('Atlas: invalid candidate');
       ids.add(item.id);
       return feasible(item);
     });
@@ -195,15 +269,32 @@
     const mine = [...view.completed.values()].filter(done => done.experienceId === experienceId && view.decisions.has(done.decisionId));
     const last = mine.at(-1) ? view.decisions.get(mine.at(-1).decisionId) : null;
     let performance = false;
-    const improved = (leverId, optionId, line) => state.outcomes.some(o => o.value != null && o.value >= 0.8 && o.assisted !== true && view.cutoff - ms(o.at) <= RECENT
-      && ms(o.at) >= ms(line.at) && picked(view.decisions.get(o.decisionId), leverId) === optionId);
+    const performanceProof = [];
+    // This compatibility policy consumes qualified practice evidence. Trail's educational
+    // module owns first exposure, help, delivery and curriculum matching; Core owns the
+    // selected option and its weight. Other product outcomes use their own contract.
+    const outcomeEvidence = state.outcomes.some(o => o.attemptId)
+      ? trail().createPracticeOutcomeIndex(trail().summarize(events, { scope, asOf: at, recordedAsOf: recordedAt })) : null;
+    const improved = (leverId, optionId, line) => {
+      for (const outcome of state.outcomes) {
+        if (outcome.value == null || outcome.value < 0.8 || picked(view.decisions.get(outcome.decisionId), leverId) !== optionId) continue;
+        const proof = outcomeEvidence?.find(outcome, { targetLine: line.key, since: line.at, maxAgeMs: RECENT });
+        if (proof) return proof;
+      }
+      return null;
+    };
     const aim = (leverId, option, content, notes, proof) => {
       let total = 0, due = false;
       for (const line of usable) if (option.targets?.includes(line.key)) {
         let weight = line.kind === 'due' ? 2 + 2 * line.strength : 4 * line.strength;
         if (line.kind === 'due') due = true;
         // An independent success on this aim lowers it until a newer observation says otherwise.
-        if (content && improved(leverId, option.id, line)) { weight *= 0.5; performance = true; notes.push('outcome.improved'); }
+        const result = content ? improved(leverId, option.id, line) : null;
+        if (result) {
+          weight *= 0.5; performance = true; notes.push('outcome.improved');
+          const refs = [...result.evidence, ...line.evidence];
+          proof.push(...refs); performanceProof.push(...refs);
+        }
         total += weight; notes.push(`line.${line.key}`); proof.push(...line.evidence);
       }
       return { total, due };
@@ -211,7 +302,15 @@
     const feedback = adapted ? state.feedback.filter(f => f.experienceId === experienceId) : [];
     const recent = feedback.at(-1);
     const targetPace = c.time === 'short' ? 'short' : recent?.value === 'too_much' ? 'short' : recent?.value === 'want_more' && c.time !== 'short' ? 'deep' : 'standard';
-    const scored = eligible.map(item => {
+    // An explicit request for another way must not lose to the old goal weight. Every way
+    // whose latest answer was "not for me" stays out while a feasible alternative remains;
+    // if all were refused, at least the one just refused is not offered straight back.
+    const latest = new Map(feedback.map(f => [f.variant, f.value]));
+    const another = recent?.value === 'not_fit' ? eligible.filter(item => latest.get(item.id) !== 'not_fit') : [];
+    const fallback = recent?.value === 'not_fit' && !another.length ? eligible.filter(item => item.id !== recent.variant) : [];
+    const selectable = another.length ? another : fallback.length ? fallback : eligible;
+    if (recent?.value === 'not_fit') reasons.push(another.length || fallback.length ? 'feedback.alternative' : 'feedback.no_alternative');
+    const scored = selectable.map(item => {
       const notes = [], proof = [];
       let score = item.pace === targetPace ? 4 : 0;
       if (c.goal && item.goals?.includes(c.goal)) score += 3;
@@ -225,13 +324,14 @@
     evidence.push(...scored[0].proof);
     const bundle = { mode: { option: scored[0].item.id, basis: !adapted ? 'baseline' : scored[0].notes.length ? 'line' : recent ? 'response' : 'setting', reasons: scored[0].notes, evidence: scored[0].proof } };
     // How a way of working went for this person: helpful counts for it, not_fit against it.
-    // too_much and want_more only steer ordered amounts above. A finished round with no answer is a weak yes.
+    // too_much and want_more only steer ordered amounts above. Completion without
+    // feedback is a missing preference observation, never a weak positive vote.
     const tally = (leverId, optionId) => {
       let s = 0, f = 0, helped = 0; const proof = [];
       for (const done of mine) {
         if (view.cutoff - ms(done.at) > RECENT || picked(view.decisions.get(done.decisionId), leverId) !== optionId) continue;
         const answer = state.feedback.find(item => item.completionId === done.id);
-        if (!answer) s += 0.25; else if (answer.value === 'helpful') { s += 1; helped += 1; proof.push(answer.id, done.id); } else if (answer.value === 'not_fit') { f += 1; proof.push(answer.id, done.id); }
+        if (answer?.value === 'helpful') { s += 1; helped += 1; proof.push(answer.id, done.id); } else if (answer?.value === 'not_fit') { f += 1; proof.push(answer.id, done.id); }
       }
       return { s, f, helped, proof };
     };
@@ -275,6 +375,7 @@
       evidence.push(...best.proof);
     }
     const following = levers.find(lever => lever.follows === 'support');
+    evidence.push(...performanceProof);
     return { version: VERSION, status: 'ready', scope: copy(scope), experienceId, at, selected: copy(scored[0].item),
       support: (following && bundle[following.id].option) || c.support || 'choose', focus: c.goal || 'explore', reasons, evidence: [...new Set(evidence)],
       alternatives: scored.slice(1).map(s => s.item.id), outcomeBasis: performance ? 'performance' : recent ? 'self_report' : 'unobserved',
@@ -284,16 +385,52 @@
   const choice = (plan, leverId, fallback = null) => (plan && plan.status === 'ready' && plan.bundle?.[leverId]?.option) || fallback;
   function createSession({ scope, events = [], clock = () => new Date().toISOString(), id, explore = 0 } = {}) {
     scopeKey(scope);
-    let log = [];
+    // The owner is fixed for this session, even if the host reuses and edits its
+    // input object while switching accounts or workspaces.
+    scope = copy(scope);
+    // The session owns its log. Appending checks one event against an id index and never
+    // copies or rescans the whole log, so a fast game with a long history stays cheap.
+    // events() returns copies; snapshot() returns the frozen entries themselves.
+    let log = [], frozen = null;
+    const byId = new Map(), attemptStats = new Map(), completions = new Map();
+    const lookup = { byId: id => byId.get(id), attempts: presentationId => attemptStats.get(presentationId) || { count: 0, latest: -Infinity },
+      get events() { return log; } };
+    const index = entry => {
+      if (entry.type === 'practice.attempted') {
+        const stats = lookup.attempts(entry.presentationId);
+        attemptStats.set(entry.presentationId, { count: stats.count + 1, latest: Math.max(stats.latest, admitted.get(entry)?.at ?? ms(entry.at)) });
+      }
+      if (entry.type === 'experience.completed' && !completions.has(entry.decisionId)) completions.set(entry.decisionId, entry);
+    };
+    const store = event => {
+      // An admitted entry is immutable, so a new session (after folding, for example) can
+      // hold the same object instead of copying it again.
+      if (admitted.has(event)) { byId.set(event.id, event); index(event); log.push(event); frozen = null; return; }
+      const entry = copy(event);
+      // The entry is never handed out or changed again, so it is checked once and frozen.
+      // Trail may load later (it is only needed for practice); until then entries stay unvouched.
+      const t = getTrail();
+      if (typeof t?.vouch === 'function') t.vouch(entry);
+      else freeze(entry);
+      admitted.set(entry, { key: scopeKey(entry.scope), at: ms(entry.at), recordedAt: ms(entry.recordedAt) });
+      byId.set(entry.id, entry); index(entry);
+      log.push(entry); frozen = null;
+    };
     for (const event of events) {
       if (scopeKey(event.scope) !== scopeKey(scope)) throw new Error('Atlas: scope mismatch');
-      log = append(log, event);
+      if (admitWith(lookup, event)) store(event);
     }
     let sequence = 0;
     const nextId = id || (() => `a${Date.now().toString(36)}-${(++sequence).toString(36)}-${Math.random().toString(36).slice(2, 10)}`);
-    const record = body => { const at = clock(); const event = { ...body, schema: 1, scope: copy(scope), id: nextId(), at, recordedAt: at }; log = append(log, event); return copy(event); };
+    const record = body => {
+      const at = clock(), event = { ...body, schema: 1, scope: copy(scope), id: nextId(), at, recordedAt: at };
+      // The caller's nested values (lists, snapshots) are detached before they enter the log.
+      if (admitWith(lookup, event)) store(event);
+      return copy(event);
+    };
     return {
       events: () => copy(log),
+      snapshot: () => frozen || (frozen = Object.freeze(log.slice())),
       set: (field, value, until = null) => record({ type: 'context.set', field, value, until }),
       observe: signal => record({ type: 'signal.observed', kind: signal?.kind, key: signal?.key, strength: signal?.strength, n: signal?.n, assisted: signal?.assisted ?? null, until: signal?.until ?? null, refs: signal?.refs ?? [] }),
       respond: (line, value) => record({ type: 'estimate.responded', line, value }),
@@ -309,13 +446,18 @@
       },
       complete: decision => {
         if (!decision || decision.status !== 'ready' || scopeKey(decision.scope) !== scopeKey(scope)) throw new Error('Atlas: invalid decision');
-        const existing = log.find(e => e.type === 'experience.completed' && e.decisionId === decision.id);
+        const existing = completions.get(decision.id);
         return existing ? copy(existing) : record({ type: 'experience.completed', decisionId: decision.id, experienceId: decision.experienceId, variant: decision.selected.id });
       },
       feedback: (completionId, value) => record({ type: 'feedback.given', completionId, value }),
-      outcome: (decisionId, result) => record({ type: 'outcome.observed', decisionId, measure: result?.measure, window: result?.window, value: result?.value ?? null, reason: result?.reason ?? null, assisted: result?.assisted ?? null }),
+      practice: (kind, fields) => {
+        if (!fields || typeof fields !== 'object' || Array.isArray(fields) || typeof kind !== 'string') throw new TypeError('Atlas: invalid practice fields');
+        return record({ ...fields, type: kind.startsWith('practice.') ? kind : `practice.${kind}` });
+      },
+      outcome: (decisionId, result) => record({ type: 'outcome.observed', decisionId, measure: result?.measure, window: result?.window, value: result?.value ?? null, reason: result?.reason ?? null, assisted: result?.assisted ?? null,
+        ...(result?.attemptId != null || result?.targetLine != null ? { attemptId: result?.attemptId, targetLine: result?.targetLine } : {}) }),
       exclude: targetId => record({ type: 'record.excluded', targetId }),
-      clear: () => { log = []; },
+      clear: () => { log = []; frozen = null; byId.clear(); attemptStats.clear(); completions.clear(); },
       state: () => understand(log, scope, clock()),
       lines: () => understand(log, scope, clock()).lines,
     };

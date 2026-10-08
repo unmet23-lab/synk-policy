@@ -2,8 +2,8 @@ import * as InterpretationModule from './atlas/interpretation.js';
 import {
   ALL_FIELDS, EXECUTION_FIELDS, PREFERENCE_CONTRACT, DOMAIN_SCOPE,
   setPreference, validatePersonalization, valueLabel,
-} from './profile.mjs';
-import { extractTravelText } from './extractor.mjs';
+} from './profile.mjs?v=dcc86f8037d0';
+import { extractTravelText } from './extractor.mjs?v=e916565a6125';
 
 const Interpretation = InterpretationModule.default ?? globalThis.SynkAtlasInterpretation;
 export const CONVERSATION_VERSION = 'path-travel-conversation-1';

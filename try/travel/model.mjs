@@ -2,8 +2,8 @@ import * as DomainModule from './atlas/domain.js';
 import * as AskModule from './atlas/ask.js';
 import * as TravelModule from './atlas/travel.js';
 import { CANDIDATES, CATALOG_META, quoteTransportation } from './catalog.mjs';
-import { DEFAULT_PROFILE, DETAIL_FIELDS, PREFERENCE_CONTRACT, DOMAIN_SCOPE, INTERPRETATION_VERSION, createPersonalization, resolvePersonalization, summarizePersonalization, setPreference, valueLabel } from './profile.mjs';
-export { DEFAULT_PROFILE } from './profile.mjs';
+import { DEFAULT_PROFILE, DETAIL_FIELDS, PREFERENCE_CONTRACT, DOMAIN_SCOPE, INTERPRETATION_VERSION, createPersonalization, resolvePersonalization, summarizePersonalization, setPreference, valueLabel } from './profile.mjs?v=dcc86f8037d0';
+export { DEFAULT_PROFILE } from './profile.mjs?v=dcc86f8037d0';
 
 const Domain = DomainModule.default ?? globalThis.SynkAtlasDomain;
 const Ask = AskModule.default ?? globalThis.SynkAsk;
