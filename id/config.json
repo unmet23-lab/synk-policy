@@ -156,6 +156,14 @@
       "redirectUris": [
         "https://workspace.synk.im/api/customer/synk-id/callback"
       ]
+    },
+    {
+      "product": "platform",
+      "clientId": "0ba369bc-6cf5-47b3-96dc-14add9d31225",
+      "redirectUris": [
+        "http://127.0.0.1:4303/",
+        "https://synk.im/try/travel/"
+      ]
     }
   ],
   "clients": {
