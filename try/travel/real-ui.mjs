@@ -39,6 +39,8 @@ function save() {
   } catch { status.textContent = '브라우저가 저장을 허용하지 않았어요. 현재 화면에서는 계속 사용할 수 있어요.'; }
 }
 function announce(text) { $('#real-status').textContent = text; }
+// 을/를 from the last Hangul syllable: the Hangul part of experiences/play-common/kit/josa.mjs, inlined because the travel bundle ships a fixed file list.
+function objectParticle(word) { const last = [...String(word)].reverse().find(char => char >= '가' && char <= '힣'); return last && (last.charCodeAt(0) - 0xac00) % 28 ? '을' : '를'; }
 function focusCard(id, kind = 'feedback') { $(`[data-place="${id}"] .real-${kind}`)?.focus({ preventScroll: true }); }
 function feedbackCount() { return Object.keys(state.reactions).length + Object.keys(state.visits).length + Object.keys(state.categoryPreferences).length; }
 function recordDate(at) { return new Intl.DateTimeFormat('ko-KR', { timeZone: 'Asia/Seoul', year: 'numeric', month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' }).format(new Date(at)); }
@@ -129,7 +131,7 @@ function render() {
     const selected = state.selected.includes(place.id), chooseText = selected ? '내 목록에서 빼기' : '내 방문 목록에 담기';
     const choose = button(chooseText, () => {
       state.selected = selected ? state.selected.filter(id => id !== place.id) : [...state.selected, place.id];
-      save(); render(); announce(`${place.name}${selected ? '을(를) 목록에서 뺐어요.' : '을(를) 목록에 담았어요.'}`); focusCard(place.id, 'choose');
+      save(); render(); announce(`${place.name}${objectParticle(place.name)} ${selected ? '목록에서 뺐어요.' : '목록에 담았어요.'}`); focusCard(place.id, 'choose');
     });
     choose.classList.add('real-choose'); choose.dataset.selected = String(selected); choose.setAttribute('aria-label', `${chooseText}: ${place.name}`);
     const feedback = button('취향·방문 기록', () => openFeedback(place.id)); feedback.classList.add('real-feedback'); feedback.setAttribute('aria-label', `취향·방문 기록: ${place.name}`);
@@ -155,7 +157,7 @@ function render() {
       move.dataset.move = String(offset); move.disabled = index + offset < 0 || index + offset >= state.selected.length; move.setAttribute('aria-label', `${label}: ${place.name}`); actions.append(move);
     }
     const remove = button('빼기', () => {
-      state.selected = state.selected.filter(value => value !== id); save(); render(); announce(`${place.name}을(를) 목록에서 뺐어요.`); $('#real-list-title').focus({ preventScroll: true });
+      state.selected = state.selected.filter(value => value !== id); save(); render(); announce(`${place.name}${objectParticle(place.name)} 목록에서 뺐어요.`); $('#real-list-title').focus({ preventScroll: true });
     }); remove.setAttribute('aria-label', `빼기: ${place.name}`); actions.append(remove); row.dataset.picked = id; row.append(actions); return row;
   }));
   $('#real-empty').hidden = state.selected.length > 0; $('#real-export').disabled = state.selected.length === 0; $('#real-list-count').textContent = `${state.selected.length}곳 담음`;

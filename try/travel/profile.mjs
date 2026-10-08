@@ -1,4 +1,4 @@
-import './atlas/engine.js?v=80e6c7048b52';
+import './atlas/engine.js';
 import * as DomainModule from './atlas/domain.js';
 import * as PersonalizationModule from './atlas/personalization.js';
 import * as InterpretationModule from './atlas/interpretation.js';

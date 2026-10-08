@@ -1,5 +1,5 @@
-import { normalizeProfile, formatMoney, VERSION } from './model.mjs?v=d46684a47584';
-import { createPersonalization, validatePersonalization } from './profile.mjs?v=dcc86f8037d0';
+import { normalizeProfile, formatMoney, VERSION } from './model.mjs';
+import { createPersonalization, validatePersonalization } from './profile.mjs';
 
 export const STORAGE_KEY = 'synk-path-travel-local-v1';
 const browserStorage = () => globalThis.localStorage;

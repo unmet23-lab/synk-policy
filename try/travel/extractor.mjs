@@ -1,4 +1,4 @@
-import { ALL_FIELDS, PREFERENCE_CONTRACT, DOMAIN_SCOPE, EXECUTION_FIELDS } from './profile.mjs?v=dcc86f8037d0';
+import { ALL_FIELDS, PREFERENCE_CONTRACT, DOMAIN_SCOPE, EXECUTION_FIELDS } from './profile.mjs';
 
 // Deliberately bounded Korean input adapter. Core Interpretation verifies the
 // source and the review; it does not certify the semantics of these patterns.
