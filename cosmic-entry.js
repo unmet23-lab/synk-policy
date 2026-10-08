@@ -4,10 +4,35 @@ const companyPath=(location.pathname.startsWith('/en/')?'/en/':'/')+'#top';
 const entry=document.querySelector('[data-cosmic-entry]');
 const portal=document.querySelector('[data-cosmic-atlas]');
 const companyPortal=document.querySelector('[data-cosmic-company]');
+const startPortal=document.querySelector('[data-cosmic-start]');
+const atlasStatus=document.querySelector('[data-atlas-entry-status]');
+const english=location.pathname.startsWith('/en/');
+const say=(ko,en)=>english?en:ko;
+const setAtlasStatus=text=>{if(atlasStatus)atlasStatus.textContent=text;};
+const preferenceKey='synk-entry-start-v1';
+const preferences=Array.from(document.querySelectorAll?.('[data-entry-preference]')||[]);
+const preferenceStatuses=Array.from(document.querySelectorAll?.('[data-entry-preference-status]')||[]);
+const readPreference=()=>{try{return localStorage.getItem(preferenceKey)==='1';}catch{return false;}};
+const updatePreferences=()=>{const checked=readPreference();for(const input of preferences)input.checked=checked;};
+for(const input of preferences){
+  input.closest('[data-entry-preference-wrap]').hidden=false;
+  input.addEventListener('change',()=>{
+    let message;
+    try{
+      if(input.checked)localStorage.setItem(preferenceKey,'1');else localStorage.removeItem(preferenceKey);
+      message=input.checked?say('다음 방문에는 체험 목록이 바로 열립니다.','Your next visit will open the free programs.') :say('다음 방문에는 첫 화면이 열립니다.','Your next visit will open the entrance.');
+    }catch{message=say('시작 화면 설정을 저장하지 못했어요. 바로 시작은 계속 이용할 수 있습니다.','Could not save this setting. You can still use Start now.');}
+    updatePreferences();
+    for(const status of preferenceStatuses)status.textContent=message;
+  });
+}
+updatePreferences();
+addEventListener('storage',event=>{if(event.key===preferenceKey||event.key===null)updatePreferences();});
 const ieung=document.querySelector('[data-cosmic-ieung]');
 const IEUNG_DURATION=1100;
 if(portal)portal.href='/atlas/';
 if(companyPortal)companyPortal.href=companyPath;
+if(startPortal)startPortal.href=companyPath.replace(/#.*$/,'')+'#products';
 const setView=view=>{root.dataset.entryView=view;if(view==='company')document.dispatchEvent(new Event('synk:company-view'));};
 const isAtlasPath=()=>location.pathname.replace(/\/$/,'')==='/atlas';
 let frame,ready=false,resolveReady,routeRevision=0,activeTravel=null;
@@ -39,6 +64,9 @@ function hideAtlas(){
 function syncRoute(){
   routeRevision++;
   activeTravel?.();
+  setAtlasStatus('');
+  portal?.removeAttribute('aria-busy');
+  updatePreferences();
   document.querySelector('.cosmic-transition')?.remove();
   if(isAtlasPath()&&ready){showAtlas(false);return;}
   hideAtlas();
@@ -55,6 +83,8 @@ function sectionOf(hash){
 function showCompany(hash='#top'){
   routeRevision++;
   activeTravel?.();
+  setAtlasStatus('');
+  portal?.removeAttribute('aria-busy');
   history.pushState({},'',companyPath.replace(/#.*$/,'')+hash);
   hideAtlas();
   setView('company');
@@ -62,7 +92,8 @@ function showCompany(hash='#top'){
     const target=sectionOf(hash)||document.getElementById('top');
     target?.scrollIntoView();
     const main=document.getElementById('top');
-    (target===main?main:target?.querySelector('h2,h3')||main)?.focus?.({preventScroll:true});
+    const focusTarget=target===main?main:target?.querySelector('h2,h3')||main;
+    if(focusTarget){focusTarget.tabIndex=-1;focusTarget.focus?.({preventScroll:true});}
   });
 }
 function prepareAtlas(){
@@ -226,6 +257,11 @@ companyPortal?.addEventListener('click',event=>{
   event.preventDefault();
   showCompany();
 });
+startPortal?.addEventListener('click',event=>{
+  if(event.defaultPrevented||event.button!==0||event.metaKey||event.ctrlKey||event.shiftKey||event.altKey)return;
+  event.preventDefault();
+  showCompany('#products');
+});
 // Atlas is loaded when a visitor reaches for it (a pointer over the link, a touch or keyboard focus),
 // not with the entrance: a visit that goes to the company never downloads it.
 if(portal&&entry)for(const type of ['pointerenter','pointerdown','focus','touchstart'])portal.addEventListener(type,()=>{if(!location.hash)prepareAtlas();},{passive:true});
@@ -241,6 +277,7 @@ if(portal&&entry){
     // The sky clock stops synchronously before this snapshot is measured.
     const departure=animate?ieungDeparture():null;
     departing=true;
+    setAtlasStatus(say('아틀라스를 여는 중입니다…','Opening Atlas…'));
     if(!animate){
       if(!showAtlas())location.assign(portal.href);
       departing=false;
@@ -256,11 +293,12 @@ if(portal&&entry){
     const available=await waitForAtlas(2500);
     portal.removeAttribute('aria-busy');
     if(routeRevision!==originRevision||location.pathname+(location.search||'')+location.hash!==originRoute){departing=false;return;}
-    if(!available){location.assign(portal.href);return;}
+    if(!available){setAtlasStatus(say('준비가 조금 길어져 아틀라스로 바로 이동합니다.','Taking a little longer. Opening Atlas directly.'));location.assign(portal.href);return;}
     const target=departure?atlasTarget():null;
     if(target)await travelFromIeung(overlay,target,departure);
     if(routeRevision!==originRevision||location.pathname+(location.search||'')+location.hash!==originRoute){overlay.remove();departing=false;return;}
     showAtlas();
+    setAtlasStatus('');
     overlay.remove();
     departing=false;
   });
