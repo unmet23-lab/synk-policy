@@ -236,7 +236,7 @@ $('#leave-dialog').addEventListener('click',async e=>{
   if(action==='confirm'){
     if(busy){toast('지금 행동을 마친 뒤 다시 눌러 주세요. / Please retry after this action finishes.');leaveDestination=null;return;}
     const result=await send('leave');
-    if(!result&&state?.phase!=='closed'){toast('탐험을 종료하지 못했어요. 연결을 확인한 뒤 다시 눌러 주세요. / Could not end the expedition. Check your connection and try again.');leaveDestination=null;return;}
+    if(!result&&state&&state.phase!=='closed'){toast('탐험을 종료하지 못했어요. 연결을 확인한 뒤 다시 눌러 주세요. / Could not end the expedition. Check your connection and try again.');leaveDestination=null;return;}
     forget();entryError='';stopped=false;if(leaveDestination)location.assign(leaveDestination);else render();
   }
   leaveDestination=null;
