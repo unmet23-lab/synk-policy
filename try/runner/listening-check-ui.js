@@ -55,7 +55,7 @@ export function mountListeningCheck({ coach, beforeOpen, onClose = () => {} }) {
     } catch {
       if (mine !== epoch || !dialog.open) return; check.delivery(token, 'failed'); pending = false;
       if (check.current?.audio === 'completed') { ready(); return; }
-      phase('stopped'); status('음성을 불러오지 못했어요. 듣기 실력의 오답으로 기록하지 않아요.'); $('check-replay').disabled = false;
+      phase('stopped'); status('음성을 불러오지 못했어요. 이 문제는 틀린 것으로 기록하지 않아요.'); $('check-replay').disabled = false;
     }
   }
   function question() {
