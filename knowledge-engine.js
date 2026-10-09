@@ -632,6 +632,9 @@ export function createKnowledgeEngine(data){
       const near=own?.s&&(!strong.confident||own.s.score>=strong.first.score-.12);
       if(own&&((near&&(own.cover>=.2||!strong.confident))||own.cover>=.45))return {...from([own.r.id]),ranked:own.s?.score||0};
     }
+    // Stable public intents stay ahead of corpus-dependent ranking as new programme copy is added.
+    if(!brand&&!previous.length&&c==='위치')return from(['lab-location']);
+    if(brand==='shift'&&/제작과정|만든과정|만드는과정|제작이야기|회사제작/.test(c))return from(['shift-making']);
     if(strong.confident&&strong.first.score>=.5&&strong.margin>=.05)return {...from([strong.first.id]),ranked:strong.first.score};
     const prefer=id=>strong.confident&&strong.first.id!==id&&strong.first.score>=.45&&strong.margin>=.05?{...from([strong.first.id]),ranked:strong.first.score}:from([id]);
     if(brand==='lab'){

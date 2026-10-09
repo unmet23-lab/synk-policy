@@ -1,6 +1,6 @@
 {
-  "version": "2026-09-15-selected-experiences-copy-9bfc4e4ce8-rhythm-20261001-copy-3910676d01-release-copy-3e4ed3be6d-en-002b14631325-bm-platform-20261007-a885b0d303-travel-20261007-ce148dd860-real-20261007-ab58ee7076",
-  "updatedAt": "2026-10-07",
+  "version": "2026-09-15-selected-experiences-copy-9bfc4e4ce8-rhythm-20261001-copy-3910676d01-release-copy-3e4ed3be6d-en-002b14631325-bm-platform-20261007-a885b0d303-travel-20261007-ce148dd860-real-20261007-ab58ee7076-homepage-current-20261009-033c24b61f29",
+  "updatedAt": "2026-10-09",
   "docs": [
     {
       "id": "company",
@@ -14,15 +14,15 @@
         "Each brand’s website explains which experiences are available now and which services are still in preparation.",
         "An engine that fits you better the more you use it.",
         "SYNK is a personalization technology company that started in Korean education. We are extending Atlas, the engine we build ourselves, to games, study, work, and consulting.",
-        "LAB is an EdTech brand preparing Korean education, textbooks, scenario-based games, and a personalized learning app.",
+        "LAB is an EdTech brand preparing Korean education, textbooks and a personalized learning app. It offers eight existing Korean games and three beginner activities as public prototypes.",
         "SHIFT focuses on introducing and operating personalization for one client task. Training, consulting, automation, branding, research and testing are prepared where they support that introduction, use and validation. The direction is to expand into APIs and engine licensing after repeatable delivery and profitability have been checked.",
         "PULSE creates product ads, brand films, AI model images, lookbooks and how-to videos, alongside original music, character content, IP and advertising collaborations. AI portraits and introduction decks are also in preparation, as are studio and equipment rental.",
-        "PATH is developing personalized travel across countries, bringing together restaurants, stays, experiences and routes around each traveler’s preferences and budget. We also prepare study and career plans for Korea, Korean and VR practice, portfolios, and connections with schools and employers. Housing, settling-in support, visits and cultural experiences in Korea are being prepared with partner operators.",
+        "PATH offers a free app for planning a day in Jongno, Bukchon and Seochon in Seoul. Compare real places and alternatives against your interests, budget, companions and walking needs. Travel across other countries and support with studying and working in Korea are being prepared. Housing, settling-in support, visits and cultural experiences in Korea are being prepared with partner operators.",
         "These brands have different roles within SYNK. They do not represent a count of separate legal entities or businesses already in operation.",
-        "LAB is preparing textbooks, courses, a personalized learning app, and VR interview and career experiences. The LAB page shows gameplay clips of eight Korean games.",
+        "LAB is preparing textbooks, courses, a personalized learning app, and VR interview and career experiences. Eight existing Korean games and three beginner activities are publicly available, and the LAB page shows real gameplay clips from eight games. When signed in to WORLD, coins, owned items, goals and supported game records are saved to your account. The 3D SYNK TOWN life prototype is still in local development.",
         "SHIFT is preparing to introduce and operate personalization for one client task. Purchasing advice, usage guidance, expert coaching and staff training are candidate use cases. Education and research support that introduction; launch, pricing, client results and profitability have not yet been established or validated. PULSE makes ads and model videos, provides ways to enjoy released music and content, and handles IP, production and advertising collaborations.",
-        "PATH is preparing personalized travel and support with study, careers, housing and settling in. We are developing restaurant, stay, experience and route planning around travelers’ preferences and budgets, along with Korean and VR practice connected with LAB. Destinations, schedules and booking options will be announced as they are confirmed.",
-        "SHIFT prepares research and testing to help validate the introduction of a personalized service. PULSE is preparing AI portraits, introduction materials, and studio and equipment rental; PATH is preparing personalized travel and support with housing and settling in. The Platform section introduces SYNK’s free experiences and personalized programs. New programs, including travel and food, will be released in stages. Reservations for new services are not yet open.",
+        "PATH’s Seoul travel app is available free now. Compare a day of two to five real places and alternative plans, then adjust the remaining itinerary during your trip. SYNK ID account saving is supported. Travel across other countries, accommodation, booking and support with study, careers, housing and settling in remain in preparation.",
+        "You can start Seoul travel planning, Korean games and everyday tools for free on the SYNK platform. Supported WORLD records and Seoul itineraries can be saved to your SYNK ID account; saving options vary by program. SHIFT research and testing, PULSE AI portraits, introduction materials, space and equipment rental, and PATH travel across other countries, housing and settling-in support remain in preparation. Reservations for new services are not yet open.",
         "Explore LAB for Korean education, SHIFT for introducing and operating personalized services for companies, PULSE for ads, model and profile images, music, content and IP, and PATH for personalized travel and preparation for study, careers and life in Korea.",
         "The main SYNK website explains the company’s philosophy and Atlas, our shared technology.",
         "The SYNK characters you meet on this website are Mongle, Kkamong, and Marin.",
@@ -42,11 +42,11 @@
         "Performance · Projects — 2023 RCA · Royal College of Art (Royal College of Art graduate project · Main Performer), 2023 TV series “Bora! Deborah” · Netflix (Appearance in the opening sequence of Episode 1), 2014 LOEN Entertainment (Performer)",
         "Awards — 2019 Fine Art Photography Awards (Open Theme category · Winner), 2017 MK Challenge · Hosted by Maeil Business Newspaper (Project Leader · Runner-up)",
         "In Yuho’s words: “I studied architecture and psychology, worked as a performer on stage and on screen, and served as deputy director of an academy in Mongolia. Architecture gave me an eye for structure, psychology an interest in how people think and act, and the stage the experience of making something together with others. Today I put all of this into planning and building SYNK.”",
-        "From travel and food to learning and everyday life, explore free programs and discover what fits you.",
-        "Travel and food — Where to go, what to eat. Explore a day that fits your tastes and plans.",
-        "Learning and everyday life — Enjoy Korean games and useful personalized tools at your own pace.",
-        "Your preferences, remembered — The preferences and feedback you share help future recommendations and guidance fit you better.",
-        "Explore real places in Jongno and compare your preferences with fictional itineraries. Records and storage vary by program.",
+        "Discover what you can use today. Plan a day in Seoul around your preferences, or learn Korean by listening and playing.",
+        "Your kind of day in Seoul — Connect 2–5 real places around your time, budget, walking preferences and companions. See your route on a map and adjust the rest of your day as you go.",
+        "Your first Korean starts with play — Cast a spell, serve a first order or fix a spaceship with a friend. Start with beginner play, then explore listening and reading games.",
+        "Pick up where you left off — Save trips with SYNK ID, and continue supported game progress and customization in WORLD.",
+        "Start the free experiences without signing up. Check venue information and estimated walking times before visiting. Storage varies by program; guest progress is not automatically transferred to an account.",
         "Atlas is the personalization engine SYNK builds, and the name for its eight engines together. They share the work, from deciding what a person needs to ordering what to learn, giving explanations and hints, shaping screens and sound, and checking whether the help worked. LAB, SHIFT, PULSE, and PATH each pick the engines they need and fit them to their own services.",
         "The same person needs different practice as their goals change. The expressions you need when preparing to study in Korea, working with a Korean company, or talking with family are not the same. We are developing Atlas to adjust tasks and explanations to the goals you set and your recent results, not to your age.",
         "Core — Judging what is needed now. It looks at what the person is trying to do and where they get stuck, and decides what to do next and what help is needed. It also sets out the reasons for what it recommends and leaves out.",
@@ -60,11 +60,11 @@
         "LAB — Adjusts Korean practice, games, and hints to each learner’s goals and the results of what they tried.",
         "SHIFT — We prepare to introduce personalization for one task. Purchasing advice, usage guidance, coaching and staff training are candidate use cases.",
         "PULSE — Uses Loom, which composes the screen, and Reed, which handles sound, to make ad and model videos and music and character content.",
-        "PATH — Adjusts practice for life in Korea and interviews to each learner's intended major, career plans, and Korean level.",
-        "We are developing it by first connecting it to Korean learning games and our learning app. Each brand page explains how far it is used in business services and video production.\nThe descriptions include capabilities in development.",
+        "PATH — For Seoul travel, it compares places and plans against your interests, budget and walking limits. We are also developing goal- and practice-based support for study and interview preparation.",
+        "Selected engines are in use in Seoul travel and Korean games, with connections to learning apps and business services under development.\nEach experience and brand introduction explains which features are available and which are in development.",
         "Strata is an engine in development."
       ],
-      "updatedAt": "2026-10-07"
+      "updatedAt": "2026-10-09"
     },
     {
       "id": "lab",
@@ -84,13 +84,15 @@
         "The learning goals for each Synapse Core book are:\nBook 1 · TOPIK Level 1 — Read Hangul and introduce yourself.\nBook 2 · TOPIK Level 2 — Build basic sentence patterns for everyday conversation.\nBook 3 · TOPIK Levels 2–3 — Talk naturally about familiar everyday situations.\nBook 4 · TOPIK Level 3 — Share your opinion and explain your reasons.\nBook 5 · TOPIK Levels 3–4 — Explain your views on social issues.\nBook 6 · TOPIK Levels 4–5 — Discuss specialist and abstract topics.",
         "Synapse Talk Book 1 covers beginner conversation and connects with Core Books 1–2. Book 2 covers intermediate conversation and connects with Core Books 3–5. The conversation books cover material through TOPIK Level 4.",
         "The levels indicate each book’s learning goals, not a guarantee of passing. The manuscripts are complete, but final review and publication are still in preparation. Publication dates and access details will be announced separately.",
-        "SYNK LAB is preparing 10 minigames. On the LAB page you can watch real gameplay from eight Korean games: Korean Racing, Words in Rhythm, Wind Run, Order Rush and Talk Rally practise listening, while The Teacher Is Back, Entry Check and Blank Slice practise reading. All eight are prototypes.",
+        "SYNK LAB offers eight existing Korean games and three beginner activities as public prototypes. On the LAB page you can watch real gameplay from eight Korean games: Korean Racing, Words in Rhythm, Wind Run, Order Rush and Talk Rally practise listening, while The Teacher Is Back, Entry Check and Blank Slice practise reading. All eight are prototypes.",
         "Race along a coastal road with Marin or Kkamong, listen to a Korean question, and answer by driving into a picture or word lane. Correct answers trigger a boost. The prototype includes 2,000 basic and extended vocabulary items, 400 learning stages of five words, and 2,008 word and guidance voice clips. All stages share one coastal course; the vocabulary list does not guarantee coverage of every TOPIK Level 1–2 item. Use A/D or arrow keys, or mobile steering and answer buttons.",
         "Narration sequences each question, word pronunciation, and correct/incorrect feedback. Engine volume falls while speech plays, and the car waits before the gate until the question finishes. Replay, optional listening captions, pronunciation after the race, and a review that prioritizes mistakes support practice. The commentary is scripted audio, rather than live AI conversation.",
         "Listening connects word sounds with pictures and spelling; reading practises recognizing spelling and meaning. Words in Rhythm plays three of our own Korean songs across two lanes. Listen to a narrated sentence and question, then answer O/X. Music quietens and regular notes clear during narration. Practise understanding times, places, reasons, conditions and changed information, with timing and listening answers checked separately and new spoken review questions. Speaking and writing extend expressions into offline dialogue and sentence tasks. The games currently provide no pronunciation or free-writing assessment. TOPIK I tests listening and reading; TOPIK II includes writing, while TOPIK Speaking is a separate test.",
         "In Wind Run you hear 16 short requests such as “Take the left path.” or “Jump over the low fence.” and act them out. While you run there is only sound, no text; the text appears in the practice before the run and the review after it. In Order Rush you hear café orders and make each drink, matching the number of cups, the temperature and what to leave out. In Talk Rally, Mongle says something in Korean as it hits the ball, and you hit it back toward the reply card that fits. In The Teacher Is Back you read the requests in a story and move Marin and Kkamong to tidy the classroom, then read new, changed requests at the end. In Entry Check you read a notice, check each guest’s ticket, bags and words, and stamp pass or reject. In Blank Slice you read a sentence with a blank and slash the one word piece out of four that fits.",
         "A meta-analysis of digital game-based second-language learning reported a between-group effect size of d=0.50 (Dixon et al., 2022). A retrieval-practice meta-analysis covering 222 studies and 48,478 learners reported g=0.499 (Yang et al., 2021). Picture-and-audio effects vary with materials and pacing (Reinwein, 2012). These findings inform our recall, feedback, short-audio, and replay design. Effect sizes are not percentage improvements, and SYNK-specific TOPIK gains and long-term learning outcomes have not yet been tested with learners. Primary sources are linked in the learning showcase.",
-        "We are preparing a path from minigames and offline learning toward TOPIK Level 1, followed by everyday-life content and village NPC conversations. The planned unlock follows an in-app TOPIK Level 1+ foundation stage and does not require an official score report. The full ten-game set, classroom-to-village integration, and NPC connection are still in preparation. The games store anonymous progress in this browser only, racing’s automated demonstrations are left out of learning records, and nothing connects to student accounts or a server.",
+        "We are preparing a path from minigames and offline learning toward TOPIK Level 1, followed by everyday-life content and village NPC conversations. The planned unlock follows an in-app TOPIK Level 1+ foundation stage and does not require an official score report. The full learning path connecting classes, games and the village is in preparation. SYNK TOWN is a local prototype where you walk between a home, tea house, workshop and greenhouse and share activities with residents; it is not yet public.",
+        "In Word Wizard, basic expressions for size and position change objects. In Order Rush for beginners, you listen for water, bread, apples and quantities, then serve the food. In Fix a Spaceship Together, two players see different information and exchange expressions to carry out repairs. These picture-and-audio activities practise basic vocabulary and short requests before TOPIK I. Cooperative success, customization and saving a photo are not counted as independent listening answers.",
+        "When signed in to WORLD, coins, owned items, goals and supported game records are saved to your account. Guest experiences and pending drafts remain in the current browser; each game explains its saving scope. Racing’s automated demonstrations are excluded from learning records.",
         "Use Korean learned from textbooks in games. LAB is developing an app that adjusts subsequent tasks and feedback using students’ answers and the areas where they needed help.",
         "Practise Korean for real situations. In five listening games and three reading games, you act directly on the requests you hear and the notices you read. Understanding Korean leads to action.",
         "We create games with clear roles and goals, based on grammar from Synapse Core and conversations from Synapse Talk. Scenes and characters help students understand the situation and take part themselves.",
@@ -217,7 +219,7 @@
         "How are the 30 minutes used? — This is group activity time within the 90-minute class. It is not an extra 30 minutes or 30 minutes of solo speaking per student. Learners practice speaking, listening, asking questions, and coordinating, while the teacher checks that the conversation is not dominated by a few students. Task difficulty and support are adjusted to the learners’ levels, while the group speaking time remains fixed.",
         "These are operating guidelines for the regular classes currently in preparation. Cooperation, consideration, and judgment are skills we work on, not measured improvement results."
       ],
-      "updatedAt": "2026-10-06"
+      "updatedAt": "2026-10-09"
     },
     {
       "id": "shift",
@@ -463,13 +465,13 @@
         "Move in & get settled — We tell you what you need at the start, such as the move-in date, what to bring, and how to use the facilities.",
         "When a problem comes up — If a problem comes up with the facilities or daily life, we help you tell the operator.",
         "Partner operators, areas, and costs are not decided yet, and we are not taking move-in bookings. The operator handles the actual contract and facility management; we check its terms and explain them.",
-        "We start with what you want to eat, where you want to unwind, and where you would rather save or spend. We are developing personalized travel across countries, bringing together restaurants, stays, experiences and daily routes around your taste, budget, companions and mobility needs.",
-        "Make the same budget feel like yours — Some travelers prefer a simple stay and a memorable meal; others put a comfortable room and time to rest first. We plan around where spending matters most to you.",
-        "Restaurants, stays and experiences in one plan — Your companions, energy and travel time shape a day of meals, experiences and rest, with concerts, night views or bars included when they suit your taste.",
-        "Your preferences travel with you — We are building a service that carries the preferences you confirm and the experiences you share into your next plan. Your usual tastes stay distinct from the needs of this particular trip, so visiting a new country does not mean starting from scratch.",
-        "Personalized travel, visits and cultural experiences are in preparation. Booking details will follow once destinations, schedules and prices are confirmed."
+        "Build a day around real places in Jongno, Bukchon and Seochon. Set your interests, budget, companions and walking needs, then compare plans of two to five stops with photos, a map and a timetable.",
+        "A day that fits your needs — Set your start and finish times, starting point, budget and walking limits. See confirmed costs and details that need checking, then keep or replace the places you choose.",
+        "Include your companions — Enter each companion’s likes, things to avoid and requirements. See how each person’s preferences are reflected and choose a plan together.",
+        "Adjust as the day unfolds — Mark places you have visited or want to skip, then compare plans for your remaining time and budget. Review the new itinerary before applying changes such as less walking or more time indoors.",
+        "Seoul itineraries are free and can be saved with SYNK ID. Recheck opening hours and costs before visiting. Travel across other countries, accommodation and booking services are in preparation."
       ],
-      "updatedAt": "2026-10-07"
+      "updatedAt": "2026-10-09"
     }
   ],
   "records": [
@@ -607,7 +609,7 @@
         "Tell me about your business structure",
         "How are the four brands different?"
       ],
-      "answer": "LAB is an EdTech brand preparing Korean education, textbooks, scenario-based games, and a personalized learning app.\n\nSHIFT focuses on introducing and operating personalization for one client task. Training, consulting, automation, branding, research and testing are prepared where they support that introduction, use and validation. The direction is to expand into APIs and engine licensing after repeatable delivery and profitability have been checked.\n\nPULSE creates product ads, brand films, AI model images, lookbooks and how-to videos, alongside original music, character content, IP and advertising collaborations. AI portraits and introduction decks are also in preparation, as are studio and equipment rental.\n\nPATH is developing personalized travel across countries, bringing together restaurants, stays, experiences and routes around each traveler’s preferences and budget. We also prepare study and career plans for Korea, Korean and VR practice, portfolios, and connections with schools and employers. Housing, settling-in support, visits and cultural experiences in Korea are being prepared with partner operators.\n\nThese brands have different roles within SYNK. They do not represent a count of separate legal entities or businesses already in operation.",
+      "answer": "LAB is an EdTech brand preparing Korean education, textbooks and a personalized learning app. It offers eight existing Korean games and three beginner activities as public prototypes.\n\nSHIFT focuses on introducing and operating personalization for one client task. Training, consulting, automation, branding, research and testing are prepared where they support that introduction, use and validation. The direction is to expand into APIs and engine licensing after repeatable delivery and profitability have been checked.\n\nPULSE creates product ads, brand films, AI model images, lookbooks and how-to videos, alongside original music, character content, IP and advertising collaborations. AI portraits and introduction decks are also in preparation, as are studio and equipment rental.\n\nPATH offers a free app for planning a day in Jongno, Bukchon and Seochon in Seoul. Compare real places and alternatives against your interests, budget, companions and walking needs. Travel across other countries and support with studying and working in Korea are being prepared. Housing, settling-in support, visits and cultural experiences in Korea are being prepared with partner operators.\n\nThese brands have different roles within SYNK. They do not represent a count of separate legal entities or businesses already in operation.",
       "sourceId": "company",
       "relatedIds": [
         "lab-intro",
@@ -619,7 +621,7 @@
         "label": "Explore our brands",
         "href": "/en/#worlds"
       },
-      "reviewedAt": "2026-10-07",
+      "reviewedAt": "2026-10-09",
       "aliases": [
         "LAB, SHIFT, PULSE는 어떻게 달라요?",
         "세 브랜드의 관계가 궁금해요",
@@ -645,7 +647,7 @@
         "What stage are the services at?",
         "Have your services launched?"
       ],
-      "answer": "LAB is preparing textbooks, courses, a personalized learning app, and VR interview and career experiences. The LAB page shows gameplay clips of eight Korean games.\n\nSHIFT is preparing to introduce and operate personalization for one client task. Purchasing advice, usage guidance, expert coaching and staff training are candidate use cases. Education and research support that introduction; launch, pricing, client results and profitability have not yet been established or validated. PULSE makes ads and model videos, provides ways to enjoy released music and content, and handles IP, production and advertising collaborations.\n\nPATH is preparing personalized travel and support with study, careers, housing and settling in. We are developing restaurant, stay, experience and route planning around travelers’ preferences and budgets, along with Korean and VR practice connected with LAB. Destinations, schedules and booking options will be announced as they are confirmed.\n\nSHIFT prepares research and testing to help validate the introduction of a personalized service. PULSE is preparing AI portraits, introduction materials, and studio and equipment rental; PATH is preparing personalized travel and support with housing and settling in. The Platform section introduces SYNK’s free experiences and personalized programs. New programs, including travel and food, will be released in stages. Reservations for new services are not yet open.",
+      "answer": "LAB is preparing textbooks, courses, a personalized learning app, and VR interview and career experiences. Eight existing Korean games and three beginner activities are publicly available, and the LAB page shows real gameplay clips from eight games. When signed in to WORLD, coins, owned items, goals and supported game records are saved to your account. The 3D SYNK TOWN life prototype is still in local development.\n\nSHIFT is preparing to introduce and operate personalization for one client task. Purchasing advice, usage guidance, expert coaching and staff training are candidate use cases. Education and research support that introduction; launch, pricing, client results and profitability have not yet been established or validated. PULSE makes ads and model videos, provides ways to enjoy released music and content, and handles IP, production and advertising collaborations.\n\nPATH’s Seoul travel app is available free now. Compare a day of two to five real places and alternative plans, then adjust the remaining itinerary during your trip. SYNK ID account saving is supported. Travel across other countries, accommodation, booking and support with study, careers, housing and settling in remain in preparation.\n\nYou can start Seoul travel planning, Korean games and everyday tools for free on the SYNK platform. Supported WORLD records and Seoul itineraries can be saved to your SYNK ID account; saving options vary by program. SHIFT research and testing, PULSE AI portraits, introduction materials, space and equipment rental, and PATH travel across other countries, housing and settling-in support remain in preparation. Reservations for new services are not yet open.",
       "sourceId": "company",
       "relatedIds": [
         "lab-intro",
@@ -654,7 +656,7 @@
         "shift-scope",
         "pulse-listening"
       ],
-      "reviewedAt": "2026-10-07",
+      "reviewedAt": "2026-10-09",
       "aliases": [
         "지금 운영 중인가요?",
         "현재 어떤 단계인가요?",
@@ -679,7 +681,7 @@
         "Which brand is right for me?",
         "I’m new here"
       ],
-      "answer": "Explore LAB for Korean education, SHIFT for introducing and operating personalized services for companies, PULSE for ads, model and profile images, music, content and IP, and PATH for personalized travel and preparation for study, careers and life in Korea.\n\nThe main SYNK website explains the company’s philosophy and Atlas, our shared technology.\n\nSHIFT prepares research and testing to help validate the introduction of a personalized service. PULSE is preparing AI portraits, introduction materials, and studio and equipment rental; PATH is preparing personalized travel and support with housing and settling in. The Platform section introduces SYNK’s free experiences and personalized programs. New programs, including travel and food, will be released in stages. Reservations for new services are not yet open.",
+      "answer": "Explore LAB for Korean education, SHIFT for introducing and operating personalized services for companies, PULSE for ads, model and profile images, music, content and IP, and PATH for personalized travel and preparation for study, careers and life in Korea.\n\nThe main SYNK website explains the company’s philosophy and Atlas, our shared technology.\n\nYou can start Seoul travel planning, Korean games and everyday tools for free on the SYNK platform. Supported WORLD records and Seoul itineraries can be saved to your SYNK ID account; saving options vary by program. SHIFT research and testing, PULSE AI portraits, introduction materials, space and equipment rental, and PATH travel across other countries, housing and settling-in support remain in preparation. Reservations for new services are not yet open.",
       "sourceId": "company",
       "relatedIds": [
         "lab-intro",
@@ -692,7 +694,7 @@
         "label": "Choose a brand",
         "href": "/en/#worlds"
       },
-      "reviewedAt": "2026-10-07",
+      "reviewedAt": "2026-10-09",
       "aliases": [
         "어디부터 보면 좋을까요?",
         "저에게 맞는 사업은 어디인가요?",
@@ -933,7 +935,11 @@
         "The Teacher Is Back",
         "Entry Check",
         "Blank Slice",
-        "Talk Rally"
+        "Talk Rally",
+        "word wizard",
+        "beginner activities",
+        "spaceship",
+        "account saving"
       ],
       "questionExamples": [
         "What Korean do the racing and rhythm games practise?",
@@ -948,7 +954,7 @@
         "What does Entry Check practise?",
         "What kind of game is The Teacher Is Back?"
       ],
-      "answer": "SYNK LAB is preparing 10 minigames. On the LAB page you can watch real gameplay from eight Korean games: Korean Racing, Words in Rhythm, Wind Run, Order Rush and Talk Rally practise listening, while The Teacher Is Back, Entry Check and Blank Slice practise reading. All eight are prototypes.\n\nRace along a coastal road with Marin or Kkamong, listen to a Korean question, and answer by driving into a picture or word lane. Correct answers trigger a boost. The prototype includes 2,000 basic and extended vocabulary items, 400 learning stages of five words, and 2,008 word and guidance voice clips. All stages share one coastal course; the vocabulary list does not guarantee coverage of every TOPIK Level 1–2 item. Use A/D or arrow keys, or mobile steering and answer buttons.\n\nNarration sequences each question, word pronunciation, and correct/incorrect feedback. Engine volume falls while speech plays, and the car waits before the gate until the question finishes. Replay, optional listening captions, pronunciation after the race, and a review that prioritizes mistakes support practice. The commentary is scripted audio, rather than live AI conversation.\n\nListening connects word sounds with pictures and spelling; reading practises recognizing spelling and meaning. Words in Rhythm plays three of our own Korean songs across two lanes. Listen to a narrated sentence and question, then answer O/X. Music quietens and regular notes clear during narration. Practise understanding times, places, reasons, conditions and changed information, with timing and listening answers checked separately and new spoken review questions. Speaking and writing extend expressions into offline dialogue and sentence tasks. The games currently provide no pronunciation or free-writing assessment. TOPIK I tests listening and reading; TOPIK II includes writing, while TOPIK Speaking is a separate test.\n\nIn Wind Run you hear 16 short requests such as “Take the left path.” or “Jump over the low fence.” and act them out. While you run there is only sound, no text; the text appears in the practice before the run and the review after it. In Order Rush you hear café orders and make each drink, matching the number of cups, the temperature and what to leave out. In Talk Rally, Mongle says something in Korean as it hits the ball, and you hit it back toward the reply card that fits. In The Teacher Is Back you read the requests in a story and move Marin and Kkamong to tidy the classroom, then read new, changed requests at the end. In Entry Check you read a notice, check each guest’s ticket, bags and words, and stamp pass or reject. In Blank Slice you read a sentence with a blank and slash the one word piece out of four that fits.\n\nA meta-analysis of digital game-based second-language learning reported a between-group effect size of d=0.50 (Dixon et al., 2022). A retrieval-practice meta-analysis covering 222 studies and 48,478 learners reported g=0.499 (Yang et al., 2021). Picture-and-audio effects vary with materials and pacing (Reinwein, 2012). These findings inform our recall, feedback, short-audio, and replay design. Effect sizes are not percentage improvements, and SYNK-specific TOPIK gains and long-term learning outcomes have not yet been tested with learners. Primary sources are linked in the learning showcase.\n\nWe are preparing a path from minigames and offline learning toward TOPIK Level 1, followed by everyday-life content and village NPC conversations. The planned unlock follows an in-app TOPIK Level 1+ foundation stage and does not require an official score report. The full ten-game set, classroom-to-village integration, and NPC connection are still in preparation. The games store anonymous progress in this browser only, racing’s automated demonstrations are left out of learning records, and nothing connects to student accounts or a server.",
+      "answer": "SYNK LAB offers eight existing Korean games and three beginner activities as public prototypes. On the LAB page you can watch real gameplay from eight Korean games: Korean Racing, Words in Rhythm, Wind Run, Order Rush and Talk Rally practise listening, while The Teacher Is Back, Entry Check and Blank Slice practise reading. All eight are prototypes.\n\nRace along a coastal road with Marin or Kkamong, listen to a Korean question, and answer by driving into a picture or word lane. Correct answers trigger a boost. The prototype includes 2,000 basic and extended vocabulary items, 400 learning stages of five words, and 2,008 word and guidance voice clips. All stages share one coastal course; the vocabulary list does not guarantee coverage of every TOPIK Level 1–2 item. Use A/D or arrow keys, or mobile steering and answer buttons.\n\nNarration sequences each question, word pronunciation, and correct/incorrect feedback. Engine volume falls while speech plays, and the car waits before the gate until the question finishes. Replay, optional listening captions, pronunciation after the race, and a review that prioritizes mistakes support practice. The commentary is scripted audio, rather than live AI conversation.\n\nListening connects word sounds with pictures and spelling; reading practises recognizing spelling and meaning. Words in Rhythm plays three of our own Korean songs across two lanes. Listen to a narrated sentence and question, then answer O/X. Music quietens and regular notes clear during narration. Practise understanding times, places, reasons, conditions and changed information, with timing and listening answers checked separately and new spoken review questions. Speaking and writing extend expressions into offline dialogue and sentence tasks. The games currently provide no pronunciation or free-writing assessment. TOPIK I tests listening and reading; TOPIK II includes writing, while TOPIK Speaking is a separate test.\n\nIn Wind Run you hear 16 short requests such as “Take the left path.” or “Jump over the low fence.” and act them out. While you run there is only sound, no text; the text appears in the practice before the run and the review after it. In Order Rush you hear café orders and make each drink, matching the number of cups, the temperature and what to leave out. In Talk Rally, Mongle says something in Korean as it hits the ball, and you hit it back toward the reply card that fits. In The Teacher Is Back you read the requests in a story and move Marin and Kkamong to tidy the classroom, then read new, changed requests at the end. In Entry Check you read a notice, check each guest’s ticket, bags and words, and stamp pass or reject. In Blank Slice you read a sentence with a blank and slash the one word piece out of four that fits.\n\nA meta-analysis of digital game-based second-language learning reported a between-group effect size of d=0.50 (Dixon et al., 2022). A retrieval-practice meta-analysis covering 222 studies and 48,478 learners reported g=0.499 (Yang et al., 2021). Picture-and-audio effects vary with materials and pacing (Reinwein, 2012). These findings inform our recall, feedback, short-audio, and replay design. Effect sizes are not percentage improvements, and SYNK-specific TOPIK gains and long-term learning outcomes have not yet been tested with learners. Primary sources are linked in the learning showcase.\n\nWe are preparing a path from minigames and offline learning toward TOPIK Level 1, followed by everyday-life content and village NPC conversations. The planned unlock follows an in-app TOPIK Level 1+ foundation stage and does not require an official score report. The full learning path connecting classes, games and the village is in preparation. SYNK TOWN is a local prototype where you walk between a home, tea house, workshop and greenhouse and share activities with residents; it is not yet public.\n\nIn Word Wizard, basic expressions for size and position change objects. In Order Rush for beginners, you listen for water, bread, apples and quantities, then serve the food. In Fix a Spaceship Together, two players see different information and exchange expressions to carry out repairs. These picture-and-audio activities practise basic vocabulary and short requests before TOPIK I. Cooperative success, customization and saving a photo are not counted as independent listening answers.\n\nWhen signed in to WORLD, coins, owned items, goals and supported game records are saved to your account. Guest experiences and pending drafts remain in the current browser; each game explains its saving scope. Racing’s automated demonstrations are excluded from learning records.",
       "sourceId": "lab",
       "relatedIds": [
         "lab-curriculum",
@@ -959,7 +965,7 @@
         "label": "See all eight games",
         "href": "/en/lab/#work"
       },
-      "reviewedAt": "2026-10-06",
+      "reviewedAt": "2026-10-09",
       "aliases": [
         "레이싱·리듬 게임은 어떤 한국어를 연습하나요?",
         "한국어 레이싱은 어떻게 플레이하나요?",
@@ -4124,7 +4130,7 @@
         "I want to ask about a visit to Korea and cultural experiences",
         "Can I book a cultural experience?"
       ],
-      "answer": "We start with what you want to eat, where you want to unwind, and where you would rather save or spend. We are developing personalized travel across countries, bringing together restaurants, stays, experiences and daily routes around your taste, budget, companions and mobility needs.\n\nMake the same budget feel like yours — Some travelers prefer a simple stay and a memorable meal; others put a comfortable room and time to rest first. We plan around where spending matters most to you.\n\nRestaurants, stays and experiences in one plan — Your companions, energy and travel time shape a day of meals, experiences and rest, with concerts, night views or bars included when they suit your taste.\n\nYour preferences travel with you — We are building a service that carries the preferences you confirm and the experiences you share into your next plan. Your usual tastes stay distinct from the needs of this particular trip, so visiting a new country does not mean starting from scratch.\n\nPersonalized travel, visits and cultural experiences are in preparation. Booking details will follow once destinations, schedules and prices are confirmed.",
+      "answer": "Build a day around real places in Jongno, Bukchon and Seochon. Set your interests, budget, companions and walking needs, then compare plans of two to five stops with photos, a map and a timetable.\n\nA day that fits your needs — Set your start and finish times, starting point, budget and walking limits. See confirmed costs and details that need checking, then keep or replace the places you choose.\n\nInclude your companions — Enter each companion’s likes, things to avoid and requirements. See how each person’s preferences are reflected and choose a plan together.\n\nAdjust as the day unfolds — Mark places you have visited or want to skip, then compare plans for your remaining time and budget. Review the new itinerary before applying changes such as less walking or more time indoors.\n\nSeoul itineraries are free and can be saved with SYNK ID. Recheck opening hours and costs before visiting. Travel across other countries, accommodation and booking services are in preparation.",
       "relatedIds": [
         "path-intro",
         "path-philosophy"
@@ -4133,7 +4139,7 @@
         "label": "Explore the details",
         "href": "/en/path/#path-visit"
       },
-      "reviewedAt": "2026-10-07",
+      "reviewedAt": "2026-10-09",
       "aliases": [
         "PATH의 개인화 여행은 무엇인가요?",
         "PATH는 맛집과 숙소를 어떻게 추천하나요?",
@@ -4168,7 +4174,7 @@
         "Does the SYNK platform become more personal as I use it?",
         "Are there programs for travel and food?"
       ],
-      "answer": "From travel and food to learning and everyday life, explore free programs and discover what fits you.\n\nTravel and food — Where to go, what to eat. Explore a day that fits your tastes and plans.\n\nLearning and everyday life — Enjoy Korean games and useful personalized tools at your own pace.\n\nYour preferences, remembered — The preferences and feedback you share help future recommendations and guidance fit you better.\n\nExplore real places in Jongno and compare your preferences with fictional itineraries. Records and storage vary by program.",
+      "answer": "Discover what you can use today. Plan a day in Seoul around your preferences, or learn Korean by listening and playing.\n\nYour kind of day in Seoul — Connect 2–5 real places around your time, budget, walking preferences and companions. See your route on a map and adjust the rest of your day as you go.\n\nYour first Korean starts with play — Cast a spell, serve a first order or fix a spaceship with a friend. Start with beginner play, then explore listening and reading games.\n\nPick up where you left off — Save trips with SYNK ID, and continue supported game progress and customization in WORLD.\n\nStart the free experiences without signing up. Check venue information and estimated walking times before visiting. Storage varies by program; guest progress is not automatically transferred to an account.",
       "relatedIds": [
         "synk-stage",
         "guide-contact"
@@ -4177,7 +4183,7 @@
         "label": "Explore the SYNK platform",
         "href": "/en/#products"
       },
-      "reviewedAt": "2026-10-07",
+      "reviewedAt": "2026-10-09",
       "aliases": [
         "SYNK 플랫폼에서는 무엇을 무료로 체험하나요?",
         "SYNK 플랫폼은 쓸수록 나에게 맞춰지나요?",
@@ -4287,7 +4293,7 @@
         "How is Atlas used by each brand?",
         "What does it mean for Atlas to evolve with the user?"
       ],
-      "answer": "Atlas is the personalization engine SYNK builds, and the name for its eight engines together. They share the work, from deciding what a person needs to ordering what to learn, giving explanations and hints, shaping screens and sound, and checking whether the help worked. LAB, SHIFT, PULSE, and PATH each pick the engines they need and fit them to their own services.\n\nThe same person needs different practice as their goals change. The expressions you need when preparing to study in Korea, working with a Korean company, or talking with family are not the same. We are developing Atlas to adjust tasks and explanations to the goals you set and your recent results, not to your age.\n\nCore — Judging what is needed now. It looks at what the person is trying to do and where they get stuck, and decides what to do next and what help is needed. It also sets out the reasons for what it recommends and leaves out.\n\nLoom — Scenes that respond to your touch. Combines soft materials, light, and movement to create interfaces and characters, with scenes that respond naturally to the user's actions.\n\nVellum — Explanations that make sense. Offers explanations and hints suited to the current task and the person’s own answer. Explains why the practice matters and what to look at when the student gets stuck.\n\nTrail — Tracking practice and progress. Records the tasks completed and the help received. Lets learners compare earlier and recent answers to see what has changed.\n\nPrism — Comparing learning results. Finds recurring difficulties and differences across learning examples. Highlights which content and explanations need a closer look.\n\nTemper — Checking whether support helped. Checks whether a person can now do it on their own after a hint or practice activity, then uses those results to improve tasks and support.\n\nReed — Music and sound for each scene. Handles music and sound for creative work and learning scenes. Decides when to use sound, for example turning it down when someone needs to focus.\n\nStrata (in development) — A map of what to learn next. Connects grammar, expressions, and vocabulary by difficulty and prerequisites. Helps identify the learning needed for a goal and which basics to revisit after a mistake.\n\nLAB — Adjusts Korean practice, games, and hints to each learner’s goals and the results of what they tried.\n\nSHIFT — We prepare to introduce personalization for one task. Purchasing advice, usage guidance, coaching and staff training are candidate use cases.\n\nPULSE — Uses Loom, which composes the screen, and Reed, which handles sound, to make ad and model videos and music and character content.\n\nPATH — Adjusts practice for life in Korea and interviews to each learner's intended major, career plans, and Korean level.\n\nWe are developing it by first connecting it to Korean learning games and our learning app. Each brand page explains how far it is used in business services and video production.\nThe descriptions include capabilities in development.",
+      "answer": "Atlas is the personalization engine SYNK builds, and the name for its eight engines together. They share the work, from deciding what a person needs to ordering what to learn, giving explanations and hints, shaping screens and sound, and checking whether the help worked. LAB, SHIFT, PULSE, and PATH each pick the engines they need and fit them to their own services.\n\nThe same person needs different practice as their goals change. The expressions you need when preparing to study in Korea, working with a Korean company, or talking with family are not the same. We are developing Atlas to adjust tasks and explanations to the goals you set and your recent results, not to your age.\n\nCore — Judging what is needed now. It looks at what the person is trying to do and where they get stuck, and decides what to do next and what help is needed. It also sets out the reasons for what it recommends and leaves out.\n\nLoom — Scenes that respond to your touch. Combines soft materials, light, and movement to create interfaces and characters, with scenes that respond naturally to the user's actions.\n\nVellum — Explanations that make sense. Offers explanations and hints suited to the current task and the person’s own answer. Explains why the practice matters and what to look at when the student gets stuck.\n\nTrail — Tracking practice and progress. Records the tasks completed and the help received. Lets learners compare earlier and recent answers to see what has changed.\n\nPrism — Comparing learning results. Finds recurring difficulties and differences across learning examples. Highlights which content and explanations need a closer look.\n\nTemper — Checking whether support helped. Checks whether a person can now do it on their own after a hint or practice activity, then uses those results to improve tasks and support.\n\nReed — Music and sound for each scene. Handles music and sound for creative work and learning scenes. Decides when to use sound, for example turning it down when someone needs to focus.\n\nStrata (in development) — A map of what to learn next. Connects grammar, expressions, and vocabulary by difficulty and prerequisites. Helps identify the learning needed for a goal and which basics to revisit after a mistake.\n\nLAB — Adjusts Korean practice, games, and hints to each learner’s goals and the results of what they tried.\n\nSHIFT — We prepare to introduce personalization for one task. Purchasing advice, usage guidance, coaching and staff training are candidate use cases.\n\nPULSE — Uses Loom, which composes the screen, and Reed, which handles sound, to make ad and model videos and music and character content.\n\nPATH — For Seoul travel, it compares places and plans against your interests, budget and walking limits. We are also developing goal- and practice-based support for study and interview preparation.\n\nSelected engines are in use in Seoul travel and Korean games, with connections to learning apps and business services under development.\nEach experience and brand introduction explains which features are available and which are in development.",
       "relatedIds": [
         "synk-intro",
         "lab-personalization",
@@ -4298,7 +4304,7 @@
         "label": "Explore Atlas",
         "href": "/en/#atlas"
       },
-      "reviewedAt": "2026-10-06",
+      "reviewedAt": "2026-10-09",
       "aliases": [
         "SYNK 아틀라스는 어떻게 작동하나요?",
         "아틀라스의 여덟 엔진은 어떤 역할을 하나요?",
@@ -4311,7 +4317,7 @@
       "brand": "synk",
       "category": "technology",
       "sourceId": "company",
-      "title": "Core — Understanding needs and guiding the next choice",
+      "title": "Core — Decides what is needed now",
       "keywords": [
         "Core",
         "core engine",
@@ -4321,7 +4327,7 @@
         "What does Core do?",
         "What is the Core engine?"
       ],
-      "answer": "Core — Judging what is needed now. It looks at what the person is trying to do and where they get stuck, and decides what to do next and what help is needed. It also sets out the reasons for what it recommends and leaves out.\n\nWe are developing it by first connecting it to Korean learning games and our learning app. Each brand page explains how far it is used in business services and video production.\nThe descriptions include capabilities in development.",
+      "answer": "Core — Judging what is needed now. It looks at what the person is trying to do and where they get stuck, and decides what to do next and what help is needed. It also sets out the reasons for what it recommends and leaves out.\n\nSelected engines are in use in Seoul travel and Korean games, with connections to learning apps and business services under development.\nEach experience and brand introduction explains which features are available and which are in development.",
       "relatedIds": [
         "synk-atlas",
         "lab-personalization"
@@ -4330,7 +4336,7 @@
         "label": "Explore the eight engines",
         "href": "/en/#atlas"
       },
-      "reviewedAt": "2026-10-06",
+      "reviewedAt": "2026-10-09",
       "aliases": [
         "Core은 어떤 역할을 하나요?",
         "코어 엔진이 뭐예요?"
@@ -4351,7 +4357,7 @@
         "What does Loom do?",
         "What is the Loom engine?"
       ],
-      "answer": "Loom — Scenes that respond to your touch. Combines soft materials, light, and movement to create interfaces and characters, with scenes that respond naturally to the user's actions.\n\nWe are developing it by first connecting it to Korean learning games and our learning app. Each brand page explains how far it is used in business services and video production.\nThe descriptions include capabilities in development.",
+      "answer": "Loom — Scenes that respond to your touch. Combines soft materials, light, and movement to create interfaces and characters, with scenes that respond naturally to the user's actions.\n\nSelected engines are in use in Seoul travel and Korean games, with connections to learning apps and business services under development.\nEach experience and brand introduction explains which features are available and which are in development.",
       "relatedIds": [
         "synk-atlas",
         "lab-personalization"
@@ -4360,7 +4366,7 @@
         "label": "Explore the eight engines",
         "href": "/en/#atlas"
       },
-      "reviewedAt": "2026-10-06",
+      "reviewedAt": "2026-10-09",
       "aliases": [
         "Loom은 어떤 역할을 하나요?",
         "룸 엔진이 뭐예요?"
@@ -4381,7 +4387,7 @@
         "What does Vellum do?",
         "What is the Vellum engine?"
       ],
-      "answer": "Vellum — Explanations that make sense. Offers explanations and hints suited to the current task and the person’s own answer. Explains why the practice matters and what to look at when the student gets stuck.\n\nWe are developing it by first connecting it to Korean learning games and our learning app. Each brand page explains how far it is used in business services and video production.\nThe descriptions include capabilities in development.",
+      "answer": "Vellum — Explanations that make sense. Offers explanations and hints suited to the current task and the person’s own answer. Explains why the practice matters and what to look at when the student gets stuck.\n\nSelected engines are in use in Seoul travel and Korean games, with connections to learning apps and business services under development.\nEach experience and brand introduction explains which features are available and which are in development.",
       "relatedIds": [
         "synk-atlas",
         "lab-personalization"
@@ -4390,7 +4396,7 @@
         "label": "Explore the eight engines",
         "href": "/en/#atlas"
       },
-      "reviewedAt": "2026-10-06",
+      "reviewedAt": "2026-10-09",
       "aliases": [
         "Vellum은 어떤 역할을 하나요?",
         "벨룸 엔진이 뭐예요?"
@@ -4411,7 +4417,7 @@
         "What does Trail do?",
         "What is the Trail engine?"
       ],
-      "answer": "Trail — Tracking practice and progress. Records the tasks completed and the help received. Lets learners compare earlier and recent answers to see what has changed.\n\nWe are developing it by first connecting it to Korean learning games and our learning app. Each brand page explains how far it is used in business services and video production.\nThe descriptions include capabilities in development.",
+      "answer": "Trail — Tracking practice and progress. Records the tasks completed and the help received. Lets learners compare earlier and recent answers to see what has changed.\n\nSelected engines are in use in Seoul travel and Korean games, with connections to learning apps and business services under development.\nEach experience and brand introduction explains which features are available and which are in development.",
       "relatedIds": [
         "synk-atlas",
         "lab-personalization"
@@ -4420,7 +4426,7 @@
         "label": "Explore the eight engines",
         "href": "/en/#atlas"
       },
-      "reviewedAt": "2026-10-06",
+      "reviewedAt": "2026-10-09",
       "aliases": [
         "Trail은 어떤 역할을 하나요?",
         "트레일 엔진이 뭐예요?"
@@ -4441,7 +4447,7 @@
         "What does Prism do?",
         "What is the Prism engine?"
       ],
-      "answer": "Prism — Comparing learning results. Finds recurring difficulties and differences across learning examples. Highlights which content and explanations need a closer look.\n\nWe are developing it by first connecting it to Korean learning games and our learning app. Each brand page explains how far it is used in business services and video production.\nThe descriptions include capabilities in development.",
+      "answer": "Prism — Comparing learning results. Finds recurring difficulties and differences across learning examples. Highlights which content and explanations need a closer look.\n\nSelected engines are in use in Seoul travel and Korean games, with connections to learning apps and business services under development.\nEach experience and brand introduction explains which features are available and which are in development.",
       "relatedIds": [
         "synk-atlas",
         "lab-personalization"
@@ -4450,7 +4456,7 @@
         "label": "Explore the eight engines",
         "href": "/en/#atlas"
       },
-      "reviewedAt": "2026-10-06",
+      "reviewedAt": "2026-10-09",
       "aliases": [
         "Prism은 어떤 역할을 하나요?",
         "프리즘 엔진이 뭐예요?"
@@ -4471,7 +4477,7 @@
         "What does Temper do?",
         "What is the Temper engine?"
       ],
-      "answer": "Temper — Checking whether support helped. Checks whether a person can now do it on their own after a hint or practice activity, then uses those results to improve tasks and support.\n\nWe are developing it by first connecting it to Korean learning games and our learning app. Each brand page explains how far it is used in business services and video production.\nThe descriptions include capabilities in development.",
+      "answer": "Temper — Checking whether support helped. Checks whether a person can now do it on their own after a hint or practice activity, then uses those results to improve tasks and support.\n\nSelected engines are in use in Seoul travel and Korean games, with connections to learning apps and business services under development.\nEach experience and brand introduction explains which features are available and which are in development.",
       "relatedIds": [
         "synk-atlas",
         "lab-personalization"
@@ -4480,7 +4486,7 @@
         "label": "Explore the eight engines",
         "href": "/en/#atlas"
       },
-      "reviewedAt": "2026-10-06",
+      "reviewedAt": "2026-10-09",
       "aliases": [
         "Temper은 어떤 역할을 하나요?",
         "템퍼 엔진이 뭐예요?"
@@ -4501,7 +4507,7 @@
         "What does Reed do?",
         "What is the Reed engine?"
       ],
-      "answer": "Reed — Music and sound for each scene. Handles music and sound for creative work and learning scenes. Decides when to use sound, for example turning it down when someone needs to focus.\n\nWe are developing it by first connecting it to Korean learning games and our learning app. Each brand page explains how far it is used in business services and video production.\nThe descriptions include capabilities in development.",
+      "answer": "Reed — Music and sound for each scene. Handles music and sound for creative work and learning scenes. Decides when to use sound, for example turning it down when someone needs to focus.\n\nSelected engines are in use in Seoul travel and Korean games, with connections to learning apps and business services under development.\nEach experience and brand introduction explains which features are available and which are in development.",
       "relatedIds": [
         "synk-atlas",
         "lab-personalization"
@@ -4510,7 +4516,7 @@
         "label": "Explore the eight engines",
         "href": "/en/#atlas"
       },
-      "reviewedAt": "2026-10-06",
+      "reviewedAt": "2026-10-09",
       "aliases": [
         "Reed은 어떤 역할을 하나요?",
         "리드 엔진이 뭐예요?"
