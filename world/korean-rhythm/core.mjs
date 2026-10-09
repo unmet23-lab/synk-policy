@@ -1,4 +1,4 @@
-import {SUNO_RECORDINGS} from './suno-tracks.mjs';
+import {RECORDINGS} from './recording-tracks.mjs';
 import {LISTENING} from './listening.mjs';
 import {NARRATION} from './narration.mjs';
 export const LEVELS = {
@@ -6,7 +6,7 @@ export const LEVELS = {
   normal: {label:'리드미컬', step:.5, window:.23, perfect:.085, great:.155, approach:2.9},
   hard: {label:'도전', step:.5, window:.20, perfect:.065, great:.125, approach:2.55},
 };
-export const TRACKS=SUNO_RECORDINGS.map((recording,id)=>({id,...recording,
+export const TRACKS=RECORDINGS.map((recording,id)=>({id,...recording,
   subtitle:['한국어 시티팝 · 시간과 장소 듣기','한국어 시티팝 · 문장 연결 듣기','한국어 시티팝 · 같은 뜻 알아듣기'][id],
   tag:['듣기 · 일상 표현','듣기 · 문장 연결','듣기 · 뜻 이해'][id],
   color:['#f36f63','#86aaf4','#ffe07a'][id],questions:LISTENING[id],
