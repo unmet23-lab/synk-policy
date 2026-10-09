@@ -31,12 +31,13 @@ function updateOwnedPlay(card,id,state){
  link.href=href;link.dataset.ownedPlay=item?.id||id;link.querySelector('b').textContent=ko;link.querySelector('[lang=en]').textContent=en;link.querySelector('img').src=image;
 }
 let beginnerShopRevision=0;
+for(const card of document.querySelectorAll('[data-beginner-shop]')){const next=document.createElement('div');next.className='shop-next';next.hidden=true;const copy=document.createElement('p'),ko=document.createElement('span'),en=document.createElement('span'),link=document.createElement('a');en.lang='en';copy.append(ko,en);link.className='shop-visit';next.append(copy,link);card.querySelector('.shop-owned').after(next);}
 async function updateBeginnerShops(){
  const revision=++beginnerShopRevision;
- const states=await Promise.all(beginnerShops.map(row=>SynkPlayCollection.beginnerProgress(row[6])));
+ const results=await Promise.all(beginnerShops.map(async row=>({state:await SynkPlayCollection.beginnerProgress(row[6]),route:await SynkPlayCollection.beginnerRewardRoute?.(row[6])})));
  if(revision!==beginnerShopRevision)return;
  beginnerShops.forEach(([id,,,,,,,kinds],index)=>{
-  const state=states[index],items=state.items.filter(item=>kinds.includes(item.kind)&&item.price>0),count=items.filter(item=>item.owned).length;
+  const {state,route}=results[index],items=state.items.filter(item=>kinds.includes(item.kind)&&item.price>0),count=items.filter(item=>item.owned).length;
   const card=document.querySelector(`[data-beginner-shop="${id}"]`),goal=state.goal;
   card.querySelector('.shop-owned').textContent=state.available?`모은 물건 ${count}/${items.length} · Collected ${count}/${items.length}`:'저장을 사용할 수 없어요 · Storage unavailable';
   const status=card.querySelector('.shop-goal');status.replaceChildren();
@@ -44,6 +45,8 @@ async function updateBeginnerShops(){
   line.textContent=!state.available?'':!goal?(count?'내가 모은 놀이가 기다리고 있어요.':'어떤 놀이를 갖고 싶나요?'):`${goal.name} · ${state.owned?'목표 달성! 바로 써 보세요':state.affordable?'이제 살 수 있어요':`${state.remaining}코인 더 모으면 돼요`}`;
   translation.textContent=!state.available?'':!goal?(count?'Your play things are ready whenever you are.':'Choose something to play with.'):`${goal.nameEn} · ${state.owned?'Yours! Ready to use.':state.affordable?'Ready to buy.':`${state.remaining} more coins to go.`}`;
   status.append(line,translation);status.hidden=!state.available;
+  const next=card.querySelector('.shop-next');next.hidden=!state.available||!goal||state.owned||state.affordable;
+  if(!next.hidden){const coins=route?.kind==='first-shop'?'15~25':route?.potentialCoins;next.querySelector('p>span:first-child').textContent=route?.available?(route.kind==='magic-practice'?`오늘 첫 실험 보상 ${coins}코인 · 두 말로 놀이`:`아직 받지 않은 첫 완주 보상 ${coins}코인 · 도움 무료`):route?.description||'학습은 계속 무료예요. 다음 놀이를 직접 골라요.';next.querySelector('p>[lang=en]').textContent=route?.available?(route.kind==='magic-practice'?`Today’s one-time experiment reward: ${coins} coins.`:`First completion reward: ${coins} coins. Help is free.`):route?.descriptionEn||'Learning stays free. Choose your next activity.';const link=next.querySelector('a');link.href=route?.href||'/try/learning-hub/#beginner-title';link.textContent=route?`${route.label} · ${route.labelEn} →`:'다음 무료 학습 고르기 · Choose my next free activity →';}
   updateOwnedPlay(card,id,state);
  });
 }

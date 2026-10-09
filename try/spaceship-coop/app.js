@@ -1,10 +1,10 @@
 import { VoiceBank, WORDS } from './audio.js';
 import { createShipShop, DEFAULT_OUTFIT, BADGE_ART } from './shop.js';
-import { createStarbook, STARBOOK_ITEM } from './starbook.js';
+import { createStarbook, createReturnRecall, loadStarbook, STARBOOK_ITEM } from './starbook.js';
 
 // Restore the verified account before reading progress or enabling play.
 await globalThis.SynkPlayAccount.ready();
-let shipShop,starbook;
+let shipShop,starbook,returnRecall;
 
 const $=selector=>document.querySelector(selector),main=$('#main'),voices=new VoiceBank();
 const API=document.querySelector('meta[name="spaceship-api"]')?.content||'/api/spaceship';
@@ -35,7 +35,7 @@ async function request(route,method='GET',data){
 function update(next){
   if(state&&next.revision<state.revision)return;
   const previousPhase=state?.phase,previousRound=state?.round;state=next;
-  if(!['lobby','complete','closed'].includes(state.phase)){document.querySelector('#ship-shop[open]')?.close();document.querySelector('#starbook[open]')?.close();}
+  if(!['lobby','complete','closed'].includes(state.phase)){document.querySelector('#ship-shop[open]')?.close();document.querySelector('#starbook[open]')?.close();if(returnRecall?.isOpen())returnRecall.close({restore:false});}
   if(state.phase==='complete')starbook?.capture(state);
   if(lastRound!==state.round){lastRound=state.round;helpOpen=false;count=0;demo=state.stage.words[0];}
   const newSignal=state.signal&&state.signal.id!==playedSignal&&state.role==='pilot';
@@ -97,6 +97,7 @@ async function stream(){
 }
 function forget(){stopped=true;streamController?.abort();session=null;state=null;clearEntry();inReview=false;voices.stop();heardSignal=0;playedSignal=0;lastFeedback=0;lastRound=-1;reviewReady=false;listening=false;save();$('#leave-top').hidden=true;const url=new URL(location.href);if(url.searchParams.has('room')){url.searchParams.delete('room');history.replaceState(null,'',url);}}
 function interruptAudio(){voices.stop();heardSignal=0;listening=false;reviewReady=false;render();}
+function returnRecallMarkup(){return loadStarbook().entries.length?'<section class="paper return-entry"><span class="eyebrow">COME BACK TO A SOUND</span><h2>지금은 혼자여도 복습할 수 있어요</h2><p>지난 탐험의 소리 3개를 듣고 그림으로 다시 골라요. 친구와 하던 탐험은 그대로 두어요.<br><span lang="en">Recall three sounds from your latest finished expedition. Keep your current expedition.</span></p><button class="felt cream" data-action="return-recall">지난 소리 3개 떠올리기<small>Free solo recall · no timer</small></button></section>':'';}
 function picture(word,{label=true}={}){
   const a=label?`role="img" aria-label="${esc(EN[word])}"`:'aria-hidden="true"';
   if(word==='red'||word==='blue')return `<span class="disc ${word==='blue'?'blue':''}" ${a}>${word==='red'?'▲':'●'}</span>`;
@@ -113,7 +114,7 @@ function entry(){
   ${entryError?`<p class="error" role="alert">${esc(entryError)}</p>`:''}
   ${session?`<section class="paper"><h2>하던 탐험으로 돌아갈까요?</h2><p>방 ${esc(session.code)} · 이 기기의 자리로 돌아가요.</p><button class="felt coral" data-action="resume">소리 켜고 이어 하기 / Resume</button><button class="text-button" data-action="forget">이 기기의 입장 정보 지우기 / Forget session</button></section>`:
   `<section class="lobby-grid"><article class="paper"><span class="eyebrow">01 / INVITE A FRIEND</span><h2>함께 탈 친구를 초대해요</h2><p class="sub">각자 다른 화면에서 해요. 휴대폰 두 대 또는 컴퓨터와 휴대폰을 준비해요.<br><span lang="en">Use two separate screens on a shared game address.</span></p><button class="felt coral" data-action="create">탐험 만들기 <small lang="en">Create an expedition</small></button><p class="fine">소리를 먼저 확인해요. 마이크는 필요 없어요.<br><span lang="en">Sound on. No microphone needed.</span></p></article><article class="paper"><span class="eyebrow">02 / GOT A CODE?</span><h2>친구가 만든 탐험으로</h2><form class="join-form" id="join-form"><label class="sr" for="room-input">방 코드 6자리 / Six-character room code</label><input id="room-input" name="room" value="${joinCode}" placeholder="ABC123" minlength="6" maxlength="6" pattern="[A-Za-z2-9]{6}" autocomplete="off" autocapitalize="characters" spellcheck="false" required><button class="felt cream" type="submit">입장<small>Join</small></button></form><p class="fine">친구와 같은 게임 주소에서 방 코드를 넣어요.<br><span lang="en">Open the same game address and enter your friend’s code.</span></p></article></section>`}
-  <p class="network-note">친구에게는 초대 링크를 보내 주세요. 각자 다른 화면과 소리가 필요해요. 마이크는 필요 없어요.<br><span lang="en">You need a friend, two separate screens and sound. Share the invite link. No microphone is needed.</span></p>${['127.0.0.1','localhost'].includes(location.hostname)?'<p class="fine local-note">현재 주소는 이 컴퓨터에서만 열려요. 여기서는 서로 다른 브라우저로 시험할 수 있어요.<br><span lang="en">This local address works only on this computer. Use two different browsers to try it here.</span></p>':''}<p class="solo-link">지금은 혼자인가요? / Playing alone? ${moreGames}</p><p class="fine">연습: 색 · 위치 · 횟수 듣기와 표현 선택. TOPIK I 듣기에 필요한 기초 표현을 준비해요. 점수는 이 탐험의 행동 기록이며, 학습 향상을 입증하지 않아요.</p>`;
+  ${returnRecallMarkup()}<p class="network-note">친구에게는 초대 링크를 보내 주세요. 각자 다른 화면과 소리가 필요해요. 마이크는 필요 없어요.<br><span lang="en">You need a friend, two separate screens and sound. Share the invite link. No microphone is needed.</span></p>${['127.0.0.1','localhost'].includes(location.hostname)?'<p class="fine local-note">현재 주소는 이 컴퓨터에서만 열려요. 여기서는 서로 다른 브라우저로 시험할 수 있어요.<br><span lang="en">This local address works only on this computer. Use two different browsers to try it here.</span></p>':''}<p class="solo-link">지금은 혼자인가요? / Playing alone? ${moreGames}</p><p class="fine">연습: 색 · 위치 · 횟수 듣기와 표현 선택. TOPIK I 듣기에 필요한 기초 표현을 준비해요. 점수는 이 탐험의 행동 기록이며, 학습 향상을 입증하지 않아요.</p>`;
 }
 function roomLobby(){
   const me=state.players[state.slot],partner=state.players[1-state.slot];
@@ -172,6 +173,7 @@ function render(){
   if(inReview){review();main.insertAdjacentHTML('beforeend',moreGames);if(action)focusAction(action,word);return;}
   if(state.phase==='closed'){main.innerHTML='<section class="result paper"><h1>탐험을 마쳤어요</h1><p>한 사람이 나가서 이 탐험은 끝났어요.</p><p lang="en">A player left this expedition.</p><button class="felt coral" data-action="new">새 탐험으로 / Start again</button>'+moreGames+'</section>';return;}
   ({lobby:roomLobby,tutorial,playing:playScreen,celebrate:playScreen,launch,complete:result}[state.phase]||entry)();
+  if(state.phase==='lobby')main.insertAdjacentHTML('beforeend',returnRecallMarkup());
   if(state.phase==='complete')main.insertAdjacentHTML('beforeend',moreGames);
   if(action)focusAction(action,word);
 }
@@ -197,6 +199,8 @@ async function enter(type,code){
 async function copy(value){try{await navigator.clipboard.writeText(value);toast('복사했어요. / Copied.');}catch{const input=$('#copy-value');input.value=value;$('#copy-dialog').showModal();input.focus();input.select();input.setSelectionRange(0,value.length);}}
 main.addEventListener('submit',e=>{if(e.target.id==='join-form'){e.preventDefault();const code=$('#room-input').value.toUpperCase();if(/^[A-Z2-9]{6}$/.test(code))enter('join',code);}});
 main.addEventListener('click',async e=>{
+  if(e.target.closest('[data-reward-route]'))return followRewardRoute(e);
+  if(e.target.closest('[data-action="return-recall"]')){const item=loadStarbook().entries[0];if(item)return returnRecall?.open(item);return;}
   if(e.target.closest('[data-shop-open]'))return shipShop?.open(e.target.closest('[data-shop-open]').dataset.shopOpen);
   if(e.target.closest('[data-book-open]'))return starbook?.open();
   if(e.target.closest('[data-book-save-retry]')){await starbook?.retry();return render();}
@@ -230,6 +234,8 @@ main.addEventListener('click',async e=>{
   if(action==='back-result'){voices.stop();inReview=false;render();focusAction('review');return;}
 });
 $('#leave-top').addEventListener('click',()=>{leaveDestination=null;if(state?.phase==='complete'){forget();entryError='';stopped=false;render();}else $('#leave-dialog').showModal();});
+function followRewardRoute(e){if(state&&!['complete','closed'].includes(state.phase)){e.preventDefault();leaveDestination=e.target.closest('[data-reward-route]').href;document.querySelector('#ship-shop[open]')?.close();$('#leave-dialog').showModal();}}
+$('#ship-shop').addEventListener('click',e=>{if(e.target.closest('[data-reward-route]'))followRewardRoute(e);});
 $('#world-link').addEventListener('click',e=>{if(state&&!['complete','closed'].includes(state.phase)){e.preventDefault();leaveDestination=e.currentTarget.href;$('#leave-dialog').showModal();}});
 $('#leave-dialog').addEventListener('click',async e=>{
   const action=e.target.closest('[data-dialog]')?.dataset.dialog;if(!action)return;$('#leave-dialog').close();
@@ -249,7 +255,8 @@ document.addEventListener('keydown',e=>{
 document.addEventListener('visibilitychange',()=>{if(document.hidden)interruptAudio();});
 window.addEventListener('pagehide',()=>{pageAway=true;transportOnline=false;interruptAudio();streamController?.abort();});
 window.addEventListener('pageshow',e=>{if(e.persisted){pageAway=false;if(session&&!stopped){transportOnline=false;render();stream();}}});
-starbook=createStarbook({dialog:$('#starbook'),onCapture:()=>{if(state?.phase==='complete')render();},onStop:()=>voices.stop(),onListen:async word=>{await voices.prepare();return voices.play(word);},onShop:()=>shipShop.open(STARBOOK_ITEM),onStart:()=>{if(state&&['complete','closed'].includes(state.phase)){forget();entryError='';stopped=false;render();}if(!state)focusAction(session?'resume':'create');else $('#invite-url')?.focus();}});
+returnRecall=createReturnRecall({onPrepare:()=>voices.ready?voices.context.resume():voices.prepare(),onListen:word=>voices.play(word),onStop:()=>{voices.stop();reviewReady=false;},canRun:()=>!state||stopped||['lobby','complete','closed'].includes(state.phase)});
+starbook=createStarbook({dialog:$('#starbook'),onRecall:item=>returnRecall.open(item),onCapture:()=>{if(state?.phase==='complete')render();},onStop:()=>{voices.stop();reviewReady=false;},onListen:async word=>{await voices.prepare();return voices.play(word);},onShop:()=>shipShop.open(STARBOOK_ITEM),onStart:()=>{if(state&&['complete','closed'].includes(state.phase)){forget();entryError='';stopped=false;render();}if(!state)focusAction(session?'resume':'create');else $('#invite-url')?.focus();}});
 shipShop=createShipShop({onKeepsake:()=>starbook.open(),dialog:$('#ship-shop'),openButton:$('#ship-shop-open'),renderShip:ship,onChange:look=>{for(const scene of main.querySelectorAll('.scene')){scene.dataset.sky=look.sky;scene.dataset.badge=look.badge;const badge=scene.querySelector('.ship-emblem');if(badge)badge.src=`assets/felt/${BADGE_ART[look.badge]}.webp`;}}});
 load();render();
 const entryParams=new URL(location.href).searchParams;

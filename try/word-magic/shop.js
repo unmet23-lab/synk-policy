@@ -17,7 +17,7 @@ const appearance=wallet=>({scene:wallet?.equipped?.['magic-scene']||'default',fr
 /** Uses the same wallet, ownership and persisted purchase operations as racing's garage. */
 export class MagicShop{
  constructor({say,onApply,onOpen,onUse,onProgress}){
-  this.say=say;this.onApply=onApply;this.onOpen=onOpen;this.onUse=onUse;this.onProgress=onProgress;this.wallet=null;this.progress=null;this.items=[];this.look={...defaultLook};this.preview={...defaultLook};this.busy=false;this.previewId=null;this.message='';this.previewVersion=0;this.lastEquipped=null;this.viewEpoch=0;
+  this.say=say;this.onApply=onApply;this.onOpen=onOpen;this.onUse=onUse;this.onProgress=onProgress;this.wallet=null;this.progress=null;this.rewardRoute=null;this.refreshVersion=0;this.items=[];this.look={...defaultLook};this.preview={...defaultLook};this.busy=false;this.previewId=null;this.message='';this.previewVersion=0;this.lastEquipped=null;this.viewEpoch=0;
   this.dialog=document.querySelector('#shop-dialog');
   this.stage=new MagicStage(document.createElement('canvas'),document.createElement('div'),()=>{});this.thumbnails=new Map();
   this.ready=this.stage.load().then(()=>this.stage.set(LAB_OBJECTS,{animate:false}));this.ready.catch(()=>{});
@@ -33,9 +33,9 @@ export class MagicShop{
   this.refresh();
  }
  async refresh(){
-  const api=globalThis.SynkPlayCollection;
-  try{const [wallet,items,progress]=await Promise.all([api?.load(),api?.catalog(),api?.beginnerProgress?.('word-magic')]);this.wallet=wallet||null;this.progress=progress||null;this.items=(items||[]).filter(x=>Object.hasOwn(names,x.id));}
-  catch{this.wallet=null;this.progress=null;this.items=[];}
+  const api=globalThis.SynkPlayCollection,version=++this.refreshVersion;
+  try{const [wallet,items,progress,route]=await Promise.all([api?.load(),api?.catalog(),api?.beginnerProgress?.('word-magic'),api?.beginnerRewardRoute?.('word-magic')]);if(version!==this.refreshVersion)return;this.wallet=wallet||null;this.progress=progress||null;this.rewardRoute=route||null;this.items=(items||[]).filter(x=>Object.hasOwn(names,x.id));}
+  catch{if(version!==this.refreshVersion)return;this.wallet=null;this.progress=null;this.rewardRoute=null;this.items=[];}
   if(this.wallet)this.look=appearance(this.wallet);this.onApply(this.look);if(!this.previewId)this.preview={...this.look};this.labels();this.onProgress?.();if(this.dialog.open)this.render();
  }
  labels(){
@@ -74,7 +74,10 @@ export class MagicShop{
   const copy=document.createElement('p');if(!g){copy.textContent=s('Choose a toy set, backdrop or frame you would like. You can change your goal at any time.','갖고 싶은 소품·배경·사진틀을 직접 골라요. 목표는 언제든 바꿀 수 있어요.');node.append(copy);if(!this.dialog.open){const choose=document.createElement('button');choose.id=`${node.id}-choose`;choose.className='small-button';choose.textContent=s('Choose my goal','내 목표 고르기');choose.onclick=()=>this.open(choose);node.append(choose);}return;}
   copy.textContent=p.owned?s(`${this.name(g)} · Yours!`,`${this.name(g)} · 목표 달성!`):s(`${this.name(g)} · ${p.remaining} more coins`,`${this.name(g)} · 코인 ${p.remaining}개 더`);node.append(copy);
   const meter=document.createElement('div');meter.className='magic-goal-meter';meter.setAttribute('role','progressbar');meter.setAttribute('aria-label',this.name(g));meter.setAttribute('aria-valuemin','0');meter.setAttribute('aria-valuemax',String(g.price));meter.setAttribute('aria-valuenow',String(p.owned?g.price:Math.min(p.coins,g.price)));const fill=document.createElement('span');fill.style.width=`${p.owned?100:Math.min(100,p.coins/g.price*100)}%`;meter.append(fill);node.append(meter);
-  const action=document.createElement('button');action.id=`${node.id}-action`;action.className='secondary-button';action.textContent=p.owned?s('Use it in my playground','실험실에서 바로 사용'):p.affordable?s('My goal is ready to buy','모았어요 · 구매하러 가기'):p.practiceClaimed?s('Keep playing with my words','배운 말로 계속 놀기'):s('Play with my words · daily +5','배운 말로 놀기 · 하루 +5');action.onclick=()=>{if(p.owned)this.onUse?.(g);else if(p.affordable){this.open(action);this.previewId=g.id;this.preview={...this.look,[g.kind.replace('magic-','')]:g.value};this.render();}else this.onUse?.(null);};node.append(action);
+  const needsCoins=!p.owned&&!p.affordable,route=this.rewardRoute;
+  const action=document.createElement(needsCoins?'a':'button');action.id=`${node.id}-action`;action.className='secondary-button';
+  if(needsCoins){action.href=route?.href||'/try/learning-hub/#beginner-title';action.textContent=route?s(route.labelEn,route.label):s('Choose my next free activity','다음 무료 학습 고르기');const detail=document.createElement('p');detail.textContent=route?s(route.descriptionEn,route.description):s('Learning stays free. Check the save connection for reward guidance.','학습은 계속 무료예요. 보상 안내는 저장 연결을 확인해 주세요.');node.append(detail);}
+  else{action.textContent=p.owned?s('Use it in my playground','실험실에서 바로 사용'):s('My goal is ready to buy','모았어요 · 구매하러 가기');action.onclick=()=>{if(p.owned)this.onUse?.(g);else{this.open(action);this.previewId=g.id;this.preview={...this.look,[g.kind.replace('magic-','')]:g.value};this.render();}};}node.append(action);
   const clear=document.createElement('button');clear.className='text-button';clear.textContent=s('Clear goal','목표 해제');clear.onclick=()=>this.setGoal(null);node.append(clear);}finally{this.restoreFocus(focus);}
  }
  async setGoal(id){if(this.busy)return;const viewEpoch=this.viewEpoch;this.busy=true;try{const result=await globalThis.SynkPlayCollection.setBeginnerGoal('word-magic',id);if(viewEpoch===this.viewEpoch)this.message=result.ok?this.say(id?'Your goal is saved.':'Your goal is cleared.',id?'내 목표를 저장했어요.':'목표를 해제했어요.'):this.say('Could not save the goal. Check the account save status above and try again.','목표를 저장하지 못했어요. 화면 위의 저장 상태를 확인하고 다시 시도해 주세요.');}catch{if(viewEpoch===this.viewEpoch)this.message=this.say('Could not save the goal. Please try again.','목표를 저장하지 못했어요. 다시 시도해 주세요.');}this.busy=false;await this.refresh();this.render();}
