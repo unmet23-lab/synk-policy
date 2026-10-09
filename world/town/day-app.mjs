@@ -453,7 +453,7 @@ try {
   }
   await document.fonts.ready;
   await Promise.all([...document.images].map(img => img.complete && img.naturalWidth ? Promise.resolve() : img.decode()));
-  try { renderer = createDayScene($('day-canvas'), { onDestination: id => { if (!walking()) command('DAY_MOVE', { location: id }); }, onError: useFallback, getInterfaceBounds: () => walking() && walkPanel ? $('nearby-panel').getBoundingClientRect() : null }); if (worldAppearance) renderer.setAppearance(worldAppearance); sceneReady = true; $('scene').dataset.renderer = 'webgl'; }
+  try { renderer = createDayScene($('day-canvas'), { deferInitialRender: worldHostRequested, onDestination: id => { if (!walking()) command('DAY_MOVE', { location: id }); }, onError: useFallback, getInterfaceBounds: () => walking() && walkPanel ? $('nearby-panel').getBoundingClientRect() : null }); if (worldAppearance) renderer.setAppearance(worldAppearance); sceneReady = true; $('scene').dataset.renderer = 'webgl'; }
   catch (error) { useFallback(error); }
   // An embedded town reopens with focus on the parent navigation button.
   // Acquire actual input focus before the first foreground lease; never spoof it.
