@@ -49,7 +49,7 @@
 .atelier button,.atelier input,.atelier select,.atelier summary,.atelier a{font-size:calc(12px * var(--atelier-font-scale,1))!important;white-space:normal;word-break:keep-all}.atelier-item strong,.atelier-look strong,.atelier-hanger strong{font-size:calc(13px * var(--atelier-font-scale,1))}.atelier p,.atelier label,.atelier small,.atelier-item-material{font-size:calc(12px * var(--atelier-font-scale,1));line-height:1.7}.atelier input[type=checkbox]{width:19px;height:19px;accent-color:#915444}.atelier[data-contrast=true]{color:#101820}.atelier[data-contrast=true] p,.atelier[data-contrast=true] small,.atelier[data-contrast=true] .atelier-item-material{color:#24343f}.atelier[data-contrast=true] button{color:#112c3b;outline:1px solid #71828b;outline-offset:-4px}.atelier[data-reduced=true] *{animation:none!important;transition:none!important;scroll-behavior:auto}
 .atelier button:focus-visible,.atelier summary:focus-visible,.atelier select:focus-visible{outline:3px solid #365d93;outline-offset:2px}
 @media(max-width:799px){
- .atelier-workbar{gap:4px;margin:-5px 0 12px}.atelier-workbar .atelier-soft{flex:1 1 30%;padding:8px 9px}.atelier-camera-bar .atelier-soft{padding:9px 12px;min-height:44px}.atelier-camera-bar label{font-size:11px}
+ .atelier-workbar{gap:4px;margin:-5px 0 8px}.atelier-workbar .atelier-soft{flex:1 1 30%;padding:8px 9px}.atelier-camera-bar{margin-bottom:8px}.atelier-camera-bar .atelier-soft{padding:9px 12px;min-height:44px}.atelier-camera-bar label{font-size:11px}
  .atelier-slots{grid-template-columns:1fr;gap:4px}.atelier-slot{gap:6px;min-height:44px}.atelier-slot strong{font-size:12px}.atelier-slot button{width:auto;height:44px;flex-shrink:0}.atelier[data-tab=photo] .atelier-slots{display:grid}
  .atelier-items{grid-auto-columns:146px;max-height:260px;align-items:start;overflow-y:visible;padding-bottom:10px}.atelier-item-card{min-height:231px}.atelier-item-card .atelier-item-art{height:91px}.atelier-item-card .atelier-item{padding:10px 11px 5px}.atelier-item-tools{padding:0 7px;gap:3px}.atelier-item-tools details[open]{top:92px}
  .atelier[data-tab=fitting] .atelier-filters button{min-height:44px}.atelier-modes{gap:3px}.atelier-modes button{flex:1 1 28%;padding:8px 7px}.atelier-advanced{margin:10px 0}.atelier-tag-options{gap:4px}.atelier-tag-options button{padding:8px 9px}
@@ -62,9 +62,31 @@
 @media(max-width:799px){.atelier-slot button{width:44px;height:44px;min-width:44px}.atelier-slot{min-height:44px}.atelier[data-tab=fitting] .atelier-filters button{min-height:44px}}
 @media(max-width:799px){.atelier-item-material,.atelier-slot,.atelier-slot>span,.atelier-slot strong,.atelier-sync-note{font-size:11px}.atelier-sync-note{max-width:184px;line-height:1.6}.atelier-counter{font-size:11px}.atelier-footer>div:first-child{align-items:center}.atelier-outfit-state{white-space:normal;max-width:150px}}
 .atelier-feedback:empty{display:none}
-@media(max-width:799px){.atelier-scene{height:215px}.atelier-selected{padding-top:6px;padding-bottom:6px}.atelier-slots{margin-bottom:6px}}
+@media(max-width:799px){.atelier-scene{height:215px}.atelier-selected{padding-top:4px;padding-bottom:4px}.atelier-slots{margin-bottom:6px}}
 @media(max-width:355px){
  .wardrobe-dialog #panel-eyebrow,.atelier-intro{display:none}.wardrobe-dialog .dialog-top{margin-bottom:8px}.atelier-tabs{padding-bottom:7px;margin-bottom:8px}.atelier-tabs button{min-height:44px}.atelier-scene{height:190px}.atelier-selected{padding-top:5px;padding-bottom:5px}.atelier-slots{margin-bottom:4px}.atelier[data-tab=fitting] .atelier-filters{margin-bottom:4px}.atelier-items{max-height:168px}.atelier-item-art{height:74px}.atelier-sync-note{max-width:172px}
+}
+
+/* Keep the first clothing choices in view; secondary look hangers stay compact. */
+@media(min-width:800px){
+ .atelier-pane-heading{margin:0 0 12px}.atelier-pane-heading p{margin:0 0 4px}.atelier-pane-heading h3{margin:0}
+ .atelier-quick-looks>.atelier-field-label{margin:8px 0 7px}.atelier-quick-looks>div{gap:6px;margin-bottom:8px}
+ .atelier-hanger{display:grid;grid-template-columns:minmax(0,1fr) 44px;align-items:center;gap:4px;padding:4px}.atelier-hanger>button:first-child{display:flex;align-items:center;gap:5px;text-align:left;min-height:52px}.atelier-hanger img{width:40px;height:44px;flex-shrink:0}.atelier-hanger strong{overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow-wrap:anywhere}.atelier-hanger>button:last-child{margin:0;padding:8px 4px}
+ .atelier-modes{margin:5px 0}.atelier-filters{margin-bottom:6px}.atelier-search{margin-bottom:6px}.atelier-advanced{margin:6px 0;padding-bottom:4px}
+ .atelier-items{max-height:clamp(176px,calc(100dvh - 410px),460px)}
+}
+@media(min-width:800px) and (max-height:800px){
+ .panel-dialog.wardrobe-dialog{padding:16px 24px 0}.wardrobe-dialog .dialog-top{margin-bottom:4px}.wardrobe-dialog .dialog-top h2{font-size:25px}
+ .atelier-intro{display:none}.atelier-tabs{margin-bottom:10px;padding-bottom:8px}.atelier-tabs button{min-height:44px}.atelier-workbar{margin:0 0 8px}
+ .atelier-pane-heading p,.atelier-quick-looks>.atelier-field-label{display:none}.atelier-pane-heading{margin-bottom:8px}.atelier-scene{height:320px}
+ .atelier-item-card .atelier-item{padding:8px 10px 9px}.atelier-item-card .atelier-item-art{height:76px;margin-bottom:5px}.atelier-item-card .atelier-item-material{margin-top:3px}
+ /* In short windows the closed detail filter shares the category row, so names remain above the footer. */
+ .atelier[data-tab=fitting] .atelier-pane:not([hidden]):not(:has(>.atelier-advanced[open] [data-field=sort])){display:grid;grid-template-columns:minmax(0,3fr) minmax(0,2fr);column-gap:6px;grid-template-areas:"heading heading" "hangers hangers" "modes modes" "search search" "categories filterTools" "groups groups" "items items" "note note" "manager manager"}
+ .atelier[data-tab=fitting] .atelier-pane-heading{grid-area:heading}.atelier[data-tab=fitting] .atelier-quick-looks{grid-area:hangers}.atelier[data-tab=fitting] .atelier-modes{grid-area:modes}
+ .atelier[data-tab=fitting] .atelier-search{grid-area:search;margin-bottom:4px}.atelier[data-tab=fitting] .atelier-filters{grid-area:categories;margin:0;align-self:center}
+ .atelier[data-tab=fitting] .atelier-advanced:has([data-field=sort]){grid-area:filterTools;margin:0;padding-bottom:0}.atelier[data-tab=fitting] .atelier-advanced:has([data-field=sort])>summary{font-size:calc(11px * var(--atelier-font-scale,1))!important}
+ .atelier[data-tab=fitting] .atelier-group-select{grid-area:groups}.atelier[data-tab=fitting] .atelier-items{grid-area:items;margin-top:6px}.atelier[data-tab=fitting] .atelier-collection-note{grid-area:note}
+ .atelier[data-tab=fitting] .atelier-advanced:has([data-field=group-name]){grid-area:manager}
 }
 
 .atelier-camera-bar label{display:grid;grid-template-columns:max-content minmax(0,1fr);min-width:0;white-space:nowrap}.atelier-camera-bar input{min-width:0;width:100%}

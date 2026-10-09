@@ -8,7 +8,7 @@ import {STAGE_DEFAULT_VIEW,STAGE_POSES,STAGE_BACKGROUNDS,normalizeStageView,stag
 const LIGHTS={
   daylight:{background:'#eef2f1',key:'#fff4e1',fill:'#d9e9f3',intensity:2.85,exposure:1.09},
   sunset:{background:'#ece5e4',key:'#ffd1ad',fill:'#c1cbed',intensity:3.05,exposure:1.05},
-  studio:{background:'#edf0f5',key:'#fffaf1',fill:'#e3e9ff',intensity:3.0,exposure:1.07},
+  studio:{background:'#edf0f2',key:'#ffffff',fill:'#edf1f7',intensity:2.8,exposure:1.03},
 };
 function mesh(parent,geometry,material,position=[0,0,0]){const m=new THREE.Mesh(geometry,material);m.position.set(...position);m.castShadow=m.receiveShadow=true;parent.add(m);return m;}
 function woodMap(){
@@ -121,7 +121,7 @@ export async function mountWardrobeStage(host,{slots={},dyes={},reducedMotion=fa
   for(const [event,handler]of events)canvas.addEventListener(event,handler);
   canvas.addEventListener('wheel',wheel,{passive:false});
   document.addEventListener('visibilitychange',visibility);resize();
-  function setLight(value){light=LIGHTS[value]?value:'daylight';const preset=LIGHTS[light];scene.background=new THREE.Color(preset.background).lerp(new THREE.Color(background==='warm'?'#f0e6da':background==='garden'?'#e0ebe2':preset.background),.50);key.color.set(preset.key);key.intensity=preset.intensity;fill.color.set(preset.fill);renderer.toneMappingExposure=preset.exposure;schedule();}
+  function setLight(value){light=LIGHTS[value]?value:'daylight';const preset=LIGHTS[light];scene.background=new THREE.Color(preset.background).lerp(new THREE.Color(background==='warm'?'#f0e6da':background==='garden'?'#e0ebe2':preset.background),.50);key.color.set(preset.key);key.intensity=preset.intensity;fill.color.set(preset.fill);const neutral=light==='studio';key.position.set(...(neutral?[-3.8,3.6,3.3]:[-3.4,4.8,4.6]));fill.intensity=neutral?.42:.65;hemi.intensity=neutral?.88:1.15;scene.environmentIntensity=neutral?.48:.42;renderer.toneMappingExposure=preset.exposure;schedule();}
   function setPose(value){pose=STAGE_POSES.includes(value)?value:'neutral';avatar.setPose(pose);schedule();return pose;}
   function setBackground(value){background=STAGE_BACKGROUNDS.includes(value)?value:'room';props.visible=background==='room';for(const g of backgrounds.values())g.visible=false;if(background!=='room')backdrop(background).visible=true;plaster.color.set(background==='warm'?'#efe6d9':background==='garden'?'#edf1e8':'#f2f3f0');setLight(light);schedule();return background;}
   function setDyes(value={}){const normalized=avatar.setDyes(value);schedule();return normalized;}
@@ -134,7 +134,7 @@ export async function mountWardrobeStage(host,{slots={},dyes={},reducedMotion=fa
     try{
       renderer.setPixelRatio(1);renderer.setSize(width,height,false);
       if(thumbnail){angle=-.11;detail=false;zoom=0;setPose('neutral');setBackground('room');setLight('studio');}
-      fit(width,height);if(photoSlots)avatar.setEquipment(slotsForOutfit(photoSlots));if(photoDyes!==undefined)avatar.setDyes(photoDyes);avatar.group.rotation.y=angle;contactLight.render();
+      fit(width,height);if(photoSlots)avatar.setEquipment(slotsForOutfit(photoSlots));if(photoDyes!==undefined)avatar.setDyes(photoDyes);avatar.group.rotation.y=thumbnail?angle:targetAngle;contactLight.render();
       return canvas.toDataURL('image/png');
     }finally{angle=previousAngle;targetAngle=previousTargetAngle;detail=previous.view.detail;zoom=previous.view.zoom;avatar.setEquipment(previous.slots);avatar.setDyes(previous.dyes);avatar.group.rotation.y=angle;setPose(previous.pose);setBackground(previous.background);setLight(previous.light);renderer.setPixelRatio(dpr);renderer.setSize(size.width,size.height,false);fit();render();schedule();}
   }
@@ -145,7 +145,7 @@ export async function mountWardrobeStage(host,{slots={},dyes={},reducedMotion=fa
   }
   disposeReady=dispose;
   return {
-    canvas,setAngle,setLight,setZoom,getView,setView,resetView,setDyes,getDyes:()=>avatar.getDyes(),getDyeDefaults:()=>wardrobeDyeDefaults(currentSlots),setPose,setBackground,getState,capture,dispose,
+    canvas,setAngle,setLight,setZoom,getView,setView,resetView,setDyes,getDyes:()=>avatar.getDyes(),getDyeDefaults:(slots=currentSlots)=>wardrobeDyeDefaults(slots),setPose,setBackground,getState,capture,dispose,
     setSlots(value){currentSlots=slotsForOutfit(value);avatar.setEquipment(currentSlots);schedule();},
     setDetail(value){detail=Boolean(value);fit();notifyView();schedule();},
     setActive(value){active=Boolean(value);if(!active){cancelAnimationFrame(frame);frame=0;}else schedule();},
