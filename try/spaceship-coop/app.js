@@ -10,17 +10,27 @@ const $=selector=>document.querySelector(selector),main=$('#main'),voices=new Vo
 const API=document.querySelector('meta[name="spaceship-api"]')?.content||'/api/spaceship';
 const EN={red:'red',blue:'blue',up:'up',down:'down',one:'once',two:'twice',three:'three times'};
 let session=null,state=null,connecting=false,stopped=false,streamController=null,busy=false,studying=false,helpOpen=false,demo='red',count=0,playedSignal=0,heardSignal=0,listening=false,lastFeedback=0,lastRound=-1,reviewIndex=0,reviewAnswer=null,reviewReady=false,reviewOrder=[],toastTimer,entryError='',transportOnline=false;
-let pageAway=false,leaveDestination=null;
+let pageAway=false,leaveDestination=null,pendingEntry=null;
 const moreGames='<a class="text-button more-games" href="/try/learning-hub/#beginner-title">다른 입문 놀이 / More beginner games</a>';
 const esc=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const id=()=>[...crypto.getRandomValues(new Uint8Array(16))].map(x=>x.toString(16).padStart(2,'0')).join('');
 function toast(message){$('#toast').textContent=message;$('#toast').hidden=false;clearTimeout(toastTimer);toastTimer=setTimeout(()=>{$('#toast').hidden=true;},5500);$('#live').textContent=message;}
 function focusAction(action,word){[...main.querySelectorAll('[data-action]')].find(x=>x.dataset.action===action&&(word===undefined||x.dataset.word===word)&&!x.disabled)?.focus({preventScroll:true});}
 function save(){try{session?sessionStorage.setItem('synk-spaceship-session',JSON.stringify(session)):sessionStorage.removeItem('synk-spaceship-session');}catch{toast('이 기기에서는 새로고침 후 이어 하기가 저장되지 않아요. / Keep this page open.');}}
-function load(){try{const p=JSON.parse(sessionStorage.getItem('synk-spaceship-session'));if(p&&/^[A-Z2-9]{6}$/.test(p.code)&&/^[A-Za-z0-9_-]{32}$/.test(p.token))session=p;}catch{}}
+function clearEntry(){pendingEntry=null;try{sessionStorage.removeItem('synk-spaceship-pending-entry');}catch{}}
+function entryRequest(type,code){
+  const room=type==='join'?code:'';
+  if(pendingEntry?.type!==type||pendingEntry.code!==room)pendingEntry={type,code:room,id:id()};
+  try{sessionStorage.setItem('synk-spaceship-pending-entry',JSON.stringify(pendingEntry));}catch{toast('이 기기에서는 새로고침 후 입장 재시도가 저장되지 않아요. / Retry before reloading.');}
+  return pendingEntry;
+}
+function load(){
+  try{const p=JSON.parse(sessionStorage.getItem('synk-spaceship-session'));if(p&&/^[A-Z2-9]{6}$/.test(p.code)&&/^[A-Za-z0-9_-]{32}$/.test(p.token))session=p;}catch{}
+  try{const p=JSON.parse(sessionStorage.getItem('synk-spaceship-pending-entry'));if(p&&['create','join'].includes(p.type)&&/^[a-f0-9]{32}$/.test(p.id)&&(p.type==='create'?p.code==='':/^[A-Z2-9]{6}$/.test(p.code)))pendingEntry=p;}catch{}
+}
 async function request(route,method='GET',data){
   const response=await fetch(`${API}${route}`,{method,headers:{...(data?{'Content-Type':'application/json'}:{}),...(session?{Authorization:`Bearer ${session.token}`}:{})},body:data?JSON.stringify(data):undefined,credentials:'omit',cache:'no-store',signal:AbortSignal.timeout(12000)});
-  const result=await response.json();if(!response.ok){const error=new Error(result.message||'서버에 연결할 수 없어요. / Connection unavailable.');error.code=result.error;throw error;}return result;
+  const result=await response.json();if(!response.ok){const error=new Error(result.message||'서버에 연결할 수 없어요. / Connection unavailable.');error.code=result.error;error.status=response.status;throw error;}return result;
 }
 function update(next){
   if(state&&next.revision<state.revision)return;
@@ -52,7 +62,12 @@ async function send(type,fields={}){
       catch(e){if(e.code==='REVISION'&&attempt===0){update(await request(`/rooms/${session.code}/state`));body.revision=state.revision;continue;}throw e;}
     }
     if(result)update(result);return result;
-  }catch(e){toast(e.message);return null;}finally{busy=false;}
+  }catch(e){
+    // A previous leave may have succeeded while its response and SSE update were
+    // lost. Only these exact server statuses confirm that the room cannot continue.
+    if(type==='leave'&&((e.code==='CLOSED'&&e.status===410)||(e.code==='ROOM_MISSING'&&e.status===404)))return {phase:'closed',confirmed:true,reason:e.code};
+    toast(e.message);return null;
+  }finally{busy=false;}
 }
 async function stream(){
   if(connecting||stopped||!session||pageAway)return;connecting=true;let retry=700;
@@ -80,7 +95,7 @@ async function stream(){
   connecting=false;
   if(!stopped&&session&&!pageAway&&streamController?.signal.aborted)stream();
 }
-function forget(){stopped=true;streamController?.abort();session=null;state=null;inReview=false;voices.stop();heardSignal=0;playedSignal=0;lastFeedback=0;lastRound=-1;reviewReady=false;listening=false;save();$('#leave-top').hidden=true;const url=new URL(location.href);if(url.searchParams.has('room')){url.searchParams.delete('room');history.replaceState(null,'',url);}}
+function forget(){stopped=true;streamController?.abort();session=null;state=null;clearEntry();inReview=false;voices.stop();heardSignal=0;playedSignal=0;lastFeedback=0;lastRound=-1;reviewReady=false;listening=false;save();$('#leave-top').hidden=true;const url=new URL(location.href);if(url.searchParams.has('room')){url.searchParams.delete('room');history.replaceState(null,'',url);}}
 function interruptAudio(){voices.stop();heardSignal=0;listening=false;reviewReady=false;render();}
 function picture(word,{label=true}={}){
   const a=label?`role="img" aria-label="${esc(EN[word])}"`:'aria-hidden="true"';
@@ -164,10 +179,20 @@ async function enter(type,code){
   if(busy)return;busy=true;entryError='';const controls=[...main.querySelectorAll('button,input')];controls.forEach(x=>x.disabled=true);toast('소리를 준비하고 있어요. / Preparing Korean audio…');
   try{
     await voices.prepare();
-    if(type==='create')session=await request('/rooms','POST',{id:id()});
-    if(type==='join')session=await request(`/rooms/${code}/join`,'POST',{id:id()});
+    if(type==='create'||type==='join'){
+      // The server may accept the request before its response is lost. Reuse its
+      // ID on retry/reload to recover the same room and participant, not a new seat.
+      const pending=entryRequest(type,code);
+      session=await request(type==='create'?'/rooms':`/rooms/${code}/join`,'POST',{id:pending.id});
+      save();clearEntry();
+    }
     save();stopped=false;transportOnline=false;playedSignal=0;lastRound=-1;update(await request(`/rooms/${session.code}/state`));clearTimeout(toastTimer);$('#toast').hidden=true;stream();
-  }catch(e){entryError=e.message;render();}finally{busy=false;}
+  }catch(e){
+    // Throttling, capacity and server interruptions cannot prove that an earlier
+    // POST was rejected. Keep its ID unless the room/schema rejection is final.
+    if(['ROOM_MISSING','FULL','SCHEMA'].includes(e.code))clearEntry();
+    entryError=e.message;render();
+  }finally{busy=false;}
 }
 async function copy(value){try{await navigator.clipboard.writeText(value);toast('복사했어요. / Copied.');}catch{const input=$('#copy-value');input.value=value;$('#copy-dialog').showModal();input.focus();input.select();input.setSelectionRange(0,value.length);}}
 main.addEventListener('submit',e=>{if(e.target.id==='join-form'){e.preventDefault();const code=$('#room-input').value.toUpperCase();if(/^[A-Z2-9]{6}$/.test(code))enter('join',code);}});
@@ -206,7 +231,16 @@ main.addEventListener('click',async e=>{
 });
 $('#leave-top').addEventListener('click',()=>{leaveDestination=null;if(state?.phase==='complete'){forget();entryError='';stopped=false;render();}else $('#leave-dialog').showModal();});
 $('#world-link').addEventListener('click',e=>{if(state&&!['complete','closed'].includes(state.phase)){e.preventDefault();leaveDestination=e.currentTarget.href;$('#leave-dialog').showModal();}});
-$('#leave-dialog').addEventListener('click',async e=>{const action=e.target.closest('[data-dialog]')?.dataset.dialog;if(!action)return;$('#leave-dialog').close();if(action==='confirm'){await send('leave');forget();entryError='';stopped=false;if(leaveDestination)location.assign(leaveDestination);else render();}leaveDestination=null;});
+$('#leave-dialog').addEventListener('click',async e=>{
+  const action=e.target.closest('[data-dialog]')?.dataset.dialog;if(!action)return;$('#leave-dialog').close();
+  if(action==='confirm'){
+    if(busy){toast('지금 행동을 마친 뒤 다시 눌러 주세요. / Please retry after this action finishes.');leaveDestination=null;return;}
+    const result=await send('leave');
+    if(!result&&state?.phase!=='closed'){toast('탐험을 종료하지 못했어요. 연결을 확인한 뒤 다시 눌러 주세요. / Could not end the expedition. Check your connection and try again.');leaveDestination=null;return;}
+    forget();entryError='';stopped=false;if(leaveDestination)location.assign(leaveDestination);else render();
+  }
+  leaveDestination=null;
+});
 document.addEventListener('keydown',e=>{
   if(e.repeat||e.ctrlKey||e.metaKey||e.altKey||['INPUT','TEXTAREA'].includes(document.activeElement?.tagName)||document.querySelector('dialog[open]'))return;
   if(e.code==='KeyR'&&state?.phase==='playing'&&state.role==='pilot'&&state.signal){e.preventDefault();main.querySelector('[data-action="replay"]')?.click();}
