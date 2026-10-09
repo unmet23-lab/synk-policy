@@ -17,12 +17,12 @@ const appearance=wallet=>({scene:wallet?.equipped?.['magic-scene']||'default',fr
 /** Uses the same wallet, ownership and persisted purchase operations as racing's garage. */
 export class MagicShop{
  constructor({say,onApply,onOpen,onUse,onProgress}){
-  this.say=say;this.onApply=onApply;this.onOpen=onOpen;this.onUse=onUse;this.onProgress=onProgress;this.wallet=null;this.progress=null;this.items=[];this.look={...defaultLook};this.preview={...defaultLook};this.busy=false;this.previewId=null;this.message='';this.previewVersion=0;this.lastEquipped=null;
+  this.say=say;this.onApply=onApply;this.onOpen=onOpen;this.onUse=onUse;this.onProgress=onProgress;this.wallet=null;this.progress=null;this.items=[];this.look={...defaultLook};this.preview={...defaultLook};this.busy=false;this.previewId=null;this.message='';this.previewVersion=0;this.lastEquipped=null;this.viewEpoch=0;
   this.dialog=document.querySelector('#shop-dialog');
   this.stage=new MagicStage(document.createElement('canvas'),document.createElement('div'),()=>{});this.thumbnails=new Map();
   this.ready=this.stage.load().then(()=>this.stage.set(LAB_OBJECTS,{animate:false}));this.ready.catch(()=>{});
   document.querySelector('#shop-close').onclick=()=>this.dialog.close();
-  this.dialog.addEventListener('close',()=>{this.onProgress?.();if(!this.skipReturnFocus){const target=this.opener?.id?document.getElementById(this.opener.id):this.opener;target?.focus({preventScroll:true});}this.skipReturnFocus=false;});
+  this.dialog.addEventListener('close',()=>{this.viewEpoch++;this.onProgress?.();if(!this.skipReturnFocus){const target=this.opener?.id?document.getElementById(this.opener.id):this.opener;target?.focus({preventScroll:true});}this.skipReturnFocus=false;});
   document.querySelector('#shop-language').onclick=()=>{document.querySelector('#language').click();this.message='';this.render();};
   document.querySelector('#shop-retry').onclick=()=>this.refresh();
   document.querySelector('#shop-use').onclick=()=>{const item=this.items.find(x=>x.id===this.lastEquipped);if(item)this.onUse?.(item);};
@@ -43,7 +43,7 @@ export class MagicShop{
   const balance=document.querySelector('#magic-balance');if(balance)balance.textContent=this.wallet?this.say(`${this.wallet.coins} shared coins`, `공통 코인 ${this.wallet.coins}`):this.say('Wallet unavailable','지갑 연결 안 됨');
  }
  async open(opener){
-  if(this.dialog.open)return;this.opener=opener;this.onOpen?.();this.previewId=null;this.message='';this.preview={...this.look};this.render();this.dialog.showModal();await this.refresh();
+  if(this.dialog.open)return;this.viewEpoch++;this.opener=opener;this.onOpen?.();this.previewId=null;this.message='';this.preview={...this.look};this.render();this.dialog.showModal();await this.refresh();
  }
  closeForPlay(){if(!this.dialog.open)return;this.skipReturnFocus=true;this.dialog.close();}
  async drawPreview(){
@@ -55,16 +55,31 @@ export class MagicShop{
   if(!this.thumbnails.has(item.id))this.thumbnails.set(item.id,this.ready.then(async()=>{const scene=new MagicStage(document.createElement('canvas'),document.createElement('div'),()=>{});scene.images=this.stage.images;scene.set(item.kind==='magic-toys'?LAB_SETS[item.value].objects:LAB_OBJECTS,{animate:false});scene.appearance({scene:item.kind==='magic-scene'?item.value:'default',frame:item.kind==='magic-frame'?item.value:'cream'});const blob=await scene.photo();return URL.createObjectURL(blob);}));return this.thumbnails.get(item.id);
  }
  name(item){return this.say(...(names[item.id]||[item.name,item.name]));}
+ focusSnapshot(root){
+  const node=document.activeElement;if(!root?.contains(node))return null;let selector;
+  if(node.dataset.shopAction)selector=`[data-shop-action="${node.dataset.shopAction}"]`;
+  else if(node.dataset.goal)selector=`[data-goal="${node.dataset.goal}"]`;
+  else if(node.matches('.shop-swatch'))selector=`[data-item="${node.closest('[data-item]').dataset.item}"] .shop-swatch`;
+  else if(node.id)selector=`#${node.id}`;
+  else if(node.matches('.magic-goal > .text-button'))selector=`#${node.parentElement.id} > .text-button`;
+  return selector?{node,selector,fallback:node.closest('#shop-dialog')?'#shop-language':`#${root.id}-choose`}:null;
+ }
+ restoreFocus(snapshot){
+  if(!snapshot||document.activeElement!==document.body&&document.activeElement!==snapshot.node)return;
+  let target=document.querySelector(snapshot.selector);if(!target||target.disabled||!target.getClientRects().length)target=document.querySelector(snapshot.fallback);
+  if(target&&!target.disabled&&target.getClientRects().length)target.focus({preventScroll:true});
+ }
  goalView(node){
-  if(!node)return;node.replaceChildren();const s=this.say,p=this.progress,g=p?.goal;const heading=document.createElement('h3');heading.textContent=s('Something to look forward to','내가 고른 다음 즐거움');node.append(heading);
+  if(!node)return;const focus=this.focusSnapshot(node);try{node.replaceChildren();const s=this.say,p=this.progress,g=p?.goal;const heading=document.createElement('h3');heading.textContent=s('Something to look forward to','내가 고른 다음 즐거움');node.append(heading);
   const copy=document.createElement('p');if(!g){copy.textContent=s('Choose a toy set, backdrop or frame you would like. You can change your goal at any time.','갖고 싶은 소품·배경·사진틀을 직접 골라요. 목표는 언제든 바꿀 수 있어요.');node.append(copy);if(!this.dialog.open){const choose=document.createElement('button');choose.id=`${node.id}-choose`;choose.className='small-button';choose.textContent=s('Choose my goal','내 목표 고르기');choose.onclick=()=>this.open(choose);node.append(choose);}return;}
   copy.textContent=p.owned?s(`${this.name(g)} · Yours!`,`${this.name(g)} · 목표 달성!`):s(`${this.name(g)} · ${p.remaining} more coins`,`${this.name(g)} · 코인 ${p.remaining}개 더`);node.append(copy);
   const meter=document.createElement('div');meter.className='magic-goal-meter';meter.setAttribute('role','progressbar');meter.setAttribute('aria-label',this.name(g));meter.setAttribute('aria-valuemin','0');meter.setAttribute('aria-valuemax',String(g.price));meter.setAttribute('aria-valuenow',String(p.owned?g.price:Math.min(p.coins,g.price)));const fill=document.createElement('span');fill.style.width=`${p.owned?100:Math.min(100,p.coins/g.price*100)}%`;meter.append(fill);node.append(meter);
   const action=document.createElement('button');action.id=`${node.id}-action`;action.className='secondary-button';action.textContent=p.owned?s('Use it in my playground','실험실에서 바로 사용'):p.affordable?s('My goal is ready to buy','모았어요 · 구매하러 가기'):p.practiceClaimed?s('Keep playing with my words','배운 말로 계속 놀기'):s('Play with my words · daily +5','배운 말로 놀기 · 하루 +5');action.onclick=()=>{if(p.owned)this.onUse?.(g);else if(p.affordable){this.open(action);this.previewId=g.id;this.preview={...this.look,[g.kind.replace('magic-','')]:g.value};this.render();}else this.onUse?.(null);};node.append(action);
-  const clear=document.createElement('button');clear.className='text-button';clear.textContent=s('Clear goal','목표 해제');clear.onclick=()=>this.setGoal(null);node.append(clear);
+  const clear=document.createElement('button');clear.className='text-button';clear.textContent=s('Clear goal','목표 해제');clear.onclick=()=>this.setGoal(null);node.append(clear);}finally{this.restoreFocus(focus);}
  }
- async setGoal(id){if(this.busy)return;this.busy=true;try{const result=await globalThis.SynkPlayCollection.setBeginnerGoal('word-magic',id);this.message=result.ok?this.say(id?'Your goal is saved.':'Your goal is cleared.',id?'내 목표를 저장했어요.':'목표를 해제했어요.'):this.say('Could not save the goal. Check the account save status above and try again.','목표를 저장하지 못했어요. 화면 위의 저장 상태를 확인하고 다시 시도해 주세요.');}catch{this.message=this.say('Could not save the goal. Please try again.','목표를 저장하지 못했어요. 다시 시도해 주세요.');}this.busy=false;await this.refresh();this.render();}
+ async setGoal(id){if(this.busy)return;const viewEpoch=this.viewEpoch;this.busy=true;try{const result=await globalThis.SynkPlayCollection.setBeginnerGoal('word-magic',id);if(viewEpoch===this.viewEpoch)this.message=result.ok?this.say(id?'Your goal is saved.':'Your goal is cleared.',id?'내 목표를 저장했어요.':'목표를 해제했어요.'):this.say('Could not save the goal. Check the account save status above and try again.','목표를 저장하지 못했어요. 화면 위의 저장 상태를 확인하고 다시 시도해 주세요.');}catch{if(viewEpoch===this.viewEpoch)this.message=this.say('Could not save the goal. Please try again.','목표를 저장하지 못했어요. 다시 시도해 주세요.');}this.busy=false;await this.refresh();this.render();}
  render(){
+  const focus=this.focusSnapshot(this.dialog);
   const s=this.say;this.labels();document.querySelector('#shop-title').textContent=s('Your magic shop','나만의 마법 상점');document.querySelector('#shop-close').textContent=s('Back to playing','놀이로 돌아가기');document.querySelector('#shop-language').textContent=document.documentElement.lang==='ko'?'English':'한국어';
   document.querySelector('#shop-copy').textContent=s('Each finished adventure earns 15 coins once. In either playground, hear and make 3 different changes with 2 words and 2 objects for +5 coins once a day. The shared daily reward limit applies.','모험 완주는 장마다 한 번 15코인. 어느 실험실에서든 소리를 듣고 두 말·두 물건으로 서로 다른 변화 3번을 만들면 하루 한 번 5코인을 받아요. 공통 일일 보상 한도가 적용돼요.');
   document.querySelector('#shop-note').textContent=s('Every word, adventure and the original playground stays free. Sign in with SYNK ID to keep purchases across devices. Check account save status above.','모든 표현·모험·기본 실험실은 계속 무료예요. SYNK ID로 연결하면 구매품을 다른 기기에서도 쓸 수 있어요. 저장 상태는 화면 위에서 확인해요.');
@@ -90,12 +105,14 @@ export class MagicShop{
     card.append(sample,name,purpose,detail,action);if(item.price>0){const goal=document.createElement('button');goal.type='button';goal.className='text-button shop-goal-choice';goal.dataset.goal=item.id;goal.setAttribute('aria-pressed',String(this.progress?.goal?.id===item.id));goal.disabled=this.busy||!this.wallet;goal.textContent=this.progress?.goal?.id===item.id?s('My goal · clear','내 목표 · 해제'):s('Make this my goal','내 목표로 고르기');goal.onclick=()=>this.setGoal(this.progress?.goal?.id===item.id?null:item.id);card.append(goal);}if(owned){const useItem=document.createElement('button');useItem.type='button';useItem.className='text-button';useItem.textContent=s('Play with this','바로 사용하기');useItem.dataset.use=item.id;useItem.onclick=()=>this.onUse?.(item);card.append(useItem);}group.append(card);
    }
   }
-  this.drawPreview();
+  this.drawPreview();this.restoreFocus(focus);
  }
  async act(item){
-  if(this.busy)return;this.busy=true;this.message='';this.render();const api=globalThis.SynkPlayCollection;let result,purchased=false;
-  try{const current=await api.load();if(!current)throw Error('storage');if(!current.owned.includes(item.id)){result=await api.buy(item.id);if(!result.ok&&result.reason!=='owned')throw result;purchased=result.ok;}result=await api.equip(item.id);if(!result.ok)throw result;this.previewId=null;this.lastEquipped=item.id;this.message=this.say(`${names[item.id][0]} is equipped.`,`${names[item.id][1]}을 장착했어요.`);}
-  catch(error){this.message=purchased?this.say('Purchased and owned, but equipping could not be saved. Try Equip again for free.','구매하여 보유 중이지만 장착을 저장하지 못했어요. 무료로 다시 장착해 주세요.'):error.reason==='insufficient'?this.say('Your balance changed. Earn a few more coins and try again.','코인 잔액이 바뀌었어요. 코인을 더 모아 다시 시도해 주세요.'):this.say('Could not save this change. Your equipped decoration has not changed. Check the account save status above and try again.','변경을 저장하지 못했어요. 장착은 그대로예요. 화면 위의 저장 상태를 확인한 뒤 다시 시도해 주세요.');}
-  this.busy=false;await this.refresh();this.preview={...this.look};this.render();const action=document.querySelector(`[data-shop-action="${item.id}"]`);if(action&&!action.disabled)action.focus({preventScroll:true});else document.querySelector(`[data-item="${item.id}"] .shop-swatch`)?.focus({preventScroll:true});
+  if(this.busy)return;const focus=this.focusSnapshot(this.dialog),viewEpoch=this.viewEpoch;let moved=false;const cancelFocus=()=>{moved=true;};document.addEventListener('pointerdown',cancelFocus,true);document.addEventListener('keydown',cancelFocus,true);
+  this.busy=true;this.message='';this.render();const waitFocus=document.activeElement,api=globalThis.SynkPlayCollection;let result,purchased=false;
+  try{try{const current=await api.load();if(!current)throw Error('storage');if(!current.owned.includes(item.id)){result=await api.buy(item.id);if(!result.ok&&result.reason!=='owned')throw result;purchased=result.ok;}result=await api.equip(item.id);if(!result.ok)throw result;if(viewEpoch===this.viewEpoch){this.previewId=null;this.lastEquipped=item.id;this.message=this.say(`${names[item.id][0]} is equipped.`,`${names[item.id][1]}을 장착했어요.`);}}
+  catch(error){if(viewEpoch===this.viewEpoch)this.message=purchased?this.say('Purchased and owned, but equipping could not be saved. Try Equip again for free.','구매하여 보유 중이지만 장착을 저장하지 못했어요. 무료로 다시 장착해 주세요.'):error.reason==='insufficient'?this.say('Your balance changed. Earn a few more coins and try again.','코인 잔액이 바뀌었어요. 코인을 더 모아 다시 시도해 주세요.'):this.say('Could not save this change. Your equipped decoration has not changed. Check the account save status above and try again.','변경을 저장하지 못했어요. 장착은 그대로예요. 화면 위의 저장 상태를 확인한 뒤 다시 시도해 주세요.');}
+  this.busy=false;await this.refresh();if(viewEpoch===this.viewEpoch){this.render();if(focus&&!moved&&this.dialog.open&&document.activeElement===waitFocus){const action=document.querySelector(focus.selector);(action&&!action.disabled?action:document.querySelector(`[data-item="${item.id}"] .shop-swatch`))?.focus({preventScroll:true});}}
+  }finally{document.removeEventListener('pointerdown',cancelFocus,true);document.removeEventListener('keydown',cancelFocus,true);}
  }
 }

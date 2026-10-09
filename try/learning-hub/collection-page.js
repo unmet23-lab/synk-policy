@@ -54,7 +54,16 @@ for(const [game,name,description,path,art,journey,anchor] of gameList){
   document.getElementById('collection-games').append(card);
   SynkPlayProgress.mount({game,home:card.querySelector('.collection-goal'),...(game==='racing'||game==='runner'?{nativeShop:()=>{location.href=`/try/${PUBLIC_GAME_SLUGS[path]||path}/?${game==='racing'?'garage':'shop'}=1`;},nativeShopLabel:game==='racing'?'나의 차고':'바람상점',nativeShopDescription:description+'. 게임에서 미리 보고 골라요.'}:{})});
 }
-async function updateSummary(){const states=await Promise.all(gameList.map(([game])=>SynkPlayCollection.progress(game)));document.getElementById('wallet').textContent=`${states[0].coins} 코인`;document.getElementById('collection-summary').textContent=`모은 칭호 ${states.reduce((sum,s)=>sum+s.achievements.filter(a=>a.unlocked).length,0)} / 28 · 일곱 게임의 기록이 차곡차곡`;}updateSummary();addEventListener('synk:collection-change',updateSummary);
+let summaryRevision=0;
+async function updateSummary(){
+ const revision=++summaryRevision;
+ const states=await Promise.all(gameList.map(([game])=>SynkPlayCollection.progress(game)));
+ if(revision!==summaryRevision)return;
+ const available=states.every(state=>state.available);
+ document.getElementById('wallet').textContent=available?`${states[0].coins} 코인`:'코인 확인 필요';
+ document.getElementById('collection-summary').textContent=available?`모은 칭호 ${states.reduce((sum,state)=>sum+state.achievements.filter(a=>a.unlocked).length,0)} / 28 · 일곱 게임의 기록이 차곡차곡`:'컬렉션 기록을 읽지 못했어요. 저장 연결을 확인한 뒤 이 화면으로 돌아오면 다시 확인해요.';
+}
+updateSummary();addEventListener('synk:collection-change',updateSummary);addEventListener('pageshow',updateSummary);addEventListener('focus',updateSummary);
 
 // Use the canonical shared ledger. Optional journey modules are not shipped here.
 async function updateJourneys(){
