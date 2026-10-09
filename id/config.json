@@ -104,7 +104,8 @@
       "clientId": "d4f8347e-72a4-4c8c-8d5f-00aece7ac137",
       "redirectUris": [
         "http://127.0.0.1:4280/synk-account/client.html?product=world",
-        "https://synk.im/account/client.html?product=world"
+        "https://synk.im/account/client.html?product=world",
+        "https://synk.im/world/"
       ]
     },
     {
@@ -164,6 +165,13 @@
       "redirectUris": [
         "http://127.0.0.1:4303/",
         "https://synk.im/try/travel/"
+      ]
+    },
+    {
+      "product": "world",
+      "clientId": "7cb43eb6-5c5e-4da6-8a6f-abbdc0f3d166",
+      "redirectUris": [
+        "https://workspace.synk.im/api/teaching/callback"
       ]
     }
   ],
