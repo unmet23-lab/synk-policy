@@ -139,14 +139,14 @@
     },
     {
       "file": "experiences/synk-account/src/product-account.mjs",
-      "sha256": "1eb245e91e60d4307f51977154387b2fbce7f8c130ca9236ed384e6e6db275c2"
+      "sha256": "21158142f47bfb209db4f5a24b31eeaabc5f67bf2a14e998ea0330fd6085b9e2"
     }
   ],
   "files": [
     {
       "name": "app.mjs",
-      "bytes": 1084800,
-      "sha256": "2e6583f81c735c5bb96ac5400acf2ecb0ac7411f4f060d0a35fcc103b503a046"
+      "bytes": 1084969,
+      "sha256": "fad860744e3891cff9761867325beaa9cbb79e4f77cfc123921f2dab49423698"
     },
     {
       "name": "app.css",
@@ -241,7 +241,7 @@
     {
       "name": "index.html",
       "bytes": 1849,
-      "sha256": "d2dc3504cb974e85995b5bae34592fc4e09f399f1df2c11e7c46f6eede38885f"
+      "sha256": "eafeb62fa65a10951c9be6d290bec78a4771e640987a7169d807f121bf417fb3"
     }
   ],
   "transformations": [

@@ -189,7 +189,7 @@
     },
     {
       "file": "experiences/synk-account/src/product-account.mjs",
-      "sha256": "1eb245e91e60d4307f51977154387b2fbce7f8c130ca9236ed384e6e6db275c2"
+      "sha256": "21158142f47bfb209db4f5a24b31eeaabc5f67bf2a14e998ea0330fd6085b9e2"
     },
     {
       "file": "experiences/synk-account/src/document-sync.mjs",
@@ -200,7 +200,7 @@
     {
       "name": "index.html",
       "bytes": 51780,
-      "sha256": "649433e3570b16583546a03e61a6f6b8f5af0fb08c046ae2e92b21bb905b9a0f"
+      "sha256": "9a8123203000e401c327a3104fe210325fd5bbbc9d94868abce1a7cfa7dad12a"
     },
     {
       "name": "style.css",
@@ -429,8 +429,8 @@
     },
     {
       "name": "vendor/account/product-account.mjs",
-      "bytes": 31221,
-      "sha256": "1eb245e91e60d4307f51977154387b2fbce7f8c130ca9236ed384e6e6db275c2"
+      "bytes": 31573,
+      "sha256": "21158142f47bfb209db4f5a24b31eeaabc5f67bf2a14e998ea0330fd6085b9e2"
     },
     {
       "name": "vendor/account/document-sync.mjs",

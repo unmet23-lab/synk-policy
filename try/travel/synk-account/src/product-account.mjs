@@ -311,9 +311,17 @@ export function createProductAccount({
       try {
         const loaded = await send(accountUrl, old.access_token);
         const current = loaded.data?.sessions?.find(item => item.current && !item.revoked);
-        if (current?.id) { const revoked = await send(accountUrl, old.access_token, { action: 'revoke-session', session_id: current.id }); serverSessionRevoked = revoked.response.ok && revoked.data?.ok === true; }
+        if (current?.id) {
+          const revoked = await send(accountUrl, old.access_token, { action: 'revoke-session', session_id: current.id });
+          serverSessionRevoked = revoked.response.ok && revoked.data?.ok === true;
+          // The central service may already revoke this provider session.
+          // Keep its explicit current-session confirmation instead of logging out twice.
+          refreshRevoked = serverSessionRevoked && revoked.data.current === true && revoked.data.refreshRevoked === true;
+        }
       } catch { /* 로컬 로그인은 먼저 종료했다. 서버 종료 상태는 반환값으로 구분한다. */ }
-      try { const result = await send(new URL('/auth/v1/logout?scope=local', config.supabaseUrl).href, old.access_token, {}, { logout: true }); refreshRevoked = result.response.ok || result.response.status === 404 || serverSessionRevoked && result.response.status === 401; } catch {}
+      if (!refreshRevoked) {
+        try { const result = await send(new URL('/auth/v1/logout?scope=local', config.supabaseUrl).href, old.access_token, {}, { logout: true }); refreshRevoked = result.response.ok || result.response.status === 404 || serverSessionRevoked && result.response.status === 401; } catch {}
+      }
     }
     return { ok: !snapshot.error, status: status(), serverRevoked: serverSessionRevoked && refreshRevoked, serverSessionRevoked, refreshRevoked };
   }

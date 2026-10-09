@@ -1737,13 +1737,16 @@ function createProductAccount({
         if (current2?.id) {
           const revoked = await send(accountUrl, old.access_token, { action: "revoke-session", session_id: current2.id });
           serverSessionRevoked = revoked.response.ok && revoked.data?.ok === true;
+          refreshRevoked = serverSessionRevoked && revoked.data.current === true && revoked.data.refreshRevoked === true;
         }
       } catch {
       }
-      try {
-        const result = await send(new URL("/auth/v1/logout?scope=local", config.supabaseUrl).href, old.access_token, {}, { logout: true });
-        refreshRevoked = result.response.ok || result.response.status === 404 || serverSessionRevoked && result.response.status === 401;
-      } catch {
+      if (!refreshRevoked) {
+        try {
+          const result = await send(new URL("/auth/v1/logout?scope=local", config.supabaseUrl).href, old.access_token, {}, { logout: true });
+          refreshRevoked = result.response.ok || result.response.status === 404 || serverSessionRevoked && result.response.status === 401;
+        } catch {
+        }
       }
     }
     return { ok: !snapshot.error, status: status(), serverRevoked: serverSessionRevoked && refreshRevoked, serverSessionRevoked, refreshRevoked };
