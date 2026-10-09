@@ -664,7 +664,7 @@ export function createDayScene(canvas, { onDestination = () => {}, onError = () 
       player.group.add(body); player.body = body; player.avatar = avatar; dirty = true; schedule();
     } catch { assetFailures.push('avatar-v3'); }
   }
-  Promise.all([
+  const initialAssets = Promise.all([
     loadPlayerAvatar(),
     loadSurface(`azure-sky-v3${canvas.clientWidth < 600 ? '-mobile' : ''}.jpg`, map => {
       skyTexture = map; map.colorSpace = THREE.SRGBColorSpace; map.mapping = THREE.EquirectangularReflectionMapping;
@@ -684,5 +684,14 @@ export function createDayScene(canvas, { onDestination = () => {}, onError = () 
       environmentArt.setCliffNormal?.(map);
     }),
   ]).finally(() => { pmrem.dispose(); assetsReady = true; if (!disposed) { dirty = true; schedule(); } });
-  resize(); if (!deferInitialRender) render({ location: 'home' , player: { x: -6, z: 1.1 }, npcs: [] }); return { render, setPlayerPose, setAppearance, resize, stats, dispose };
+  async function prepareInitialAssets() {
+    if (disposed || assetsReady) return;
+    let timer;
+    // Start the account handshake after initial material variants settle so a
+    // late map cannot trigger another shader compilation during that request.
+    // A stalled image still permits the existing procedural fallback to draw.
+    try { await Promise.race([initialAssets.catch(() => {}), new Promise(resolve => { timer = setTimeout(resolve, 5000); })]); }
+    finally { clearTimeout(timer); }
+  }
+  resize(); if (!deferInitialRender) render({ location: 'home' , player: { x: -6, z: 1.1 }, npcs: [] }); return { render, setPlayerPose, setAppearance, prepareInitialAssets, resize, stats, dispose };
 }
