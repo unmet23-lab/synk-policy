@@ -1,0 +1,236 @@
+/* 말의 리듬 — 공통 화면(입구·게임 바·멈춤·결과·펠트 부품)은 kit/lab.css(SYNK LAB PLAY 키트, 원본 experiences/play-common/kit/).
+ * 여기에는 말의 리듬에만 있는 것: 입구 그림(펠트 레인과 O·X 배지), 곡 쿠션 타일·박자 난이도, 무대 위 문제 카드·셈·O/X 단추,
+ * 결과의 문장 목록·새 문장 확인, 설정의 박자 보정. 무대(벽·바닥·레인·노트)는 stage.mjs가 캔버스에 펠트 사진으로 그린다. */
+
+/* ── 입구 그림: 게임과 같은 펠트 레인 둘(원근) · 크림 판정선 · O·X 배지를 멈춘 채 그린 캔버스(stage.mjs preview) + 몽글 ── */
+.hero-runway{position:absolute;inset:0;width:100%;height:100%;display:block}
+.hero-art .hero-mongle{width:min(31%,170px)}
+
+/* ── 오늘의 한 곡: 곡 셋은 도톰한 펠트 쿠션 타일(고른 곡은 들뜨고 크림 칼선 + 펠트 체크, 추천 곡은 꼬리표) ── */
+.start-card h2 b{color:var(--coral-deep)}
+.card-head{display:grid;gap:10px}
+.songs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:6px 0 2px}
+.song{position:relative;display:grid;align-content:center;justify-items:center;gap:3px;min-height:66px;padding:6px 9% 15px;border:0;text-align:center;
+  background:transparent center/100% 100% no-repeat;filter:drop-shadow(0 4px 5px rgba(73,45,30,.16));transition:transform .14s var(--ease),filter .16s,opacity .2s}
+.song.blush{background-image:url(kit/felt/cushion-blush-phone.webp);color:#5c2318}
+.song.lapis{background-image:url(kit/felt/cushion-lapis-phone.webp);color:#fffaf2;text-shadow:0 1px 1px rgba(16,36,96,.45)}
+.song.butter{background-image:url(kit/felt/cushion-butter-phone.webp);color:#3a2a08}
+.song-title{font:800 18px/1.15 var(--sans);letter-spacing:-.02em}
+.song-what{display:none;font:700 12.5px/1.3 var(--sans)}
+.song-meta{display:flex;flex-wrap:wrap;justify-content:center;font:500 11px/1.3 var(--mono);opacity:.92}
+.song-meta .len{display:none}
+.song:active{transform:translateY(3px)}   /* 눌림 = 3px 내려앉기 */
+.song[aria-pressed=true]{transform:translateY(-4px);filter:var(--sticker) drop-shadow(0 10px 9px rgba(73,45,30,.3))}
+.song[aria-pressed=true]::after{content:"";position:absolute;right:-7px;top:-11px;width:30px;height:30px;background:url(kit/felt/badge-check.webp) center/contain no-repeat;filter:drop-shadow(0 2px 2px rgba(73,45,30,.3))}
+.song.rec::before{content:"추천";position:absolute;left:-5px;top:-12px;padding:4px 9px 6px;font:800 11px/1 var(--sans);color:var(--coral-deep);text-shadow:none;
+  background:url(kit/felt/chip-blush-long.webp) center/100% 100% no-repeat;filter:drop-shadow(0 2px 2px rgba(73,45,30,.18))}
+.song:disabled{opacity:.42;cursor:default}
+.levels{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+.levels-label{font:800 13px/1 var(--sans);color:var(--ink-2);margin-right:2px}
+.levels .chip-btn,.start-options .chip-btn{min-height:40px;padding:0 15px 3px;font-size:13.5px}
+/* 고른 칩: 글자 앞에 작은 펠트 체크(납작한 회색 비활성 없음) */
+.levels .chip-btn[aria-pressed=true]::before,.dialog-toggles .chip-btn[aria-pressed=true]::before{content:"";width:17px;height:17px;margin:0 6px 0 -4px;flex:none;
+  background:url(kit/felt/badge-check.webp) center/contain no-repeat}
+
+/* ── 게임: 캔버스 무대 위에 지금 곡 · 문제 카드 · 셈 · 판정 글자 · O/X 단추 ── */
+body.playing{overflow:hidden}
+.game .arena{background:#e45a49}
+.game .arena::after{display:none}   /* 코랄 바닥은 캔버스가 원근으로 그린다 */
+.game-bar .song-line{position:absolute;left:0;right:0;bottom:-1px;height:3px;background:rgba(43,35,32,.06)}
+.song-line i{display:block;width:0;height:100%;background:var(--coral)}
+.stage{position:absolute;inset:0;width:100%;height:100%;display:block}
+.now{position:absolute;z-index:3;left:12px;top:12px;margin:0;display:flex;align-items:baseline;flex-wrap:wrap;gap:2px 8px;max-width:calc(100% - 24px);padding:8px 14px 9px;border-radius:14px;
+  font:600 12.5px/1.2 var(--sans);color:var(--ink-2)}
+.now b{font:800 14.5px/1.2 var(--sans);color:var(--ink)}
+.now-time{font:500 12px/1.2 var(--mono)}
+
+/* 문제 카드(종이): 듣기 → 생각 → 답 → 답한 뒤. 문장 글은 ‘글로 보기’를 눌렀을 때만(도움으로 남는다). 기울이지 않는다 */
+.qcard{position:absolute;z-index:4;left:50%;top:10px;transform:translateX(-50%);width:min(560px,calc(100% - 20px));margin:0;padding:12px 14px 13px;display:grid;gap:6px;animation:cardIn .26s var(--ease) both}
+.q-head{display:flex;align-items:center;gap:8px;min-height:34px}
+.q-ear{display:none;align-items:center;gap:4px}
+.qcard[data-phase=listening] .q-ear{display:inline-flex}
+.q-ear i{width:8px;height:8px;border-radius:50%;background:var(--coral);opacity:.35}
+.qcard[data-phase=listening] .q-ear i{animation:dots 1s infinite ease-in-out}   /* 밝기만 바뀐다(움직이지 않는다) */
+.qcard[data-phase=listening] .q-ear i:nth-child(2){animation-delay:.15s}
+.qcard[data-phase=listening] .q-ear i:nth-child(3){animation-delay:.3s}
+.q-text{margin-left:auto;min-height:34px;padding:0 13px 2px;font-size:13px}
+.q-say{margin:0;display:grid;gap:3px;padding:9px 12px 10px;border-radius:12px;background:var(--cream);font:700 15.5px/1.45 var(--sans)}
+.q-say b{font-weight:800}
+.q-say span{color:var(--ink-2)}
+.q-ask{margin:0;font:800 20px/1.32 var(--sans);letter-spacing:-.02em}
+.qcard[data-phase=answer] .q-ask{color:var(--coral-deep)}
+.qcard[data-result=ok] .q-ask::before{content:"";display:inline-block;width:28px;height:28px;margin:-6px 8px -6px 0;vertical-align:middle;background:url(kit/felt/badge-check.webp) center/contain no-repeat}
+.q-hint{margin:0;font:600 13px/1.4 var(--sans);color:var(--ink-2)}
+/* 글로 볼 때는 카드를 낮게: 단계 안내는 작게, 덧말은 답한 뒤에만(몽글과 레인을 덜 가리게) */
+.qcard.texted .q-ask{font-size:16.5px}
+.qcard.texted:not([data-phase=answered]) .q-hint{display:none}
+@keyframes cardIn{from{opacity:0;transform:translate(-50%,-10px)}to{opacity:1;transform:translate(-50%,0)}}
+@keyframes dots{0%,100%{opacity:.3}50%{opacity:1}}
+
+/* 시작 전 네 박자: 크림 펠트 배지 */
+.count{position:absolute;z-index:4;left:50%;top:46%;width:104px;height:106px;margin:-53px 0 0 -52px;display:grid;place-items:center;padding:0 9px 9px 0;
+  background:url(kit/felt/badge-cream.webp) center/contain no-repeat;filter:drop-shadow(0 8px 10px rgba(120,40,25,.28))}
+.count b{font:700 46px/1 var(--mono);color:var(--coral-deep)}
+.count.punch b{animation:countIn .28s var(--ease)}
+@keyframes countIn{0%{transform:scale(.72)}60%{transform:scale(1.08)}100%{transform:scale(1)}}
+.game .tip{top:58px;bottom:auto}
+
+/* 판정 글자: 레인 위에 잠깐(딱! · 좋아요 · 아쉬워요). 놓친 노트에는 글자가 없다 */
+.game .pop{z-index:5}
+.pop[data-kind=perfect]{font-size:30px;color:var(--coral-deep)}
+.pop[data-kind=great]{font-size:25px;color:#1d4f9c}
+.pop[data-kind=good]{font-size:21px;color:var(--ink-2)}
+.game.calm .pop.go{animation:none}   /* 효과 줄이기: 움직이지 않고 보였다 사라진다 */
+.game.calm .pill.punch{animation:none}
+
+/* O/X 단추: 도톰한 펠트 쿠션(O 라피스 · X 분홍). 레인이 이 단추 가운데로 모인다(stage.mjs). 글자는 쿠션의 평평한 면 가운데 */
+.pads{position:absolute;z-index:3;left:50%;bottom:max(12px,env(safe-area-inset-bottom));transform:translateX(-50%);width:min(600px,calc(100% - 20px));
+  display:grid;grid-template-columns:1fr 1fr;gap:12px;touch-action:none;user-select:none;-webkit-user-select:none}
+.pad{position:relative;height:104px;display:grid;align-content:center;justify-items:center;gap:3px;padding:4% 10% 17%;border:0;
+  background:transparent center/100% 100% no-repeat;filter:drop-shadow(0 6px 7px rgba(80,25,15,.28));transition:transform .07s var(--ease),filter .1s,opacity .2s;
+  -webkit-tap-highlight-color:transparent;touch-action:none}
+.pad.o{background-image:url(kit/felt/cushion-lapis-phone.webp);color:#fffaf2;text-shadow:0 1px 1px rgba(16,36,96,.5)}
+.pad.x{background-image:url(kit/felt/cushion-blush-phone.webp);color:#6b231b}
+.pad .glyph{font:900 40px/1 var(--sans)}
+.pad .say{font:800 13px/1.2 var(--sans)}
+.pad kbd{position:absolute;left:-5px;top:-11px;width:30px;height:30px;display:grid;place-items:center;padding:0 2px 2px 0;background:url(kit/felt/badge-cream.webp) center/contain no-repeat;
+  color:var(--ink);text-shadow:none;font:700 12px/1 var(--mono);filter:drop-shadow(0 2px 2px rgba(73,45,30,.22))}
+.pad.active,.pad:active{transform:translateY(3px);filter:drop-shadow(0 2px 3px rgba(80,25,15,.26))}   /* 눌림 = 3px 내려앉기 */
+.pad.intent{filter:var(--sticker) drop-shadow(0 8px 8px rgba(80,25,15,.3))}   /* 고른 답: 크림 칼선 */
+.pad.intent.active{filter:var(--sticker) drop-shadow(0 3px 4px rgba(80,25,15,.28))}
+.pad.right::after{content:"";position:absolute;right:-6px;top:-13px;width:40px;height:40px;background:url(kit/felt/badge-check.webp) center/contain no-repeat;filter:drop-shadow(0 3px 3px rgba(73,45,30,.3))}
+.pad.waiting .glyph{opacity:.5}   /* 듣는 동안: 펠트 색은 그대로, 글자만 옅게 + ‘듣는 중’ */
+.pad:disabled{cursor:default}
+/* 몽글: 레인이 시작하는 먼 끝(벽 앞)에 서서 노트를 보낸다. 움직이지 않고 표정만 바뀐다(듣기 → 집중, 맞힘 → 활짝) */
+.stage-mongle{position:absolute;z-index:2;left:var(--runway-x,50%);top:var(--runway-y,30%);width:clamp(46px,7.6vh,86px);height:auto;transform:translate(-50%,-92%);pointer-events:none}
+
+/* ── 결과 ── */
+.r-label{margin:4px 0 0;font:800 15px/1.3 var(--sans);color:rgba(43,35,32,.82)}
+#r-stars i:nth-child(1){animation-delay:.3s}
+#r-stars i:nth-child(2){animation-delay:.52s}
+#r-stars i:nth-child(3){animation-delay:.74s}
+.r-stats{display:flex;flex-wrap:wrap;gap:6px;margin:12px 0 0}
+.r-stats .pill{min-width:76px}
+.log li{grid-template-columns:30px minmax(0,1fr) auto}
+.log li.ok .mark,.log li.ko .mark{width:28px;height:28px;border-radius:0;background:transparent center/contain no-repeat;color:var(--ink-2)}
+.log li.ok .mark.ok{background-image:url(kit/felt/badge-check.webp)}   /* 맞힘: 펠트 체크 배지 */
+.log li.ko .mark.again{background-image:url(kit/felt/badge-cream.webp);padding:0 2px 2px 0;font:700 13px/1 var(--mono)}   /* 다시 볼 문장: 크림 펠트 원에 번호(빨간 X 없음) */
+.log .line{display:block;font:800 15.5px/1.45 var(--sans)}
+.log .sent{display:block;margin-top:2px;font:700 14px/1.45 var(--sans);color:var(--ink-2)}
+.log .sent b{margin-left:4px;white-space:nowrap;padding:0 .25em;border-radius:6px;background:var(--marker);color:var(--ink)}
+.log small{margin-top:2px}
+.log .why{display:block;margin-top:4px;font-size:13px;line-height:1.5;color:var(--ink-2)}
+.say-again{min-height:34px;padding:0 12px 2px;font-size:13px;align-self:center}
+.skills .fine{margin:0 0 6px}
+.recall{display:grid;gap:8px;margin-top:8px;padding:14px;border-radius:16px;background:var(--cream)}
+.recall h3{margin:0;font:800 16px/1.35 var(--sans)}
+.recall .fine{margin:0}
+#recall-content{display:grid;gap:8px}
+#recall-content[hidden]{display:none}
+.recall-q{margin:0;font:800 15px/1.4 var(--sans)}
+.recall-options{display:flex;gap:12px}
+.ox{position:relative;width:76px;height:48px;padding:0 0 6px;border:0;font:900 22px/1 var(--sans);background:transparent center/100% 100% no-repeat;
+  filter:drop-shadow(0 4px 5px rgba(73,45,30,.18));transition:transform .12s var(--ease)}
+.ox.o{background-image:url(kit/felt/cushion-lapis-phone.webp);color:#fffaf2;text-shadow:0 1px 1px rgba(16,36,96,.5)}
+.ox.x{background-image:url(kit/felt/cushion-blush-phone.webp);color:#6b231b}
+.ox:active{transform:translateY(3px)}
+.ox:disabled{opacity:.55;cursor:default}
+.ox.chosen{opacity:1;transform:translateY(-3px);filter:var(--sticker) drop-shadow(0 6px 6px rgba(73,45,30,.25))}
+.ox.right{opacity:1}
+.ox.right::after{content:"";position:absolute;right:-8px;top:-10px;width:26px;height:26px;background:url(kit/felt/badge-check.webp) center/contain no-repeat}
+.recall-sentence{margin:0;font:700 14.5px/1.5 var(--sans)}
+.recall-sentence:empty,.recall-feedback:empty{display:none}
+.recall-feedback{margin:0;font:800 14px/1.4 var(--sans);color:var(--ink)}
+#recall-button{justify-self:start;min-height:40px;font-size:13.5px}
+
+/* ── 설정·멈춤: 박자 보정(− 값 +) ── */
+dialog.lab-dialog .fine{margin:0}
+.offset{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 12px;border-radius:14px;background:var(--cream)}
+.offset-label{display:grid;gap:2px;min-width:0}
+.offset-label b{font:800 15px/1.3 var(--sans)}
+.offset-label small{font-size:12.5px;line-height:1.45;color:var(--muted)}
+.offset-ctl{display:flex;align-items:center;gap:4px;flex:none}
+#pause-where{display:block;margin-top:2px;font:500 13px/1.4 var(--mono);color:var(--muted)}
+.offset-ctl output{min-width:56px;text-align:center;font:500 14px/1 var(--mono)}
+.offset .disc-btn{padding:0 3px 3px 0;font:800 19px/1 var(--sans)}
+.offset .disc-btn:active{transform:translateY(2px)}
+.toast{position:fixed;z-index:50;left:50%;bottom:max(18px,env(safe-area-inset-bottom));transform:translateX(-50%);width:max-content;max-width:calc(100% - 32px);margin:0;
+  padding:12px 18px 13px;border-radius:16px;font:700 14.5px/1.45 var(--sans);text-align:center}
+
+/* ── 휴대폰·태블릿 입구: 무대 열기 단추가 첫 화면에 들어오게 그림을 줄인다 ── */
+@media (max-width:959px){.hero-art{height:min(46vw,300px)}}
+@media (max-width:599px){
+  .hero{padding-bottom:40px}
+  .hero .sub{display:none}
+  .hero-art{height:min(44vw,196px);margin-top:4px}
+  .hero-art .hero-mongle{width:min(30%,140px)}
+}
+@media (max-width:599px) and (max-height:700px){   /* 키 작은 휴대폰(375×667): 입구 그림을 낮은 띠로 */
+  .hero{padding-bottom:36px}
+  .hero-art{height:92px}
+  .hero-art .hero-mongle{width:auto;height:100%;bottom:0}
+}
+@media (max-width:440px){.game-bar .logo-mini{display:none}}
+@media (min-width:460px){   /* 넓은 단추는 판 비율(2.4:1)에 맞춘 쿠션으로 — 모서리·옆면이 찌그러지지 않게 */
+  .pad.o{background-image:url(kit/felt/cushion-lapis-mid.webp)}
+  .pad.x{background-image:url(kit/felt/cushion-blush-mid.webp)}
+  .pad{padding:4% 12% 16%}
+}
+/* 키 작은 휴대폰(320×568 등): 단추·카드·게임 바를 줄인다 */
+@media (max-height:700px){
+  .pad{height:88px}
+  .pad .glyph{font-size:34px}
+  .qcard{padding:10px 12px 11px;gap:4px}
+  .q-ask{font-size:18px}
+  .q-say{font-size:14.5px;padding:7px 10px 8px}
+}
+@media (max-height:600px){
+  .game-bar{padding:7px 10px}
+  .game-bar .pill{padding:2px 9px 5px}
+  .game-bar .disc-btn{width:38px;height:38px}
+  .pad{height:80px}
+  .pad .say{font-size:12px}
+  .now{top:8px;left:8px;padding:6px 11px 7px}
+  .count{width:84px;height:86px;margin:-43px 0 0 -42px}
+  .count b{font-size:38px}
+}
+@media (max-width:359px){
+  .hero-art{display:none}
+  .songs{gap:8px}
+  .song-title{font-size:16px}
+  .song{padding:6px 7% 14px}
+  .levels .chip-btn{padding:0 11px 3px}
+  .pads{gap:8px;width:calc(100% - 12px)}
+  .pad kbd{width:26px;height:26px;font-size:11px}
+  .q-text{padding:0 10px 2px}
+}
+
+/* ── 넓은 화면 ── */
+@media (min-width:960px){
+  .hero-art{height:400px}
+  .card-head{display:flex;align-items:center;gap:14px}   /* 꼬리표와 제목을 한 줄로: 무대 열기 단추가 첫 화면에 들게 */
+  .start-card h2{margin:0}
+  .song{min-height:88px;padding:7px 9% 17px;gap:3px}
+  .song-title{font-size:21px}
+  .song-what{display:block}
+  .song-meta{font-size:11.5px}
+  .song-meta .len{display:inline}
+  .songs{gap:12px}
+  .pads{gap:16px}
+  .pad{height:112px}
+  .pad .glyph{font-size:46px}
+  .pad .say{font-size:14px}
+  .pad kbd{width:34px;height:34px;font-size:13px}
+  .now{left:24px;top:20px;display:grid;gap:3px;padding:12px 18px 13px;border-radius:18px}
+  .now b{font-size:18px}
+  .game .tip{top:72px}
+  .qcard{top:16px;padding:16px 18px 16px;gap:8px}
+  .q-ask{font-size:23px}
+  .q-say{font-size:17px}
+  .res-grid .recall{margin-top:10px}
+}
+@media (min-width:960px) and (max-height:860px){   /* 키 낮은 노트북(1366×768, 1280×720): 무대 열기 단추가 첫 화면에 들게 */
+  .hero h1{font-size:clamp(64px,9vw,112px)}
+  .hero .sub{display:none}
+  .hero-art{height:320px}
+}

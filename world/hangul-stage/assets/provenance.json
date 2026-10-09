@@ -1,0 +1,395 @@
+{
+  "note": "바이트 그대로 가져온 사본이다. 펠트 부품(kit)은 입장 검사의 줄이고 흰 띠를 걷은 사본(빈칸 베기와 같음), 몽글·글꼴·효과음도 입장 검사 사본에서 왔다(효과음은 docs/브랜드_사운드킷 원본과 같다). 원본 키트를 고치면 docs/디자인/펠트부품/README.md 「사본 맞추기」대로 이 사본도 맞춘다. 노래(songs/)는 Suno 공식 내려받기 원본이거나 그것을 고친 판이다(고친 판은 from에 적었다)(songs/README.md, 음악 장부). 자음 그림 연상(mnemonic/)과 받침 노래 낱말 그림(words/)은 Codex로 구운 펠트 판에서 오렸다(지시문은 판과 같은 곳).",
+  "files": [
+    {
+      "path": "brand/mongle-curious.webp",
+      "from": "experiences/entry-check/assets/brand/mongle-curious.webp",
+      "bytes": 118984,
+      "sha256": "7dab074570e2b6219fc86249ea607655a164538b3b2c8a783370142610556675"
+    },
+    {
+      "path": "brand/mongle-smile.webp",
+      "from": "experiences/entry-check/assets/brand/mongle-smile.webp",
+      "bytes": 120020,
+      "sha256": "3a24744f0d6207706d2fce116fe7795a1fa24b6e6749ad17b631655488142229"
+    },
+    {
+      "path": "fonts/SUIT-OFL.txt",
+      "from": "experiences/entry-check/assets/fonts/SUIT-OFL.txt",
+      "bytes": 4380,
+      "sha256": "30d101ee3c35ef629d622d933d261a27b2f60223e0a3b0f36791e569c2b9daa9"
+    },
+    {
+      "path": "fonts/SUIT-Variable.woff2",
+      "from": "experiences/entry-check/assets/fonts/SUIT-Variable.woff2",
+      "bytes": 624536,
+      "sha256": "aa894a204d5a6fbae259dac6868d350cbd373a390caee0313f92946af741df23"
+    },
+    {
+      "path": "kit/badge-check.webp",
+      "from": "experiences/entry-check/assets/kit/badge-check.webp",
+      "bytes": 11924,
+      "sha256": "fe9c972903efb6d1346b2c66ac6c6530f7abd619b8a486b96a8ea441d969a494"
+    },
+    {
+      "path": "kit/badge-coral.webp",
+      "from": "experiences/entry-check/assets/kit/badge-coral.webp",
+      "bytes": 11660,
+      "sha256": "b83aef15e27ed17fe1a7179abb8935bb1acb8fbbae70a180ebc46f61261689d2"
+    },
+    {
+      "path": "kit/badge-cream.webp",
+      "from": "experiences/entry-check/assets/kit/badge-cream.webp",
+      "bytes": 8582,
+      "sha256": "9d791e8f21381ffeb1214bcd523523717db881499ae6220bcb15bb7618a8f01d"
+    },
+    {
+      "path": "kit/chip-blush-long.webp",
+      "from": "experiences/entry-check/assets/kit/chip-blush-long.webp",
+      "bytes": 49488,
+      "sha256": "8f4f938682c8b047f00d186d95b804355cbb9e5f96d9bbc8e3b3689d567d98b8"
+    },
+    {
+      "path": "kit/slab-blush-long.webp",
+      "from": "experiences/entry-check/assets/kit/slab-blush-long.webp",
+      "bytes": 106334,
+      "sha256": "d28bece617250a03745173b311dd0de187f9ef8e259c0b7573b86279c94cfa50"
+    },
+    {
+      "path": "kit/slab-blush.webp",
+      "from": "experiences/entry-check/assets/kit/slab-blush.webp",
+      "bytes": 52120,
+      "sha256": "38cd655421ef8b2dc39dce56153620e73ff6cdf91731da46caa7a6ab6367e5fe"
+    },
+    {
+      "path": "kit/slab-coral-long.webp",
+      "from": "experiences/entry-check/assets/kit/slab-coral-long.webp",
+      "bytes": 140444,
+      "sha256": "04abd854673ca854af927c46e65baf8243a5d5dd44f54edb54b9e8c9a92654f7"
+    },
+    {
+      "path": "kit/slab-cream-long.webp",
+      "from": "experiences/entry-check/assets/kit/slab-cream-long.webp",
+      "bytes": 81146,
+      "sha256": "5807744d5189f4c9e6efa6824f124d13c298dacb9057b2e098924a3685544eee"
+    },
+    {
+      "path": "kit/slab-cream.webp",
+      "from": "experiences/entry-check/assets/kit/slab-cream.webp",
+      "bytes": 40438,
+      "sha256": "b83d8968bb0a231511c5d7235434e853c7c32fa37fdb1e16d6fddbc503eb8c1a"
+    },
+    {
+      "path": "kit/tag-cream.webp",
+      "from": "experiences/entry-check/assets/kit/tag-cream.webp",
+      "bytes": 24330,
+      "sha256": "0f54b059c986d0d192b32fdb8bd46d0e093e60c60a18a334884bac573ce6287d"
+    },
+    {
+      "path": "kit/tex-coral.webp",
+      "from": "experiences/entry-check/assets/kit/tex-coral.webp",
+      "bytes": 53002,
+      "sha256": "c6eea0ddf76860f7a5ca4db54c6948bbb8071fe23eec7106307fe484f6053800"
+    },
+    {
+      "path": "kit/tex-cream.webp",
+      "from": "experiences/entry-check/assets/kit/tex-cream.webp",
+      "bytes": 15526,
+      "sha256": "9b8c9e9654d36a96f3a663d34293792b9d67776c157ab5ef74c3debd70b198e9"
+    },
+    {
+      "path": "sound/achieve.wav",
+      "from": "experiences/entry-check/assets/sound/achieve.wav",
+      "bytes": 31796,
+      "sha256": "8ed08659fbaca6cf923b8409d6ca338f187d3f5526df3d0f29927f83258aa30a"
+    },
+    {
+      "path": "sound/earn.wav",
+      "from": "experiences/entry-check/assets/sound/earn.wav",
+      "bytes": 9746,
+      "sha256": "5baf5337b980ace0b75f31160fd4f09cc154429c78d2d40196c9a9644c25a7e7"
+    },
+    {
+      "path": "sound/mongle-mii.wav",
+      "from": "experiences/entry-check/assets/sound/mongle-mii.wav",
+      "bytes": 39910,
+      "sha256": "0de5136ab4b97e0f1931f0a718b62cf629e0059c28d09930bc76dfd1b656dd64"
+    },
+    {
+      "path": "sound/mongle-miyu.wav",
+      "from": "experiences/entry-check/assets/sound/mongle-miyu.wav",
+      "bytes": 41102,
+      "sha256": "b938c764425c44146d88a85eee4c8066e49a7b780a837254c00008a7c32a5652"
+    },
+    {
+      "path": "songs/vowel-dance.mp3",
+      "from": "Suno 399224fa-4ca7-42ee-854d-fbd7ea288bde · 공식 내려받기 MP3 2026-10-04(유호님 허락) · 2026-10-07 둘째 후렴 첫 줄(36초쯤) 발음만 고침: Suno 편집기 구간 바꾸기 후보 321aaf44-8f1e-4d5e-8f70-5df2dbedb9f9(공식 내려받기, 유호님 허락)의 34.78~45.075초를 원곡에 끼우고 MP3 192kbps로 다시 구움(유호님 「원곡보다 훨씬 좋다」) · 원본·끼우기 스크립트 Documents/synk-vendor/hangul-songs/vowel-dance-fix-20261007/",
+      "bytes": 1315653,
+      "sha256": "9098d5c9bfa91f10ceeb2434bf24bebedec1d70d9e766d43d4ab1789c7c50395"
+    },
+    {
+      "path": "songs/geu-a-ga.mp3",
+      "from": "Suno 644b446b-0387-48f2-a6cc-58163c232f4f · 공식 내려받기 MP3 2026-10-08(유호님 「C로 가자 받아서」) · 2026-10-09 v4: 「그 더하기 아는?」·「느 더하기 아는?」 뒤(원곡 32.672 · 35.057초)에 반주만 흐르는 한 마디(2.4초)씩을 끼우고(떠올리기 — 노래 영상 가이드, 유호님 「오케이 이어서 남은것도 전부 하자」) MP3 192kbps로 다시 구움 · 원본 Documents/synk-vendor/hangul-songs/geu-a-ga-v2_644b446b.mp3, 끼운 판·스크립트 Documents/synk-vendor/hangul-songs/geu-a-ga-v4-20261009/",
+      "bytes": 2064428,
+      "sha256": "98204e5f41aac1bb3f0ccd1bc2f1d8f41cd4ebcdd23c02e583b69e5aac70034f"
+    },
+    {
+      "path": "songs/batchim.mp3",
+      "from": "Suno c3610361-6e52-41f7-a758-feea28b4ec09 · 공식 내려받기 MP3 2026-10-08(유호님 「A로 가자」) · 받침 하나(ㄴ·ㄹ·ㅁ·ㅇ) 가사로 만든 네 후보 가운데 유호님이 고름 · 원본 Documents/synk-vendor/hangul-songs/batchim_c3610361.mp3",
+      "bytes": 1482876,
+      "sha256": "d5fc41c339e96deaf5aa813cad629ab9b3e54da8b94fa0e40784f388db5d1c9e"
+    },
+    {
+      "path": "songs/compound-dance.mp3",
+      "from": "Suno 827ae68f-65d7-448f-899e-8d8f0191ed96 · 공식 내려받기 MP3 2026-10-08(유호님 「C로 가자」) · 2026-10-09 v3: 떠올리기 두 곳 앞(원곡 12.73 · 15.21초)에 반주만 흐르는 한 마디씩, 「와!」 뒤(13.17초)에 한 박을 끼우고(유호님 「와가 0.1초만에 지나가는데 조금 0.5초는 있어야」) MP3 192kbps로 구움 · 원본 Documents/synk-vendor/hangul-songs/compound_827ae68f.mp3, 끼운 판·스크립트 Documents/synk-vendor/hangul-songs/compound-dance-v3-20261009/",
+      "bytes": 1177388,
+      "sha256": "9abe7edde9643abe5e6a171fdb2b788d2fef05c884f3da23abcd9449b2078bdf"
+    },
+    {
+      "path": "mnemonic/c-g.webp",
+      "from": "Codex 그림 만들기(ChatGPT 구독, API 아님) 2026-10-05 · 판 Documents/synk-vendor/hangul-mnemonic/sheet2_codex_20261005.png의 lamp · tools/펠트부품_오리기.py로 오림(흰 판 걷기 --고치기 포함)",
+      "bytes": 66902,
+      "sha256": "bc768fb260e8bdf47aa991866f456f87e7d0e35fcdc65aee55bf93a84bbfab4e"
+    },
+    {
+      "path": "mnemonic/c-n.webp",
+      "from": "Codex 그림 만들기(ChatGPT 구독, API 아님) 2026-10-05 · 판 Documents/synk-vendor/hangul-mnemonic/sheet2_codex_20261005.png의 laptop · tools/펠트부품_오리기.py로 오림(흰 판 걷기 --고치기 포함)",
+      "bytes": 73990,
+      "sha256": "6ca9374224d7273862b76a46649eae8f80dd92ef737f1aec895648e149786b12"
+    },
+    {
+      "path": "mnemonic/c-d.webp",
+      "from": "Codex 그림 만들기(ChatGPT 구독, API 아님) 2026-10-05 · 판 Documents/synk-vendor/hangul-mnemonic/sheet2_codex_20261005.png의 moon · tools/펠트부품_오리기.py로 오림(흰 판 걷기 --고치기 포함)",
+      "bytes": 77442,
+      "sha256": "a58a94d69b03c47592f303cf00c9ef7d880f8aa882e8ee07b8ca9c7e55b253b5"
+    },
+    {
+      "path": "mnemonic/c-r.webp",
+      "from": "Codex 그림 만들기(ChatGPT 구독, API 아님) 2026-10-05 · 판 Documents/synk-vendor/hangul-mnemonic/sheet2_codex_20261005.png의 ramen · tools/펠트부품_오리기.py로 오림(흰 판 걷기 --고치기 포함)",
+      "bytes": 76458,
+      "sha256": "c6c82516f17fcec283061e8a465d3b665a8f870b62b0de7fadf356df6d254f97"
+    },
+    {
+      "path": "mnemonic/c-m.webp",
+      "from": "Codex 그림 만들기(ChatGPT 구독, API 아님) 2026-10-05 · 판 Documents/synk-vendor/hangul-mnemonic/sheet2_codex_20261005.png의 window · tools/펠트부품_오리기.py로 오림(흰 판 걷기 --고치기 포함)",
+      "bytes": 97510,
+      "sha256": "76977a05c639daac0f2f19d1a5d7e65ceeed3e7892ff0b5f36305db5283e7c2b"
+    },
+    {
+      "path": "mnemonic/c-b.webp",
+      "from": "Codex 그림 만들기(ChatGPT 구독, API 아님) 2026-10-05 · 판 Documents/synk-vendor/hangul-mnemonic/sheet2_codex_20261005.png의 basket · tools/펠트부품_오리기.py로 오림(흰 판 걷기 --고치기 포함)",
+      "bytes": 94504,
+      "sha256": "5feca1cfe37ec6493514c91737b81065d21988a61d02aa6dcc2b338c740dd99f"
+    },
+    {
+      "path": "mnemonic/c-s.webp",
+      "from": "Codex 그림 만들기(ChatGPT 구독, API 아님) 2026-10-05 · 판 Documents/synk-vendor/hangul-mnemonic/sheet1_codex_20261005.png의 mountain · tools/펠트부품_오리기.py로 오림(흰 판 걷기 --고치기 포함)",
+      "bytes": 62778,
+      "sha256": "234fc1177b671972102a187bd053073c716a66a69cfbafa7d17ce1f35ab381d1"
+    },
+    {
+      "path": "mnemonic/c-ng.webp",
+      "from": "Codex 그림 만들기(ChatGPT 구독, API 아님) 2026-10-05 · 판 Documents/synk-vendor/hangul-mnemonic/sheet2_codex_20261005.png의 egg · tools/펠트부품_오리기.py로 오림(흰 판 걷기 --고치기 포함)",
+      "bytes": 53370,
+      "sha256": "db00a91c34387de8bc4f242f89754b184344c4866023dc741b625451f9bafd06"
+    },
+    {
+      "path": "mnemonic/c-j.webp",
+      "from": "Codex 그림 만들기(ChatGPT 구독, API 아님) 2026-10-05 · 판 Documents/synk-vendor/hangul-mnemonic/sheet2_codex_20261005.png의 bicycle · tools/펠트부품_오리기.py로 오림(흰 판 걷기 --고치기 포함)",
+      "bytes": 92868,
+      "sha256": "c1fc0fde038b7c36faae4c3f4e92e8da2ae2ddc9bac2091459c1dc544395bb5c"
+    },
+    {
+      "path": "mnemonic/c-h.webp",
+      "from": "Codex 그림 만들기(ChatGPT 구독, API 아님) 2026-10-05 · 판 Documents/synk-vendor/hangul-mnemonic/sheet2_codex_20261005.png의 sun · tools/펠트부품_오리기.py로 오림(흰 판 걷기 --고치기 포함)",
+      "bytes": 76538,
+      "sha256": "bdf5041a3ec75dc561a8dc6b9b7f717f5cfef98bb27e036aed63b9775a526275"
+    },
+    {
+      "path": "mnemonic/c-k.webp",
+      "from": "Codex 그림 만들기(ChatGPT 구독, API 아님) 2026-10-05 · 판 Documents/synk-vendor/hangul-mnemonic/sheet3_codex_20261005.png의 cattower · tools/펠트부품_오리기.py로 오림",
+      "bytes": 125492,
+      "sha256": "746e5d3c9775a8a4939abc69f2d1e3ece7358729a43997874768c682d1c9f0a0"
+    },
+    {
+      "path": "mnemonic/c-t.webp",
+      "from": "Codex 그림 만들기(ChatGPT 구독, API 아님) 2026-10-05 · 판 Documents/synk-vendor/hangul-mnemonic/sheet3_codex_20261005.png의 tomato · tools/펠트부품_오리기.py로 오림",
+      "bytes": 152190,
+      "sha256": "04e4074a073b9168c1b377494da19d619225068071d109f25552fa89c6a45a32"
+    },
+    {
+      "path": "mnemonic/c-p.webp",
+      "from": "Codex 그림 만들기(ChatGPT 구독, API 아님) 2026-10-05 · 판 Documents/synk-vendor/hangul-mnemonic/sheet3_codex_20261005.png의 piano · tools/펠트부품_오리기.py로 오림",
+      "bytes": 166960,
+      "sha256": "aaeeb9dbac78605355fedfd636ead5ebc33e91e7d89f9a4ad4c704da88acc7ae"
+    },
+    {
+      "path": "mnemonic/c-ch.webp",
+      "from": "Codex 그림 만들기(ChatGPT 구독, API 아님) 2026-10-05 · 판 Documents/synk-vendor/hangul-mnemonic/sheet3_codex_20261005.png의 jeans · tools/펠트부품_오리기.py로 오림",
+      "bytes": 134880,
+      "sha256": "42dc16abde541589394abbca292a3959b90f2a0d1a9d6396ff83d83c163ca401"
+    },
+    {
+      "path": "mnemonic/f-n.webp",
+      "from": "Codex 그림 만들기(ChatGPT 구독, API 아님) 2026-10-06 · 판 Documents/synk-vendor/hangul-mnemonic/sheet4_codex_20261006.png의 hand · tools/펠트부품_오리기.py로 오림",
+      "bytes": 97506,
+      "sha256": "aec3e6c0517ae9f76967af0b8c86390c1d5bbc7bd633c37a34b2f83d24b83cf3"
+    },
+    {
+      "path": "mnemonic/f-r.webp",
+      "from": "Codex 그림 만들기(ChatGPT 구독, API 아님) 2026-10-06 · 판 Documents/synk-vendor/hangul-mnemonic/sheet4_codex_20261006.png의 star · tools/펠트부품_오리기.py로 오림",
+      "bytes": 95094,
+      "sha256": "cd4d6449ec2e9128e45de6ad7cba7bb7937f34dc201a65e32b9a32e8345dea21"
+    },
+    {
+      "path": "mnemonic/f-m.webp",
+      "from": "Codex 그림 만들기(ChatGPT 구독, API 아님) 2026-10-06 · 판 Documents/synk-vendor/hangul-mnemonic/sheet4_codex_20261006.png의 bear · tools/펠트부품_오리기.py로 오림(흰 판 걷기 --고치기)",
+      "bytes": 125996,
+      "sha256": "e356afcfb4ca1572ee50b94c04cdb6fb0b8e0d920c929511f1d6008aff22ada1"
+    },
+    {
+      "path": "mnemonic/f-ng.webp",
+      "from": "Codex 그림 만들기(ChatGPT 구독, API 아님) 2026-10-06 · 판 Documents/synk-vendor/hangul-mnemonic/sheet4_codex_20261006.png의 ball · tools/펠트부품_오리기.py로 오림(흰 판 걷기 --고치기)",
+      "bytes": 104616,
+      "sha256": "4526b5ea0f40acda2304684136827bbf7c82575328bd25d2acb5f6d3f8f60427"
+    },
+    {
+      "path": "mnemonic/f-g.webp",
+      "from": "Codex 그림 만들기(ChatGPT 구독, API 아님) 2026-10-06 · 판 Documents/synk-vendor/hangul-mnemonic/sheet4_codex_20261006.png의 book · tools/펠트부품_오리기.py로 오림(흰 판 걷기 --고치기)",
+      "bytes": 153772,
+      "sha256": "448580ae74d8559e91889878c56046f3dd6603975861134a5387f10966448403"
+    },
+    {
+      "path": "mnemonic/f-b.webp",
+      "from": "Codex 그림 만들기(ChatGPT 구독, API 아님) 2026-10-06 · 판 Documents/synk-vendor/hangul-mnemonic/sheet4_codex_20261006.png의 rice · tools/펠트부품_오리기.py로 오림(흰 판 걷기 --고치기)",
+      "bytes": 100930,
+      "sha256": "cc98cd560f340f02d57ed8adb10ecf044612eb2c295aac5f8e42868c57c85a42"
+    },
+    {
+      "path": "mnemonic/f-s.webp",
+      "from": "Codex 그림 만들기(ChatGPT 구독, API 아님) 2026-10-06 · 판 Documents/synk-vendor/hangul-mnemonic/sheet4_codex_20261006.png의 shirt · tools/펠트부품_오리기.py로 오림(흰 판 걷기 --고치기)",
+      "bytes": 155714,
+      "sha256": "c2bca248b947595966a7946123391d870fdc2bf3cb992305515f8a8a2ab012b0"
+    },
+    {
+      "path": "mnemonic/c-kk.webp",
+      "from": "Codex 그림 만들기(ChatGPT 구독, API 아님) 2026-10-06 · 판 Documents/synk-vendor/hangul-mnemonic/sheet5_codex_20261006.png의 honey pot · tools/펠트부품_오리기.py로 오림(흰 판 걷기 --고치기)",
+      "bytes": 180200,
+      "sha256": "4250bc8da25fbf2cbc4ddea712d5c7a132656477a39f8e10a3a063b344df8f4c"
+    },
+    {
+      "path": "mnemonic/c-tt.webp",
+      "from": "Codex 그림 만들기(ChatGPT 구독, API 아님) 2026-10-06 · 판 Documents/synk-vendor/hangul-mnemonic/sheet5_codex_20261006.png의 strawberry · tools/펠트부품_오리기.py로 오림(흰 판 걷기 --고치기)",
+      "bytes": 182434,
+      "sha256": "34b0cfb755b3ab0fe384b35aeb4e33136915394a0e363c73a17fbd133201910c"
+    },
+    {
+      "path": "mnemonic/c-pp.webp",
+      "from": "Codex 그림 만들기(ChatGPT 구독, API 아님) 2026-10-06 · 판 Documents/synk-vendor/hangul-mnemonic/sheet5_codex_20261006.png의 bread · tools/펠트부품_오리기.py로 오림(흰 판 걷기 --고치기)",
+      "bytes": 198966,
+      "sha256": "805d6eda70f6323005d610a336808a72d5e4d6e8425f890893a9b5d138daa621"
+    },
+    {
+      "path": "mnemonic/c-ss.webp",
+      "from": "Codex 그림 만들기(ChatGPT 구독, API 아님) 2026-10-06 · 판 Documents/synk-vendor/hangul-mnemonic/sheet5_codex_20261006.png의 seed · tools/펠트부품_오리기.py로 오림(흰 판 걷기 --고치기)",
+      "bytes": 123870,
+      "sha256": "307ec992852ec7a428528f56e0e5f93d536ab46cf2689d3b0c88b0fadde66dd1"
+    },
+    {
+      "path": "mnemonic/c-jj.webp",
+      "from": "Codex 그림 만들기(ChatGPT 구독, API 아님) 2026-10-06 · 판 Documents/synk-vendor/hangul-mnemonic/sheet5_codex_20261006.png의 black-bean noodles · tools/펠트부품_오리기.py로 오림(흰 판 걷기 --고치기)",
+      "bytes": 201758,
+      "sha256": "d8fccb538c50e27b27c118d76487b70556bf9f49706e2e0fbe0f572ae4589b05"
+    },
+    {
+      "path": "mnemonic/v-wa.webp",
+      "from": "Codex 그림 만들기(ChatGPT 구독, API 아님) 2026-10-06 · 판 Documents/synk-vendor/hangul-mnemonic/sheet6_codex_20261006.png의 apple · tools/펠트부품_오리기.py로 오림(물건마다 따로 오린 뒤 막힌 구멍·흰 테 걷기, 흰 판 걷기 --고치기)",
+      "bytes": 127100,
+      "sha256": "15e8efa233e65ab962c9ca0732d334749c95279e879f65ea6a1766fa78434920"
+    },
+    {
+      "path": "mnemonic/v-wo.webp",
+      "from": "Codex 그림 만들기(ChatGPT 구독, API 아님) 2026-10-06 · 판 Documents/synk-vendor/hangul-mnemonic/sheet6_codex_20261006.png의 monkey · tools/펠트부품_오리기.py로 오림(물건마다 따로 오림, 흰 판 걷기 --고치기)",
+      "bytes": 125948,
+      "sha256": "d3fa69d0be1d2dd4a80af03b152a55901a321761f0299d1c0965a5320eeb5a19"
+    },
+    {
+      "path": "mnemonic/v-wi.webp",
+      "from": "Codex 그림 만들기(ChatGPT 구독, API 아님) 2026-10-06 · 판 Documents/synk-vendor/hangul-mnemonic/sheet6_codex_20261006.png의 scissors · tools/펠트부품_오리기.py로 오림(물건마다 따로 오린 뒤 손잡이 구멍 걷기, 흰 판 걷기 --고치기)",
+      "bytes": 99952,
+      "sha256": "f0edf055227c5d1adbdcb6b1b20d7fe60de0528acdf1e1d0050bed9ce22fc594"
+    },
+    {
+      "path": "mnemonic/v-ui.webp",
+      "from": "Codex 그림 만들기(ChatGPT 구독, API 아님) 2026-10-06 · 판 Documents/synk-vendor/hangul-mnemonic/sheet6_codex_20261006.png의 chair · tools/펠트부품_오리기.py로 오림(물건마다 따로 오린 뒤 등받이 구멍 걷기, 흰 판 걷기 --고치기)",
+      "bytes": 105022,
+      "sha256": "70a46028f63596450f2d5c033f9c41fe47ecf6b53fb42769046e0af0b89527bc"
+    },
+    {
+      "path": "mnemonic/v-oe.webp",
+      "from": "Codex 그림 만들기(ChatGPT 구독, API 아님) 2026-10-06 · 판 Documents/synk-vendor/hangul-mnemonic/sheet6_codex_20261006.png의 alien · tools/펠트부품_오리기.py로 오림(물건마다 따로 오림, 흰 판 걷기 --고치기)",
+      "bytes": 114692,
+      "sha256": "03502f5214904c4739d5095273c5b517b9635e63f8889036203dd53616212e49"
+    },
+    {
+      "path": "mnemonic/v-wae.webp",
+      "from": "Codex 그림 만들기(ChatGPT 구독, API 아님) 2026-10-06 · 판 Documents/synk-vendor/hangul-mnemonic/sheet6_codex_20261006.png의 pig · tools/펠트부품_오리기.py로 오림(물건마다 따로 오림(이웃 스웨터와 붙어 덩어리로 가름), 흰 판 걷기 --고치기)",
+      "bytes": 128440,
+      "sha256": "e6bd71ad5718d5193d7fa43c846d744816f6498059fe53ff5d3cc730253db095"
+    },
+    {
+      "path": "mnemonic/v-we.webp",
+      "from": "Codex 그림 만들기(ChatGPT 구독, API 아님) 2026-10-06 · 판 Documents/synk-vendor/hangul-mnemonic/sheet6_codex_20261006.png의 sweater · tools/펠트부품_오리기.py로 오림(물건마다 따로 오림(이웃 돼지와 붙어 덩어리로 가름), 흰 판 걷기 --고치기)",
+      "bytes": 168312,
+      "sha256": "3c33d1c6431be26123bf320bd9abce9bb42d46fe45f16e8593baa70ca8a9841e"
+    },
+    {
+      "path": "mnemonic/v-ye.webp",
+      "from": "Codex 그림 만들기(ChatGPT 구독, API 아님) 2026-10-06 · 판 Documents/synk-vendor/hangul-mnemonic/sheet6_codex_20261006.png의 alarm clock · tools/펠트부품_오리기.py로 오림(물건마다 따로 오린 뒤 흰 테 걷기, 흰 판 걷기 --고치기)",
+      "bytes": 140188,
+      "sha256": "89a8fcfa4745faf94fcdf95f9a813cf427006a8a203f545a387a4318dbe3a5da"
+    },
+    {
+      "path": "words/mul.webp",
+      "from": "Codex 그림 만들기(ChatGPT 구독, API 아님) 2026-10-08 · 판 Documents/synk-vendor/hangul-mnemonic/sheet13_batchim_words_codex_20261008.png의 water drop · 물건마다 같은 크기 흰 판에 옮겨 tools/펠트부품_오리기.py로 오리고 330px 안으로 줄임(webp 무손실) · 받침 노래 낱말 그림",
+      "bytes": 99208,
+      "sha256": "fcc76f18053c18df3559cf7b109b166c3f5cac40d6896b2b311857a705e0f8ba"
+    },
+    {
+      "path": "words/bam.webp",
+      "from": "Codex 그림 만들기(ChatGPT 구독, API 아님) 2026-10-08 · 판 Documents/synk-vendor/hangul-mnemonic/sheet13_batchim_words_codex_20261008.png의 chestnut · 물건마다 같은 크기 흰 판에 옮겨 tools/펠트부품_오리기.py로 오리고 330px 안으로 줄임(webp 무손실) · 받침 노래 낱말 그림",
+      "bytes": 107968,
+      "sha256": "b9f98ea0a0b9130b8398624868f3d4831354a4cf91140ca4a1d3bd9a0b4847b8"
+    },
+    {
+      "path": "words/gang.webp",
+      "from": "Codex 그림 만들기(ChatGPT 구독, API 아님) 2026-10-08 · 판 Documents/synk-vendor/hangul-mnemonic/sheet13_batchim_words_codex_20261008.png의 river · 물건마다 같은 크기 흰 판에 옮겨 tools/펠트부품_오리기.py로 오리고 330px 안으로 줄임(webp 무손실) · 받침 노래 낱말 그림",
+      "bytes": 148472,
+      "sha256": "efabe80c0a146a502d91029482a7c43d2b83c32c3f9d4763ce1510deeb9ea076"
+    },
+    {
+      "path": "words/nun.webp",
+      "from": "Codex 그림 만들기(ChatGPT 구독, API 아님) 2026-10-08 · 판 Documents/synk-vendor/hangul-mnemonic/sheet13_batchim_words_codex_20261008.png의 snowflake · 물건마다 같은 크기 흰 판에 옮겨 tools/펠트부품_오리기.py로 오리고 330px 안으로 줄임(webp 무손실) · 받침 노래 낱말 그림",
+      "bytes": 127682,
+      "sha256": "6e33b91897dbceca848b8b1f1e9d89f0996229e36db3b2b47a3ae2568d387a56"
+    },
+    {
+      "path": "words/mal.webp",
+      "from": "Codex 그림 만들기(ChatGPT 구독, API 아님) 2026-10-08 · 판 Documents/synk-vendor/hangul-mnemonic/sheet13_batchim_words_codex_20261008.png의 horse · 물건마다 같은 크기 흰 판에 옮겨 tools/펠트부품_오리기.py로 오리고 330px 안으로 줄임(webp 무손실) · 받침 노래 낱말 그림",
+      "bytes": 97330,
+      "sha256": "b2ad9685ab71017b43a2da8b083f9914f865a04c4f0833db72cb91f2b3778441"
+    },
+    {
+      "path": "words/mom.webp",
+      "from": "Codex 그림 만들기(ChatGPT 구독, API 아님) 2026-10-08 · 판 Documents/synk-vendor/hangul-mnemonic/sheet13_batchim_words_codex_20261008.png의 body · 물건마다 같은 크기 흰 판에 옮겨 tools/펠트부품_오리기.py로 오리고 330px 안으로 줄임(webp 무손실) · 받침 노래 낱말 그림",
+      "bytes": 78572,
+      "sha256": "d8cedb26d0778b935ec24d71aa0778918e7b034dd8bf82c3160af2248d12f743"
+    },
+    {
+      "path": "words/bang.webp",
+      "from": "Codex 그림 만들기(ChatGPT 구독, API 아님) 2026-10-08 · 판 Documents/synk-vendor/hangul-mnemonic/sheet13_batchim_words_codex_20261008.png의 room · 물건마다 같은 크기 흰 판에 옮겨 tools/펠트부품_오리기.py로 오리고 330px 안으로 줄임(webp 무손실) · 받침 노래 낱말 그림",
+      "bytes": 132812,
+      "sha256": "ae982eb557ff9fc4e643019334b41441d7490aff80d096a8b39840b97377a56e"
+    }
+  ]
+}

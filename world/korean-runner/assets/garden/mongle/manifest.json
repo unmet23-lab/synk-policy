@@ -1,0 +1,373 @@
+{
+  "version": "mongle-game-v2",
+  "referenceHeight": 259,
+  "poses": {
+    "idle-right": {
+      "file": "idle-right.webp",
+      "width": 276,
+      "height": 272,
+      "contact": [
+        138,
+        265
+      ],
+      "umbrellaMount": [
+        160,
+        144
+      ],
+      "carry": [
+        196,
+        201
+      ],
+      "sourceCell": {
+        "left": 0,
+        "top": 0,
+        "width": 362,
+        "height": 362
+      },
+      "crop": {
+        "left": 52,
+        "top": 67,
+        "width": 276,
+        "height": 272
+      },
+      "sha256": "5779013ad598f4468632c65b0876ab780bb0c7ec794a4bf1f0621521cb938fdf"
+    },
+    "walk-a-right": {
+      "file": "walk-a-right.webp",
+      "width": 282,
+      "height": 276,
+      "contact": [
+        141,
+        269
+      ],
+      "umbrellaMount": [
+        164,
+        146
+      ],
+      "carry": [
+        200,
+        204
+      ],
+      "sourceCell": {
+        "left": 362,
+        "top": 0,
+        "width": 362,
+        "height": 362
+      },
+      "crop": {
+        "left": 48,
+        "top": 67,
+        "width": 282,
+        "height": 276
+      },
+      "sha256": "f17b0fc2f05012d74220c523190cb4314ceaed5e7bfaf66e6a391ea73608ba9e"
+    },
+    "walk-b-right": {
+      "file": "walk-b-right.webp",
+      "width": 279,
+      "height": 271,
+      "contact": [
+        140,
+        264
+      ],
+      "umbrellaMount": [
+        162,
+        144
+      ],
+      "carry": [
+        198,
+        201
+      ],
+      "sourceCell": {
+        "left": 724,
+        "top": 0,
+        "width": 362,
+        "height": 362
+      },
+      "crop": {
+        "left": 51,
+        "top": 73,
+        "width": 279,
+        "height": 271
+      },
+      "sha256": "940ce5e9fb58a1d34a4ed6644c4d52bcacd57e6a081b2f65bb406afab59a7be1"
+    },
+    "jump-right": {
+      "file": "jump-right.webp",
+      "width": 249,
+      "height": 262,
+      "contact": [
+        125,
+        255
+      ],
+      "umbrellaMount": [
+        144,
+        139
+      ],
+      "carry": [
+        177,
+        194
+      ],
+      "sourceCell": {
+        "left": 1086,
+        "top": 0,
+        "width": 362,
+        "height": 362
+      },
+      "crop": {
+        "left": 57,
+        "top": 60,
+        "width": 249,
+        "height": 262
+      },
+      "sha256": "70c1dca73362933e871e6fd9bf572a68d14a217ff6b8c5c99589e6c944f591dc"
+    },
+    "idle-left": {
+      "file": "idle-left.webp",
+      "width": 283,
+      "height": 273,
+      "contact": [
+        142,
+        266
+      ],
+      "umbrellaMount": [
+        119,
+        145
+      ],
+      "carry": [
+        82,
+        202
+      ],
+      "sourceCell": {
+        "left": 0,
+        "top": 362,
+        "width": 362,
+        "height": 362
+      },
+      "crop": {
+        "left": 53,
+        "top": 55,
+        "width": 283,
+        "height": 273
+      },
+      "sha256": "c539e3bdfe1994ab88b0854b896da25f100ff9117ba3cdead2395714f629b41d"
+    },
+    "walk-a-left": {
+      "file": "walk-a-left.webp",
+      "width": 300,
+      "height": 273,
+      "contact": [
+        150,
+        266
+      ],
+      "umbrellaMount": [
+        126,
+        145
+      ],
+      "carry": [
+        87,
+        202
+      ],
+      "sourceCell": {
+        "left": 362,
+        "top": 362,
+        "width": 362,
+        "height": 362
+      },
+      "crop": {
+        "left": 53,
+        "top": 55,
+        "width": 300,
+        "height": 273
+      },
+      "sha256": "99827e0961437a3b1d313228a44cbf034ae44420b15cafe201ac21157578404c"
+    },
+    "walk-b-left": {
+      "file": "walk-b-left.webp",
+      "width": 292,
+      "height": 270,
+      "contact": [
+        146,
+        263
+      ],
+      "umbrellaMount": [
+        123,
+        143
+      ],
+      "carry": [
+        85,
+        200
+      ],
+      "sourceCell": {
+        "left": 724,
+        "top": 362,
+        "width": 362,
+        "height": 362
+      },
+      "crop": {
+        "left": 61,
+        "top": 59,
+        "width": 292,
+        "height": 270
+      },
+      "sha256": "7e818a55357307366c302334f7bc1764b176cd1646069d404c626b07be2e5590"
+    },
+    "jump-left": {
+      "file": "jump-left.webp",
+      "width": 249,
+      "height": 262,
+      "contact": [
+        125,
+        255
+      ],
+      "umbrellaMount": [
+        105,
+        139
+      ],
+      "carry": [
+        72,
+        194
+      ],
+      "sourceCell": {
+        "left": 1086,
+        "top": 362,
+        "width": 362,
+        "height": 362
+      },
+      "crop": {
+        "left": 86,
+        "top": 46,
+        "width": 249,
+        "height": 262
+      },
+      "sha256": "d63fc036bd8bf631ae370ce7b8c756592f9e7ee47539b40f5f089d30b68a0f0a"
+    },
+    "glide-right": {
+      "file": "glide-right.webp",
+      "width": 274,
+      "height": 274,
+      "contact": [
+        137,
+        267
+      ],
+      "umbrellaMount": [
+        159,
+        145
+      ],
+      "carry": [
+        195,
+        203
+      ],
+      "sourceCell": {
+        "left": 0,
+        "top": 724,
+        "width": 362,
+        "height": 362
+      },
+      "crop": {
+        "left": 35,
+        "top": 17,
+        "width": 274,
+        "height": 274
+      },
+      "sha256": "be29728ac4f63036dcd0937f804488e72c40f9352188404dd3c88b0abc2d23a7"
+    },
+    "glide-left": {
+      "file": "glide-left.webp",
+      "width": 277,
+      "height": 272,
+      "contact": [
+        139,
+        265
+      ],
+      "umbrellaMount": [
+        116,
+        144
+      ],
+      "carry": [
+        80,
+        201
+      ],
+      "sourceCell": {
+        "left": 362,
+        "top": 724,
+        "width": 362,
+        "height": 362
+      },
+      "crop": {
+        "left": 67,
+        "top": 20,
+        "width": 277,
+        "height": 272
+      },
+      "sha256": "11da02b0abf7e6f2b8c738f542548f01e199f5cf903a6ea9609c9bbefdfeea6a"
+    },
+    "land-right": {
+      "file": "land-right.webp",
+      "width": 314,
+      "height": 227,
+      "contact": [
+        157,
+        220
+      ],
+      "umbrellaMount": [
+        182,
+        120
+      ],
+      "carry": [
+        223,
+        168
+      ],
+      "sourceCell": {
+        "left": 724,
+        "top": 724,
+        "width": 362,
+        "height": 362
+      },
+      "crop": {
+        "left": 29,
+        "top": 73,
+        "width": 314,
+        "height": 227
+      },
+      "sha256": "88413b79b39e28d966314992116bac81317effcac8ce2f347f6ad3fb2695adbc"
+    },
+    "land-left": {
+      "file": "land-left.webp",
+      "width": 315,
+      "height": 224,
+      "contact": [
+        158,
+        217
+      ],
+      "umbrellaMount": [
+        132,
+        119
+      ],
+      "carry": [
+        91,
+        166
+      ],
+      "sourceCell": {
+        "left": 1086,
+        "top": 724,
+        "width": 362,
+        "height": 362
+      },
+      "crop": {
+        "left": 29,
+        "top": 76,
+        "width": 315,
+        "height": 224
+      },
+      "sha256": "c504a1ff1e16ea97a1355d9f4c371b415b0c71adb9d9bbf49bea68e646759cbd"
+    }
+  },
+  "source": {
+    "file": "art-direction/mongle-game-v2-20260919/atlas.png",
+    "sha256": "af8012f2681b0ec573801330058180747084ed3cbc2a7a3a5e7dfbc6d95e2e21",
+    "width": 1448,
+    "height": 1086
+  },
+  "processing": "Cell extraction, transparent-margin crop, WebP encoding only. Original pixels retained; no repainting or global mascot changes."
+}

@@ -1,0 +1,26 @@
+{
+  "date": "2026-10-07",
+  "source": "Three.js r180 vendor (MIT). 2026-10-07 SYNK LAB PLAY 키트로 바꾸며 로고·글꼴·펠트 사본(brand-lab.webp·suit.woff2·dm-mono.woff2·inter-tight.ttf·felt.webp·favicon.svg)을 뺐다 — 그림·글꼴은 kit/(원본 experiences/play-common/kit/), 목소리는 assets/voice/manifest.json. BufferGeometryUtils.js는 v7 world.mjs가 쓰지 않지만 3D 원본으로 남겨 둔다.",
+  "files": [
+    {
+      "file": "vendor/BufferGeometryUtils.js",
+      "bytes": 35539,
+      "sha256": "fda7e946b8e0b5ab39b779206589e7a1079a22eb24efb89d7223e03fdfb1f751"
+    },
+    {
+      "file": "vendor/THREE-LICENSE.txt",
+      "bytes": 1081,
+      "sha256": "bfe119ea4fd413f5f7ca3fcd63adb0c4a073ed39daa2fe7d3e6b769e21272601"
+    },
+    {
+      "file": "vendor/three.core.js",
+      "bytes": 1403455,
+      "sha256": "eb077d2417f61d3e6d9264c317cabc4ea35769ed6b0ab533067292a550784c20"
+    },
+    {
+      "file": "vendor/three.module.js",
+      "bytes": 603113,
+      "sha256": "c8211c69345d2e9949dc7a8ac969380497aa0600a5a8ac6a459c8cd02dd9cb8a"
+    }
+  ]
+}

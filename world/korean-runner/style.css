@@ -1,0 +1,217 @@
+/* 바람길 — 공통 화면(입구·게임 바·멈춤·결과·펠트 부품)은 kit/lab.css(SYNK LAB PLAY 키트, 원본 experiences/play-common/kit/).
+ * 여기에는 바람길에만 있는 것: 입구 그림(펠트 길), 3D 무대와 바람의 말 카드, 코랄 펠트 받침 위 움직이기 단추, 보호 알약,
+ * 결과의 부탁 목록, 듣기 확인 판(쿠션 카드). 3D 길·마을은 world.mjs가 펠트 사진으로 그린다. */
+
+/* ── 입구 그림: 펠트 길 캔버스(hero.mjs) · 바람의 말풍선 · 몽글 ── */
+.hero-road{position:absolute;inset:0;width:100%;height:100%;display:block}
+.hero-say{position:absolute;z-index:1;left:2%;top:2%;display:flex;align-items:center;gap:10px;max-width:72%;margin:0;padding:10px 16px 12px 10px;border-radius:20px 20px 20px 6px;
+  font:800 clamp(16px,4.3vw,24px)/1.3 var(--sans);letter-spacing:-.02em}
+.hero-say .tag{flex:none}
+.hero-art .hero-mongle{width:min(31%,170px)}
+
+.fine.warn{color:var(--coral-deep);font-weight:700}
+
+/* ── 게임: 위 막대 · 무대(3D 길 + 말 카드) · 코랄 펠트 받침(움직이기 단추) ── */
+body.playing{overflow:hidden;overscroll-behavior:none}
+.game .arena.run{display:flex;flex-direction:column;background:#efe3d0}
+.game .arena.run::after{display:none}   /* 코랄 받침은 아래 단추 받침(.moves)이 맡는다 */
+/* 무대 벽: 키트 판과 같은 크림 펠트, 가운데 빛 번짐 없이 고르게(먼 길이 world.mjs FOG_COLOR로 이 벽에 녹아든다) */
+.stage{position:relative;flex:1;min-height:0;overflow:hidden;touch-action:none;user-select:none;-webkit-user-select:none;
+  background:linear-gradient(rgba(251,247,240,.42),rgba(251,247,240,.42)),url(kit/felt/wide-cream.webp) center/max(2560px,100%) auto no-repeat,#efe3d0}
+.world{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:none}
+
+/* 바람의 말 카드(종이): 듣는 중 → 움직이기 → 해냄(펠트 체크) / 놓침(무엇을 부탁했는지). 글은 ‘글로 보기’를 눌렀을 때와 놓친 뒤에만. 기울이지 않는다 */
+.say{position:absolute;z-index:4;left:50%;top:10px;transform:translateX(-50%);width:min(520px,calc(100% - 20px));margin:0;padding:11px 14px 15px;display:grid;gap:5px;
+  animation:sayIn .24s var(--ease) both}
+.say-head{display:flex;align-items:center;gap:8px;min-height:34px}
+.say-ear{display:none;align-items:center;gap:4px}
+.say[data-phase=listening] .say-ear,.check-q[data-phase=listening] .say-ear{display:inline-flex}
+.say-ear i{width:8px;height:8px;border-radius:50%;background:var(--coral);opacity:.35;animation:dots 1s infinite ease-in-out}   /* 밝기만 바뀐다(움직이지 않는다) */
+.say-ear i:nth-child(2){animation-delay:.15s}
+.say-ear i:nth-child(3){animation-delay:.3s}
+.say-steps{display:flex;align-items:center;gap:4px}
+.say-steps i{display:grid;place-items:center;width:24px;height:24px;padding:0 2px 2px 0;font:700 11.5px/1 var(--mono);font-style:normal;color:var(--ink);
+  background:url(kit/felt/badge-cream.webp) center/contain no-repeat}
+.say-steps i.now{color:var(--coral-deep)}
+.say-steps i.done{background-image:url(kit/felt/badge-check.webp);color:transparent}
+.say-steps b{font:700 11px/1 var(--mono);color:var(--muted)}
+.say-text{margin-left:auto;min-height:36px;padding:0 13px 3px;font-size:13px}
+.say-line{margin:0;font:800 20px/1.32 var(--sans);letter-spacing:-.02em}
+.say.texted .say-line,.say[data-phase=missed] .say-line{font-size:18px}
+.say[data-phase=done] .say-line{color:var(--coral-deep)}
+.say-hint{margin:0;font:600 13px/1.45 var(--sans);color:var(--ink-2)}
+.say-hint:empty{display:none}
+.say-hint b{color:var(--ink);font-weight:800}
+.say-near{position:absolute;left:14px;right:14px;bottom:6px;height:4px;border-radius:2px;background:rgba(43,35,32,.07);overflow:hidden}
+.say-near i{display:block;width:100%;height:100%;border-radius:2px;background:var(--coral);transform-origin:left center}
+.say.soon .say-near i{background:var(--coral-deep)}
+.say[data-phase=done] .say-near,.say[data-phase=missed] .say-near{display:none}
+.say[data-phase=done]::after{content:"";position:absolute;right:-8px;top:-12px;width:44px;height:44px;background:url(kit/felt/badge-check.webp) center/contain no-repeat;
+  filter:drop-shadow(0 3px 3px rgba(73,45,30,.3));animation:pop .3s var(--ease) both}
+.say[data-phase=missed]{background:#fffaf3}
+@keyframes sayIn{from{opacity:0;transform:translate(-50%,-8px)}to{opacity:1;transform:translate(-50%,0)}}
+@keyframes dots{0%,100%{opacity:.3}50%{opacity:1}}
+
+.game .tip{top:var(--tip-top,12px);bottom:auto;width:min(440px,calc(100% - 28px));font-size:14.5px}
+.game .pop{z-index:5}
+.pop[data-kind=ok]{font-size:30px}
+.pop[data-kind=shield]{color:#1d4f9c}
+.pop[data-kind=bump]{font-size:22px;color:var(--ink-2)}
+.pop[data-kind=end]{font-size:40px}
+
+/* 위 막대 알약: 보호(펠트 구슬 셋 — 잃은 것은 크림 구슬, 회색 없음) · 바람막이 있으면 반짝이 */
+.game-bar .pill{position:relative}
+.hearts{display:flex;align-items:center;gap:3px;height:14px;margin-top:1px}
+.hearts i{width:12px;height:12px;flex:none;background:url(kit/felt/badge-coral.webp) center/contain no-repeat}
+.hearts i.off{background-image:url(kit/felt/badge-cream.webp)}
+.pill.guard.shield::after{content:"";position:absolute;right:-7px;top:-8px;width:20px;height:20px;background:url(kit/felt/sparkle.webp) center/contain no-repeat}
+
+/* 움직이기 단추: 코랄 펠트 받침 위 크림 펠트 배지 넷(왼쪽 · 점프 · 숙이기 · 오른쪽). 눌림 = 3px 내려앉기 */
+.moves{position:relative;z-index:3;flex:none;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;justify-items:center;align-items:center;
+  padding:9px max(10px,env(safe-area-inset-left)) max(10px,env(safe-area-inset-bottom)) max(10px,env(safe-area-inset-right));
+  background:linear-gradient(rgba(249,104,89,.3),rgba(249,104,89,.3)),url(kit/felt/tex-coral.webp) 0 0/150px 150px,var(--coral);box-shadow:0 -6px 14px -8px rgba(120,40,25,.45);
+  touch-action:none;user-select:none;-webkit-user-select:none}
+/* badge-cream.webp(156×160) 안의 펠트 원은 왼쪽 위로 조금 치우쳐 있다(아래·오른쪽은 바닥 그림자) → 글자를 원 가운데에 */
+.move{position:relative;width:min(100%,80px);aspect-ratio:156/160;display:grid;align-content:center;justify-items:center;gap:1px;padding:0 6% 7% 0;border:0;
+  color:var(--ink);background:url(kit/felt/badge-cream.webp) center/contain no-repeat;filter:drop-shadow(0 6px 6px rgba(110,30,20,.32));
+  transition:transform .07s var(--ease),filter .1s;-webkit-tap-highlight-color:transparent;touch-action:none}
+.move:active,.move.on{transform:translateY(3px);filter:drop-shadow(0 2px 3px rgba(110,30,20,.3))}
+.move .ico{width:24px;height:24px;background:var(--ink);-webkit-mask:var(--ico) center/contain no-repeat;mask:var(--ico) center/contain no-repeat}
+.move span{font:800 12.5px/1.15 var(--sans);letter-spacing:-.01em}
+.move[data-action=left]{--ico:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 12H5M11 5l-7 7 7 7'/%3E%3C/svg%3E")}
+.move[data-action=right]{--ico:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 12h15M13 5l7 7-7 7'/%3E%3C/svg%3E")}
+.move[data-action=jump]{--ico:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 17V4M6 10l6-6 6 6M5 21h14'/%3E%3C/svg%3E")}
+.move[data-action=slide]{--ico:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 3h16M12 7v13M6 14l6 6 6-6'/%3E%3C/svg%3E")}
+
+/* 반짝이(해낸 순간 몽글 머리 위에서 펠트 반짝이 몇 개 — 움직임 줄이기에서는 없다) */
+.stage .spark{position:absolute;z-index:4;pointer-events:none}
+
+/* ── 결과 ── */
+.r-label{margin:4px 0 0;font:800 15px/1.3 var(--sans);color:rgba(43,35,32,.82)}
+#r-stars i:nth-child(1){animation-delay:.3s}
+#r-stars i:nth-child(2){animation-delay:.52s}
+#r-stars i:nth-child(3){animation-delay:.74s}
+.log ol{margin-top:12px}
+.log li{grid-template-columns:30px minmax(0,1fr) auto}
+.log li.ok .mark,.log li.ko .mark{width:28px;height:28px;border-radius:0;background:transparent center/contain no-repeat;color:var(--ink-2)}   /* 키트의 납작한 원 대신 펠트 배지 */
+.log li.ok .mark{background-image:url(kit/felt/badge-check.webp);color:transparent}   /* 해낸 부탁: 펠트 체크 배지 */
+.log li.ko .mark{background-image:url(kit/felt/badge-cream.webp);padding:0 2px 2px 0;font:700 12.5px/1 var(--mono);color:var(--ink)}   /* 다시 들을 부탁: 크림 펠트 원에 번호(빨간 X 없음) */
+.log .line{display:block;font:800 15.5px/1.45 var(--sans)}
+.log .acts{display:block;margin-top:2px;font:700 13.5px/1.45 var(--sans);color:var(--ink-2)}
+.log .acts b{padding:0 .22em;border-radius:5px;background:var(--marker);color:var(--ink);white-space:nowrap}
+.log .why{display:block;margin-top:3px;font-size:13px;line-height:1.5;color:var(--ink-2)}
+.log small{margin-top:3px}
+.say-again{min-height:34px;padding:0 12px 2px;font-size:13px;align-self:center}
+.log li.empty{display:block;color:var(--ink-2);font-size:14px}
+.log .fine{margin-top:10px}
+.toast{position:fixed;z-index:50;left:50%;bottom:max(18px,env(safe-area-inset-bottom));transform:translateX(-50%);width:max-content;max-width:calc(100% - 32px);margin:0;
+  padding:12px 18px 13px;border-radius:16px;font:700 14.5px/1.45 var(--sans);text-align:center}
+.skills li em{white-space:nowrap}
+
+/* ── 듣기 확인: 종이 판 · 위쪽 듣기 카드 · 들은 행동 쿠션 카드 셋(번호는 모서리의 크림 펠트 단추) ── */
+dialog.check{width:min(500px,calc(100% - 24px));max-height:calc(100svh - 24px);overflow:hidden auto;padding:16px 18px 18px}   /* 쿠션 카드: min-height가 aspect-ratio로 넘어가 최소 폭이 되지 않게 min-width:0 */
+dialog.check p{margin:0}
+.check-top{display:flex;align-items:center;gap:10px}
+.check-count{font:500 13px/1 var(--mono);color:var(--ink-2)}
+.check-close{margin-left:auto;min-height:36px;padding:0 15px 3px;font-size:13px}
+dialog.check h2{margin:8px 0 4px;font-size:22px}
+.check-intro{font-size:14px;line-height:1.55;color:var(--ink-2);margin-bottom:12px!important}
+.check-q{display:grid;gap:8px;margin:0 0 14px;padding:11px 12px 12px;border-radius:16px;background:var(--cream)}
+.check-q-head{display:flex;align-items:center;gap:8px;min-height:36px}
+.check-q-head .chip-btn{margin-left:auto;min-height:36px;padding:0 14px 3px;font-size:13px}
+.check-status{font:700 14px/1.5 var(--sans);color:var(--ink-2)}
+.check-choices{display:grid;gap:12px;margin:0 0 12px;padding-top:6px}
+.choice{position:relative;display:grid;grid-template-columns:minmax(0,1fr);align-content:center;width:100%;min-width:0;aspect-ratio:6/1;min-height:54px;padding:5px 9% 12px;border:0;text-align:center;
+  font:800 16.5px/1.25 var(--sans);letter-spacing:-.01em;background:transparent center/100% 100% no-repeat;filter:drop-shadow(0 4px 5px rgba(73,45,30,.14));
+  transition:transform .14s var(--ease),opacity .2s,filter .16s}
+.choice .no{position:absolute;left:-6px;top:-9px;display:grid;place-items:center;width:28px;height:28px;padding:0 2px 2px 0;background:url(kit/felt/badge-cream.webp) center/contain no-repeat;
+  color:#2b2320;text-shadow:none;font:800 12.5px/1 var(--mono);filter:drop-shadow(0 2px 2px rgba(73,45,30,.22))}
+.choice .lbl{overflow-wrap:normal;text-wrap:balance}
+.choice .lbl .nb{white-space:nowrap}
+.choice.c0{background-image:url(kit/felt/cushion-blush-strip.webp);color:#5c2318}
+.choice.c1{background-image:url(kit/felt/cushion-butter-strip.webp);color:#3a2a08}
+.choice.c2{background-image:url(kit/felt/cushion-lapis-strip.webp);color:#fffaf2;text-shadow:0 1px 1px rgba(16,36,96,.45)}
+.choice:not(:disabled):active{transform:translateY(3px)}   /* 눌림 = 3px 내려앉기 */
+.choice:disabled{cursor:default}
+.check-choices.waiting .choice .lbl{opacity:.6}   /* 듣는 동안: 펠트 색은 그대로, 글자만 옅게 */
+.choice.chosen{transform:translateY(-4px);filter:var(--sticker) drop-shadow(0 9px 8px rgba(73,45,30,.28))}
+.choice.right::after{content:"";position:absolute;right:-7px;top:-13px;width:36px;height:36px;background:url(kit/felt/badge-check.webp) center/contain no-repeat;filter:drop-shadow(0 3px 3px rgba(73,45,30,.3))}
+.choice.dim{opacity:.5}
+/* 넓은 판: 보기 셋을 한 줄로, 말 랠리 대답 카드처럼 1.6:1 쿠션(긴 띠는 넓게 늘이면 이어 붙인 결이 줄무늬로 보인다) */
+@media (min-width:600px){
+  .check-choices{grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+  .choice{aspect-ratio:1.6/1;min-height:0;padding:6px 10% 17%;font-size:17px}
+  .choice.c0{background-image:url(kit/felt/cushion-blush-phone.webp)}
+  .choice.c1{background-image:url(kit/felt/cushion-butter-phone.webp)}
+  .choice.c2{background-image:url(kit/felt/cushion-lapis-phone.webp)}
+}
+.check-feedback{font:700 14.5px/1.55 var(--sans);color:var(--ink)}
+.check-feedback:empty{display:none}
+.check-feedback q{font-weight:800;quotes:"“" "”"}
+.check-plan{font:600 13px/1.5 var(--sans);color:var(--ink-2);margin-bottom:12px!important}
+.check-plan:empty{display:none}
+.check-feedback .selection,.check-feedback .explanation,.check-feedback .correction,.check-feedback .record{display:block;margin-top:8px}
+.check-feedback .selection{font-weight:600;color:var(--ink-2)}
+.check-feedback .correction{color:var(--coral-deep)}
+.check-feedback .record{font-weight:500;font-size:13px;color:var(--ink-2)}
+.check-feedback .sum{display:block;margin-top:6px;color:var(--coral-deep)}
+#check-next{margin-top:12px}
+
+/* ── 휴대폰·태블릿 입구: 시작 단추가 첫 화면에 들게 그림을 줄인다(키 작은 휴대폰은 낮은 띠) ── */
+@media (max-width:959px){.hero-art{height:min(44vw,300px)}}
+@media (max-width:599px){
+  .hero{padding-bottom:40px}
+  .hero .sub{display:none}
+  .hero-art{height:min(48vw,200px);margin-top:4px}
+  .hero-art .hero-mongle{width:min(30%,140px)}
+  .hero-say{padding:8px 13px 10px 8px;gap:8px}
+}
+@media (max-width:599px) and (max-height:700px){.hero-art{height:min(40vw,150px)}.hero-say{font-size:15px}}
+@media (max-width:440px){.game-bar .logo-mini{display:none}}
+@media (max-width:359px){
+  .hero-art{display:none}
+  .moves{gap:4px}
+  .move span{font-size:12px}
+  .say-line{font-size:18px}
+  .say.texted .say-line,.say[data-phase=missed] .say-line{font-size:16.5px}
+  .say-text{padding:0 10px 3px}
+  .choice{font-size:15px}
+}
+/* 키 작은 휴대폰(320×568 등): 카드·단추를 낮춘다 */
+@media (max-height:700px){
+  .say{padding:9px 12px 13px;gap:3px}
+  .say-head{min-height:30px}
+  .say-text{min-height:32px}
+  .move{width:min(100%,70px)}
+  .move .ico{width:21px;height:21px}
+  dialog.check{padding:12px 14px 14px}
+  dialog.check h2{font-size:19px;margin:4px 0 2px}
+  .check-intro{display:none}
+  .check-q{margin-bottom:10px}
+  .check-choices{gap:10px}
+}
+@media (max-height:600px){
+  .game-bar{padding:7px 10px}
+  .game-bar .pill{padding:2px 8px 5px}
+  .game-bar .disc-btn{width:38px;height:38px}
+  .move{width:min(100%,62px)}
+  .move span{font-size:11.5px}
+}
+
+/* ── 넓은 화면 ── */
+@media (min-width:960px){
+  .hero-art{height:400px}
+  .hero-say{left:0;top:6%}
+  .say{top:16px;padding:14px 18px 18px;gap:6px}
+  .say-line{font-size:23px}
+  .say.texted .say-line,.say[data-phase=missed] .say-line{font-size:20px}
+  .moves{grid-template-columns:repeat(4,84px);justify-content:center;gap:22px;padding:10px 24px 12px}
+  .move{width:80px}
+  .game-bar .pill{min-width:58px}
+  dialog.check{padding:20px 24px 22px}
+}
+@media (min-width:960px) and (max-height:860px){   /* 키 낮은 노트북(1366×768): 시작 단추가 첫 화면에 들게 */
+  .hero h1{font-size:clamp(64px,9vw,112px)}
+  .hero .sub{display:none}
+  .hero-art{height:320px}
+}

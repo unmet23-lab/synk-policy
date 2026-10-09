@@ -1,0 +1,286 @@
+{
+  "voice": "바람",
+  "clips": [
+    {
+      "id": "left",
+      "text": "왼쪽 길로 가세요.",
+      "seconds": 1.785125,
+      "bytes": 15089,
+      "sha256": "7c8dd6cef31737458c9aacc84a19cf439d3c4bf6b2124613ee40e38d148e2dc6",
+      "codec": "mp3",
+      "sampleRate": 22050,
+      "channels": 1
+    },
+    {
+      "id": "jump",
+      "text": "낮은 울타리를 뛰어넘으세요.",
+      "seconds": 2.22254,
+      "bytes": 18642,
+      "sha256": "a2d6869c0c3cffa86462603c74f313141d5a40fa2f81e319e30c4b8017a84bbf",
+      "codec": "mp3",
+      "sampleRate": 22050,
+      "channels": 1
+    },
+    {
+      "id": "right",
+      "text": "오른쪽 길로 가세요.",
+      "seconds": 1.875193,
+      "bytes": 15716,
+      "sha256": "4c13329c918b1564bbdc4cc37620705e6c53472da04b1e93dfcd920dd06f3c54",
+      "codec": "mp3",
+      "sampleRate": 22050,
+      "channels": 1
+    },
+    {
+      "id": "slide",
+      "text": "표지판 아래로 몸을 숙여 지나가세요.",
+      "seconds": 2.698231,
+      "bytes": 22403,
+      "sha256": "07e1a4a8dd146a14ef570e01362682d20b37d03fa4b7e9b87cfa9f20bcbe8830",
+      "codec": "mp3",
+      "sampleRate": 22050,
+      "channels": 1
+    },
+    {
+      "id": "middle",
+      "text": "가운데 길로 가세요.",
+      "seconds": 1.885215,
+      "bytes": 15925,
+      "sha256": "827ce16f0655ad289038a63edaa5a5df41b30592351d1c6b197367869262e157",
+      "codec": "mp3",
+      "sampleRate": 22050,
+      "channels": 1
+    },
+    {
+      "id": "no-jump",
+      "text": "이번에는 뛰지 말고 그대로 달리세요.",
+      "seconds": 2.90644,
+      "bytes": 24075,
+      "sha256": "065e71e0df7c1ba72bc20e7dfcba3bfdcb6d9c498d4faa7c492eb8d2292e4da2",
+      "codec": "mp3",
+      "sampleRate": 22050,
+      "channels": 1
+    },
+    {
+      "id": "left-jump",
+      "text": "왼쪽으로 간 다음, 울타리를 뛰어넘으세요.",
+      "seconds": 3.24322,
+      "bytes": 26792,
+      "sha256": "ca6f2632061597f5d12356066920955da17aae1711019ee561382c9d77df8857",
+      "codec": "mp3",
+      "sampleRate": 22050,
+      "channels": 1
+    },
+    {
+      "id": "middle-slide",
+      "text": "가운데로 간 뒤, 몸을 숙이세요.",
+      "seconds": 2.539909,
+      "bytes": 21149,
+      "sha256": "858e57ada4431ece0e7362f8a15138e8c6919dce88f3b35a416b5aba59ae94b4",
+      "codec": "mp3",
+      "sampleRate": 22050,
+      "channels": 1
+    },
+    {
+      "id": "not-right",
+      "text": "오른쪽으로 가지 말고 왼쪽으로 가세요.",
+      "seconds": 2.85161,
+      "bytes": 23657,
+      "sha256": "7480a71dd9f024efa26e9bc1f0a9b4d4e95b0eed1ec343823203cc430694bbe6",
+      "codec": "mp3",
+      "sampleRate": 22050,
+      "channels": 1
+    },
+    {
+      "id": "jump-right",
+      "text": "울타리를 뛰어넘은 뒤, 오른쪽으로 가세요.",
+      "seconds": 2.962585,
+      "bytes": 24493,
+      "sha256": "c43ce27e8c94edf4d620a10eb4519ed29695c2a08c11169f9bd9968e34d0d345",
+      "codec": "mp3",
+      "sampleRate": 22050,
+      "channels": 1
+    },
+    {
+      "id": "slide-left",
+      "text": "몸을 숙인 다음, 왼쪽으로 가세요.",
+      "seconds": 2.67737,
+      "bytes": 22194,
+      "sha256": "daac72a56b76b4e730c5fb4714ac6ccc060e2bb475e020c7290708722542fa19",
+      "codec": "mp3",
+      "sampleRate": 22050,
+      "channels": 1
+    },
+    {
+      "id": "not-left",
+      "text": "왼쪽으로 가지 말고 가운데로 가세요.",
+      "seconds": 2.835011,
+      "bytes": 23448,
+      "sha256": "96745e3ce710dd5b5f4c2bb1629e2c224f13b8e2a3984cc2c6639b183f295409",
+      "codec": "mp3",
+      "sampleRate": 22050,
+      "channels": 1
+    },
+    {
+      "id": "right-slide",
+      "text": "오른쪽으로 간 다음, 표지판 아래로 지나가세요.",
+      "seconds": 3.375238,
+      "bytes": 27837,
+      "sha256": "1e56294c5c2095076761751032713b2333c26d19fab5d8af6965581a9c7d5390",
+      "codec": "mp3",
+      "sampleRate": 22050,
+      "channels": 1
+    },
+    {
+      "id": "jump-stay",
+      "text": "한 번 뛰어넘고, 다음 표시선에서는 뛰지 마세요.",
+      "seconds": 3.408889,
+      "bytes": 28046,
+      "sha256": "82735ad65318ce81e336ba76821eff6b4deaf5ae5fa018fe3f068c328b77fff6",
+      "codec": "mp3",
+      "sampleRate": 22050,
+      "channels": 1
+    },
+    {
+      "id": "right-middle",
+      "text": "오른쪽으로 갔다가 가운데로 돌아오세요.",
+      "seconds": 2.790748,
+      "bytes": 23030,
+      "sha256": "f9a3a6185fd7463585692db0804339d11e441f8ed7fe5f4e62cc97ba2209a2a8",
+      "codec": "mp3",
+      "sampleRate": 22050,
+      "channels": 1
+    },
+    {
+      "id": "not-slide",
+      "text": "이번에는 몸을 숙이지 말고 그대로 달리세요.",
+      "seconds": 3.268435,
+      "bytes": 27001,
+      "sha256": "dd53c2e51ba5abe11378f49c6bc95b5de9d221812cf8087e37358dfafb4bc0b7",
+      "codec": "mp3",
+      "sampleRate": 22050,
+      "channels": 1
+    },
+    {
+      "id": "check-star-middle",
+      "text": "가운데 길에 별이 있어요. 별이 있는 길로 가세요.",
+      "seconds": 3.335283,
+      "bytes": 27419,
+      "sha256": "1c197e0d4e1d8e47131a9cf56d12338f7393b3f7304e9882941c7bae661d2bfd",
+      "codec": "mp3",
+      "sampleRate": 22050,
+      "channels": 1
+    },
+    {
+      "id": "check-wide-left",
+      "text": "왼쪽 길이 넓어요. 넓은 길로 가세요.",
+      "seconds": 2.793651,
+      "bytes": 23030,
+      "sha256": "24edccd9ea6d9e8cea1a5cb5f7406c104c98ec7ddc18512e2c4e535bb90e9eba",
+      "codec": "mp3",
+      "sampleRate": 22050,
+      "channels": 1
+    },
+    {
+      "id": "check-fence-jump",
+      "text": "앞에 낮은 울타리가 있어요. 울타리를 넘어가세요.",
+      "seconds": 3.458549,
+      "bytes": 28464,
+      "sha256": "201fb16c466516a1e09d8cf3dc0ae3a3d4e39ea1e6def879a3ed3dcd11d2c2a5",
+      "codec": "mp3",
+      "sampleRate": 22050,
+      "channels": 1
+    },
+    {
+      "id": "check-sign-duck",
+      "text": "앞에 낮은 표지판이 있어요. 머리를 숙이고 지나가세요.",
+      "seconds": 3.580907,
+      "bytes": 29509,
+      "sha256": "69ea055a165f2168fab3802ce141c45430d8792cb77b83b69dac7f5232bd84f5",
+      "codec": "mp3",
+      "sampleRate": 22050,
+      "channels": 1
+    },
+    {
+      "id": "check-not-middle",
+      "text": "가운데로 가지 말고 오른쪽으로 가세요.",
+      "seconds": 2.965714,
+      "bytes": 24493,
+      "sha256": "2f0f2376d03f9716d79e84dbaea8e8e125055059568cc68f4e0c6fa857797d8d",
+      "codec": "mp3",
+      "sampleRate": 22050,
+      "channels": 1
+    },
+    {
+      "id": "check-no-fence",
+      "text": "울타리가 없으니까 뛰지 않아도 돼요.",
+      "seconds": 2.823356,
+      "bytes": 23448,
+      "sha256": "fe19073ace74f4f7c551d6ebe4068705640428bbad295137a1b05e8fedc93405",
+      "codec": "mp3",
+      "sampleRate": 22050,
+      "channels": 1
+    },
+    {
+      "id": "check-high-sign",
+      "text": "표지판이 높아서 숙이지 않아도 돼요.",
+      "seconds": 2.650068,
+      "bytes": 21985,
+      "sha256": "6a2592f2bbb15628d1b7f4b5f8fe4fd5e4123330b84df227e153de165d81984d",
+      "codec": "mp3",
+      "sampleRate": 22050,
+      "channels": 1
+    },
+    {
+      "id": "check-not-left",
+      "text": "왼쪽으로 가지 마세요. 오른쪽 길이 좋아요.",
+      "seconds": 3.041905,
+      "bytes": 25120,
+      "sha256": "a3bd4994520f169ef74fe4d6935bd7ae6dc72fab19761b11b071c2f5535bf809",
+      "codec": "mp3",
+      "sampleRate": 22050,
+      "channels": 1
+    },
+    {
+      "id": "check-duck-jump",
+      "text": "먼저 몸을 숙이고, 그다음에 울타리를 뛰어넘으세요.",
+      "seconds": 3.714966,
+      "bytes": 30554,
+      "sha256": "972d316869f4f05fa82a700a1c062adb9b4119f003c4f443ff1246855449b5e4",
+      "codec": "mp3",
+      "sampleRate": 22050,
+      "channels": 1
+    },
+    {
+      "id": "check-middle-left",
+      "text": "가운데로 간 다음, 왼쪽으로 가세요.",
+      "seconds": 2.713107,
+      "bytes": 22403,
+      "sha256": "a795bc87f19aa05b50d7386dd84cbaf9d7ba190cbf0a8b4757381c91c2d151d0",
+      "codec": "mp3",
+      "sampleRate": 22050,
+      "channels": 1
+    },
+    {
+      "id": "check-right-before-jump",
+      "text": "뛰어넘기 전에 오른쪽으로 가세요.",
+      "seconds": 2.57746,
+      "bytes": 21358,
+      "sha256": "4f2a759ea3aa3a04517a49323cc6cee958cf3b31bc49371f44e4074de99de8e1",
+      "codec": "mp3",
+      "sampleRate": 22050,
+      "channels": 1
+    },
+    {
+      "id": "check-left-run",
+      "text": "왼쪽으로 간 다음, 그냥 달리세요.",
+      "seconds": 2.62907,
+      "bytes": 21776,
+      "sha256": "a9442b1e03455582821e72ac3871ecc8b0cbf168f5348d6408535de4ff201add",
+      "codec": "mp3",
+      "sampleRate": 22050,
+      "channels": 1
+    }
+  ],
+  "totalBytes": 659056
+}
