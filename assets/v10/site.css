@@ -1,6 +1,7 @@
-/* SYNK 홈페이지 v10 · 2026-10-10
-   밝은 종이 위에 펠트 물건 하나, 큰 글자와 가는 선. 어두운 면은 질문 구획 한 곳에만 쓴다.
-   근거: Recent(recent.design) 10-09 기준 Web 121개·인기 80개·웹사이트 40개 집계(docs는 site-v10/README.md). */
+/* SYNK 홈페이지 v10 · 2026-10-10 · 검정 판
+   v10의 큰 글자·가는 선·펠트 물건 하나 위에, 10-07 「night signal」의 밤 바탕·사업 색 포스터·번호 붙은 구획을 입혔다(맨 끝의 검정 층).
+   첫 화면은 처마 사진 입구 — 처마 밑으로 들어가는 싱ㅋ와 아틀라스·회사 소개 두 입구.
+   근거: Recent(recent.design) 10-09·10-10 집계(site-v10/README.md). */
 
 @font-face{font-family:'SUIT Variable';src:url('/assets/suit.woff2') format('woff2');font-weight:100 900;font-display:swap}
 @font-face{font-family:'SYNK Latin';src:url('/assets/inter-tight.woff2') format('woff2');font-weight:400 599;font-display:swap;unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+2000-206F,U+20AC,U+2122,U+2190-21FF,U+2212}
@@ -169,63 +170,113 @@ main{display:block}
 @media (max-width:860px){.sec-head{grid-template-columns:minmax(0,1fr);gap:18px}}
 .rule{height:1px;background:var(--line);border:0;margin:0}
 
-/* ---------- 싱ㅋ 표지(회사 첫 화면) ----------
-   거의 검은 바탕에 아주 큰 싱ㅋ, 작은 고정폭 라벨과 1px 선, 계기판 같은 숫자. 플랫폼 「싱ㅋ 시그널」과 같은 문법이다.
-   ㅇ 아래의 코랄빛은 떠오르는 별(새로 떠오르는 회사). 글자는 처음 한 번만 아래에서 떠오르고, 움직임 줄이기 설정이면 바로 보인다. */
-.cover{--c-ink:#fafaf9;--c-ink-2:rgba(250,250,249,.72);--c-ink-3:rgba(250,250,249,.56);--c-line:rgba(250,250,249,.14);
-  position:relative;isolation:isolate;overflow:hidden;background:#060709;color:var(--c-ink);min-height:100svh;display:flex;flex-direction:column;justify-content:center;
-  padding-top:clamp(112px,12vw,150px);padding-bottom:clamp(28px,3.4vw,44px)}
-.cover-top{display:flex;align-items:center;gap:18px;margin-bottom:clamp(26px,4vw,52px)}
+/* ---------- 입구(회사 첫 화면, 2026-10-10 검정 판) ----------
+   처마 사진(보는 사람의 시간에 맞는 하늘 한 장) 위에 아주 큰 싱ㅋ를 두고, 같은 사진에서 오려 낸 처마를 한 겹 더 얹어 싱ㅋ가 처마 밑으로 들어가 보이게 한다.
+   층: 하늘 → 견본선·싱ㅋ·자모 꼬리표 → 처마 → 위 정보 줄·두 입구. 하늘과 처마는 같은 사진을 같은 자리에 깔아 겹쳐도 어긋나지 않는다.
+   아래쪽 어둠은 하늘·처마 두 층에만 깔아(싱ㅋ 위는 덮지 않는다) 두 입구 글자를 받친다. 움직임은 싱ㅋ가 처음 한 번 떠오르는 것뿐이다. */
+.gate{--img:url('/assets/korean-eaves-night-20260927.webp');--roof:url('/assets/v10/eaves-roof-land.webp');--pos:100% 38%;
+  --g-ink:#fafaf9;--g-ink-2:rgba(250,250,249,.76);--g-line:rgba(250,250,249,.3);
+  --mark-top:clamp(150px,19svh,176px);--mark-w:min(57vw,calc((100svh - 410px) * 1.7073));--mark-h:calc(var(--mark-w) * .5857);
+  --fade:calc(var(--mark-top) + var(--mark-h) + 14px);
+  position:relative;isolation:isolate;height:100svh;min-height:640px;overflow:hidden;background:#08090c;color:var(--g-ink)}
+html[data-sky="sunset"] .gate{--img:url('/assets/korean-eaves-sunset-20260927.webp')}
+html[data-sky="day"] .gate{--img:url('/assets/korean-eaves-day-20260927.webp');--g-ink:#0a0c12;--g-ink-2:rgba(10,12,18,.74);--g-line:rgba(10,12,18,.3)}
+.gate-sky,.gate-roof{position:absolute;inset:0;background-image:linear-gradient(rgba(8,9,12,0) var(--fade),rgba(8,9,12,.8) calc(var(--fade) + 9%),#08090c 97%),var(--img);
+  background-size:100% 100%,cover;background-position:0 0,var(--pos);background-repeat:no-repeat}
+.gate-sky{z-index:0}
+html[data-sky="sunset"] .gate-sky::after{content:"";position:absolute;inset:0;background:radial-gradient(70% 80% at 22% 36%,rgba(20,8,30,.42),rgba(20,8,30,0) 72%)}
+.gate-roof{z-index:3;-webkit-mask:var(--roof) var(--pos)/cover no-repeat;mask:var(--roof) var(--pos)/cover no-repeat}
+.gate-type{position:absolute;z-index:2;left:var(--gut);top:var(--mark-top);width:var(--mark-w);color:var(--g-ink)}
+.gate .singk .sk-hole{fill:none}
+/* 견본선: 윗선 · 받침선(ㅇ 위) · 기준선. 화면 끝까지, 처마 뒤로 지나간다 */
+.gate-guides{position:absolute;z-index:-1;left:calc(var(--gut) * -1);width:100vw;inset-block:0;pointer-events:none}
+.gate-guides i{position:absolute;left:0;right:0;height:1px;background:var(--g-line)}
+.gate-guides i:nth-child(1){top:2.4%}.gate-guides i:nth-child(2){top:58.5%}.gate-guides i:nth-child(3){top:98.2%}
+/* 자모 꼬리표: 「S 시옷 · Y 이 · K 키읔 · N 이응」 — 싱ㅋ가 SYNK의 한글 표기라는 것을 글자 견본처럼 보인다 */
+.gate .tag{position:absolute;display:flex;align-items:center;gap:8px;font:400 12px/1.2 var(--mono);letter-spacing:.06em;color:var(--g-ink-2);white-space:nowrap}
+.gate .tag b{font:700 13.5px/1 var(--sans);letter-spacing:0;color:var(--g-ink)}
+.gate .tag .ko{font-weight:600}
+.gate .tag.up{transform:translate(-50%,-100%);flex-direction:column;gap:6px}
+.gate .tag.up::after{content:"";width:1px;height:16px;background:var(--g-line)}
+.gate .tag.side{transform:translate(0,-50%)}
+.gate .tag.side::before{content:"";width:22px;height:1px;background:var(--g-line)}
+.gate-top{position:absolute;z-index:5;left:var(--gut);right:var(--gut);top:92px;display:flex;align-items:center;gap:16px;font:400 12.5px/1 var(--mono);letter-spacing:.08em;color:var(--g-ink-2)}
+.gate-top .rule{flex:1;height:1px;background:var(--g-line)}
+/* 두 입구: 아래쪽 어둠 위에서는 하늘과 상관없이 흰 글자 */
+.gate-doors{--g-ink:#fafaf9;--g-ink-2:rgba(250,250,249,.76);--g-line:rgba(250,250,249,.26);
+  position:absolute;z-index:5;left:var(--gut);right:var(--gut);bottom:clamp(22px,3.6svh,40px);display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) auto;column-gap:clamp(20px,3vw,44px);align-items:end;color:var(--g-ink)}
+.gate-kicker{grid-column:1/-1;margin:0 0 14px;display:flex;gap:6px 14px;align-items:baseline;flex-wrap:wrap}
+.gate-kicker b{font-size:15px;font-weight:700;color:#ff9a8a}
+.gate-kicker span{font-size:15px;font-weight:600;color:var(--g-ink-2)}
+.door{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:end;gap:8px 16px;padding:14px 0 4px;border-top:1px solid var(--g-line);text-decoration:none;color:var(--g-ink)}
+.door small{grid-column:1/-1;font:400 12.5px/1 var(--mono);letter-spacing:.06em;color:var(--g-ink-2)}
+.door strong{font-size:clamp(28px,2.7vw,40px);font-weight:760;letter-spacing:-.04em;line-height:1.1}
+.door>span{display:inline-flex;align-items:center;gap:6px;font-size:14.5px;font-weight:700;color:var(--g-ink-2);padding-bottom:8px;white-space:nowrap}
+.door .arr{font-family:var(--mono);transition:transform .2s var(--ease)}
+.door:hover>span{color:var(--g-ink)}
+.door:hover .arr{transform:translateX(3px)}
+.gate-acts{display:flex;gap:4px;align-items:center;padding-bottom:2px}
+.gate-acts .btn{min-height:48px}
+.gate-home{display:inline-flex;align-items:center;gap:8px;min-height:48px;padding:0 12px;color:var(--g-ink-2);text-decoration:none;font-weight:700;font-size:15px;white-space:nowrap}
+.gate-home:hover{color:var(--g-ink)}
+.gate-home .arr{font-family:var(--mono)}
+.gate :focus-visible{outline-color:currentColor}
+@media (max-width:1100px){.gate-doors{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.gate-acts{grid-column:1/-1;margin-top:16px}}
+/* 휴대폰·세로로 긴 화면: 세로 사진, 하늘 아래에 두 입구 */
+@media (max-width:700px),(max-aspect-ratio:4/5){
+  .gate{--roof:url('/assets/v10/eaves-roof-port.webp');--img:url('/assets/korean-eaves-night-portrait-20260927.webp');--pos:70% 92%;--sky-h:min(128vw,78svh);
+    --mark-top:150px;--mark-w:min(calc(100vw - 40px),640px);--fade:calc(var(--mark-top) + var(--mark-h) + 10px);height:auto;min-height:0;padding-bottom:34px}
+  html[data-sky="sunset"] .gate{--img:url('/assets/korean-eaves-sunset-portrait-20260927.webp')}
+  html[data-sky="day"] .gate{--img:url('/assets/korean-eaves-day-portrait-20260927.webp')}
+  .gate-sky,.gate-roof{bottom:auto;height:var(--sky-h)}
+  .gate-top{top:84px}.gate-top .brands{display:none}
+  .gate .tag{font-size:10.5px;gap:5px}.gate .tag b{font-size:12px}.gate .tag.up::after{height:10px}.gate .tag.side::before{width:12px}
+  .gate-doors{position:relative;left:auto;right:auto;bottom:auto;margin:calc(var(--sky-h) - 64px) var(--gut) 0;grid-template-columns:minmax(0,1fr);row-gap:0}
+  .gate-acts{grid-column:auto;margin-top:18px}
+}
+
+/* ---------- 회사 소개 머리(#top) ----------
+   예전 주소 /#top이 여는 회사 본문의 머리. 큰 두 톤 제목과 설명, 계기판 같은 숫자 셋. */
+.cover{--c-ink:#fafaf9;--c-ink-2:rgba(250,250,249,.74);--c-ink-3:rgba(250,250,249,.58);--c-line:rgba(250,250,249,.14);
+  position:relative;background:var(--paper);color:var(--c-ink);padding-top:clamp(84px,9vw,128px);padding-bottom:clamp(8px,1.4vw,20px)}
+/* /#top·「회사 소개」로 오면 이 머리가 화면 맨 위에서 시작한다(자체 위 여백이 메뉴를 비킨다). 입구 아래 글씨가 메뉴 뒤로 비치지 않게 */
+.cover{scroll-margin-top:-96px}
+.cover-top{display:flex;align-items:center;gap:18px;margin-bottom:clamp(26px,3.4vw,44px)}
 .cover-top .eyebrow{margin:0;color:var(--c-ink-3);flex:none}
 .cover-top .eyebrow .dot{background:#f96859;box-shadow:0 0 0 4px rgba(249,104,89,.18)}
 .cover-rule{flex:1;height:1px;background:var(--c-line)}
-.cover-brands{margin:0;flex:none;font-size:12px;letter-spacing:.08em;color:var(--c-ink-3)}
-.cover-main{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:clamp(28px,4.4vw,72px);align-items:end}
-.cover-mark{position:relative;color:var(--c-ink);width:min(100%,calc(58svh * 560 / 328))}
-.cover-mark::before{content:"";position:absolute;z-index:-1;left:28%;top:78%;width:96%;aspect-ratio:2/1;transform:translate(-50%,-50%);
-  background:radial-gradient(closest-side,rgba(249,104,89,.62),rgba(249,104,89,.26) 46%,rgba(249,104,89,.08) 72%,rgba(249,104,89,0));filter:blur(16px)}
-.singk .sk-hole{fill:#060709}
-.singk{display:block;width:100%;height:auto;overflow:visible}
-.cover-copy{padding-bottom:6px}
-.cover-kicker{margin:0 0 18px;font-size:15px;font-weight:700;letter-spacing:-.01em;color:#ff8a7a}
-.cover-title{font-size:clamp(32px,3.3vw,50px);line-height:1.08;letter-spacing:-.045em;font-weight:820;color:var(--c-ink);text-wrap:balance}
+.cover-brands{margin:0;flex:none;font-size:12.5px;letter-spacing:.08em;color:var(--c-ink-3)}
+.cover-main{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(24px,3vw,40px) clamp(28px,4.4vw,72px);align-items:start}
+.cover-main .cover-title{grid-column:1/-1}
+.cover-copy{grid-column:2}
+.cover-title{font-size:clamp(40px,5.4vw,80px);line-height:1.04;letter-spacing:-.05em;font-weight:800;color:var(--c-ink);text-wrap:balance}
 .cover-title>span{display:block}
 .cover-title .tone{color:rgba(250,250,249,.46)}
-html[lang="en"] .cover-title{font-size:clamp(30px,2.95vw,44px);letter-spacing:-.04em}
-.cover .lead{margin-top:22px;color:var(--c-ink-2);font-size:clamp(16px,1.18vw,18px);max-width:34em}
-.cover .btns{margin-top:30px}
+html[lang="en"] .cover-title{font-size:clamp(36px,4.4vw,64px);letter-spacing:-.042em}
+.cover .lead{color:var(--c-ink-2);font-size:clamp(16px,1.25vw,19px);max-width:34em}
+.cover .btns{margin-top:28px}
 .btn-light{background:var(--c-ink,#fafaf9);color:#0b0b0d}
 .btn-light:hover{background:#fff;transform:translateY(-1px)}
 .btn-ghost{background:transparent;color:var(--c-ink,#fafaf9);border-color:rgba(250,250,249,.3)}
 .btn-ghost:hover{border-color:var(--c-ink,#fafaf9);transform:translateY(-1px)}
-.cover-home{display:inline-flex;align-items:center;gap:8px;min-height:52px;padding:0 6px;color:var(--c-ink-2);text-decoration:none;font-weight:700;font-size:15px}
-.cover-home:hover{color:var(--c-ink)}
-.cover-home .arr{font-family:var(--mono)}
-.cover-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));margin:clamp(34px,5vw,64px) 0 0;border-top:1px solid var(--c-line)}
+.cover-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));margin:clamp(40px,5vw,64px) 0 0;border-top:1px solid var(--c-line)}
 .cover-stats>div{display:flex;flex-direction:column-reverse;justify-content:flex-end;gap:8px;padding:20px 20px 0;border-left:1px solid var(--c-line)}
 .cover-stats>div:first-child{border-left:0;padding-left:0}
 .cover-stats dd{margin:0;font-size:clamp(40px,4.6vw,68px);font-weight:700;letter-spacing:-.04em;line-height:.95;font-variant-numeric:tabular-nums}
 .cover-stats dt{font-size:14px;font-weight:600;color:var(--c-ink-3)}
+/* 싱ㅋ는 처음 한 번만 아래에서 떠오른다(처마 뒤에서 올라오는 것처럼). 움직임 줄이기 설정이면 바로 보인다 */
 @keyframes sk-rise{from{opacity:0;transform:translateY(14%)}to{opacity:1;transform:none}}
-@keyframes sk-glow{from{opacity:0}to{opacity:1}}
+.singk{display:block;width:100%;height:auto;overflow:visible}
 .singk>*{transform-box:fill-box;animation:sk-rise .9s var(--ease) both}
 .singk .sk-i{animation-delay:.06s}
 .singk .sk-k{animation-delay:.12s}
 .singk .sk-o{animation-delay:.3s}
-.cover-mark::before{animation:sk-glow 1.4s .4s var(--ease) both}
-@media (prefers-reduced-motion:reduce){.singk>*,.cover-mark::before{animation:none}}
-/* 짧은 세로 화면(1440×768 등)에서도 숫자 셋이 첫 화면에 들어오게(Fable 검수 ☆-4) */
-@media (min-width:1001px) and (max-height:820px){.cover{padding-top:96px}.cover-top{margin-bottom:24px}.cover-stats{margin-top:28px}.cover-mark{width:min(100%,calc(52svh * 560 / 328))}}
-@media (max-width:1000px){
-  .cover{min-height:auto;justify-content:flex-start}
-  .cover-main{grid-template-columns:minmax(0,1fr);gap:30px}
-  .cover-mark{width:100%}
-}
+@media (prefers-reduced-motion:reduce){.singk>*{animation:none}}
+@media (max-width:900px){.cover-main{grid-template-columns:minmax(0,1fr);gap:22px}.cover-copy{grid-column:auto}}
 @media (max-width:640px){
   .cover-top{gap:12px}.cover-brands{display:none}
-  .cover-title{font-size:clamp(30px,8.4vw,38px)}
+  .cover-title{font-size:clamp(34px,9.6vw,44px)}
   .cover .btns .btn{flex:1 1 auto}
-  .cover-home{flex:1 1 100%;padding:0;min-height:40px}
   .cover-stats>div{padding:16px 12px 0}
   .cover-stats dt{font-size:12.5px}
 }
@@ -635,3 +686,144 @@ html:not(.js) .reveal{opacity:1;transform:none}
 
 /* 인쇄 */
 @media print{.bar,.ask,.foot-scene,.clip-dialog{display:none!important}.reveal{opacity:1;transform:none}}
+
+/* ── 검정 판(2026-10-10) ─────────────────────────────────────────────
+   유호님 「검정으로 후보 만들어줘, 장점을 합쳐보자」: v10의 글·구성·마감은 그대로 두고, 화면 문법은 10-07 「night signal」 판(밤 바탕, 사업 색 포스터,
+   기울인 흰 스티커 로고, 번호 붙은 구획 머리, 흰 종이 아틀라스 지도)으로. 값은 SYNK 플랫폼 「싱ㅋ 시그널」과 같다
+   (SYNK-appsscript docs/디자인/플랫폼_시그널/README.md). 위의 규칙은 지우지 않고 이 층이 덮는다 — 토큰을 밤으로 뒤집고, 색을 직접 쓴 부품만 짝지어 고친다. */
+:root{
+  --paper:#08090c;--ink:#fafaf9;--ink-2:rgba(250,250,249,.76);--ink-3:rgba(250,250,249,.6);--line:rgba(255,255,255,.12);--line-2:rgba(255,255,255,.2);
+  --stage:#111215;--stage-2:#18191d;--plate:#111215;--plate-2:#18191d;--plate-3:#212227;--night:#111215;--night-2:#18191d;--night-line:rgba(255,255,255,.12);
+  --lab-ink:#ffb4a9;--lab-stage:#1e1311;--shift-ink:#c5d6f5;--shift-stage:#10151f;--pulse-ink:#f8c7de;--pulse-stage:#1c1016;--path-ink:#d3e8be;--path-stage:#121712;
+  --shadow-float:0 1px 0 rgba(255,255,255,.04) inset,0 24px 48px -22px rgba(0,0,0,.8);--shadow-soft:0 18px 40px -24px rgba(0,0,0,.75);
+  color-scheme:dark;
+}
+body{background:var(--paper)}
+::selection{background:rgba(255,255,255,.24);color:#fff}
+:focus-visible{outline-color:#fafaf9}
+.skip{background:#fafaf9;color:#08090c}
+
+/* 위쪽 유리 메뉴: 어디서나 밤 유리(입구·표지 위에서 쓰던 것과 같다) */
+.bar-inner{background:rgba(24,25,30,.62);border-color:rgba(255,255,255,.1);box-shadow:0 1px 0 rgba(255,255,255,.08) inset,0 12px 32px -16px rgba(0,0,0,.7)}
+.bar-logo img{filter:brightness(0) invert(1)}
+.bar-nav a{color:rgba(250,250,249,.74)}
+.bar-nav a:hover{background:rgba(255,255,255,.08);color:#fafaf9}
+.bar-nav a[aria-current="page"],.bar-lang a[aria-current="true"]{color:#fafaf9}
+.bar-brands a[aria-current="page"]{background:#fafaf9;color:#08090c}
+.bar-sep{background:rgba(255,255,255,.16)}
+.bar-cta{background:#fafaf9;color:#0b0b0d}
+.bar-cta:hover{background:#fff}
+.bar-toggle span,.bar-toggle span::before,.bar-toggle span::after{background:#fafaf9}
+.bar.open .bar-toggle span{background:transparent}
+@media (max-width:900px){
+  .bar-panel{background:rgba(17,18,21,.97);border-color:rgba(255,255,255,.1);box-shadow:0 24px 60px -24px rgba(0,0,0,.85)}
+  .bar-panel a:hover{background:rgba(255,255,255,.06)}
+  .bar-panel .panel-row a{background:var(--plate-2)}
+  .bar-panel .panel-row a.dark{background:#fafaf9;color:#08090c}
+}
+@media (prefers-reduced-transparency:reduce){.bar-inner{background:rgba(17,18,21,.97)}}
+
+/* 단추: 주 행동은 흰 알약, 손을 올리면 그 사업 색으로 빛난다. 보조는 1px 선 알약 */
+.btn-dark{background:#fafaf9;color:#08090c;box-shadow:none}
+.btn-dark:hover{background:#fff;box-shadow:0 0 0 6px color-mix(in srgb,var(--accent) 34%,transparent)}
+.btn-line{background:transparent;color:var(--ink);border-color:rgba(255,255,255,.26)}
+.btn-line:hover{border-color:var(--ink)}
+.btn-accent{color:#fff}
+.status::before{box-shadow:0 0 0 3px rgba(47,143,78,.24)}
+.status{color:var(--ink-2)}
+
+/* 사업 페이지의 글자색: 큰 글자·면은 원래 색, 작은 글자는 옅은 실(밤 바탕에서 읽히게) */
+body[data-site="lab"]{--accent-ink:var(--lab-ink)}
+body[data-site="shift"]{--accent-ink:var(--shift-ink)}
+body[data-site="pulse"]{--accent-ink:var(--pulse-ink)}
+body[data-site="path"]{--accent-ink:var(--path-ink)}
+body[data-site="synk"]{--accent:#fafaf9}
+
+/* 사진 설명 알약·사업 줄 */
+.hero-media{background:var(--plate)}
+.hero-media figcaption{background:rgba(17,18,21,.66);border-color:rgba(255,255,255,.12);color:#fafaf9}
+.hero-media figcaption .mono{color:rgba(250,250,249,.62)}
+.brandline img{box-sizing:content-box;height:20px;padding:6px 11px;border-radius:999px;background:#fafaf9}
+.brandline a.is-path img{height:22px;margin-top:0}
+.brandline a:hover{background:linear-gradient(var(--plate),var(--plate))}
+
+/* 체험 카드: 밤 면 위에 실제 제품 화면이 떠 있다 */
+.try-card{background:var(--plate)}
+.try-body{background:var(--plate-2);border-top-color:var(--line)}
+.try-shot img{box-shadow:0 0 0 1px rgba(255,255,255,.06),0 30px 50px -24px rgba(0,0,0,.8)}
+.try-card.tint-path .try-shot{background:radial-gradient(120% 120% at 50% 0%,#2a3a2c 0%,#141a14 72%)}
+.try-card.tint-lab .try-shot{background:radial-gradient(120% 120% at 50% 0%,#4a2a24 0%,#1e1311 72%)}
+.try-card.tint-world .try-shot{background:radial-gradient(120% 120% at 50% 0%,#283048 0%,#12151f 72%)}
+.callout{background:var(--plate)}
+.start-track{background:rgba(255,255,255,.2)}
+.start-switch input:checked+.start-track{background:#f96859}
+.start-switch input:focus-visible+.start-track{outline-color:#fafaf9}
+
+/* 네 사업: 색 면은 포스터(촬영 배경지처럼 왼쪽 위가 살짝 밝은 정지 그라데이션), 펠트 로고는 그 위에 살짝 기울여 붙인 흰 스티커, 상태는 어두운 알약 */
+.biz{background:var(--plate);border-color:transparent}
+.biz:hover{border-color:transparent}
+.biz-stage{background:radial-gradient(120% 110% at 26% 12%,color-mix(in srgb,var(--tint-strong) 82%,#fff) 0%,var(--tint-strong) 46%,color-mix(in srgb,var(--tint-strong) 78%,#000) 100%)}
+.biz-stage img.obj{filter:drop-shadow(0 26px 22px rgba(0,0,0,.32))}
+.biz-stage img.logo{box-sizing:content-box;padding:7px 12px;border-radius:999px;background:#fafaf9;height:22px;transform:rotate(-2.5deg);box-shadow:0 8px 22px rgba(0,0,0,.24)}
+.biz-stage .status{background:rgba(8,9,12,.62);color:#fafaf9;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+.biz-points li::before{box-shadow:0 0 0 3px rgba(255,255,255,.06)}
+@media (max-width:700px){.biz-stage img.logo{height:19px;padding:6px 10px}}
+
+/* 아틀라스: 지도는 어디서나 흰 종이 카드(night signal과 같다). 띠는 한 단 올린 밤 면 */
+.atlas-band{background:var(--plate)}
+.orbit{--ink:#0b0b0d;background:#f4f4f5;border-radius:var(--r-xl);padding:4%}
+.orbit .ring{stroke:#cfcfd5}
+.atlas-band .orbit{max-width:480px}
+.chip{background:var(--plate-2);border-color:var(--line-2);color:var(--ink)}
+.engine-steps{border-top-color:var(--line-2)}
+
+/* 원칙·단계의 위 굵은 선은 흰 1px로 */
+.principles,.steps{border-top-color:rgba(250,250,249,.5)}
+
+/* 창업자 */
+.founder-photo{background:#000}
+
+/* 사업 페이지 첫 화면 무대: 사업 색 포스터 위에 펠트 물건(아틀라스·창업자 페이지는 흰 종이 무대) */
+.b-stage{background:radial-gradient(110% 100% at 28% 14%,color-mix(in srgb,var(--accent) 80%,#fff) 0%,var(--accent) 48%,color-mix(in srgb,var(--accent) 76%,#000) 100%)}
+.b-stage img{filter:drop-shadow(0 34px 26px rgba(0,0,0,.34))}
+.b-stage .status{background:rgba(8,9,12,.62);color:#fafaf9}
+body[data-site="synk"] .b-stage{background:#f4f4f5}
+body[data-site="synk"] .b-stage img{filter:drop-shadow(0 30px 24px rgba(20,16,12,.18))}
+body[data-site="synk"] .b-stage .status{background:rgba(255,255,255,.86);color:#0b0b0d}
+.b-hero .brand-mark{box-sizing:content-box;padding:9px 16px;border-radius:999px;background:#fafaf9;transform:rotate(-2deg);height:clamp(24px,2.4vw,30px)}
+
+/* 서비스 카드·예시 */
+.offer{background:var(--plate);border-color:transparent}
+.offer-example{background:var(--accent-stage)}
+.offer-example li::before{background:var(--plate-3);color:var(--accent-ink)}
+.offer-result div{border-top-color:var(--line-2)}
+.split-media{background:var(--accent-stage)}
+.split-media.shot{background:radial-gradient(120% 120% at 50% 0%,#24252b 0%,var(--accent-stage) 72%)}
+.split-media.shot img{box-shadow:0 0 0 1px rgba(255,255,255,.06),0 30px 50px -24px rgba(0,0,0,.8)}
+.ticks li::before{background-color:#fafaf9}
+.scene figure{background:var(--plate)}
+thead th{background:var(--plate-2)}
+.case{background:var(--plate)}
+
+/* LAB 게임·PULSE 모델 */
+.game-card{background:var(--plate);border-color:transparent}
+.game-thumb{background:var(--plate-2)}
+.model figure{background:var(--plate)}
+
+/* 질문 구획: 밤 바탕 위에 한 단 올린 면과 1px 테 */
+.ask{background:var(--plate);box-shadow:inset 0 0 0 1px var(--line)}
+.ask-contact a,.ask-contact button,.ask-form,.msg-answer{background:var(--plate-2)}
+.msg-user{background:var(--plate-3)}
+/* 흰 알약 단추(묻기·답 아래 주 행동)의 글자는 검정 — 잉크 토큰이 흰색으로 바뀌어 흰 위에 흰이 되지 않게 */
+.ask-form button,.answer-foot .primary{color:#08090c}
+
+/* 대화 상자·알림 */
+.doc-dialog{background:var(--plate);color:var(--ink);box-shadow:0 0 0 1px var(--line),0 30px 80px -30px rgba(0,0,0,.85)}
+.doc-head{background:var(--plate);border-bottom-color:var(--line)}
+.doc-close{background:transparent;border-color:var(--line-2);color:var(--ink)}
+.biz-dialog{background:var(--plate);color:var(--ink);box-shadow:0 0 0 1px var(--line),0 30px 80px -30px rgba(0,0,0,.85)}
+.toast{background:#fafaf9;color:#08090c}
+
+/* 바닥: 펠트 마당 그림 아래는 한 단 더 깊은 밤 */
+.foot-body{background:#050608}
+.foot-bottom{border-top-color:var(--line)}
