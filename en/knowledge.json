@@ -1,5 +1,5 @@
 {
-  "version": "2026-09-15-selected-experiences-copy-9bfc4e4ce8-rhythm-20261001-copy-3910676d01-release-copy-3e4ed3be6d-en-002b14631325-bm-platform-20261007-a885b0d303-travel-20261007-ce148dd860-real-20261007-ab58ee7076-homepage-current-20261009-033c24b61f29-homepage-v10-20261010-c0b34e3a81c0",
+  "version": "2026-09-15-selected-experiences-copy-9bfc4e4ce8-rhythm-20261001-copy-3910676d01-release-copy-3e4ed3be6d-en-002b14631325-bm-platform-20261007-a885b0d303-travel-20261007-ce148dd860-real-20261007-ab58ee7076-homepage-current-20261009-033c24b61f29-homepage-v10-20261010-fe35aad07ed4",
   "updatedAt": "2026-10-10",
   "docs": [
     {
@@ -32,8 +32,8 @@
         "Start by deciding what you need now. Learning Korean, a personalized service for your company, video or music, or travel and study plans each point to a different page.",
         "Each business page separates what you can do today from what is in preparation, and what you would receive and on what terms. Trying the free Seoul planner and Korean games first is another way in.",
         "We do not claim proven effects or superiority over other companies based on the examples on our site. Ask through the contact form or hello@synk.im and we will tell you what is possible today.",
-        "We are currently preparing a new business registration. Once it is complete, we will provide the actual registration details.",
-        "The “© 2026 SYNK. All rights reserved.” notice in the footer is SYNK’s copyright notice. Please check separately which uses of individual works, logos, and characters are permitted.",
+        "The site does not yet show a business registration number. We are preparing a new business registration and will publish the actual registration details once it is complete. If you need confirmation, write to hello@synk.im.",
+        "“© 2026 SYNK. All rights reserved.” at the bottom is the copyright notice. If you want to use our work, logos or characters, please ask about the permitted scope separately.",
         "SYNK’s founder is Yuho Yang. He studied architecture and psychology, performed on stage and screen, and worked as deputy director of Skyline Edu, an academy in Ulaanbaatar, Mongolia.",
         "Working at the academy in Mongolia, he knew each student needed different help but never had time to tailor it to each one. He started SYNK to do that with technology.",
         "Setting the company’s direction, and deciding what to hand to AI and what to check himself, is also the founder’s job.",
@@ -131,11 +131,12 @@
         "For the level at which you could join regular classes, tell us why you are learning and your current level and we will let you know.",
         "Adults are also among LAB’s intended learners. LAB is preparing education for everyone who wants to learn Korean. Available programs, levels, and class formats will be announced for each program.",
         "This does not mean regular online classes are currently running. Share your learning goals and available times through the contact form or hello@synk.im to check preparation status and participation requirements.",
-        "We are preparing classes in which teachers understand students and determine their learning direction. AI assists with tasks such as organizing records and materials.",
-        "Students’ education is not left entirely to AI. Check each program’s information for the actual teaching approach and teachers’ responsibilities.",
-        "Start by talking about what the student wants to do in Korean. Check the teaching approach, teachers’ roles, costs and time commitments, and support conditions.",
-        "We are preparing ways to explain which expressions students can now use and where they need help. We are currently preparing the education programs and opening.",
-        "The content and frequency of guardian updates and access to records will be explained for each program. This question panel cannot retrieve a student’s personal learning records or verify guardian access.",
+        "No. A teacher teaches the class. The teacher gets to know each student and sets the direction; Atlas helps by recording the student’s answers and where they needed help, and by suggesting the next practice.",
+        "The one-year course is being prepared as a regular in-person programme with textbook lessons and group speaking. Of each 90-minute class, 60 minutes are lesson and practice and 30 minutes are group speaking. Conversation with native Korean speakers and the English classes are taught by people too.",
+        "The AI does not teach or grade on its own. The Korean games published so far can be played alone, but their records are not a level or pass judgement, and we have not yet confirmed the learning effect with students.",
+        "Start by talking with the student about what they want to do in Korean. Then check how the course is taught, the teacher’s role, the length and cost, and the support conditions. The one-year course is still being prepared, so enrolment dates and fees will be announced once they are set.",
+        "When the course opens, we will also explain how we tell guardians what the student can now express and where they need help. What is shared, how often, and who can view records will be set in the course guide.",
+        "This question box cannot look up a student’s learning records or confirm guardian access. The free Korean games can be played without signing up, and records made without logging in stay in that browser only.",
         "We aim for Level 4 with life after admission in mind. Some universities admit students at Level 3, but graduation, scholarships and part-time work often use Level 4 as the benchmark.",
         "TOPIK II PBT · out of 300 — Level 3: 120–149 / Level 4: 150–189",
         "TOPIK II IBT · out of 600 — Level 3: 191–290 / Level 4: 291–360",
@@ -233,11 +234,9 @@
         "Features, deliverables, which source files you can edit, schedule and price are set in each contract, and client results are checked together after launch.",
         "SHIFT services use Atlas to give each person different guidance. For the companies that adopt them, we also teach staff to use the service on real work material and check the results.",
         "We never present features under test as client results. What problem we set out to solve, what we asked AI to do and why a person revised the result are explained from real work.",
-        "The finished result alone does not explain how it was made. SHIFT shares the approaches tried, what failed, and the reasons behind revisions and decisions so you can draw on them in your own work.",
-        "For example, adding decorative stitching to both the SYNK wordmark and the business names made the website logos difficult to read. We kept the soft texture but reduced the stitching on SYNK so the colors and details of LAB, SHIFT, and PULSE could stand out.",
-        "We wanted to make the characters and objects from our screens in the real world, too. We designed their soft textures with objects you could touch and keep nearby in mind.",
-        "We built the Loom engine to bring those textures to the screen and make them feel alive through small movements and responses.",
-        "In this example, we decided which text should be read first, then adjusted the other decoration. This is an actual design revision, not evidence of a measured effect on customer response or sales.",
+        "Because the result alone does not tell you what method was used or whether you could use it yourself. SYNK writes down the methods tried, the failures and the reasons for each fix, so that you can judge the method and take it into your own work.",
+        "For example, when we made the site logo we put stitch decoration on both the SYNK letters and the business names, and the letters became hard to read. We kept the soft texture and took the stitches off the SYNK letters only, so the word that has to be read first comes first. The felt characters and objects on screen were designed as things you could hold in your hand, and the Loom engine was built to carry that texture onto the screen.",
+        "Today you can see this process in the trials and cases on the home page and on the founder page. SHIFT introductions work the same way: the person in charge tries the service with real material, checks the results and learns to fix things.",
         "SHIFT’s work is bringing a personalized service to one task at a company. Training and consulting, automation and system connections, and service copy and screen branding are taken on as part of that.",
         "Training and consulting — staff learn to use the service on real work material, check results and handle exceptions.",
         "Automation and system connections — split the steps the service handles from those a person checks, and connect repetitive work to existing systems.",
@@ -248,10 +247,11 @@
         "If you need a service or training for company work, tell us who will use it, what problem it should solve and what you need delivered, and we will confirm scope and schedule.",
         "Not only AI lectures. SHIFT’s work is bringing personalized services into company work, and training is provided for the staff who will use and run them.",
         "Staff practise making requests with real work material, comparing and revising results and handling exceptions. Participants, schedule and cost are set per project, and this does not mean an accredited course or institutional agreement is in operation.",
-        "We do not guarantee the same results as the public examples. Results may vary with the working environment, tools, and requests. Our own production examples cannot establish a promise of business success, revenue, or time savings.",
-        "After introduction, we compare completion, errors, time and introduction and support costs with the existing method. Live client operations, effects and profitability have not yet been validated.",
-        "Where work can be shared publicly, we also show failures and revisions. Using actual work, we explain what we asked for, what came back, and why we changed the approach.",
-        "We do not publish private student or client materials or internal operating documents.",
+        "We do not guarantee the same results. The cases on the site were made by SYNK ourselves, and operation at real client companies, its effect and its profitability have not been verified yet. Nor do we claim that using AI makes a business succeed.",
+        "SHIFT introduces a personalized service to one task at one company and checks task completion, errors, handling time and support load against how things were before. Results depend on the company’s material, the task and the people using it.",
+        "Costs are split into an initial setup fee, a regular usage and operation fee, and extra usage or development. We set the scope with each company first, then quote.",
+        "For work we can show publicly, we present the fixes as well as the finished result: where we got stuck and why we changed the method, based on the actual work. On the home page, “How these trials were made” lists the starting problem, what we built, what it can do now and what to know before using it, in the same order each time.",
+        "There is no collection of the exact prompts we sent to AI tools. The cases do explain what we asked for and what came back. Students’ and clients’ material and private operational documents are not published.",
         "SHIFT brings a personalized service to one task at a company. The four candidates are personalized purchase advice, product onboarding, an expert coaching service and sales and customer service training.",
         "Along the way we can also take on staff training and consulting, automation and system connections, and service copy and screen branding. Interviewing the people who will use the service and watching them try it are part of the process.",
         "Start with one task and make sure it is really used. We choose one piece of work where each person needs different guidance and begin by agreeing who has to finish what.",
@@ -337,11 +337,9 @@
         "Hire is in preparation and we are not taking bookings yet. We will announce the location, equipment, available dates, rates, and on-site support once they are decided.",
         "The product, people and style rules set at the start carry into every later video. With two Atlas engines — Loom for the picture and Reed for sound — we set the rules for scene layout, motion and sound so that many videos still look like one brand.",
         "We first fix the reference material for the product and people and what must be shown, then lay out scenes, motion and sound and review them against the finished result. What the brand receives is finished video and images for each channel.",
-        "We are preparing a service for founders, instructors and freelancers that turns existing photos into AI portraits and introduction content into a slide deck, ready to adapt for websites, social media, proposals and course introductions.",
-        "Profile images — We use photos of you or an adult who has consented to the work, checking facial features while creating profile images for the intended use.",
-        "A finished introduction deck — We arrange the experience, services and examples you provide alongside the finished images in an introduction deck delivered as PPTX and PDF.",
-        "Editable templates — We include editable slide templates so you can update the photos and text for future use.",
-        "This service is in preparation. Image and slide counts, revisions, timing and pricing will be confirmed before sales begin. An in-person photo shoot is not included."
+        "It is in preparation. The service makes AI profile photos from pictures you already have and organises your introduction into a deck, for founders, instructors and freelancers. We are not taking orders yet.",
+        "We only use photos of you, or of an adult who has agreed to the work. The plan is to deliver a finished version you can show right away plus an editable template where you can swap photos and text. Photography is not included.",
+        "The number of photos, the number of slides, the revision scope, schedule and price will be set before sale. If you would like to talk it through early, ask PULSE."
       ],
       "updatedAt": "2026-10-10"
     },
@@ -359,9 +357,9 @@
         "We look at whether it helped, not just whether it was finished — whether people can now do more without help, whether the suggestion was right, and whether it was easy to use.",
         "We check that explanations are clear, screens are easy to use and promised features work. A new method is not rolled out if results get worse for anyone, in their 20s or their 60s.",
         "People can choose large text, shorter explanations or a sound-free mode, and first-time users should always see their next step.",
-        "We use AI to help with repetitive recording, organization, and production. People understand one another, build relationships, and make important decisions.",
-        "When students change their goals or preferences, their education should be able to reflect that. We record what students say, what teachers observe, and what AI infers as distinct types of information.",
-        "We distinguish between what is planned, what has been built, what is actually in use, and what has demonstrated results."
+        "Repeated guidance, sorting and record-keeping go to the service; exceptions that need judgement, relationships between people and important decisions stay with people. At LAB the teacher runs the class and sets the direction; at SHIFT the person in charge checks results and handles exceptions.",
+        "The standard for using technology is the six principles on the home page. We do not guess from age, gender or nationality; we fit to the settings you chose and what you actually did. Finishing something is not proof of progress, so we check separately whether you can do more without help.",
+        "What you wrote and what you actually did stay as the original record. Anything the AI inferred is marked separately so you can check and correct it. Anything still in preparation is labelled as such, and we do not promise results we have not confirmed."
       ],
       "updatedAt": "2026-10-10"
     },
@@ -376,30 +374,32 @@
         "Contact us through the website form or at hello@synk.im. You do not need to attach students’ or customers’ private materials to your first enquiry. Whether to proceed, the schedule, and the contract are determined after consultation. This question box does not submit enquiries.",
         "This question box cannot confirm enrollment dates, tuition fees, quotes, refunds, or contract terms. Please check separately whether a service in preparation is currently accepting applications.",
         "Use the contact form or email hello@synk.im to tell us which course or output you are interested in and your preferred timeline. We will check what is currently available and explain the terms.",
-        "This question feature keeps the conversation only in the page you currently have open. It does not send your questions to a server to process answers or save them in browser storage. Starting a new conversation or refreshing the page clears the conversation.",
-        "This question box does not submit enquiries. Please do not enter sensitive personal, student, or customer information. If you follow an external link, check that service’s information about data handling. The website’s privacy notice is linked below.",
-        "If you use this guide through an AI agent in a supported browser, that browser’s and agent’s data handling also applies. Copying an answer puts a copy on your device’s clipboard. There is no feature that automatically hides sensitive information you enter.",
+        "Nowhere. Your question is matched against the published material inside this screen and is not sent to SYNK’s servers or to an outside AI. Nothing is saved in cookies or browser storage either, so the conversation disappears when you reload the page.",
+        "This question box is not an enquiry form or a consultation request. Please do not type personal details such as names, phone numbers, student records or passwords. There is no feature that masks personal details automatically.",
+        "“Copy answer” leaves a copy on your device’s clipboard. If a link in an answer takes you to another service, that service’s rules apply. The details are in the question box section of the privacy policy.",
         "Use the website’s contact form or email hello@synk.im. This question box helps you find information; it does not send or submit enquiries, enrollment applications, or collaboration requests.",
         "In the contact form, select a category, enter the email address where you want to receive a reply, and write your message. Your enquiry is submitted when Google Forms shows its submission confirmation. You can also contact us by email.",
         "For a consultation, use the form or email to tell us what you are interested in and what you would like to know. Please confirm available dates, the format, and any fees separately.",
-        "This guide does not provide private operational materials or internal source documents. It can explain the company’s published direction, real work examples and outputs, and usage scope relevant to a collaboration.",
+        "Private operational material and internal documents are not shown in this question box. We can answer about the published company introduction, the business descriptions, the trials and cases we made ourselves, and the terms of use for working together.",
+        "If you need material for a collaboration, tell us the purpose and what you need at hello@synk.im. We will check what can be shared and reply.",
         "This guide does not provide personal information or private answers, consultations, or records belonging to students, guardians, or customers. Even materials with names removed require a separate check before they can be shared publicly.",
         "If you want to understand the teaching approach, explore the published explanations and examples. To ask about your own records or personal information, email hello@synk.im to confirm the available process.",
-        "Our current public materials do not contain measured revenue, effectiveness, or success-rate comparisons with competitors. We do not speculate about certifications, partnerships, assigned instructors, admissions outcomes, or employment results.",
-        "The website shows work we have made and how we revised it. These examples are distinct from actual customer or student outcomes. If you are considering a collaboration, ask us about the outputs you need, the scope of service, and the terms.",
-        "This information cannot be confirmed from our current public materials. We do not speculate about staffing, finances, contracts, partnerships, or unpublished plans.",
-        "If you need information to assess a collaboration, email hello@synk.im with your purpose and the details you want to confirm. We will check what can be shared.",
+        "Not yet. We have published no figures comparing revenue, results or success rates with other companies, and no material confirming customer or student outcomes. We will not guess at such numbers.",
+        "The trials and cases on the site were made by SYNK ourselves. They say what we started from, what we built and how far it goes today, but we do not present them as proof of customer revenue or learning results. We do not promise results, passes or job placement rates.",
+        "If you are considering working with us, tell us what you need, the scope and the conditions. We will answer only within what has been confirmed.",
+        "This question box does not answer about information that is not in the published material: headcount, founding date, finances, contracts and partnerships, and plans not yet announced. We do not guess either.",
+        "If you need it for a collaboration review, send the purpose and what you want to confirm to hello@synk.im. We will reply after checking what can be shared.",
         "The question box on this website does not receive consultation requests or retrieve student records. What you type here remains only in the page you have open.",
         "Retention, access, and deletion of records used in actual classes, consultations, and apps must be checked under the relevant service’s privacy policy and identity or guardian verification process. This guide does not mean that all consultation records are unsaved. Email hello@synk.im with the service you used and the purpose of your enquiry.",
-        "This guide does not list any confirmed staff or instructor openings currently accepting applications. Please email hello@synk.im to ask whether recruitment is underway and how to apply.",
-        "This question box does not accept job applications. Before sending a résumé containing personal information, please check whether we are hiring in your area of interest.",
+        "There is no open job or instructor posting right now. If you tell us your field and what you can do at hello@synk.im, we will say whether we can let you know when a position opens.",
+        "This question box does not accept applications. Please confirm that a position is open before sending anything with personal details, such as a CV.",
         "The SYNK LAB public channels currently confirmed are YouTube @synkkorean, Instagram @synk.mn, and Telegram @synkmn. Check each page for its published content and current status.",
         "You can open K-LOFI 24 radio through its YouTube live link. For consultations and collaboration enquiries, email hello@synk.im.",
         "This English guide answers questions in English. Use KR at the top of the page to switch to Korean.",
         "For enquiries in another language, please email hello@synk.im.",
         "I could not find an answer to this question in the public materials.",
         "Please tell me a little more about what you want to know: Korean education, services for organizations, study and career support, or music and creative work. For individual advice, please use the contact form or email.",
-        "Thank you. Feel free to ask whenever you have more questions."
+        "Thank you. Ask again whenever something comes up. For consultations or collaboration proposals, write to hello@synk.im and a person will reply."
       ],
       "updatedAt": "2026-10-10"
     },
@@ -1321,7 +1321,7 @@
         "Why did you remove stitching from SYNK?",
         "Show me an actual revision"
       ],
-      "answer": "The finished result alone does not explain how it was made. SHIFT shares the approaches tried, what failed, and the reasons behind revisions and decisions so you can draw on them in your own work.\n\nFor example, adding decorative stitching to both the SYNK wordmark and the business names made the website logos difficult to read. We kept the soft texture but reduced the stitching on SYNK so the colors and details of LAB, SHIFT, and PULSE could stand out.\n\nWe wanted to make the characters and objects from our screens in the real world, too. We designed their soft textures with objects you could touch and keep nearby in mind.\n\nWe built the Loom engine to bring those textures to the screen and make them feel alive through small movements and responses.\n\nIn this example, we decided which text should be read first, then adjusted the other decoration. This is an actual design revision, not evidence of a measured effect on customer response or sales.",
+      "answer": "Because the result alone does not tell you what method was used or whether you could use it yourself. SYNK writes down the methods tried, the failures and the reasons for each fix, so that you can judge the method and take it into your own work.\n\nFor example, when we made the site logo we put stitch decoration on both the SYNK letters and the business names, and the letters became hard to read. We kept the soft texture and took the stitches off the SYNK letters only, so the word that has to be read first comes first. The felt characters and objects on screen were designed as things you could hold in your hand, and the Loom engine was built to carry that texture onto the screen.\n\nToday you can see this process in the trials and cases on the home page and on the founder page. SHIFT introductions work the same way: the person in charge tries the service with real material, checks the results and learns to fix things.",
       "sourceId": "shift",
       "relatedIds": [
         "shift-takeaway",
@@ -1645,19 +1645,23 @@
         "What guides your use of technology?",
         "How do you see the teacher’s role?"
       ],
-      "answer": "We use AI to help with repetitive recording, organization, and production. People understand one another, build relationships, and make important decisions.\n\nWhen students change their goals or preferences, their education should be able to reflect that. We record what students say, what teachers observe, and what AI infers as distinct types of information.\n\nWe distinguish between what is planned, what has been built, what is actually in use, and what has demonstrated results.",
+      "answer": "Repeated guidance, sorting and record-keeping go to the service; exceptions that need judgement, relationships between people and important decisions stay with people. At LAB the teacher runs the class and sets the direction; at SHIFT the person in charge checks results and handles exceptions.\n\nThe standard for using technology is the six principles on the home page. We do not guess from age, gender or nationality; we fit to the settings you chose and what you actually did. Finishing something is not proof of progress, so we check separately whether you can do more without help.\n\nWhat you wrote and what you actually did stay as the original record. Anything the AI inferred is marked separately so you can check and correct it. Anything still in preparation is labelled as such, and we do not promise results we have not confirmed.",
       "sourceId": "philosophy",
       "relatedIds": [
         "lab-personal",
         "shift-ai",
         "philosophy-quality"
       ],
-      "reviewedAt": "2026-09-14",
+      "reviewedAt": "2026-10-10",
       "aliases": [
         "사람과 AI의 역할은 어떻게 다른가요?",
         "기술을 쓰는 기준이 궁금해요",
         "선생님의 역할을 어떻게 생각하나요?"
-      ]
+      ],
+      "action": {
+        "label": "See the six principles",
+        "href": "/en/#principles"
+      }
     },
     {
       "id": "guide-ask",
@@ -1786,7 +1790,7 @@
         "Are conversations saved?",
         "Where are my questions kept?"
       ],
-      "answer": "This question feature keeps the conversation only in the page you currently have open. It does not send your questions to a server to process answers or save them in browser storage. Starting a new conversation or refreshing the page clears the conversation.\n\nThis question box does not submit enquiries. Please do not enter sensitive personal, student, or customer information. If you follow an external link, check that service’s information about data handling. The website’s privacy notice is linked below.\n\nIf you use this guide through an AI agent in a supported browser, that browser’s and agent’s data handling also applies. Copying an answer puts a copy on your device’s clipboard. There is no feature that automatically hides sensitive information you enter.",
+      "answer": "Nowhere. Your question is matched against the published material inside this screen and is not sent to SYNK’s servers or to an outside AI. Nothing is saved in cookies or browser storage either, so the conversation disappears when you reload the page.\n\nThis question box is not an enquiry form or a consultation request. Please do not type personal details such as names, phone numbers, student records or passwords. There is no feature that masks personal details automatically.\n\n“Copy answer” leaves a copy on your device’s clipboard. If a link in an answer takes you to another service, that service’s rules apply. The details are in the question box section of the privacy policy.",
       "sourceId": "guide",
       "relatedIds": [
         "guide-contact",
@@ -1796,7 +1800,7 @@
         "label": "Website privacy notice",
         "href": "https://synk.im/privacy/#website-questions"
       },
-      "reviewedAt": "2026-09-11",
+      "reviewedAt": "2026-10-10",
       "aliases": [
         "대화는 저장되나요?",
         "질문이 어디에 남나요?"
@@ -1936,7 +1940,7 @@
       "sourceId": "company",
       "brand": "synk",
       "title": "What is your business registration number?",
-      "answer": "We are currently preparing a new business registration. Once it is complete, we will provide the actual registration details.\n\nThe “© 2026 SYNK. All rights reserved.” notice in the footer is SYNK’s copyright notice. Please check separately which uses of individual works, logos, and characters are permitted.",
+      "answer": "The site does not yet show a business registration number. We are preparing a new business registration and will publish the actual registration details once it is complete. If you need confirmation, write to hello@synk.im.\n\n“© 2026 SYNK. All rights reserved.” at the bottom is the copyright notice. If you want to use our work, logos or characters, please ask about the permitted scope separately.",
       "questionExamples": [
         "What is your business registration number?",
         "Can you give me the company registration number?",
@@ -2145,7 +2149,7 @@
       "sourceId": "lab",
       "brand": "lab",
       "title": "Does AI teach children instead of a teacher?",
-      "answer": "We are preparing classes in which teachers understand students and determine their learning direction. AI assists with tasks such as organizing records and materials.\n\nStudents’ education is not left entirely to AI. Check each program’s information for the actual teaching approach and teachers’ responsibilities.",
+      "answer": "No. A teacher teaches the class. The teacher gets to know each student and sets the direction; Atlas helps by recording the student’s answers and where they needed help, and by suggesting the next practice.\n\nThe one-year course is being prepared as a regular in-person programme with textbook lessons and group speaking. Of each 90-minute class, 60 minutes are lesson and practice and 30 minutes are group speaking. Conversation with native Korean speakers and the English classes are taught by people too.\n\nThe AI does not teach or grade on its own. The Korean games published so far can be played alone, but their records are not a level or pass judgement, and we have not yet confirmed the learning effect with students.",
       "questionExamples": [
         "Does AI teach children instead of a teacher?",
         "Will AI teach my child on its own?",
@@ -2165,7 +2169,7 @@
         "label": "Explore LAB’s educational approach",
         "href": "/en/lab/"
       },
-      "reviewedAt": "2026-09-17",
+      "reviewedAt": "2026-10-10",
       "aliases": [
         "AI가 선생님을 대신해 아이를 가르치나요?",
         "AI가 아이를 혼자 가르치는 건가요?",
@@ -2177,7 +2181,7 @@
       "sourceId": "lab",
       "brand": "lab",
       "title": "What should parents and guardians check?",
-      "answer": "Start by talking about what the student wants to do in Korean. Check the teaching approach, teachers’ roles, costs and time commitments, and support conditions.\n\nWe are preparing ways to explain which expressions students can now use and where they need help. We are currently preparing the education programs and opening.\n\nThe content and frequency of guardian updates and access to records will be explained for each program. This question panel cannot retrieve a student’s personal learning records or verify guardian access.",
+      "answer": "Start by talking with the student about what they want to do in Korean. Then check how the course is taught, the teacher’s role, the length and cost, and the support conditions. The one-year course is still being prepared, so enrolment dates and fees will be announced once they are set.\n\nWhen the course opens, we will also explain how we tell guardians what the student can now express and where they need help. What is shared, how often, and who can view records will be set in the course guide.\n\nThis question box cannot look up a student’s learning records or confirm guardian access. The free Korean games can be played without signing up, and records made without logging in stay in that browser only.",
       "questionExamples": [
         "What should parents and guardians check?",
         "I have a question as a parent",
@@ -2389,7 +2393,7 @@
       "sourceId": "shift",
       "brand": "shift",
       "title": "Will SHIFT's methods give me the same business results?",
-      "answer": "We do not guarantee the same results as the public examples. Results may vary with the working environment, tools, and requests. Our own production examples cannot establish a promise of business success, revenue, or time savings.\n\nAfter introduction, we compare completion, errors, time and introduction and support costs with the existing method. Live client operations, effects and profitability have not yet been validated.",
+      "answer": "We do not guarantee the same results. The cases on the site were made by SYNK ourselves, and operation at real client companies, its effect and its profitability have not been verified yet. Nor do we claim that using AI makes a business succeed.\n\nSHIFT introduces a personalized service to one task at one company and checks task completion, errors, handling time and support load against how things were before. Results depend on the company’s material, the task and the people using it.\n\nCosts are split into an initial setup fee, a regular usage and operation fee, and extra usage or development. We set the scope with each company first, then quote.",
       "questionExamples": [
         "Will SHIFT's methods give me the same business results?",
         "Will using AI make my business successful?"
@@ -2421,7 +2425,7 @@
       "sourceId": "shift",
       "brand": "shift",
       "title": "Do you share failures and sample AI prompts?",
-      "answer": "Where work can be shared publicly, we also show failures and revisions. Using actual work, we explain what we asked for, what came back, and why we changed the approach.\n\nWe do not publish private student or client materials or internal operating documents.",
+      "answer": "For work we can show publicly, we present the fixes as well as the finished result: where we got stuck and why we changed the method, based on the actual work. On the home page, “How these trials were made” lists the starting problem, what we built, what it can do now and what to know before using it, in the same order each time.\n\nThere is no collection of the exact prompts we sent to AI tools. The cases do explain what we asked for and what came back. Students’ and clients’ material and private operational documents are not published.",
       "questionExamples": [
         "Do you share failures and sample AI prompts?",
         "Do you publish prompts?",
@@ -2529,7 +2533,7 @@
       "sourceId": "guide",
       "brand": "synk",
       "title": "Can I see private operational materials?",
-      "answer": "This guide does not provide private operational materials or internal source documents. It can explain the company’s published direction, real work examples and outputs, and usage scope relevant to a collaboration.",
+      "answer": "Private operational material and internal documents are not shown in this question box. We can answer about the published company introduction, the business descriptions, the trials and cases we made ourselves, and the terms of use for working together.\n\nIf you need material for a collaboration, tell us the purpose and what you need at hello@synk.im. We will check what can be shared and reply.",
       "questionExamples": [
         "Can I see private operational materials?",
         "Show me internal system documents"
@@ -2543,7 +2547,7 @@
         "shift-publicity",
         "guide-collaboration"
       ],
-      "reviewedAt": "2026-09-11",
+      "reviewedAt": "2026-10-10",
       "aliases": [
         "비공개 운영 자료도 볼 수 있나요?",
         "내부 시스템 자료를 보여주세요"
@@ -2583,7 +2587,7 @@
       "sourceId": "guide",
       "brand": "synk",
       "title": "Do you have verified results or competitor comparison data?",
-      "answer": "Our current public materials do not contain measured revenue, effectiveness, or success-rate comparisons with competitors. We do not speculate about certifications, partnerships, assigned instructors, admissions outcomes, or employment results.\n\nThe website shows work we have made and how we revised it. These examples are distinct from actual customer or student outcomes. If you are considering a collaboration, ask us about the outputs you need, the scope of service, and the terms.",
+      "answer": "Not yet. We have published no figures comparing revenue, results or success rates with other companies, and no material confirming customer or student outcomes. We will not guess at such numbers.\n\nThe trials and cases on the site were made by SYNK ourselves. They say what we started from, what we built and how far it goes today, but we do not present them as proof of customer revenue or learning results. We do not promise results, passes or job placement rates.\n\nIf you are considering working with us, tell us what you need, the scope and the conditions. We will answer only within what has been confirmed.",
       "questionExamples": [
         "Do you have verified results or competitor comparison data?",
         "How many times more did revenue grow compared with other companies?",
@@ -2599,7 +2603,7 @@
         "synk-value",
         "shift-making"
       ],
-      "reviewedAt": "2026-09-17",
+      "reviewedAt": "2026-10-10",
       "aliases": [
         "확인된 성과나 경쟁사 비교 수치가 있나요?",
         "다른 회사보다 매출이 몇 배 늘었나요?",
@@ -2611,7 +2615,7 @@
       "sourceId": "guide",
       "brand": "synk",
       "title": "How can I ask about company information that is not public?",
-      "answer": "This information cannot be confirmed from our current public materials. We do not speculate about staffing, finances, contracts, partnerships, or unpublished plans.\n\nIf you need information to assess a collaboration, email hello@synk.im with your purpose and the details you want to confirm. We will check what can be shared.",
+      "answer": "This question box does not answer about information that is not in the published material: headcount, founding date, finances, contracts and partnerships, and plans not yet announced. We do not guess either.\n\nIf you need it for a collaboration review, send the purpose and what you want to confirm to hello@synk.im. We will reply after checking what can be shared.",
       "questionExamples": [
         "How can I ask about company information that is not public?",
         "How many employees do you have, and when was the company founded?"
@@ -2753,7 +2757,7 @@
       "sourceId": "guide",
       "brand": "synk",
       "title": "Are you hiring staff or instructors?",
-      "answer": "This guide does not list any confirmed staff or instructor openings currently accepting applications. Please email hello@synk.im to ask whether recruitment is underway and how to apply.\n\nThis question box does not accept job applications. Before sending a résumé containing personal information, please check whether we are hiring in your area of interest.",
+      "answer": "There is no open job or instructor posting right now. If you tell us your field and what you can do at hello@synk.im, we will say whether we can let you know when a position opens.\n\nThis question box does not accept applications. Please confirm that a position is open before sending anything with personal details, such as a CV.",
       "questionExamples": [
         "Are you hiring staff or instructors?",
         "Are you recruiting?",
@@ -2876,7 +2880,7 @@
       "sourceId": "guide",
       "brand": "synk",
       "title": "Ending the conversation",
-      "answer": "Thank you. Feel free to ask whenever you have more questions.",
+      "answer": "Thank you. Ask again whenever something comes up. For consultations or collaboration proposals, write to hello@synk.im and a person will reply.",
       "questionExamples": [
         "Ending the conversation"
       ],
@@ -2884,7 +2888,7 @@
       "relatedIds": [
         "synk-choose"
       ],
-      "reviewedAt": "2026-09-11",
+      "reviewedAt": "2026-10-10",
       "aliases": [
         "대화를 마칠 때의 안내"
       ]
@@ -4649,7 +4653,7 @@
         "I need profile images for a founder or instructor introduction",
         "Can you prepare portraits and an editable introduction deck together?"
       ],
-      "answer": "We are preparing a service for founders, instructors and freelancers that turns existing photos into AI portraits and introduction content into a slide deck, ready to adapt for websites, social media, proposals and course introductions.\n\nProfile images — We use photos of you or an adult who has consented to the work, checking facial features while creating profile images for the intended use.\n\nA finished introduction deck — We arrange the experience, services and examples you provide alongside the finished images in an introduction deck delivered as PPTX and PDF.\n\nEditable templates — We include editable slide templates so you can update the photos and text for future use.\n\nThis service is in preparation. Image and slide counts, revisions, timing and pricing will be confirmed before sales begin. An in-person photo shoot is not included.",
+      "answer": "It is in preparation. The service makes AI profile photos from pictures you already have and organises your introduction into a deck, for founders, instructors and freelancers. We are not taking orders yet.\n\nWe only use photos of you, or of an adult who has agreed to the work. The plan is to deliver a finished version you can show right away plus an editable template where you can swap photos and text. Photography is not included.\n\nThe number of photos, the number of slides, the revision scope, schedule and price will be set before sale. If you would like to talk it through early, ask PULSE.",
       "relatedIds": [
         "pulse-studio",
         "pulse-models"
