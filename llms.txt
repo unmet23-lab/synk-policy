@@ -1,267 +1,134 @@
 # SYNK
 
-> 쓸수록 나에게 맞춰지는 엔진을 만듭니다. SYNK는 한국어 교육에서 시작한 개인화 기술 회사입니다. 직접 만든 엔진 아틀라스를 게임과 공부, 일과 상담으로 넓혀 가고 있습니다.
-> SYNK LAB — 한국어를 배우며, 스스로 판단하는 힘을 기릅니다. LAB은 한국 유학과 그 이후의 삶을 준비하는 교육입니다. TOPIK 4급을 분명한 목표로 삼고, 배운 한국어를 실제 상황에서 써 봅니다. AI를 쓰더라도 자기 생각을 설명하고 결과를 판단할 수 있는 사람으로 자라도록 돕습니다.
-> SYNK SHIFT — 한 업무부터, 개인화가 실제로 쓰이게. SHIFT는 고객과 직원에게 필요한 안내가 달라지는 한 업무부터 시작합니다. 누가 어떤 일을 마칠지 정하고, 회사 자료와 전문 모듈을 공통 아틀라스에 연결합니다. 도입 후에는 담당자와 함께 실제 사용 결과와 운영 부담을 확인하며 서비스를 다듬습니다.
-> SYNK PULSE — 맡은 영상은 목적에 맞게, 우리 작품은 다시 보고 싶게 만듭니다. 브랜드가 맡긴 영상은 어디에 쓸지와 누구에게 보여 줄지부터 정하고 만듭니다. PULSE의 음악과 영상, 캐릭터 이야기는 다시 듣고 보고 싶은 작품을 목표로 만듭니다. 두 일 모두 아틀라스의 엔진 가운데 화면을 짜는 Loom과 소리를 다루는 Reed를 제작에 씁니다.
-> SYNK PATH — 여행과 새로운 생활에, 나다운 선택을 더합니다. 같은 도시를 여행해도 좋아하는 하루는 다르고, 한국에서 이루고 싶은 목표도 사람마다 다릅니다. PATH는 본인이 원하는 경험과 예산, 준비 상태를 살펴 여행과 생활의 계획을 함께 세웁니다. 직접 확인한 취향은 다음 여행으로, 학습과 프로젝트 경험은 유학·취업 준비로 이어지도록 돕습니다.
+> 쓸수록 나에게 맞춰지는 엔진을 만듭니다. SYNK는 개인화 엔진 아틀라스를 만드는 회사입니다. 한국어 교육에서 시작해, 지금은 같은 엔진으로 여행 일정을 짜고, 한국어 게임의 다음 문제를 고르고, 기업 서비스와 광고 영상을 만듭니다.
 
-회사의 비전과 핵심 철학, 브랜드별 역할과 현재 준비 범위를 함께 안내합니다. 공개 질문은 작성된 문장을 찾아 보여주며, 문의 접수·결제·계약 확정이나 성과 보장을 하지 않습니다.
+지금 쓸 수 있는 것과 준비 중인 것을 나눠 적었습니다. 홈페이지의 질문창은 공개한 안내 안에서 답을 찾아 보여 주며, 문의 접수·결제·계약 확정이나 성과 보장을 하지 않습니다.
 
-<!-- SYNK PUBLIC COPY START -->
-## 전사 비전
+## 지금 써 볼 수 있는 것
 
-쓸수록 나에게 맞춰지는 엔진을 만듭니다.
+- [내 조건으로 짜는 서울의 하루](https://synk.im/try/travel/) — 시간과 예산, 걷는 양, 함께 가는 사람의 취향을 넣으면 종로 일대의 실제 장소 2~5곳으로 하루 일정을 짭니다. 여행 중에 늦어지면 남은 일정만 다시 짤 수 있습니다.
+- [듣고 움직이며 배우는 한국어 게임](https://synk.im/try/learning-hub/) — 한글을 몰라도 시작하는 입문 놀이 세 가지와, 레이싱·리듬·카페 주문처럼 듣고 읽은 대로 움직이는 게임 여덟 가지가 있습니다.
+- [SYNK WORLD](https://synk.im/world/) — 몽글과 놀고 옷을 갈아입히며, 미니게임과 노래로 한국어를 익히는 작은 세계입니다.
+- [회원 혜택](https://synk.im/care/) — 소중한 사람의 날을 챙기는 플레저, 무료 운세, 중요한 대화를 미리 해 보는 대화 리허설을 씁니다.
+- [SYNK Radio](https://synk.im/listen/) — 일할 때도 쉴 때도 틀어 두는 음악입니다. 몽글·까몽·마린과 해 질 녘 마당에서 들어 보세요.
+- [회의 기록 맞춤 정리](https://synk.im/brief/meeting/) — 회의 종류와 쓰는 AI를 고르면 붙여 넣을 요청문을 만들어 줍니다
+- [AI 컴퓨터 맞춤 추천](https://synk.im/brief/computer/) — 용도와 예산으로 데스크톱·노트북 사양을 계산합니다
+- [AI 직원 매뉴얼 만들기](https://synk.im/builds/) — 질문 다섯 개에 답하면 내 일에 맞는 AI 매뉴얼이 나옵니다
+- [플레저](https://synk.im/care/) — 소중한 사람의 날을 기억하고 내 말투로 마음을 전합니다
+- [무료 운세](https://synk.im/fortune/) — 별자리와 생년월일로 오늘과 이번 주를 돌아봅니다
+- [대화 리허설](https://synk.im/rehearsal/) — 중요한 대화를 앞두고 할 말을 미리 연습합니다
 
-SYNK는 한국어 교육에서 시작한 개인화 기술 회사입니다. 직접 만든 엔진 아틀라스를 게임과 공부, 일과 상담으로 넓혀 가고 있습니다.
+무료 체험은 가입 없이 시작할 수 있습니다. 기록을 저장하는 방식은 프로그램마다 다르고, 가입 전에 남긴 기록이 계정으로 옮겨지지는 않습니다. 실제 장소의 운영 시간과 요금은 방문 전에 다시 확인해 주세요.
 
-## 핵심 철학
+## 네 사업
 
-### 여덟 엔진을 직접 만듭니다
+### SYNK LAB — 한국어를 배우고, 한국에서 공부할 준비까지
 
-무엇이 필요한지 판단하는 일부터 배울 내용의 순서, 해 본 과정의 기록, 설명과 힌트, 도움이 됐는지 확인하는 일까지 여덟 엔진이 나눠 맡습니다. 펠트로 만든 화면과 음악·소리까지 한 팀이 직접 만듭니다. 그래서 한 사람에게 맞춘 내용을 화면과 소리로도 전할 수 있습니다.
+SYNK LAB은 한국어 교재와 학습 게임, 개인화 학습 앱을 만드는 에듀테크 회사입니다. TOPIK 4급을 목표로 한 정규 1년 과정을 준비하고 있고, 지금은 학습 게임을 무료로 공개하고 있습니다.
 
-### 나이로 짐작하지 않습니다
+TOPIK 4급을 목표로 한 1년 과정과 교재, 학습 게임과 개인화 학습 앱을 만듭니다.
 
-나이·성별·국적이 아니라 본인이 고른 설정과 실제로 해 본 결과로 맞춥니다. 같은 사람도 목표가 바뀌면 다음 연습과 제안이 함께 바뀌고, 왜 그렇게 준비했는지 알려 드립니다.
+- 한국어 학습 게임 8종 무료 공개
+- 시냅스 교재 8권 원고 완성
+- 정규 1년 과정 개원 준비
 
-### 도움이 됐는지 확인합니다
+[SYNK LAB 보기](https://synk.im/lab/)
 
-끝까지 했다는 것만으로 늘었다고 말하지 않습니다. 도움 없이 해내는 일이 늘었는지, 제안이 맞았는지, 쓰기 편했는지를 따로 봅니다. 새 방법은 20대든 60대든 어느 한쪽이라도 결과가 나빠지면 넓히지 않습니다.
+### SYNK SHIFT — 사람마다 다른 안내를, 회사 자료로 만듭니다
 
-### 본인의 답과 AI의 추정을 구분합니다
+SYNK SHIFT는 상담, 사용 안내, 코칭, 직원 훈련처럼 사람마다 안내가 달라지는 업무에 개인화 서비스를 도입합니다. 아틀라스에 회사의 제품 정보와 규칙을 연결하고, 도입한 뒤에도 실제로 쓰이는지 함께 확인합니다.
 
-직접 쓴 답과 실제로 한 행동, 선생님이 본 사실을 원본으로 남깁니다. AI가 고치거나 짐작한 내용은 따로 표시해, 본인이 확인하고 바로잡을 수 있게 합니다.
+구매 상담, 제품 사용 안내, 전문가 코칭, 직원 응대 훈련처럼 사람마다 안내가 달라지는 일을 회사 자료로 만듭니다.
 
-### 누구나 오래 쓰게 만듭니다
+- 도입할 업무와 완료 기준부터 함께 정합니다
+- 회사 자료와 규칙을 아틀라스에 연결합니다
+- 도입 뒤 실제 사용과 운영 부담을 확인합니다
 
-큰 글자와 짧은 설명, 소리 없이 쓰는 방법을 본인이 고르게 하고, 처음 쓰는 사람도 다음에 할 일을 바로 알 수 있게 다듬습니다. 무료로 쓰는 기능은 AI 서버를 거치지 않고 기기 안에서 계산하도록 만들어, 많은 사람이 써도 오래 운영할 수 있게 합니다.
+[SYNK SHIFT 보기](https://synk.im/shift/)
 
-이 기준으로 엔진과 서비스, 콘텐츠를 만듭니다. 개발 중인 것과 지금 쓸 수 있는 것은 구분해서 알려 드리며, 이용 범위는 각 브랜드 안내에서 확인할 수 있습니다.
+### SYNK PULSE — 광고·모델 영상을 만들고, 음악과 캐릭터를 키웁니다
 
-## 브랜드 유니버스
+SYNK PULSE는 제품 광고, 브랜드필름, AI 모델 룩북, 사용법 영상을 기획부터 완성본까지 만듭니다. 몽글·까몽·마린의 음악과 이야기도 직접 만들고, 작품 이용과 공동 제작으로 함께할 곳을 찾습니다.
 
-### SYNK LAB — 개인 맞춤 한국어 교육을 설계하는 에듀테크 기업
+제품 광고, 브랜드필름, AI 모델 룩북, 사용법 영상을 만듭니다. 몽글·까몽·마린의 음악과 이야기도 직접 만듭니다.
 
-SYNK LAB은 한국어 교재와 게임, 개인화 엔진 아틀라스를 넣은 학습 앱을 개발하는 에듀테크 기업입니다. TOPIK 4급을 목표로 하는 정규 오프라인 1년 과정과 한국인 원어민 회화·글로벌 영어 수업을 준비합니다. 문화체험과 AI 활용, 협업 과제까지 함께 다루는, 한국 유학과 그 이후의 삶을 위한 교육입니다.
+- AI 모델 여섯 명의 캐스팅북
+- SYNK Radio와 캐릭터 이야기
+- 작품 이용과 공동 제작 협업
 
-**한국어를 배우며, 스스로 판단하는 힘을 기릅니다.**
+[SYNK PULSE 보기](https://synk.im/pulse/)
 
-LAB은 한국 유학과 그 이후의 삶을 준비하는 교육입니다. TOPIK 4급을 분명한 목표로 삼고, 배운 한국어를 실제 상황에서 써 봅니다. AI를 쓰더라도 자기 생각을 설명하고 결과를 판단할 수 있는 사람으로 자라도록 돕습니다.
+### SYNK PATH — 여행부터 한국 생활까지, 나에게 맞게 준비합니다
 
-현재 교육 과정과 교재, 학생 앱을 개발하며 개원을 준비하고 있습니다. 과정별 참여 조건과 일정은 따로 안내합니다. 방향을 고르고 바꾸는 것은 학생 본인이며, 학습 결과를 보장하지는 않습니다.
+SYNK PATH는 취향과 예산에 맞춘 여행 일정을 짜고, 한국 유학·취업과 정착을 준비하도록 돕습니다. 서울 여행은 지금 무료로 써 볼 수 있습니다.
 
-### SYNK SHIFT — 한 업무부터, 개인화 서비스를 도입합니다.
+서울 여행 일정은 지금 무료로 짜 볼 수 있습니다. 한국 유학·취업 준비와 VR 면접 연습, 주거·정착 지원을 준비하고 있습니다.
 
-SYNK SHIFT는 회사의 한 업무에 개인화 서비스를 도입하고 운영하는 일을 준비합니다. 공통 아틀라스와 필요한 전문 모듈에 회사 자료·규칙을 연결해 고객과 직원의 조건에 맞는 안내를 만듭니다. 아래는 적용 후보이며, 범위·운영 책임·일정·가격은 실제 도입 건별로 정합니다.
+- 서울 여행 무료 공개
+- 유학 계획·지원 서류·면접 준비
+- VR 면접·생활 연습 준비 중
 
-**한 업무부터, 개인화가 실제로 쓰이게.**
+[SYNK PATH 보기](https://synk.im/path/)
 
-SHIFT는 고객과 직원에게 필요한 안내가 달라지는 한 업무부터 시작합니다. 누가 어떤 일을 마칠지 정하고, 회사 자료와 전문 모듈을 공통 아틀라스에 연결합니다. 도입 후에는 담당자와 함께 실제 사용 결과와 운영 부담을 확인하며 서비스를 다듬습니다.
+## 아틀라스
 
-도입·운영을 준비 중입니다. 제공 기능과 시스템 연결, 운영 책임·지원 범위·일정·가격은 실제 도입 건별로 정합니다. 실고객 운영·효과·수익성은 아직 검증하지 않았으며, 아래 변화는 도입 후 확인할 목표입니다. API와 엔진 라이선스는 이후 확장 방향이며 지금 판매하는 상품이 아닙니다.
+아틀라스는 SYNK가 직접 만드는 개인화 엔진입니다. 여덟 엔진이 목표와 지금 상황을 이해하고, 배울 내용과 화면·말·소리를 한 사람에게 맞추고, 도움이 됐는지 확인합니다.
 
-### SYNK PULSE — 광고·모델 영상부터 음악과 캐릭터까지
+- Core — 지금 무엇이 필요한지 판단. 무엇을 하려는지, 어디에서 막히는지 살펴 다음에 할 일과 필요한 도움을 정합니다. 권하는 것과 빼는 것의 이유도 함께 남깁니다.
+- Strata — 배울 내용과 순서의 지도. 문법·표현·어휘를 난이도와 먼저 배울 순서에 따라 잇습니다. 틀린 부분을 어떤 기초부터 다시 연습할지 정하는 기준입니다. (개발 중)
+- Trail — 해 본 과정과 변화 기록. 어떤 과제를 했고 어디에서 도움을 받았는지 기록합니다. 이전의 답과 최근의 답을 비교해 달라진 점을 봅니다.
+- Loom — 손길에 반응하는 화면. 펠트 재질에 빛과 움직임을 더해 화면과 캐릭터를 표현합니다. 사용자의 행동에 자연스럽게 반응하는 장면을 만듭니다.
+- Vellum — 이해할 수 있는 설명. 지금 하는 과제와 본인의 답에 맞춰 설명과 힌트를 건넵니다. 왜 이 연습을 하는지, 막혔을 때 무엇을 볼지 알려 줍니다.
+- Reed — 장면에 맞는 음악과 소리. 작품과 학습 장면에 맞는 음악과 소리를 다룹니다. 집중해야 할 때는 소리를 줄이는 식으로 소리를 쓰는 때를 조절합니다.
+- Prism — 여러 결과에서 반복되는 것 찾기. 여러 사람의 결과에서 반복되는 어려움과 차이를 찾아, 어떤 내용과 설명을 더 손봐야 하는지 알려 줍니다.
+- Temper — 도움이 됐는지 확인. 힌트나 연습을 준 뒤 혼자서도 해낼 수 있게 됐는지 확인합니다. 그 결과로 과제와 도움 방식을 고칩니다.
 
-SYNK PULSE는 제품 광고와 브랜드필름, AI 모델 이미지·룩북·사용법 영상을 만들고, 음악·캐릭터 콘텐츠와 IP 사업을 함께 합니다. 사진으로 만드는 AI 프로필과 소개 PPT, 스튜디오·장비 대여도 준비합니다.
+아틀라스는 계속 개발하고 있습니다. 소개에는 아직 개발 중인 기능도 들어 있으며, 실제로 쓰이는 범위는 각 서비스에서 확인할 수 있습니다.
 
-**맡은 영상은 목적에 맞게, 우리 작품은 다시 보고 싶게 만듭니다.**
+[아틀라스 보기](https://synk.im/atlas/)
 
-브랜드가 맡긴 영상은 어디에 쓸지와 누구에게 보여 줄지부터 정하고 만듭니다. PULSE의 음악과 영상, 캐릭터 이야기는 다시 듣고 보고 싶은 작품을 목표로 만듭니다. 두 일 모두 아틀라스의 엔진 가운데 화면을 짜는 Loom과 소리를 다루는 Reed를 제작에 씁니다.
+## 일하는 방식
 
-광고 영상·모델 이미지·룩북 제작과 온라인 콘텐츠, 자체 IP, 작품 이용과 공동 제작, 광고 협업을 하고 있습니다. 공개한 작품과 준비 중인 사업은 구분해서 안내합니다. 개인의 감상을 교육·감정 프로필로 수집하지 않으며, 학습·치료 효과를 보장하지 않습니다. AI 프로필 사진과 소개 PPT 제작, 스튜디오·장비 대여는 준비 중이며 지금은 예약을 받지 않습니다. 장소와 보유 장비, 이용할 수 있는 날짜와 요금, 현장 지원 범위는 정해지면 알려 드립니다.
+- 나이로 짐작하지 않습니다 — 나이·성별·국적이 아니라 본인이 고른 설정과 실제로 해 본 결과로 맞춥니다. 목표가 바뀌면 다음 제안도 함께 바뀝니다.
+- 도움이 됐는지 따로 확인합니다 — 끝까지 했다는 것만으로 늘었다고 말하지 않습니다. 도움 없이 해내는 일이 늘었는지, 제안이 맞았는지를 따로 봅니다.
+- 본인의 답과 AI의 추정을 나눠 둡니다 — 직접 쓴 답과 실제로 한 행동을 원본으로 남깁니다. AI가 짐작한 내용은 따로 표시해 본인이 확인하고 고칠 수 있게 합니다.
+- 화면과 소리까지 직접 만듭니다 — 펠트로 만든 화면과 캐릭터, 음악과 목소리까지 한 팀이 만듭니다. 그래서 내용뿐 아니라 보고 듣는 방식까지 한 사람에게 맞출 수 있습니다.
+- 누구나 오래 쓸 수 있게 만듭니다 — 큰 글자, 짧은 설명, 소리 없이 쓰는 방법을 본인이 고르게 합니다. 무료 기능은 기기 안에서 계산해 많은 사람이 써도 오래 운영할 수 있게 합니다.
+- 준비 중인 것은 준비 중이라고 씁니다 — 지금 쓸 수 있는 것과 준비하고 있는 것을 나눠 적습니다. 아직 확인하지 않은 효과는 약속하지 않습니다.
 
-### SYNK PATH — 여행부터 새로운 생활까지, 나에게 맞는 길을 준비합니다.
+## 창업자
 
-SYNK PATH는 취향과 예산에 맞는 나라별 개인화 여행, 한국 유학과 취업, 주거·정착 지원을 준비합니다. 여행에서는 맛집·숙소·경험과 하루 동선을 함께 맞추고, 한국 생활에서는 학교 선택과 한국어·면접·포트폴리오부터 정착 준비까지 이어갑니다.
+양유호 · SYNK 창업자. 몽골의 학원에서 일할 때, 학생마다 필요한 도움이 다르다는 걸 알면서도 한 명씩 맞춰 줄 시간이 없었습니다. 그 일을 기술로 해 보려고 SYNK를 시작했습니다.
 
-**여행과 새로운 생활에, 나다운 선택을 더합니다.**
-
-같은 도시를 여행해도 좋아하는 하루는 다르고, 한국에서 이루고 싶은 목표도 사람마다 다릅니다. PATH는 본인이 원하는 경험과 예산, 준비 상태를 살펴 여행과 생활의 계획을 함께 세웁니다. 직접 확인한 취향은 다음 여행으로, 학습과 프로젝트 경험은 유학·취업 준비로 이어지도록 돕습니다.
-
-개인화 여행과 유학·취업·주거·정착 지원을 준비 중입니다. 제공 지역과 협력 기관, 이용 조건은 순차 안내하며 현재 여행·입주 예약은 받지 않습니다. 학생 자료는 본인이 확인하고 동의한 범위에서만 공유하며, 입학·비자·취업 결과를 보장하지 않습니다.
-
-## LAB 교재와 학습 예시
-
-### 시냅스 교재는 어떻게 구성되어 있나요?
-
-SYNK LAB의 교재는 문법을 다루는 시냅스 코어 6권과 회화를 다루는 시냅스 톡 2권, 총 8권입니다. 원고는 완성되었으며 출간을 준비하고 있습니다.
-
-시냅스 코어의 권별 학습 목표는 다음과 같습니다.
-1권 · TOPIK 1급 — 한글을 읽고 나를 소개하기.
-2권 · TOPIK 2급 — 일상 대화의 기본 문형 다지기.
-3권 · TOPIK 2–3급 — 익숙한 일상을 자연스럽게 말하기.
-4권 · TOPIK 3급 — 이유를 더해 내 의견 말하기.
-5권 · TOPIK 3–4급 — 사회 문제에 대해 의견 설명하기.
-6권 · TOPIK 4–5급 — 전문적이고 추상적인 주제에 대해 말하기.
-
-시냅스 톡 1권은 초급 회화로 코어 1–2권과 연결되고, 2권은 중급 회화로 코어 3–5권과 연결됩니다. 회화 교재는 TOPIK 4급 범위까지 다룹니다.
-
-급수는 권별 학습 목표이며 합격을 보장하지 않습니다. 원고는 완성됐지만 최종 검수와 출간은 아직 준비 중입니다. 출간 일정과 이용 방법은 정해지면 따로 알려 드립니다.
-
-### LAB 게임은 어떤 한국어를 연습하나요?
-
-SYNK LAB은 기존 한국어 게임 여덟 가지와 입문 놀이 세 가지를 공개 시제품으로 제공합니다. 홈페이지 LAB에서는 한국어 게임 여덟 가지의 실제 플레이 장면을 볼 수 있습니다. 한국어 레이싱·말의 리듬·바람길·주문 폭주·말 랠리는 듣기를, 선생님이 돌아왔다·입장 검사·빈칸 베기는 읽기를 연습하는 시제품입니다.
-
-레이싱은 마린·까몽과 해안도로를 달리며 한국어 문제를 듣고 그림·단어 차선으로 답합니다. 정답이면 부스터가 켜집니다. 기초·확장 어휘 2,000개, 5단어씩 400개 학습 스테이지와 2,008개 단어·안내 음성 클립을 준비했습니다. 400개 스테이지는 같은 해안 코스를 공유하며, 어휘 목록이 TOPIK 1–2급 전체 출제 범위를 보장하는 것은 아닙니다. 키보드 A·D/방향키 또는 모바일 좌우·보기 버튼으로 조작합니다.
-
-나레이션은 문제→단어 발음→정답·오답 피드백을 순서대로 들려줍니다. 음성이 나오는 동안 엔진 소리를 낮추고, 문제를 끝까지 듣기 전에는 차가 게이트 앞에서 기다립니다. 다시 듣기와 선택형 듣기 자막이 있고, 완주한 뒤에는 단어 발음을 다시 듣고 틀린 단어부터 복습합니다. 미리 작성한 음성 중계이며 실시간 AI 대화는 아닙니다.
-
-듣기는 단어의 소리를 그림·철자와 연결하고, 읽기는 철자·의미를 알아보는 기초를 연습합니다. 말의 리듬은 우리가 만든 세 곡을 두 레인으로 연주하는 듣기 게임입니다. 짧은 문장과 질문을 나레이션으로 듣고 O/X로 답합니다. 음성이 나올 때는 음악을 낮추고 일반 노트를 비워, 듣기에 집중할 수 있게 했습니다. 시간·장소·이유·조건·바뀐 정보의 이해를 연습하며, 타이밍과 듣기 정답을 따로 확인하고 새로운 음성 문제로 복습합니다. 말하기·쓰기는 게임에서 익힌 표현을 오프라인 대화·문장 작성 과제로 넓히는 구성입니다. 현재 게임은 발음·자유 글쓰기 평가를 제공하지 않습니다. TOPIK I은 듣기·읽기 시험이고, 쓰기는 TOPIK II, 말하기는 TOPIK 말하기 시험에서 봅니다.
-
-바람길에서는 “왼쪽 길로 가세요.”, “낮은 울타리를 뛰어넘으세요.” 같은 짧은 부탁 16가지를 듣고 몸으로 움직입니다. 달리는 동안에는 글 없이 소리로만 듣고, 글은 시작 전 연습과 끝난 뒤 복습에서 봅니다. 주문 폭주에서는 카페 손님의 주문을 듣고 잔 수와 온도, 빼야 할 재료를 맞춰 음료를 만듭니다. 말 랠리에서는 몽글이 공을 치며 건네는 한국어 한마디를 듣고, 알맞은 대답 카드 쪽으로 받아칩니다. 선생님이 돌아왔다에서는 이야기 속 부탁을 읽고 마린과 까몽을 움직여 교실을 정리하고, 마지막에는 달라진 새 부탁을 다시 읽습니다. 입장 검사에서는 안내문을 읽고 손님의 표·짐·말을 맞춰 본 뒤 통과나 거절 도장을 찍습니다. 빈칸 베기에서는 빈칸이 있는 문장을 읽고 낱말 조각 넷 중 맞는 것만 베어 냅니다.
-
-게임 기반 제2언어 학습 메타분석(Dixon 외, 2022)은 비교집단 간 효과크기 d=0.50을 보고했습니다. 인출 연습 메타분석(Yang 외, 2021)은 222개 연구·48,478명에서 g=0.499를 보고했습니다. 그림과 음성의 효과는 자료와 학습 속도에 따라 달라집니다(Reinwein, 2012). 이 연구들을 문제 회상·피드백·짧은 음성·다시 듣기 설계의 근거로 삼았습니다. 효과크기는 향상률이 아니며, SYNK 게임의 TOPIK 점수·장기 학습 효과는 아직 학습자 실험으로 검증하지 않았습니다. 홈페이지 학습 소개에서 원문 근거를 열 수 있습니다.
-
-미니게임과 오프라인 학습을 이어 TOPIK 1급을 목표로 하고, 그 뒤에는 생활 콘텐츠와 마을 주민과의 대화로 이어지는 과정을 준비하고 있습니다. 앱 안의 TOPIK 1급 수준 기초 단계를 마치면 마을이 열리도록 설계하고 있으며, 공식 성적표를 내야 하는 것은 아닙니다. 수업·게임·마을을 잇는 전체 학습 과정은 준비 중입니다. 싱크 타운에서는 집·찻집·공방·온실을 직접 걷고 주민과 생활하는 로컬 시제품을 만들고 있으며 아직 공개하지 않았습니다.
-
-말의 마법사에서는 크기·위치 등 기초 표현으로 물체를 바꾸고, 주문 폭주 입문에서는 물·빵·사과와 수량을 듣고 음식을 건넵니다. 둘이서 우주선 고치기에서는 서로 다른 정보를 보고 표현을 주고받으며 함께 수리합니다. 그림과 소리로 시작하는 입문 놀이이며, TOPIK I에 앞선 기초 어휘와 짧은 부탁 듣기를 연습합니다. 협동 성공이나 꾸미기·사진 저장을 독립적인 듣기 정답으로 계산하지 않습니다.
-
-로그인한 WORLD에서는 코인·구매품·목표와 지원되는 게임 기록을 계정에 보관합니다. 비회원 체험과 전송 대기 초안은 해당 브라우저에 남으며, 저장 범위는 각 게임에서 안내합니다. 레이싱의 자동 시연은 학습 기록에 포함하지 않습니다.
-
-### LAB의 게임과 개인화 학습은 어떻게 연결되나요?
-
-교재에서 익힌 한국어를 게임에서 직접 써 봅니다. LAB은 학생이 쓴 답과 도움이 필요했던 부분을 참고해 다음 과제와 피드백을 조정하는 앱을 개발하고 있습니다.
-
-실제로 쓸 한국어를 연습합니다. 듣기 게임 다섯 가지와 읽기 게임 세 가지에서, 들은 부탁과 읽은 안내대로 직접 움직입니다. 한국어 이해가 실제 조작으로 이어집니다.
-
-시냅스 코어에서 배운 문법과 시냅스 톡의 대화를 바탕으로, 역할과 목표가 분명한 게임을 만듭니다. 장면과 캐릭터는 학생이 상황을 이해하고 직접 참여하게 만듭니다.
-
-말의 리듬에서는 짧은 문장과 질문을 나레이션으로 듣고, 두 버튼 O/X 중 하나를 박자에 맞춰 누릅니다. 음성이 나올 때 음악을 낮추고 연주 노트를 비웁니다. 리듬 타이밍과 듣기 정답을 따로 확인하고, 곡이 끝나면 해설과 새로운 음성 문제로 복습합니다.
-
-게임에서 쓴 문장과 선택한 답을 학습 기록으로 남겨, 다음 연습과 피드백에 활용하도록 개발하고 있습니다.
-
-나에게 맞는 공부 방법을 찾습니다. 한국어를 배우는 목적과 선호하는 공부 방법을 먼저 묻습니다. 학생이 쓴 답과 수정한 내용, 교사의 관찰을 함께 참고해 잘하는 부분과 어려워하는 부분을 파악합니다.
-
-처음에는 학습 목표와 선호하는 설명 순서, 힌트가 필요한 때, 피드백을 보고 싶은 방식을 묻습니다.
-
-학생이 직접 알려 준 내용, 실제 학습 기록, AI가 추정한 내용은 구분해서 다룹니다. 한 번의 선택이나 좋아하는 캐릭터만으로 성격이나 실력을 판단하지 않습니다.
-
-목표나 공부 방법이 달라지면 설정도 바꿀 수 있도록 준비하고 있습니다. 앱이 잘못 파악한 내용은 학생이 직접 고칠 수 있게 만들고 있습니다.
-
-학습 기록에 맞춰 과제를 조정합니다. 목표와 학습 기록에 맞춰 과제의 주제, 힌트, 피드백 방식을 조정하는 앱을 개발하고 있습니다. 어려웠던 표현은 다시 연습하고, 도움 없이도 쓸 수 있는지 확인합니다.
-
-예문과 문법 설명의 순서, 힌트와 피드백 방식을 학생에 맞춰 조정하는 앱을 준비합니다. 현재 공개 리듬 게임에서는 곡과 리듬 난이도를 직접 고르고, 문항별 해설과 새 문장 복습을 볼 수 있습니다.
-
-처음 쓴 글과 수정한 글, 힌트를 사용한 부분을 구분해 기록합니다. AI가 정리한 내용을 교사가 학생의 실제 상황과 함께 검토하고, 어려웠던 표현은 새 과제에서 다시 연습합니다.
-
-마스코트의 안내, 오늘의 과제, 피드백과 학습 기록을 하나의 앱에서 볼 수 있도록 개발합니다. 연습한 내용은 다음 과제와 피드백에 반영됩니다.
-
-한국 특허 출원 준비 중. 2028년 출원 예정.
-
-비전은 각 브랜드가 앞으로 나아갈 방향입니다. 지금 제공하거나 준비하는 범위와 이용 조건은 사업 안내에서 확인할 수 있습니다.
-<!-- SYNK PUBLIC COPY END -->
-
-## 준비 중인 신규 서비스
-
-### 시장조사와 제품 테스트는 어떻게 준비하나요?
-
-개인화 서비스를 도입할 고객과 사용 환경을 조사하고, 실제 제품을 써 보며 필요한 개선을 찾습니다. 누구에게 무엇이 필요한지부터 기존 방식보다 도움이 되는지까지 확인합니다.
-
-사용자·시장 조사 — 사용할 사람과 완료할 업무를 정하고, 조건과 기존 방식의 어려움을 인터뷰와 자료로 확인합니다.
-
-제품 사용성 테스트 — 참여자가 직접 써 보는 동안 어디에서 멈추고 어떤 설명이 필요한지 봅니다.
-
-결과와 운영 부담 확인 — 완료·오류·처리 시간과 도입·지원에 드는 일을 함께 확인합니다. 관찰한 사실과 해석을 구분하고 다음 개선을 정합니다.
-
-준비 중인 도입 검증 지원입니다. 조사 대상·참여 조건·동의·보상·일정·비용은 해당 도입 범위에서 정합니다. 소수 반응을 시장 전체의 결과로 확대하거나 성과를 보장하지 않습니다.
-
-[자세히 살펴보기](https://synk.im/shift/#shift-research)
-
-### PULSE 스튜디오와 장비를 대여할 수 있나요?
-
-영상과 사진을 찍거나 강의, 작은 행사를 직접 여는 분들이 공간과 장비를 예약해 쓸 수 있게 준비하고 있습니다.
-
-촬영·행사 공간 — 무엇을 찍는지와 몇 명이 오는지에 맞춰 공간과 이용 시간, 준비할 것을 안내합니다.
-
-촬영·음향 장비 — 카메라와 조명, 음향 장비의 구성과 사용법, 받는 방법과 돌려주는 방법을 안내합니다.
-
-설치와 현장 지원 — 직접 하실 부분과 저희가 도울 부분을 미리 나눠 정합니다.
-
-대여는 준비 중이며 지금은 예약을 받지 않습니다. 장소와 보유 장비, 이용할 수 있는 날짜와 요금, 현장 지원 범위는 정해지면 알려 드립니다.
-
-[자세히 살펴보기](https://synk.im/pulse/#pulse-rental)
-
-### PATH 주거·정착 지원은 무엇인가요?
-
-유학이나 취업으로 한국에 오는 분이 지낼 곳을 고르고 입주 뒤 생활을 시작할 수 있게, 주거 운영사와 연결해 드리는 지원을 준비하고 있습니다.
-
-조건 정리와 비교 — 머무는 기간과 예산, 학교까지의 거리를 정리하고 고를 수 있는 집을 비교합니다.
-
-입주와 생활 안내 — 입주 날짜와 준비물, 시설 쓰는 법처럼 처음에 필요한 것을 알려 드립니다.
-
-문제가 생겼을 때 — 시설이나 생활에 문제가 생기면 운영사에 알리는 일을 돕습니다.
-
-제휴 운영사와 지역, 비용은 아직 정해지지 않았고 지금은 입주 예약을 받지 않습니다. 실제 계약과 시설 관리는 운영사가 맡으며, 그 조건을 확인해 안내합니다.
-
-[자세히 살펴보기](https://synk.im/path/#path-settle)
-
-### PATH의 개인화 여행은 무엇인가요?
-
-종로·북촌·서촌의 실제 장소로 나에게 맞는 하루를 만듭니다. 취향과 예산, 동행과 걷기 조건을 정하면 2~5곳의 일정과 대안을 사진·지도·시간표로 비교할 수 있습니다.
-
-내 조건에 맞는 하루 — 시작과 마칠 시각, 출발점, 예산과 걷기 여유를 정합니다. 확인된 비용과 더 알아볼 조건을 나누어 보고, 마음에 드는 장소를 유지하거나 바꿉니다.
-
-함께 가는 사람까지 — 동행별로 좋아하는 것과 피할 것, 꼭 필요한 조건을 넣습니다. 누구의 취향이 어떻게 반영됐는지 살펴보고 함께 갈 일정을 고릅니다.
-
-여행 중에도 다시 조정 — 다녀온 곳과 건너뛸 곳을 직접 표시하고 남은 시간·예산에 맞춰 다시 비교합니다. 덜 걷기나 실내 위주로 바꾸는 것도 새 일정을 확인한 뒤 적용합니다.
-
-서울 일정은 무료이며 SYNK ID로 보관할 수 있습니다. 운영 시간과 비용은 방문 전 다시 확인해 주세요. 나라별 여행·숙박·예약 서비스는 준비 중입니다.
-
-[자세히 살펴보기](https://synk.im/path/#path-visit)
-
-### SYNK 플랫폼에서는 무엇을 무료로 체험하나요?
-
-지금 써 볼 수 있는 SYNK를 만나 보세요. 내 취향으로 서울의 하루를 만들고, 한국어는 듣고 움직이며 배웁니다.
-
-서울에서 찾는, 내 취향의 하루 — 시간·예산·걷기·동행에 맞춰 실제 장소 2~5곳을 연결합니다. 지도로 살펴보고, 여행 중에도 남은 일정을 바꿔 보세요.
-
-처음 배우는 한국어도, 놀이부터 — 마법을 쓰고, 첫 주문을 받고, 친구와 우주선을 고칩니다. 입문 놀이부터 듣기·읽기 게임까지, 지금 할 수 있는 것부터 시작해 보세요.
-
-다음에도, 하던 곳에서 — SYNK ID로 여행을 보관하고, WORLD에서는 지원되는 게임 기록과 꾸미기를 이어갑니다.
-
-무료 체험은 가입 없이 시작할 수 있습니다. 실제 장소의 운영 정보와 도보 시간은 방문 전에 확인해 주세요. 저장 방식은 프로그램마다 다르며, 익명 체험 기록이 계정으로 자동 이전되지는 않습니다.
-
-[자세히 살펴보기](https://synk.im/#products)
+[창업자 이야기](https://synk.im/founder/)
 
 ## Pages
 
-- [SYNK](https://synk.im/)
-- [SYNK LAB](https://synk.im/lab/)
-- [SYNK SHIFT](https://synk.im/shift/)
-- [SYNK PULSE](https://synk.im/pulse/)
-- [SYNK PATH](https://synk.im/path/)
-- [Public company notes](https://synk.im/knowledge.json)
-- [Web enquiry form](https://synk.im/#contact-web)
+- [SYNK](https://synk.im/) · [English](https://synk.im/en/)
+- [SYNK LAB](https://synk.im/lab/) · [English](https://synk.im/en/lab/)
+- [SYNK SHIFT](https://synk.im/shift/) · [English](https://synk.im/en/shift/)
+- [SYNK PULSE](https://synk.im/pulse/) · [English](https://synk.im/en/pulse/)
+- [SYNK PATH](https://synk.im/path/) · [English](https://synk.im/en/path/)
+- [Atlas](https://synk.im/atlas/) · [English](https://synk.im/en/atlas/)
+- [Founder](https://synk.im/founder/) · [English](https://synk.im/en/founder/)
+- [Public company notes (Korean)](https://synk.im/knowledge.json) · [English](https://synk.im/en/knowledge.json)
 - [Privacy policy](https://synk.im/privacy/)
 - [Terms](https://synk.im/terms/)
 - [Data deletion](https://synk.im/data-deletion/)
 
-## Public scope
+## In English
 
-Current company and service information is maintained in the reviewed public notes above. The letter-writing experience is a public self-review exercise, not an automated grading service. Web enquiries are submitted through a separate Google Form; the public question guide does not receive enquiries.
+An engine that fits you better the more you use it. SYNK builds Atlas, a personalization engine. We started in Korean education. Today the same engine plans travel days, picks the next question in a Korean game, and powers business services and video production.
+
+- SYNK LAB — Learn Korean, and get ready for Korea. SYNK LAB makes Korean textbooks, learning games and a personalized learning app. We are preparing a full-time one-year course aimed at TOPIK Level 4, and our learning games are free to play now. A one-year course aimed at TOPIK Level 4, textbooks, learning games and a personalized learning app.
+- SYNK SHIFT — Personal guidance for everyone, built from your material. SYNK SHIFT brings personalized services to work where every person needs different guidance — advice, onboarding, coaching and staff training. We connect your product information and rules to Atlas, and after launch we check with you that it is really used. Purchase advice, product onboarding, expert coaching and staff training: work where every customer or employee needs different guidance, built from the company’s own material.
+- SYNK PULSE — Ads and model videos, plus our own music and characters. SYNK PULSE makes product ads, brand films, AI model lookbooks and how-to videos, from planning to the final cut. We also create the music and stories of Mongle, Kkamong and Marin, and look for partners to license them or make something together. Product ads, brand films, AI model lookbooks and how-to videos. We also make the music and stories of Mongle, Kkamong and Marin.
+- SYNK PATH — From travel to life in Korea, planned around you. SYNK PATH plans trips around your tastes and budget and helps you prepare to study, work and settle in Korea. The Seoul day planner is free to use now. You can plan a day in Seoul for free today. Support for studying and working in Korea, VR interview practice and housing is in preparation.
+
+Atlas: Atlas is the personalization engine SYNK builds. Eight engines understand a person’s goal and situation, fit the content, screens, words and sound to them, and check whether it helped.
+
+Most programs are offered in Korean. What is live and what is still in preparation is labelled on every page, and no effect is promised that has not been measured.
 
 ## Contact
 
 hello@synk.im
-
-## Korean games on the LAB page
-
-SYNK LAB offers eight existing Korean games and three beginner activities as public prototypes. On the LAB page you can watch real gameplay from eight Korean games: Korean Racing, Words in Rhythm, Wind Run, Order Rush and Talk Rally practise listening, while The Teacher Is Back, Entry Check and Blank Slice practise reading. All eight are prototypes.
-
-Korean Racing connects spoken Korean to picture or word lanes and rewards correct choices with boosts. It includes 2,000 vocabulary items, 400 learning stages sharing one coastal course, and 2,008 voice clips. Words in Rhythm plays three Korean songs made by SYNK. When the music softens, players hear a short Korean sentence and a question in the narration, then answer O or X on the beat. Timing and listening answers are scored separately, and review uses new audio questions.
-
-Wind Run gives 16 short spoken requests, such as taking the left path or jumping a low fence, with no text while running; the text appears in the practice before a run and the review after it. In Order Rush, players hear café orders and make each drink, matching the number of cups, hot or iced, and what to leave out. In Talk Rally, Mongle says something in Korean as it hits the ball, and players hit it back toward the reply card that fits. In The Teacher Is Back, players read the requests in a story and move two characters to tidy a classroom, then read new, changed requests. In Entry Check, players read a venue notice, check each guest's ticket, bags and words, and stamp pass or reject. In Blank Slice, players read a sentence with a blank and slash the one word piece out of four that fits.
-
-Listening and reading are practised in the games; speaking and writing continue in class, and the current games do not assess pronunciation or free writing. Offline learning toward TOPIK Level 1 and a later path to conversations with village residents are in preparation.
-
-In Word Wizard, basic expressions for size and position change objects. In Order Rush for beginners, you listen for water, bread, apples and quantities, then serve the food. In Fix a Spaceship Together, two players see different information and exchange expressions to carry out repairs. These picture-and-audio activities practise basic vocabulary and short requests before TOPIK I. Cooperative success, customization and saving a photo are not counted as independent listening answers.
-
-When signed in to WORLD, coins, owned items, goals and supported game records are saved to your account. Guest experiences and pending drafts remain in the current browser; each game explains its saving scope. Racing’s automated demonstrations are excluded from learning records.
-
-External research informs retrieval, feedback and narration design, not measured SYNK efficacy or a TOPIK pass guarantee.
-
-- [All eight games, gameplay clips and research](https://synk.im/lab/#work)
-- [Game learning meta-analysis, Dixon et al. 2022](https://www.lltjournal.org/item/10125-73464/)
-- [Retrieval practice, Yang et al. 2021](https://pubmed.ncbi.nlm.nih.gov/33683913/)
-- [Modality conditions, Reinwein 2012](https://pubmed.ncbi.nlm.nih.gov/21989625/)
