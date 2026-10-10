@@ -3,10 +3,11 @@
    첫 화면은 처마 사진 입구 — 처마 밑으로 들어가는 싱ㅋ와 아틀라스·회사 소개 두 입구.
    근거: Recent(recent.design) 10-09·10-10 집계(site-v10/README.md). */
 
-@font-face{font-family:'SUIT Variable';src:url('/assets/suit.woff2') format('woff2');font-weight:100 900;font-display:swap}
-@font-face{font-family:'SYNK Latin';src:url('/assets/inter-tight.woff2') format('woff2');font-weight:400 599;font-display:swap;unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+2000-206F,U+20AC,U+2122,U+2190-21FF,U+2212}
-@font-face{font-family:'SYNK Latin';src:url('/assets/inter-tight-bold.woff2') format('woff2');font-weight:600 900;font-display:swap;unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+2000-206F,U+20AC,U+2122,U+2190-21FF,U+2212}
-@font-face{font-family:'DM Mono';src:url('/assets/dm-mono.woff2') format('woff2');font-weight:400;font-display:swap}
+/* 글꼴은 회사 페이지에 쓰인 글자와 흔한 음절만 남긴 판(font-subset.py). 공용 /assets/suit.woff2 등은 게임·계정 화면이 그대로 쓴다. */
+@font-face{font-family:'SUIT Variable';src:url('/assets/v10/suit-v10.woff2') format('woff2');font-weight:100 900;font-display:swap}
+@font-face{font-family:'SYNK Latin';src:url('/assets/v10/inter-tight-latin.woff2') format('woff2');font-weight:400 599;font-display:swap;unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+2000-206F,U+20AC,U+2122,U+2190-21FF,U+2212}
+@font-face{font-family:'SYNK Latin';src:url('/assets/v10/inter-tight-bold-latin.woff2') format('woff2');font-weight:600 900;font-display:swap;unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+2000-206F,U+20AC,U+2122,U+2190-21FF,U+2212}
+@font-face{font-family:'DM Mono';src:url('/assets/v10/dm-mono-latin.woff2') format('woff2');font-weight:400;font-display:swap}
 
 :root{
   --paper:#fff;--ink:#0b0b0d;--ink-2:#3f3f46;--ink-3:#6b6b74;--line:#e6e6e9;--line-2:#d6d6db;
@@ -174,20 +175,30 @@ main{display:block}
    처마 사진(보는 사람의 시간에 맞는 하늘 한 장) 위에 아주 큰 싱ㅋ를 두고, 같은 사진에서 오려 낸 처마를 한 겹 더 얹어 싱ㅋ가 처마 밑으로 들어가 보이게 한다.
    층: 하늘 → 견본선·싱ㅋ·자모 꼬리표 → 처마 → 위 정보 줄·두 입구. 하늘과 처마는 같은 사진을 같은 자리에 깔아 겹쳐도 어긋나지 않는다.
    아래쪽 어둠은 하늘·처마 두 층에만 깔아(싱ㅋ 위는 덮지 않는다) 두 입구 글자를 받친다. 움직임은 싱ㅋ가 처음 한 번 떠오르는 것뿐이다. */
-.gate{--img:url('/assets/korean-eaves-night-20260927.webp');--roof:url('/assets/v10/eaves-roof-land.webp');--pos:100% 38%;
+.gate{--img:url('/assets/korean-eaves-night-20260927.webp');--roof:url('/assets/v10/eaves-roof-land.webp');
   --g-ink:#fafaf9;--g-ink-2:rgba(250,250,249,.76);--g-line:rgba(250,250,249,.3);
   --mark-top:clamp(150px,19svh,176px);--mark-w:min(57vw,calc((100svh - 410px) * 1.7073));--mark-h:calc(var(--mark-w) * .5857);
   --fade:calc(var(--mark-top) + var(--mark-h) + 14px);
+  /* 사진 폭·자리: 화면 비율이 1440×900에서 멀어지면 사진(폭 기준)과 싱ㅋ(높이 기준)가 따로 커져, ㅋ가 처마에서 떨어지거나(1536×864에서 84px)
+     너무 깊이 숨었다(1024×768에서 대각선 획 대부분). ㅋ 오른쪽 아래 끝이 처마 뒤로 싱ㅋ 폭의 18/560만큼 들어가게 맞춘다:
+     모자라면 사진을 키우고(cover~1.25배), 넘치면 화면보다 넓은 사진을 오른쪽으로 민다(사진 왼쪽 끝이 화면 안으로 들어오지 않을 만큼).
+     처마 경계를 ㅋ 발치 근처에서 직선(사진 x ≈ 1308 − 0.82·y, 1536×1024 기준)으로 놓고 푼 식이라, 사진이나 가림판을 바꾸면 다시 잰다. */
+  --gh:max(100svh,640px);--cover:max(100vw,calc(var(--gh) * 1.5));
+  --tuck:calc((100vw + var(--gh) * .3116 - var(--mark-top) * .82 - var(--gut) - var(--mark-w) * 1.2526) * 2.806);
+  --photo-w:clamp(var(--cover),var(--tuck),calc(var(--cover) * 1.25));
+  /* 정사각형에 가까운 창에서는 ㅋ 윗줄이 처마의 곧게 선 부분(사진 x ≈ 975 − 0.22·y)에 먼저 닿으므로, 윗줄 오른쪽 끝이 10/560 넘게 가려지지 않을 만큼도 민다. */
+  --photo-shift:clamp(0px,max(calc((var(--cover) - var(--tuck)) / 2.806),calc(var(--gut) + var(--mark-top) * .22 + var(--mark-w) * .982 - 100vw - var(--gh) * .0836 + var(--photo-w) * .421)),calc(var(--photo-w) - 100vw));
+  --photo-size:var(--photo-w) auto;--pos:calc(100vw - var(--photo-w) + var(--photo-shift)) 38%;
   position:relative;isolation:isolate;height:100svh;min-height:640px;overflow:hidden;background:#08090c;color:var(--g-ink)}
 html[data-sky="sunset"] .gate{--img:url('/assets/korean-eaves-sunset-20260927.webp')}
 html[data-sky="day"] .gate{--img:url('/assets/korean-eaves-day-20260927.webp');--g-ink:#0a0c12;--g-ink-2:rgba(10,12,18,.74);--g-line:rgba(10,12,18,.3)}
 .gate-sky,.gate-roof{position:absolute;inset:0;background-image:linear-gradient(rgba(8,9,12,0) var(--fade),rgba(8,9,12,.8) calc(var(--fade) + 9%),#08090c 97%),var(--img);
-  background-size:100% 100%,cover;background-position:0 0,var(--pos);background-repeat:no-repeat}
+  background-size:100% 100%,var(--photo-size);background-position:0 0,var(--pos);background-repeat:no-repeat}
 .gate-sky{z-index:0}
 html[data-sky="sunset"] .gate-sky::after{content:"";position:absolute;inset:0;background:radial-gradient(70% 80% at 22% 36%,rgba(20,8,30,.42),rgba(20,8,30,0) 72%)}
 /* 노을 구름 위의 작은 글자는 어두운 테를 둘러 읽히게(Fable 2차 P2-2). 밤·낮은 그대로 */
 html[data-sky="sunset"] .gate .tag,html[data-sky="sunset"] .gate-top{text-shadow:0 1px 2px rgba(12,8,22,.8),0 0 8px rgba(12,8,22,.6)}
-.gate-roof{z-index:3;-webkit-mask:var(--roof) var(--pos)/cover no-repeat;mask:var(--roof) var(--pos)/cover no-repeat}
+.gate-roof{z-index:3;-webkit-mask:var(--roof) var(--pos)/var(--photo-size) no-repeat;mask:var(--roof) var(--pos)/var(--photo-size) no-repeat}
 .gate-type{position:absolute;z-index:2;left:var(--gut);top:var(--mark-top);width:var(--mark-w);color:var(--g-ink)}
 /* 꼬리표 상자: 싱ㅋ와 같은 자리·크기, 처마(z 3) 위. 꼬리표가 처마에 가려지지 않는다(Fable 2차 확인 1) */
 .gate-tags{position:absolute;z-index:4;left:var(--gut);top:var(--mark-top);width:var(--mark-w);height:var(--mark-h);color:var(--g-ink);pointer-events:none}
@@ -234,7 +245,7 @@ html[data-sky="sunset"] .gate .tag,html[data-sky="sunset"] .gate-top{text-shadow
 @media (max-width:1100px){.gate-doors{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.gate-acts{grid-column:1/-1;margin-top:16px}}
 /* 휴대폰·세로로 긴 화면: 세로 사진, 하늘 아래에 두 입구 */
 @media (max-width:700px),(max-aspect-ratio:4/5){
-  .gate{--roof:url('/assets/v10/eaves-roof-port.webp');--img:url('/assets/korean-eaves-night-portrait-20260927.webp');--pos:70% 92%;--sky-h:min(128vw,78svh);
+  .gate{--roof:url('/assets/v10/eaves-roof-port.webp');--img:url('/assets/korean-eaves-night-portrait-20260927.webp');--pos:70% 92%;--photo-size:cover;--sky-h:min(128vw,78svh);
     --mark-top:150px;--mark-w:min(calc(100vw - 40px),640px);--fade:calc(var(--mark-top) + var(--mark-h) + 10px);height:auto;min-height:0;padding-bottom:34px}
   html[data-sky="sunset"] .gate{--img:url('/assets/korean-eaves-sunset-portrait-20260927.webp')}
   html[data-sky="day"] .gate{--img:url('/assets/korean-eaves-day-portrait-20260927.webp')}
@@ -678,7 +689,8 @@ details.cases{margin-top:36px}
 
 /* ---------- 바닥: 펠트 풍경 + 링크 ---------- */
 .foot{margin-top:clamp(40px,6vw,80px)}
-.foot-scene{position:relative;height:clamp(180px,26vw,360px);background:#2a2230 url('/assets/pulse-radio-courtyard-20260919.webp') center 58%/cover no-repeat;border-radius:var(--r-xl) var(--r-xl) 0 0;overflow:hidden}
+.foot-scene{position:relative;height:clamp(180px,26vw,360px);background:#2a2230;border-radius:var(--r-xl) var(--r-xl) 0 0;overflow:hidden}
+.foot-scene img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 58%}
 .foot-scene::after{content:'';position:absolute;inset:auto 0 0;height:40%;background:linear-gradient(transparent,rgba(11,11,13,.35))}
 .foot-body{background:var(--night);color:#d4d4d8;padding:clamp(40px,5vw,64px) 0 32px}
 .foot-grid{display:grid;grid-template-columns:minmax(0,1.3fr) repeat(4,minmax(0,1fr));gap:32px}
