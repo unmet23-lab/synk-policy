@@ -5,3 +5,4 @@ qa-results/
 .npm-cache/
 native-libs/
 intel-diagnostics/
+baseline/

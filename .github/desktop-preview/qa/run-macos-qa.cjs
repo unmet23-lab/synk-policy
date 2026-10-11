@@ -2,7 +2,8 @@
 // Run on an ephemeral macOS CI host after packaging. Every app is copied from
 // its actual mounted DMG into a private Applications folder before native QA.
 const fs=require('node:fs'),path=require('node:path'),crypto=require('node:crypto'),cp=require('node:child_process');
-const args=Object.fromEntries(process.argv.slice(2).map(x=>{const m=/^--(root|manifest|out|arch)=(.+)$/.exec(x);if(!m)throw Error('Unexpected argument '+x);return [m[1],m[2]];}));
+const args=Object.fromEntries(process.argv.slice(2).map(x=>{const m=/^--(root|manifest|out|arch|scope)=(.+)$/.exec(x);if(!m)throw Error('Unexpected argument '+x);return [m[1],m[2]];}));
+if(args.scope&&args.scope!=='platform')throw Error('Unknown QA scope');
 const expectedArch=args.arch||process.arch;
 if(process.platform!=='darwin'||!['arm64','x64'].includes(expectedArch)||expectedArch!==process.arch)throw Error('Native macOS host matching --arch required');
 const root=path.resolve(args.root||process.cwd()),out=path.resolve(args.out||path.join(root,'qa-results',expectedArch)),manifestFile=path.resolve(root,args.manifest||path.join('dist',expectedArch,'deliverables','mac-package-'+expectedArch+'.json'));
@@ -52,7 +53,7 @@ try{
   }
   const config={arch:manifest.arch,applications,bundles:Object.fromEntries(Object.entries(bundles).map(([id,b])=>[id,{app:b.app,executable:b.executable,archive:b.archive,version:b.metadata.version}]))};
   const configFile=path.join(out,'native-config.json');fs.writeFileSync(configFile,JSON.stringify(config,null,2));
-  for(const mode of ['world-online','world-offline','platform']){
+  for(const mode of (args.scope==='platform'?['platform']:['world-online','world-offline','platform'])){
     const nativeOut=path.join(out,mode);
     const p=cp.spawnSync(process.execPath,[path.join(__dirname,'native-smoke.cjs'),'--config='+configFile,'--out='+nativeOut,'--mode='+mode],{encoding:'utf8',timeout:190000,maxBuffer:6*1024*1024});
     fs.writeFileSync(path.join(out,mode+'-process.log'),(p.stdout||'')+(p.stderr||''));
@@ -61,5 +62,5 @@ try{
   }
   for(const [client,b]of Object.entries(bundles))check(client+' QA preserved candidate bytes',sha(b.archive)===b.manifestAsarSha&&sha(b.executable)===b.manifestExecutableSha);
 }catch(error){failure=error.stack||error.message;}
-const result={checkedAt:new Date().toISOString(),ok:!failure,host:{platform:process.platform,arch:process.arch,node:process.version,runnerArch:process.env.RUNNER_ARCH||null},manifest:manifestFile,checks,failure,limitations:{installedFromActualDmg:true,location:'private temporary Applications',notarized:false,gatekeeperApprovalTested:false,realAuthenticationPerformed:false,realProfileTouched:false,physicalUserMac:false,platformManagedLaunchPerformed:false,offlineSimulation:'initial HTTPS canceled; actual native retry after unblocking'}};
+const result={checkedAt:new Date().toISOString(),ok:!failure,host:{platform:process.platform,arch:process.arch,node:process.version,runnerArch:process.env.RUNNER_ARCH||null},manifest:manifestFile,checks,failure,scope:args.scope||'all',limitations:{worldGameRetested:args.scope!=='platform',installedFromActualDmg:true,location:'private temporary Applications',notarized:false,gatekeeperApprovalTested:false,realAuthenticationPerformed:false,realProfileTouched:false,physicalUserMac:false,platformManagedLaunchPerformed:false,offlineSimulation:'initial HTTPS canceled; actual native retry after unblocking'}};
 fs.writeFileSync(path.join(out,'mac-native-qa.json'),JSON.stringify(result,null,2));console.log(JSON.stringify({ok:result.ok,passed:checks.filter(x=>x.ok).length,checks:checks.length,report:path.join(out,'mac-native-qa.json'),failure}));if(!result.ok)process.exitCode=1;
