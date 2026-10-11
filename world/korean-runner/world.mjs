@@ -5,7 +5,7 @@
 // 카메라는 화면 크기가 바뀔 때만 자리를 잡고 그 뒤로 움직이지 않는다(흔들기·따라가기·기울이기 없음 — 멀미).
 // 몽글은 게임에 필요한 움직임만 한다: 옆 길로 옮기기(그쪽으로 잠깐 돌아봄)·뛰기·숙이기. 출렁임·찌그러짐·흔들림을 더하지 않는다.
 import * as T from './vendor/three.module.js';
-import { LANES } from './core.mjs';
+import { LANES } from './core.mjs?v=tutor-4e57536c0';
 import { loopedWorldZ, eventWorldZ, runnerYaw, forwardForYaw, groundOffset, texelWorldZ, SCENERY_RECYCLE_Z } from './course-motion.mjs';
 import { sceneryLayout, TILE, TILES, LOOP, VIEW, PALETTE, SIGNS } from './scenery.mjs';
 

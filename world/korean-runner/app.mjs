@@ -4,19 +4,19 @@
 // (읽기로 바꾸지 않는다). 동작은 장면을 보고도 할 수 있어 늘 ‘평가하지 않음’으로 남고, 듣기 실력 기록은 따로 여는 ‘듣기 확인’이 맡는다.
 // 보상은 공통 코인 하나: 90초를 끝까지 달린 판에만 결과 화면에서 받는다(그만두면 받지 않는다). 예전 바람상점·여행 목표는 열지도 읽지도 않는다
 // (이 브라우저의 synk.windrun.shop.v1 기록은 지우지 않고 그대로 둔다).
-import { RunnerModel } from './core.mjs';
+import { RunnerModel } from './core.mjs?v=tutor-4e57536c0';
 import { INSTRUCTIONS, actionLabel } from './instructions.mjs';
 import { KeyboardInput, KEY_ACTIONS } from './controls.mjs';
 import { InstructionAudio } from './audio.mjs';
 import { instructionMetadata, chooseInstruction, actionEvidence, FLOW_RUN, TIRED_RUN, FLOW_WORDS, paceOf, runObservation } from './learning.mjs';
-import { mountListeningCheck } from './listening-check-ui.mjs';
+import { mountListeningCheck } from './listening-check-ui.mjs?v=tutor-4e57536c0';
 import { scoreRun, skillReport, skillOf, SKILL_LABEL, STEP_WORD } from './report.mjs';
 import { drawHeroRoad } from './hero.mjs';
 import { preloadImages } from './kit/lab.mjs';
+import {runnerSupport,obstacleSupport,runnerCheckSupport} from '../brand-opening/game-tutor-support.mjs?v=tutor-4e57536c0';
 
-// Restore the verified account before reading progress or enabling play.
-await globalThis.SynkPlayAccount.ready();
-const progressStorage = globalThis.SynkPlayAccount.storage();
+let gameTutor=null;
+const tutorEvent=(kind,detail)=>gameTutor?.emit(kind,detail);
 
 const byId = (id) => document.getElementById(id);
 const QA = /[?&]qa(?:[=&]|$)/.test(location.search);
@@ -30,8 +30,8 @@ if (!globalThis.SynkPlayCollection) for (const n of document.querySelectorAll('.
 
 /* ── 저장: 최고 거리만(이 브라우저의 synk.windrun.*). 학습 기록은 아틀라스가 따로 맡는다 ── */
 let storageAvailable = true;
-function stored(key, fallback) { try { return progressStorage.getItem('synk.windrun.' + key) ?? fallback; } catch { storageAvailable = false; return fallback; } }
-function store(key, value) { try { progressStorage.setItem('synk.windrun.' + key, String(value)); } catch { storageAvailable = false; } }
+function stored(key, fallback) { try { return localStorage.getItem('synk.windrun.' + key) ?? fallback; } catch { storageAvailable = false; return fallback; } }
+function store(key, value) { try { localStorage.setItem('synk.windrun.' + key, String(value)); } catch { storageAvailable = false; } }
 let best = Number(stored('best', '0')) || 0;
 
 /* ── 아틀라스: 다음 부탁 고르기 · 기록 · 순간 맞춤(달리기 속도만) ── */
@@ -107,6 +107,7 @@ const qa = { scale: 1, auto: false, plan: [] };
 
 function show(id) {
   screen = id;
+  if(id==='lobby')tutorEvent('lobby');
   for (const s of ['lobby', 'game', 'results']) byId(s).hidden = s !== id;
   document.body.classList.toggle('playing', id === 'game');
   window.scrollTo(0, 0);
@@ -151,7 +152,7 @@ function setSound(value) {
 /* ── 한 판 ── */
 function ensureWorld() {
   if (!worldReady) {
-    worldReady = import('./world.mjs').then(({ createWorld }) => createWorld(byId('world'), { reduced }))
+    worldReady = import('./world.mjs?v=tutor-4e57536c0').then(({ createWorld }) => createWorld(byId('world'), { reduced }))
       .then((w) => { world = w; return w; })
       .catch((e) => { worldReady = null; throw e; });
   }
@@ -182,6 +183,7 @@ async function start() {
   tip(opening || '바람이 길을 알려 줘요. 잘 듣고 움직여요!', 2600);
   announce('한국어 부탁을 듣고 바람길을 달려요. 왼쪽·오른쪽 화살표로 길을 바꾸고, 위는 점프, 아래는 숙이기예요.');
   starting = false;
+  tutorEvent('playing');
 }
 
 function resetRunUI() {
@@ -204,23 +206,24 @@ function closeUnanswered() {
 
 function handle(n) {
   switch (n.type) {
-    case 'instruction': showInstruction(n.mission); break;
+    case 'instruction': showInstruction(n.mission); tutorEvent('listening'); break;
     case 'stepResult': renderSteps(n.mission); break;
     case 'step': world?.light(n.step); SFX.step(); sparkle(); break;
     case 'correct': {
       const rec = model.answers[resolvedSeen++]; if (rec) rec.texted = !!n.mission.texted;
       recordAction(n.mission, true); sayDone(n.mission); SFX.correct();
+      tutorEvent('success',{answer:true});
       popText(model.combo >= 3 ? `좋아요! 연속 ${model.combo}` : '좋아요!', 'ok', model.combo);
       punch(byId('g-combo-wrap')); break;
     }
     case 'wrong': {
       const rec = model.answers[resolvedSeen++]; if (rec) rec.texted = !!n.mission.texted;
-      recordAction(n.mission, false); sayMissed(n.mission, n.record || rec); break;
+      recordAction(n.mission, false); sayMissed(n.mission, n.record || rec); tutorEvent('retry',{answer:true,support:runnerSupport(n.record||rec)}); break;
     }
     case 'earnedShield': shields += 1; SFX.shield(); setTimeout(() => { if (running && !model?.finished) popText('바람막!', 'shield'); }, 520);
       if (shields === 1) tip('세 번 연속! 바람막이 한 번은 부딪혀도 지켜 줘요.', 2600); break;
     case 'shield': world?.knock(model); SFX.block(); popText('막았어요!', 'shield'); break;
-    case 'hit': world?.knock(model); SFX.bump(); popText('쿵!', 'bump'); punch(byId('g-guard')); break;
+    case 'hit': world?.knock(model); SFX.bump(); popText('쿵!', 'bump'); punch(byId('g-guard')); tutorEvent('retry',{reason:'obstacle',support:n.mission?[]:obstacleSupport(n.obstacle)}); break;
     case 'jump': SFX.jump(); break;
     case 'slide': SFX.slide(); break;
     case 'finish': finish(); break;
@@ -372,11 +375,13 @@ function pause() {
   if (!running || !model || model.finished || paused) return;
   paused = true; keyboard.reset(); gesture = null; voiceBank?.pause().catch(() => {});
   openDialog('pause-dialog'); announce('잠깐 멈췄어요.');
+  tutorEvent('paused');
 }
 function audioFault(retry) {
   retryAudio = retry;
   if (running) { paused = true; keyboard.reset(); voiceBank?.pause().catch(() => {}); }
   openDialog('audio-dialog');
+  tutorEvent('paused');
 }
 async function resume() {
   if (!running || !model || model.finished || resuming) return;
@@ -385,6 +390,7 @@ async function resume() {
     if (!await ensureVoices()) { audioFault(resume); return; }
     if (pendingInstruction) { if (!voiceBank.play(pendingInstruction)) { audioFault(resume); return; } pendingInstruction = null; }
     closeDialogs(); document.activeElement?.blur?.(); lastFrame = performance.now(); paused = false;
+    tutorEvent('playing');
   } catch { audioFault(resume); } finally { resuming = false; }
 }
 function home() {
@@ -409,6 +415,7 @@ function finish() {
   if (newBest) { best = distance; store('best', best); }
   SFX.finish(); popText(completed ? '도착!' : '여기까지!', 'end');
   renderResults({ completed, distance, newBest });
+  tutorEvent('finish',{completed});
   announce(`달리기 끝. ${distance}미터, 부탁 ${model.correct}개를 해냈어요.`);
   setTimeout(() => { if (ending && screen === 'game') { ending = false; show('results'); byId('r-title').focus({ preventScroll: true }); } }, reduced() ? 700 : 1500);
 }
@@ -500,7 +507,9 @@ byId('world').addEventListener('pointerup', (e) => {
   const value = Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? 'right' : 'left') : dy > 0 ? 'slide' : 'jump';
   action(value); flash(value);
 });
-byId('world').addEventListener('pointercancel', () => { gesture = null; });
+function cancelGesture(e) { if (!e || gesture?.id === e.pointerId) gesture = null; }
+byId('world').addEventListener('pointercancel', cancelGesture);
+byId('world').addEventListener('lostpointercapture', cancelGesture);
 stageEl.addEventListener('contextmenu', (e) => e.preventDefault());
 document.addEventListener('visibilitychange', () => { if (document.hidden && running && !paused && model && !model.finished) pause(); });
 window.addEventListener('blur', () => { keyboard.reset(); if (running && !paused && model && !model.finished) pause(); });
@@ -516,10 +525,10 @@ byId('learning-reset').addEventListener('click', () => {
   catch (error) { if (error?.code !== 'ACCOUNT_RESET_REQUIRED') learningFailed = true; }
   renderLobby();
 });
-const listeningCheck = mountListeningCheck({ coach, beforeOpen: () => { if (running && !model?.finished) return false; cancelVoice(); return true; } });
+const listeningCheck = mountListeningCheck({ coach, beforeOpen: () => { if (running && !model?.finished) return false; cancelVoice(); return true; },onListen:()=>tutorEvent('listening'),onFeedback:(correct,detail)=>tutorEvent(correct?'success':'retry',{answer:true,support:!correct&&detail?runnerCheckSupport(detail.item,detail.choice,detail.feedback):[]}),onClose:()=>tutorEvent('lobby') });
 
 let resizeT = 0;
-window.addEventListener('resize', () => { clearTimeout(resizeT); resizeT = setTimeout(() => { if (screen === 'lobby') drawHeroRoad(byId('hero-road')); placeTip(); }, 140); });
+window.addEventListener('resize', () => { cancelGesture(); clearTimeout(resizeT); resizeT = setTimeout(() => { if (screen === 'lobby') drawHeroRoad(byId('hero-road')); placeTip(); }, 140); });
 // 입구에서 펠트 그림과 3D 무대를 미리 받아 둔다(시작 단추를 누른 뒤 기다림이 짧게)
 preloadImages(['tex-cream', 'tex-coral', 'badge-cream', 'badge-check', 'badge-coral', 'sparkle', 'cushion-blush-strip', 'cushion-butter-strip', 'cushion-lapis-strip'].map((n) => `kit/felt/${n}.webp`));
 (window.requestIdleCallback || ((fn) => setTimeout(fn, 700)))(() => { ensureWorld().catch(() => { /* 시작할 때 다시 시도하고 안내한다 */ }); }, { timeout: 2500 });
@@ -577,3 +586,9 @@ if (QA) {
     summary: () => learn('summary'),
   };
 }
+
+// Install after the game's pause/check state exists.
+if(globalThis.parent&&globalThis.parent!==globalThis)void import('../brand-opening/game-tutor-channel.mjs?v=tutor-4e57536c0').then(({connectGameTutor})=>{
+ gameTutor=connectGameTutor('runner',{onHelp:()=>{pause();if(listeningCheck.open){listeningCheck.interrupt();tutorEvent('paused');}},onPracticeComplete:()=>{if(listeningCheck.open)return;if(screen==='game'&&running&&!model?.finished)void resume();else void start();},onResumeAfterHelp:()=>{if(screen==='game'&&running&&!model?.finished)void resume();}});
+ if(screen==='game'&&running&&!model?.finished)tutorEvent(paused?'paused':'playing');else if(screen==='results')tutorEvent('finish',{completed:model?.reason==='tour'});else tutorEvent('lobby');
+}).catch(()=>{});
