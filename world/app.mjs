@@ -1,4 +1,4 @@
-import {createWardrobeStudio} from './wardrobe-studio.mjs';
+import {createWardrobeStudio} from './wardrobe-studio.mjs?v=performance-20261012';
 import {WARDROBE_ITEMS,WARDROBE_OUTFITS,slotsForOutfit,outfitForSlots,outfitLabel} from './wardrobe-catalog.mjs';
 import {normalizeEditState} from './wardrobe-workbench.mjs';
 const $=(s,root=document)=>root.querySelector(s);

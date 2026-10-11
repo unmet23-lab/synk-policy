@@ -6,7 +6,6 @@ import {createLifeProgress} from './life-progress.mjs?v=tutor-account-20261012';
 import {restoreTutorSelection,commitTutorSelection,tutorSelectionStatus} from './tutor-selection-sync.mjs?v=tutor-account-20261012';
 import {createLifeExperience} from './life-ui.mjs?v=tutor-4e57536c0';
 import {createTownWorldHost} from './world-town-client.mjs';
-import {createWardrobeStudio} from './wardrobe-studio.mjs';
 import {WARDROBE_ITEMS} from './wardrobe-catalog.mjs';
 import {createWorkbenchStorage,thumbnailKey,wardrobeThumbnailCache} from './wardrobe-workbench.mjs';
 const $=s=>document.querySelector(s);
@@ -14,7 +13,7 @@ const connection=await loadWorldConfig();
 const operating=connection.mode==='account';
 const worldUrl=path=>new URL(connection.basePath+path,location.origin).href;
 const {firstSupport}=await import(worldUrl('brand-opening/game-tutor-support.mjs?v=tutor-4e57536c0'));
-const home=window.__synkHome||(await import(worldUrl('brand-opening/home.mjs?v=tutor-account-20261012'))).home;
+const home=window.__synkHome||(await import(worldUrl('brand-opening/home.mjs?v=performance-20261012'))).home;
 let client,townSession,enrollmentView,lifeUI=null,lifeProgress=null,lifePort=null,lifeOwner=null,lifeGeneration=-1,lifeEpoch=0,lifeReady=null,lifeRecoveryShown=false;
 let tutorReady=false,tutorRefresh=null;
 // Loading and session restoration run behind the company splash. A failed
@@ -199,14 +198,19 @@ async function photo(){
 async function town(){if(operating){if(!client.snapshot)return signIn();try{const entry=await client.request('town/entry');if(!entry.allowed){show('동네를 열 준비','<p class="panel-description">TOPIK 1급 이상 입장 확인과<br>타운 이용권이 필요해요.</p><p class="dialog-note">내 계정의 입장 권한을 확인한 뒤 다시 열어 주세요.</p><div class="world-actions"><button class="plain-button" data-world="profile">내 계정 확인</button></div>','world-town');return;}const state=await client.request('town/state'),binding=state.binding,sharing=binding?.sharing;show('우리 동네, 가까이 만나봐요',`<img class="town-preview" src="assets/town.webp" alt="싱크타운 광장"><p class="panel-description">내 차림 그대로 동네를 걸어보고,<br>몽글을 가까이서 만나봐요.</p><div class="world-notice"><strong>내 타운 기록 · SYNK ID에 보관</strong><span>개인 기록은 내 계정으로 이어져요.${binding?.kind==='academy'?' 학원에 보여 줄 활동은 아래에서 따로 골라요.':' 학원 활동 공유는 소속 반이 연결되면 선택할 수 있어요.'}</span></div>${binding?.classId?`<label class="world-notice"><span><input type="checkbox" data-town-sharing data-revision="${Number(sharing?.revision)||0}" ${sharing?.enabled?'checked':''} ${sharing?.blockedByLearningSharing?'disabled':''}> 타운 활동을 학원에 공유하기</span><span>${sharing?.blockedByLearningSharing?'학습 공유를 켠 뒤 타운 공유를 선택할 수 있어요.':'선택한 뒤 새로 한 타운 활동만 공유해요. 꺼도 내 개인 기록은 보관돼요.'}</span></label>`:''}<div class="world-actions"><button class="felt-button" data-world="town-preview">내 차림으로 동네 열기 <span aria-hidden="true">→</span></button></div>`,'world-town');}catch(error){home.toast(errorText(error));}return;}show('우리 동네, 가까이 만나봐요',`<img class="town-preview" src="assets/town.webp" alt="싱크타운 광장 콘셉트"><p class="panel-description">내 차림 그대로 동네를 걸어보고,<br>몽글을 가까이서 만나봐요.</p><div class="world-notice"><strong>타운 연결 미리보기</strong><span>시험 계정의 차림 연결을 확인하는 개발 체험이에요. 실제 타운의 TOPIK 1급+ 조건·이용권·입장 권한을 부여하지 않아요.</span></div><div class="world-actions"><button class="felt-button" data-world="town-preview">${client.snapshot?'내 차림으로 미리보기':'시험 계정으로 연결하기'} <span aria-hidden="true">→</span></button><button class="plain-button" data-action="hangul">한글부터 배우기</button></div>`,'world-town');}
 function townPreview(){if(!client.snapshot)return signIn();townSession?.dispose();townSession=operating?createTownWorldHost(client):null;if(townSession)window.SYNKWorldTownHost=townSession;show(operating?'나의 싱크타운':'싱크타운 연결 미리보기',`<iframe class="game-frame" title="내 차림으로 걷는 싱크타운" src="${worldUrl('town/day.html')}?play=walk" allow="autoplay; fullscreen" allowfullscreen></iframe>`,'game');}
 function profile(){if(!client.snapshot)return signIn();show('내 세계와 기록',`<div class="profile-view"><img src="assets/mongle-smile.webp" alt=""><h3>반가워요!</h3><p>차림과 첫 놀이의 선물이<br>${operating?'내 SYNK ID':'이 테스트 계정'}에 보관돼요.</p></div><div class="world-notice"><strong>서버 저장 ${client.pending?'대기 중':'연결됨'}</strong><span>현재 차림 판본 ${client.snapshot.revision} · ${operating?'SYNK 계정 연결':'로컬 테스트 계정'}</span></div>${operating?`<section class="world-notice"><strong>내 학습 기록 연결</strong>${account.preferences()?`<label><input type="checkbox" data-world-learning data-revision="${account.preferences().revision}" ${account.preferences().enabled?'checked':''}> 학습 기록을 내 SYNK 계정으로 이어가기</label><span>직접 켠 뒤 새로 한 첫 놀이의 언어 응답을 계정에 저장해요. 학원에 보여 줄 학습과 타운 활동은 내 수업에서 따로 선택해요.</span>`:'<span>학습 연결 설정은 내 수업의 계정 화면에서 확인할 수 있어요.</span>'}<a class="felt-button" href="https://synk.im/account/client.html?product=world">내 수업 · 과제와 공유 설정 <span aria-hidden="true">→</span></a></section>`:''}<div id="world-classroom-entry"></div><div class="world-actions"><button class="felt-button" data-world="wardrobe">내 옷장 열기</button><button class="plain-button" data-world="logout">이 화면에서 로그아웃</button></div>`,'world-profile');if(home.isMaru){$('#panel-content').append(hanger);renderHomeHanger(client.snapshot);}if(operating){const generation=client.generation,owner=client.snapshot.accountId;enrollmentView=mountEnrollment({container:$('#world-classroom-entry'),request:account.enrollmentRequest,guard:()=>{account.assertActive();if(generation!==client.generation||client.snapshot?.accountId!==owner)throw Object.assign(Error('ACCOUNT_CHANGED'),{code:'ACCOUNT_CHANGED'});},onLinked:async()=>{townSession?.dispose();townSession=null;delete window.SYNKWorldTownHost;await account.restore();profile();}});}}
-function wardrobe(){
+async function wardrobe(){
  if(!client.snapshot)return signIn();
- show('나를 닮은 차림.','','world-wardrobe');
+ show('나를 닮은 차림.','<p class="panel-description" role="status">옷장을 준비하고 있어요.</p>','world-wardrobe');
+ const ticket=gameLaunch,owner=client.snapshot.accountId,generation=client.generation;
+ let createWardrobeStudio;
+ try{({createWardrobeStudio}=await import('./wardrobe-studio.mjs?v=performance-20261012'));}
+ catch{if(ticket===gameLaunch&&screen==='world-wardrobe')show('옷장을 다시 열어 주세요.','<p class="panel-description">연결을 확인한 뒤 다시 시도해 주세요.</p><button class="felt-button" data-world="wardrobe">다시 열기</button>','world-wardrobe');return;}
+ if(ticket!==gameLaunch||screen!=='world-wardrobe'||!worldPanel.open||client.generation!==generation||client.snapshot?.accountId!==owner)return;
  wardrobeStudio=createWardrobeStudio({snapshot:client.snapshot,reducedMotion:home.state.reduced,
   onEquip:(slots,dyes)=>client.equip(slots,dyes),onSaveLooks:looks=>client.saveLooks(looks),
   onRefresh:()=>client.refresh(),onRetry:()=>client.sendPending(),onDiscard:()=>client.discardPending(),onPlay:play,
  });
- $('#panel-content').append(wardrobeStudio.element);home.attachPanelResource(wardrobeStudio);
+ $('#panel-content').replaceChildren(wardrobeStudio.element);home.attachPanelResource(wardrobeStudio);
  const openedStudio=wardrobeStudio;
  openedStudio.update(client.snapshot,{busy:true,pending:client.pending,status:client.status});
  // Read the current account when opening, before a new selection is confirmed.
@@ -268,7 +272,7 @@ async function launchGame(id){
   if(ticket!==gameLaunch||!worldPanel.open||home.isMaru&&home.openPanel()!=='world-game-loading'||client.snapshot?.accountId!==accountId){session.dispose();return;}
   if(session.status().play.phase==='conflict'){showGameConflict(id,session);return;}
  }
- show(game.title,`<iframe class="game-frame" title="${game.title}" src="${worldUrl(game.path)}?v=tutor-4e57536c0" allow="autoplay; fullscreen" allowfullscreen></iframe>`,'game');
+ show(game.title,`<iframe class="game-frame" title="${game.title}" src="${worldUrl(game.path)}?v=performance-20261012" allow="autoplay; fullscreen" allowfullscreen></iframe>`,'game');
  const companion=home.mountGameTutor?.(id,{frame:document.querySelector('.game-frame')});
  if(session)activeGameSession=session;
  if(session||companion)home.attachPanelResource({dispose:()=>{companion?.dispose();if(session){if(activeGameSession===session)activeGameSession=null;session.closeGame();}}});

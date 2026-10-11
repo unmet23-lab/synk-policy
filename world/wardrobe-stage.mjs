@@ -127,7 +127,7 @@ export async function mountWardrobeStage(host,{slots={},dyes={},reducedMotion=fa
   function setDyes(value={}){const normalized=avatar.setDyes(value);schedule();return normalized;}
   function getState(){return {slots:{...currentSlots},dyes:avatar.getDyes(),view:getView(),light,pose,background};}
   setLight(light);
-  function capture({width=1200,height=1500,slots:photoSlots,dyes:photoDyes,thumbnail=false}={}){
+  function capture({width=1200,height=1500,slots:photoSlots,dyes:photoDyes,thumbnail=false,restoreImmediately=true}={}){
     if(disposed||lost||renderer.getContext().isContextLost())throw Error('STAGE_UNAVAILABLE');
     width=Math.max(1,Math.min(2400,Math.round(Number(width)||1200)));height=Math.max(1,Math.min(2400,Math.round(Number(height)||1500)));
     const dpr=renderer.getPixelRatio(),previous=getState(),previousAngle=angle,previousTargetAngle=targetAngle;
@@ -136,7 +136,7 @@ export async function mountWardrobeStage(host,{slots={},dyes={},reducedMotion=fa
       if(thumbnail){angle=-.11;detail=false;zoom=0;setPose('neutral');setBackground('room');setLight('studio');}
       fit(width,height);if(photoSlots)avatar.setEquipment(slotsForOutfit(photoSlots));if(photoDyes!==undefined)avatar.setDyes(photoDyes);avatar.group.rotation.y=thumbnail?angle:targetAngle;contactLight.render();
       return canvas.toDataURL('image/png');
-    }finally{angle=previousAngle;targetAngle=previousTargetAngle;detail=previous.view.detail;zoom=previous.view.zoom;avatar.setEquipment(previous.slots);avatar.setDyes(previous.dyes);avatar.group.rotation.y=angle;setPose(previous.pose);setBackground(previous.background);setLight(previous.light);renderer.setPixelRatio(dpr);renderer.setSize(size.width,size.height,false);fit();render();schedule();}
+    }finally{angle=previousAngle;targetAngle=previousTargetAngle;detail=previous.view.detail;zoom=previous.view.zoom;avatar.setEquipment(previous.slots);avatar.setDyes(previous.dyes);avatar.group.rotation.y=angle;setPose(previous.pose);setBackground(previous.background);setLight(previous.light);renderer.setPixelRatio(dpr);renderer.setSize(size.width,size.height,false);fit();if(restoreImmediately)render();schedule();}
   }
   function dispose(){
     if(disposed)return;disposed=true;cancelAnimationFrame(frame);resizeObserver.disconnect();intersection.disconnect();document.removeEventListener('visibilitychange',visibility);
@@ -146,7 +146,7 @@ export async function mountWardrobeStage(host,{slots={},dyes={},reducedMotion=fa
   disposeReady=dispose;
   return {
     canvas,setAngle,setLight,setZoom,getView,setView,resetView,setDyes,getDyes:()=>avatar.getDyes(),getDyeDefaults:(slots=currentSlots)=>wardrobeDyeDefaults(slots),setPose,setBackground,getState,capture,dispose,
-    setSlots(value){currentSlots=slotsForOutfit(value);avatar.setEquipment(currentSlots);schedule();},
+    setSlots(value){const next=slotsForOutfit(value);if(next.body===currentSlots.body&&next.neck===currentSlots.neck)return;currentSlots=next;avatar.setEquipment(currentSlots);schedule();},
     setDetail(value){detail=Boolean(value);fit();notifyView();schedule();},
     setActive(value){active=Boolean(value);if(!active){cancelAnimationFrame(frame);frame=0;}else schedule();},
     metrics:()=>({stageRevision:3,avatar:avatar.metrics(),contactLight:contactLight.metrics(),shadowMapSize:key.shadow.mapSize.x,shadowTechnique:'VSM',slots:{...currentSlots},dyes:avatar.getDyes(),view:getView(),angle,targetAngle,detail,zoom,light,pose,background,disposed,lost,active,inView,paused:!active||!inView||document.hidden||lost,frames:frameCount,dpr:renderer.getPixelRatio(),drawCalls:renderer.info.render.calls,triangles:renderer.info.render.triangles,textures:renderer.info.memory.textures,geometries:renderer.info.memory.geometries,renderSubmissionMs:renderMs,drawingBuffer:{width:canvas.width,height:canvas.height}}),
