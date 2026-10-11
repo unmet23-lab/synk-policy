@@ -41,7 +41,9 @@ jobs:
       - name: Validate frozen public source
         run: node build.cjs --validate-only
       - name: Build native Preview DMGs
-        run: node build.cjs --arch=${{ matrix.arch }}
+        run: |
+          node build.cjs --arch=${{ matrix.arch }}
+          test -s dist/${{ matrix.arch }}/deliverables/mac-package-${{ matrix.arch }}.json
         env:
           CSC_IDENTITY_AUTO_DISCOVERY: 'false'
       - name: Install DMGs in an isolated folder and run native QA
@@ -65,6 +67,7 @@ jobs:
             .github/desktop-preview/qa-results/${{ matrix.arch }}/*/report.json
             .github/desktop-preview/qa-results/${{ matrix.arch }}/*/*.png
             .github/desktop-preview/qa-results/${{ matrix.arch }}/*-process.log
+            .github/desktop-preview/dist/${{ matrix.arch }}/logs/
           include-hidden-files: true
           if-no-files-found: ignore
           retention-days: 14
