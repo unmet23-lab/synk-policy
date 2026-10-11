@@ -10,11 +10,13 @@ On a native macOS runner with Node.js 24:
 npm ci --no-audit --no-fund
 node build.cjs --validate-only
 node build.cjs --arch=arm64
-# Use --arch=x64 on an Intel runner.
+# For x64, first run bash build-vulkan-loader.sh on a Mac, then --arch=x64.
 ```
 
 `dist/<arch>/deliverables/` contains WORLD, Workspace, and Platform DMGs plus checksums and verification reports. Platform bundles the same WORLD and Workspace DMGs. All three apps must retain their original bundle names when copied to `/Applications` so Platform can verify and find them.
 
 These are ad-hoc signed Preview builds, without a Developer ID or Apple notarization. The minimum system is macOS 13. Internet access is required; no development server, Node.js installation, or source checkout is needed to use an installed app. The build never uploads artifacts or runs a signed release workflow.
+
+Intel packaging includes the missing Chromium 151+ Vulkan loader, compiled from pinned official Khronos SDK 1.4.363.0 sources. The loader and its license/provenance are added before code signing. App source and normal GPU selection stay unchanged. The Intel GitHub runner has no hardware GPU, so native CI alone uses explicit SwiftShader flags; those flags are not added to the application. This verifies CPU execution and real public game actions, not physical Intel GPU performance. A separate x64 Rosetta check exercises the default Metal path.
 
 The script verifies frozen source hashes, secret-file patterns, native architecture, final code signatures, actual read-only DMG contents, application bytes, and bundled child checksums. Separate native GUI QA must pass before publication. Download quarantine and Gatekeeper approval on another physical Mac are not proven by a CI run.

@@ -3,3 +3,5 @@ stage/
 dist/
 qa-results/
 .npm-cache/
+native-libs/
+intel-diagnostics/
