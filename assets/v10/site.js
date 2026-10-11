@@ -63,9 +63,10 @@ addEventListener('pointerdown', smooth, true); addEventListener('keydown', smoot
 const ORB_GRID = 64; let grainJob = null;
 function orbRandom(seed) { return function () { seed |= 0; seed = seed + 0x6D2B79F5 | 0; let t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
 const whenIdle = window.requestIdleCallback ? cb => requestIdleCallback(cb, { timeout: 1000 }) : cb => setTimeout(() => cb(null), 16);
-function inSlices(steps) {
+function inSlices(steps, active = () => true) {
   return new Promise(resolve => {
     const run = deadline => {
+      if (!active()) { resolve(null); return; }
       const stop = performance.now() + (deadline && !deadline.didTimeout ? Math.min(8, deadline.timeRemaining()) : 8);
       for (;;) { const next = steps.next(); if (next.done) { resolve(next.value); return; } if (performance.now() >= stop) break; }
       whenIdle(run);
@@ -110,10 +111,10 @@ function* grainSteps() {
   }
   return order;
 }
-function grainOrder() {
+function grainOrder(active = () => true) {
   if (grainJob) return grainJob;
   const stored = storedGrain(ORB_GRID * ORB_GRID);
-  return grainJob = stored ? Promise.resolve(stored) : inSlices(grainSteps()).then(order => { storeGrain(order); return order; });
+  return grainJob = stored ? Promise.resolve(stored) : inSlices(grainSteps(), active).then(order => { if (order) storeGrain(order); else grainJob = null; return order; });
 }
 const LIGHT = { angle: -Math.PI * 2 * .108, lift: .56, fall: 2.4, gain: .9, floor: .02, rim: .06 };
 const FALL = new Float32Array(1025); for (let i = 0; i <= 1024; i++) FALL[i] = Math.pow(i / 1024, LIGHT.fall) * LIGHT.gain;
@@ -128,28 +129,31 @@ function mountOrb(holder) {
   const ctx = canvas?.getContext('2d'); if (!ctx || !surface) return;
   const fine = matchMedia('(hover: hover) and (pointer: fine)');
   let angle = LIGHT.angle, lift = LIGHT.lift, frame = 0, drawn = '', shape = null, preparing = '';
+  let near = !('IntersectionObserver' in window), image = null, inkKey = '', dark = null, light = null;
+  const active = () => near && !document.hidden;
   function* measureSteps(size, dpr, grain) {
     const G = ORB_GRID, cell = Math.max(1, Math.round(dpr * .62)), radius = size / 2 - dpr, middle = size / 2, outer = (1 + 1.5 / radius) ** 2;
-    const index = [], cx = [], cy = [], cz = [], rim = [], threshold = [], cover = [];
+    // 픽셀마다 일반 배열을 늘린 뒤 일곱 번 복사하던 임시 메모리를 없앤다.
+    const capacity = size * size, index = new Int32Array(capacity), cx = new Float32Array(capacity), cy = new Float32Array(capacity), cz = new Float32Array(capacity), rim = new Float32Array(capacity), threshold = new Float32Array(capacity), cover = new Uint8Array(capacity);
+    let used = 0;
     for (let py = 0; py < size; py++) {
       const y = (py + .5 - middle) / radius, gy = Math.floor(py / cell), sy = ((gy + .5) * cell - middle) / radius, row = (gy % G) * G;
       for (let px = 0; px < size; px++) {
         const x = (px + .5 - middle) / radius, reachSq = x * x + y * y; if (reachSq > outer) continue;
         const edge = Math.round(Math.min(1, Math.max(0, (1 - Math.sqrt(reachSq)) * radius + .5)) * 255); if (!edge) continue;
         const gx = Math.floor(px / cell), sx = ((gx + .5) * cell - middle) / radius, z = Math.sqrt(Math.max(0, 1 - sx * sx - sy * sy));
-        index.push((py * size + px) * 4); cx.push(sx); cy.push(sy); cz.push(z); rim.push(LIGHT.floor + Math.pow(1 - z, 5) * LIGHT.rim); threshold.push(grain[row + gx % G]); cover.push(edge);
+        index[used] = (py * size + px) * 4; cx[used] = sx; cy[used] = sy; cz[used] = z; rim[used] = LIGHT.floor + Math.pow(1 - z, 5) * LIGHT.rim; threshold[used] = grain[row + gx % G]; cover[used++] = edge;
       }
-      if (py % 32 === 31) yield;
+      if (py % 8 === 7) yield;
     }
-    return { size, dpr, index: Int32Array.from(index), cx: Float32Array.from(cx), cy: Float32Array.from(cy), cz: Float32Array.from(cz), rim: Float32Array.from(rim), threshold: Float32Array.from(threshold), cover: Uint8Array.from(cover) };
+    return { size, dpr, index: index.subarray(0, used), cx: cx.subarray(0, used), cy: cy.subarray(0, used), cz: cz.subarray(0, used), rim: rim.subarray(0, used), threshold: threshold.subarray(0, used), cover: cover.subarray(0, used) };
   }
   function prepare(size, dpr) {
     const want = size + '|' + dpr; if (preparing === want) return; preparing = want;
-    grainOrder().then(grain => inSlices(measureSteps(size, dpr, grain))).then(next => { if (preparing !== want) return; preparing = ''; shape = next; request(); });
+    grainOrder(active).then(grain => grain && inSlices(measureSteps(size, dpr, grain), () => active() && preparing === want)).then(next => { if (preparing !== want) return; preparing = ''; if (next) { shape = next; image = null; } request(); });
   }
-  let near = !('IntersectionObserver' in window), idle = 0;
   function paint() {
-    frame = 0; if (!near) return;
+    frame = 0; if (!active()) return;
     const dpr = Math.min(Math.max(devicePixelRatio || 1, 1), 3), width = surface.getBoundingClientRect().width; if (!width) return;
     const style = getComputedStyle(surface), inks = style.color + '/' + style.caretColor;
     const size = Math.round(width * dpr), key = size + '|' + dpr + '|' + angle.toFixed(2) + '|' + lift.toFixed(2) + '|' + inks;
@@ -158,9 +162,10 @@ function mountOrb(holder) {
     drawn = key;
     if (canvas.width !== size) canvas.width = canvas.height = size;
     const css = (size + .004) / dpr + 'px'; if (canvas.style.width !== css) canvas.style.width = canvas.style.height = css;
-    const image = ctx.createImageData(size, size), data = image.data, side = Math.sqrt(1 - lift * lift), lx = Math.sin(angle) * side, ly = -Math.cos(angle) * side;
+    image ??= ctx.createImageData(size, size);
+    const data = image.data, side = Math.sqrt(1 - lift * lift), lx = Math.sin(angle) * side, ly = -Math.cos(angle) * side;
     const { index, cx, cy, cz, rim, threshold, cover } = shape;
-    const dark = rgba(style.color, '#0a0a0a'), light = rgba(style.caretColor, '#fff');
+    if (inkKey !== inks) { inkKey = inks; dark = rgba(style.color, '#0a0a0a'); light = rgba(style.caretColor, '#fff'); }
     for (let k = 0; k < index.length; k++) {
       const facing = Math.max(0, Math.min(1, cx[k] * lx + cy[k] * ly + cz[k] * lift)), lit = rim[k] + FALL[(facing * 1024) | 0] > threshold[k], i = index[k], ink = lit ? light : dark;
       data[i] = ink[0]; data[i + 1] = ink[1]; data[i + 2] = ink[2]; data[i + 3] = cover[k] * ink[3] / 255;
@@ -168,12 +173,14 @@ function mountOrb(holder) {
     ctx.putImageData(image, 0, 0);
     surface.classList.add('orb-rendered');
   }
-  const request = () => { if (!frame) frame = requestAnimationFrame(paint); };
-  // 구는 질문 구역에 있다. 화면이 조용해진 뒤나 가까이 왔을 때 먼저 오는 쪽에 계산한다(스크롤이 기다리지 않게).
-  const quiet = window.requestIdleCallback ? cb => requestIdleCallback(cb, { timeout: 2500 }) : cb => setTimeout(cb, 300);
-  const later = () => { if (idle) return; idle = quiet(() => { idle = 0; near = true; request(); }); };
-  if (!near) new IntersectionObserver(entries => { if (entries.some(e => e.isIntersecting)) { near = true; request(); } }, { rootMargin: '800px 0px' }).observe(surface);
-  new ResizeObserver(later).observe(surface);
+  const request = () => { if (active() && !frame) frame = requestAnimationFrame(paint); };
+  // 질문 구역에 가까워질 때만 준비한다. 최초 ResizeObserver 통지를 가시성으로 취급하지 않는다.
+  if (!near) new IntersectionObserver(entries => {
+    near = entries.some(e => e.isIntersecting);
+    if (near) request();
+    else if (frame) { cancelAnimationFrame(frame); frame = 0; }
+  }, { rootMargin: '800px 0px' }).observe(surface);
+  new ResizeObserver(request).observe(surface);
   holder.addEventListener('pointermove', event => {
     if (reduced.matches || !fine.matches || event.pointerType === 'touch') return;
     const r = surface.getBoundingClientRect(), dx = (event.clientX - r.left) / r.width * 2 - 1, dy = (event.clientY - r.top) / r.height * 2 - 1, d = Math.min(1, Math.hypot(dx, dy));
@@ -181,6 +188,7 @@ function mountOrb(holder) {
   });
   holder.addEventListener('pointerleave', () => { angle = LIGHT.angle; lift = LIGHT.lift; request(); });
   addEventListener('pageshow', request);
+  document.addEventListener('visibilitychange', () => { if (document.hidden && frame) { cancelAnimationFrame(frame); frame = 0; } else request(); });
   let density = null;
   const watch = () => { density?.removeEventListener?.('change', changed); density = matchMedia('(resolution: ' + (devicePixelRatio || 1) + 'dppx)'); density.addEventListener?.('change', changed); };
   const changed = () => { watch(); request(); };
