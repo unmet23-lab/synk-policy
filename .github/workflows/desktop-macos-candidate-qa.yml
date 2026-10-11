@@ -42,6 +42,7 @@ jobs:
         run: node qa/run-macos-qa.cjs --arch=x64
         env:
           SYNK_QA_VISIBLE: '1'
+          SYNK_QA_UNLIMITED_FRAMES: '1'
       - name: Save validation evidence
         if: always()
         uses: actions/upload-artifact@v7
