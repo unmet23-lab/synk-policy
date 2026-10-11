@@ -75,7 +75,7 @@ export function createFilmPlayer({ mount, manifest, onState = () => {}, onEnded 
     video.setAttribute('playsinline', ''); video.setAttribute('aria-hidden', 'true'); video.tabIndex = -1;
     Object.assign(video.style, { position: 'absolute', inset: '0', width: '100%', height: '100%', objectFit: 'contain', opacity: '0', pointerEvents: 'none', transition: transitionMs ? `opacity ${transitionMs}ms linear` : 'none' });
     stage.appendChild(video);
-    return { video, index, version: 0, id: null, primed: false, watch: null, frame: null };
+    return { video, index, version: 0, playSerial: 0, id: null, primed: false, watch: null, frame: null };
   });
   mount.appendChild(stage);
   let state = 'idle', active = null, queued = null, deferredQueue = null, paused = false, disposed = false, generation = 0, transitioning = false, transitionOwner = null, blend = null, playbackSerial = 0, handoffJob = null;
@@ -160,14 +160,16 @@ export function createFilmPlayer({ mount, manifest, onState = () => {}, onEnded 
     });
   }
   function started(slot, job) {
-    const version = slot.version;
+    const version = slot.version, playSerial = ++slot.playSerial;
     return wait(job, (resolve, reject) => {
       let result;
       try { result = slot.video.play(); } catch (error) { reject(error); return; }
       Promise.resolve(result).then(() => {
         // A late play() promise must not restart cancelled media. A newer source
-        // in the same slot owns its playback and must not be paused by this job.
-        if ((job.signal.aborted || job.token !== generation || disposed) && (slot.version === version || !slot.id)) { slot.video.pause(); slot.video.muted = true; }
+        // or resume in the same slot owns its playback and must not be paused
+        // by this job. Source version cannot distinguish two resumes of the
+        // same decoded performance; each play request also has its own owner.
+        if ((job.signal.aborted || job.token !== generation || disposed) && ((slot.version === version && slot.playSerial === playSerial) || !slot.id)) { slot.video.pause(); slot.video.muted = true; }
         try { guard(job); resolve(); } catch (error) { reject(error); }
       }, reject);
     });
