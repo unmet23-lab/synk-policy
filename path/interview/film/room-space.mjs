@@ -365,6 +365,10 @@ export async function createInterviewSpace(THREE, { parent, loadTexture, maxAnis
       const texture = new THREE.VideoTexture(video);
       texture.colorSpace = THREE.SRGBColorSpace;
       texture.minFilter = texture.magFilter = THREE.LinearFilter;
+      // Preview can first open (or reopen) after pause/completion. The decoded
+      // frame already exists, so a new RVFC may never arrive. Upload that frame
+      // on the first render; later frames keep Three's normal callback updates.
+      if (video.readyState >= 2) texture.needsUpdate = true;
       videoTextures.set(video, texture);
     }
     return videoTextures.get(video);
@@ -414,7 +418,10 @@ export async function createInterviewSpace(THREE, { parent, loadTexture, maxAnis
       const entries = frames.slice(0, 2), videos = new Set(entries.map((entry) => entry?.video).filter(Boolean));
       for (const [video, t] of videoTextures) if (!videos.has(video)) { videoWarmupRevision++; t.dispose(); videoTextures.delete(video); }
       const hasActiveFilm = entries.some((entry) => entry?.video?.readyState >= 2 && entry.opacity > 0);
-      reference.visible = !hasActiveFilm && ['idle', 'preparing'].includes(state.phase) && !!reference.material.map;
+      // Changing quality after completion clears the old film buffers. Keep
+      // the seated people visible while waiting for the next interview, without
+      // replacing an active performance or disguising a playback error.
+      reference.visible = !hasActiveFilm && ['idle', 'preparing', 'complete'].includes(state.phase) && !!reference.material.map;
       layers.forEach((mesh, index) => {
         const entry = entries[index], video = entry?.video;
         mesh.visible = !!video && video.readyState >= 2 && entry.opacity > 0;
