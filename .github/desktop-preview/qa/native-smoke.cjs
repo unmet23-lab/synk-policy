@@ -86,7 +86,7 @@ function observe(config){
   return {appData:app.getPath('appData'),archive:app.getAppPath()};
 }
 // Intel hosted CI has no working hardware GL. This affects only the QA process, not the shipped app.
-const graphicsArgs=config.arch==='x64'?['--use-angle=swiftshader','--enable-unsafe-swiftshader']:[];
+const graphicsArgs=config.arch==='x64'?['--use-gl=angle','--use-angle=swiftshader','--enable-unsafe-swiftshader']:[];
 const child=spawn(bundle.executable,[...graphicsArgs,'--inspect-brk=127.0.0.1:0','--log-file='+path.join(out,'electron.log')],{cwd:out,env:{...process.env,TMPDIR:path.join(out,'tmp')},stdio:['ignore','pipe','pipe']});
 let stdout='',stderr='',ws,connected=false,sequence=0,injected=false,error=null;const pending=new Map();
 const rpc=(method,params={})=>new Promise((resolve,reject)=>{const id=++sequence;pending.set(id,{resolve,reject});ws.send(JSON.stringify({id,method,params}));});
