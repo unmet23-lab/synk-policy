@@ -1,5 +1,5 @@
 {
-  "version": "2026-09-15-selected-experiences-copy-9bfc4e4ce8-rhythm-20261001-copy-3910676d01-release-copy-3e4ed3be6d-en-002b14631325-bm-platform-20261007-a885b0d303-travel-20261007-ce148dd860-real-20261007-ab58ee7076-homepage-current-20261009-033c24b61f29-homepage-v10-20261010-494a2ec8c946",
+  "version": "2026-09-15-selected-experiences-copy-9bfc4e4ce8-rhythm-20261001-copy-3910676d01-release-copy-3e4ed3be6d-en-002b14631325-bm-platform-20261007-a885b0d303-travel-20261007-ce148dd860-real-20261007-ab58ee7076-homepage-current-20261009-033c24b61f29-homepage-v10-20261010-9ca68c915977",
   "updatedAt": "2026-10-10",
   "docs": [
     {
@@ -64,12 +64,12 @@
         "Lowering the music while a LAB game plays a sentence, and checking levels and narration before a PULSE video is delivered, are Reed’s work.",
         "Strata maps what to learn and in what order, and it is still in development. It links grammar, expressions and vocabulary by difficulty and learning order, and decides which foundation to revisit when something goes wrong.",
         "Strata is still in development.",
-        "It is where you use SYNK apps and member benefits in one place with a single SYNK ID. Right now it is open as a development 0.2 web preview, and we are building versions you install on Windows and macOS.",
+        "It is where you use SYNK apps and member benefits in one place with a single SYNK ID. From the platform section on our home page, you can download Preview 0.4.0 for 64-bit Windows or open the web preview.",
         "One SYNK ID — apps such as SYNK WORLD and the member benefits run on the same account, so you do not sign up for each app separately, and once you sign in the records linked to your account are in one spot.",
         "Only the apps you need — we are building it so that you see the apps that match your organization and access, with recommendations that follow the interests you choose.",
         "Experiences that carry on — we are working so that the words you chose, the stories you saved and the moments you found hard in practice carry over to what comes next. You choose, check and correct what each service remembers.",
         "My library — keep shortcuts to the apps and benefits you open often on this device; turn on the account library to carry them to your other devices.",
-        "The official release date and how to get the installed versions will be announced once decided.",
+        "The Windows installer is a development build without code signing, so Windows may show a security notice during installation. The bundled WORLD app requires a separate development server. The macOS version and official release date will be announced once decided.",
         "They fall into three groups: engines that understand (Core, Strata, Trail), engines that fit the experience (Loom, Vellum, Reed) and engines that check (Prism, Temper). Each service uses the ones it needs.",
         "Core decides what is needed now and records why something was recommended or left out. Strata maps what to learn and in what order (in development). Trail records the process and what changed.",
         "Loom brings felt textures to life with light and motion for screens that respond to touch. Vellum gives explanations and hints that fit the task and the answer. Reed handles music and sound, and turns it down when focus matters.",
@@ -4687,7 +4687,7 @@
         "When does the platform launch?",
         "What carries over when I sign in?"
       ],
-      "answer": "It is where you use SYNK apps and member benefits in one place with a single SYNK ID. Right now it is open as a development 0.2 web preview, and we are building versions you install on Windows and macOS.\n\nOne SYNK ID — apps such as SYNK WORLD and the member benefits run on the same account, so you do not sign up for each app separately, and once you sign in the records linked to your account are in one spot.\n\nOnly the apps you need — we are building it so that you see the apps that match your organization and access, with recommendations that follow the interests you choose.\n\nExperiences that carry on — we are working so that the words you chose, the stories you saved and the moments you found hard in practice carry over to what comes next. You choose, check and correct what each service remembers.\n\nMy library — keep shortcuts to the apps and benefits you open often on this device; turn on the account library to carry them to your other devices.\n\nThe official release date and how to get the installed versions will be announced once decided.",
+      "answer": "It is where you use SYNK apps and member benefits in one place with a single SYNK ID. From the platform section on our home page, you can download Preview 0.4.0 for 64-bit Windows or open the web preview.\n\nOne SYNK ID — apps such as SYNK WORLD and the member benefits run on the same account, so you do not sign up for each app separately, and once you sign in the records linked to your account are in one spot.\n\nOnly the apps you need — we are building it so that you see the apps that match your organization and access, with recommendations that follow the interests you choose.\n\nExperiences that carry on — we are working so that the words you chose, the stories you saved and the moments you found hard in practice carry over to what comes next. You choose, check and correct what each service remembers.\n\nMy library — keep shortcuts to the apps and benefits you open often on this device; turn on the account library to carry them to your other devices.\n\nThe Windows installer is a development build without code signing, so Windows may show a security notice during installation. The bundled WORLD app requires a separate development server. The macOS version and official release date will be announced once decided.",
       "sourceId": "company",
       "relatedIds": [
         "synk-intro",
@@ -4695,8 +4695,8 @@
         "synk-value"
       ],
       "action": {
-        "label": "Open the SYNK platform",
-        "href": "/account/platform.html"
+        "label": "Download or open the web preview",
+        "href": "/en/#platform"
       },
       "reviewedAt": "2026-10-10"
     },

@@ -13,9 +13,11 @@ SYNK 플랫폼은 SYNK의 앱과 회원 혜택을 한곳에서 쓰는 입구입�
 - 이어지는 경험 — 고른 말과 남긴 이야기가 다음 경험으로 이어지게 만들고 있습니다. 기억할 내용은 직접 고르고 고칩니다.
 - 내 라이브러리 — 자주 여는 앱을 이 기기에 담아 두고, 계정 라이브러리를 켜면 다른 기기와도 이어집니다.
 
-지금은 개발 중인 웹 미리보기입니다. Windows·macOS 설치판과 정식 출시 일정은 정해지면 알려 드립니다.
+Windows 64비트용 Preview 0.4.0입니다. 코드 서명이 없는 개발판으로 설치할 때 Windows 보안 알림이 표시될 수 있습니다. 포함된 WORLD는 별도 개발 서버가 필요합니다. macOS 설치판과 정식 출시 일정은 정해지면 알려 드립니다.
 
 [SYNK 플랫폼 열기](https://synk.im/account/platform.html#home)
+
+[Windows용 다운로드](https://github.com/unmet23-lab/synk-policy/releases/download/platform-preview-0.4.0-20261011/SYNK-Platform-Preview-0.4.0-win-x64.exe)
 
 ## 네 사업
 
