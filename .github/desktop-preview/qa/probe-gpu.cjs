@@ -1,7 +1,7 @@
 'use strict';
 const fs=require('node:fs'),path=require('node:path'),os=require('node:os');
 if(!process.versions.electron){
- const cp=require('node:child_process'),result=cp.spawnSync(require('electron'),[__filename],{encoding:'utf8',timeout:45000,maxBuffer:1000000});
+ const cp=require('node:child_process'),flags=process.env.SYNK_QA_SOFTWARE_GPU==='1'?['--use-gl=angle','--use-angle=swiftshader','--enable-unsafe-swiftshader']:[],result=cp.spawnSync(require('electron'),[...flags,__filename],{encoding:'utf8',timeout:45000,maxBuffer:1000000});
  process.stdout.write(result.stdout||'');process.stderr.write(result.stderr||'');if(result.error)process.stderr.write(result.error.message+'\n');process.exit(result.status===0?0:1);
 }
 const {app,BrowserWindow}=require('electron');
