@@ -1,0 +1,19 @@
+{
+  "name": "synk-public-macos-preview-build",
+  "version": "0.4.1",
+  "private": true,
+  "description": "Frozen SYNK macOS Preview distribution build",
+  "author": "SYNK",
+  "scripts": {
+    "validate-source": "node build.cjs --validate-only",
+    "build:mac": "node build.cjs"
+  },
+  "engines": {
+    "node": ">=24"
+  },
+  "devDependencies": {
+    "@electron/asar": "3.4.1",
+    "electron": "44.5.1",
+    "electron-builder": "26.15.3"
+  }
+}

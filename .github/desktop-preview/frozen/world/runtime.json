@@ -1,0 +1,51 @@
+{
+  "clientId": "world",
+  "mode": "development",
+  "entry": "https://synk.im/account/client.html?product=world",
+  "releases": [],
+  "auth": {
+    "version": 1,
+    "supabaseUrl": "https://qiwxeddwwnzkwalpsuty.supabase.co",
+    "accountApiUrl": "https://qiwxeddwwnzkwalpsuty.supabase.co",
+    "supabasePublishableKey": "sb_publishable_g_T9VApp7f7L3girlJW8hA_j__pZjED",
+    "clients": {
+      "platform": {
+        "clientId": "9d7f276d-58bf-4c98-a7fd-9c3da0a40408",
+        "redirectUri": "http://127.0.0.1:43821/synk/oauth/platform/callback"
+      },
+      "world": {
+        "clientId": "a256e2f3-62f5-4a18-80f5-c3342c463dd0",
+        "redirectUri": "http://127.0.0.1:43822/synk/oauth/world/callback"
+      },
+      "messenger": {
+        "clientId": "57824287-1db2-4fdd-a29b-ec059d85f136",
+        "redirectUri": "http://127.0.0.1:43823/synk/oauth/messenger/callback"
+      },
+      "teacher": {
+        "clientId": "5e3730e8-8cf4-4e7e-aa92-c3f1582996b5",
+        "redirectUri": "http://127.0.0.1:43824/synk/oauth/teacher/callback"
+      },
+      "fortune": {
+        "clientId": "88ecd6c3-7b11-4630-853d-4be21f321af9",
+        "redirectUri": "http://127.0.0.1:43825/synk/oauth/fortune/callback"
+      },
+      "care": {
+        "clientId": "3313e645-6e13-466c-a788-bc203dcb7219",
+        "redirectUri": "http://127.0.0.1:43826/synk/oauth/care/callback"
+      },
+      "rehearsal": {
+        "clientId": "17e1fbfb-8899-4186-8cf7-a40b1732b84e",
+        "redirectUri": "http://127.0.0.1:43827/synk/oauth/rehearsal/callback"
+      },
+      "family-album": {
+        "clientId": "4f1c015d-0523-4b61-9b10-6c3faa09217a",
+        "redirectUri": "http://127.0.0.1:43828/synk/oauth/family-album/callback"
+      },
+      "path": {
+        "clientId": "9c1f7c0e-db52-42eb-949e-9f2d7e5d4220",
+        "redirectUri": "http://127.0.0.1:43829/synk/oauth/path/callback"
+      }
+    }
+  },
+  "worldCloudPreview": true
+}
