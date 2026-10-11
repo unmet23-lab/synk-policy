@@ -1,5 +1,5 @@
 {
-  "version": "2026-09-15-selected-experiences-copy-9bfc4e4ce8-rhythm-20261001-copy-3910676d01-release-copy-3e4ed3be6d-en-002b14631325-bm-platform-20261007-a885b0d303-travel-20261007-ce148dd860-real-20261007-ab58ee7076-homepage-current-20261009-033c24b61f29-homepage-v10-20261010-2c5e5a62f529",
+  "version": "2026-09-15-selected-experiences-copy-9bfc4e4ce8-rhythm-20261001-copy-3910676d01-release-copy-3e4ed3be6d-en-002b14631325-bm-platform-20261007-a885b0d303-travel-20261007-ce148dd860-real-20261007-ab58ee7076-homepage-current-20261009-033c24b61f29-homepage-v10-20261010-4353bd225ea5",
   "updatedAt": "2026-10-10",
   "docs": [
     {
@@ -439,10 +439,10 @@
         "Application support — polish the documents you wrote and practise interviews, and check deadlines, paperwork and what to do before departure.",
         "Korean for real situations — practise the expressions from LAB as if asking a professor a question or explaining your motivation in an interview.",
         "If your goal changes, so does the plan. The scope, schedule and cost of support are agreed after a consultation.",
-        "VR interview and daily-life practice is being prepared as VR lessons alongside LAB’s Korean classes and is not available yet. You will practise explaining your study plan in a visa interview, asking questions in a university class and talking about your experience in a job interview.",
-        "Visa interview — answer questions about why you want to study in Korea, your major and your plans.",
-        "University life — ask about what you did not understand in class, talk to a professor and divide roles with teammates.",
-        "Job interviews — connect your role and what you solved, and prepare for follow-up questions.",
+        "A 60–90 second caregiver interview test with three interviewers is available in Korean. Select See VR practice below to find the start button.",
+        "You can explore the room and answer on a PC. VR requires a supported Quest headset and browser, plus microphone permission; testing on a physical Quest is still pending.",
+        "Caregiver interview — explain your motivation, then answer a follow-up question based on whether you have experience.",
+        "Visa interview and university-life practice are still in preparation and are not available yet.",
         "VR practice is not work experience or a qualification, and admission, visas and jobs are not guaranteed.",
         "We help you build a portfolio that shows why you chose your field and what you have done, through your study plan and the writing, presentations and projects you made yourself.",
         "For students — explain your experience with concrete examples and find what to strengthen.",
@@ -3475,7 +3475,7 @@
         "How does PATH use VR to prepare for visa interviews?",
         "When can I try VR practice?"
       ],
-      "answer": "VR interview and daily-life practice is being prepared as VR lessons alongside LAB’s Korean classes and is not available yet. You will practise explaining your study plan in a visa interview, asking questions in a university class and talking about your experience in a job interview.\n\nVisa interview — answer questions about why you want to study in Korea, your major and your plans.\n\nUniversity life — ask about what you did not understand in class, talk to a professor and divide roles with teammates.\n\nJob interviews — connect your role and what you solved, and prepare for follow-up questions.\n\nVR practice is not work experience or a qualification, and admission, visas and jobs are not guaranteed.",
+      "answer": "A 60–90 second caregiver interview test with three interviewers is available in Korean. Select See VR practice below to find the start button.\n\nYou can explore the room and answer on a PC. VR requires a supported Quest headset and browser, plus microphone permission; testing on a physical Quest is still pending.\n\nCaregiver interview — explain your motivation, then answer a follow-up question based on whether you have experience.\n\nVisa interview and university-life practice are still in preparation and are not available yet.\n\nVR practice is not work experience or a qualification, and admission, visas and jobs are not guaranteed.",
       "relatedIds": [
         "path-intro",
         "path-philosophy"
