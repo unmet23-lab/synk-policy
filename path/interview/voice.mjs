@@ -40,18 +40,21 @@ export function mergeVoiceResults(results = []) {
         ...(Number.isFinite(item.end) && item.end >= 0 ? { end: item.end } : {}),
       };
     });
-    return { text, words };
+    return { text, words, engine: result?.engine };
   });
   const words = segments.flatMap((segment) => segment.words);
   const known = words.filter((word) => Number.isFinite(word.conf));
+  const engines = [...new Set(segments.filter(segment => segment.text).map(segment => segment.engine))];
   return { text: segments.map((segment) => segment.text).filter(Boolean).join(' '), words,
+    ...(engines.length === 1 && typeof engines[0] === 'string' ? { engine: engines[0] } : {}),
+    ...(results.some(result => result?.truncated) ? { truncated: true } : {}),
     ...(known.length ? { confidence: known.reduce((sum, word) => sum + word.conf, 0) / known.length } : {}),
     confidenceCoverage: words.length ? known.length / words.length : 0,
   };
 }
 
 function normalize(result = {}) {
-  return mergeVoiceResults([{ text: result.text, words: result.result }]);
+  return mergeVoiceResults([{ text: result.text, words: result.result, engine: result.engine, truncated: result.truncated }]);
 }
 
 /**
@@ -64,7 +67,7 @@ function normalize(result = {}) {
  * `platform` / `modelFactory` are dependency seams for lifecycle tests.
  */
 export function createVoiceInput({ onPartial = noop, onResult = noop, onLevel = noop, onStatus = noop,
-  platform = globalThis, modelFactory, prepareTimeoutMs = 240_000, finalTimeoutMs = 15_000 } = {}) {
+  platform = globalThis, modelFactory, modelNotice = '한국어 음성 모델을 준비하고 있어요. 처음에는 약 89MB를 내려받아요.', prepareTimeoutMs = 240_000, finalTimeoutMs = 15_000 } = {}) {
   let model = null;
   let preparing = null;
   let cancelPreparing = null;
@@ -88,7 +91,7 @@ export function createVoiceInput({ onPartial = noop, onResult = noop, onLevel = 
     if (disposed) throw abortError();
     if (model?.ready) return;
     if (preparing) return preparing;
-    emit('loading', '한국어 음성 모델을 준비하고 있어요. 처음에는 약 89MB를 내려받아요.', { progress: null });
+    emit('loading', modelNotice, { progress: null });
     preparing = (async () => {
       if (!platform.Worker || !platform.WebAssembly) throw new Error('WebAssembly worker unavailable');
       const factory = modelFactory || (async () => {

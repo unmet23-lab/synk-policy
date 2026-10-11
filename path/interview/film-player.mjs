@@ -75,10 +75,10 @@ export function createFilmPlayer({ mount, manifest, onState = () => {}, onEnded 
     video.setAttribute('playsinline', ''); video.setAttribute('aria-hidden', 'true'); video.tabIndex = -1;
     Object.assign(video.style, { position: 'absolute', inset: '0', width: '100%', height: '100%', objectFit: 'contain', opacity: '0', pointerEvents: 'none', transition: transitionMs ? `opacity ${transitionMs}ms linear` : 'none' });
     stage.appendChild(video);
-    return { video, index, version: 0, playSerial: 0, id: null, primed: false, watch: null, frame: null };
+    return { video, index, version: 0, playSerial: 0, id: null, primed: false, headFrame: null, watch: null, frame: null };
   });
   mount.appendChild(stage);
-  let state = 'idle', active = null, queued = null, deferredQueue = null, paused = false, disposed = false, generation = 0, transitioning = false, transitionOwner = null, blend = null, playbackSerial = 0, handoffJob = null;
+  let state = 'idle', active = null, pendingStart = null, queued = null, deferredQueue = null, paused = false, disposed = false, generation = 0, transitioning = false, transitionOwner = null, blend = null, playbackSerial = 0, handoffJob = null;
   function finishBlend() {
     if (!blend) return;
     blend.from.video.style.opacity = '0'; blend.from.video.style.zIndex = '0';
@@ -149,6 +149,12 @@ export function createFilmPlayer({ mount, manifest, onState = () => {}, onEnded 
     const start = playbackStart(clip), earliest = start - startFrameTolerance(clip), latest = start + clip.transition.headHoldMs / 1000;
     return Number.isFinite(video.currentTime) && video.currentTime >= earliest && video.currentTime <= latest && metadata.mediaTime >= earliest && metadata.mediaTime <= latest;
   }
+  function hasPausedHead(slot, clip) {
+    const proof = slot.headFrame;
+    return slot.primed && proof?.version === slot.version && proof.src === clipUrl(clip.src) && slot.video.src === proof.src
+      && slot.id === clip.id && slot.video.paused && Math.abs(slot.video.currentTime - playbackStart(clip)) <= 0.001
+      && inHead(slot.video, clip, proof.metadata);
+  }
   function decodedData(slot, job) {
     return wait(job, (resolve, reject) => {
       const video = slot.video;
@@ -162,8 +168,9 @@ export function createFilmPlayer({ mount, manifest, onState = () => {}, onEnded 
   function started(slot, job) {
     const version = slot.version, playSerial = ++slot.playSerial;
     return wait(job, (resolve, reject) => {
+      const error = () => reject(mediaError()); slot.video.addEventListener('error', error);
       let result;
-      try { result = slot.video.play(); } catch (error) { reject(error); return; }
+      try { result = slot.video.play(); } catch (failure) { reject(failure); return () => slot.video.removeEventListener('error', error); }
       Promise.resolve(result).then(() => {
         // A late play() promise must not restart cancelled media. A newer source
         // or resume in the same slot owns its playback and must not be paused
@@ -172,6 +179,7 @@ export function createFilmPlayer({ mount, manifest, onState = () => {}, onEnded 
         if ((job.signal.aborted || job.token !== generation || disposed) && ((slot.version === version && slot.playSerial === playSerial) || !slot.id)) { slot.video.pause(); slot.video.muted = true; }
         try { guard(job); resolve(); } catch (error) { reject(error); }
       }, reject);
+      return () => slot.video.removeEventListener('error', error);
     });
   }
   function stopWatch(slot) {
@@ -179,8 +187,17 @@ export function createFilmPlayer({ mount, manifest, onState = () => {}, onEnded 
     if (slot.frame !== null) slot.video.cancelVideoFrameCallback(slot.frame);
     slot.frame = null;
   }
+  function clearPendingStart(job) {
+    if (!pendingStart || (job && pendingStart.job !== job)) return;
+    const { record, previous } = pendingStart; pendingStart = null;
+    if (record.slot.version !== record.version) return;
+    record.slot.video.pause(); record.slot.video.muted = true; record.slot.video.style.opacity = '0';
+    blend = null;
+    if (previous && active === previous) { previous.slot.video.style.opacity = '1'; previous.slot.video.style.zIndex = '1'; }
+  }
   function invalidate() {
     generation++; transitioning = false; transitionOwner = null;
+    clearPendingStart();
     for (const job of [...jobs]) job.abort();
     for (const slot of slots) { stopWatch(slot); slot.video.pause(); slot.video.muted = true; }
     queued = null;
@@ -210,8 +227,8 @@ export function createFilmPlayer({ mount, manifest, onState = () => {}, onEnded 
       guard(job);
       if (blend?.from === slot) finishBlend();
     }
-    if (slot.id === clip.id && slot.primed && slot.video.readyState >= 2) return;
-    const video = slot.video; slot.version++; const version = slot.version; slot.id = clip.id; slot.primed = false;
+    if (hasPausedHead(slot, clip) && slot.video.readyState >= 2) return;
+    const video = slot.video; slot.version++; const version = slot.version; slot.id = clip.id; slot.primed = false; slot.headFrame = null;
     video.pause(); video.muted = true; video.loop = false; video.style.opacity = '0';
     video.src = clipUrl(clip.src); video.load(); stage.hidden = false;
     try {
@@ -226,46 +243,38 @@ export function createFilmPlayer({ mount, manifest, onState = () => {}, onEnded 
         metadata = await rewound; guard(job);
       }
       if (!inHead(video, clip, metadata)) throw filmError('invalid-first-frame', '영상 시작 프레임을 확인하지 못했습니다.');
+      slot.headFrame = { version, src: clipUrl(clip.src), metadata };
       slot.primed = true;
     } finally { if (slot.version === version) { video.pause(); video.muted = true; } }
   }
   async function begin(slot, clip, loop, job) {
     guard(job); transitioning = true; transitionOwner = job;
     const video = slot.video, version = slot.version;
-    // A primed frame is a one-use proof. play() advances its clock even when a
-    // handoff is cancelled before it becomes visible. A repair that queues the
-    // same clip must not treat that advanced decoder as still at its head.
-    slot.primed = false;
     try {
       video.muted = true; video.loop = false;
-      // The first submitted frame can precede a delayed play() resolution.
-      // Verify the current clock as well before exposing native speech.
-      const start = playbackStart(clip);
-      for (let attempt = 0; attempt < 2; attempt++) {
-        const rendered = frame(slot, job);
-        const [, metadata] = await Promise.all([started(slot, job), rendered]); guard(job);
-        if (inHead(video, clip, metadata)) break;
-        if (attempt) throw filmError('start-hold-missed', '시작 여유 프레임을 지나 영상 전환을 중단했습니다.');
-        // A delayed callback/play promise can consume a short neutral handle.
-        // Neither kind has become visible or audible yet. Rewind once within
-        // the SAME timeout, then require a fresh decoded head before replay.
-        // The outgoing frame stays visible; the 250ms/one-frame gates do not
-        // change. Native dialogue restarts at zero and can never unmute late.
-        video.pause();
-        const rewound = frame(slot, job, (metadata) => inHead(video, clip, metadata)); video.currentTime = start;
-        const resetFrame = await rewound; guard(job);
-        if (!inHead(video, clip, resetFrame)) throw filmError('invalid-first-frame', '영상 시작 프레임을 확인하지 못했습니다.');
-      }
+      // prime() already decoded and paused the reviewed head. Expose that
+      // one-use proof BEFORE starting its clock, in this same JS turn. Waiting
+      // for another play promise/RVFC while hidden can consume the entire
+      // neutral handle on a busy device and must never cause a late unmute.
+      if (!hasPausedHead(slot, clip)) throw filmError('invalid-first-frame', '영상 시작 프레임을 확인하지 못했습니다.');
+      slot.primed = false; slot.headFrame = null;
       finishBlend();
       const previous = active;
       blend = previous && previous.slot !== slot && transitionMs ? { from: previous.slot, to: slot, start: performance.now() } : null;
-      active = { slot, clip, loop, version, playbackId: ++playbackSerial, ended: false };
+      const record = { slot, clip, loop, version, playbackId: ++playbackSerial, ended: false };
+      pendingStart = { job, record, previous };
       video.style.zIndex = '2'; video.muted = clip.kind === 'listening'; video.style.opacity = '1'; stage.hidden = false;
       if (previous && previous.slot !== slot) { stopWatch(previous.slot); previous.slot.video.pause(); previous.slot.video.muted = true; previous.slot.video.style.zIndex = '1'; previous.slot.video.style.opacity = blend ? '1' : '0'; }
+      await started(slot, job); guard(job);
+      // An unresolved start cannot silently consume a whole question. Keep the
+      // original finite deadline and report failure instead of a false start.
+      if (record.ended) throw filmError('start-timeout', '영상 시작 확인 전에 재생이 끝났습니다. 다시 준비해 주세요.');
+      active = record; pendingStart = null;
       paused = false; transitioning = false; transitionOwner = null; emit('playing'); watch(active);
       if (loop) automaticLoop();
       return snapshot();
     } catch (error) {
+      clearPendingStart(job);
       if (slot.version === version && active?.slot !== slot) { video.pause(); video.muted = true; }
       throw error;
     } finally { if (transitionOwner === job) { transitioning = false; transitionOwner = null; } }
@@ -309,6 +318,7 @@ export function createFilmPlayer({ mount, manifest, onState = () => {}, onEnded 
     pending?.job?.abort();
     if (handoffJob) {
       handoffJob.abort();
+      clearPendingStart(handoffJob);
       // A cancelled play promise can still be unwinding when a recognition
       // repair immediately queues again. Release only that handoff's lock;
       // its late finally must not unlock a newer transition using this slot.
@@ -318,6 +328,7 @@ export function createFilmPlayer({ mount, manifest, onState = () => {}, onEnded 
   }
   for (const slot of slots) {
     slot.video.addEventListener('ended', () => {
+      if (pendingStart?.record.slot === slot && pendingStart.record.version === slot.version) { pendingStart.record.ended = true; slot.video.pause(); slot.video.muted = true; return; }
       const record = active;
       if (!record || record.slot !== slot || record.version !== slot.version || paused || disposed || record.ended) return;
       record.ended = true; stopWatch(slot); slot.video.pause(); slot.video.muted = true;
@@ -352,13 +363,14 @@ export function createFilmPlayer({ mount, manifest, onState = () => {}, onEnded 
   }
   function pause() {
     checkLive(); if (paused) return;
-    deferredQueue = queued ? { id: queued.clip.id, loop: queued.loop } : null;
+    const successor = queued || pendingStart?.record;
+    deferredQueue = successor ? { id: successor.clip.id, loop: successor.loop } : null;
     invalidate(); paused = true; emit('paused');
   }
   async function resume() {
     checkLive(); if (!paused) return snapshot();
     const desired = deferredQueue; deferredQueue = null; paused = false;
-    if (!active) { emit('idle'); return null; }
+    if (!active) { if (desired) return play(desired.id, desired); emit('idle'); return null; }
     if (active.ended) { if (desired) await queueClip(desired.id, desired); else automaticLoop(); return snapshot(); }
     const record = active, job = task(startTimeoutMs, 'start-timeout');
     try {
@@ -373,7 +385,7 @@ export function createFilmPlayer({ mount, manifest, onState = () => {}, onEnded 
   function stop() {
     if (disposed) return;
     invalidate(); active = null; paused = false; deferredQueue = null; blend = null; stage.hidden = true;
-    for (const slot of slots) { slot.version++; slot.id = null; slot.primed = false; slot.video.style.opacity = '0'; slot.video.removeAttribute('src'); slot.video.load(); }
+    for (const slot of slots) { slot.version++; slot.id = null; slot.primed = false; slot.headFrame = null; slot.video.style.opacity = '0'; slot.video.removeAttribute('src'); slot.video.load(); }
     emit('idle');
   }
   function dispose() { if (disposed) return; stop(); disposed = true; stage.remove(); emit('disposed'); }
@@ -383,7 +395,8 @@ export function createFilmPlayer({ mount, manifest, onState = () => {}, onEnded 
     const progress = blend ? Math.min(1, Math.max(0, (performance.now() - blend.start) / transitionMs)) : 1;
     if (blend && progress === 1) finishBlend();
     const order = blend ? [blend.from, blend.to] : slots;
-    return order.map((slot) => ({ video: slot.video, opacity: stage.hidden ? 0 : blend ? (slot === blend.to ? progress : 1) : slot === active?.slot ? 1 : 0 }));
+    const visible = pendingStart?.record || active;
+    return order.map((slot) => ({ video: slot.video, opacity: stage.hidden ? 0 : blend ? (slot === blend.to ? progress : 1) : slot === visible?.slot ? 1 : 0 }));
   }
   return Object.freeze({ prepare, play, queue: queueClip, cancelQueued, pause, resume, stop, dispose, getVideos, get current() { return snapshot(); }, get state() { return state; } });
 }

@@ -1,5 +1,7 @@
 import { createFilmPlayer, evaluateFilmReadiness } from '../film-player.mjs';
 import { createVoiceInput, voiceError, mergeVoiceResults } from '../voice.mjs';
+import { WhisperModel } from '../whisper-model.mjs';
+import { assessVoiceAnswer, replaceVoiceSpan, rebaseConfirmedSpans } from './voice-assessment.mjs';
 import { CLIPS, QUESTIONS, REHEARSAL_DURATION_PROFILES, createRehearsalSession, safeExitWaitMs, rehearsalMediaQualities, selectRehearsalMedia, transcriptReviewPages } from './rehearsal-session.mjs';
 import { createStrictVR } from './strict-vr.mjs';
 import { createSpeechTurn } from './speech-turn.mjs';
@@ -15,6 +17,7 @@ let film = null, manifest = null, mode = 'text', voice = null, busy = false, pre
 let manifestLoad = null, playbackManifest = null, selectedQuality = '4k', filmQuality = null;
 let listeningSequence = null, listeningRun = 0, listeningEnabled = false, scheduledListeningOwner = null;
 let voicePrefixResult = { text: '' }, voiceReview = null, reviewPage = 0;
+let voiceAssessment = null, clarificationBase = null, confirmedSpans = [];
 const abortError = () => new DOMException('취소된 면접 작업입니다.', 'AbortError');
 const current = (token) => !disposed && token === epoch;
 const guard = (token) => { if (!current(token)) throw abortError(); };
@@ -22,7 +25,7 @@ const activePhases = ['preparing', 'question', 'listening', 'confirming', 'revie
 
 function getState() {
   const state = session.snapshot();
-  return { ...state, mode, voiceReady: !!voice?.ready && microphoneReady, micLevel, micActive, automaticEnd: mode === 'voice', settling, transcript: state.phase === 'confirming' ? ui.answer.value : mode === 'voice' ? partial : ui.answer.value, reviewPages: transcriptReviewPages(ui.answer.value), reviewPage, canConfirm: state.phase === 'confirming' && !state.paused && !busy && !!ui.answer.value.trim(), remainingSeconds: Math.ceil(state.remainingMs / 1000), canSubmit: state.phase === 'listening' && !state.paused && !busy, canStart: ['idle', 'complete', 'error'].includes(state.phase) && !busy && !checkingMic && !preparingVoice && (mode === 'text' || !!voice?.ready && microphoneReady) };
+  return { ...state, mode, voiceReady: !!voice?.ready && microphoneReady, micLevel, micActive, automaticEnd: mode === 'voice', settling, transcript: state.phase === 'confirming' ? ui.answer.value : mode === 'voice' ? partial : ui.answer.value, reviewPages: transcriptReviewPages(ui.answer.value), reviewPage, reviewPrompt: voiceAssessment?.issue?.prompt || '', partialReview: !!voiceAssessment?.issue, clarificationPrompt: clarificationBase ? `이 부분만 다시 말씀하세요: “${clarificationBase.result.text.slice(clarificationBase.issue.start, clarificationBase.issue.end)}”` : '', canConfirm: state.phase === 'confirming' && !state.paused && !busy && !!ui.answer.value.trim(), remainingSeconds: Math.ceil(state.remainingMs / 1000), canSubmit: state.phase === 'listening' && !state.paused && !busy, canStart: ['idle', 'complete', 'error'].includes(state.phase) && !busy && !checkingMic && !preparingVoice && (mode === 'text' || !!voice?.ready && microphoneReady) };
 }
 function render() {
   if (disposed) return;
@@ -39,7 +42,7 @@ function render() {
     ui['media-limit'].textContent = hasUpscale && selectedQuality === '4k' ? '면접관은 720p 원본을 4K로 확대한 단안 영상이라 몸을 크게 옮겨 옆모습을 볼 수는 없습니다.' : `면접관은 ${selectedHeight || 480}p 단안 영상이라 몸을 크게 옮겨 옆모습을 볼 수는 없습니다.`;
   }
   document.body.classList.toggle('in-session', active || state.phase === 'complete');
-  const labels = { idle: '면접 시작 전', preparing: '영상 준비', question: '첫 번째 질문', followup: '후속 질문', listening: '답변 중', confirming: '음성 답변 확인', reviewing: '답변 검토', repair: '답변 확인', complete: '면접 종료', error: '연결 확인' };
+  const labels = { idle: '면접 시작 전', preparing: '영상 준비', question: '첫 번째 질문', followup: '후속 질문', listening: '답변 중', confirming: '애매한 부분 확인', reviewing: '답변 검토', repair: '답변 확인', complete: '면접 종료', error: '연결 확인' };
   ui['phase-label'].textContent = state.paused ? '일시 정지' : labels[state.phase] || '';
   ui['turn-label'].textContent = active ? `${state.turn} / 2` : '2 QUESTIONS';
   ui.timer.textContent = state.phase === 'listening' && !state.paused ? `${state.remainingSeconds}초` : '';
@@ -53,16 +56,19 @@ function render() {
   ui['answer-context'].hidden = !answerQuote || !['reviewing', 'followup', 'listening', 'repair'].includes(state.phase);
   ui['answer-context'].textContent = answerQuote ? `첫 답변에서 확인한 내용: “${briefQuote}”` : '';
   ui.answer.disabled = state.paused || busy || mode === 'voice' && state.phase !== 'confirming';
-  ui.answer.placeholder = mode === 'voice' ? '말한 내용이 아래에 표시됩니다. 인식이 잘 안 되면 직접 입력으로 바꿀 수 있습니다.' : '질문에 대한 답변을 입력하세요.';
+  ui.answer.placeholder = state.phase === 'confirming' ? '이 부분이 다르게 들렸다면 고쳐 주세요.' : mode === 'voice' ? '말한 내용이 아래에 표시됩니다. 명확하게 인식되면 자동으로 이어집니다.' : '질문에 대한 답변을 입력하세요.';
   ui.partial.textContent = partial;
   ui.partial.hidden = state.phase === 'confirming';
   ui.confirm.hidden = state.phase !== 'confirming'; ui.confirm.disabled = !state.canConfirm;
+  ui.confirm.textContent = '이 부분이 맞아요';
   ui['recognition-note'].hidden = state.phase !== 'confirming';
-  const unclear = [...new Set((voiceReview?.words || []).filter(word => !Number.isFinite(word.conf) || word.conf < .8).map(word => word.word))].slice(0, 8);
-  ui['recognition-note'].textContent = '인식한 문장이 말한 내용과 같은지 확인해 주세요. 다르면 아래에서 고치거나 다시 말할 수 있습니다.' + (unclear.length ? ` 다시 확인할 부분: ${unclear.map(word => `“${word}”`).join(', ')}.` : ' 표시가 없어도 잘못 인식한 단어가 있을 수 있습니다.');
+  ui['recognition-note'].textContent = `${state.reviewPrompt || '이 부분을 정확히 들었는지 확인해 주세요.'} 맞으면 확인하고, 다르면 고치거나 이 부분만 다시 말해 주세요. 나머지 답변은 유지됩니다.`;
+  $('answer-label').textContent = state.phase === 'confirming' ? '확인할 부분' : clarificationBase ? '이 부분만 다시 답변' : '내 답변';
+  $('recognized-full').hidden = state.phase !== 'confirming';
+  $('recognized-full-text').textContent = voiceReview?.text || '';
   ui.start.hidden = active; ui.start.disabled = !state.canStart; ui.start.textContent = state.phase === 'idle' ? '면접 시작' : '처음부터 다시';
   ui.submit.hidden = state.phase !== 'listening'; ui.submit.disabled = !state.canSubmit;
-  ui.retry.hidden = !['repair', 'confirming'].includes(state.phase); ui.retry.disabled = busy || state.paused; ui.retry.textContent = state.phase === 'confirming' ? '다시 말하기' : mode === 'text' && ui.answer.value.trim() ? '수정한 답변 제출' : '다시 답변';
+  ui.retry.hidden = !['repair', 'confirming'].includes(state.phase); ui.retry.disabled = busy || state.paused; ui.retry.textContent = state.phase === 'confirming' ? '이 부분만 다시 말하기' : mode === 'text' && ui.answer.value.trim() ? '수정한 답변 제출' : '다시 답변';
   ui.repeat.hidden = !['listening', 'repair'].includes(state.phase); ui.repeat.disabled = busy || state.paused;
   ui.pause.hidden = !active; ui.pause.textContent = state.paused ? '이어서 진행' : '일시 정지'; ui.pause.disabled = state.phase === 'preparing';
   ui.stop.hidden = !active;
@@ -75,14 +81,14 @@ function render() {
   ui['mic-meter'].value = micLevel;
   ui['mic-check-result'].hidden = mode !== 'voice' || active;
   ui['room-preview'].disabled = preparingVoice || checkingMic || busy || !!vr?.active;
-  for (const input of document.querySelectorAll('input[name="mode"]')) input.disabled = active && !['repair', 'listening'].includes(state.phase) || busy || preparingVoice || checkingMic || !!vr?.active;
+  for (const input of document.querySelectorAll('input[name="mode"]')) input.disabled = active && !['repair', 'listening'].includes(state.phase) || !!clarificationBase || busy || preparingVoice || checkingMic || !!vr?.active;
   ui.vr.disabled = !vrSupported || !state.voiceReady || mode !== 'voice' || busy || !!vr?.active;
   ui.vr.textContent = vrSupported ? 'Quest 면접실 입장' : 'Quest에서 VR 입장';
   const messages = {
     idle: mode === 'voice' ? state.voiceReady ? '마이크 확인 완료. 앉은 상태에서 면접실에 입장하세요.' : '한국어 음성을 준비하고 마이크를 확인하세요.' : '화면에서는 직접 입력하거나 마이크로 연습할 수 있습니다.', preparing: settling ? '자리에 앉아 정면을 바라보세요. 곧 질문을 시작합니다.' : '면접 장면을 기기에서 준비하고 있습니다.',
     question: '면접관의 질문을 들으세요.', followup: '첫 답변에 따른 후속 질문입니다.',
-    listening: busy ? (mode === 'voice' ? voice?.state === 'processing' ? '마이크가 꺼졌습니다. 마지막 말을 확인하고 있습니다.' : '마이크를 연결하고 있습니다.' : '답변 화면을 준비하고 있습니다.') : mode === 'voice' ? '말씀하세요. 답변 후 약 6초간 말이 없으면 인식한 내용을 확인합니다.' : '답변을 입력한 뒤 완료를 누르세요.',
-    confirming: '마이크가 꺼졌습니다. 인식한 내용을 확인한 뒤 이어가세요. 확인 시간은 답변 시간에 포함되지 않습니다.',
+    listening: busy ? (mode === 'voice' ? voice?.state === 'processing' ? '마이크가 꺼졌습니다. 마지막 말을 확인하고 있습니다.' : '마이크를 연결하고 있습니다.' : '답변 화면을 준비하고 있습니다.') : state.clarificationPrompt || (mode === 'voice' ? '말씀하세요. 답변을 마치면 자동으로 이어지며, 애매한 부분만 확인합니다.' : '답변을 입력한 뒤 완료를 누르세요.'),
+    confirming: '마이크가 꺼졌습니다. 아래 부분만 확인해 주세요. 확인 시간은 답변 시간에 포함되지 않습니다.',
     reviewing: '면접관이 답변을 검토하고 있습니다.', repair: state.repair?.message,
     complete: '면접을 마쳤습니다. 다른 답변으로 다시 연습할 수 있습니다.', error: state.error,
   };
@@ -131,6 +137,9 @@ function continueListeningSequence() {
 }
 function getVoice() {
   if (!voice) voice = createVoiceInput({
+    modelFactory: () => new WhisperModel(),
+    modelNotice: '한국어 음성을 준비합니다. 처음에는 약 103MB를 내려받으며, 이후 이 기기에서 재사용합니다.',
+    finalTimeoutMs: 45_000,
     onPartial({ text }) { if (checkingMic) { calibrationText = text || calibrationText; ui['mic-check-result'].textContent = text || '“면접 연습을 시작하겠습니다”라고 말해 보세요.'; } else if (session.snapshot().phase === 'listening' && mode === 'voice') { partial = [voicePrefix, text].filter(Boolean).join(' '); speechTurn.transcript(partial); render(); } },
     onResult({ text }) { if (checkingMic) { calibrationText = text || calibrationText; ui['mic-check-result'].textContent = text || '목소리를 확인하고 있습니다.'; } else if (session.snapshot().phase === 'listening' && mode === 'voice') { partial = [voicePrefix, text].filter(Boolean).join(' '); speechTurn.transcript(partial); render(); } },
     onLevel(value) { micLevel = value; if (checkingMic) micPeak = Math.max(micPeak, value); if (micActive) speechTurn.level(value); ui['mic-meter'].value = value; },
@@ -214,9 +223,12 @@ async function ensureFilm(token) {
 async function start() {
   if (!getState().canStart) return;
   stopListeningSequence();
-  const token = ++epoch; busy = true; partial = ''; voicePrefix = ''; voicePrefixResult = { text: '' }; voiceReview = null; reviewPage = 0; voiceFailed = false; speechTurn.reset(); ui.answer.value = ''; session.start(); render();
+  const token = ++epoch; busy = true; partial = ''; voicePrefix = ''; voicePrefixResult = { text: '' }; voiceReview = null; voiceAssessment = null; clarificationBase = null; confirmedSpans = []; reviewPage = 0; voiceFailed = false; speechTurn.reset(); ui.answer.value = ''; session.start(); render();
   try {
     film?.stop(); await ensureFilm(token); guard(token);
+    // Upload the room before speech/video run together. Opening it mid-answer
+    // must not compile its first 4K textures during a short film handoff.
+    await vr.prepareRoom(); guard(token);
     listeningSequence?.resetSession();
     await film.prepare(Object.values(CLIPS)); guard(token);
     await vr.warmVideoFrames(); guard(token);
@@ -235,7 +247,7 @@ async function startMicrophone(token) {
   }
 }
 async function beginListening(token, retainSilentTail = false) {
-  busy = true; partial = ''; voicePrefix = ''; voicePrefixResult = { text: '' }; voiceReview = null; reviewPage = 0; ui.answer.value = ''; render();
+  busy = true; partial = ''; voicePrefix = ''; voicePrefixResult = { text: '' }; voiceReview = null; voiceAssessment = null; clarificationBase = null; confirmedSpans = []; reviewPage = 0; ui.answer.value = ''; render();
   // The question's speech ends before the 10-second clip. Open input at its
   // reviewed audio cue while the same actors continue listening in that tail.
   stopListeningSequence();
@@ -271,6 +283,15 @@ async function finishReview(token) {
   else if (state.phase === 'followup') await film.play(state.clip);
   guard(token); busy = false; render();
 }
+function assessResult(result) {
+  return assessVoiceAnswer(result, { turn: session.snapshot().turn, availableClipIds: [CLIPS.experience, CLIPS.plan], confirmedSpans });
+}
+function showVoiceIssue(result, assessment) {
+  voiceReview = result; voiceAssessment = assessment; reviewPage = 0;
+  const issue = assessment.issue;
+  ui.answer.value = issue ? result.text.slice(issue.start, issue.end) : result.text;
+  session.reviewTranscript(result.text); continueListeningSequence(); busy = false; render();
+}
 async function submit() {
   if (!getState().canSubmit) return;
   stopListeningSequence();
@@ -282,15 +303,22 @@ async function submit() {
   render();
   try {
     let result = stopped ? { ...await stopped } : { text: ui.answer.value }; guard(token);
+    let recognitionError = mode === 'voice' && voiceFailed;
     if (mode === 'voice') {
       result = mergeVoiceResults([voicePrefixResult, result]); partial = result.text;
       if (!voiceFailed && result.text.trim()) {
-        voiceReview = result; reviewPage = 0; ui.answer.value = result.text;
-        session.reviewTranscript(result.text); continueListeningSequence(); busy = false; render();
-        return;
+        if (clarificationBase) {
+          confirmedSpans = rebaseConfirmedSpans(clarificationBase.result.text, clarificationBase.issue, result.text, clarificationBase.confirmedSpans || []);
+          result = replaceVoiceSpan(clarificationBase.result, clarificationBase.issue, result);
+          clarificationBase = null; partial = result.text;
+        }
+        voiceAssessment = assessResult(result);
+        if (voiceAssessment.decision === 'clarify') { showVoiceIssue(result, voiceAssessment); return; }
+        recognitionError = voiceAssessment.decision === 'retry';
       }
     }
-    const state = session.submit(result.text, { recognitionError: mode === 'voice' && voiceFailed });
+    voiceReview = null; voiceAssessment = null;
+    const state = session.submit(result.text, { recognitionError });
     if (state.phase === 'repair') { continueListeningSequence(); busy = false; render(); return; }
     render(); await finishReview(token);
   } catch (error) {
@@ -302,23 +330,38 @@ async function submit() {
 async function confirm() {
   if (!getState().canConfirm) return;
   const token = epoch; busy = true; stopListeningSequence();
-  const state = session.confirmTranscript(ui.answer.value.trim());
-  partial = ui.answer.value.trim(); voiceReview = null; reviewPage = 0;
+  const issue = voiceAssessment?.issue;
+  let result = voiceReview || { text: ui.answer.value.trim() };
+  let rejected = false;
+  if (issue) {
+    const replacement = ui.answer.value.trim();
+    if (replacement !== result.text.slice(issue.start, issue.end)) {
+      confirmedSpans = rebaseConfirmedSpans(result.text, issue, replacement, confirmedSpans);
+      result = replaceVoiceSpan(result, issue, replacement);
+    }
+    confirmedSpans.push({ start: issue.start, end: issue.start + replacement.length, text: replacement });
+    const assessment = assessResult(result);
+    if (assessment.decision === 'clarify') { showVoiceIssue(result, assessment); return; }
+    rejected = assessment.decision === 'retry';
+  }
+  const state = session.confirmTranscript(rejected ? '' : result.text);
+  partial = result.text; voiceReview = null; voiceAssessment = null; reviewPage = 0; confirmedSpans = [];
   if (state.phase === 'repair') { continueListeningSequence(); busy = false; render(); return; }
   render(); await finishReview(token);
 }
 async function retry() {
   if (busy || session.snapshot().paused || !['repair', 'confirming'].includes(session.snapshot().phase)) return;
+  if (session.snapshot().phase === 'confirming' && voiceReview && voiceAssessment?.issue) clarificationBase = { result: voiceReview, issue: voiceAssessment.issue, confirmedSpans: [...confirmedSpans] };
   const token = epoch; session.retry();
   if (mode === 'text' && ui.answer.value.trim()) { render(); return submit(); }
-  busy = true; partial = ''; voicePrefix = ''; voicePrefixResult = { text: '' }; voiceReview = null; reviewPage = 0; ui.answer.value = ''; render();
+  busy = true; partial = ''; voicePrefix = ''; voicePrefixResult = { text: '' }; voiceReview = null; voiceAssessment = null; confirmedSpans = []; reviewPage = 0; ui.answer.value = ''; render();
   // Keep the current silent actors moving; a recognition repair must not reset
   // a pen halfway through a note or discard a typed correction.
   await startMicrophone(token); guard(token); busy = false; lastTick = performance.now(); render();
 }
 async function repeat() {
   if (busy || session.snapshot().paused || !['listening', 'repair'].includes(session.snapshot().phase)) return;
-  stopListeningSequence();
+  stopListeningSequence(); clarificationBase = null; voiceAssessment = null; confirmedSpans = [];
   const token = epoch; busy = true; micActive = false; speechTurn.reset(); const stopped = voice?.stop(); render();
   await stopped?.catch(() => {}); guard(token); await safeExit(token); guard(token);
   const state = session.repeat(); await film.play(state.clip); guard(token); busy = false; render();
@@ -341,11 +384,11 @@ async function resume() {
 }
 async function stop() {
   stopListeningSequence();
-  epoch++; busy = false; micActive = false; settling = false; checkingMic = false; speechTurn.reset(); const stopped = micStopping = voice?.stop(); film?.stop(); session.reset(); partial = ''; voicePrefix = ''; voicePrefixResult = { text: '' }; voiceReview = null; reviewPage = 0; ui.answer.value = ''; render();
+  epoch++; busy = false; micActive = false; settling = false; checkingMic = false; speechTurn.reset(); const stopped = micStopping = voice?.stop(); film?.stop(); session.reset(); partial = ''; voicePrefix = ''; voicePrefixResult = { text: '' }; voiceReview = null; voiceAssessment = null; clarificationBase = null; confirmedSpans = []; reviewPage = 0; ui.answer.value = ''; render();
   await stopped?.catch(() => {});
 }
 async function changeMode(next) {
-  if (next === mode || busy || vr.active || session.snapshot().phase === 'confirming') return;
+  if (next === mode || busy || vr.active || clarificationBase || session.snapshot().phase === 'confirming') return;
   const token = ++epoch; mode = next; micActive = false; busy = true; speechTurn.reset();
   const stopped = voice?.stop(); render();
   const result = await stopped?.catch(() => null); guard(token);
@@ -378,7 +421,7 @@ ui.quality.addEventListener('change', () => {
 });
 for (const input of document.querySelectorAll('input[name="mode"]')) input.addEventListener('change', () => { if (input.checked) void changeMode(input.value).catch(report); });
 ui.answer.addEventListener('keydown', (event) => { if ((event.ctrlKey || event.metaKey) && event.key === 'Enter') { event.preventDefault(); void action(session.snapshot().phase === 'confirming' ? 'confirm' : 'submit'); } });
-ui.answer.addEventListener('input', () => { reviewPage = 0; if (voiceReview?.text !== ui.answer.value) voiceReview = null; render(); });
+ui.answer.addEventListener('input', () => { reviewPage = 0; render(); });
 document.addEventListener('visibilitychange', () => { if (document.hidden && !vr.active && !vr.pending) { cancelMicrophoneCheck(); if (preparingVoice) { epoch++; void voice?.stop().catch(() => {}); } void pause(); } });
 document.addEventListener('keydown', (event) => {
   if (event.key !== 'Escape' || event.repeat) return;
