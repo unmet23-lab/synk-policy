@@ -6,7 +6,7 @@ const config=JSON.parse(fs.readFileSync(path.resolve(args.config),'utf8')),out=p
 if(fs.existsSync(out)&&fs.readdirSync(out).length)throw Error('Output must be new');fs.mkdirSync(out,{recursive:true});
 const sha=file=>crypto.createHash('sha256').update(fs.readFileSync(file)).digest('hex'),before=sha(bundle.archive);
 const isolation=path.join(out,'profile');fs.mkdirSync(isolation);fs.mkdirSync(path.join(out,'tmp'));
-const input={...config,client,mode:args.mode,out,appData:isolation,archive:bundle.archive,version:bundle.version,prefix:'SYNK_MAC_QA '};
+const input={...config,client,mode:args.mode,out,appData:isolation,archive:bundle.archive,version:bundle.version,runnerArch:process.env.RUNNER_ARCH||null,softwareGpu:process.env.SYNK_QA_SOFTWARE_GPU==="1",prefix:'SYNK_MAC_QA '};
 function observe(config){
   const {app,shell}=require('electron'),fs=require('node:fs'),path=require('node:path');
   app.setPath('appData',config.appData);app.once('ready',()=>app.dock?.hide());
@@ -23,7 +23,7 @@ function observe(config){
   async function waitFor(code,label,timeout=30000){const start=Date.now();while(Date.now()-start<timeout){try{if(await run(code))return;}catch{}await sleep(100);}throw Error('TIMEOUT_'+label);}
   async function screenshot(name){await run('document.fonts.ready.then(()=>true)');await sleep(350);const file=path.join(config.out,name+'.png');fs.writeFileSync(file,(await contents.capturePage()).toPNG());screenshots.push(file);}
   async function click(selector,expected){await run(`document.querySelector(${JSON.stringify(selector)}).click()`);await waitFor(`location.href===${JSON.stringify(expected)}&&document.readyState==='complete'`,selector);}
-  async function finish(ok){if(finished)return;finished=true;const local=requests.filter(r=>{try{const u=new URL(r.url);return ['127.0.0.1','localhost','[::1]'].includes(u.hostname)&&['4280','4191'].includes(u.port);}catch{return false;}});const result={ok:ok&&!errors.length&&!local.length&&!providerRequests.length,mode:config.mode,packaged:app.isPackaged,arch:process.arch,electron:process.versions.electron,archive:app.getAppPath(),visible:window?.isVisible(),profileIsolated:app.getPath('userData').startsWith(config.appData+path.sep),installationRoot:config.applications,checks,errors,pageErrors,requests,localhostDevelopmentRequests:local,providerRequests,openRequestsSuppressed:opened,screenshots,realAuthenticationPerformed:false,realProfileTouched:false,managedChildLaunched:false,graphicsBackend:config.arch==="x64"?"CI-only SwiftShader (no hardware GPU)":"default"};process.stdout.write(config.prefix+JSON.stringify(result)+'\n');setTimeout(()=>app.exit(result.ok?0:1),250);}
+  async function finish(ok){if(finished)return;finished=true;const local=requests.filter(r=>{try{const u=new URL(r.url);return ['127.0.0.1','localhost','[::1]'].includes(u.hostname)&&['4280','4191'].includes(u.port);}catch{return false;}});const result={ok:ok&&!errors.length&&!local.length&&!providerRequests.length,mode:config.mode,packaged:app.isPackaged,arch:process.arch,electron:process.versions.electron,archive:app.getAppPath(),visible:window?.isVisible(),profileIsolated:app.getPath('userData').startsWith(config.appData+path.sep),installationRoot:config.applications,checks,errors,pageErrors,requests,localhostDevelopmentRequests:local,providerRequests,openRequestsSuppressed:opened,screenshots,realAuthenticationPerformed:false,realProfileTouched:false,managedChildLaunched:false,graphicsBackend:config.softwareGpu?"CI-only SwiftShader":"default",runnerArch:config.runnerArch,translated:app.runningUnderARM64Translation===true};process.stdout.write(config.prefix+JSON.stringify(result)+'\n');setTimeout(()=>app.exit(result.ok?0:1),250);}
   app.on('browser-window-created',(_event,created)=>{
     if(window)return;window=created;window.show=()=>{};window.showInactive=()=>{};contents=window.webContents;contents.setBackgroundThrottling(false);contents.setAudioMuted(true);
     contents.session.webRequest.onBeforeRequest({urls:['http://*/*','https://*/*','ws://*/*','wss://*/*']},(details,callback)=>{requests.push({url:details.url,resourceType:details.resourceType,method:details.method,blocked:networkBlocked});callback({cancel:networkBlocked||config.client==='platform'});});
@@ -86,7 +86,7 @@ function observe(config){
   return {appData:app.getPath('appData'),archive:app.getAppPath()};
 }
 // Intel hosted CI has no working hardware GL. This affects only the QA process, not the shipped app.
-const graphicsArgs=config.arch==='x64'?['--use-gl=angle','--use-angle=swiftshader','--enable-unsafe-swiftshader']:[];
+const graphicsArgs=input.softwareGpu?['--use-gl=angle','--use-angle=swiftshader','--enable-unsafe-swiftshader']:[];
 const child=spawn(bundle.executable,[...graphicsArgs,'--inspect-brk=127.0.0.1:0','--log-file='+path.join(out,'electron.log')],{cwd:out,env:{...process.env,TMPDIR:path.join(out,'tmp')},stdio:['ignore','pipe','pipe']});
 let stdout='',stderr='',ws,connected=false,sequence=0,injected=false,error=null;const pending=new Map();
 const rpc=(method,params={})=>new Promise((resolve,reject)=>{const id=++sequence;pending.set(id,{resolve,reject});ws.send(JSON.stringify({id,method,params}));});
