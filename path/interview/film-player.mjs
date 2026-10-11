@@ -124,20 +124,30 @@ export function createFilmPlayer({ mount, manifest, onState = () => {}, onEnded 
     });
   }
   const mediaError = () => filmError('media-error', '영상 파일을 읽거나 재생하지 못했습니다. 실제 MP4/WebM 파일을 확인해 주세요.');
-  function frame(slot, job) {
+  function frame(slot, job, accepts = () => true) {
     return wait(job, (resolve, reject) => {
       const video = slot.video;
-      const handle = video.requestVideoFrameCallback((_, metadata) => {
+      let handle;
+      const submitted = (_, metadata) => {
         // During a seek readyState can temporarily fall even though this callback
         // proves a decoded frame was submitted. Inspect the submitted frame;
         // initial buffering still has its separate HAVE_CURRENT_DATA gate.
         const width = metadata.width || video.videoWidth, height = metadata.height || video.videoHeight;
         if (!Number.isFinite(width) || width <= 0 || !Number.isFinite(height) || height <= 0 || !Number.isFinite(metadata.mediaTime)) reject(mediaError());
-        else resolve(metadata);
-      });
+        else if (accepts(metadata)) resolve(metadata);
+        // A seek can complete after a previously submitted frame's callback.
+        // Keep listening under this job's existing timeout until the requested
+        // decoded pose actually arrives; never expose the stale frame.
+        else handle = video.requestVideoFrameCallback(submitted);
+      };
+      handle = video.requestVideoFrameCallback(submitted);
       const error = () => reject(mediaError()); video.addEventListener('error', error);
       return () => { video.cancelVideoFrameCallback(handle); video.removeEventListener('error', error); };
     });
+  }
+  function inHead(video, clip, metadata) {
+    const start = playbackStart(clip), earliest = start - startFrameTolerance(clip), latest = start + clip.transition.headHoldMs / 1000;
+    return Number.isFinite(video.currentTime) && video.currentTime >= earliest && video.currentTime <= latest && metadata.mediaTime >= earliest && metadata.mediaTime <= latest;
   }
   function decodedData(slot, job) {
     return wait(job, (resolve, reject) => {
@@ -209,11 +219,11 @@ export function createFilmPlayer({ mount, manifest, onState = () => {}, onEnded 
       const first = frame(slot, job);
       // Register before play; loadedmetadata alone is never a decoded-frame proof.
       let [, metadata] = await Promise.all([started(slot, job), first]); guard(job); video.pause();
-      if (Math.abs(video.currentTime - start) > 0.001) {
-        const rewound = frame(slot, job); video.currentTime = start;
+      if (Math.abs(video.currentTime - start) > 0.001 || !inHead(video, clip, metadata)) {
+        const rewound = frame(slot, job, (metadata) => inHead(video, clip, metadata)); video.currentTime = start;
         metadata = await rewound; guard(job);
       }
-      if (metadata.mediaTime < start - startFrameTolerance(clip) || metadata.mediaTime > start + clip.transition.headHoldMs / 1000) throw filmError('invalid-first-frame', '영상 시작 프레임을 확인하지 못했습니다.');
+      if (!inHead(video, clip, metadata)) throw filmError('invalid-first-frame', '영상 시작 프레임을 확인하지 못했습니다.');
       slot.primed = true;
     } finally { if (slot.version === version) { video.pause(); video.muted = true; } }
   }
@@ -228,21 +238,20 @@ export function createFilmPlayer({ mount, manifest, onState = () => {}, onEnded 
       video.muted = true; video.loop = false;
       // The first submitted frame can precede a delayed play() resolution.
       // Verify the current clock as well before exposing native speech.
-      const start = playbackStart(clip), headHoldEnd = start + clip.transition.headHoldMs / 1000, earliestFrame = start - startFrameTolerance(clip);
-      const inHead = (metadata) => Number.isFinite(video.currentTime) && video.currentTime >= earliestFrame && video.currentTime <= headHoldEnd && metadata.mediaTime >= earliestFrame && metadata.mediaTime <= headHoldEnd;
+      const start = playbackStart(clip);
       for (let attempt = 0; attempt < 2; attempt++) {
         const rendered = frame(slot, job);
         const [, metadata] = await Promise.all([started(slot, job), rendered]); guard(job);
-        if (inHead(metadata)) break;
+        if (inHead(video, clip, metadata)) break;
         if (attempt || clip.kind !== 'listening') throw filmError('start-hold-missed', '시작 여유 프레임을 지나 영상 전환을 중단했습니다.');
         // A delayed callback/play promise can consume a short neutral handle.
         // Rewind a still-hidden, silent listener once within the SAME timeout.
         // The outgoing frame stays visible; the 250ms/one-frame gates do not
         // change. Native dialogue keeps its strict no-late-unmute failure.
         video.pause();
-        const rewound = frame(slot, job); video.currentTime = start;
+        const rewound = frame(slot, job, (metadata) => inHead(video, clip, metadata)); video.currentTime = start;
         const resetFrame = await rewound; guard(job);
-        if (!inHead(resetFrame)) throw filmError('invalid-first-frame', '영상 시작 프레임을 확인하지 못했습니다.');
+        if (!inHead(video, clip, resetFrame)) throw filmError('invalid-first-frame', '영상 시작 프레임을 확인하지 못했습니다.');
       }
       finishBlend();
       const previous = active;
