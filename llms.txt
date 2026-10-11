@@ -1,24 +1,21 @@
 # SYNK
 
-> 쓸수록 나에게 맞춰지는 엔진을 만듭니다. SYNK는 개인화 엔진 아틀라스를 만드는 회사입니다. 한국어 교육에서 시작해, 지금은 같은 엔진으로 여행 일정을 짜고, 한국어 게임의 다음 문제를 고르고, 기업 서비스와 광고 영상을 만듭니다.
+> 쓸수록 나에게 맞춰지는 엔진을 만듭니다. SYNK는 개인화 엔진 아틀라스를 만드는 회사입니다. 한국어 교육에서 시작해, 지금은 SYNK ID 하나로 SYNK의 앱을 이어 쓰는 SYNK 플랫폼을 만들고, 같은 엔진을 기업 서비스와 광고 영상에도 씁니다.
 
 지금 쓸 수 있는 것과 준비 중인 것을 나눠 적었습니다. 홈페이지의 질문창은 공개한 안내 안에서 답을 찾아 보여 주며, 문의 접수·결제·계약 확정이나 성과 보장을 하지 않습니다.
 
-## 지금 써 볼 수 있는 것
+## SYNK 플랫폼
 
-- [내 조건으로 짜는 서울의 하루](https://synk.im/try/travel/) — 시간과 예산, 걷는 양, 함께 가는 사람의 취향을 넣으면 종로 일대의 실제 장소 2~5곳으로 하루 일정을 짭니다. 여행 중에 늦어지면 남은 일정만 다시 짤 수 있습니다.
-- [듣고 움직이며 배우는 한국어 게임](https://synk.im/try/learning-hub/) — 한글을 몰라도 시작하는 입문 놀이 세 가지와, 레이싱·리듬·카페 주문처럼 듣고 읽은 대로 움직이는 게임 여덟 가지가 있습니다.
-- [SYNK WORLD](https://synk.im/world/) — 몽글과 놀고 옷을 갈아입히며, 미니게임과 노래로 한국어를 익히는 작은 세계입니다.
-- [SYNK 플레저](https://synk.im/care/) — 소중한 사람의 생일과 경조사를 기억하고, 우리 사이에 맞는 말로 마음을 전하도록 돕습니다.
-- [SYNK Radio](https://synk.im/listen/) — 일할 때도 쉴 때도 틀어 두는 음악입니다. 몽글·까몽·마린과 해 질 녘 마당에서 들어 보세요.
-- [회의 기록 맞춤 정리](https://synk.im/brief/meeting/) — 회의 종류와 쓰는 AI를 고르면 붙여 넣을 요청문을 만들어 줍니다
-- [AI 컴퓨터 맞춤 추천](https://synk.im/brief/computer/) — 용도와 예산으로 데스크톱·노트북 사양을 계산합니다
-- [AI 직원 매뉴얼 만들기](https://synk.im/builds/) — 질문 다섯 개에 답하면 내 일에 맞는 AI 매뉴얼이 나옵니다
-- [무료 운세](https://synk.im/fortune/) — 별자리와 생년월일로 오늘과 이번 주를 돌아봅니다
-- [대화 리허설](https://synk.im/rehearsal/) — 중요한 대화를 앞두고 할 말을 미리 연습합니다
-- [회원 혜택 모두 보기](https://synk.im/account/platform.html#benefits) — 준비 중인 가족 이야기 앨범까지 한 화면에서 봅니다
+SYNK 플랫폼은 SYNK의 앱과 회원 혜택을 한곳에서 쓰는 입구입니다. 로그인하면 계정과 연결된 기록을 한자리에서 이어 봅니다.
 
-무료 체험은 가입 없이 시작할 수 있습니다. 기록을 저장하는 방식은 프로그램마다 다르고, 가입 전에 남긴 기록이 계정으로 옮겨지지는 않습니다. 실제 장소의 운영 시간과 요금은 방문 전에 다시 확인해 주세요.
+- 하나의 SYNK ID — 앱마다 따로 가입하지 않고, 같은 계정으로 이어 씁니다.
+- 나에게 필요한 앱만 — 소속과 이용권에 맞는 앱만 보이고, 고른 관심사에 따라 추천이 달라지게 만들고 있습니다.
+- 이어지는 경험 — 고른 말과 남긴 이야기가 다음 경험으로 이어지게 만들고 있습니다. 기억할 내용은 직접 고르고 고칩니다.
+- 내 라이브러리 — 자주 여는 앱을 이 기기에 담아 두고, 계정 라이브러리를 켜면 다른 기기와도 이어집니다.
+
+지금은 개발 중인 웹 미리보기입니다. Windows·macOS 설치판과 정식 출시 일정은 정해지면 알려 드립니다.
+
+[SYNK 플랫폼 열기](https://synk.im/account/platform.html#home)
 
 ## 네 사업
 
@@ -28,9 +25,9 @@ SYNK LAB은 한국어 교재와 학습 게임, 개인화 학습 앱을 만드는
 
 TOPIK 4급을 목표로 한 1년 과정과 교재, 학습 게임과 개인화 학습 앱을 만듭니다.
 
-- 한국어 학습 게임 8종 무료 공개
+- TOPIK 4급 목표 정규 1년 과정
 - 시냅스 교재 8권 원고 완성
-- 정규 1년 과정 개원 준비
+- 개인화 학습 앱 개발 중
 
 [SYNK LAB 보기](https://synk.im/lab/)
 
@@ -53,20 +50,20 @@ SYNK PULSE는 제품 광고, 브랜드필름, AI 모델 룩북, 사용법 영상
 제품 광고, 브랜드필름, AI 모델 룩북, 사용법 영상을 만듭니다. 몽글·까몽·마린의 음악과 이야기도 직접 만듭니다.
 
 - AI 모델 여섯 명의 캐스팅북
-- SYNK Radio와 캐릭터 이야기
+- 음악과 캐릭터 이야기
 - 작품 이용과 공동 제작 협업
 
 [SYNK PULSE 보기](https://synk.im/pulse/)
 
 ### SYNK PATH — 여행부터 한국 생활까지, 나에게 맞게 준비합니다
 
-SYNK PATH는 취향과 예산에 맞춘 여행 일정을 짜고, 한국 유학·취업과 정착을 준비하도록 돕습니다. 서울 여행은 지금 무료로 써 볼 수 있습니다.
+SYNK PATH는 취향과 예산에 맞춘 여행 일정을 짜고, 한국 유학·취업과 정착을 준비하도록 돕습니다.
 
-서울 여행 일정은 지금 무료로 짜 볼 수 있습니다. 한국 유학·취업 준비와 VR 면접 연습, 주거·정착 지원을 준비하고 있습니다.
+한국 유학·취업 준비와 VR 면접 연습, 주거·정착 지원을 준비하고 있습니다.
 
-- 서울 여행 무료 공개
 - 유학 계획·지원 서류·면접 준비
-- VR 면접·생활 연습 준비 중
+- VR 면접·생활 연습
+- 주거·정착 지원
 
 [SYNK PATH 보기](https://synk.im/path/)
 
@@ -118,12 +115,12 @@ SYNK PATH는 취향과 예산에 맞춘 여행 일정을 짜고, 한국 유학·
 
 ## In English
 
-An engine that fits you better the more you use it. SYNK builds Atlas, a personalization engine. We started in Korean education. Today the same engine plans travel days, picks the next question in a Korean game, and powers business services and video production.
+An engine that fits you better the more you use it. SYNK builds Atlas, a personalization engine. We started in Korean education. Today we are building the SYNK platform, where one SYNK ID carries you across SYNK apps, and we use the same engine for business services and video production.
 
 - SYNK LAB — Learn Korean, and get ready for Korea. SYNK LAB makes Korean textbooks, learning games and a personalized learning app. We are preparing a full-time one-year course aimed at TOPIK Level 4, and our learning games are free to play now. A one-year course aimed at TOPIK Level 4, textbooks, learning games and a personalized learning app.
 - SYNK SHIFT — Personal guidance for everyone, built from your material. SYNK SHIFT brings personalized services to work where every person needs different guidance — advice, onboarding, coaching and staff training. We connect your product information and rules to Atlas, and after launch we check with you that it is really used. Purchase advice, product onboarding, expert coaching and staff training: work where every customer or employee needs different guidance, built from the company’s own material.
 - SYNK PULSE — Ads and model videos, plus our own music and characters. SYNK PULSE makes product ads, brand films, AI model lookbooks and how-to videos, from planning to the final cut. We also create the music and stories of Mongle, Kkamong and Marin, and look for partners to license them or make something together. Product ads, brand films, AI model lookbooks and how-to videos. We also make the music and stories of Mongle, Kkamong and Marin.
-- SYNK PATH — From travel to life in Korea, planned around you. SYNK PATH plans trips around your tastes and budget and helps you prepare to study, work and settle in Korea. The Seoul day planner is free to use now. You can plan a day in Seoul for free today. Support for studying and working in Korea, VR interview practice and housing is in preparation.
+- SYNK PATH — From travel to life in Korea, planned around you. SYNK PATH plans trips around your tastes and budget and helps you prepare to study, work and settle in Korea. Support for studying and working in Korea, VR interview practice and housing is in preparation.
 
 Atlas: Atlas is the personalization engine SYNK builds. Eight engines understand a person’s goal and situation, fit the content, screens, words and sound to them, and check whether it helped.
 

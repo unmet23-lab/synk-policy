@@ -554,6 +554,7 @@ ol.steps,ul.steps{margin:0;padding:0}
 .split-media img{width:100%;height:100%;object-fit:cover}
 .split-media.contain img{object-fit:contain;padding:8%}
 .split-media.shot{padding:clamp(18px,3vw,36px) clamp(18px,3vw,36px) 0;place-items:end center;background:radial-gradient(120% 120% at 50% 0%,#fff 0%,var(--accent-stage) 70%)}
+.split-media.shot.wide{aspect-ratio:16/9.6}
 .split-media.shot img{height:auto;border-radius:12px 12px 0 0;box-shadow:0 0 0 1px rgba(10,10,15,.06),0 30px 50px -24px rgba(10,10,15,.35)}
 .ticks{list-style:none;margin:24px 0 0;padding:0;display:grid;gap:12px}
 .ticks li{display:grid;grid-template-columns:24px 1fr;gap:10px;color:var(--ink-2);line-height:1.55}
@@ -634,11 +635,19 @@ details.cases{margin-top:36px}
 @media (max-width:520px){.models{grid-template-columns:repeat(2,minmax(0,1fr))}}
 
 /* ---------- 질문 구획(어두운 면 한 곳) ---------- */
-.ask{background:var(--night);color:#f4f4f5;border-radius:var(--r-xl);padding:clamp(28px,5vw,72px);display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr);gap:clamp(28px,5vw,72px)}
+.ask{background:var(--night);color:#f4f4f5;border-radius:var(--r-xl);padding:clamp(28px,5vw,72px);display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr);grid-template-areas:"intro orb" "side questions";column-gap:clamp(28px,5vw,72px);row-gap:clamp(36px,4.5vw,56px)}
+/* 대화 구(2026-10-11): 9월 질문창의 구. 어두운 알갱이(color)는 바탕보다 한 단 밝게, 빛난 알갱이(caret-color)는 밤 잉크 */
+.ask-intro{grid-area:intro;align-self:center}
+.ask-orb{grid-area:orb;display:grid;justify-items:center;align-content:center;gap:22px}
+.ask-side{grid-area:side}
+.ask #questions{grid-area:questions}
+.orb{width:min(320px,100%);aspect-ratio:1;border-radius:50%;cursor:pointer}
+.orb-surface{display:block;width:100%;height:100%;border-radius:50%;color:#23242b;caret-color:#f4f4f5}
+.orb canvas{display:block;width:100%;height:100%;border-radius:50%}
 .ask .eyebrow{color:#9a9aa3}
 .ask .h2{color:#fff}
 .ask .lead{color:#b8b8c0;margin-top:20px}
-.ask-contact{margin-top:32px;display:grid;gap:10px}
+.ask-contact{display:grid;gap:10px}
 .ask-contact a,.ask-contact button{display:inline-flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 18px;border-radius:16px;background:var(--night-2);border:1px solid var(--night-line);text-decoration:none;color:#f4f4f5;font-weight:650;font-size:15.5px;cursor:pointer;text-align:left}
 .ask-contact a:hover,.ask-contact button:hover{border-color:#4a4a52}
 .ask-contact .mono{color:#9a9aa3;font-size:13px}
@@ -674,7 +683,7 @@ details.cases{margin-top:36px}
 .msg-user{justify-self:end;max-width:85%;padding:11px 16px;border-radius:18px 18px 6px 18px;background:#26262b;color:#fff;font-size:15.5px;line-height:1.5}
 .msg-answer{padding:18px 20px;border-radius:18px;background:var(--night-2);border:1px solid var(--night-line)}
 .msg-answer .msg-label{display:flex;align-items:center;gap:8px;margin-bottom:10px;font-family:var(--mono);font-size:11.5px;letter-spacing:.06em;color:#8a8a93;text-transform:uppercase}
-@media (max-width:900px){.ask{grid-template-columns:minmax(0,1fr)}}
+@media (max-width:900px){.ask{grid-template-columns:minmax(0,1fr);grid-template-areas:"intro" "orb" "questions" "side"}.orb{width:min(260px,64vw)}}
 .doc-dialog{width:min(760px,calc(100% - 24px));max-height:min(86vh,900px);padding:0;border:0;border-radius:var(--r-lg);background:#fff;color:var(--ink);box-shadow:var(--shadow-float)}
 .doc-dialog::backdrop{background:rgba(8,8,10,.55);-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px)}
 .doc-head{position:sticky;top:0;display:flex;justify-content:space-between;align-items:flex-start;gap:16px;padding:22px 24px 16px;background:#fff;border-bottom:1px solid var(--line)}

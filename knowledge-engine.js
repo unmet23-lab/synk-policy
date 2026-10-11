@@ -280,7 +280,9 @@ export function createKnowledgeEngine(data){
       ['pulse-rental',/(?:스튜디오|촬영공간|행사공간|장비|카메라|음향|조명).{0,12}(?:대여|대관|빌리|빌릴|렌탈)|(?:대여|대관|렌탈).{0,8}(?:스튜디오|장비)/.test(c)],
       ['path-settle',/주거|정착지원|입주/.test(c)||((brand==='path'||/한국.*유학/.test(c))&&/숙소|살곳|집구|집을구|기숙사/.test(c)&&!/여행|맛집|휴가/.test(c))],
       ['path-visit',records.get('path-visit')?.questionExamples.some(ex=>compact(normalizeQuery(ex))===c)||/방문.*문화체험/.test(c)||((brand==='path'||/path|패스/.test(c))&&/개인화여행|여행|맛집|문화체험|방문/.test(c))],
-      ['synk-products',records.get('synk-products')?.questionExamples.some(ex=>compact(normalizeQuery(ex))===c)||(/플랫폼/.test(c)&&/synk|무료|체험|개인화|취향|쓸수록/.test(c)&&(brand!=='shift'||/무료|체험|synk플랫폼/.test(c)))]
+      // 2026-10-11: SYNK 플랫폼은 이제 SYNK ID로 앱을 쓰는 입구(synk-platform)다. 무료·체험을 함께 물을 때만 예전 무료 체험 모음(synk-products)으로.
+      ['synk-platform',/플랫폼|런처/.test(c)&&!/무료|체험/.test(c)&&!/도입|기업|회사|고객사|직원/.test(c)&&(brand!=='shift'||/synk플랫폼|싱크플랫폼/.test(c))],
+      ['synk-products',records.get('synk-products')?.questionExamples.some(ex=>compact(normalizeQuery(ex))===c)||(/플랫폼/.test(c)&&/무료|체험/.test(c)&&(brand!=='shift'||/무료|체험|synk플랫폼/.test(c)))]
     ].filter(([id,hit])=>hit&&records.has(id)).map(([id])=>id);
     if(plannedService.length){
     if(/(?:지난번|예전|이전|어제|저번)(?:에)?.{0,8}(?:대화|질문|채팅)/.test(c)&&/다시|볼수|확인|찾|보여|남아|있어/.test(c))return from(['guide-privacy']);

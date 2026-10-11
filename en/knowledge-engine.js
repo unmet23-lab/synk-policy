@@ -175,7 +175,9 @@ export function createKnowledgeEngine(data){
    ['pulse-rental',/\b(?:studio|production space|equipment|camera|audio equipment)\b.{0,30}\b(?:hire|rent|rental|book)|\b(?:hire|rent|rental|book)\b.{0,30}\b(?:studio|production space|equipment|camera)\b/.test(q)],
    ['path-settle',/\b(?:housing|settling in|move in|accommodation|somewhere to live)\b/.test(q)&&(brand==='path'||/\b(?:path|study|studying|student)\b/.test(q))&&!/\b(?:travel|trip|food)\b/.test(q)],
    ['path-visit',/\b(?:visit|cultural experience|travel|trip|food recommendations)\w*\b/.test(q)&&(brand==='path'||/\bpath\b/.test(q))],
-   ['synk-products',/\bplatform\b/.test(q)&&/\bsynk\b|\bfree\b|\btry\b|\bpersonal\w*|\bpreferences?\b/.test(q)&&(brand!=='shift'||/\b(?:free|try)\b|\bsynk platform\b/.test(q))]
+   // 2026-10-11: the SYNK platform is now the SYNK ID entrance (synk-platform); only questions about free trials go to the old free collection.
+   ['synk-platform',/\bplatform\b|\blauncher\b/.test(q)&&!/\b(?:free|try|trial)\b/.test(q)&&!/\b(?:introduc\w*|deploy\w*|compan\w*|corporate|business|employees?)\b/.test(q)&&(brand!=='shift'||/\bsynk platform\b/.test(q))],
+   ['synk-products',/\bplatform\b/.test(q)&&/\b(?:free|try|trial)\b/.test(q)&&(brand!=='shift'||/\b(?:free|try)\b|\bsynk platform\b/.test(q))]
   ].filter(([id,hit])=>hit&&records.has(id)).map(([id])=>id);
   if(plannedService.length){
   if(/\bprivacy|\bcookies?\b|\b(?:save|store|retain|record|collect|track|keep|log|send|sent|upload|transmit)(?:s|ed|ing)?\b.*\b(?:chats?|conversations?|questions?|data|what (?:i|she|he|they|we|my \w+) (?:listen|type|ask|write|say|enter)\w*|anything (?:i|she|he|they|we) (?:type|write|say)\w*|somewhere|servers?|cloud|third part\w*|here)\b|\b(?:chat|conversation|data|anything (?:i|she|he|they) type\w*|what (?:i|she|he) type\w*)\b.*\b(?:saved|stored|collected|tracked|kept|logged|sent)\b/.test(q)&&!/consultation|chat ?gpt|chatbot|brief|proposal|files?/.test(q))return from(['guide-privacy']);

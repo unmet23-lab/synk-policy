@@ -1,4 +1,4 @@
-// SYNK 홈페이지 v10 · 메뉴, 나타나기, 질문(자주 묻는 질문 + 직접 묻기), 게임 장면, 알림.
+// SYNK 홈페이지 v10 · 메뉴, 나타나기, 대화 구, 질문(자주 묻는 질문 + 직접 묻기), 게임 장면, 알림.
 // 질문의 답은 공개 안내(knowledge.json) 안에서만 고른다. 대화는 저장하지 않는다.
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => [...r.querySelectorAll(s)];
@@ -57,21 +57,139 @@ if (cover && bar) {
 const smooth = () => { document.documentElement.classList.add('smooth'); removeEventListener('pointerdown', smooth, true); removeEventListener('keydown', smooth, true); };
 addEventListener('pointerdown', smooth, true); addEventListener('keydown', smooth, true);
 
-/* 시작 화면(2026-10-08 확정): 고른 사람만 다음 방문에 체험 목록부터 연다. 이 브라우저에만 저장하고, 주소에 #이 있거나 ?intro=1이면 따르지 않는다.
-   주소는 <head>의 짧은 스크립트가 바꾸고, 여기서는 그 자리로 한 번에 옮긴다. */
-const START_KEY = 'synk-entry-start-v1';
-if (document.documentElement.dataset.start === 'try') $('#try')?.scrollIntoView({ block: 'start' });
-const startPref = $('[data-start-pref]');
-if (startPref) {
-  const input = $('input', startPref), status = $('[data-start-pref-status]', startPref);
-  const read = () => { try { return localStorage.getItem(START_KEY) === '1'; } catch { return false; } };
-  startPref.hidden = false; input.checked = read();
-  input.addEventListener('change', () => {
-    try { if (input.checked) localStorage.setItem(START_KEY, '1'); else localStorage.removeItem(START_KEY); status.textContent = input.checked ? status.dataset.on : status.dataset.off; }
-    catch { input.checked = read(); status.textContent = status.dataset.fail; }
+/* 대화 구(2026-10-11 유호님 「예전에 SYNK 구체같은거 … 그거 추가해주고」): 9월 질문창의 구를 그대로 옮겨 왔다(공개본 orb-conversation.js).
+   빛 알갱이를 찍은 잉크 구. 빛은 왼쪽 위에 머물다가, 포인터가 구 위에서 움직일 때만 그쪽으로 돈다. 저절로 움직이지 않는다.
+   두 잉크는 CSS에서 온다(color = 어두운 알갱이, caret-color = 빛난 알갱이). 알갱이 순서는 아틀라스 지도와 같아 이 브라우저에 한 번만 계산해 둔다. */
+const ORB_GRID = 64; let grainJob = null;
+function orbRandom(seed) { return function () { seed |= 0; seed = seed + 0x6D2B79F5 | 0; let t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+const whenIdle = window.requestIdleCallback ? cb => requestIdleCallback(cb, { timeout: 1000 }) : cb => setTimeout(() => cb(null), 16);
+function inSlices(steps) {
+  return new Promise(resolve => {
+    const run = deadline => {
+      const stop = performance.now() + (deadline && !deadline.didTimeout ? Math.min(8, deadline.timeRemaining()) : 8);
+      for (;;) { const next = steps.next(); if (next.done) { resolve(next.value); return; } if (performance.now() >= stop) break; }
+      whenIdle(run);
+    };
+    whenIdle(run);
   });
-  addEventListener('storage', e => { if (e.key === START_KEY || e.key === null) input.checked = read(); });
 }
+const GRAIN_KEY = 'synk-grain-order-v1';
+function storedGrain(count) {
+  try {
+    const text = localStorage.getItem(GRAIN_KEY); if (!text || text.length !== Math.ceil(count * 2 / 3) * 4) return null;
+    const bytes = Uint8Array.from(atob(text), c => c.charCodeAt(0)), steps = new Uint16Array(bytes.buffer, 0, count);
+    const seen = new Uint8Array(count), order = new Float32Array(count);
+    for (let place = 0; place < count; place++) { const step = steps[place]; if (step >= count || seen[step]) return null; seen[step] = 1; order[place] = (step + .5) / count; }
+    return order;
+  } catch { return null; }
+}
+function storeGrain(order) {
+  try {
+    const count = order.length, steps = new Uint16Array(count);
+    for (let place = 0; place < count; place++) steps[place] = Math.round(order[place] * count - .5);
+    const bytes = new Uint8Array(steps.buffer); let text = '';
+    for (let i = 0; i < bytes.length; i += 0x8000) text += String.fromCharCode.apply(null, bytes.subarray(i, i + 0x8000));
+    localStorage.setItem(GRAIN_KEY, btoa(text));
+  } catch {}
+}
+// 고른 순서: 다음 알갱이는 가장 빈 자리로(아틀라스 지도와 같은 씨앗)
+function* grainSteps() {
+  const G = ORB_GRID, count = G * G, rnd = orbRandom(862104), crowd = new Float32Array(count), taken = new Uint8Array(count);
+  const reach = 9, span = reach * 2 + 1, near = new Float32Array(span * span);
+  for (let y = -reach; y <= reach; y++) for (let x = -reach; x <= reach; x++) near[(y + reach) * span + x + reach] = Math.exp(-(x * x + y * y) / 7.22);
+  for (let i = 0; i < count; i++) crowd[i] = rnd() * 1e-4;
+  const rowLeast = new Float32Array(G), rowPlace = new Int32Array(G);
+  const recount = row => { let place = -1, least = Infinity; for (let i = row * G, end = i + G; i < end; i++) if (!taken[i] && crowd[i] < least) { least = crowd[i]; place = i; } rowLeast[row] = least; rowPlace[row] = place; };
+  for (let row = 0; row < G; row++) recount(row);
+  const order = new Float32Array(count);
+  for (let step = 0; step < count; step++) {
+    let py = 0; for (let row = 1; row < G; row++) if (rowLeast[row] < rowLeast[py]) py = row;
+    const place = rowPlace[py], px = place % G; taken[place] = 1; order[place] = (step + .5) / count;
+    for (let y = -reach; y <= reach; y++) { const row = (py + y + G) % G, line = (y + reach) * span + reach; for (let x = -reach; x <= reach; x++) crowd[row * G + (px + x + G) % G] += near[line + x]; recount(row); }
+    if (step % 128 === 127) yield;
+  }
+  return order;
+}
+function grainOrder() {
+  if (grainJob) return grainJob;
+  const stored = storedGrain(ORB_GRID * ORB_GRID);
+  return grainJob = stored ? Promise.resolve(stored) : inSlices(grainSteps()).then(order => { storeGrain(order); return order; });
+}
+const LIGHT = { angle: -Math.PI * 2 * .108, lift: .56, fall: 2.4, gain: .9, floor: .02, rim: .06 };
+const FALL = new Float32Array(1025); for (let i = 0; i <= 1024; i++) FALL[i] = Math.pow(i / 1024, LIGHT.fall) * LIGHT.gain;
+let probe = null;
+function rgba(value, fallback) {
+  probe ??= Object.assign(document.createElement('canvas'), { width: 1, height: 1 }).getContext('2d', { willReadFrequently: true });
+  probe.clearRect(0, 0, 1, 1); probe.fillStyle = fallback; probe.fillStyle = value || fallback; probe.fillRect(0, 0, 1, 1);
+  return Array.from(probe.getImageData(0, 0, 1, 1).data);
+}
+function mountOrb(holder) {
+  const canvas = $('canvas', holder), surface = $('.orb-surface', holder);
+  const ctx = canvas?.getContext('2d'); if (!ctx || !surface) return;
+  const fine = matchMedia('(hover: hover) and (pointer: fine)');
+  let angle = LIGHT.angle, lift = LIGHT.lift, frame = 0, drawn = '', shape = null, preparing = '';
+  function* measureSteps(size, dpr, grain) {
+    const G = ORB_GRID, cell = Math.max(1, Math.round(dpr * .62)), radius = size / 2 - dpr, middle = size / 2, outer = (1 + 1.5 / radius) ** 2;
+    const index = [], cx = [], cy = [], cz = [], rim = [], threshold = [], cover = [];
+    for (let py = 0; py < size; py++) {
+      const y = (py + .5 - middle) / radius, gy = Math.floor(py / cell), sy = ((gy + .5) * cell - middle) / radius, row = (gy % G) * G;
+      for (let px = 0; px < size; px++) {
+        const x = (px + .5 - middle) / radius, reachSq = x * x + y * y; if (reachSq > outer) continue;
+        const edge = Math.round(Math.min(1, Math.max(0, (1 - Math.sqrt(reachSq)) * radius + .5)) * 255); if (!edge) continue;
+        const gx = Math.floor(px / cell), sx = ((gx + .5) * cell - middle) / radius, z = Math.sqrt(Math.max(0, 1 - sx * sx - sy * sy));
+        index.push((py * size + px) * 4); cx.push(sx); cy.push(sy); cz.push(z); rim.push(LIGHT.floor + Math.pow(1 - z, 5) * LIGHT.rim); threshold.push(grain[row + gx % G]); cover.push(edge);
+      }
+      if (py % 32 === 31) yield;
+    }
+    return { size, dpr, index: Int32Array.from(index), cx: Float32Array.from(cx), cy: Float32Array.from(cy), cz: Float32Array.from(cz), rim: Float32Array.from(rim), threshold: Float32Array.from(threshold), cover: Uint8Array.from(cover) };
+  }
+  function prepare(size, dpr) {
+    const want = size + '|' + dpr; if (preparing === want) return; preparing = want;
+    grainOrder().then(grain => inSlices(measureSteps(size, dpr, grain))).then(next => { if (preparing !== want) return; preparing = ''; shape = next; request(); });
+  }
+  let near = !('IntersectionObserver' in window), idle = 0;
+  function paint() {
+    frame = 0; if (!near) return;
+    const dpr = Math.min(Math.max(devicePixelRatio || 1, 1), 3), width = surface.getBoundingClientRect().width; if (!width) return;
+    const style = getComputedStyle(surface), inks = style.color + '/' + style.caretColor;
+    const size = Math.round(width * dpr), key = size + '|' + dpr + '|' + angle.toFixed(2) + '|' + lift.toFixed(2) + '|' + inks;
+    if (key === drawn) return;
+    if (!shape || shape.size !== size || shape.dpr !== dpr) { prepare(size, dpr); return; }
+    drawn = key;
+    if (canvas.width !== size) canvas.width = canvas.height = size;
+    const css = (size + .004) / dpr + 'px'; if (canvas.style.width !== css) canvas.style.width = canvas.style.height = css;
+    const image = ctx.createImageData(size, size), data = image.data, side = Math.sqrt(1 - lift * lift), lx = Math.sin(angle) * side, ly = -Math.cos(angle) * side;
+    const { index, cx, cy, cz, rim, threshold, cover } = shape;
+    const dark = rgba(style.color, '#0a0a0a'), light = rgba(style.caretColor, '#fff');
+    for (let k = 0; k < index.length; k++) {
+      const facing = Math.max(0, Math.min(1, cx[k] * lx + cy[k] * ly + cz[k] * lift)), lit = rim[k] + FALL[(facing * 1024) | 0] > threshold[k], i = index[k], ink = lit ? light : dark;
+      data[i] = ink[0]; data[i + 1] = ink[1]; data[i + 2] = ink[2]; data[i + 3] = cover[k] * ink[3] / 255;
+    }
+    ctx.putImageData(image, 0, 0);
+    surface.classList.add('orb-rendered');
+  }
+  const request = () => { if (!frame) frame = requestAnimationFrame(paint); };
+  // 구는 질문 구역에 있다. 화면이 조용해진 뒤나 가까이 왔을 때 먼저 오는 쪽에 계산한다(스크롤이 기다리지 않게).
+  const quiet = window.requestIdleCallback ? cb => requestIdleCallback(cb, { timeout: 2500 }) : cb => setTimeout(cb, 300);
+  const later = () => { if (idle) return; idle = quiet(() => { idle = 0; near = true; request(); }); };
+  if (!near) new IntersectionObserver(entries => { if (entries.some(e => e.isIntersecting)) { near = true; request(); } }, { rootMargin: '800px 0px' }).observe(surface);
+  new ResizeObserver(later).observe(surface);
+  holder.addEventListener('pointermove', event => {
+    if (reduced.matches || !fine.matches || event.pointerType === 'touch') return;
+    const r = surface.getBoundingClientRect(), dx = (event.clientX - r.left) / r.width * 2 - 1, dy = (event.clientY - r.top) / r.height * 2 - 1, d = Math.min(1, Math.hypot(dx, dy));
+    angle = Math.round(Math.atan2(dx, -dy) * 60) / 60; lift = Math.round((.92 - .5 * d) * 50) / 50; request();
+  });
+  holder.addEventListener('pointerleave', () => { angle = LIGHT.angle; lift = LIGHT.lift; request(); });
+  addEventListener('pageshow', request);
+  let density = null;
+  const watch = () => { density?.removeEventListener?.('change', changed); density = matchMedia('(resolution: ' + (devicePixelRatio || 1) + 'dppx)'); density.addEventListener?.('change', changed); };
+  const changed = () => { watch(); request(); };
+  watch(); request();
+}
+// 구나 「대화 시작」을 누르면 질문 입력창으로
+const goAsk = () => { const q = $('#question'); if (!q) return; q.scrollIntoView({ block: 'center', behavior: reduced.matches ? 'auto' : 'smooth' }); q.focus({ preventScroll: true }); };
+$$('[data-orb]').forEach(o => { mountOrb(o); o.addEventListener('click', goAsk); });
+$$('[data-ask-start]').forEach(b => b.addEventListener('click', goAsk));
 
 /* 나타나기 */
 const reveals = $$('.reveal');
