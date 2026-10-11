@@ -1,0 +1,65 @@
+name: Intel Mac graphics diagnosis
+on:
+  workflow_dispatch:
+  push:
+    branches: [codex/macos-intel-fix-20261012]
+    paths:
+      - '.github/desktop-preview/qa/diagnose-intel.cjs'
+      - '.github/workflows/desktop-macos-intel-diagnostics.yml'
+permissions:
+  contents: read
+jobs:
+  graphics:
+    strategy:
+      fail-fast: false
+      matrix:
+        runner: [macos-15-intel, macos-15]
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: .github/desktop-preview
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '24'
+          architecture: x64
+      - run: npm ci --no-audit --no-fund
+        env:
+          npm_config_arch: x64
+      - name: Default graphics without inspector
+        continue-on-error: true
+        run: node qa/diagnose-intel.cjs --backend=default
+      - name: OpenGL backend without inspector
+        continue-on-error: true
+        run: node qa/diagnose-intel.cjs --backend=gl
+      - name: Build missing Vulkan loader from pinned Khronos source
+        if: matrix.runner == 'macos-15-intel'
+        run: |
+          git clone --quiet https://github.com/KhronosGroup/Vulkan-Headers.git intel-diagnostics/vulkan-headers
+          git -C intel-diagnostics/vulkan-headers checkout --quiet 6802bb4733b63ed5efd3adb308a6c885ef180ea1
+          git clone --quiet https://github.com/KhronosGroup/Vulkan-Loader.git intel-diagnostics/vulkan-loader
+          git -C intel-diagnostics/vulkan-loader checkout --quiet fa218055ff4948b159f31d43f800c808a13d51df
+          cmake -S intel-diagnostics/vulkan-headers -B intel-diagnostics/headers-build -DCMAKE_INSTALL_PREFIX="$PWD/intel-diagnostics/vulkan-install"
+          cmake --install intel-diagnostics/headers-build
+          cmake -S intel-diagnostics/vulkan-loader -B intel-diagnostics/loader-build -DCMAKE_BUILD_TYPE=Release -DCMAKE_OSX_ARCHITECTURES=x86_64 -DCMAKE_OSX_DEPLOYMENT_TARGET=13.0 -DVULKAN_HEADERS_INSTALL_DIR="$PWD/intel-diagnostics/vulkan-install" -DBUILD_TESTS=OFF
+          cmake --build intel-diagnostics/loader-build --parallel 3
+          cp -L intel-diagnostics/loader-build/loader/libvulkan.dylib 'node_modules/electron/dist/Electron.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Libraries/libvulkan.dylib'
+          codesign --force --deep --sign - node_modules/electron/dist/Electron.app
+      - name: Software renderer with the missing loader
+        if: matrix.runner == 'macos-15-intel'
+        continue-on-error: true
+        run: node qa/diagnose-intel.cjs --backend=swiftshader
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: intel-diagnostics-${{ matrix.runner }}
+          path: |
+            .github/desktop-preview/intel-diagnostics/*/report.json
+            .github/desktop-preview/intel-diagnostics/*/process.log
+            .github/desktop-preview/intel-diagnostics/*/screen.png
+            .github/desktop-preview/intel-diagnostics/loader-build/loader/libvulkan*.dylib
+          retention-days: 7
