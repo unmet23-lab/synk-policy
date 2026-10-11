@@ -36,6 +36,8 @@ export function getStrictVRGate(state = {}) {
 export function getStrictVRControls(state = {}) {
   const primary = state.paused
     ? { action: 'resume', label: '계속하기', enabled: true }
+    : state.phase === 'confirming'
+      ? { action: state.reviewPage < (state.reviewPages?.length || 1) - 1 ? 'reviewNext' : 'confirm', label: state.reviewPage < (state.reviewPages?.length || 1) - 1 ? '다음 부분 확인' : '이 내용으로 답변', enabled: !!state.canConfirm }
     : state.phase === 'repair'
       ? { action: 'retry', label: '다시 답변', enabled: true }
     : state.canStart
@@ -43,7 +45,9 @@ export function getStrictVRControls(state = {}) {
       : { action: 'submit', label: state.canSubmit ? '답변 마침' : '질문을 듣고 답변하세요', enabled: !!state.canSubmit };
   return [
     { ...BUTTONS[0], ...primary },
-    { ...BUTTONS[1], ...(state.phase === 'repair' && !state.paused
+    { ...BUTTONS[1], ...(state.phase === 'confirming' && !state.paused
+      ? { action: 'retry', label: '다시 말하기', enabled: !!state.canConfirm }
+      : state.phase === 'repair' && !state.paused
       ? { action: 'repeat', label: '질문 다시 듣기', enabled: true }
       : { action: state.paused ? 'resume' : 'pause', label: state.paused ? '계속하기' : '일시정지', enabled: !state.canStart }) },
     { ...BUTTONS[2], action: 'exit', label: 'VR 나가기', enabled: true },
@@ -193,13 +197,14 @@ async function buildStage({ mount, getFrameState, getState, onAction, onClosePre
     const seconds = Number.isFinite(state.remainingSeconds) ? Math.max(0, Math.ceil(state.remainingSeconds)) : null;
     const micLevel = Math.round(Math.max(0, Math.min(1, Number(state.micLevel) || 0)) * 8) / 8;
     const answerQuote = String(state.branch?.evidence?.quote || '');
-    const key = JSON.stringify([state.phase, state.question, state.transcript, answerQuote, seconds, state.paused, state.canStart, state.canSubmit, state.settling, state.micActive, micLevel, state.automaticEnd]);
+    const key = JSON.stringify([state.phase, state.question, state.transcript, answerQuote, seconds, state.paused, state.canStart, state.canSubmit, state.canConfirm, state.reviewPage, state.settling, state.micActive, micLevel, state.automaticEnd]);
     if (key === lastHUDKey) return;
     lastHUDKey = key;
     context.fillStyle = '#e8e7e2'; context.fillRect(0, 0, HUD_WIDTH, HUD_HEIGHT);
     context.textAlign = 'left'; context.textBaseline = 'top';
     context.fillStyle = '#555653'; context.font = '500 28px SUIT, sans-serif';
     const status = state.paused ? '일시정지 · 마이크 꺼짐'
+      : state.phase === 'confirming' ? `음성 답변 확인 · ${(state.reviewPage || 0) + 1}/${state.reviewPages?.length || 1} · 마이크 꺼짐`
       : state.phase === 'reviewing' ? '면접관이 답변을 검토하고 있습니다'
       : state.phase === 'repair' ? '답변을 확인하지 못했습니다'
       : state.canSubmit ? `답변 중${seconds === null ? '' : ` · ${seconds}초`}`
@@ -211,11 +216,11 @@ async function buildStage({ mount, getFrameState, getState, onAction, onClosePre
       context.fillStyle = '#526847'; context.fillRect(1320, 24, Math.max(4, 160 * micLevel), 15);
     }
     context.fillStyle = '#252a22'; context.font = '500 36px SUIT, sans-serif';
-    lines(state.question || '세 면접관의 질문에 소리 내어 답변하세요.', 36, 70, 1460, 46, 2);
+    lines(state.phase === 'confirming' ? state.reviewPages?.[state.reviewPage || 0] || state.transcript : state.question || '세 면접관의 질문에 소리 내어 답변하세요.', 36, 70, 1460, 46, state.phase === 'confirming' ? 4 : 2);
     context.fillStyle = '#575c51'; context.font = '400 29px SUIT, sans-serif';
     const transcript = String(state.transcript || '');
     const answerContext = answerQuote && ['reviewing', 'followup'].includes(state.phase) ? `첫 답변: “${answerQuote.slice(0, 100)}”` : '';
-    lines(state.phase === 'repair' ? '다시 답변하거나 질문을 다시 들으세요.' : answerContext || (transcript ? `인식: ${transcript.slice(-120)}` : state.canSubmit ? state.automaticEnd ? '답변 후 약 6초간 말이 없으면 이어집니다.' : '답변을 마치면 아래에서 완료하세요.' : '선택 버튼으로 시작합니다.'), 36, 184, 1460, 38, 2);
+    if (state.phase !== 'confirming') lines(state.phase === 'repair' ? '다시 답변하거나 질문을 다시 들으세요.' : answerContext || (transcript ? `인식: ${transcript.slice(-120)}` : state.canSubmit ? state.automaticEnd ? '답변 후 약 6초간 말이 없으면 내용을 확인합니다.' : '답변을 마치면 아래에서 완료하세요.' : '선택 버튼으로 시작합니다.'), 36, 184, 1460, 38, 2);
     for (const control of getStrictVRControls(state)) {
       context.fillStyle = control.enabled ? '#cecfca' : '#deded8';
       context.fillRect(control.x, control.y, control.w, control.h);

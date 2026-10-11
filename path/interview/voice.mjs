@@ -19,15 +19,46 @@ export function voiceError(error) {
 
 function abortError() { return new DOMException('Voice input cancelled', 'AbortError'); }
 
+/** Merge capture segments without correcting their text or inferring missing
+ * confidence. Word times remain relative to their original capture, including
+ * after pause/resume. Vosk confidence is a decoder score, not accuracy proof.
+ * Text-only/edited segments have unknown words; their confidence is never
+ * borrowed from another segment or from a supplied utterance-level average. */
+export function mergeVoiceResults(results = []) {
+  const segments = results.map((result) => {
+    const text = String(result?.text || '').replace(/\s+/gu, ' ').trim();
+    const tokens = text ? text.split(' ') : [];
+    const supplied = Array.isArray(result?.words) ? result.words : [];
+    // Confidence must refer to the exact, unedited transcript. If the text and
+    // metadata no longer agree, preserve the text and mark its words unknown.
+    const aligned = supplied.length === tokens.length && supplied.every((item, index) => item?.word === tokens[index]);
+    const words = tokens.map((word, index) => {
+      const item = aligned ? supplied[index] : {};
+      return { word,
+        ...(Number.isFinite(item.conf) && item.conf >= 0 && item.conf <= 1 ? { conf: item.conf } : {}),
+        ...(Number.isFinite(item.start) && item.start >= 0 ? { start: item.start } : {}),
+        ...(Number.isFinite(item.end) && item.end >= 0 ? { end: item.end } : {}),
+      };
+    });
+    return { text, words };
+  });
+  const words = segments.flatMap((segment) => segment.words);
+  const known = words.filter((word) => Number.isFinite(word.conf));
+  return { text: segments.map((segment) => segment.text).filter(Boolean).join(' '), words,
+    ...(known.length ? { confidence: known.reduce((sum, word) => sum + word.conf, 0) / known.length } : {}),
+    confidenceCoverage: words.length ? known.length / words.length : 0,
+  };
+}
+
 function normalize(result = {}) {
-  const text = String(result.text || '').replace(/\s+/gu, ' ').trim();
-  const words = Array.isArray(result.result) ? result.result.filter((item) => Number.isFinite(item.conf)) : [];
-  return { text, ...(words.length ? { confidence: words.reduce((sum, item) => sum + item.conf, 0) / words.length } : {}) };
+  return mergeVoiceResults([{ text: result.text, words: result.result }]);
 }
 
 /**
  * onStatus receives { state, message, code?, loaded?, total?, progress? }.
- * onPartial receives {text}; onResult receives the complete utterance so far.
+ * onPartial receives {text}; onResult receives the complete utterance so far as
+ * {text, words: [{word, conf?, start?, end?}], confidence?, confidenceCoverage}.
+ * Missing confidence is unknown, not zero or an assumed high-confidence word.
  * stop() resolves only after the worker acknowledges final PCM. Mic is closed
  * immediately on stop, while only local queued PCM finishes recognition.
  * `platform` / `modelFactory` are dependency seams for lifecycle tests.
@@ -135,9 +166,7 @@ export function createVoiceInput({ onPartial = noop, onResult = noop, onLevel = 
   }
 
   function combinedResult(active) {
-    const segments = active.results.filter((result) => result.text);
-    const confidence = segments.filter((result) => Number.isFinite(result.confidence));
-    return { text: segments.map((result) => result.text).join(' ').trim(), ...(confidence.length ? { confidence: confidence.reduce((sum, result) => sum + result.confidence, 0) / confidence.length } : {}) };
+    return mergeVoiceResults(active.results);
   }
 
   async function begin(arrayBuffer) {
@@ -221,7 +250,7 @@ export function createVoiceInput({ onPartial = noop, onResult = noop, onLevel = 
   async function stop() {
     captureGeneration += 1;
     const active = session;
-    if (!active) return { text: '' };
+    if (!active) return mergeVoiceResults();
     if (active.stopping) return active.stopping;
     if (!active.started) {
       active.cancelled = true;

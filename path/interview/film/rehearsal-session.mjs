@@ -10,6 +10,12 @@ export const QUESTIONS = Object.freeze({
   experience: '그 경험에서 직접 맡았던 일과 그 결과를 구체적으로 말씀해 주세요.',
   plan: '현장에 투입되기 전에 무엇을 어떻게 준비하실 겁니까.',
 });
+// The desk display must expose the whole transcript before confirmation, even
+// for a long answer. Splitting never rewrites or drops a recognized character.
+export function transcriptReviewPages(text) {
+  const chars = Array.from(String(text || ''));
+  return chars.length ? Array.from({ length: Math.ceil(chars.length / 90) }, (_, index) => chars.slice(index * 90, (index + 1) * 90).join('')) : [''];
+}
 export const SAFE_EXIT_WINDOWS = Object.freeze([[0, .35], [5.4, 5.8], [7.5, 9.95]]);
 const MEDIA_FIELDS = ['src', 'width', 'height', 'fps', 'sha256', 'durationSeconds'];
 export function rehearsalMediaQualities(manifest) {
@@ -128,7 +134,7 @@ const repairMessages = Object.freeze({
  * follow-ups; it is not a hiring score, factual verifier or unrestricted AI. */
 export function createRehearsalSession({ durationProfile = 'quest', limits: customLimits } = {}) {
   const { answerLimitsMs: limits } = durationOptions(durationProfile, customLimits);
-  const initial = () => ({ phase: 'idle', turn: 1, branch: null, question: QUESTIONS.question, clip: CLIPS.question, durationProfile, answerLimitsMs: [...limits], remainingMs: limits[0], paused: false, repair: null, answers: [], pendingClip: null, error: '' });
+  const initial = () => ({ phase: 'idle', turn: 1, branch: null, question: QUESTIONS.question, clip: CLIPS.question, durationProfile, answerLimitsMs: [...limits], remainingMs: limits[0], paused: false, repair: null, answers: [], pendingClip: null, transcriptDraft: '', error: '' });
   let state = initial();
   const snapshot = () => structuredClone(state);
   function start() {
@@ -164,8 +170,21 @@ export function createRehearsalSession({ durationProfile = 'quest', limits: cust
     if (state.turn === 2) { state.phase = 'complete'; return snapshot(); }
     state.turn = 2; state.phase = 'followup'; state.clip = state.pendingClip; state.pendingClip = null; state.question = state.branch.question; return snapshot();
   }
+  function reviewTranscript(text) {
+    if (state.phase !== 'listening' || state.paused) return snapshot();
+    if (!String(text || '').trim()) return submit('', { recognitionError: true });
+    state.transcriptDraft = String(text); state.phase = 'confirming';
+    return snapshot();
+  }
+  function confirmTranscript(text) {
+    if (state.phase !== 'confirming' || state.paused) return snapshot();
+    // Explicitly reviewed/edited words are the answer. ASR scores must not
+    // override the user's correction; semantic validation still runs below.
+    state.phase = 'listening'; state.transcriptDraft = '';
+    return submit(text);
+  }
   function retry() {
-    if (state.phase === 'repair' && !state.paused) { state.phase = 'listening'; state.repair = null; state.remainingMs = limits[state.turn - 1]; }
+    if (['repair', 'confirming'].includes(state.phase) && !state.paused) { state.phase = 'listening'; state.repair = null; state.transcriptDraft = ''; state.remainingMs = limits[state.turn - 1]; }
     return snapshot();
   }
   function repeat() {
@@ -177,5 +196,5 @@ export function createRehearsalSession({ durationProfile = 'quest', limits: cust
   function fail(message) { state.phase = 'error'; state.error = message; state.paused = false; return snapshot(); }
   function reset() { state = initial(); return snapshot(); }
   function dispose() { state = initial(); state.phase = 'disposed'; }
-  return Object.freeze({ snapshot, start, prepared, clipEnded, tick, submit, finishReview, retry, repeat, pause, resume, fail, reset, dispose });
+  return Object.freeze({ snapshot, start, prepared, clipEnded, tick, submit, reviewTranscript, confirmTranscript, finishReview, retry, repeat, pause, resume, fail, reset, dispose });
 }
