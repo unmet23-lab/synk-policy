@@ -1,3 +1,5 @@
+Upstream model card (verbatim original below)
+
 ---
 base_model: openai/whisper-base
 library_name: transformers.js

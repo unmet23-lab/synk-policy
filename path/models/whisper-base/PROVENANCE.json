@@ -101,10 +101,14 @@
     },
     {
       "file": "UPSTREAM-MODEL-CARD.txt",
-      "bytes": 531,
-      "sha256": "60a378018182c57cf382866ddfbf0fb2b4031b3895ae932aa34ecb8ff7065a13",
+      "bytes": 578,
+      "sha256": "7a960ee5db1c87fda3d457caddd782e441aeb4aeff7a568393b28e3fa42cb892",
       "source": "https://huggingface.co/onnx-community/whisper-base/raw/1846881b6b3a3024392c1eea3ad983695bc23925/README.md",
-      "modified": false
+      "modified": true,
+      "originalSourceSHA256": "60a378018182c57cf382866ddfbf0fb2b4031b3895ae932aa34ecb8ff7065a13",
+      "originalSourceBytes": 531,
+      "packagingPrefixBytes": 47,
+      "packagingNote": "Prefix prevents Jekyll from treating the original YAML as page front matter. All following bytes are the unmodified upstream original."
     },
     {
       "file": "README.md",
