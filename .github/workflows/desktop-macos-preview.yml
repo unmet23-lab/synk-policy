@@ -2,8 +2,13 @@ name: SYNK macOS Preview
 
 on:
   workflow_dispatch:
+    inputs:
+      architecture:
+        type: choice
+        options: [both, arm64, x64]
+        default: both
   push:
-    branches: [codex/macos-preview-20261012]
+    branches: [codex/macos-preview-20261012, codex/macos-intel-preview-20261012]
     paths:
       - '.github/desktop-preview/**'
       - '.github/workflows/desktop-macos-preview.yml'
@@ -19,11 +24,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        include:
-          - arch: arm64
-            runner: macos-15
-          - arch: x64
-            runner: macos-15-intel
+        include: ${{ fromJSON((inputs.architecture == 'x64' || github.ref_name == 'codex/macos-intel-preview-20261012') && '[{"arch":"x64","runner":"macos-15-intel"}]' || inputs.architecture == 'arm64' && '[{"arch":"arm64","runner":"macos-15"}]' || '[{"arch":"arm64","runner":"macos-15"},{"arch":"x64","runner":"macos-15-intel"}]') }}
     defaults:
       run:
         working-directory: .github/desktop-preview
