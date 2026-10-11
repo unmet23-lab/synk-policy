@@ -24,7 +24,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        include: ${{ fromJSON((inputs.architecture == 'x64' || github.ref_name == 'codex/macos-intel-preview-20261012') && '[{"arch":"x64","runner":"macos-15-intel"}]' || inputs.architecture == 'arm64' && '[{"arch":"arm64","runner":"macos-15"}]' || '[{"arch":"arm64","runner":"macos-15"},{"arch":"x64","runner":"macos-15-intel"}]') }}
+        include: ${{ fromJSON((inputs.architecture == 'x64' || github.ref_name == 'codex/macos-intel-preview-20261012') && '[{"arch":"x64","runner":"macos-15"}]' || inputs.architecture == 'arm64' && '[{"arch":"arm64","runner":"macos-15"}]' || '[{"arch":"arm64","runner":"macos-15"},{"arch":"x64","runner":"macos-15"}]') }}
     defaults:
       run:
         working-directory: .github/desktop-preview
@@ -35,13 +35,17 @@ jobs:
       - uses: actions/setup-node@v7
         with:
           node-version: '24'
+          architecture: ${{ matrix.arch }}
           cache: npm
           cache-dependency-path: .github/desktop-preview/package-lock.json
       - name: Install pinned build tools
         run: npm ci --no-audit --no-fund
+      - name: Verify graphics before packaging (x64 uses preinstalled Rosetta)
+        run: node qa/probe-gpu.cjs
       - name: Validate frozen public source
         run: node build.cjs --validate-only
       - name: Build native Preview DMGs
+        id: build
         run: |
           node build.cjs --arch=${{ matrix.arch }}
           test -s dist/${{ matrix.arch }}/deliverables/mac-package-${{ matrix.arch }}.json
@@ -58,12 +62,21 @@ jobs:
           if-no-files-found: error
           compression-level: 0
           retention-days: 14
+      - name: Preserve failed QA candidate for diagnosis
+        if: failure() && steps.build.outcome == 'success'
+        uses: actions/upload-artifact@v7
+        with:
+          name: synk-macos-candidate-${{ matrix.arch }}
+          path: .github/desktop-preview/dist/${{ matrix.arch }}/deliverables/
+          compression-level: 0
+          retention-days: 7
       - name: Save validation evidence
         if: always()
         uses: actions/upload-artifact@v7
         with:
           name: synk-macos-qa-${{ matrix.arch }}
           path: |
+            .github/desktop-preview/qa/gpu-preflight.json
             .github/desktop-preview/qa-results/${{ matrix.arch }}/mac-native-qa.json
             .github/desktop-preview/qa-results/${{ matrix.arch }}/*/report.json
             .github/desktop-preview/qa-results/${{ matrix.arch }}/*/*.png
