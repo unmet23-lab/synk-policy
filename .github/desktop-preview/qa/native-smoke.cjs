@@ -6,10 +6,10 @@ const config=JSON.parse(fs.readFileSync(path.resolve(args.config),'utf8')),out=p
 if(fs.existsSync(out)&&fs.readdirSync(out).length)throw Error('Output must be new');fs.mkdirSync(out,{recursive:true});
 const sha=file=>crypto.createHash('sha256').update(fs.readFileSync(file)).digest('hex'),before=sha(bundle.archive);
 const isolation=path.join(out,'profile');fs.mkdirSync(isolation);fs.mkdirSync(path.join(out,'tmp'));
-const input={...config,client,mode:args.mode,out,appData:isolation,archive:bundle.archive,version:bundle.version,runnerArch:process.env.RUNNER_ARCH||null,softwareGpu:process.env.SYNK_QA_SOFTWARE_GPU==="1",prefix:'SYNK_MAC_QA '};
+const input={...config,client,mode:args.mode,out,appData:isolation,archive:bundle.archive,version:bundle.version,runnerArch:process.env.RUNNER_ARCH||null,softwareGpu:process.env.SYNK_QA_SOFTWARE_GPU==="1",visible:process.env.SYNK_QA_VISIBLE==="1",prefix:'SYNK_MAC_QA '};
 function observe(config){
   const {app,shell}=require('electron'),fs=require('node:fs'),path=require('node:path');
-  app.setPath('appData',config.appData);app.once('ready',()=>app.dock?.hide());
+  app.setPath('appData',config.appData);app.once('ready',()=>{if(!config.visible)app.dock?.hide();});
   // Only the read/launch root is substituted. The production installation
   // verifier still checks actual DMG-copied metadata, executables and archives.
   require(app.getAppPath()+'/src/program-root.cjs').resolveProgramRoot=()=>config.applications;
@@ -25,7 +25,7 @@ function observe(config){
   async function click(selector,expected){await run(`document.querySelector(${JSON.stringify(selector)}).click()`);await waitFor(`location.href===${JSON.stringify(expected)}&&document.readyState==='complete'`,selector);}
   async function finish(ok){if(finished)return;finished=true;const local=requests.filter(r=>{try{const u=new URL(r.url);return ['127.0.0.1','localhost','[::1]'].includes(u.hostname)&&['4280','4191'].includes(u.port);}catch{return false;}});const result={ok:ok&&!errors.length&&!local.length&&!providerRequests.length,mode:config.mode,packaged:app.isPackaged,arch:process.arch,electron:process.versions.electron,archive:app.getAppPath(),visible:window?.isVisible(),profileIsolated:app.getPath('userData').startsWith(config.appData+path.sep),installationRoot:config.applications,checks,errors,pageErrors,requests,localhostDevelopmentRequests:local,providerRequests,openRequestsSuppressed:opened,screenshots,realAuthenticationPerformed:false,realProfileTouched:false,managedChildLaunched:false,graphicsBackend:config.softwareGpu?"CI-only SwiftShader":"default",runnerArch:config.runnerArch,translated:app.runningUnderARM64Translation===true};process.stdout.write(config.prefix+JSON.stringify(result)+'\n');setTimeout(()=>app.exit(result.ok?0:1),250);}
   app.on('browser-window-created',(_event,created)=>{
-    if(window)return;window=created;window.show=()=>{};window.showInactive=()=>{};contents=window.webContents;contents.setBackgroundThrottling(false);contents.setAudioMuted(true);
+    if(window)return;window=created;if(!config.visible){window.show=()=>{};window.showInactive=()=>{};}else{window.once('ready-to-show',()=>{window.show();window.focus();});}contents=window.webContents;contents.setBackgroundThrottling(false);contents.setAudioMuted(true);
     contents.session.webRequest.onBeforeRequest({urls:['http://*/*','https://*/*','ws://*/*','wss://*/*']},(details,callback)=>{requests.push({url:details.url,resourceType:details.resourceType,method:details.method,blocked:networkBlocked});callback({cancel:networkBlocked||config.client==='platform'});});
     contents.on('console-message',event=>{if(event.level==='error')pageErrors.push({message:event.message.slice(0,400),source:event.sourceId.split('?')[0],line:event.lineNumber});});
     (async()=>{try{
@@ -80,7 +80,7 @@ function observe(config){
         await click('a[href="/account/client.html?product=world&play=learning-hub"]','https://synk.im/account/client.html?product=world&play=learning-hub');
         const returned=await run('(async()=>({environment:await window.synkDesktop.getEnvironment(),auth:await window.synkDesktop.authStatus()}))()');check('account return restores native IPC',returned.environment.clientId==='world'&&returned.auth.configured===true&&!returned.auth.signedIn);await screenshot('world-return');
       }
-      check('no account provider request with empty vault',providerRequests.length===0);check('no localhost development server requests',requests.every(r=>!/^https?:\/\/(?:127\.0\.0\.1|localhost):(?:4280|4191)(?:\/|$)/.test(r.url)));check('window remained hidden',!window.isVisible());await finish(true);
+      check('no account provider request with empty vault',providerRequests.length===0);check('no localhost development server requests',requests.every(r=>!/^https?:\/\/(?:127\.0\.0\.1|localhost):(?:4280|4191)(?:\/|$)/.test(r.url)));check('QA window visibility matches requested mode',window.isVisible()===config.visible);await finish(true);
     }catch(error){errors.push(error.stack||error.message);try{await screenshot('failure');checks.push({name:'failure snapshot',ok:false,detail:await run("({url:location.href,text:document.body.innerText.slice(0,1600),runner:window.synkRunner?.info})")});}catch{}await finish(false);}})();
   });
   return {appData:app.getPath('appData'),archive:app.getAppPath()};

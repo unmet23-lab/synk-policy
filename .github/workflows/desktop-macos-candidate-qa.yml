@@ -1,0 +1,57 @@
+name: SYNK existing x64 Mac candidate QA
+on:
+  workflow_dispatch:
+    inputs:
+      candidate_run_id:
+        type: string
+        default: '38156112969'
+  push:
+    branches: [codex/macos-install-qa-20261012]
+    paths:
+      - '.github/desktop-preview/qa/**'
+      - '.github/workflows/desktop-macos-candidate-qa.yml'
+permissions:
+  contents: read
+  actions: read
+jobs:
+  installed:
+    runs-on: macos-15
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: .github/desktop-preview
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '24'
+          architecture: x64
+          cache: npm
+          cache-dependency-path: .github/desktop-preview/package-lock.json
+      - run: npm ci --no-audit --no-fund
+        env:
+          npm_config_arch: x64
+      - name: Fetch the existing immutable candidate
+        run: gh run download "$CANDIDATE_RUN" --repo "$GITHUB_REPOSITORY" --name synk-macos-candidate-x64 --dir dist/x64/deliverables
+        env:
+          GH_TOKEN: ${{ github.token }}
+          CANDIDATE_RUN: ${{ inputs.candidate_run_id || '38156112969' }}
+      - name: Run the actual installed x64 apps with a visible CI window
+        run: node qa/run-macos-qa.cjs --arch=x64
+        env:
+          SYNK_QA_VISIBLE: '1'
+      - name: Save validation evidence
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: synk-macos-qa-x64
+          path: |
+            .github/desktop-preview/qa-results/x64/mac-native-qa.json
+            .github/desktop-preview/qa-results/x64/*/report.json
+            .github/desktop-preview/qa-results/x64/*/*.png
+            .github/desktop-preview/qa-results/x64/*-process.log
+            .github/desktop-preview/dist/x64/deliverables/mac-package-x64.json
+          if-no-files-found: warn
+          retention-days: 14
