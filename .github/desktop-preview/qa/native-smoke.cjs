@@ -1,12 +1,12 @@
 'use strict';
 const fs=require('node:fs'),path=require('node:path'),crypto=require('node:crypto'),{spawn}=require('node:child_process');
 const args=Object.fromEntries(process.argv.slice(2).map(x=>{const m=/^--(config|out|mode)=(.+)$/.exec(x);if(!m)throw Error('Unexpected argument');return [m[1],m[2]];}));
-if(process.platform!=='darwin'||!['world-online','world-offline','platform'].includes(args.mode))throw Error('Native macOS mode required');
+if(!['darwin','win32'].includes(process.platform)||(process.platform==='win32'&&args.mode!=='platform')||!['world-online','world-offline','platform'].includes(args.mode))throw Error('Native macOS mode required');
 const config=JSON.parse(fs.readFileSync(path.resolve(args.config),'utf8')),out=path.resolve(args.out),client=args.mode==='platform'?'platform':'world',bundle=config.bundles[client];
 if(fs.existsSync(out)&&fs.readdirSync(out).length)throw Error('Output must be new');fs.mkdirSync(out,{recursive:true});
 const sha=file=>crypto.createHash('sha256').update(fs.readFileSync(file)).digest('hex'),before=sha(bundle.archive);
 const isolation=path.join(out,'profile');fs.mkdirSync(isolation);fs.mkdirSync(path.join(out,'tmp'));
-const input={...config,client,mode:args.mode,out,appData:isolation,archive:bundle.archive,version:bundle.version,runnerArch:process.env.RUNNER_ARCH||null,softwareGpu:process.env.SYNK_QA_SOFTWARE_GPU==="1",visible:process.env.SYNK_QA_VISIBLE==="1",unlimitedFrames:process.env.SYNK_QA_UNLIMITED_FRAMES==="1",prefix:'SYNK_MAC_QA '};
+const input={...config,platform:process.platform,client,mode:args.mode,out,appData:isolation,archive:bundle.archive,version:bundle.version,runnerArch:process.env.RUNNER_ARCH||null,softwareGpu:process.env.SYNK_QA_SOFTWARE_GPU==="1",visible:process.env.SYNK_QA_VISIBLE==="1",unlimitedFrames:process.env.SYNK_QA_UNLIMITED_FRAMES==="1",prefix:'SYNK_MAC_QA '};
 function observe(config){
   const {app,shell}=require('electron'),fs=require('node:fs'),path=require('node:path');
   app.setPath('appData',config.appData);app.once('ready',()=>{if(!config.visible)app.dock?.hide();});
@@ -35,7 +35,7 @@ function observe(config){
       if(config.mode==='platform'){
         await waitFor("location.href==='synk-desktop://platform/index.html'&&document.documentElement.dataset.ready==='true'",'local-platform');
         const state=await run('(async()=>({environment:await window.synkDesktop.getEnvironment(),auth:await window.synkDesktop.authStatus(),clients:await window.synkDesktop.getClients(),node:typeof require,html:document.body.innerText.length}))()');
-        check('Platform local renderer and native environment',state.environment.clientId==='platform'&&state.environment.platform==='darwin'&&state.environment.arch===config.arch&&state.environment.version===config.version&&state.environment.nativeShell===true&&state.node==='undefined'&&state.html>100);
+        check('Platform local renderer and native environment',state.environment.clientId==='platform'&&state.environment.platform===config.platform&&state.environment.arch===config.arch&&state.environment.version===config.version&&state.environment.nativeShell===true&&state.node==='undefined'&&state.html>100);
         check('Platform empty configured account stays signed out',state.auth.configured===true&&state.auth.signedIn===false);
         for(const id of ['world','messenger']){
           const installed=state.clients.find(x=>x.id===id);check(id+' managed DMG copy recognized by real hash verifier',installed?.status==='installed'&&installed?.canLaunch===true&&installed?.version===config.bundles[id].version,installed);
@@ -45,7 +45,7 @@ function observe(config){
         }
         await run("document.querySelector('[data-view=downloads]').click()");await waitFor("document.documentElement.dataset.view==='downloads'",'downloads');
         const installationHelp=await run("(()=>{const n=document.querySelector('#view-downloads .quiet-note'),r=n.getBoundingClientRect();return {text:n.innerText,width:r.width,height:r.height,visible:!document.querySelector('#view-downloads').hidden};})()");
-        check('visible Mac installation help points to Applications',installationHelp.visible&&installationHelp.width>0&&installationHelp.height>0&&installationHelp.text.includes('Mac')&&installationHelp.text.includes('Applications'),installationHelp);await screenshot('platform-installation-help');
+        check('visible installation help matches the OS',installationHelp.visible&&installationHelp.width>0&&installationHelp.height>0&&(config.platform==='darwin'?installationHelp.text.includes('Mac')&&installationHelp.text.includes('Applications'):installationHelp.text.includes('설치')),installationHelp);await screenshot('platform-installation-help');
         await run("document.querySelector('[data-view=library]').click()");await waitFor("document.documentElement.dataset.view==='library'",'library');
         await screenshot('platform-library');check('Platform boot requires no network',requests.length===0);
       }else if(config.mode==='world-offline'){
@@ -88,7 +88,7 @@ function observe(config){
 // Intel hosted CI has no working hardware GL. This affects only the QA process, not the shipped app.
 const graphicsArgs=input.softwareGpu?['--use-gl=angle','--use-angle=swiftshader','--enable-unsafe-swiftshader']:[];
 const frameArgs=input.unlimitedFrames?['--disable-frame-rate-limit','--disable-gpu-vsync']:[];
-const child=spawn(bundle.executable,[...graphicsArgs,...frameArgs,'--inspect-brk=127.0.0.1:0','--log-file='+path.join(out,'electron.log')],{cwd:out,env:{...process.env,TMPDIR:path.join(out,'tmp')},stdio:['ignore','pipe','pipe']});
+const child=spawn(bundle.executable,[...graphicsArgs,...frameArgs,'--inspect-brk=127.0.0.1:0','--log-file='+path.join(out,'electron.log')],{cwd:out,windowsHide:true,env:{...process.env,TMPDIR:path.join(out,'tmp'),TEMP:path.join(out,'tmp'),TMP:path.join(out,'tmp')},stdio:['ignore','pipe','pipe']});
 let stdout='',stderr='',ws,connected=false,sequence=0,injected=false,error=null;const pending=new Map();
 const rpc=(method,params={})=>new Promise((resolve,reject)=>{const id=++sequence;pending.set(id,{resolve,reject});ws.send(JSON.stringify({id,method,params}));});
 function connect(url){ws=new WebSocket(url);ws.addEventListener('open',async()=>{await rpc('Debugger.enable');await rpc('Runtime.runIfWaitingForDebugger');});ws.addEventListener('message',async event=>{const m=JSON.parse(event.data);if(m.id){const p=pending.get(m.id);if(p){pending.delete(m.id);m.error?p.reject(Error(m.error.message)):p.resolve(m.result);}return;}if(m.method==='Debugger.paused'&&!injected){injected=true;try{const result=await rpc('Debugger.evaluateOnCallFrame',{callFrameId:m.params.callFrames[0].callFrameId,expression:'('+observe.toString()+')('+JSON.stringify(input)+')',returnByValue:true});if(result.exceptionDetails)throw Error(JSON.stringify(result.exceptionDetails));await rpc('Debugger.resume');}catch(e){error=e.message;child.kill('SIGKILL');}}});}
