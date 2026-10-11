@@ -1,13 +1,25 @@
 import * as THREE from './scene-assets/three.module.js';
 import {wardrobeItem} from './wardrobe-catalog.mjs';
 import {buildWardrobeGarmentV8} from './wardrobe-garments-v8.mjs';
-import {wardrobeFabricProfile} from './avatar-textiles.mjs';
+import {wardrobeFabricProfile} from './avatar-textiles.mjs?v=wardrobe-startup-20261012';
 
 const TAU=Math.PI*2;
 const radii=[[.2,.90],[.35,.874],[.49,.852],[.83,.820],[1.0,.803],[1.12,.782],[1.43,.690]];
 function radius(y){for(let i=1;i<radii.length;i++)if(y<=radii[i][0]){const [a,b]=radii[i-1], [c,d]=radii[i];return b+(d-b)*Math.max(0,(y-a)/(c-a));}return .69;}
 const front=(x,y,lift=.055)=>[x,y,Math.sqrt(Math.max(.001,radius(y)**2-x*x))*.91+lift];
 const at=(a,y,lift=.035)=>{const r=radius(y)+lift;return[Math.sin(a)*r,y,Math.cos(a)*r*.91];};
+
+// Fabric dependencies of the authored patterns below and in v8. Only equipped
+// slots are prepared; browsing the catalog must not preload the other garments.
+const garmentFabricKinds={
+  apron:['cotton-detail'],knit:['knit-detail'],denim:['denim-detail'],cape:['wax-detail','cotton-detail'],hanbok:['silk-detail','cotton-detail'],
+  scarf:['knit-detail'],'lapis-scarf':['knit-detail'],bandana:['cotton-detail'],linen:['linen-detail'],corduroy:['corduroy-detail'],
+  quilted:['quilted-detail','cotton-detail'],velvet:['velvet-detail'],silk:['silk-detail'],'wool-felt':['wool-felt-detail'],
+};
+export function wardrobeFabricKinds(slots={}){
+  const kinds=new Set();for(const slot of ['body','neck']){const item=wardrobeItem(slots?.[slot]);if(item?.slot===slot)for(const kind of garmentFabricKinds[item.key]||[])kinds.add(kind);}
+  return [...kinds];
+}
 
 export function wardrobeDyeDefaults(slots={}){
   const result={};

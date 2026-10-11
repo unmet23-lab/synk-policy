@@ -1,4 +1,4 @@
-import { createDayScene } from './day-scene.mjs';
+import { createDayScene } from './day-scene.mjs?v=wardrobe-startup-20261012';
 import { createWalkControls } from './walk-controls.mjs';
 import { movePoint, nearbyPlace } from './walk.mjs';
 

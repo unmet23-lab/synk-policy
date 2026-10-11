@@ -1,7 +1,7 @@
 import {WARDROBE_ITEMS,wardrobeItem,outfitLabel,slotsForOutfit} from './wardrobe-catalog.mjs';
 import {DraftHistory,normalizeEditState,normalizeWorkbenchState,createWorkbenchStorage,filterItems,randomSlots,FILTER_OPTIONS,thumbnailKey,wardrobeThumbnailCache} from './wardrobe-workbench.mjs';
 import {createWardrobeAlbum} from './wardrobe-album.mjs';
-import {createWardrobeThumbnailQueue} from './wardrobe-thumbnail-queue.mjs?v=performance-20261012';
+import {createWardrobeThumbnailQueue} from './wardrobe-thumbnail-queue.mjs';
 
 const esc=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const clone=value=>JSON.parse(JSON.stringify(value));
@@ -14,7 +14,7 @@ const shortDate=value=>new Date(value).toLocaleDateString('ko-KR',{month:'long',
 const GRAPHICS_REVISION='costume-workbench-v7';
 const catalogThumbnail=id=>new URL(`./assets/wardrobe-thumbnails-v8/${id}.png`,import.meta.url).href;
 let nextStudioId=0;
-function installStyle(){if(document.getElementById('wardrobe-studio-style'))return;const link=document.createElement('link');link.id='wardrobe-studio-style';link.rel='stylesheet';link.href=new URL('./wardrobe-studio.css',import.meta.url).href;document.head.append(link);}
+function installStyle(){if(document.getElementById('wardrobe-studio-style'))return;const link=document.createElement('link');link.id='wardrobe-studio-style';link.rel='stylesheet';link.href=new URL('./wardrobe-studio.css?v=wardrobe-startup-20261012',import.meta.url).href;document.head.append(link);}
 
 /** The renderer shows a local editing draft. Only explicit wear/save commands change the server. */
 export function createWardrobeStudio({snapshot,onEquip=async()=>{},onSaveLooks=async()=>{},onRefresh=async()=>{},onRetry=async()=>{},onDiscard=async()=>{},onPlay=()=>{},preview=false,reducedMotion=false}={}){
@@ -268,9 +268,9 @@ export function createWardrobeStudio({snapshot,onEquip=async()=>{},onSaveLooks=a
   function queueItemThumbnails(){observeThumbnails();}
   function queueLooksThumbnails(){observeThumbnails();}
   async function mountStage(){
-    const token=++generation;thumbQueue.clear();stageAbort?.abort();stageAbort=new AbortController();engine?.dispose();engine=null;fault='';$('.atelier-scene').setAttribute('aria-busy','true');
+    const token=++generation;thumbQueue.clear();stageAbort?.abort();stageAbort=new AbortController();engine?.dispose();engine=null;fault='';root.dataset.stage='loading';$('.atelier-scene').setAttribute('aria-busy','true');
     const fail=text=>{if(disposed||token!==generation)return;fault=text;$('.atelier-scene').setAttribute('aria-busy','false');let box=$('.atelier-stage-error');if(!box){box=document.createElement('div');box.className='atelier-stage-error';$('.atelier-scene-wrap').append(box);}box.innerHTML=`<p>${esc(text)}</p>${button('retry-stage','3D 다시 열기')}`;renderChrome();};
-    try{const {mountWardrobeStage}=await import('./wardrobe-stage.mjs?v=performance-20261012');if(disposed||token!==generation)return;const stage=await mountWardrobeStage($('.atelier-scene'),{slots:draft.slots,reducedMotion:reducedMotion||ws.preferences.reducedMotion,signal:stageAbort.signal,onError:fail,onView:view=>{if(disposed)return;ws.view=view;$('[data-field="zoom"]').value=view.zoom;soonRemember();},onAngle:a=>{if(disposed)return;$$('[data-angle]').forEach(b=>b.setAttribute('aria-pressed',String(Math.abs(Number(b.dataset.angle)-a)<.02)));}});if(disposed||token!==generation){stage.dispose();return;}engine=stage;engine.setLight(ws.light);engine.setView?.(ws.view);engine.setPose?.(ws.pose);engine.setBackground?.(ws.background);engine.setDyes?.(draft.dyes);$('.atelier-stage-error')?.remove();$('.atelier-scene').setAttribute('aria-busy','false');root.dataset.stage='ready';render();remember();}
+    try{const {mountWardrobeStage}=await import('./wardrobe-stage.mjs?v=wardrobe-startup-20261012');if(disposed||token!==generation)return;const stage=await mountWardrobeStage($('.atelier-scene'),{slots:draft.slots,reducedMotion:reducedMotion||ws.preferences.reducedMotion,signal:stageAbort.signal,onError:fail,onView:view=>{if(disposed||token!==generation)return;ws.view=view;$('[data-field="zoom"]').value=view.zoom;soonRemember();},onAngle:a=>{if(disposed||token!==generation)return;$$('[data-angle]').forEach(b=>b.setAttribute('aria-pressed',String(Math.abs(Number(b.dataset.angle)-a)<.02)));}});if(disposed||token!==generation){stage.dispose();return;}engine=stage;engine.setLight(ws.light);engine.setView?.(ws.view);engine.setPose?.(ws.pose);engine.setBackground?.(ws.background);engine.setDyes?.(draft.dyes);$('.atelier-stage-error')?.remove();$('.atelier-scene').setAttribute('aria-busy','false');root.dataset.stage='ready';render();remember();}
     catch{fail('3D 화면을 불러오지 못했어요. 초안은 남아 있어요. 다시 열어 주세요.');}
   }
   function toggle(array,id){return array.includes(id)?array.filter(v=>v!==id):[...array,id];}

@@ -102,3 +102,6 @@
  .atelier[data-tab=looks] .atelier-pane-copy{margin-bottom:12px}
 }
 
+
+/* Cover the canvas until the first-use shader passes are ready. */
+.atelier-scene[aria-busy=true]::after{content:'옷감과 빛을 준비하고 있어요';position:absolute;inset:0;display:grid;place-items:center;background:#eef2f1;color:#66716f;font-size:12px;pointer-events:none;z-index:1}

@@ -169,15 +169,76 @@ function makeWardrobeTextile(kind,size=512){
   return {map:texture(albedo,`${kind}-yarn-colour`,true),normalMap:texture(normal,`${kind}-yarn-normal`),roughnessMap:properties,aoMap:properties,...(directional?{anisotropyMap:texture(directional,`${kind}-fibre-direction-RG-strength-B`)}:{})};
 }
 
-export function createAvatarTextiles({anisotropy=4,detailSize=512}={}){
-  const textures=[],sets={};
-  for(const kind of ['wool','knit','cotton']){sets[kind]=make(kind);for(const texture of new Set(Object.values(sets[kind]))){texture.anisotropy=anisotropy;textures.push(texture);}}
+const baseKinds=['wool','knit','cotton'],sourceImages=new Map();
+function loadTextileImage(kind,role,detailSize){
+  return new Promise((resolve,reject)=>{
+    const image=new Image();image.decoding='async';let settled=false;
+    const finish=error=>{if(settled)return;settled=true;clearTimeout(timer);image.onload=image.onerror=null;error?reject(error):resolve(image);};
+    const timer=setTimeout(()=>finish(Error('base-textile-timeout')),5000);
+    image.onload=async()=>{
+      const expected=detailSize||size;
+      if(image.naturalWidth!==expected||image.naturalHeight!==expected){finish(Error('base-textile-size'));return;}
+      try{await image.decode?.();finish();}catch{finish(Error('base-textile-decode'));}
+    };
+    image.onerror=()=>finish(Error('base-textile-unavailable'));
+    image.src=new URL(`./assets/avatar-textiles-v1/${detailSize?detailSize+'/':''}${kind}-${role}.png`,import.meta.url).href;
+  });
+}
+function loadTextileImages(kind,detailSize){
+  const key=detailSize?`${detailSize}/${kind}`:kind;
+  if(!sourceImages.has(key)){
+    // Decoded images are shared; live Three textures still belong to each avatar.
+    const roles=['colour','normal','properties'];if(detailSize&&wardrobeFabricProfile(kind).anisotropy>0)roles.push('direction');
+    const pending=Promise.all(roles.map(role=>loadTextileImage(kind,role,detailSize)));
+    sourceImages.set(key,pending);pending.catch(()=>{if(sourceImages.get(key)===pending)sourceImages.delete(key);});
+  }
+  const pending=sourceImages.get(key);sourceImages.delete(key);sourceImages.set(key,pending);
+  // Two slots need at most three detailed fabrics. Keep one spare, instead of
+  // retaining every decoded 1024px cloth after many fitting-room visits.
+  const detailKeys=[...sourceImages.keys()].filter(value=>value.includes('/'));
+  while(detailKeys.length>4)sourceImages.delete(detailKeys.shift());
+  return pending;
+}
+function awaitBaseImages(pending,signal){
+  if(!signal)return pending;
+  if(signal.aborted)return Promise.reject(new DOMException('Avatar closed','AbortError'));
+  return new Promise((resolve,reject)=>{
+    const abort=()=>{signal.removeEventListener('abort',abort);reject(new DOMException('Avatar closed','AbortError'));};
+    signal.addEventListener('abort',abort,{once:true});
+    pending.then(value=>{signal.removeEventListener('abort',abort);resolve(value);},error=>{signal.removeEventListener('abort',abort);reject(error);});
+  });
+}
+function mapsFromImages(kind,[albedo,normal,packed,directional]){
+  if(kind.endsWith('-detail')){
+    const properties=wardTexture(packed,`${kind}-AO-R-roughness-G`);
+    return {map:wardTexture(albedo,`${kind}-yarn-colour`,true),normalMap:wardTexture(normal,`${kind}-yarn-normal`),roughnessMap:properties,aoMap:properties,...(directional?{anisotropyMap:wardTexture(directional,`${kind}-fibre-direction-RG-strength-B`)}:{})};
+  }
+  const properties=map(packed,`${kind}-occlusion-R-roughness-G`);
+  return {map:map(albedo,`${kind}-low-contrast-colour`,true),normalMap:map(normal,`${kind}-micro-normal`),roughnessMap:properties,aoMap:properties};
+}
+function assembleTextiles({anisotropy=4,detailSize=512}={},sets={}){
+  const textures=[],baseSources={},detailSources={};
+  for(const kind of baseKinds){baseSources[kind]=sets[kind]?'baked':'procedural';sets[kind]??=make(kind);for(const texture of new Set(Object.values(sets[kind]))){texture.anisotropy=anisotropy;textures.push(texture);}}
+  for(const [kind,set]of Object.entries(sets))if(!baseKinds.includes(kind)){detailSources[kind]='baked';for(const texture of new Set(Object.values(set))){texture.anisotropy=anisotropy;textures.push(texture);}}
   function fabric(kind,repeat){
     kind=wardrobeKind(kind);
-    if(!sets[kind]){sets[kind]=kind.endsWith('-detail')?makeWardrobeTextile(kind,detailSize):make(kind);for(const texture of new Set(Object.values(sets[kind]))){texture.anisotropy=anisotropy;textures.push(texture);}}
+    if(!sets[kind]){sets[kind]=kind.endsWith('-detail')?makeWardrobeTextile(kind,detailSize):make(kind);if(kind.endsWith('-detail'))detailSources[kind]='procedural';for(const texture of new Set(Object.values(sets[kind]))){texture.anisotropy=anisotropy;textures.push(texture);}}
     const result={},clones=new Map();
     for(const [key,texture] of Object.entries(sets[kind])){if(!clones.has(texture)){const clone=texture.clone();clone.repeat.set(...repeat);clone.needsUpdate=true;textures.push(clone);clones.set(texture,clone);}result[key]=clones.get(texture);}
     return result;
   }
-  return {fabric,textures};
+  return {fabric,textures,baseSources,detailSources};
+}
+
+// Retain the deterministic builder for authoring, rebaking and offline fallback.
+export function createAvatarTextiles(options={}){return assembleTextiles(options);}
+/** Load the exact authored base maps without Canvas2D fibre generation. */
+export async function loadAvatarTextiles(options={}){
+  if(options.signal?.aborted)throw new DOMException('Avatar closed','AbortError');
+  const detailKinds=[...new Set((options.detailKinds||[]).map(wardrobeKind).filter(kind=>Object.hasOwn(wardrobeProfiles,kind)))],detailSize=options.detailSize>=1024?1024:512;
+  const pending=Promise.all([...baseKinds,...detailKinds].map(async kind=>{try{return [kind,await loadTextileImages(kind,detailKinds.includes(kind)?detailSize:undefined)];}catch{return [kind,null];}}));
+  const sources=await awaitBaseImages(pending,options.signal);
+  if(options.signal?.aborted)throw new DOMException('Avatar closed','AbortError');
+  const sets={};for(const [kind,images]of sources)if(images)sets[kind]=mapsFromImages(kind,images);
+  return assembleTextiles(options,sets);
 }
