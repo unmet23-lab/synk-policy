@@ -1,4 +1,16 @@
-# SYNK macOS Preview 0.4.1
+# SYNK desktop Preview builders
+
+## Platform 0.4.3 performance update
+
+`build-platform-performance.cjs` builds Platform 0.4.3 with two byte-pinned runtime changes. Executable and ASAR checks stream physical file bytes in bounded chunks and verify SHA-256 freshly at each inspection or launch. Installation chooses the newest available installer while retaining hash-only approval for already-installed newer clients. No integrity checks are skipped.
+
+The published WORLD and Workspace 0.4.1 child installers remain unchanged. Windows Platform also recognizes the verified WORLD 0.4.2 installation without downgrading it. WORLD content is served over HTTPS and receives the rendering and wardrobe loading improvements without a child reinstall.
+
+Native Windows candidate QA passed 16 checks, including actual embedded installer extraction. Native Apple Silicon and Intel DMG and Platform QA passed in [run 38164405927](https://github.com/unmet23-lab/synk-policy/actions/runs/38164405927). Intel CI uses software graphics; physical MacBook GPU performance and download quarantine approval remain separate checks.
+
+Run `node build-platform-performance.cjs --validate-only`, then `--platform=win32` or `--arch=arm64|x64` on the matching native operating system. This builder never publishes or installs. The original 0.4.1 frozen sources and build defaults remain unchanged.
+
+## Original macOS Preview 0.4.1
 
 This directory contains byte-pinned sources from the published Windows Preview clients and an independent native macOS packaging script. No private configuration or account data is required. The public authentication configuration uses publishable keys and public OAuth client IDs.
 
