@@ -211,6 +211,41 @@ if ('IntersectionObserver' in window && !reduced.matches) {
 /* 이메일 복사 */
 $$('[data-copy-email]').forEach(b => b.addEventListener('click', async () => { try { await navigator.clipboard.writeText('hello@synk.im'); toast(T.copied); } catch { toast(T.copyFail); } }));
 
+/* Mac 다운로드: JS가 없으면 details, 지원되는 브라우저에서는 작은 선택 창. */
+const downloadPicker = $('[data-download-picker]');
+if (downloadPicker && typeof HTMLDialogElement !== 'undefined' && HTMLDialogElement.prototype.showModal) {
+  const summary = $('summary', downloadPicker), panel = $('.download-panel', downloadPicker);
+  const trigger = document.createElement('button'), dialog = document.createElement('dialog');
+  trigger.type = 'button'; trigger.className = summary.className;
+  trigger.append(...[...summary.childNodes].map(n => n.cloneNode(true)));
+  trigger.setAttribute('aria-haspopup', 'dialog'); trigger.setAttribute('aria-controls', 'mac-download-dialog');
+  dialog.id = 'mac-download-dialog'; dialog.className = 'download-dialog';
+  dialog.setAttribute('aria-labelledby', 'mac-download-title'); dialog.setAttribute('aria-describedby', 'mac-download-description');
+  dialog.append(panel); document.body.append(dialog); downloadPicker.replaceWith(trigger);
+  $('[data-download-close]', dialog).hidden = false;
+  trigger.addEventListener('click', () => {
+    dialog.showModal(); document.documentElement.classList.add('download-open');
+    $('#mac-download-title', dialog).focus({ preventScroll: true });
+  });
+  $('[data-download-close]', dialog).addEventListener('click', () => dialog.close());
+  dialog.addEventListener('close', () => {
+    document.documentElement.classList.remove('download-open'); trigger.focus({ preventScroll: true });
+  });
+  dialog.addEventListener('keydown', e => {
+    if (e.key !== 'Tab') return;
+    const controls = $$('button:not([disabled]), a[href]', dialog), first = controls[0], last = controls.at(-1);
+    if (e.shiftKey && (document.activeElement === first || document.activeElement === $('#mac-download-title', dialog))) {
+      e.preventDefault(); last.focus();
+    } else if (!e.shiftKey && document.activeElement === last) {
+      e.preventDefault(); first.focus();
+    }
+  });
+  dialog.addEventListener('click', e => {
+    const r = dialog.getBoundingClientRect();
+    if (e.target === dialog && (e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom)) dialog.close();
+  });
+}
+
 /* 게임 플레이 장면: LAB 카드는 5초 장면만 보여 준다(2026-10-05 유호님 요청으로 게임으로 가는 링크는 두지 않는다) */
 const clip = $('#clip-dialog'), video = $('#clip-video');
 let clipTrigger = null;
@@ -221,7 +256,7 @@ $$('[data-clip]').forEach(b => b.addEventListener('click', () => {
 }));
 clip?.addEventListener('close', () => { video.pause(); video.removeAttribute('src'); video.load(); clipTrigger?.focus(); });
 $$('dialog [data-close]').forEach(b => b.addEventListener('click', () => b.closest('dialog').close()));
-$$('dialog').forEach(d => d.addEventListener('click', e => { if (e.target === d) d.close(); }));
+$$('dialog:not(.download-dialog)').forEach(d => d.addEventListener('click', e => { if (e.target === d) d.close(); }));
 
 /* 질문 */
 const askRoot = $('[data-ask]');
