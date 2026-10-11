@@ -1,0 +1,88 @@
+{
+  "clientId": "platform",
+  "mode": "development",
+  "entry": "synk-desktop://platform/index.html",
+  "releases": [
+    {
+      "id": "world",
+      "mode": "development",
+      "platform": "win32",
+      "arch": "x64",
+      "version": "0.4.1",
+      "executableSHA256": "121d567ba96e50c4feb20cf3fb3958c52635be67585774ddd392ebf159226e5f",
+      "asarSHA256": "1cce12377fb2ec81de0f57ac86063894e9ab220ae56d38deab37d84143769208",
+      "installer": {
+        "relativePath": "world.exe",
+        "sha256": "e0363ee835484b5f5a75be05a7a787df71983738cf98a140b9f5eaeb12283e86",
+        "bytes": 132342850
+      }
+    },
+    {
+      "id": "world",
+      "mode": "development",
+      "platform": "win32",
+      "arch": "x64",
+      "version": "0.4.0",
+      "executableSHA256": "64eb5f2bfcb0da4e714c065c9c7715b49e27554be1c553f45736a7a546ac1d78",
+      "asarSHA256": "0840f2e6f7f698b887b6ad0eb39b4bad11dc40db9d6854168e15590df770f170"
+    },
+    {
+      "id": "messenger",
+      "mode": "development",
+      "platform": "win32",
+      "arch": "x64",
+      "version": "0.4.0",
+      "executableSHA256": "f78fbae7d2457c0994207d18a8e6c037d0120edd3f368ad29ff9fed84cb10481",
+      "asarSHA256": "dfb167708db8cbe60ccfc532fc4192e14c0c3ad8c13c3c12b0c98718245b1d1a",
+      "installer": {
+        "relativePath": "messenger.exe",
+        "sha256": "ec84d50e4c48b8834434a60f941fa703ad96d63c85922d3f82fcb06d758b2cff",
+        "bytes": 132289127
+      }
+    }
+  ],
+  "auth": {
+    "version": 1,
+    "supabaseUrl": "https://qiwxeddwwnzkwalpsuty.supabase.co",
+    "accountApiUrl": "https://qiwxeddwwnzkwalpsuty.supabase.co",
+    "supabasePublishableKey": "sb_publishable_g_T9VApp7f7L3girlJW8hA_j__pZjED",
+    "clients": {
+      "platform": {
+        "clientId": "9d7f276d-58bf-4c98-a7fd-9c3da0a40408",
+        "redirectUri": "http://127.0.0.1:43821/synk/oauth/platform/callback"
+      },
+      "world": {
+        "clientId": "a256e2f3-62f5-4a18-80f5-c3342c463dd0",
+        "redirectUri": "http://127.0.0.1:43822/synk/oauth/world/callback"
+      },
+      "messenger": {
+        "clientId": "57824287-1db2-4fdd-a29b-ec059d85f136",
+        "redirectUri": "http://127.0.0.1:43823/synk/oauth/messenger/callback"
+      },
+      "teacher": {
+        "clientId": "5e3730e8-8cf4-4e7e-aa92-c3f1582996b5",
+        "redirectUri": "http://127.0.0.1:43824/synk/oauth/teacher/callback"
+      },
+      "fortune": {
+        "clientId": "88ecd6c3-7b11-4630-853d-4be21f321af9",
+        "redirectUri": "http://127.0.0.1:43825/synk/oauth/fortune/callback"
+      },
+      "care": {
+        "clientId": "3313e645-6e13-466c-a788-bc203dcb7219",
+        "redirectUri": "http://127.0.0.1:43826/synk/oauth/care/callback"
+      },
+      "rehearsal": {
+        "clientId": "17e1fbfb-8899-4186-8cf7-a40b1732b84e",
+        "redirectUri": "http://127.0.0.1:43827/synk/oauth/rehearsal/callback"
+      },
+      "family-album": {
+        "clientId": "4f1c015d-0523-4b61-9b10-6c3faa09217a",
+        "redirectUri": "http://127.0.0.1:43828/synk/oauth/family-album/callback"
+      },
+      "path": {
+        "clientId": "9c1f7c0e-db52-42eb-949e-9f2d7e5d4220",
+        "redirectUri": "http://127.0.0.1:43829/synk/oauth/path/callback"
+      }
+    }
+  }
+}

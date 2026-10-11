@@ -1,0 +1,70 @@
+name: SYNK macOS Preview
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [codex/macos-preview-20261012]
+    paths:
+      - '.github/desktop-preview/**'
+      - '.github/workflows/desktop-macos-preview.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  package:
+    name: macOS ${{ matrix.arch }}
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 40
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: arm64
+            runner: macos-15
+          - arch: x64
+            runner: macos-15-intel
+    defaults:
+      run:
+        working-directory: .github/desktop-preview
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: .github/desktop-preview/package-lock.json
+      - name: Install pinned build tools
+        run: npm ci --no-audit --no-fund
+      - name: Validate frozen public source
+        run: node build.cjs --validate-only
+      - name: Build native Preview DMGs
+        run: node build.cjs --arch=${{ matrix.arch }}
+        env:
+          CSC_IDENTITY_AUTO_DISCOVERY: 'false'
+      - name: Install DMGs in an isolated folder and run native QA
+        run: node qa/run-macos-qa.cjs --arch=${{ matrix.arch }}
+      - name: Save verified installers
+        uses: actions/upload-artifact@v7
+        with:
+          name: synk-macos-preview-${{ matrix.arch }}
+          path: .github/desktop-preview/dist/${{ matrix.arch }}/deliverables/
+          include-hidden-files: true
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 14
+      - name: Save validation evidence
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: synk-macos-qa-${{ matrix.arch }}
+          path: |
+            .github/desktop-preview/qa-results/${{ matrix.arch }}/mac-native-qa.json
+            .github/desktop-preview/qa-results/${{ matrix.arch }}/*/report.json
+            .github/desktop-preview/qa-results/${{ matrix.arch }}/*/*.png
+            .github/desktop-preview/qa-results/${{ matrix.arch }}/*-process.log
+          include-hidden-files: true
+          if-no-files-found: ignore
+          retention-days: 14

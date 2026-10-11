@@ -1,0 +1,7 @@
+{
+  "name": "synk-platform-preview",
+  "version": "0.4.1",
+  "description": "SYNK Platform desktop client",
+  "author": "SYNK",
+  "main": "src/main.cjs"
+}

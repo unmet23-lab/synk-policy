@@ -1,0 +1,7 @@
+{
+  "name": "synk-world-preview",
+  "version": "0.4.1",
+  "description": "SYNK world desktop client",
+  "author": "SYNK",
+  "main": "src/main.cjs"
+}
