@@ -220,18 +220,34 @@ export function createFilmPlayer({ mount, manifest, onState = () => {}, onEnded 
   async function begin(slot, clip, loop, job) {
     guard(job); transitioning = true; transitionOwner = job;
     const video = slot.video, version = slot.version;
+    // A primed frame is a one-use proof. play() advances its clock even when a
+    // handoff is cancelled before it becomes visible. A repair that queues the
+    // same clip must not treat that advanced decoder as still at its head.
+    slot.primed = false;
     try {
       video.muted = true; video.loop = false;
-      const rendered = frame(slot, job);
-      const [, metadata] = await Promise.all([started(slot, job), rendered]); guard(job);
       // The first submitted frame can precede a delayed play() resolution.
       // Verify the current clock as well before exposing native speech.
-      const start = playbackStart(clip), headHoldEnd = start + clip.transition.headHoldMs / 1000, earliestFrame = start - startFrameTolerance(clip), currentTime = video.currentTime;
-      if (!Number.isFinite(currentTime) || currentTime < earliestFrame || currentTime > headHoldEnd || metadata.mediaTime < earliestFrame || metadata.mediaTime > headHoldEnd) throw filmError('start-hold-missed', '시작 여유 프레임을 지나 영상 전환을 중단했습니다.');
+      const start = playbackStart(clip), headHoldEnd = start + clip.transition.headHoldMs / 1000, earliestFrame = start - startFrameTolerance(clip);
+      const inHead = (metadata) => Number.isFinite(video.currentTime) && video.currentTime >= earliestFrame && video.currentTime <= headHoldEnd && metadata.mediaTime >= earliestFrame && metadata.mediaTime <= headHoldEnd;
+      for (let attempt = 0; attempt < 2; attempt++) {
+        const rendered = frame(slot, job);
+        const [, metadata] = await Promise.all([started(slot, job), rendered]); guard(job);
+        if (inHead(metadata)) break;
+        if (attempt || clip.kind !== 'listening') throw filmError('start-hold-missed', '시작 여유 프레임을 지나 영상 전환을 중단했습니다.');
+        // A delayed callback/play promise can consume a short neutral handle.
+        // Rewind a still-hidden, silent listener once within the SAME timeout.
+        // The outgoing frame stays visible; the 250ms/one-frame gates do not
+        // change. Native dialogue keeps its strict no-late-unmute failure.
+        video.pause();
+        const rewound = frame(slot, job); video.currentTime = start;
+        const resetFrame = await rewound; guard(job);
+        if (!inHead(resetFrame)) throw filmError('invalid-first-frame', '영상 시작 프레임을 확인하지 못했습니다.');
+      }
       finishBlend();
       const previous = active;
       blend = previous && previous.slot !== slot && transitionMs ? { from: previous.slot, to: slot, start: performance.now() } : null;
-      active = { slot, clip, loop, version, playbackId: ++playbackSerial, ended: false }; slot.primed = false;
+      active = { slot, clip, loop, version, playbackId: ++playbackSerial, ended: false };
       video.style.zIndex = '2'; video.muted = clip.kind === 'listening'; video.style.opacity = '1'; stage.hidden = false;
       if (previous && previous.slot !== slot) { stopWatch(previous.slot); previous.slot.video.pause(); previous.slot.video.muted = true; previous.slot.video.style.zIndex = '1'; previous.slot.video.style.opacity = blend ? '1' : '0'; }
       paused = false; transitioning = false; transitionOwner = null; emit('playing'); watch(active);
