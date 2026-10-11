@@ -212,26 +212,6 @@ if ('IntersectionObserver' in window && !reduced.matches) {
 $$('[data-copy-email]').forEach(b => b.addEventListener('click', async () => { try { await navigator.clipboard.writeText('hello@synk.im'); toast(T.copied); } catch { toast(T.copyFail); } }));
 
 /* Mac 다운로드: JS가 없으면 details, 지원되는 브라우저에서는 작은 선택 창. */
-function desktopDownloadOS(nav) {
-  const ua = nav.userAgent || '', platform = nav.platform || '', hints = nav.userAgentData;
-  const touchMac = (/Macintosh/i.test(ua) || /^Mac/i.test(platform)) && nav.maxTouchPoints > 1;
-  if (hints?.mobile || /Android|iPhone|iPad|iPod|Windows Phone|IEMobile/i.test(ua) || touchMac) return '';
-  if (hints?.platform) return hints.platform === 'Windows' ? 'windows' : hints.platform === 'macOS' ? 'mac' : '';
-  if (/Linux|CrOS|Mobile/i.test(ua)) return '';
-  if (/Windows NT/i.test(ua) || /^Win/i.test(platform)) return 'windows';
-  if (/Macintosh|Mac OS X/i.test(ua) || /^Mac/i.test(platform)) return 'mac';
-  return '';
-}
-const downloads = $('[data-platform-downloads]');
-if (downloads) {
-  const os = desktopDownloadOS(navigator);
-  const primary = os && $(`[data-download-os="${os}"]`, downloads);
-  if (primary) {
-    $('[data-download-primary]', downloads).append(primary);
-    const otherLabel = $('[data-download-other] > summary', downloads);
-    otherLabel.textContent = otherLabel.dataset.knownLabel;
-  }
-}
 const downloadPicker = $('[data-download-picker]');
 if (downloadPicker && typeof HTMLDialogElement !== 'undefined' && HTMLDialogElement.prototype.showModal) {
   const summary = $('summary', downloadPicker), panel = $('.download-panel', downloadPicker);

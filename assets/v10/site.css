@@ -720,14 +720,7 @@ details.cases{margin-top:36px}
 .biz-dialog form{margin-top:20px;text-align:right}
 
 /* Platform download choices: one Windows link, one Mac disclosure/modal. */
-.platform-downloads{align-items:center}
-.download-primary:empty{display:none}
-.download-other{max-width:100%}
-.download-other-link{display:inline-block;padding:10px 0;list-style:none;font-size:13px;line-height:1.5;color:var(--ink-2);text-decoration:underline;text-underline-offset:4px;cursor:pointer}
-.download-other-link::-webkit-details-marker{display:none}
-.download-other-link:hover{color:var(--ink)}
-.download-other-options{display:flex;flex-wrap:wrap;align-items:flex-start;gap:12px;padding:12px 0 4px}
-.download-other[open]{flex-basis:100%}
+.platform-downloads{align-items:flex-start}
 .download-picker{max-width:100%}
 .download-picker>summary{list-style:none;cursor:pointer}
 .download-picker>summary::-webkit-details-marker{display:none}
