@@ -1,4 +1,4 @@
-import { classifyAnswer } from '../dialogue.mjs';
+import { classifyAnswer, isShortExperienceDenial } from '../dialogue.mjs';
 
 /** Fixed dialogue contracts, not text to dub over a different performance.
  * Only experience/plan have current media. Planned entries stay inactive unless
@@ -20,7 +20,7 @@ const DEFAULT_CLIPS = Object.freeze(['strict-followup-experience', 'strict-follo
 const TOPIC = /요양|돌봄|돌보|돌봐|돌봤|간병|어르신|노인|할머니|할아버지|부모|아버지|어머니|가족|환자|식사|식단|섭취|삼킴|수저|휠체어|이동|부축|낙상|보행|목욕|배변|청결|안전|자격증|교육|실습|봉사|경험|근무|보고|인수인계|배우|배워|공부|훈련|준비|지원|보람|돕|도왔|도와|도움|경력/u;
 const PAST = /돌봤|돌보았|돌본|보살폈|보살핀|간병했|간병한|부축했|부축한|도왔|도운|도와드렸|모셨|근무했|근무한|일했|봉사했|봉사한|실습했|실습한|보조했|보조한|수행했|담당했|맡았|준비했|확인했|기록했|보고했|살폈|(?:보조|수행|담당|준비|확인|기록|보고|봉사|실습|근무|간병|부축|청소|수발|돌봄활동)(?:을|를)?(?:해드렸|했|하였)|한적(?:이|은)?있|해본적(?:이|은)?있|경험(?:이|은|는)?(?:조금|많이)?있/u;
 const ACTION = /돌보|돌봐|돌봤|돌본|보살|간병|부축|돕|도왔|도운|도와|모셨|보조|준비|확인|기록|보고|관찰|담당|맡|수행|살폈/u;
-const NEGATED = /(?:경험|경력|실습|봉사)(?:이|은|는|을|를)?(?:(?:아직|전혀|별로|거의)*)?(?:없|부족|안해|못해|하지않|해보지않)|(?:적|경험)(?:이|은|는)?(?:전혀|아직)?없|(?:경험|경력)(?:이|은|는)?(?:많지|있지)(?:는)?않|(?:돌보|돕|하|일하|근무하|보조하|부축하|간병하|준비하|확인하|기록하|보고하)지(?:않|못)|(?:안|못)(?:돌봤|돌보았|도왔|도와드렸|부축했|간병했|근무했|일했|봉사했|실습했|보조했|했)|하지는않|(?:돌본|도운|간병한|부축한|맡은|돌봤던|도왔던|간병했던|부축했던|맡았던)(?:건|것은|것이|게)(?:아니|아닙)|(?:돌봤|도왔|간병했|부축했|일했|근무했)다고(?:할수는|말할수는|할수|말할수)(?:없|없습니다)/u;
+const NEGATED = /(?:경험|경력|실습|봉사)(?:이|은|는|을|를)?(?:(?:아직|전혀|별로|거의)*)?(?:없|부족|안해|못해|하지않|해보지않)|(?:적|경험)(?:이|은|는)?(?:전혀|아직)?없|(?:경험|경력)(?:이|은|는)?(?:많지|있지)(?:는)?않|(?:돌보|돕|하|일하|근무하|보조하|부축하|간병하|준비하|확인하|기록하|보고하)지(?:않|못)|(?:안|못)(?:돌봤|돌보았|도왔|도와드렸|부축했|간병했|근무했|일했|봉사했|실습했|보조했|했)|하지는않|(?:돌본|도운|간병한|부축한|맡은|돌봤던|도왔던|간병했던|부축했던|맡았던)(?:건|것은|것이|게)(?:아니|아닙)|(?:돌봤|도왔|도와드렸|간병했|부축했|일했|근무했)다고(?:는)?(?:할수|말할수)(?:는)?없/u;
 const UNCLEAR_NEGATION = /없지(?:는)?않|(?:없|안했|못했)다고[^.!?]{0,12}(?:않|아니|아닙)/u;
 const HYPOTHETICAL = /(?:만약|가령|가정하면)|(?:했다|돌봤다|돌보았다|도왔다|있다|없다|받았다|됐다|했더라|돌봤더라|도왔더라|라|이라)면|(?:했|돌봤|돌보았|도왔|맡았|일했|근무했)으면|(?:돌본|도운|맡은)다면|(?:돌보|돌봐|돕|하|도우|맡|일하|지원하|입사하|거부하|이동하|근무하)(?:게되)?면(?!서)|(?:였|했|돌봤|도왔)을(?:것|겁)|(?:하는|할|했을|돌보는|돌볼|돕는|도울)경우/u;
 const FUTURE = /고싶|겠습니다|하려고|(?:할|받을|배울|준비할)(?:예정|계획)|배우려고|준비하려|해야|할것|할겁|될것|될겁|한다면|하고자/u;
@@ -78,7 +78,8 @@ function describe(text) {
     if (unknown && !other && (!self || unknownIndex > self.index)) subject = 'unknown';
     if (REPORTED.test(value) && other) subject = 'other';
     if (QUOTED.test(value)) subject = other ? 'other' : 'reported';
-    const negated = NEGATED.test(value);
+    const shortDenial = isShortExperienceDenial(value);
+    const negated = NEGATED.test(value) || shortDenial;
     const hypothetical = HYPOTHETICAL.test(value);
     // "돌봤고 배우고 싶다" contains an affirmed past action. "돌봤다고
     // 생각하고 싶다" does not: only a direct verb conjunction qualifies.
@@ -88,7 +89,7 @@ function describe(text) {
     const result = RESULT.test(value) && !RESULT_NEGATION.test(value);
     // "...했다면. 결과가 좋아졌을 겁니다" is not measured experience.
     if (!self && !other && result && previousPolarity === 'hypothetical') polarity = 'hypothetical';
-    const relevant = TOPIC.test(value);
+    const relevant = TOPIC.test(value) || shortDenial;
     const past = PAST.test(value) && polarity === 'affirmed';
     const action = ACTION.test(value) && past;
     const observation = /봤|보았|들었|읽었/u.test(value) && !/(?:돌봤|살펴봤|도와드렸|확인했|기록했)/u.test(value);

@@ -8,6 +8,9 @@ const DEFAULT_CLIPS = ['strict-followup-experience', 'strict-followup-plan'];
 const SELF = /제가|저는|저도|나는|내가|본인은|본인이/gu;
 const ACTION = /돌봤|돌보았|돌본|보살폈|간병했|부축했|도왔|도운|도와드렸|모셨|근무했|일했|봉사했|실습했|보조했|수행했|담당했|맡았|준비했|확인했|기록했|보고했|전달했|(?:준비|공부|교육|훈련|실습)(?:를|을)?(?:하고|했|받고|받았|받으며|받겠|하겠|중)|배우고|배웠|배우겠|배울|배워/gu;
 const EXPERIENCE = /경험|경력/gu;
+// A recognizer can substitute 있/없 with a high score. A bare experience
+// claim must be explicitly checked; do not infer the missing original word.
+const EXPERIENCE_POLARITY = /(?:(?:경험|경력)(?:이|은|는)?|(?:해본|해봤던|한|돌본|돌봤던|도운|도왔던|일한|근무한|봉사한|실습한)적(?:이|은|는)?)(?:(?:아직|전혀|별로|거의|조금|많이))*(?:있|없)(?:지(?:는)?않)?(?:었)?(?:습니다|어요|다|어)?/gu;
 const POLARITY = /없|않|아니|아닙|못(?:하|했|해|도|돌)|안(?:하|했|해|도|돌)|있(?:습|어|지)|겠습니다|예정|계획/gu;
 const CARE_ACTION = /식사|이동|간병|부축|돌봄/gu;
 const AMBIGUOUS = /아니요|정정|제가아니|내가아니|뜻은아니|뜻은아닙|없지(?:는)?않|(?:것|거|듯)같|(?:봤|았|었|했)을수도|만약|(?:돌봤다|도왔다|했다|있다|없다)면|돌본다면|(?:다는|라는).{0,16}(?:얘기|말|문장)|(?:다고|라고)(?:들었|말했|합니다)/gu;
@@ -39,6 +42,17 @@ function ranges(text, pattern, role, wordList) {
     const covered = wordList.filter(word => word.start < end && word.end > start);
     return { start: covered[0].start, end: covered.at(-1).end, role };
   });
+}
+function includeRepeatedPredicate(text, span, wordList, clauseEnd) {
+  // A real noisy decode produced "경험이 있다고 있습니다.". Keep that
+  // adjacent duplicate in ONE editable issue, without repairing either word.
+  // Extend by only one exact token in this evidence clause; normal reported
+  // speech ("있다고 말했습니다"), punctuation and new clauses stay separate.
+  if (!/있다고$/u.test(text.slice(span.start, span.end).replace(/\s/gu, ''))) return span;
+  const next = wordList.find(word => word.start >= span.end);
+  if (!next || next.end > clauseEnd || next.end - span.start > 120
+    || !/^[\t ]+$/u.test(text.slice(span.end, next.start)) || !/^있습니다[.!?。！？]*$/u.test(next.word)) return span;
+  return { ...span, end: next.end };
 }
 function shortSpan(wordList, start = 0, end = Infinity) {
   const selected = wordList.filter(word => word.end > start && word.start < end);
@@ -85,8 +99,14 @@ export function assessVoiceAnswer(result, { turn = 1, availableClipIds = DEFAULT
   const experience = ranges(rawText, EXPERIENCE, 'experience', wordList).filter(span => span.start >= basis.start && span.end <= basis.end);
   const polarity = ranges(rawText, POLARITY, 'polarity', wordList).filter(span => span.start >= basis.start && span.end <= basis.end);
   const care = ranges(rawText, CARE_ACTION, 'action', wordList).filter(span => span.start >= basis.start && span.end <= basis.end);
-  if (!actors.length && !confirmed(excerpt)) return output('clarify', issue('actor', excerpt, '이 부분은 본인이 직접 한 일이나 준비를 말한 건가요? 다르면 고쳐 주세요.'));
-  if (!actions.length && !(experience.length && polarity.length)) return output(confirmed(excerpt) ? 'retry' : 'clarify', issue('detail', excerpt, '직접 한 일이나 준비한 내용을 이 부분에 구체적으로 말씀해 주세요.'));
+  const experienceClaims = ranges(rawText, EXPERIENCE_POLARITY, 'polarity', wordList)
+    .filter(span => span.start >= basis.start && span.end <= basis.end)
+    .map(span => includeRepeatedPredicate(rawText, span, wordList, basis.end));
+  criticalSpans.push(...experienceClaims);
+  const uncheckedClaim = experienceClaims.find(span => !confirmed(span));
+  if (uncheckedClaim) return output('clarify', issue('experience-polarity', uncheckedClaim, '본인의 경험이 있는지 없는지를 이 부분만 확인해 주세요. 반대로 들렸다면 고쳐 주세요.'));
+  if (!actors.length && !confirmed(excerpt) && !experienceClaims.some(confirmed)) return output('clarify', issue('actor', excerpt, '이 부분은 본인이 직접 한 일이나 준비를 말한 건가요? 다르면 고쳐 주세요.'));
+  if (!actions.length && !(experience.length && polarity.length) && !experienceClaims.length) return output(confirmed(excerpt) ? 'retry' : 'clarify', issue('detail', excerpt, '직접 한 일이나 준비한 내용을 이 부분에 구체적으로 말씀해 주세요.'));
   const other = ranges(rawText, OTHER, 'actor', wordList).find(span => !confirmed(span));
   if (other) return output('clarify', issue('actor', other, '누가 한 일인지 이 부분을 확인해 주세요. 다르면 고쳐 주세요.'));
   for (const span of [actors.at(-1), ...actions, ...experience, ...polarity, ...care].filter(Boolean)) {
