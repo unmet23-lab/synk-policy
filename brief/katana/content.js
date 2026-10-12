@@ -249,7 +249,7 @@
     id: 'brief.katana', version: 1, checked: CHECKED,
     series: 'synkbrief 뉴스', title: '카타나 요청문 만들기',
     intro: {
-      eyebrow: 'synkbrief 뉴스 · 카타나',
+      eyebrow: 'SYNKBRIEF · KATANA',
       title: '카타나에 보낼 요청문,<br><span class="hl">내 영상에 맞게</span>',
       lead: '무엇이 주인공인지, 어떤 영상으로 어디에 올릴지 고르면 클로드에서 /katana 뒤에 붙여 넣을 요청문을 만들어 드려요. 크레딧 상한, 화질, 음악까지 넣어서 비용이 새지 않게요. 영상에서 실제로 보낸 요청 두 개와 결과 숫자도 같이 보여 드려요.',
       meta: ['약 1분', '질문 6개', '클로드 + 힉스필드', '로그인 없음'],

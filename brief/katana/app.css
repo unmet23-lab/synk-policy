@@ -108,7 +108,10 @@ img{display:block;max-width:100%}
 /* ── 첫 화면: 왼쪽 큰 제목 · 오른쪽 사업 색 포스터 ── */
 .intro{display:grid;grid-template-columns:minmax(0,1.22fr) minmax(300px,.78fr);gap:clamp(24px,4.4vw,60px);align-items:stretch}
 .intro>div:first-child{display:flex;flex-direction:column;justify-content:center;align-items:flex-start;padding:6px 0}
-.intro h1{margin:18px 0 20px;font-size:clamp(38px,4.8vw,64px);font-weight:900;line-height:.98;letter-spacing:-.06em;text-wrap:balance}
+.intro .eyebrow{font-family:var(--mono);font-size:11px;font-weight:500;letter-spacing:.16em;text-transform:uppercase}
+.intro .eyebrow::before{display:none}
+.intro .eyebrow::after{content:"";flex:none;width:28px;height:1px;background:currentColor;opacity:.6}
+.intro h1{margin:16px 0 20px;font-size:clamp(40px,5.3vw,72px);font-weight:900;line-height:.98;letter-spacing:-.06em;text-wrap:balance}
 .intro h1:focus{outline:none}
 /* 두 줄 큰 제목의 둘째 줄은 회색(PATH 면접실과 같은 문법) */
 .intro h1 .hl{color:var(--ink-3)}
@@ -133,9 +136,20 @@ img{display:block;max-width:100%}
    큰 글자 크기는 포스터 폭(cqw)과 글자 수(--len)로 정해 넘치지 않는다. 인화지는 큰 글자 머리보다 위에서 끝난다. */
 .poster{position:relative;isolation:isolate;overflow:hidden;height:100%;min-height:clamp(380px,44vw,540px);border-radius:var(--r-xl);background:var(--studio),var(--face);color:var(--on-face);box-shadow:inset 0 1px 0 rgba(255,255,255,.16);container-type:inline-size}
 .poster::before{content:"";position:absolute;inset:0;z-index:1;background:var(--grain);opacity:.28;mix-blend-mode:overlay;pointer-events:none}
-.poster::after{content:attr(data-word);position:absolute;z-index:2;left:22px;bottom:14px;font-size:min(9.5rem,calc(56cqw / (var(--len,3) * .97)));font-weight:900;line-height:.84;letter-spacing:calc(-.085em + var(--len,3) * .01em);white-space:pre}
+.poster::after{content:attr(data-word);position:absolute;z-index:2;left:22px;bottom:14px;font-size:min(var(--word-max,9.5rem),calc(var(--word-scale,56cqw) / (var(--len,3) * .97)));font-weight:900;line-height:.84;letter-spacing:calc(-.085em + var(--len,3) * .01em);white-space:pre}
 .poster .label{position:absolute;z-index:3;left:24px;top:22px;font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;opacity:.82}
 .poster .cut{position:absolute;z-index:2;top:10%;right:7%;width:min(52%,300px);height:auto;object-fit:contain;filter:var(--cut-shadow);transform:rotate(-3deg)}
+/* 첫 화면 세로 포스터: 펠트 물건을 크게(면 폭 72%), 큰 글자는 면 폭의 약 3/4 */
+.poster.tall{--word-scale:74cqw}
+.poster.tall .cut{top:13%;right:8%;width:min(72%,380px)}
+/* 상태 칩: 어두운 알약 + LED 점(플랫폼 앱 포스터의 「● 설치됨」과 같은 문법) */
+.led-chip{position:absolute;z-index:3;top:16px;right:16px;display:inline-flex;align-items:center;gap:7px;height:28px;padding:0 12px 0 10px;border-radius:999px;background:rgba(8,9,12,.62);color:#fff;font-size:12px;font-weight:800;letter-spacing:-.01em;white-space:nowrap;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+.led-chip::before{content:"";flex:none;width:6px;height:6px;border-radius:50%;background:var(--led-ok);box-shadow:0 0 0 3px rgba(125,180,90,.25)}
+/* 질문 옆 포스터: 지금 질문의 낱말 + 펠트 물건 하나. 데스크톱은 팁 판 위, 휴대폰은 질문 위의 띠 */
+.step-poster{--word-scale:62cqw;--word-max:6.5rem;height:auto;min-height:280px}
+.step-poster .cut{top:10%;right:6%;width:min(38%,170px)}
+.aside{display:flex;flex-direction:column}
+.aside>div:has(>.step-poster){order:-1;margin:0 0 14px!important}
 .poster .print{position:absolute;z-index:2;top:12%;right:8%;width:min(54%,300px);height:auto;aspect-ratio:1;object-fit:cover;border:7px solid #FAFAF9;border-radius:6px;background:#FAFAF9;transform:rotate(-4deg);box-shadow:0 22px 40px rgba(0,0,0,.34),0 4px 8px rgba(0,0,0,.2)}
 /* 스티커는 한 화면에 하나: 흰 알약을 살짝 기울이고 사업 색 점 */
 .sticker{display:inline-flex;align-items:center;gap:7px;height:30px;padding:0 13px 0 11px;border-radius:999px;background:#FAFAF9;color:#08090C;font-size:12.5px;font-weight:800;letter-spacing:-.01em;white-space:nowrap;transform:rotate(-2.5deg);box-shadow:0 8px 22px rgba(0,0,0,.24)}
@@ -227,6 +241,8 @@ img{display:block;max-width:100%}
 .r-top .because{margin-top:12px;font-size:13.5px;font-weight:600;color:color-mix(in srgb,var(--on-face) 88%,transparent)}
 .r-top .shot{grid-column:2;grid-row:1 / span 5;width:clamp(150px,18vw,210px);margin:0;padding:0;border:7px solid #FAFAF9;border-radius:6px;background:#FAFAF9;transform:rotate(-4deg);box-shadow:0 22px 40px rgba(0,0,0,.34),0 4px 8px rgba(0,0,0,.2)}
 .r-top .shot img{width:100%;height:auto;aspect-ratio:1;object-fit:cover}
+.r-top .shot.cut{width:clamp(170px,21vw,250px);border:0;border-radius:0;background:none;box-shadow:none;filter:var(--cut-shadow);transform:rotate(-3deg)}
+.r-top .shot.cut img{aspect-ratio:auto;object-fit:contain}
 /* 분량 고르기: 면 1 띠 안의 분할 캡슐 */
 .layout{display:inline-flex;flex-wrap:wrap;align-items:center;justify-content:flex-start;gap:8px 14px;margin:0 0 28px;padding:6px 6px 6px 20px;border-radius:999px;background:var(--surface-1);box-shadow:inset 0 0 0 1px var(--line)}
 .layout>span{font-size:13px;font-weight:800;color:var(--ink-3)}
@@ -321,8 +337,13 @@ details.sources ul{display:grid;gap:8px;margin:6px 0 12px;padding:0;list-style:n
 details.sources ul .src{margin:0 6px 0 0}
 details.sources p{margin:0 0 14px;font-size:13.5px;color:var(--ink-3)}
 /* 영상 속 실제 요청 */
-.formbox.ex{background:var(--surface-1)}
-.formbox.ex img{box-shadow:inset 0 0 0 1px var(--line)}
+.formbox.ex{display:grid;grid-template-columns:180px minmax(0,1fr);gap:24px;align-items:stretch;padding:0;margin:0 0 14px;overflow:hidden;background:var(--surface-1)}
+.formbox.ex>div:last-child{padding:22px 22px 20px 0}
+.ex-art{position:relative;isolation:isolate;display:grid;place-items:center;min-height:250px;padding:26px 0 18px;background:var(--studio),var(--face);color:var(--on-face)}
+.ex-art::before{content:"";position:absolute;inset:0;z-index:-1;background:var(--grain);opacity:.26;mix-blend-mode:overlay;pointer-events:none}
+.ex-art .label{position:absolute;left:16px;top:14px;font-family:var(--mono);font-size:11px;letter-spacing:.16em;opacity:.82}
+.ex-art img{width:108px;height:auto;border:5px solid #FAFAF9;border-radius:5px;background:#FAFAF9;transform:rotate(-3deg);box-shadow:0 16px 30px rgba(0,0,0,.32),0 3px 6px rgba(0,0,0,.18)}
+.formbox.ex:nth-of-type(even) .ex-art img{transform:rotate(2.5deg)}
 .formbox.ex pre{color:var(--ink)}
 /* 떠 있는 하단 바: 유리 캡슐 */
 .dock{position:sticky;bottom:calc(14px + env(safe-area-inset-bottom,0px));z-index:15;display:flex;justify-content:center;gap:8px;width:max-content;max-width:100%;margin:30px auto 0;padding:7px;border-radius:999px;background:var(--glass);box-shadow:var(--glass-edge);-webkit-backdrop-filter:var(--blur);backdrop-filter:var(--blur);transition:opacity .18s var(--ease),visibility .18s}
@@ -384,7 +405,10 @@ details[open]>summary::before{transform:rotate(45deg)}
 /* ── 좁은 화면 ── */
 @media(max-width:880px){
   .stage{grid-template-columns:minmax(0,1fr);gap:26px}
-  .aside{position:static}
+  .aside{position:static;display:contents}
+  .aside>div:has(>.step-poster){order:-1;margin:0 0 4px!important}
+  .step-poster{min-height:150px;--word-scale:50cqw;--word-max:4.6rem}
+  .step-poster .cut{top:12px;right:16px;width:min(30%,118px)}
   .specs{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
 @media(max-width:760px){
@@ -395,7 +419,8 @@ details[open]>summary::before{transform:rotate(45deg)}
   .brand .bead img{height:21px}
   .intro{grid-template-columns:minmax(0,1fr);gap:22px}
   .intro .art{order:-1}
-  .poster{min-height:340px;height:auto}
+  .poster.tall{min-height:340px;height:auto}
+  .poster.tall .cut{top:15%;right:9%;width:min(52%,250px)}
   .r-top{grid-template-columns:minmax(0,1fr)}
   .r-top .shot{display:none}
 }
@@ -410,7 +435,11 @@ details[open]>summary::before{transform:rotate(45deg)}
   .intro .meta li:nth-child(3){padding-left:0;border-left:0}
   .intro .meta li:nth-child(n+3){border-top:1px solid var(--line)}
   .intro .start,.intro .start .btn{width:100%}
-  .poster{min-height:364px}
+  .poster.tall{min-height:364px}
+  .formbox.ex{grid-template-columns:minmax(0,1fr);gap:0}
+  .formbox.ex>div:last-child{padding:18px 16px 16px}
+  .ex-art{min-height:0;padding:30px 0 22px}
+  .ex-art img{width:96px}
   .specs{grid-template-columns:minmax(0,1fr)}
   .layout{border-radius:22px;padding:10px 10px 10px 16px}
   .tipbody{padding:0 16px 14px 34px}
@@ -428,7 +457,9 @@ details[open]>summary::before{transform:rotate(45deg)}
   .tool{padding:0}
   .tool>main{padding:0;box-shadow:none;border-radius:0}
   .r-top,.spec.key{background:#fff!important;color:#08090C;box-shadow:inset 0 0 0 1px var(--line-2)}
-  .r-top::before,.spec.key::before,.poster::before{display:none}
+  .r-top::before,.spec.key::before,.poster::before,.ex-art::before{display:none}
+  .ex-art{background:#fff;color:#08090C}
+  .step-poster,.led-chip{display:none}
   .r-top .rec,.r-top p,.r-top .because,.r-top h1 .hl,.spec.key .k,.spec.key .s,.spec.key .why li{color:var(--ink-2)}
   body{--tint:var(--tint-day)}
   .r-top .rec .sticker{box-shadow:inset 0 0 0 1px var(--line-2);transform:none}

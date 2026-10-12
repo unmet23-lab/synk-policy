@@ -20,9 +20,10 @@
   }
   const reasonLi = x => `<li>${esc(x.t)}${badge(x.src)}</li>`;
 
-  // 첫 화면 포스터(싱ㅋ 시그널, core/signal.css): SHIFT 청금석 면 + 큰 「카타나」 + 카타나가 실제로 만든 몽글 아우라 에딧의 한 장면을 인화지로.
+  // 첫 화면 포스터(싱ㅋ 시그널, core/signal.css): SHIFT 청금석 면 + 펠트 몽글(정본 4K 누끼, 제 색 그대로 −3°) + 아주 큰 「카타나」.
+  // 플랫폼 앱 포스터처럼 왼쪽 위 모노 번호, 오른쪽 위 상태 칩(LED 점). 펠트 물건은 한 화면에 하나.
   function hero() {
-    return '<div class="poster" data-word="카타나" style="--len:3"><span class="label">KATANA · 2026.10.13</span><img class="print" src="assets/katana-hero.webp" width="480" height="480" alt=""><span class="sticker">실제 결과 한 장면</span></div>';
+    return '<div class="poster tall" data-word="카타나" style="--len:3"><span class="label">01 / SYNKBRIEF TOOL</span><span class="led-chip">실제 결과 2편</span><img class="cut" src="assets/katana-mongle-34.webp" width="640" height="637" alt=""></div>';
   }
   function marked(title, marks) {
     const t = esc(title);
@@ -45,7 +46,16 @@
     if (key === 'rates') return rates();
     return '';
   }
-  function aside() { return ''; }
+  // 질문 옆 포스터: 지금 질문의 낱말을 큰 한글로 + 궁금한 몽글. 휴대폰에서는 질문 위의 띠가 된다(signal.css).
+  function aside(answers, rules, step) {
+    const C = root.SynkKatanaContent;
+    if (!C || !step) return '';
+    const list = C.steps.filter(x => !x.when || x.when(answers || {}));
+    const i = list.findIndex(x => x.id === step.id);
+    const word = step.short || step.eyebrow || '';
+    const pad = n => String(n).padStart(2, '0');
+    return `<div class="poster step-poster" data-word="${esc(word)}" style="--len:${Math.max(2, [...word.replace(/\s/g, '')].length)}" aria-hidden="true"><span class="label">QUESTION ${pad(i + 1)} / ${pad(list.length)}</span><img class="cut" src="assets/katana-mongle-curious.webp" width="480" height="475" alt=""></div>`;
+  }
 
   function reasonsBlock(list, layout, keep = 3) {
     if (!list || !list.length || layout === 'quick') return '';
@@ -94,7 +104,7 @@
 
   function examplesBlock(content, h2) {
     const ex = content.examples || [];
-    return `<section class="block">${h2}<p class="sub">영상에서 보여 드린 두 편이에요. 몽글 사진 5장을 붙이고 /katana 뒤에 이렇게 보냈어요(실제 요청을 줄인 것).</p>${ex.map(e => `<div class="formbox ex"><img src="assets/katana-ex-${esc(e.id)}.webp" width="120" height="213" alt="${esc(e.title)} 결과의 한 장면"><div><p class="eyebrow">${esc(e.title)} · ${esc(e.result)}</p><pre style="white-space:pre-wrap;font:inherit;font-size:15px;line-height:1.55;margin:8px 0 10px">${esc(e.text)}</pre><p class="s" style="font-size:14px;color:var(--muted);margin:0 0 10px">${esc(e.note)}</p><div class="row"><button type="button" class="btn soft" data-action="copy:ex-${esc(e.id)}" data-what="요청">이 요청 복사</button><span class="status" role="status"></span></div></div></div>`).join('')}</section>`;
+    return `<section class="block">${h2}<p class="sub">영상에서 보여 드린 두 편이에요. 몽글 사진 5장을 붙이고 /katana 뒤에 이렇게 보냈어요(실제 요청을 줄인 것).</p>${ex.map((e, i) => `<div class="formbox ex"><div class="ex-art"><span class="label">${String(i + 1).padStart(2, '0')}</span><img src="assets/katana-ex-${esc(e.id)}.webp" width="270" height="480" alt="${esc(e.title)} 결과의 한 장면"></div><div><p class="eyebrow">${esc(e.title)} · ${esc(e.result)}</p><pre style="white-space:pre-wrap;font:inherit;font-size:15px;line-height:1.55;margin:8px 0 10px">${esc(e.text)}</pre><p class="s" style="font-size:14px;color:var(--muted);margin:0 0 10px">${esc(e.note)}</p><div class="row"><button type="button" class="btn soft" data-action="copy:ex-${esc(e.id)}" data-what="요청">이 요청 복사</button><span class="status" role="status"></span></div></div></div>`).join('')}</section>`;
   }
 
   function result(ctx) {
@@ -127,7 +137,7 @@
     const editable = content.steps.filter(s => !s.when || s.when(ctx.answers)).map(s => `<button type="button" class="glass chip" data-action="edit:${esc(s.id)}">${esc(s.short || s.eyebrow || s.title)}</button>`).join('');
     const edit = `<section class="block no-print">${H('답 바꿔 보기')}<p class="sub">하나만 바꿔도 요청문과 어림이 다시 만들어져요.</p><div class="take">${editable}</div></section>`;
 
-    const html = `<article class="result"><header class="r-top"><p class="rec"><span class="sticker">${esc(content.checked.replace(/-/g, '.'))} 기준</span><span>${esc(content.series)} · 나의 카타나 요청문</span></p><h1 id="q" tabindex="-1">${marked(rec.headline.title, ['아우라 에딧', '제품 광고', '편집 영상', '레퍼런스 리믹스'])}</h1><p>${esc(rec.headline.sub)}</p>${because ? `<p class="because">${esc(because)}</p>` : ''}<figure class="shot" aria-hidden="true"><img src="assets/katana-hero.webp" alt=""></figure></header><div class="layout"><span>보기</span><div class="seg" role="radiogroup" aria-label="결과 분량">${seg}</div></div>${warns}${flow}${take}${cards}${tipsHtml}${checklist}${examples}${saveRow}${fb}${edit}${sourcesBox}<div class="nav no-print"><button type="button" class="btn ghost" data-action="restart">처음부터 다시</button></div><div class="dock no-print" role="group" aria-label="바로 쓰기"><button type="button" class="btn primary" data-proxy="copy:prompt">요청문 복사</button><button type="button" class="btn soft" data-proxy="share">내 결과 링크</button></div></article>`;
+    const html = `<article class="result"><header class="r-top"><p class="rec"><span class="sticker">${esc(content.checked.replace(/-/g, '.'))} 기준</span><span>${esc(content.series)} · 나의 카타나 요청문</span></p><h1 id="q" tabindex="-1">${marked(rec.headline.title, ['아우라 에딧', '제품 광고', '편집 영상', '레퍼런스 리믹스'])}</h1><p>${esc(rec.headline.sub)}</p>${because ? `<p class="because">${esc(because)}</p>` : ''}<figure class="shot cut" aria-hidden="true"><img src="assets/katana-mongle-star.webp" width="560" height="554" alt=""></figure></header><div class="layout"><span>보기</span><div class="seg" role="radiogroup" aria-label="결과 분량">${seg}</div></div>${warns}${flow}${take}${cards}${tipsHtml}${checklist}${examples}${saveRow}${fb}${edit}${sourcesBox}<div class="nav no-print"><button type="button" class="btn ghost" data-action="restart">처음부터 다시</button></div><div class="dock no-print" role="group" aria-label="바로 쓰기"><button type="button" class="btn primary" data-proxy="copy:prompt">요청문 복사</button><button type="button" class="btn soft" data-proxy="share">내 결과 링크</button></div></article>`;
     const texts = { prompt: rec.prompt, all: summaryText(rec, content) };
     for (const e of content.examples || []) texts[`ex-${e.id}`] = e.text;
     return { html, texts };
