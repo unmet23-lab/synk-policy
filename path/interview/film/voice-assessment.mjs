@@ -1,4 +1,4 @@
-import { classifyAnswer } from '../dialogue.mjs';
+import { classifyAnswer, isShortExperienceDenial } from '../dialogue.mjs';
 import { planAnswerFollowup } from './answer-followup.mjs';
 
 // Decoder confidence is uncertainty evidence, never a measured accuracy rate.
@@ -102,6 +102,15 @@ export function assessVoiceAnswer(result, { turn = 1, availableClipIds = DEFAULT
   const experienceClaims = ranges(rawText, EXPERIENCE_POLARITY, 'polarity', wordList)
     .filter(span => span.start >= basis.start && span.end <= basis.end)
     .map(span => includeRepeatedPredicate(rawText, span, wordList, basis.end));
+  // The shared router already recognizes complete replies such as "아직 안
+  // 해봤어요" in this question's experience context. Approve that short reply
+  // once (including its stated/omitted actor) instead of rejecting it again for
+  // lacking the literal word 경험 or a positive past-action verb. Anchors in
+  // the shared rule exclude other people, unrelated activities and quotation.
+  if (!experienceClaims.length && proposedBranch.negatedExperience === true
+    && rawText.trim().length <= 120 && isShortExperienceDenial(rawText)) {
+    experienceClaims.push({ ...shortSpan(wordList), role: 'polarity' });
+  }
   criticalSpans.push(...experienceClaims);
   const uncheckedClaim = experienceClaims.find(span => !confirmed(span));
   if (uncheckedClaim) return output('clarify', issue('experience-polarity', uncheckedClaim, '본인의 경험이 있는지 없는지를 이 부분만 확인해 주세요. 반대로 들렸다면 고쳐 주세요.'));
