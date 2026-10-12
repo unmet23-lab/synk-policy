@@ -5,7 +5,7 @@
 //    개인정보·약관처럼 처리 업체를 적어야 하는 곳과 도구 사용법 안내(brief)는 뺀다(2026-10-02 원칙).
 //    찾을 이름 목록은 이 저장소가 공개라 검색에 걸리지 않게 base64로 적었다.
 // 3. 페이지 — 주요 페이지를 컴퓨터·휴대폰으로 열어 콘솔 오류·실패한 요청·가로 넘침이 없는지 본다.
-// 4. LAB 게임 — LAB 게임 카드(data-game)마다 /try/<게임>/을 열고 시작 단추가 풀리면 눌러 8초 뒤 오류가 없는지 본다. 카드의 플레이 장면 영상 주소도 받아지는지 본다.
+// 4. LAB 게임 — LAB 게임 카드(data-game)마다 /try/<게임>/을 열고 시작 단추가 풀리면 눌러 8초 뒤 오류가 없는지 본다. 카드 그림도 받아지는지 본다.
 // 5. 질문창 — LAB 질문창에 하나 물어 답이 나오는지 본다.
 // 정적 GET/HEAD의 502·503·504만 쓰기 없는 시나리오를 새 context에서 한 번 재검사한다.
 // 첫 실패 JSON·화면을 성공 여부와 무관하게 보존하며 복구는 별도 경고로 남긴다.
@@ -197,17 +197,17 @@ for (const device of devices) for (const route of routes) {
 }
 console.log(`  ${routes.length}쪽 × ${devices.length}기기`);
 
-// 4. LAB 게임 — 게임 카드에서 게임 목록을 읽는다. 10-05부터 카드는 게임으로 가는 링크 없이 플레이 장면 창만 연다(게임은 /try/<id>/에 그대로 둔다).
+// 4. LAB 게임 — 게임 카드에서 게임 목록을 읽는다. 10-05부터 카드에 게임으로 가는 링크가 없고, 10-13부터 플레이 장면 창도 없이 그림과 글만 둔다(게임은 /try/<id>/에 그대로 둔다).
 // 게임마다 시작 단추는 아래 표로 정한다(새 게임은 여기에 더한다).
 console.log('4. LAB 게임');
 const startOf = {racing: '#watch', rhythm: '#start-button', runner: '#start', 'order-rush': '#start', 'story-classroom': '#start', 'entry-check': '#rec-start', 'blank-slice': '#btn-start', 'talk-rally': '#btn-start'};
 let games = [];
 {
   const s = await open(devices[0], '/lab/');
-  games = await s.page.evaluate(() => Promise.all([...document.querySelectorAll('article.game-card[data-game]')].map(async a => ({id: a.dataset.game, href: `/try/${a.dataset.game}/`, video: a.dataset.video || '', videoOk: a.dataset.video ? (await fetch(a.dataset.video, {method: 'HEAD', cache: 'no-store'}).catch(() => ({ok: false}))).ok : false}))));
+  games = await s.page.evaluate(() => Promise.all([...document.querySelectorAll('article.game-card[data-game]')].map(async a => { const picture = a.querySelector('img')?.getAttribute('src') || ''; return {id: a.dataset.game, href: `/try/${a.dataset.game}/`, picture, pictureOk: picture ? (await fetch(picture, {method: 'HEAD', cache: 'no-store'}).catch(() => ({ok: false}))).ok : false}; })));
   await s.context.close();
   if (!games.length) fail('게임', 'LAB 페이지에서 게임 카드를 못 찾음');
-  for (const g of games) if (!g.videoOk) fail('게임', `LAB 카드 ${g.id}: 플레이 장면 영상 ${g.video || '(주소 없음)'}을 못 받음`);
+  for (const g of games) if (!g.pictureOk) fail('게임', `LAB 카드 ${g.id}: 그림 ${g.picture || '(주소 없음)'}을 못 받음`);
 }
 for (const device of devices) for (const game of games) {
   await checkScenario('게임', device, game.href, async page => {
