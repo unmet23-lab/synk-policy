@@ -585,9 +585,8 @@ details.cases{margin-top:36px}
 .games{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:18px}
 .game-card{display:flex;flex-direction:column;border-radius:var(--r-lg);overflow:hidden;background:#fff;border:1px solid var(--line);transition:transform .3s var(--ease),box-shadow .3s var(--ease)}
 .game-card:hover{transform:translateY(-3px);box-shadow:var(--shadow-float)}
-.game-thumb{position:relative;aspect-ratio:16/10;background:var(--stage);border:0;padding:0;cursor:pointer;display:block;width:100%}
+.game-thumb{aspect-ratio:16/10;background:var(--stage)}
 .game-thumb img{width:100%;height:100%;object-fit:cover}
-.game-thumb .play{position:absolute;right:12px;bottom:12px;display:inline-flex;align-items:center;gap:6px;padding:7px 12px;border-radius:999px;background:rgba(11,11,13,.72);color:#fff;font-size:12.5px;font-weight:650;-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
 .game-body{padding:18px 18px 20px;display:flex;flex-direction:column;gap:8px;flex:1}
 .game-body .mono{font-size:12.5px;color:var(--ink-3);letter-spacing:.04em}
 .game-body h3{font-size:19px;letter-spacing:-.02em}
@@ -596,14 +595,6 @@ details.cases{margin-top:36px}
 .game-body .play-link .arr{font-family:var(--mono)}
 @media (max-width:1100px){.games{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media (max-width:560px){.games{grid-template-columns:minmax(0,1fr)}}
-.clip-dialog{width:min(960px,calc(100% - 24px));padding:0;border:0;border-radius:var(--r-lg);background:#0b0b0d;color:#fff;overflow:hidden}
-.clip-dialog::backdrop{background:rgba(8,8,10,.7);-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px)}
-.clip-dialog video{width:100%;aspect-ratio:16/10;background:#000}
-.clip-dialog .clip-bar{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px 16px;flex-wrap:wrap}
-.clip-dialog .clip-bar p{font-size:14px;color:#c9c9cf}
-.clip-dialog .clip-bar .btns{gap:8px}
-.clip-dialog .btn{min-height:42px;padding:0 16px;font-size:14px}
-.clip-dialog .btn-line{background:transparent;color:#fff;border-color:#3a3a41}
 
 /* PULSE 모델 */
 .models{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:14px}
@@ -803,7 +794,7 @@ html[lang="en"] .dp-word{font-size:66px;line-height:.82;letter-spacing:-.04em}
 html:not(.js) .reveal{opacity:1;transform:none}
 
 /* 인쇄 */
-@media print{.bar,.ask,.foot-mark,.clip-dialog{display:none!important}.reveal{opacity:1;transform:none}}
+@media print{.bar,.ask,.foot-mark{display:none!important}.reveal{opacity:1;transform:none}}
 
 /* ── 검정 판(2026-10-10) ─────────────────────────────────────────────
    유호님 「검정으로 후보 만들어줘, 장점을 합쳐보자」: v10의 글·구성·마감은 그대로 두고, 화면 문법은 10-07 「night signal」 판(밤 바탕, 사업 색 포스터,

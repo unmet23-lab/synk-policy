@@ -312,15 +312,6 @@ async function macChip() {
   return null;
 }
 
-/* 게임 플레이 장면: LAB 카드는 5초 장면만 보여 준다(2026-10-05 유호님 요청으로 게임으로 가는 링크는 두지 않는다) */
-const clip = $('#clip-dialog'), video = $('#clip-video');
-let clipTrigger = null;
-$$('[data-clip]').forEach(b => b.addEventListener('click', () => {
-  if (!clip?.showModal) { location.href = b.dataset.clip; return; }
-  clipTrigger = b; video.src = b.dataset.clip;
-  clip.showModal(); video.play().catch(() => {});
-}));
-clip?.addEventListener('close', () => { video.pause(); video.removeAttribute('src'); video.load(); clipTrigger?.focus(); });
 $$('dialog [data-close]').forEach(b => b.addEventListener('click', () => b.closest('dialog').close()));
 $$('dialog:not(.download-dialog)').forEach(d => d.addEventListener('click', e => { if (e.target === d) d.close(); }));
 
