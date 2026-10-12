@@ -314,9 +314,6 @@ html[lang="en"] .cover-title{font-size:clamp(36px,4.4vw,64px);letter-spacing:-.0
   .cover-stats dt{font-size:12.5px}
 }
 
-/* 표지 아래: 사진과 네 사업 */
-.intro{padding-top:clamp(40px,5vw,64px)}
-.intro .hero-media{margin-top:0}
 #goals figure img{width:100%;height:100%;object-fit:cover;object-position:50% 15%}
 
 /* ---------- 첫 화면 ---------- */
@@ -324,23 +321,6 @@ html[lang="en"] .cover-title{font-size:clamp(36px,4.4vw,64px);letter-spacing:-.0
 .hero .display{max-width:12.5em}
 .hero .lead{margin-top:28px}
 .hero .btns{margin-top:36px}
-.hero-media{margin-top:clamp(44px,6vw,72px);position:relative;border-radius:var(--r-xl);overflow:hidden;background:var(--stage);aspect-ratio:16/8.4;box-shadow:var(--shadow-soft)}
-.hero-media img{width:100%;height:100%;object-fit:cover}
-.hero-media figcaption{position:absolute;left:18px;bottom:18px;display:inline-flex;align-items:center;gap:10px;padding:9px 14px 9px 12px;border-radius:999px;
-  background:rgba(255,255,255,.72);-webkit-backdrop-filter:blur(14px) saturate(1.6);backdrop-filter:blur(14px) saturate(1.6);border:1px solid rgba(255,255,255,.6);font-size:13.5px;font-weight:650;color:var(--ink)}
-.hero-media figcaption .mono{font-size:11.5px;color:var(--ink-3)}
-@media (max-width:700px){.hero-media{aspect-ratio:4/3.4;border-radius:var(--r-lg)}.hero-media img{object-position:52% 60%}}
-
-/* 사업 줄: 첫 화면 아래 네 사업 */
-.brandline{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border-top:1px solid var(--line);border-bottom:1px solid var(--line);margin-top:clamp(40px,5vw,56px)}
-.brandline a{display:flex;flex-direction:column;gap:10px;padding:22px 22px 24px;text-decoration:none;border-left:1px solid var(--line);transition:background .2s}
-.brandline a:first-child{border-left:0;padding-left:0}
-.brandline a:hover{background:linear-gradient(var(--stage),var(--stage))}
-.brandline a:first-child:hover{background:none}
-.brandline img{height:26px;width:auto;align-self:flex-start}
-.brandline a.is-path img{height:30px;margin-top:-2px}
-.brandline span{font-size:15px;color:var(--ink-2);line-height:1.45}
-@media (max-width:860px){.brandline{grid-template-columns:repeat(2,minmax(0,1fr))}.brandline a{padding:20px 16px 22px}.brandline a:nth-child(3){border-left:0;padding-left:0}.brandline a:nth-child(n+3){border-top:1px solid var(--line)}}
 
 /* ---------- 체험 카드(실제 화면) ---------- */
 .try-grid{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:20px}
@@ -876,14 +856,6 @@ body[data-site="shift"]{--accent-ink:var(--shift-ink)}
 body[data-site="pulse"]{--accent-ink:var(--pulse-ink)}
 body[data-site="path"]{--accent-ink:var(--path-ink)}
 body[data-site="synk"]{--accent:#fafaf9}
-
-/* 사진 설명 알약·사업 줄 */
-.hero-media{background:var(--plate)}
-.hero-media figcaption{background:rgba(17,18,21,.66);border-color:rgba(255,255,255,.12);color:#fafaf9}
-.hero-media figcaption .mono{color:rgba(250,250,249,.62)}
-.brandline img{box-sizing:content-box;height:20px;padding:6px 11px;border-radius:999px;background:#fafaf9}
-.brandline a.is-path img{height:22px;margin-top:0}
-.brandline a:hover{background:linear-gradient(var(--plate),var(--plate))}
 
 /* 체험 카드: 밤 면 위에 실제 제품 화면이 떠 있다 */
 .try-card{background:var(--plate)}
