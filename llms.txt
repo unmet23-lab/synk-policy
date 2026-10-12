@@ -17,7 +17,7 @@ Windows 64비트와 Mac(Apple Silicon·Intel, macOS 13 이상)용 Preview 0.4.3�
 
 [SYNK 플랫폼 열기](https://synk.im/account/platform.html#home)
 
-[Windows용 다운로드](https://github.com/unmet23-lab/synk-policy/releases/download/platform-preview-0.4.3-20261012/SYNK-Platform-Preview-0.4.3-win-x64.exe)
+[Windows용 다운로드](https://github.com/unmet23-lab/synk-policy/releases/download/platform-preview-0.4.3-signal.1-20261012/SYNK-Platform-Preview-0.4.3-Signal-win-x64.exe)
 
 [Mac용 · Apple Silicon](https://github.com/unmet23-lab/synk-policy/releases/download/platform-preview-0.4.3-20261012/SYNK-Platform-Preview-0.4.3-mac-arm64.dmg)
 
