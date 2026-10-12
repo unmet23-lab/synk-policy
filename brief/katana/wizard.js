@@ -191,9 +191,19 @@
       el.innerHTML = `<div class="stage single fade-in">${out.html}</div>`;
       el._texts = out.texts || {};
       if (V.bindResult) V.bindResult(el, { rec, answers: state.answers, rules: R, content: C });
+      watchDock();
+    }
+    // 떠 있는 하단 바(.dock)는 본문의 요청문 상자 단추 줄이 화면에 보이는 동안 숨긴다(흰 주 단추는 한 화면에 하나, 싱ㅋ 시그널).
+    let dockWatch = null;
+    function watchDock() {
+      const dock = el.querySelector('.dock'), row = el.querySelector('.copybox.main .row');
+      if (!dock || !row || typeof IntersectionObserver !== 'function') return;
+      dockWatch = new IntersectionObserver(entries => { for (const e of entries) dock.classList.toggle('away', e.isIntersecting); });
+      dockWatch.observe(row);
     }
 
     function render(focus = true) {
+      if (dockWatch) { dockWatch.disconnect(); dockWatch = null; }
       if (state.at === 'intro') renderIntro();
       else if (state.at === 'result') renderResult();
       else { const s = stepById(state.at) || steps()[0]; state.at = s.id; renderStep(s); }

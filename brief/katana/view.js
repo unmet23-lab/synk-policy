@@ -20,17 +20,17 @@
   }
   const reasonLi = x => `<li>${esc(x.t)}${badge(x.src)}</li>`;
 
-  // 첫 화면: 카타나가 실제로 만든 몽글 아우라 에딧의 한 장면 위에 펠트 스티커.
+  // 첫 화면 포스터(싱ㅋ 시그널, core/signal.css): SHIFT 청금석 면 + 큰 「카타나」 + 카타나가 실제로 만든 몽글 아우라 에딧의 한 장면을 인화지로.
   function hero() {
-    return '<div class="collage"><span class="spark"></span><img class="main" src="assets/katana-hero.webp" width="340" height="340" alt="" style="border-radius:28px;object-fit:cover"><img class="stk s1" src="assets/sticker-time.webp" alt=""><img class="stk s2" src="assets/sticker-search.webp" alt=""><img class="stk s3" src="assets/sticker-check.webp" alt=""></div>';
+    return '<div class="poster" data-word="카타나" style="--len:3"><span class="label">KATANA · 2026.10.13</span><img class="print" src="assets/katana-hero.webp" width="480" height="480" alt=""><span class="sticker">실제 결과 한 장면</span></div>';
   }
   function marked(title, marks) {
     const t = esc(title);
     for (const m of marks) { const e = esc(m); const i = t.indexOf(e); if (m && i >= 0) return `${t.slice(0, i)}<span class="hl">${e}</span>${t.slice(i + e.length)}`; }
     return t;
   }
-  const sticker = (name, r) => `<img class="stk" src="assets/sticker-${name}.webp" alt=""${r ? ` style="--r:${r}deg"` : ''}>`;
-  const head = (no, title, stk, r) => `<h2><span class="no">${String(no).padStart(2, '0')}</span>${esc(title)}${stk ? sticker(stk, r) : ''}</h2>`;
+  // 구역 머리: 「01 가져가기」 모노 번호 + 제목 + 1px 선(시그널). 펠트 스티커는 붙이지 않는다.
+  const head = (no, title) => `<h2><span class="no">${String(no).padStart(2, '0')}</span>${esc(title)}</h2>`;
 
   // 카타나가 하는 일: 우리 제품 광고 실제 기록(38분) 기준.
   function pipeline() {
@@ -38,7 +38,7 @@
   }
   function rates() {
     const rows = [['480p', 3, '미리 보기'], ['720p', 7, '기본값'], ['1080p', 12, '완성본']];
-    return `<div class="pool" role="img" aria-label="초당 크레딧: 480p 3, 720p 7, 1080p 12"><div class="p" style="grid-column:1/-1">${rows.map(([k, v, s]) => `<div class="row" style="display:grid;grid-template-columns:70px 1fr 120px;align-items:center;gap:10px;margin:6px 0"><b>${k}</b><span style="display:block;height:14px;border-radius:7px;background:var(--lapis,#3d6bc9);width:${Math.round((v / 12) * 100)}%"></span><span>초당 ${v} · ${s}</span></div>`).join('')}</div></div><p class="vis-cap" style="font-size:13px;color:var(--faint);margin:8px 0 0">카타나 가격표의 10월 8일 관측값이에요. 실제 비용은 카타나가 계획할 때 받는 견적을 따라요.</p>`;
+    return `<div class="pool" role="img" aria-label="초당 크레딧: 480p 3, 720p 7, 1080p 12"><div class="p" style="grid-column:1/-1">${rows.map(([k, v, s]) => `<div class="row" style="display:grid;grid-template-columns:70px 1fr 120px;align-items:center;gap:10px;margin:6px 0"><b>${k}</b><span style="display:block;height:14px;border-radius:7px;background:var(--face);width:${Math.round((v / 12) * 100)}%"></span><span>초당 ${v} · ${s}</span></div>`).join('')}</div></div><p class="vis-cap" style="font-size:13px;color:var(--faint);margin:8px 0 0">카타나 가격표의 10월 8일 관측값이에요. 실제 비용은 카타나가 계획할 때 받는 견적을 따라요.</p>`;
   }
   function visual(key) {
     if (key === 'pipeline') return pipeline();
@@ -107,14 +107,14 @@
     const seg = [['quick', '간단히'], ['guided', '기본'], ['deep', '자세히']].map(([id, t]) => `<button type="button" class="glass chip" role="radio" aria-checked="${id === layout}" data-action="layout:${id}">${t}</button>`).join('');
     const warns = rec.warns.map(x => `<div class="warn">${esc(x.t)}${badge(x.src)}</div>`).join('');
     let n = 0;
-    const H = (title, stk, r) => head(++n, title, stk, r);
+    const H = title => head(++n, title);
 
     const flow = `<section class="formbox"><p class="eyebrow">이 순서대로 하세요</p><h2>클로드에서 카타나 쓰기</h2><ol class="steps">${rec.flow.map(x => `<li><div><b>${esc(x.t)}${x.src && x.src !== 'synk' ? badge(x.src) : ''}</b>${x.d && !quick ? `<p>${esc(x.d)}</p>` : ''}</div></li>`).join('')}</ol></section>`;
-    const take = `<section class="block">${H('가져가기', 'envelope', 8)}<p class="sub">클로드 새 채팅에 재료를 붙이고, 입력창에 <b>/katana</b> 를 쓴 다음 이 요청문을 붙여 넣어 보내세요.</p>${copyBox('prompt', '/katana 뒤에 붙여 넣을 요청문', rec.prompt, '요청문 복사', true, 520, '요청문을 복사했어요. 클로드 새 채팅에서 /katana 를 쓰고 붙여 넣으세요.')}</section>`;
-    const cards = `<section class="block">${H('어림과 설정', 'time', -6)}<p class="sub">비용은 화질과 길이로 어림했어요. 실제 비용은 카타나가 계획할 때 받는 견적을 따라요.</p><div class="specs">${rec.cards.map(c => cardHtml(c, layout)).join('')}</div></section>`;
-    const tipsHtml = tipCards(rec, content, layout, H('나에게 필요한 팁', 'search', 7));
-    const checklist = quick ? '' : `<section class="block">${H('결과 받은 뒤 확인할 것', 'check', -8)}<p class="sub">카타나는 끝까지 혼자 가요. 받은 뒤 이것만 보세요. 체크한 내용은 이 기기에 남아요.</p><ul class="checks">${rec.checklist.map(c => `<li><label><input type="checkbox" data-check="${esc(c.id)}"${checks[c.id] ? ' checked' : ''}><span><b>${esc(c.t)}</b><small>${esc(c.d)}</small></span></label></li>`).join('')}</ul></section>`;
-    const examples = examplesBlock(content, H('영상 속 실제 요청 두 개', 'book', 5));
+    const take = `<section class="block">${H('가져가기')}<p class="sub">클로드 새 채팅에 재료를 붙이고, 입력창에 <b>/katana</b> 를 쓴 다음 이 요청문을 붙여 넣어 보내세요.</p>${copyBox('prompt', '/katana 뒤에 붙여 넣을 요청문', rec.prompt, '요청문 복사', true, 0, '요청문을 복사했어요. 클로드 새 채팅에서 /katana 를 쓰고 붙여 넣으세요.')}</section>`;
+    const cards = `<section class="block">${H('어림과 설정')}<p class="sub">비용은 화질과 길이로 어림했어요. 실제 비용은 카타나가 계획할 때 받는 견적을 따라요.</p><div class="specs">${rec.cards.map(c => cardHtml(c, layout)).join('')}</div></section>`;
+    const tipsHtml = tipCards(rec, content, layout, H('나에게 필요한 팁'));
+    const checklist = quick ? '' : `<section class="block">${H('결과 받은 뒤 확인할 것')}<p class="sub">카타나는 끝까지 혼자 가요. 받은 뒤 이것만 보세요. 체크한 내용은 이 기기에 남아요.</p><ul class="checks">${rec.checklist.map(c => `<li><label><input type="checkbox" data-check="${esc(c.id)}"${checks[c.id] ? ' checked' : ''}><span><b>${esc(c.t)}</b><small>${esc(c.d)}</small></span></label></li>`).join('')}</ul></section>`;
+    const examples = examplesBlock(content, H('영상 속 실제 요청 두 개'));
     const saveRow = `<section class="block">${H('저장하고 다시 보기')}<div class="take"><button type="button" class="btn soft" data-action="share">내 결과 링크 복사</button><button type="button" class="btn soft" data-action="copy:all" data-what="결과 전체">결과 전체 복사</button><button type="button" class="btn soft" data-action="print">PDF로 저장·인쇄</button><span class="status" role="status" style="flex-basis:100%"></span></div><p class="hint">인스타그램 안에서 열었다면 오른쪽 위 메뉴에서 ‘외부 브라우저로 열기’를 누르면 복사와 저장이 더 잘 돼요.</p></section>`;
     const fbMsg = { helpful: '고마워요. 다음에도 이렇게 보여 드릴게요.', too_much: '알겠어요. 다음에 이 기기에서 열면 간단히 보여 드릴게요.', want_more: '알겠어요. 다음에 이 기기에서 열면 자세히 보여 드릴게요.', not_fit: '알려 주셔서 고마워요. 어떤 점이 안 맞았는지 synkbrief 댓글이나 DM으로 알려 주시면 다음 버전에 반영할게요.' };
     const fb = `<section class="block">${H('이 요청문, 도움이 됐나요?')}<div class="fb" role="group" aria-label="추천에 대한 반응">${[['helpful', '도움이 됐어요'], ['too_much', '너무 많아요'], ['want_more', '더 자세히 알고 싶어요'], ['not_fit', '나와 안 맞아요']].map(([id, t]) => `<button type="button" class="glass chip" aria-pressed="${feedbackGiven === id}" data-action="feedback:${id}"${feedbackGiven ? ' disabled' : ''}>${t}</button>`).join('')}</div><p class="fbnote">${feedbackGiven ? esc(fbMsg[feedbackGiven]) : '답은 이 기기에만 저장되고, 다음에 이 도구를 열 때 보여 주는 분량에 반영돼요.'}</p></section>`;
@@ -127,7 +127,7 @@
     const editable = content.steps.filter(s => !s.when || s.when(ctx.answers)).map(s => `<button type="button" class="glass chip" data-action="edit:${esc(s.id)}">${esc(s.short || s.eyebrow || s.title)}</button>`).join('');
     const edit = `<section class="block no-print">${H('답 바꿔 보기')}<p class="sub">하나만 바꿔도 요청문과 어림이 다시 만들어져요.</p><div class="take">${editable}</div></section>`;
 
-    const html = `<article class="result"><header class="r-top${rec.warns.length ? '' : ' cheer'}"><p class="rec"><span class="stamp">${esc(content.checked.replace(/-/g, '.'))} 기준</span><span>${esc(content.series)} · 나의 카타나 요청문</span></p><h1 id="q" tabindex="-1">${marked(rec.headline.title, ['아우라 에딧', '제품 광고', '편집 영상', '레퍼런스 리믹스'])}</h1><p>${esc(rec.headline.sub)}</p>${because ? `<p class="because">${esc(because)}</p>` : ''}<figure class="shot" aria-hidden="true"><img src="assets/katana-hero.webp" alt=""></figure></header><div class="layout"><span>보기</span><div class="seg" role="radiogroup" aria-label="결과 분량">${seg}</div></div>${warns}${flow}${take}${cards}${tipsHtml}${checklist}${examples}${saveRow}${fb}${edit}${sourcesBox}<div class="nav no-print"><button type="button" class="btn ghost" data-action="restart">처음부터 다시</button></div><div class="dock no-print" role="group" aria-label="바로 쓰기"><button type="button" class="btn primary" data-proxy="copy:prompt">요청문 복사</button><button type="button" class="btn soft" data-proxy="share">내 결과 링크</button></div></article>`;
+    const html = `<article class="result"><header class="r-top"><p class="rec"><span class="sticker">${esc(content.checked.replace(/-/g, '.'))} 기준</span><span>${esc(content.series)} · 나의 카타나 요청문</span></p><h1 id="q" tabindex="-1">${marked(rec.headline.title, ['아우라 에딧', '제품 광고', '편집 영상', '레퍼런스 리믹스'])}</h1><p>${esc(rec.headline.sub)}</p>${because ? `<p class="because">${esc(because)}</p>` : ''}<figure class="shot" aria-hidden="true"><img src="assets/katana-hero.webp" alt=""></figure></header><div class="layout"><span>보기</span><div class="seg" role="radiogroup" aria-label="결과 분량">${seg}</div></div>${warns}${flow}${take}${cards}${tipsHtml}${checklist}${examples}${saveRow}${fb}${edit}${sourcesBox}<div class="nav no-print"><button type="button" class="btn ghost" data-action="restart">처음부터 다시</button></div><div class="dock no-print" role="group" aria-label="바로 쓰기"><button type="button" class="btn primary" data-proxy="copy:prompt">요청문 복사</button><button type="button" class="btn soft" data-proxy="share">내 결과 링크</button></div></article>`;
     const texts = { prompt: rec.prompt, all: summaryText(rec, content) };
     for (const e of content.examples || []) texts[`ex-${e.id}`] = e.text;
     return { html, texts };
