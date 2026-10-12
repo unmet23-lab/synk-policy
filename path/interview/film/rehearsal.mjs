@@ -14,7 +14,16 @@ ui.confirm = $('confirm'); ui['recognition-note'] = $('recognition-note');
 const durationProfile = REHEARSAL_DURATION_PROFILES.quest;
 const speechTurn = createSpeechTurn();
 let film = null, manifest = null, mode = 'text', voice = null, busy = false, preparingVoice = false, micActive = false, epoch = 0, disposed = false, lastTick = performance.now(), partial = '', voiceFailed = false, vrSupported = false, voicePrefix = '', micStopping = null, microphoneReady = false, checkingMic = false, micLevel = 0, micPeak = 0, calibrationText = '', settling = false;
-let manifestLoad = null, playbackManifest = null, selectedQuality = '4k', filmQuality = null;
+// Start light where 4K cannot show or would stall: phone screens, data saver and 2G/3G links.
+// downlink is not used: Chrome reports a starting guess (1.45 Mbps in a fresh profile) until it
+// has measured the network. The 4K upscale stays the default elsewhere, and a quality the user picks is kept.
+function preferredQuality() {
+  const connection = globalThis.navigator?.connection;
+  const phone = !!globalThis.matchMedia?.('(max-width: 760px), (max-height: 500px) and (pointer: coarse)').matches;
+  const slow = !!connection && (connection.saveData === true || /(^|-)2g|3g/.test(connection.effectiveType || ''));
+  return phone || slow ? '720p' : '4k';
+}
+let manifestLoad = null, playbackManifest = null, selectedQuality = preferredQuality(), filmQuality = null;
 let listeningSequence = null, listeningRun = 0, listeningEnabled = false, scheduledListeningOwner = null;
 let voicePrefixResult = { text: '' }, voiceReview = null, reviewPage = 0;
 let voiceAssessment = null, clarificationBase = null, confirmedSpans = [];
@@ -239,7 +248,9 @@ async function start() {
     film?.stop(); await ensureFilm(token); guard(token);
     // Upload the room before speech/video run together. Opening it mid-answer
     // must not compile its first 4K textures during a short film handoff.
-    await vr.prepareRoom(); guard(token);
+    // A headset check or an earlier look-around has already begun the room; a
+    // flat screen that never opened it skips the 7.9MB build (openRoomPreview).
+    await vr.prepareRoom({ onlyIfStarted: true }); guard(token);
     listeningSequence?.resetSession();
     await film.prepare(Object.values(CLIPS)); guard(token);
     await vr.warmVideoFrames(); guard(token);
@@ -421,7 +432,13 @@ for (const name of ['start', 'submit', 'confirm', 'retry', 'repeat', 'stop']) ui
 ui.pause.addEventListener('click', () => void action(session.snapshot().paused ? 'resume' : 'pause'));
 ui['voice-prepare'].addEventListener('click', () => void prepareVoice());
 ui['microphone-check'].addEventListener('click', () => void checkMicrophone());
-ui['room-preview'].addEventListener('click', () => { void vr.preview().catch(report); });
+// The first look-around builds the room. Mid-interview, pause first so its
+// downloads and 4K uploads never run under the film's timed handoffs.
+async function openRoomPreview() {
+  if (!vr.roomReady && activePhases.includes(session.snapshot().phase)) await pause();
+  await vr.preview();
+}
+ui['room-preview'].addEventListener('click', () => { void openRoomPreview().catch(report); });
 ui.vr.addEventListener('click', () => { void vr.enter().catch(report); });
 ui.quality.addEventListener('change', () => {
   if (activePhases.includes(session.snapshot().phase) || busy || preparingVoice || checkingMic || vr.active || !rehearsalMediaQualities(manifest).includes(ui.quality.value)) { render(); return; }

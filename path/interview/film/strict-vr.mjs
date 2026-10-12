@@ -100,19 +100,19 @@ export function paintStrictVRHUD(context, state = {}) {
     : state.phase === 'confirming' || state.phase === 'repair' || state.settling ? '#D9A21B'
     : state.canSubmit ? state.micActive ? '#E5483B' : '#4E8A3A' : '#3D6BC9';
   context.fillStyle = dot; context.beginPath(); context.arc(46, 39, 8, 0, Math.PI * 2); context.fill();
-  context.fillStyle = '#5B5F66'; context.font = '600 28px SUIT, sans-serif';
+  context.fillStyle = '#5B5F66'; context.font = '600 28px "PATH Sans", SUIT, sans-serif';
   context.fillText(status, 66, 22);
   if (state.micActive) {
     pill(1320, 24, 160, 15, '#D9DAD6');
     pill(1320, 24, Math.max(15, 160 * micLevel), 15, '#526956');
   }
-  context.fillStyle = '#08090C'; context.font = '700 36px SUIT, sans-serif';
+  context.fillStyle = '#08090C'; context.font = '700 36px "PATH Sans", SUIT, sans-serif';
   lines(state.phase === 'confirming' ? state.reviewPages?.[state.reviewPage || 0] || state.transcript : state.clarificationPrompt || state.question || '세 면접관의 질문에 소리 내어 답변하세요.', 36, 70, 1460, 46, state.phase === 'confirming' ? 4 : 2);
-  context.fillStyle = '#4A4E55'; context.font = '500 29px SUIT, sans-serif';
+  context.fillStyle = '#4A4E55'; context.font = '500 29px "PATH Sans", SUIT, sans-serif';
   const transcript = String(state.transcript || '');
   const answerContext = answerQuote && ['reviewing', 'followup'].includes(state.phase) ? `첫 답변: “${answerQuote.slice(0, 100)}”` : '';
   if (state.phase !== 'confirming') lines(state.phase === 'repair' ? '다시 답변하거나 질문을 다시 들으세요.' : answerContext || (transcript ? `인식: ${transcript.slice(-120)}` : state.canSubmit ? state.automaticEnd ? '답변을 마치면 이어집니다. 애매한 부분만 확인합니다.' : '답변을 마치면 아래에서 완료하세요.' : '선택 버튼으로 시작합니다.'), 36, 184, 1460, 38, 2);
-  else { context.font = '500 24px SUIT, sans-serif'; context.fillText(state.reviewPrompt || '틀리면 이 부분만 다시 말하세요. 나머지 답변은 유지됩니다.', 36, 266, 1460); }
+  else { context.font = '500 24px "PATH Sans", SUIT, sans-serif'; context.fillText(state.reviewPrompt || '틀리면 이 부분만 다시 말하세요. 나머지 답변은 유지됩니다.', 36, 266, 1460); }
   getStrictVRControls(state).forEach((control, index) => {
     const exit = control.action === 'exit', primary = index === 0;
     if (!control.enabled) pill(control.x, control.y, control.w, control.h, '#E3E3E1');
@@ -120,7 +120,7 @@ export function paintStrictVRHUD(context, state = {}) {
     else if (exit) pill(control.x + 1, control.y + 1, control.w - 2, control.h - 2, null, '#B4B6BA');
     else pill(control.x, control.y, control.w, control.h, '#DCDCDA');
     context.fillStyle = !control.enabled ? '#A3A6AB' : primary ? '#FFFFFF' : '#08090C';
-    context.font = '700 30px SUIT, sans-serif'; context.textAlign = 'center';
+    context.font = '700 30px "PATH Sans", SUIT, sans-serif'; context.textAlign = 'center';
     context.fillText(control.label, control.x + control.w / 2, control.y + 18, control.w - 24);
   });
   context.textAlign = 'left';
@@ -446,10 +446,13 @@ export function createStrictVR({ mount, getFrameState = () => [], getState = () 
       throw error;
     }
   }
-  async function prepareRoom() {
+  async function prepareRoom({ onlyIfStarted = false } = {}) {
     if (disposed) return false;
+    // A flat screen builds the room when it is first opened. onlyIfStarted
+    // finishes a headset check or build already under way and starts nothing.
+    if (onlyIfStarted) { await checkTask; if (disposed || !stage && !stageTask) return false; }
     try { return !!await ensureStage(); }
     catch { emit('unsupported', '방 둘러보기를 준비하지 못했습니다. 화면에서 연습할 수 있습니다.'); return false; }
   }
-  return Object.freeze({ check, enter, exit, preview, closePreview, warmVideoFrames, prepareRoom, dispose, get active() { return !!session; }, get pending() { return pending; }, get previewing() { return previewing; } });
+  return Object.freeze({ check, enter, exit, preview, closePreview, warmVideoFrames, prepareRoom, dispose, get active() { return !!session; }, get pending() { return pending; }, get previewing() { return previewing; }, get roomReady() { return !!stage; } });
 }
