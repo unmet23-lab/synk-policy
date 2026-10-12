@@ -696,15 +696,15 @@ details.cases{margin-top:36px}
 .doc-body h3{font-size:18px;margin-bottom:8px}
 .doc-body p{color:var(--ink-2);font-size:15.5px}
 
-/* ---------- 바닥: 펠트 풍경 + 링크 ---------- */
+/* ---------- 바닥: 링크 + 바닥 끝의 큰 synk(2026-10-12, 펠트 풍경 사진을 뺌) ---------- */
 .foot{margin-top:clamp(40px,6vw,80px)}
-.foot-scene{position:relative;height:clamp(180px,26vw,360px);background:#2a2230;border-radius:var(--r-xl) var(--r-xl) 0 0;overflow:hidden}
-.foot-scene img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 58%}
-.foot-scene::after{content:'';position:absolute;inset:auto 0 0;height:40%;background:linear-gradient(transparent,rgba(11,11,13,.35))}
-.foot-body{background:var(--night);color:#d4d4d8;padding:clamp(40px,5vw,64px) 0 32px}
-.foot-grid{display:grid;grid-template-columns:minmax(0,1.3fr) repeat(4,minmax(0,1fr));gap:32px}
-.foot-brand img{height:30px;width:auto;filter:invert(1) brightness(1.4)}
-.foot-brand p{margin-top:16px;font-size:14.5px;color:#9a9aa3;max-width:22em;line-height:1.6}
+.foot-body{background:var(--night);color:#d4d4d8;padding:clamp(40px,5vw,64px) 0 0;overflow:hidden}
+.foot-grid{display:grid;grid-template-columns:minmax(0,1.6fr) repeat(4,minmax(0,1fr));gap:32px}
+.foot-brand p{margin:0;font-size:16px;color:#c4c4cc;max-width:24em;line-height:1.6}
+/* 큰 synk: 화면 폭(본문 폭)을 다 쓰고, y 꼬리는 바닥 끝에서 잘린다. 색은 로고 정본의 어두운 바탕용 Paper */
+.foot-mark{margin-top:clamp(28px,4vw,56px)}
+.foot-mark-crop{aspect-ratio:156/62;overflow:hidden}
+.foot-mark-svg{display:block;width:100%;height:auto;color:#fbf7f0}
 .foot-col h2{font-family:var(--mono);font-size:12px;letter-spacing:.06em;color:#7d7d86;font-weight:400;text-transform:uppercase;margin-bottom:14px}
 .foot-col ul{list-style:none;margin:0;padding:0;display:grid;gap:9px}
 .foot-col a,.foot-col button{color:#e4e4e7;text-decoration:none;font-size:14.5px;background:none;border:0;padding:0;cursor:pointer;text-align:left}
@@ -758,7 +758,7 @@ html.download-open{overflow:hidden}
 html:not(.js) .reveal{opacity:1;transform:none}
 
 /* 인쇄 */
-@media print{.bar,.ask,.foot-scene,.clip-dialog{display:none!important}.reveal{opacity:1;transform:none}}
+@media print{.bar,.ask,.foot-mark,.clip-dialog{display:none!important}.reveal{opacity:1;transform:none}}
 
 /* ── 검정 판(2026-10-10) ─────────────────────────────────────────────
    유호님 「검정으로 후보 만들어줘, 장점을 합쳐보자」: v10의 글·구성·마감은 그대로 두고, 화면 문법은 10-07 「night signal」 판(밤 바탕, 사업 색 포스터,
