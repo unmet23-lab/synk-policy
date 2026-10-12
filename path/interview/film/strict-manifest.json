@@ -9,7 +9,7 @@
   "clips": [
     {
       "id": "strict-question",
-      "src": "../assets/interview/film/strict-question-4k.mp4",
+      "src": "https://storage.googleapis.com/synk-public-media/path/interview/film/8e8db2f4a5e98ff1/strict-question-4k.mp4",
       "status": "ready",
       "kind": "speaking",
       "audio": "native",
@@ -36,7 +36,7 @@
       },
       "variants": {
         "4k": {
-          "src": "../assets/interview/film/strict-question-4k.mp4",
+          "src": "https://storage.googleapis.com/synk-public-media/path/interview/film/8e8db2f4a5e98ff1/strict-question-4k.mp4",
           "width": 3840,
           "height": 2160,
           "fps": "24/1",
@@ -44,7 +44,7 @@
           "durationSeconds": 10.08
         },
         "720p": {
-          "src": "../assets/interview/film/strict-question-720p.mp4",
+          "src": "https://storage.googleapis.com/synk-public-media/path/interview/film/c7b71793b8c646f5/strict-question-720p.mp4",
           "width": 1280,
           "height": 720,
           "fps": "24/1",
@@ -55,7 +55,7 @@
     },
     {
       "id": "strict-listening",
-      "src": "../assets/interview/film/strict-listening-4k.mp4",
+      "src": "https://storage.googleapis.com/synk-public-media/path/interview/film/7cd356db7b0806d7/strict-listening-4k.mp4",
       "status": "ready",
       "kind": "listening",
       "audio": "silent",
@@ -84,7 +84,7 @@
       },
       "variants": {
         "4k": {
-          "src": "../assets/interview/film/strict-listening-4k.mp4",
+          "src": "https://storage.googleapis.com/synk-public-media/path/interview/film/7cd356db7b0806d7/strict-listening-4k.mp4",
           "width": 3840,
           "height": 2160,
           "fps": "24/1",
@@ -92,7 +92,7 @@
           "durationSeconds": 10.08
         },
         "720p": {
-          "src": "../assets/interview/film/strict-listening-720p.mp4",
+          "src": "https://storage.googleapis.com/synk-public-media/path/interview/film/10a9d1ad6b07c701/strict-listening-720p.mp4",
           "width": 1280,
           "height": 720,
           "fps": "24/1",
@@ -103,7 +103,7 @@
     },
     {
       "id": "strict-followup-experience",
-      "src": "../assets/interview/film/strict-followup-experience-4k.mp4",
+      "src": "https://storage.googleapis.com/synk-public-media/path/interview/film/7263aa2df8deefab/strict-followup-experience-4k.mp4",
       "status": "ready",
       "kind": "speaking",
       "audio": "native",
@@ -130,7 +130,7 @@
       },
       "variants": {
         "4k": {
-          "src": "../assets/interview/film/strict-followup-experience-4k.mp4",
+          "src": "https://storage.googleapis.com/synk-public-media/path/interview/film/7263aa2df8deefab/strict-followup-experience-4k.mp4",
           "width": 3840,
           "height": 2160,
           "fps": "24/1",
@@ -138,7 +138,7 @@
           "durationSeconds": 10.041667
         },
         "720p": {
-          "src": "../assets/interview/film/strict-followup-experience-720p.mp4",
+          "src": "https://storage.googleapis.com/synk-public-media/path/interview/film/5d1680de4b5c7234/strict-followup-experience-720p.mp4",
           "width": 1280,
           "height": 720,
           "fps": "24/1",
@@ -149,7 +149,7 @@
     },
     {
       "id": "strict-followup-plan",
-      "src": "../assets/interview/film/strict-followup-plan-4k.mp4",
+      "src": "https://storage.googleapis.com/synk-public-media/path/interview/film/7895ac41e0f093a4/strict-followup-plan-4k.mp4",
       "status": "ready",
       "kind": "speaking",
       "audio": "native",
@@ -176,7 +176,7 @@
       },
       "variants": {
         "4k": {
-          "src": "../assets/interview/film/strict-followup-plan-4k.mp4",
+          "src": "https://storage.googleapis.com/synk-public-media/path/interview/film/7895ac41e0f093a4/strict-followup-plan-4k.mp4",
           "width": 3840,
           "height": 2160,
           "fps": "24/1",
@@ -184,7 +184,7 @@
           "durationSeconds": 10.041667
         },
         "720p": {
-          "src": "../assets/interview/film/strict-followup-plan-720p.mp4",
+          "src": "https://storage.googleapis.com/synk-public-media/path/interview/film/d2853c0c84408e45/strict-followup-plan-720p.mp4",
           "width": 1280,
           "height": 720,
           "fps": "24/1",
@@ -195,7 +195,7 @@
     },
     {
       "id": "strict-listen-question-tail",
-      "src": "../assets/interview/film/strict-listen-question-tail-4k.mp4",
+      "src": "https://storage.googleapis.com/synk-public-media/path/interview/film/6d7ef0c846073b9d/strict-listen-question-tail-4k.mp4",
       "status": "ready",
       "kind": "listening",
       "audio": "silent",
@@ -224,7 +224,7 @@
       },
       "variants": {
         "720p": {
-          "src": "../assets/interview/film/strict-listen-question-tail-720p.mp4",
+          "src": "https://storage.googleapis.com/synk-public-media/path/interview/film/fb2dbf3be0050a1c/strict-listen-question-tail-720p.mp4",
           "width": 1280,
           "height": 720,
           "fps": "24/1",
@@ -232,7 +232,7 @@
           "durationSeconds": 6
         },
         "4k": {
-          "src": "../assets/interview/film/strict-listen-question-tail-4k.mp4",
+          "src": "https://storage.googleapis.com/synk-public-media/path/interview/film/6d7ef0c846073b9d/strict-listen-question-tail-4k.mp4",
           "width": 3840,
           "height": 2160,
           "fps": "24/1",
@@ -243,7 +243,7 @@
     },
     {
       "id": "strict-listen-plan-tail",
-      "src": "../assets/interview/film/strict-listen-plan-tail-4k.mp4",
+      "src": "https://storage.googleapis.com/synk-public-media/path/interview/film/4280315d1a7d7861/strict-listen-plan-tail-4k.mp4",
       "status": "ready",
       "kind": "listening",
       "audio": "silent",
@@ -269,7 +269,7 @@
       },
       "variants": {
         "720p": {
-          "src": "../assets/interview/film/strict-listen-plan-tail-720p.mp4",
+          "src": "https://storage.googleapis.com/synk-public-media/path/interview/film/87324cbe873db3ff/strict-listen-plan-tail-720p.mp4",
           "width": 1280,
           "height": 720,
           "fps": "24/1",
@@ -277,7 +277,7 @@
           "durationSeconds": 3
         },
         "4k": {
-          "src": "../assets/interview/film/strict-listen-plan-tail-4k.mp4",
+          "src": "https://storage.googleapis.com/synk-public-media/path/interview/film/4280315d1a7d7861/strict-listen-plan-tail-4k.mp4",
           "width": 3840,
           "height": 2160,
           "fps": "24/1",
@@ -288,7 +288,7 @@
     },
     {
       "id": "strict-listen-experience-tail",
-      "src": "../assets/interview/film/strict-listen-experience-tail-4k.mp4",
+      "src": "https://storage.googleapis.com/synk-public-media/path/interview/film/4c09495901e4b3f1/strict-listen-experience-tail-4k.mp4",
       "status": "ready",
       "kind": "listening",
       "audio": "silent",
@@ -314,7 +314,7 @@
       },
       "variants": {
         "720p": {
-          "src": "../assets/interview/film/strict-listen-experience-tail-720p.mp4",
+          "src": "https://storage.googleapis.com/synk-public-media/path/interview/film/971e6d030c25d039/strict-listen-experience-tail-720p.mp4",
           "width": 1280,
           "height": 720,
           "fps": "24/1",
@@ -322,7 +322,7 @@
           "durationSeconds": 3
         },
         "4k": {
-          "src": "../assets/interview/film/strict-listen-experience-tail-4k.mp4",
+          "src": "https://storage.googleapis.com/synk-public-media/path/interview/film/4c09495901e4b3f1/strict-listen-experience-tail-4k.mp4",
           "width": 3840,
           "height": 2160,
           "fps": "24/1",
