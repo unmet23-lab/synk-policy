@@ -42,6 +42,8 @@ function render() {
     ui['media-limit'].textContent = hasUpscale && selectedQuality === '4k' ? '면접관은 720p 원본을 4K로 확대한 단안 영상이라 몸을 크게 옮겨 옆모습을 볼 수는 없습니다.' : `면접관은 ${selectedHeight || 480}p 단안 영상이라 몸을 크게 옮겨 옆모습을 볼 수는 없습니다.`;
   }
   document.body.classList.toggle('in-session', active || state.phase === 'complete');
+  // Styling hooks only: the status dots and on-air ring read these attributes.
+  Object.assign(document.body.dataset, { phase: state.paused ? 'paused' : state.phase, mode, mic: state.micActive ? 'on' : 'off', urgent: state.phase === 'listening' && !state.paused && state.remainingSeconds <= 10 ? 'on' : 'off' });
   const labels = { idle: '면접 시작 전', preparing: '영상 준비', question: '첫 번째 질문', followup: '후속 질문', listening: '답변 중', confirming: '애매한 부분 확인', reviewing: '답변 검토', repair: '답변 확인', complete: '면접 종료', error: '연결 확인' };
   ui['phase-label'].textContent = state.paused ? '일시 정지' : labels[state.phase] || '';
   ui['turn-label'].textContent = active ? `${state.turn} / 2` : '2 QUESTIONS';
@@ -94,7 +96,16 @@ function render() {
   };
   ui.status.textContent = state.paused ? '진행을 멈췄습니다. 이어서 진행하면 마이크를 다시 엽니다.' : messages[state.phase] || '';
   ui.result.hidden = state.phase !== 'complete';
-  ui['branch-result'].textContent = state.phase === 'complete' ? `답변: “${answerQuote}”\n${state.branch?.reason || ''}\n후속 질문: “${state.branch?.question || ''}”` : '';
+  const branchRows = state.phase === 'complete' ? [['answer', '내 답변', answerQuote && `“${answerQuote}”`], ['reason', '질문 의도', state.branch?.reason || ''], ['followup', '후속 질문', state.branch?.question && `“${state.branch.question}”`]].filter((row) => row[2]) : [];
+  const branchKey = JSON.stringify(branchRows);
+  if (ui['branch-result'].dataset.key !== branchKey) {
+    ui['branch-result'].dataset.key = branchKey;
+    ui['branch-result'].replaceChildren(...branchRows.map(([kind, label, text]) => {
+      const row = document.createElement('div'), term = document.createElement('dt'), detail = document.createElement('dd');
+      row.className = kind; term.textContent = label; detail.textContent = text; row.append(term, detail);
+      return row;
+    }));
+  }
 }
 function report(error) {
   if (error?.name === 'AbortError' || disposed) return;
