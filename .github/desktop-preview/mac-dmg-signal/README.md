@@ -29,3 +29,12 @@ node mac-dmg-signal/repackage.cjs --arch=arm64 --shots
 Outputs are `out/<arch>/SYNK-Platform-Preview-0.4.3-Signal-mac-<arch>.dmg`, `SHA256SUMS-mac-signal.1-<arch>.txt` and `mac-dmg-mac-signal.1-<arch>.json`, with screenshots in `shots/<arch>/`. The DMG container records its build time, so a rebuild gives a different DMG checksum while the application tree checksum stays the same. No signing or notarization credentials are used, and the script never installs or publishes anything.
 
 To publish, dispatch the workflow again with `release_from_run` set to the id of the build run that was checked. The release job downloads that run's DMGs, checks them against its records and creates the prerelease.
+
+## Published
+
+[platform-preview-0.4.3-mac-signal.1-20261013](https://github.com/unmet23-lab/synk-policy/releases/tag/platform-preview-0.4.3-mac-signal.1-20261013) (prerelease, 2026-10-13) holds the DMGs built and checked by [run 38296456890](https://github.com/unmet23-lab/synk-policy/actions/runs/38296456890) from commit `e2c81d55` and published by its release job ([run 38296894702](https://github.com/unmet23-lab/synk-policy/actions/runs/38296894702)):
+
+- `SYNK-Platform-Preview-0.4.3-Signal-mac-arm64.dmg`: **459,131,084 bytes**, SHA-256 `6515cd82d6737c00344b647bbd2080693f8402bded0da96b7990ee50384c7ca0`; app tree of 268 files, SHA-256 `8c7ed7b87dcb16975dd4791616f039ae9f43f79ac07fd87d1892e3ff8dc1489a`
+- `SYNK-Platform-Preview-0.4.3-Signal-mac-x64.dmg`: **476,792,659 bytes**, SHA-256 `1b8a9e5230f6e700841b64b6052cc5082a4ffb79a01a362620ed7f680ae2edb3`; app tree of 276 files, SHA-256 `d4887e4884e0121fc4eeeb219d274d21ac79aa23d9ed088d9215d1a2177f563c`
+
+The homepage Mac downloads point to this release since `d29be3d4`. The earlier `platform-preview-0.4.3-20261012` release stays published.
