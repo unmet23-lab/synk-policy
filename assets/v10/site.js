@@ -211,39 +211,105 @@ if ('IntersectionObserver' in window && !reduced.matches) {
 /* 이메일 복사 */
 $$('[data-copy-email]').forEach(b => b.addEventListener('click', async () => { try { await navigator.clipboard.writeText('hello@synk.im'); toast(T.copied); } catch { toast(T.copyFail); } }));
 
-/* Mac 다운로드: JS가 없으면 details, 지원되는 브라우저에서는 작은 선택 창. */
-const downloadPicker = $('[data-download-picker]');
-if (downloadPicker && typeof HTMLDialogElement !== 'undefined' && HTMLDialogElement.prototype.showModal) {
-  const summary = $('summary', downloadPicker), panel = $('.download-panel', downloadPicker);
-  const trigger = document.createElement('button'), dialog = document.createElement('dialog');
-  trigger.type = 'button'; trigger.className = summary.className;
-  trigger.append(...[...summary.childNodes].map(n => n.cloneNode(true)));
-  trigger.setAttribute('aria-haspopup', 'dialog'); trigger.setAttribute('aria-controls', 'mac-download-dialog');
-  dialog.id = 'mac-download-dialog'; dialog.className = 'download-dialog';
-  dialog.setAttribute('aria-labelledby', 'mac-download-title'); dialog.setAttribute('aria-describedby', 'mac-download-description');
-  dialog.append(panel); document.body.append(dialog); downloadPicker.replaceWith(trigger);
-  $('[data-download-close]', dialog).hidden = false;
-  trigger.addEventListener('click', () => {
-    dialog.showModal(); document.documentElement.classList.add('download-open');
-    $('#mac-download-title', dialog).focus({ preventScroll: true });
-  });
-  $('[data-download-close]', dialog).addEventListener('click', () => dialog.close());
-  dialog.addEventListener('close', () => {
-    document.documentElement.classList.remove('download-open'); trigger.focus({ preventScroll: true });
-  });
-  dialog.addEventListener('keydown', e => {
-    if (e.key !== 'Tab') return;
-    const controls = $$('button:not([disabled]), a[href]', dialog), first = controls[0], last = controls.at(-1);
-    if (e.shiftKey && (document.activeElement === first || document.activeElement === $('#mac-download-title', dialog))) {
-      e.preventDefault(); last.focus();
-    } else if (!e.shiftKey && document.activeElement === last) {
-      e.preventDefault(); first.focus();
-    }
-  });
-  dialog.addEventListener('click', e => {
-    const r = dialog.getBoundingClientRect();
-    if (e.target === dialog && (e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom)) dialog.close();
-  });
+/* 다운로드 창(2026-10-13 시그널): JS가 없으면 details와 바로 받기, 지원되는 브라우저에서는 플랫폼 포스터가 붙은 작은 창.
+   받기를 누르면(다운로드는 막지 않는다) 같은 창이 다음 할 일 세 단계로 바뀐다. Mac은 칩을 알 수 있으면 맞는 파일을 맨 위에 둔다. */
+const downloadArea = $('[data-platform-downloads]');
+if (downloadArea && typeof HTMLDialogElement !== 'undefined' && HTMLDialogElement.prototype.showModal) {
+  const makeDialog = (panel, id, title) => {
+    const dialog = document.createElement('dialog');
+    dialog.id = id; dialog.className = 'download-dialog';
+    dialog.setAttribute('aria-labelledby', title);
+    dialog.append(panel); document.body.append(dialog);
+    const close = $('[data-download-close]', dialog); close.hidden = false;
+    close.addEventListener('click', () => dialog.close());
+    dialog.addEventListener('keydown', e => {
+      if (e.key !== 'Tab') return;
+      const controls = $$('button:not([disabled]), a[href]', dialog).filter(el => !el.closest('[hidden]')), first = controls[0], last = controls.at(-1);
+      if (e.shiftKey && (document.activeElement === first || document.activeElement === $('#' + title, dialog))) { e.preventDefault(); last.focus(); }
+      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+    });
+    dialog.addEventListener('click', e => {
+      const r = dialog.getBoundingClientRect();
+      if (e.target === dialog && (e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom)) dialog.close();
+    });
+    return dialog;
+  };
+  const open = (dialog, trigger, focus) => {
+    if (!dialog.open) dialog.showModal();
+    document.documentElement.classList.add('download-open');
+    focus.focus({ preventScroll: true });
+    dialog.addEventListener('close', () => { document.documentElement.classList.remove('download-open'); trigger.focus({ preventScroll: true }); }, { once: true });
+  };
+  // 받은 뒤: 고르기를 걷고 다음 할 일을 보인다. 다시 받기는 방금 고른 파일로 맞춘다
+  const showNext = (dialog, href) => {
+    const next = $('[data-download-next]', dialog), choose = $('[data-download-choose]', dialog);
+    if (!next) return;
+    if (choose) choose.hidden = true;
+    next.hidden = false;
+    const retry = $('[data-download-retry]', next); if (retry && href) retry.href = href;
+    dialog.setAttribute('aria-describedby', 'download-started-' + dialog.id);
+    const started = $('[data-download-started]', next); started.id = 'download-started-' + dialog.id;
+    started.focus({ preventScroll: true });
+  };
+
+  // Mac: details → 창
+  const picker = $('[data-download-picker]', downloadArea);
+  if (picker) {
+    const summary = $('summary', picker), panel = $('.download-panel', picker);
+    const trigger = document.createElement('button');
+    trigger.type = 'button'; trigger.className = summary.className;
+    trigger.append(...[...summary.childNodes].map(n => n.cloneNode(true)));
+    trigger.setAttribute('aria-haspopup', 'dialog'); trigger.setAttribute('aria-controls', 'mac-download-dialog');
+    const dialog = makeDialog(panel, 'mac-download-dialog', 'mac-download-title');
+    dialog.setAttribute('aria-describedby', 'mac-download-description');
+    picker.replaceWith(trigger);
+    const reset = () => {
+      const next = $('[data-download-next]', dialog), choose = $('[data-download-choose]', dialog);
+      if (next) next.hidden = true; if (choose) choose.hidden = false;
+      dialog.setAttribute('aria-describedby', 'mac-download-description');
+    };
+    dialog.addEventListener('close', reset);
+    let detected = false;
+    trigger.addEventListener('click', async () => {
+      open(dialog, trigger, $('#mac-download-title', dialog));
+      if (detected) return; detected = true;
+      const chip = await macChip();
+      const pick = chip && $(`.download-choice[data-chip="${chip}"]`, dialog);
+      if (!pick) return;
+      pick.classList.add('is-recommended');
+      const tag = document.createElement('span'); tag.className = 'download-tag'; tag.textContent = panel.dataset.recommended || '';
+      $('strong', pick).after(tag);
+      pick.parentElement.prepend(pick);
+      const note = document.createElement('p'); note.className = 'download-detected'; note.textContent = panel.dataset.detected || '';
+      $('.download-choices', dialog).before(note);
+    });
+    $$('.download-choice', dialog).forEach(a => a.addEventListener('click', () => showNext(dialog, a.href)));
+    const back = $('[data-download-back]', dialog);
+    if (back) back.addEventListener('click', () => { reset(); $('#mac-download-title', dialog).focus({ preventScroll: true }); });
+  }
+
+  // Windows: 받기는 그대로 두고, 같은 모양의 창에 다음 할 일을 연다
+  const windowsLink = $('a.btn[href$=".exe"]', downloadArea), template = $('#windows-download-guide');
+  if (windowsLink && template) {
+    const dialog = makeDialog(template.content.firstElementChild.cloneNode(true), 'windows-download-dialog', 'windows-download-title');
+    windowsLink.addEventListener('click', () => { open(dialog, windowsLink, $('#windows-download-title', dialog)); showNext(dialog, windowsLink.href); });
+  }
+}
+
+/* Mac 칩 알아내기: Chrome·Edge는 클라이언트 힌트, 그 밖에는 WebGL 그래픽 이름에 Apple M·Intel이 드러날 때만.
+   Safari는 Apple Silicon에서도 「Intel」로 적으므로 브라우저 이름표(UA)는 쓰지 않는다. 모르면 null(두 파일을 같은 무게로 둔다). */
+async function macChip() {
+  const ua = navigator.userAgentData;
+  const mac = ua ? ua.platform === 'macOS' : /Mac/.test(navigator.platform || '');
+  if (!mac) return null;
+  try { if (ua?.getHighEntropyValues) { const v = await ua.getHighEntropyValues(['architecture']); if (v.architecture === 'arm') return 'arm64'; if (v.architecture === 'x86') return 'x64'; } } catch {}
+  try {
+    const gl = document.createElement('canvas').getContext('webgl'), ext = gl && gl.getExtension('WEBGL_debug_renderer_info');
+    const name = gl ? String(gl.getParameter(ext ? ext.UNMASKED_RENDERER_WEBGL : gl.RENDERER)) : '';
+    if (/Apple M\d/i.test(name)) return 'arm64';
+    if (/Intel/i.test(name)) return 'x64';
+  } catch {}
+  return null;
 }
 
 /* 게임 플레이 장면: LAB 카드는 5초 장면만 보여 준다(2026-10-05 유호님 요청으로 게임으로 가는 링크는 두지 않는다) */

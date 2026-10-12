@@ -719,33 +719,98 @@ details.cases{margin-top:36px}
 .biz-dialog dd{margin:0}
 .biz-dialog form{margin-top:20px;text-align:right}
 
-/* Platform download choices: one Windows link, one Mac disclosure/modal. */
+/* 다운로드 창(2026-10-13 · 싱ㅋ 시그널): 플랫폼 앱 상세와 같은 문법. 떠 있는 판 안에 「플랫폼」 포스터 띠(플랫폼 기본 사업 색 청금석 +
+   스튜디오 빛 + 그레인 + 흰 펠트 synk + 큰 한글 + 기울인 흰 스티커), 그 아래 큰 제목·모노 라벨·선 카드. 받기를 누르면 같은 창이
+   다음 할 일 세 단계(01·02·03)로 바뀐다. 스스로 움직이는 효과는 없다. 스크립트가 없으면 details 안에 같은 판이 펼쳐진다. */
 .platform-downloads{align-items:flex-start}
 .download-picker{max-width:100%}
 .download-picker>summary{list-style:none;cursor:pointer}
 .download-picker>summary::-webkit-details-marker{display:none}
 .download-picker[open]{flex-basis:100%}
-.download-picker[open]>.download-panel{margin-top:16px;border:1px solid var(--line);border-radius:var(--r-lg)}
-.download-dialog{width:min(480px,calc(100% - 32px));max-height:calc(100dvh - 32px);padding:0;border:1px solid var(--line-2);border-radius:var(--r-lg);background:var(--plate);color:var(--ink);box-shadow:0 24px 80px rgba(0,0,0,.4);overflow:auto;overscroll-behavior:contain}
-.download-dialog::backdrop{background:rgba(0,0,0,.65)}
+.download-picker[open]>.download-panel{margin-top:16px;max-width:560px}
+.download-dialog{width:min(560px,calc(100% - 32px));max-height:calc(100dvh - 32px);padding:0;border:0;border-radius:28px;background:#0c0d10;color:#fafaf9;
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.09),inset 0 1px 0 rgba(255,255,255,.06),0 40px 120px -24px rgba(0,0,0,.9);overflow:auto;overscroll-behavior:contain}
+.download-dialog::backdrop{background:rgba(3,4,6,.72);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
 html.download-open{overflow:hidden}
-.download-panel{padding:28px;text-align:left}
+.download-panel{padding:10px;text-align:left;border-radius:28px;background:#0c0d10;color:#fafaf9;box-shadow:inset 0 0 0 1px rgba(255,255,255,.09)}
+.download-dialog .download-panel{background:transparent;box-shadow:none}
+/* 포스터 띠: 글자·스티커는 그레인 위(2), 펠트 물건은 그 아래(0) — 플랫폼 .hero와 같은 층 */
+.download-poster{position:relative;isolation:isolate;overflow:hidden;height:184px;border-radius:20px;color:#fff;
+  background:radial-gradient(120% 85% at 28% -10%,rgba(255,255,255,.16),transparent 58%),linear-gradient(180deg,transparent 55%,rgba(0,0,0,.1)),#3d6bc9;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.16)}
+.download-poster::after{content:'';position:absolute;inset:0;z-index:1;pointer-events:none;opacity:.3;mix-blend-mode:overlay;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .7 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+.dp-scope{position:absolute;z-index:2;top:18px;left:18px;font:400 10.5px/1 var(--mono);letter-spacing:.14em;color:rgba(255,255,255,.68)}
+.dp-stage{position:absolute;z-index:2;top:13px;right:14px;display:inline-flex;align-items:center;gap:7px;height:28px;padding:0 12px 0 11px;border-radius:999px;
+  background:#fafaf9;color:#08090c;font-size:12px;font-weight:800;line-height:1;letter-spacing:-.01em;white-space:nowrap;transform:rotate(-2.5deg);box-shadow:0 8px 22px rgba(0,0,0,.24)}
+.dp-stage::before{content:'';width:7px;height:7px;border-radius:50%;background:#3d6bc9;box-shadow:0 0 0 3px rgba(61,107,201,.25)}
+.dp-felt{position:absolute;z-index:0;right:34px;top:60px;width:176px;height:auto;max-width:none;transform:rotate(-3deg);
+  filter:drop-shadow(0 22px 26px rgba(0,0,0,.3)) drop-shadow(0 4px 6px rgba(0,0,0,.18))}
+.dp-word{position:absolute;z-index:2;left:15px;bottom:13px;font-size:84px;font-weight:900;line-height:.8;letter-spacing:-.055em;color:#fff;white-space:nowrap}
+/* 영어 페이지는 한글을 두지 않으므로 큰 글자도 라틴(Platform) — 글자 수가 많아 한 단 작게 */
+html[lang="en"] .dp-word{font-size:66px;line-height:.82;letter-spacing:-.04em}
+/* 본문 */
+.download-body{padding:24px 16px 14px}
 .download-heading{display:flex;align-items:flex-start;justify-content:space-between;gap:16px}
-.download-heading h2{margin:4px 0 0;font-size:25px;line-height:1.25;letter-spacing:-.04em}
+.download-heading h2{margin:0;font-size:30px;font-weight:850;line-height:1.15;letter-spacing:-.045em;color:#fafaf9}
 .download-heading h2:focus{outline:none}
-.download-close{flex-shrink:0;width:36px;height:36px;border:1px solid var(--line);border-radius:50%;background:transparent;color:var(--ink-2);font:24px/1 var(--sans);cursor:pointer}
-.download-close:hover{background:var(--line);color:var(--ink)}
+.download-close{flex:none;display:grid;place-items:center;width:40px;height:40px;margin:-4px -4px 0 0;padding:0;border:0;border-radius:50%;cursor:pointer;
+  background:rgba(255,255,255,.06);box-shadow:inset 0 1px 0 rgba(255,255,255,.1),inset 0 0 0 1px rgba(255,255,255,.1);color:rgba(250,250,249,.76);font:300 24px/1 var(--sans)}
+.download-close:hover{background:rgba(255,255,255,.12);color:#fafaf9}
 .download-close[hidden]{display:none}
-.download-panel>p{margin:14px 0 0;font-size:15px;line-height:1.6;color:var(--ink-2)}
-.download-panel>.download-requirement{margin-top:4px;font-size:13px;color:var(--ink-3)}
-.download-choices{display:grid;gap:10px;margin:24px 0}
-.download-choice{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:18px 20px;border:1px solid var(--line-2);border-radius:12px;color:var(--ink);text-decoration:none}
-.download-choice:hover{background:var(--line);border-color:var(--ink-3)}
-.download-choice strong{display:block;font-size:17px;line-height:1.35}
-.download-choice small{display:block;margin-top:5px;font-size:13px;line-height:1.5;color:var(--ink-2)}
-.download-panel>.download-help{font-size:13px;line-height:1.7;color:var(--ink-3)}
-@media(max-width:480px){.download-panel{padding:22px}.download-heading h2{font-size:23px}.download-choice{padding:16px}.download-close{width:36px;height:36px}}
-@media(forced-colors:active){.download-dialog,.download-choice,.download-close{border-color:ButtonText}}
+.download-choose>p,.download-next>p{margin:0}
+#mac-download-description{margin-top:10px;font-size:15.5px;line-height:1.6;color:rgba(250,250,249,.76)}
+.download-requirement{margin-top:4px!important;font-size:13px;color:rgba(250,250,249,.6)}
+/* 포스터 스티커가 같은 조건을 보이므로 글은 화면 읽기 프로그램에만 남긴다(포스터는 aria-hidden) */
+.download-poster~.download-body .download-requirement{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+.download-detected{margin-top:18px!important;display:flex;align-items:center;gap:9px;font-size:13.5px;line-height:1.5;color:rgba(250,250,249,.76)}
+.download-detected::before{content:'';flex:none;width:6px;height:6px;border-radius:50%;background:#6fd39b;box-shadow:0 0 0 3px rgba(111,211,155,.16)}
+/* 칩 고르기: 선 카드, 이 Mac에 맞는 것은 흰 알약 카드(플랫폼의 주 행동) */
+.download-choices{display:grid;gap:10px;margin:18px 0 0}
+.download-choice{position:relative;display:flex;align-items:center;justify-content:space-between;gap:16px;min-height:76px;padding:14px 12px 14px 22px;border-radius:22px;
+  background:rgba(255,255,255,.03);box-shadow:inset 0 0 0 1px rgba(255,255,255,.14);color:#fafaf9;text-decoration:none;transition:background-color .18s var(--ease),box-shadow .18s var(--ease)}
+.download-choice:hover{background:rgba(255,255,255,.07);box-shadow:inset 0 0 0 1px rgba(255,255,255,.3)}
+.download-choice strong{display:inline-block;font-size:18px;font-weight:750;line-height:1.3;letter-spacing:-.02em}
+.download-choice small{display:block;margin-top:4px;font-size:13.5px;line-height:1.45;color:rgba(250,250,249,.6)}
+.download-go{flex:none;display:grid;place-items:center;width:44px;height:44px;border-radius:50%;background:#fafaf9;color:#08090c;font:500 18px/1 var(--mono)}
+.download-choice.is-recommended{background:#fafaf9;color:#08090c;box-shadow:0 18px 44px -20px rgba(197,214,245,.55)}
+.download-choice.is-recommended:hover{background:#c5d6f5}
+.download-choice.is-recommended small{color:rgba(8,9,12,.62)}
+.download-choice.is-recommended .download-go{background:#08090c;color:#fafaf9}
+.download-tag{display:inline-flex;align-items:center;gap:6px;margin-left:10px;padding:4px 9px 4px 8px;border-radius:999px;vertical-align:3px;
+  background:#08090c;color:#fafaf9;font-size:11.5px;font-weight:800;line-height:1;letter-spacing:-.01em}
+.download-tag::before{content:'';width:6px;height:6px;border-radius:50%;background:#6fd39b}
+.download-help{margin-top:16px!important;padding-top:14px;border-top:1px solid rgba(255,255,255,.08);font-size:13px;line-height:1.7;color:rgba(250,250,249,.6)}
+/* 받은 뒤: 다음 할 일 세 단계 */
+.download-started{display:flex;align-items:center;gap:9px;margin-top:12px!important;font-size:15.5px;font-weight:750;letter-spacing:-.015em;color:#fafaf9}
+.download-started::before{content:'';flex:none;width:7px;height:7px;border-radius:50%;background:#6fd39b;box-shadow:0 0 0 3px rgba(111,211,155,.16),0 0 10px rgba(111,211,155,.5)}
+.download-started:focus{outline:none}
+.download-lead{margin-top:6px!important;font-size:14px;line-height:1.6;color:rgba(250,250,249,.6)}
+.download-steps{list-style:none;margin:16px 0 0;padding:0;border-top:1px solid rgba(255,255,255,.1)}
+.download-steps li{display:grid;grid-template-columns:34px minmax(0,1fr);gap:4px 10px;padding:14px 0;border-bottom:1px solid rgba(255,255,255,.08)}
+.download-steps .mono{padding-top:3px;font-size:11.5px;letter-spacing:.12em;color:rgba(250,250,249,.5)}
+.download-steps strong{display:block;font-size:15.5px;font-weight:750;line-height:1.45;letter-spacing:-.015em;color:#fafaf9}
+.download-steps p{margin:4px 0 0;font-size:13.5px;line-height:1.65;color:rgba(250,250,249,.66)}
+.download-retry{margin-top:14px!important;font-size:13px;line-height:1.7;color:rgba(250,250,249,.6)}
+.download-retry a{color:#c5d6f5;font-weight:700;text-decoration:underline;text-decoration-color:rgba(197,214,245,.4);text-underline-offset:3px}
+.download-back{display:inline-flex;align-items:center;min-height:40px;margin-top:12px;padding:0 16px;border:0;border-radius:999px;cursor:pointer;
+  background:transparent;box-shadow:inset 0 0 0 1px rgba(255,255,255,.18);color:rgba(250,250,249,.8);font-size:13.5px;font-weight:700}
+.download-back:hover{box-shadow:inset 0 0 0 1px rgba(255,255,255,.4);color:#fafaf9}
+.download-dialog :focus-visible,.download-panel :focus-visible{outline:2px solid #c5d6f5;outline-offset:3px}
+@media(max-width:480px){
+  .download-dialog{width:calc(100% - 20px);max-height:calc(100dvh - 20px);border-radius:24px}
+  .download-panel{padding:8px}
+  .download-poster{height:148px;border-radius:18px}
+  .dp-felt{width:132px;right:20px;top:54px}
+  .dp-word{font-size:64px;left:13px;bottom:11px}
+  html[lang="en"] .dp-word{font-size:48px}
+  .download-body{padding:20px 12px 10px}
+  .download-heading h2{font-size:26px}
+  .download-choice{min-height:70px;padding-left:18px}
+  .download-tag{margin:6px 0 0;display:flex;width:max-content}
+}
+@media(prefers-reduced-motion:reduce){.download-choice{transition:none}}
+@media(forced-colors:active){.download-dialog,.download-panel,.download-choice,.download-close,.download-back{border:1px solid ButtonText}.download-poster{forced-color-adjust:none}}
 
 /* 알림 */
 .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);z-index:80;padding:12px 18px;border-radius:999px;background:var(--ink);color:#fff;font-size:14.5px;font-weight:600;box-shadow:var(--shadow-float)}
