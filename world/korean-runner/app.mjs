@@ -18,6 +18,10 @@ import {runnerSupport,obstacleSupport,runnerCheckSupport} from '../brand-opening
 let gameTutor=null;
 const tutorEvent=(kind,detail)=>gameTutor?.emit(kind,detail);
 
+// Restore the verified account before reading progress or enabling play.
+await globalThis.SynkPlayAccount.ready();
+const progressStorage = globalThis.SynkPlayAccount.storage();
+
 const byId = (id) => document.getElementById(id);
 const QA = /[?&]qa(?:[=&]|$)/.test(location.search);
 const reduced = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -30,8 +34,8 @@ if (!globalThis.SynkPlayCollection) for (const n of document.querySelectorAll('.
 
 /* ── 저장: 최고 거리만(이 브라우저의 synk.windrun.*). 학습 기록은 아틀라스가 따로 맡는다 ── */
 let storageAvailable = true;
-function stored(key, fallback) { try { return localStorage.getItem('synk.windrun.' + key) ?? fallback; } catch { storageAvailable = false; return fallback; } }
-function store(key, value) { try { localStorage.setItem('synk.windrun.' + key, String(value)); } catch { storageAvailable = false; } }
+function stored(key, fallback) { try { return progressStorage.getItem('synk.windrun.' + key) ?? fallback; } catch { storageAvailable = false; return fallback; } }
+function store(key, value) { try { progressStorage.setItem('synk.windrun.' + key, String(value)); } catch { storageAvailable = false; } }
 let best = Number(stored('best', '0')) || 0;
 
 /* ── 아틀라스: 다음 부탁 고르기 · 기록 · 순간 맞춤(달리기 속도만) ── */
