@@ -10,7 +10,7 @@ import { KeyboardInput, KEY_ACTIONS } from './controls.mjs';
 import { InstructionAudio } from './audio.mjs';
 import { instructionMetadata, chooseInstruction, actionEvidence, FLOW_RUN, TIRED_RUN, FLOW_WORDS, paceOf, runObservation } from './learning.mjs';
 import { mountListeningCheck } from './listening-check-ui.mjs?v=tutor-4e57536c0';
-import { scoreRun, skillReport, skillOf, SKILL_LABEL, STEP_WORD } from './report.mjs';
+import { scoreRun, skillReport, skillOf, SKILL_LABEL, STEP_WORD } from './report.mjs?v=runner-listening-scope-20261014';
 import { drawHeroRoad } from './hero.mjs';
 import { preloadImages } from './kit/lab.mjs';
 import {runnerSupport,obstacleSupport,runnerCheckSupport} from '../brand-opening/game-tutor-support.mjs?v=tutor-4e57536c0';
