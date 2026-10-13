@@ -442,7 +442,7 @@ function renderResults({ completed, distance, newBest }) {
   // 공통 코인: 끝까지 마친 판에 완주 15 + 해낸 비율 × 10(다른 게임과 같은 규칙). 부딪혀 멈춘 판·그만둔 판은 받지 않는다.
   const coinRound = collectionRoundId; collectionRoundId = null;
   const coins = byId('r-coins'); coins.textContent = '공통 코인을 계산하고 있어요.';
-  const award = globalThis.SynkPlayCollection?.award({ game: 'runner', total: s.total, correct: s.correct, completed, automatic: false, roundId: coinRound });
+  const award = globalThis.SynkPlayCollection?.award({ game: 'runner', total: s.total, correct: s.correct, completed, automatic: false, roundId: coinRound, metrics: { bestCombo: model.maxCombo } });
   if (award) award.then((result) => { coins.textContent = globalThis.SynkPlayCollection.rewardText(result); });
   else coins.textContent = '';
   // 이번 달리기의 부탁(지난 순서). 해낸 것은 펠트 체크, 다시 들을 것은 크림 원에 번호. 다시 듣기는 MP3 그대로
