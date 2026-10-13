@@ -10,6 +10,8 @@
   'use strict';
   const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const KIND_TEXT = { official: '공식', synk: 'SYNK 판단', community: '커뮤니티' };
+  // 「·」로 이은 말(「병·상자·화장품」)은 한 덩어리로 묶는다 — word-break:keep-all이 「·」 앞뒤에서 줄을 가르기 때문(10-13 글자 2판, PULSE keepDots와 같은 규칙).
+  const keepDots = s => esc(s).replace(/[^\s·]+(?:·[^\s·]+)+/g, m => `<span class="nw">${m}</span>`);
   let SOURCES = {};
 
   const sources = () => (Object.keys(SOURCES).length ? SOURCES : ((root.SynkKatanaContent || {}).SOURCES || {}));
@@ -18,12 +20,26 @@
     const s = all[src] || all.synk || { kind: 'synk', label: '' };
     return `<span class="src ${esc(s.kind)}" title="${esc(s.label)}">${KIND_TEXT[s.kind] || ''}</span>`;
   }
-  const reasonLi = x => `<li>${esc(x.t)}${badge(x.src)}</li>`;
+  const reasonLi = x => `<li>${keepDots(x.t)}${badge(x.src)}</li>`;
 
-  // 첫 화면 포스터(싱ㅋ 시그널, core/signal.css): SHIFT 청금석 면 + 펠트 몽글(정본 4K 누끼, 제 색 그대로 −3°) + 아주 큰 「카타나」.
+  // 화면마다 내용을 설명하는 펠트 그림(10-13 GPT 이미지 2.5로 한 판에 구워 오림, 판·지시문은 Documents/synk-vendor/katana-tool-felt/).
+  // 유호님 「각 사진마다 너무 똑같아서 별로야. 항상 내용에 도움이 되는 사진을 넣어야해」 → 같은 그림을 되풀이하지 않는다.
+  const ART = {
+    intro: ['katana-art-intro.webp', 605, 680],     // 말풍선 붙은 클래퍼보드: 말로 요청하면 영상이 된다
+    hero: ['katana-art-hero.webp', 405, 251],       // 제품·음료·가게: 주인공 후보
+    style: ['katana-art-style.webp', 211, 366],     // 색이 다른 세 칸 필름: 영상 종류
+    input: ['katana-art-input.webp', 420, 314],     // 사진 묶음과 필름통: 재료
+    where: ['katana-art-where.webp', 398, 285],     // 세로 휴대폰과 가로 모니터: 올릴 곳
+    quality: ['katana-art-quality.webp', 420, 314], // 높이가 다른 코인 탑: 화질이 비용을 바꾼다
+    keep: ['katana-art-keep.webp', 276, 360],       // 자물쇠: 바뀌면 안 되는 것을 잠근다
+    result: ['katana-art-result.webp', 390, 332],   // 체크 붙은 메모: 요청문 완성
+  };
+  const art = (key, cls) => { const a = ART[key]; return a ? `<img class="${cls}" src="assets/${a[0]}" width="${a[1]}" height="${a[2]}" alt="">` : ''; };
+
+  // 첫 화면 포스터(싱ㅋ 시그널, core/signal.css): SHIFT 청금석 면 + 펠트 그림(제 색 그대로 −3°) + 아주 큰 「카타나」.
   // 플랫폼 앱 포스터처럼 왼쪽 위 모노 번호, 오른쪽 위 상태 칩(LED 점). 펠트 물건은 한 화면에 하나.
   function hero() {
-    return '<div class="poster tall" data-word="카타나" style="--len:3"><span class="label">01 / SYNKBRIEF TOOL</span><span class="led-chip">실제 결과 2편</span><img class="cut" src="assets/katana-mongle-34.webp" width="640" height="637" alt=""></div>';
+    return `<div class="poster tall" data-word="카타나" style="--len:3"><span class="label">01 / SYNKBRIEF TOOL</span><span class="led-chip">실제 결과 2편</span>${art('intro', 'cut')}</div>`;
   }
   function marked(title, marks) {
     const t = esc(title);
@@ -46,7 +62,7 @@
     if (key === 'rates') return rates();
     return '';
   }
-  // 질문 옆 포스터: 지금 질문의 낱말을 큰 한글로 + 궁금한 몽글. 휴대폰에서는 질문 위의 띠가 된다(signal.css).
+  // 질문 옆 포스터: 지금 질문의 낱말을 큰 한글로 + 그 질문을 설명하는 펠트 그림. 휴대폰에서는 질문 위의 띠가 된다(signal.css).
   function aside(answers, rules, step) {
     const C = root.SynkKatanaContent;
     if (!C || !step) return '';
@@ -54,7 +70,7 @@
     const i = list.findIndex(x => x.id === step.id);
     const word = step.short || step.eyebrow || '';
     const pad = n => String(n).padStart(2, '0');
-    return `<div class="poster step-poster" data-word="${esc(word)}" style="--len:${Math.max(2, [...word.replace(/\s/g, '')].length)}" aria-hidden="true"><span class="label">QUESTION ${pad(i + 1)} / ${pad(list.length)}</span><img class="cut" src="assets/katana-mongle-curious.webp" width="480" height="475" alt=""></div>`;
+    return `<div class="poster step-poster" data-word="${esc(word)}" style="--len:${Math.max(2, [...word.replace(/\s/g, '')].length)}" aria-hidden="true"><span class="label">QUESTION ${pad(i + 1)} / ${pad(list.length)}</span>${art(step.id, 'cut')}</div>`;
   }
 
   function reasonsBlock(list, layout, keep = 3) {
@@ -70,7 +86,7 @@
   }
   function cardHtml(c, layout) {
     const quick = layout === 'quick';
-    return `<div class="spec${c.key ? ' key' : ''}"><p class="k">${esc(c.k)}</p><p class="v">${esc(c.v)}</p>${c.s ? `<p class="s">${esc(c.s)}</p>` : ''}${yesNo(c, quick)}${reasonsBlock(c.reasons, layout)}</div>`;
+    return `<div class="spec${c.key ? ' key' : ''}"><p class="k">${keepDots(c.k)}</p><p class="v">${keepDots(c.v)}</p>${c.s ? `<p class="s">${keepDots(c.s)}</p>` : ''}${yesNo(c, quick)}${reasonsBlock(c.reasons, layout)}</div>`;
   }
   function copyBox(id, label, text, button, primary, rows, done) {
     return `<div class="copybox${primary ? ' main' : ''}"><label for="t-${id}">${esc(label)}</label><textarea id="t-${id}" readonly spellcheck="false"${rows ? ` style="min-height:${rows}px"` : ''}>${esc(text)}</textarea><div class="row"><button type="button" class="btn ${primary ? 'primary' : 'soft'}" data-action="copy:${id}"${done ? ` data-done="${esc(done)}"` : ''}>${esc(button)}</button><span class="status" role="status"></span></div></div>`;
@@ -98,13 +114,13 @@
     return `<section class="block">${h2}<p class="sub">고른 답에 맞춰, 왜 그렇게 넣었는지와 조심할 점, 신경 쓰지 않아도 되는 것을 골라 드렸어요.</p><div class="tipcards">${ids.map((id, i) => {
       const t = tips[id];
       const open = layout === 'deep' || (layout === 'guided' && i < 2);
-      return `<details class="tipcard"${open ? ' open' : ''}><summary>${esc(t.title)}</summary><div class="tipbody">${t.body.map(p => `<p>${esc(p)}</p>`).join('')}<p class="tipsrc">${[...new Map(t.src.map(s => [(sources()[s] || {}).kind, s])).values()].map(badge).join(' ')}</p></div></details>`;
+      return `<details class="tipcard"${open ? ' open' : ''}><summary>${keepDots(t.title)}</summary><div class="tipbody">${t.body.map(p => `<p>${keepDots(p)}</p>`).join('')}<p class="tipsrc">${[...new Map(t.src.map(s => [(sources()[s] || {}).kind, s])).values()].map(badge).join(' ')}</p></div></details>`;
     }).join('')}</div></section>`;
   }
 
   function examplesBlock(content, h2) {
     const ex = content.examples || [];
-    return `<section class="block">${h2}<p class="sub">영상에서 보여 드린 두 편이에요. 몽글 사진 5장을 붙이고 /katana 뒤에 이렇게 보냈어요(실제 요청을 줄인 것).</p>${ex.map((e, i) => `<div class="formbox ex"><div class="ex-art"><span class="label">${String(i + 1).padStart(2, '0')}</span><img src="assets/katana-ex-${esc(e.id)}.webp" width="270" height="480" alt="${esc(e.title)} 결과의 한 장면"></div><div><p class="eyebrow">${esc(e.title)} · ${esc(e.result)}</p><pre style="white-space:pre-wrap;font:inherit;font-size:15px;line-height:1.55;margin:8px 0 10px">${esc(e.text)}</pre><p class="s" style="font-size:14px;color:var(--muted);margin:0 0 10px">${esc(e.note)}</p><div class="row"><button type="button" class="btn soft" data-action="copy:ex-${esc(e.id)}" data-what="요청">이 요청 복사</button><span class="status" role="status"></span></div></div></div>`).join('')}</section>`;
+    return `<section class="block">${h2}<p class="sub">영상에서 보여 드린 두 편이에요. 몽글 사진 5장을 붙이고 /katana 뒤에 이렇게 보냈어요(실제 요청을 줄인 것).</p>${ex.map((e, i) => `<div class="formbox ex"><div class="ex-art"><span class="label">${String(i + 1).padStart(2, '0')}</span><img src="assets/katana-ex-${esc(e.id)}.webp" width="270" height="480" alt="${esc(e.title)} 결과의 한 장면"></div><div><p class="eyebrow">${esc(e.title)} · ${esc(e.result)}</p><pre style="white-space:pre-wrap;font:inherit;font-size:15.5px;line-height:1.6;margin:8px 0 10px">${esc(e.text)}</pre><p class="s" style="font-size:14px;color:var(--muted);margin:0 0 10px">${esc(e.note)}</p><div class="row"><button type="button" class="btn soft" data-action="copy:ex-${esc(e.id)}" data-what="요청">이 요청 복사</button><span class="status" role="status"></span></div></div></div>`).join('')}</section>`;
   }
 
   function result(ctx) {
@@ -115,15 +131,15 @@
       ? (plan.reasons.includes('feedback.too_much') ? '지난번에 ‘너무 많아요’라고 하셔서 간단히 보여 드려요. 이 기기에 저장된 답을 기준으로 했어요.' : plan.reasons.includes('feedback.want_more') ? '지난번에 ‘더 자세히’를 고르셔서 자세히 보여 드려요. 이 기기에 저장된 답을 기준으로 했어요.' : '')
       : '';
     const seg = [['quick', '간단히'], ['guided', '기본'], ['deep', '자세히']].map(([id, t]) => `<button type="button" class="glass chip" role="radio" aria-checked="${id === layout}" data-action="layout:${id}">${t}</button>`).join('');
-    const warns = rec.warns.map(x => `<div class="warn">${esc(x.t)}${badge(x.src)}</div>`).join('');
+    const warns = rec.warns.map(x => `<div class="warn">${keepDots(x.t)}${badge(x.src)}</div>`).join('');
     let n = 0;
     const H = title => head(++n, title);
 
-    const flow = `<section class="formbox"><p class="eyebrow">이 순서대로 하세요</p><h2>클로드에서 카타나 쓰기</h2><ol class="steps">${rec.flow.map(x => `<li><div><b>${esc(x.t)}${x.src && x.src !== 'synk' ? badge(x.src) : ''}</b>${x.d && !quick ? `<p>${esc(x.d)}</p>` : ''}</div></li>`).join('')}</ol></section>`;
+    const flow = `<section class="formbox"><p class="eyebrow">이 순서대로 하세요</p><h2>클로드에서 카타나 쓰기</h2><ol class="steps">${rec.flow.map(x => `<li><div><b>${keepDots(x.t)}${x.src && x.src !== 'synk' ? badge(x.src) : ''}</b>${x.d && !quick ? `<p>${keepDots(x.d)}</p>` : ''}</div></li>`).join('')}</ol></section>`;
     const take = `<section class="block">${H('가져가기')}<p class="sub">클로드 새 채팅에 재료를 붙이고, 입력창에 <b>/katana</b> 를 쓴 다음 이 요청문을 붙여 넣어 보내세요.</p>${copyBox('prompt', '/katana 뒤에 붙여 넣을 요청문', rec.prompt, '요청문 복사', true, 0, '요청문을 복사했어요. 클로드 새 채팅에서 /katana 를 쓰고 붙여 넣으세요.')}</section>`;
     const cards = `<section class="block">${H('어림과 설정')}<p class="sub">비용은 화질과 길이로 어림했어요. 실제 비용은 카타나가 계획할 때 받는 견적을 따라요.</p><div class="specs">${rec.cards.map(c => cardHtml(c, layout)).join('')}</div></section>`;
     const tipsHtml = tipCards(rec, content, layout, H('나에게 필요한 팁'));
-    const checklist = quick ? '' : `<section class="block">${H('결과 받은 뒤 확인할 것')}<p class="sub">카타나는 끝까지 혼자 가요. 받은 뒤 이것만 보세요. 체크한 내용은 이 기기에 남아요.</p><ul class="checks">${rec.checklist.map(c => `<li><label><input type="checkbox" data-check="${esc(c.id)}"${checks[c.id] ? ' checked' : ''}><span><b>${esc(c.t)}</b><small>${esc(c.d)}</small></span></label></li>`).join('')}</ul></section>`;
+    const checklist = quick ? '' : `<section class="block">${H('결과 받은 뒤 확인할 것')}<p class="sub">카타나는 끝까지 혼자 가요. 받은 뒤 이것만 보세요. 체크한 내용은 이 기기에 남아요.</p><ul class="checks">${rec.checklist.map(c => `<li><label><input type="checkbox" data-check="${esc(c.id)}"${checks[c.id] ? ' checked' : ''}><span><b>${keepDots(c.t)}</b><small>${keepDots(c.d)}</small></span></label></li>`).join('')}</ul></section>`;
     const examples = examplesBlock(content, H('영상 속 실제 요청 두 개'));
     const saveRow = `<section class="block">${H('저장하고 다시 보기')}<div class="take"><button type="button" class="btn soft" data-action="share">내 결과 링크 복사</button><button type="button" class="btn soft" data-action="copy:all" data-what="결과 전체">결과 전체 복사</button><button type="button" class="btn soft" data-action="print">PDF로 저장·인쇄</button><span class="status" role="status" style="flex-basis:100%"></span></div><p class="hint">인스타그램 안에서 열었다면 오른쪽 위 메뉴에서 ‘외부 브라우저로 열기’를 누르면 복사와 저장이 더 잘 돼요.</p></section>`;
     const fbMsg = { helpful: '고마워요. 다음에도 이렇게 보여 드릴게요.', too_much: '알겠어요. 다음에 이 기기에서 열면 간단히 보여 드릴게요.', want_more: '알겠어요. 다음에 이 기기에서 열면 자세히 보여 드릴게요.', not_fit: '알려 주셔서 고마워요. 어떤 점이 안 맞았는지 synkbrief 댓글이나 DM으로 알려 주시면 다음 버전에 반영할게요.' };
@@ -137,7 +153,7 @@
     const editable = content.steps.filter(s => !s.when || s.when(ctx.answers)).map(s => `<button type="button" class="glass chip" data-action="edit:${esc(s.id)}">${esc(s.short || s.eyebrow || s.title)}</button>`).join('');
     const edit = `<section class="block no-print">${H('답 바꿔 보기')}<p class="sub">하나만 바꿔도 요청문과 어림이 다시 만들어져요.</p><div class="take">${editable}</div></section>`;
 
-    const html = `<article class="result"><header class="r-top"><p class="rec"><span class="sticker">${esc(content.checked.replace(/-/g, '.'))} 기준</span><span>${esc(content.series)} · 나의 카타나 요청문</span></p><h1 id="q" tabindex="-1">${marked(rec.headline.title, ['아우라 에딧', '제품 광고', '편집 영상', '레퍼런스 리믹스'])}</h1><p>${esc(rec.headline.sub)}</p>${because ? `<p class="because">${esc(because)}</p>` : ''}<figure class="shot cut" aria-hidden="true"><img src="assets/katana-mongle-star.webp" width="560" height="554" alt=""></figure></header><div class="layout"><span>보기</span><div class="seg" role="radiogroup" aria-label="결과 분량">${seg}</div></div>${warns}${flow}${take}${cards}${tipsHtml}${checklist}${examples}${saveRow}${fb}${edit}${sourcesBox}<div class="nav no-print"><button type="button" class="btn ghost" data-action="restart">처음부터 다시</button></div><div class="dock no-print" role="group" aria-label="바로 쓰기"><button type="button" class="btn primary" data-proxy="copy:prompt">요청문 복사</button><button type="button" class="btn soft" data-proxy="share">내 결과 링크</button></div></article>`;
+    const html = `<article class="result"><header class="r-top"><p class="rec"><span class="sticker">${esc(content.checked.replace(/-/g, '.'))} 기준</span><span>${esc(content.series)} · 나의 카타나 요청문</span></p><h1 id="q" tabindex="-1">${marked(rec.headline.title, ['아우라 에딧', '제품 광고', '편집 영상', '레퍼런스 리믹스'])}</h1><p>${esc(rec.headline.sub)}</p>${because ? `<p class="because">${esc(because)}</p>` : ''}<figure class="shot cut" aria-hidden="true">${art('result', '')}</figure></header><div class="layout"><span>보기</span><div class="seg" role="radiogroup" aria-label="결과 분량">${seg}</div></div>${warns}${flow}${take}${cards}${tipsHtml}${checklist}${examples}${saveRow}${fb}${edit}${sourcesBox}<div class="nav no-print"><button type="button" class="btn ghost" data-action="restart">처음부터 다시</button></div><div class="dock no-print" role="group" aria-label="바로 쓰기"><button type="button" class="btn primary" data-proxy="copy:prompt">요청문 복사</button><button type="button" class="btn soft" data-proxy="share">내 결과 링크</button></div></article>`;
     const texts = { prompt: rec.prompt, all: summaryText(rec, content) };
     for (const e of content.examples || []) texts[`ex-${e.id}`] = e.text;
     return { html, texts };
