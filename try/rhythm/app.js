@@ -1,3 +1,4 @@
+import { recordTrialStarted } from '/social-conversion.js';
 // 말의 리듬 — 화면과 흐름. 보면·판정은 core.js, 음악·내레이션과 공통 시계는 audio.js, 펠트 무대는 stage.js,
 // 문항과 능력의 대응·판정 폭 맞춤은 personalization.js, 공통 학습 기록은 atlas-learning.js(SynkLearning).
 // 한 곡: 곡 고르기 → 무대 열기(음악·내레이션을 받아 한 시계에 예약) → 박자 맞추기와 듣기 O·X 다섯 번
@@ -163,6 +164,7 @@ async function start() {
     collectionRoundId = globalThis.SynkPlayCollection?.roundId('rhythm') || null;
     stage.reset(); startTiming(); tip(null); setMongle('smile');
     music.start(buffer, round.beat);
+    recordTrialStarted();
     lastFrame = performance.now(); lastUi = 0;
     cancelAnimationFrame(raf); raf = requestAnimationFrame(frame);
     $('pause-button').focus({ preventScroll: true });

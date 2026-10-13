@@ -1,3 +1,4 @@
+import { recordTrialStarted } from '/social-conversion.js';
 // 바람길 — 화면과 흐름. 판정·코스는 core.js, 3D 펠트 길은 world.js, 좌표 기준은 course-motion.js, 학습 기록 연결은 learning.js(아틀라스).
 // 한 판: 90초. 바람이 짧은 한국어 부탁(방향·동작·하지 말라는 말·두 동작의 순서)을 하면 표시선 전에 그대로 움직인다(←·→·점프·숙이기).
 // 달리는 중에는 부탁의 글을 보이지 않는다 — ‘글로 보기’를 누르면 그 부탁만 보이고 도움으로 남는다. 목소리를 틀 수 없으면 달리기를 멈춘다
@@ -182,6 +183,7 @@ async function start() {
   tip(opening || '바람이 길을 알려 줘요. 잘 듣고 움직여요!', 2600);
   announce('한국어 부탁을 듣고 바람길을 달려요. 왼쪽·오른쪽 화살표로 길을 바꾸고, 위는 점프, 아래는 숙이기예요.');
   starting = false;
+  recordTrialStarted();
 }
 
 function resetRunUI() {
