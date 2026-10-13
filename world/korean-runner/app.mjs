@@ -461,6 +461,11 @@ function renderResults({ completed, distance, newBest }) {
   });
   byId('r-log-note').textContent = s.timing ? `동작은 맞았지만 표시선에서 조금 이르거나 늦은 곳 ${s.timing}개는 ‘타이밍 놓침’으로 남겼어요.` : '';
   byId('r-log-note').hidden = !s.timing;
+  renderResultLearning(s);
+}
+// Listening checks can add evidence after this run ended. Refresh only the
+// learning report and next plan; the run's score, replay list and award stay put.
+function renderResultLearning(s) {
   renderSkills(s);
   byId('r-next-reason').textContent = learningBroken() ? '학습 기록을 저장할 수 없어서 다음에도 기본 부탁으로 달려요.'
     : `${nextPlan?.reason || '아직 안 들어 본 부탁부터 준비해요.'} 다음 달리기에는 그런 부탁을 먼저 넣어요.`;
@@ -530,7 +535,14 @@ byId('learning-reset').addEventListener('click', () => {
   catch (error) { if (error?.code !== 'ACCOUNT_RESET_REQUIRED') learningFailed = true; }
   renderLobby();
 });
-const listeningCheck = mountListeningCheck({ coach, beforeOpen: () => { if (running && !model?.finished) return false; cancelVoice(); return true; },onListen:()=>tutorEvent('listening'),onFeedback:(correct,detail)=>tutorEvent(correct?'success':'retry',{answer:true,support:!correct&&detail?runnerCheckSupport(detail.item,detail.choice,detail.feedback):[]}),onClose:()=>tutorEvent('lobby') });
+function closeListeningCheck() {
+  if (screen === 'results' && model?.finished) {
+    refreshRecommendation();
+    renderResultLearning(scoreRun(model.answers, { completed: model.reason === 'tour' }));
+  }
+  tutorEvent('lobby');
+}
+const listeningCheck = mountListeningCheck({ coach, beforeOpen: () => { if (running && !model?.finished) return false; cancelVoice(); return true; },onListen:()=>tutorEvent('listening'),onFeedback:(correct,detail)=>tutorEvent(correct?'success':'retry',{answer:true,support:!correct&&detail?runnerCheckSupport(detail.item,detail.choice,detail.feedback):[]}),onClose:closeListeningCheck });
 
 let resizeT = 0;
 window.addEventListener('resize', () => { cancelGesture(); clearTimeout(resizeT); resizeT = setTimeout(() => { if (screen === 'lobby') drawHeroRoad(byId('hero-road')); placeTip(); }, 140); });
