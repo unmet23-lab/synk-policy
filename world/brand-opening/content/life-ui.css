@@ -383,3 +383,27 @@
  [data-layout=landscape] .cafe-soft-note { font-size: 11px !important; }
  [data-layout=landscape] .cafe-complete-orders { margin: 10px auto; max-width: 380px; }
 }
+.study-form{max-width:680px;margin:0 auto;padding:8px 4px 28px;color:var(--ink,#172026)}
+.study-intro{font-size:17px;line-height:1.65;margin:0 0 24px}
+.study-form fieldset{border:0;padding:0;margin:24px 0}
+.study-form legend,.study-field>strong{font-size:16px;font-weight:800;margin-bottom:12px}
+.study-options{display:grid;gap:9px}
+.study-option{display:flex;align-items:center;gap:12px;min-height:50px;padding:12px 16px;border:1px solid #0002;border-radius:16px;background:linear-gradient(135deg,#fffd,#ffffff80);box-shadow:inset 0 1px 1px #fff,0 4px 10px #00000008;cursor:pointer}
+.study-option:has(input:checked){border-color:#b94f61;background:#fff5f7;box-shadow:inset 0 0 0 1px #b94f61}
+.study-option input,.study-consent input{accent-color:#b94f61;flex-shrink:0;width:19px;height:19px}
+.study-field,.study-two-fields label{display:grid;gap:10px;min-width:0}
+.study-form select{font:inherit;color:inherit;background:#fff;border:1px solid #0003;border-radius:12px;padding:12px;min-height:48px;width:100%}
+.study-today{margin:24px 0;padding:20px 0;border-top:1px solid #0002;border-bottom:1px solid #0002}
+.study-today>p,.study-scope,.study-understanding>p{font-size:14px;line-height:1.6;color:#505760}
+.study-two-fields{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.study-consent{display:flex;align-items:flex-start;gap:10px;line-height:1.65}
+.study-save-status{font-size:14px;min-height:24px;line-height:1.5;color:#834252}
+.study-controls{display:flex;flex-wrap:wrap;gap:12px;margin-top:12px}
+.study-understanding{margin-top:30px;border-top:1px solid #0002;padding-top:18px}
+.study-understanding h3{font-size:17px}.study-understanding ul{padding:0;list-style:none;display:grid;gap:14px}
+.study-understanding li{display:grid;gap:4px}.study-understanding li span{font-size:14px;color:#505760}
+.world-shell .life-home-board.lobby-action{max-height:none}
+.study-home-note{text-align:center;display:grid;gap:4px;margin:4px 0;padding:8px 10px;border:1px solid #e0d9c8;border-radius:16px;background:#fffefbf5;box-shadow:inset 0 1px 1px #fff,0 3px 10px #1825191a;text-shadow:none}.study-home-note p{font-size:13px;line-height:1.5;margin:0;color:#354237}.study-home-note p:empty{display:none}.study-home-note button{font-size:13px;min-height:44px;color:#564032;text-decoration:underline;text-underline-offset:3px}
+.study-form :focus-visible{outline:3px solid #3576af;outline-offset:3px}
+.study-form .life-actions{flex-wrap:wrap}
+@media(max-width:380px){.study-two-fields{grid-template-columns:1fr}.study-option{padding:10px}.study-intro{font-size:16px}}

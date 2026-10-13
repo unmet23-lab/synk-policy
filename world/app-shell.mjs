@@ -1,10 +1,11 @@
 import {WorldClient} from './world-client.mjs';
 import {mountEnrollment} from './enrollment.mjs';
-import {createWorldAccount,loadWorldConfig,createLifeProgressPort} from './world-account.bundle.mjs?v=account-desktop-20261012';
+import {createWorldAccount,loadWorldConfig,createLifeProgressPort,createLocalWorldLearningHost,worldLearning,createWorldLearningPlan} from './world-account.bundle.mjs?v=personalization-20261013';
+import {createWorldEducation} from './world-learning-ui.mjs?v=personalization-20261013';
 import {PACKS,LESSONS} from './life-content.mjs?v=tutor-4e57536c0';
-import {createLifeProgress} from './life-progress.mjs?v=tutor-account-20261012';
+import {createLifeProgress} from './life-progress.mjs?v=personalization-20261013';
 import {restoreTutorSelection,commitTutorSelection,tutorSelectionStatus} from './tutor-selection-sync.mjs?v=tutor-account-20261012';
-import {createLifeExperience} from './life-ui.mjs?v=tutor-4e57536c0';
+import {createLifeExperience} from './life-ui.mjs?v=personalization-20261013';
 import {createTownWorldHost} from './world-town-client.mjs';
 import {WARDROBE_ITEMS} from './wardrobe-catalog.mjs';
 import {createWorkbenchStorage,thumbnailKey,wardrobeThumbnailCache} from './wardrobe-workbench.mjs';
@@ -13,9 +14,9 @@ const connection=await loadWorldConfig();
 const operating=connection.mode==='account';
 const worldUrl=path=>new URL(connection.basePath+path,location.origin).href;
 const {firstSupport}=await import(worldUrl('brand-opening/game-tutor-support.mjs?v=tutor-4e57536c0'));
-const home=window.__synkHome||(await import(worldUrl('brand-opening/home.mjs?v=performance-20261012'))).home;
+const home=window.__synkHome||(await import(worldUrl('brand-opening/home.mjs?v=personalization-20261013'))).home;
 let client,townSession,enrollmentView,lifeUI=null,lifeProgress=null,lifePort=null,lifeOwner=null,lifeGeneration=-1,lifeEpoch=0,lifeReady=null,lifeRecoveryShown=false;
-let tutorReady=false,tutorRefresh=null;
+let tutorReady=false,tutorRefresh=null,education=null,localLearning=null;
 // Loading and session restoration run behind the company splash. A failed
 // optional opening must never disable the existing account or guest entrance.
 function startOpening(replay=false){return import(worldUrl('brand-opening/opening.mjs?v=tutor-4e57536c0')).then(({mountBrandOpening})=>{
@@ -135,7 +136,7 @@ async function refreshTutorAccount(){
 }
 function initializeLife(){
  const owner=client.snapshot?.accountId||'guest',generation=client.generation,epoch=++lifeEpoch;
- lifeOwner=owner;lifeGeneration=generation;tutorReady=false;lifeUI?.dispose();lifeProgress?.stop();lifePort?.dispose();lifeUI=null;lifeProgress=null;lifePort=null;lifeRecoveryShown=false;
+ lifeOwner=owner;lifeGeneration=generation;tutorReady=false;education?.dispose();education=null;home.connectEducation?.(null);localLearning?.dispose();localLearning=null;lifeUI?.dispose();lifeProgress?.stop();lifePort?.dispose();lifeUI=null;lifeProgress=null;lifePort=null;lifeRecoveryShown=false;
  const guard=()=>{if(epoch!==lifeEpoch||(client.snapshot?.accountId||'guest')!==owner||generation!==client.generation)throw Object.assign(Error('생활 한국어 계정 연결이 바뀌었어요.'),{code:'ACCOUNT_CHANGED'});};
  home.updateLearning?.({owner,completed:0,total:LESSONS.length,packs:PACKS,nextLesson:null,resume:false,dueCount:0,status:{phase:'loading'}});
  lifeReady=(async()=>{
@@ -151,12 +152,22 @@ function initializeLife(){
   const getSaveStatus=()=>lifeSaveStatus(port);
   lifeProgress=createLifeProgress({owner,mode,storage:port?.storage||localStorage,now:()=>Date.now(),guard,save:port?.flush,getSaveStatus,onChange:refreshLife});
   if(notice){const status=lifeProgress.status;lifeProgress=Object.freeze({...lifeProgress,status:()=>({...status(),message:notice})});}
-  lifeUI=createLifeExperience({home,getProgress:()=>lifeProgress,asset:path=>worldUrl('brand-opening/assets/'+path),show:(title,html,options)=>show(title,html,options.type,{eyebrow:options.eyebrow,nav:options.nav})});
+  if(!operating&&owner!=='guest')localLearning=createLocalWorldLearningHost({owner,guard,target:window,storage:localStorage});
+  if(operating&&owner!=='guest')try{await account.prepareGame({target:window});guard();}catch{guard();}
+  mountLifeLearning();
   window.__synkLife=lifeUI;
   tutorReady=true;restoreTutor();
   refreshLife();
  })().catch(error=>{if(epoch===lifeEpoch)home.toast(error.message||'생활 진도를 확인하지 못했어요.');});
  return lifeReady;
+}
+function mountLifeLearning(){
+ education?.dispose();education=null;
+ lifeUI=createLifeExperience({home,getProgress:()=>lifeProgress,asset:path=>worldUrl('brand-opening/assets/'+path),show:(title,html,options)=>show(title,html,options.type,{eyebrow:options.eyebrow,nav:options.nav}),onSummary:()=>education?.refresh(),onNext:()=>education?.next()});
+ education=createWorldEducation({home,getProgress:()=>lifeProgress,engine:worldLearning,createPlan:createWorldLearningPlan,target:window,
+  launchGame,startLesson:id=>lifeUI.start(id),startReview:(id,ids)=>lifeUI.reviewStart(id,ids),
+  prepare:async()=>{if(operating&&client.snapshot&&!window.SYNKLearningHost)await account.prepareGame({target:window});}});
+ home.connectEducation?.(education);window.__synkEducation=education;
 }
 async function openLife(method){
  if(!lifeReady)initializeLife();
@@ -175,7 +186,7 @@ async function resolveLife(button){
   lifeRecoveryShown=false;lifeUI?.dispose();lifeProgress?.stop();
   const guard=port.guard;
   lifeProgress=createLifeProgress({owner:lifeOwner,mode:'account',storage:port.storage,now:()=>Date.now(),guard,save:port.flush,getSaveStatus:()=>lifeSaveStatus(port),onChange:refreshLife});
-  lifeUI=createLifeExperience({home,getProgress:()=>lifeProgress,asset:path=>worldUrl('brand-opening/assets/'+path),show:(title,html,options)=>show(title,html,options.type,{eyebrow:options.eyebrow,nav:options.nav})});
+  mountLifeLearning();
   window.__synkLife=lifeUI;tutorReady=true;restoreTutor();close();refreshLife();
  }catch(error){if(epoch===lifeEpoch&&home.openPanel()==='life-recovery'){home.toast(error.message||'아직 진도를 저장하지 못했어요.');document.querySelectorAll('[data-world="life-resolve"]').forEach(node=>node.disabled=false);}}
 }
@@ -272,10 +283,11 @@ async function launchGame(id){
   if(ticket!==gameLaunch||!worldPanel.open||home.isMaru&&home.openPanel()!=='world-game-loading'||client.snapshot?.accountId!==accountId){session.dispose();return;}
   if(session.status().play.phase==='conflict'){showGameConflict(id,session);return;}
  }
+ if(education?.applyPreferences()===false)throw Error('도움 방식 저장을 다시 확인해 주세요.');
  show(game.title,`<iframe class="game-frame" title="${game.title}" src="${worldUrl(game.path)}?v=performance-20261012" allow="autoplay; fullscreen" allowfullscreen></iframe>`,'game');
  const companion=home.mountGameTutor?.(id,{frame:document.querySelector('.game-frame')});
  if(session)activeGameSession=session;
- if(session||companion)home.attachPanelResource({dispose:()=>{companion?.dispose();if(session){if(activeGameSession===session)activeGameSession=null;session.closeGame();}}});
+ home.attachPanelResource({dispose:()=>{companion?.dispose();if(session){if(activeGameSession===session)activeGameSession=null;session.closeGame();}queueMicrotask(()=>refreshLife());}});
 }
 const learningSongs={'vowel-dance':{title:'모음 댄스',description:'모음 글자와 소리'},'geu-a-ga':{title:'그 아 가',description:'자음과 모음의 만남'},batchim:{title:'받침 노래',description:'글자 아래에 붙는 소리'}};
 function songs(){show('노래로 만나는 한글',`<div class="play-list">${Object.entries(learningSongs).map(([id,s])=>`<button data-world-song="${id}"><img src="${worldUrl('brand-opening/assets/home/headphones.webp')}" alt=""><span><strong>${s.title}</strong><small>${s.description}</small></span></button>`).join('')}</div>`,'world-songs');}
@@ -311,7 +323,7 @@ document.addEventListener('click',event=>{
  }
 },true);
 document.addEventListener('change',event=>{const control=event.target;if(control.matches?.('[data-world-learning]')){control.disabled=true;const enabled=control.checked;void account.setLearning(enabled,Number(control.dataset.revision)).then(()=>{if(screen==='world-profile')profile();}).catch(error=>{control.checked=!enabled;home.toast(errorText(error));}).finally(()=>{control.disabled=false;});return;}if(!control.matches?.('[data-town-sharing]'))return;control.disabled=true;const enabled=control.checked,revision=Number(control.dataset.revision);void client.request('town/sharing',{method:'POST',body:{enabled,revision}}).then(()=>town()).catch(error=>{control.checked=!enabled;home.toast(errorText(error));}).finally(()=>{control.disabled=false;});});
-window.addEventListener('pagehide',()=>{lifeEpoch++;lifeUI?.dispose();lifeProgress?.stop();lifePort?.dispose();townSession?.dispose();delete window.SYNKWorldTownHost;account?.stop();});
+window.addEventListener('pagehide',()=>{education?.dispose();localLearning?.dispose();lifeEpoch++;lifeUI?.dispose();lifeProgress?.stop();lifePort?.dispose();townSession?.dispose();delete window.SYNKWorldTownHost;account?.stop();});
 window.addEventListener('online',()=>{if(client.snapshot)client.refresh().then(refreshTutorAccount).catch(()=>{});});
 // Switching between side-by-side web and desktop windows need not hide either
 // document. Refocus must also restore the latest selected companion.
