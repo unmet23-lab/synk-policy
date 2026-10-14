@@ -1,3 +1,4 @@
 /frozen/** -text
 /mac-renderer-overlay.json -text
 /platform-performance/*.cjs -text
+/unified/** -text
