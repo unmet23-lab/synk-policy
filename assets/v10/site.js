@@ -1,3 +1,4 @@
+import { ORB_GRID, LIGHT, grainSteps, measureSteps, inkPixels, paintPixels } from './orb-renderer-2c3b14ce8c61.js';
 // SYNK 홈페이지 v10 · 메뉴, 나타나기, 대화 구, 질문(자주 묻는 질문 + 직접 묻기), 게임 장면, 알림.
 // 질문의 답은 공개 안내(knowledge.json) 안에서만 고른다. 대화는 저장하지 않는다.
 const $ = (s, r = document) => r.querySelector(s);
@@ -46,11 +47,16 @@ matchMedia('(min-width: 901px)').addEventListener('change', () => setMenu(false)
 // 어두운 싱ㅋ 표지가 메뉴 뒤에 있는 동안만 어두운 유리로 둔다
 const cover = $('.cover');
 if (cover && bar) {
-  let ticking = false;
-  const tone = () => { ticking = false; bar.classList.toggle('on-dark', cover.getBoundingClientRect().bottom > 64); };
-  addEventListener('scroll', () => { if (!ticking) { ticking = true; requestAnimationFrame(tone); } }, { passive: true });
-  addEventListener('resize', tone);
-  tone();
+  if ('IntersectionObserver' in window) {
+    // 관찰 결과의 좌표를 쓴다. 매 스크롤 프레임에 문서 전체 레이아웃을 강제로 읽지 않는다.
+    new IntersectionObserver(entries => {
+      bar.classList.toggle('on-dark', entries[0].boundingClientRect.bottom > 64);
+    }, { rootMargin: '-64px 0px 0px 0px' }).observe(cover);
+  } else {
+    const tone = () => bar.classList.toggle('on-dark', cover.getBoundingClientRect().bottom > 64);
+    addEventListener('scroll', tone, { passive: true });
+    addEventListener('resize', tone); tone();
+  }
 }
 
 /* 부드러운 이동: 사람이 처음 누르거나 키를 친 뒤에 켠다. 주소(#…)로 들어온 첫 이동은 움직임 없이 바로 그 자리다 */
@@ -60,8 +66,7 @@ addEventListener('pointerdown', smooth, true); addEventListener('keydown', smoot
 /* 대화 구(2026-10-11 유호님 「예전에 SYNK 구체같은거 … 그거 추가해주고」): 9월 질문창의 구를 그대로 옮겨 왔다(공개본 orb-conversation.js).
    빛 알갱이를 찍은 잉크 구. 빛은 왼쪽 위에 머물다가, 포인터가 구 위에서 움직일 때만 그쪽으로 돈다. 저절로 움직이지 않는다.
    두 잉크는 CSS에서 온다(color = 어두운 알갱이, caret-color = 빛난 알갱이). 알갱이 순서는 아틀라스 지도와 같아 이 브라우저에 한 번만 계산해 둔다. */
-const ORB_GRID = 64; let grainJob = null;
-function orbRandom(seed) { return function () { seed |= 0; seed = seed + 0x6D2B79F5 | 0; let t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+let grainJob = null;
 const whenIdle = window.requestIdleCallback ? cb => requestIdleCallback(cb, { timeout: 1000 }) : cb => setTimeout(() => cb(null), 16);
 function inSlices(steps, active = () => true) {
   return new Promise(resolve => {
@@ -94,60 +99,29 @@ function storeGrain(order) {
   } catch {}
 }
 // 고른 순서: 다음 알갱이는 가장 빈 자리로(아틀라스 지도와 같은 씨앗)
-function* grainSteps() {
-  const G = ORB_GRID, count = G * G, rnd = orbRandom(862104), crowd = new Float32Array(count), taken = new Uint8Array(count);
-  const reach = 9, span = reach * 2 + 1, near = new Float32Array(span * span);
-  for (let y = -reach; y <= reach; y++) for (let x = -reach; x <= reach; x++) near[(y + reach) * span + x + reach] = Math.exp(-(x * x + y * y) / 7.22);
-  for (let i = 0; i < count; i++) crowd[i] = rnd() * 1e-4;
-  const rowLeast = new Float32Array(G), rowPlace = new Int32Array(G);
-  const recount = row => { let place = -1, least = Infinity; for (let i = row * G, end = i + G; i < end; i++) if (!taken[i] && crowd[i] < least) { least = crowd[i]; place = i; } rowLeast[row] = least; rowPlace[row] = place; };
-  for (let row = 0; row < G; row++) recount(row);
-  const order = new Float32Array(count);
-  for (let step = 0; step < count; step++) {
-    let py = 0; for (let row = 1; row < G; row++) if (rowLeast[row] < rowLeast[py]) py = row;
-    const place = rowPlace[py], px = place % G; taken[place] = 1; order[place] = (step + .5) / count;
-    for (let y = -reach; y <= reach; y++) { const row = (py + y + G) % G, line = (y + reach) * span + reach; for (let x = -reach; x <= reach; x++) crowd[row * G + (px + x + G) % G] += near[line + x]; recount(row); }
-    if (step % 128 === 127) yield;
-  }
-  return order;
-}
 function grainOrder(active = () => true) {
   if (grainJob) return grainJob;
   const stored = storedGrain(ORB_GRID * ORB_GRID);
   return grainJob = stored ? Promise.resolve(stored) : inSlices(grainSteps(), active).then(order => { if (order) storeGrain(order); else grainJob = null; return order; });
 }
-const LIGHT = { angle: -Math.PI * 2 * .108, lift: .56, fall: 2.4, gain: .9, floor: .02, rim: .06 };
-const FALL = new Float32Array(1025); for (let i = 0; i <= 1024; i++) FALL[i] = Math.pow(i / 1024, LIGHT.fall) * LIGHT.gain;
 let probe = null;
 function rgba(value, fallback) {
+  // getComputedStyle의 sRGB 값은 직접 읽는다. 색 두 개 때문에 GPU 픽셀을 동기 회수하지 않는다.
+  const rgb = String(value || fallback).match(/^rgba?\(\s*([\d.]+)[,\s]+([\d.]+)[,\s]+([\d.]+)(?:\s*[,/]\s*([\d.]+))?\s*\)$/);
+  if (rgb) return [...rgb.slice(1, 4).map(Number), Math.round(Number(rgb[4] ?? 1) * 255)];
+  const hex = String(value || fallback).match(/^#([\da-f]{3}|[\da-f]{6})$/i);
+  if (hex) { const h = hex[1].length === 3 ? [...hex[1]].map(c => c + c).join('') : hex[1]; return [0, 2, 4].map(i => parseInt(h.slice(i, i + 2), 16)).concat(255); }
   probe ??= Object.assign(document.createElement('canvas'), { width: 1, height: 1 }).getContext('2d', { willReadFrequently: true });
   probe.clearRect(0, 0, 1, 1); probe.fillStyle = fallback; probe.fillStyle = value || fallback; probe.fillRect(0, 0, 1, 1);
   return Array.from(probe.getImageData(0, 0, 1, 1).data);
 }
-function mountOrb(holder) {
+function mountOrbFallback(holder) {
   const canvas = $('canvas', holder), surface = $('.orb-surface', holder);
   const ctx = canvas?.getContext('2d'); if (!ctx || !surface) return;
   const fine = matchMedia('(hover: hover) and (pointer: fine)');
   let angle = LIGHT.angle, lift = LIGHT.lift, frame = 0, drawn = '', shape = null, preparing = '';
   let near = !('IntersectionObserver' in window), image = null, inkKey = '', dark = null, light = null;
   const active = () => near && !document.hidden;
-  function* measureSteps(size, dpr, grain) {
-    const G = ORB_GRID, cell = Math.max(1, Math.round(dpr * .62)), radius = size / 2 - dpr, middle = size / 2, outer = (1 + 1.5 / radius) ** 2;
-    // 픽셀마다 일반 배열을 늘린 뒤 일곱 번 복사하던 임시 메모리를 없앤다.
-    const capacity = size * size, index = new Int32Array(capacity), cx = new Float32Array(capacity), cy = new Float32Array(capacity), cz = new Float32Array(capacity), rim = new Float32Array(capacity), threshold = new Float32Array(capacity), cover = new Uint8Array(capacity);
-    let used = 0;
-    for (let py = 0; py < size; py++) {
-      const y = (py + .5 - middle) / radius, gy = Math.floor(py / cell), sy = ((gy + .5) * cell - middle) / radius, row = (gy % G) * G;
-      for (let px = 0; px < size; px++) {
-        const x = (px + .5 - middle) / radius, reachSq = x * x + y * y; if (reachSq > outer) continue;
-        const edge = Math.round(Math.min(1, Math.max(0, (1 - Math.sqrt(reachSq)) * radius + .5)) * 255); if (!edge) continue;
-        const gx = Math.floor(px / cell), sx = ((gx + .5) * cell - middle) / radius, z = Math.sqrt(Math.max(0, 1 - sx * sx - sy * sy));
-        index[used] = (py * size + px) * 4; cx[used] = sx; cy[used] = sy; cz[used] = z; rim[used] = LIGHT.floor + Math.pow(1 - z, 5) * LIGHT.rim; threshold[used] = grain[row + gx % G]; cover[used++] = edge;
-      }
-      if (py % 8 === 7) yield;
-    }
-    return { size, dpr, index: index.subarray(0, used), cx: cx.subarray(0, used), cy: cy.subarray(0, used), cz: cz.subarray(0, used), rim: rim.subarray(0, used), threshold: threshold.subarray(0, used), cover: cover.subarray(0, used) };
-  }
   function prepare(size, dpr) {
     const want = size + '|' + dpr; if (preparing === want) return; preparing = want;
     grainOrder(active).then(grain => grain && inSlices(measureSteps(size, dpr, grain), () => active() && preparing === want)).then(next => { if (preparing !== want) return; preparing = ''; if (next) { shape = next; image = null; } request(); });
@@ -163,13 +137,8 @@ function mountOrb(holder) {
     if (canvas.width !== size) canvas.width = canvas.height = size;
     const css = (size + .004) / dpr + 'px'; if (canvas.style.width !== css) canvas.style.width = canvas.style.height = css;
     image ??= ctx.createImageData(size, size);
-    const data = image.data, side = Math.sqrt(1 - lift * lift), lx = Math.sin(angle) * side, ly = -Math.cos(angle) * side;
-    const { index, cx, cy, cz, rim, threshold, cover } = shape;
-    if (inkKey !== inks) { inkKey = inks; dark = rgba(style.color, '#0a0a0a'); light = rgba(style.caretColor, '#fff'); }
-    for (let k = 0; k < index.length; k++) {
-      const facing = Math.max(0, Math.min(1, cx[k] * lx + cy[k] * ly + cz[k] * lift)), lit = rim[k] + FALL[(facing * 1024) | 0] > threshold[k], i = index[k], ink = lit ? light : dark;
-      data[i] = ink[0]; data[i + 1] = ink[1]; data[i + 2] = ink[2]; data[i + 3] = cover[k] * ink[3] / 255;
-    }
+    if (inkKey !== inks) { inkKey = inks; dark = inkPixels(rgba(style.color, '#0a0a0a')); light = inkPixels(rgba(style.caretColor, '#fff')); }
+    paintPixels(image, shape, angle, lift, dark, light);
     ctx.putImageData(image, 0, 0);
     surface.classList.add('orb-rendered');
   }
@@ -194,6 +163,66 @@ function mountOrb(holder) {
   const changed = () => { watch(); request(); };
   watch(); request();
 }
+function mountOrb(holder) {
+  let canvas = $('canvas', holder);
+  if (typeof Worker === 'undefined' || !canvas?.transferControlToOffscreen) { mountOrbFallback(holder); return; }
+  const surface = $('.orb-surface', holder), fine = matchMedia('(hover: hover) and (pointer: fine)');
+  let worker = null, frame = 0, near = !('IntersectionObserver' in window), busy = false, sent = '', failed = false;
+  let angle = LIGHT.angle, lift = LIGHT.lift, density, width = 0;
+  const active = () => near && !document.hidden && !failed;
+  const fallback = () => {
+    if (failed) return; failed = true; worker?.terminate(); cancelAnimationFrame(frame);
+    intersection?.disconnect(); resize.disconnect(); density?.removeEventListener('change', densityChanged);
+    holder.removeEventListener('pointermove', move); holder.removeEventListener('pointerleave', leave);
+    document.removeEventListener('visibilitychange', visibility); removeEventListener('pageshow', request);
+    const fresh = canvas.cloneNode(false); canvas.replaceWith(fresh); canvas = fresh;
+    mountOrbFallback(holder);
+  };
+  const render = () => {
+    frame = 0; if (!active() || busy) return;
+    const dpr = Math.min(Math.max(devicePixelRatio || 1, 1), 3);
+    if (!width) return;
+    const size = Math.round(width * dpr), style = getComputedStyle(surface);
+    const key = [size, dpr, angle.toFixed(2), lift.toFixed(2), style.color, style.caretColor].join('|');
+    if (key === sent) return;
+    const css = (size + .004) / dpr + 'px';
+    if (canvas.style.width !== css) canvas.style.width = canvas.style.height = css;
+    try {
+      if (!worker) {
+        worker = new Worker(new URL('./orb-worker-c252814a8089.js', import.meta.url), { type: 'module' });
+        worker.onerror = event => { event.preventDefault(); fallback(); };
+        worker.onmessageerror = fallback;
+        worker.onmessage = ({ data }) => {
+          if (data.error) { fallback(); return; }
+          busy = false;
+          if (data.drawn) { surface.classList.add('orb-rendered'); canvas.dataset.renderSize = String(data.size); }
+          else sent = '';
+          request();
+        };
+        const offscreen = canvas.transferControlToOffscreen();
+        worker.postMessage({ canvas: offscreen }, [offscreen]);
+      }
+      sent = key; busy = true;
+      worker.postMessage({ render: { size, dpr, angle, lift, dark: rgba(style.color, '#23242b'), light: rgba(style.caretColor, '#f4f4f5') } });
+    } catch { fallback(); }
+  };
+  const request = () => { if (active() && !frame) frame = requestAnimationFrame(render); };
+  const pause = () => { cancelAnimationFrame(frame); frame = 0; worker?.postMessage({ pause: true }); };
+  const visibility = () => { if (document.hidden) pause(); else request(); };
+  const move = event => {
+    if (reduced.matches || !fine.matches || event.pointerType === 'touch') return;
+    const r = surface.getBoundingClientRect(), dx = (event.clientX - r.left) / r.width * 2 - 1, dy = (event.clientY - r.top) / r.height * 2 - 1;
+    angle = Math.round(Math.atan2(dx, -dy) * 60) / 60; lift = Math.round((.92 - .5 * Math.min(1, Math.hypot(dx, dy))) * 50) / 50; request();
+  };
+  const leave = () => { angle = LIGHT.angle; lift = LIGHT.lift; request(); };
+  const intersection = near ? null : new IntersectionObserver(entries => { near = entries.some(e => e.isIntersecting); if (near) request(); else pause(); }, { rootMargin: '300px 0px' });
+  intersection?.observe(surface);
+  const resize = new ResizeObserver(entries => { width = entries[0].contentRect.width; request(); }); resize.observe(surface);
+  const watchDensity = () => { density?.removeEventListener('change', densityChanged); density = matchMedia('(resolution: ' + (devicePixelRatio || 1) + 'dppx)'); density.addEventListener('change', densityChanged); };
+  const densityChanged = () => { watchDensity(); request(); }; watchDensity();
+  holder.addEventListener('pointermove', move); holder.addEventListener('pointerleave', leave);
+  document.addEventListener('visibilitychange', visibility); addEventListener('pageshow', request); request();
+}
 // 구나 「대화 시작」을 누르면 질문 입력창으로
 const goAsk = () => { const q = $('#question'); if (!q) return; q.scrollIntoView({ block: 'center', behavior: reduced.matches ? 'auto' : 'smooth' }); q.focus({ preventScroll: true }); };
 $$('[data-orb]').forEach(o => { mountOrb(o); o.addEventListener('click', goAsk); });
@@ -204,8 +233,7 @@ const reveals = $$('.reveal');
 if ('IntersectionObserver' in window && !reduced.matches) {
   const io = new IntersectionObserver(entries => { for (const en of entries) if (en.isIntersecting) { en.target.classList.add('in'); io.unobserve(en.target); } }, { rootMargin: '0px 0px -8% 0px', threshold: 0.06 });
   reveals.forEach(el => io.observe(el));
-  // 인쇄·앵커 이동 직후처럼 관찰 전에 화면 안에 있던 것은 바로 보인다
-  requestAnimationFrame(() => reveals.forEach(el => { const r = el.getBoundingClientRect(); if (r.top < innerHeight && r.bottom > 0) el.classList.add('in'); }));
+  // 최초 화면·앵커 진입도 observer가 통지한다. 읽기/쓰기 교대로 강제 레이아웃을 만들지 않는다.
 } else reveals.forEach(el => el.classList.add('in'));
 
 /* 이메일 복사 */
@@ -319,13 +347,63 @@ $$('dialog:not(.download-dialog)').forEach(d => d.addEventListener('click', e =>
 const askRoot = $('[data-ask]');
 const form = $('#question-form'), input = $('#question'), send = $('#send'), messages = $('#messages');
 const site = askRoot?.dataset.site || 'synk';
-let engine = null, pending = null, context = { brand: ['lab', 'shift', 'pulse', 'path'].includes(site) ? site : 'synk' }, busy = false;
+let engine = null, pending = null, guideData = null, localEngine = null, queryWorker = null, workerUnavailable = false, querySequence = 0;
+let context = { brand: ['lab', 'shift', 'pulse', 'path'].includes(site) ? site : 'synk' }, busy = false;
+const queries = new Map();
+function stopQueryWorker() {
+  workerUnavailable = true; queryWorker?.terminate(); queryWorker = null;
+  for (const query of queries.values()) { clearTimeout(query.timer); query.reject(new Error('worker unavailable')); }
+  queries.clear();
+}
+function startQueryWorker() {
+  if (queryWorker || workerUnavailable || !guideData) return;
+  if (typeof Worker === 'undefined') { workerUnavailable = true; return; }
+  try {
+    queryWorker = new Worker(new URL('./answer-worker-b280f79e438e.js', import.meta.url), { type: 'module' });
+    queryWorker.onmessage = ({ data }) => {
+      const query = queries.get(data.id); if (!query) return;
+      queries.delete(data.id); clearTimeout(query.timer);
+      if (data.error) query.reject(new Error(data.error)); else query.resolve(data.result);
+    };
+    queryWorker.onerror = event => { event.preventDefault(); stopQueryWorker(); };
+    queryWorker.onmessageerror = stopQueryWorker;
+    queryWorker.postMessage({ type: 'init', src: new URL(askRoot.dataset.engine, location.href).href, data: guideData });
+  } catch { stopQueryWorker(); }
+}
+async function queryAnswer(question, previous) {
+  startQueryWorker();
+  if (queryWorker) {
+    try {
+      return await new Promise((resolve, reject) => {
+        const id = ++querySequence, timer = setTimeout(stopQueryWorker, 15000);
+        queries.set(id, { resolve, reject, timer });
+        try { queryWorker.postMessage({ type: 'answer', id, question, context: previous }); }
+        catch { stopQueryWorker(); }
+      });
+    } catch { stopQueryWorker(); }
+  }
+  // Worker를 차단한 브라우저도 같은 공개 검색 엔진으로 답한다. 질문하지 않으면 색인을 만들지 않는다.
+  localEngine ??= import(askRoot.dataset.engine).then(mod => mod.createKnowledgeEngine(guideData)).catch(error => { localEngine = null; throw error; });
+  return (await localEngine).answer(question, previous);
+}
 function loadEngine() {
   if (engine) return Promise.resolve(engine);
   if (pending) return pending;
-  const src = askRoot.dataset.engine, data = askRoot.dataset.knowledge;
-  pending = Promise.all([import(src), fetch(data).then(r => { if (!r.ok) throw new Error('knowledge'); return r.json(); })])
-    .then(([mod, json]) => (engine = mod.createKnowledgeEngine(json)))
+  const data = askRoot.dataset.knowledge;
+  pending = fetch(data).then(r => { if (!r.ok) throw new Error('knowledge'); return r.json(); })
+    .then(json => {
+      // FAQ와 출처 열기는 색인 없이 원문에서 바로 읽는다. 스크롤만 해도 검색 색인을 만들던 지연을 없앤다.
+      // Keep the same public-source validation as createKnowledgeEngine before exposing any answer.
+      if (!json || !Array.isArray(json.docs) || !Array.isArray(json.records)) throw new Error('knowledge');
+      const docs = new Map(json.docs.map(d => [d.id, d])), records = new Map(json.records.map(r => [r.id, r]));
+      if (docs.size !== json.docs.length || records.size !== json.records.length) throw new Error('duplicate knowledge');
+      for (const r of records.values()) {
+        if (!docs.has(r.sourceId) || typeof r.answer !== 'string' || !r.answer.trim() || !Array.isArray(r.questionExamples) || !r.questionExamples.length || !Array.isArray(r.keywords)) throw new Error('knowledge source');
+        if (r.relatedIds?.some(id => !records.has(id)) || r.answer.split('\n\n').some(p => !docs.get(r.sourceId).paragraphs.includes(p))) throw new Error('knowledge evidence');
+      }
+      guideData = json;
+      return engine = { docs, records };
+    })
     .catch(err => { pending = null; throw err; });
   return pending;
 }
@@ -376,8 +454,8 @@ function renderAnswer(result, { inline = false } = {}) {
   return wrap;
 }
 
-function answer(question) {
-  const result = engine.answer(question, context);
+async function answer(question) {
+  const result = await queryAnswer(question, context);
   if (['matched', 'needs_confirmation'].includes(result.status)) context = { brand: ['lab', 'shift', 'pulse', 'path'].includes(result.brand) ? result.brand : context.brand, recordIds: (result.records || []).map(r => r.id) };
   else if (!['clarify', 'courtesy'].includes(result.status)) context = { brand: context.brand };
   return result;
@@ -391,7 +469,7 @@ async function ask(text, { scroll = true } = {}) {
   try {
     await loadEngine();
     const user = el('div', 'msg-user', q); messages.append(user);
-    messages.append(renderAnswer(answer(q)));
+    messages.append(renderAnswer(await answer(q)));
     while (messages.children.length > 24) messages.firstElementChild.remove();
     input.value = ''; autosize();
     if (scroll) user.scrollIntoView({ behavior: reduced.matches ? 'auto' : 'smooth', block: 'start' });
@@ -401,6 +479,8 @@ async function ask(text, { scroll = true } = {}) {
 function autosize() { if (!input) return; input.style.height = 'auto'; input.style.height = Math.min(input.scrollHeight, 160) + 'px'; }
 function syncSend() { if (send) send.disabled = busy || !input.value.trim(); }
 if (askRoot) {
+  // 입력하려는 순간 별도 스레드를 준비한다. 질문·답은 이 기기를 벗어나지 않는다.
+  input.addEventListener('focus', () => { loadEngine().then(startQueryWorker).catch(() => {}); });
   input.addEventListener('input', () => { autosize(); syncSend(); });
   input.addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey && !e.isComposing) { e.preventDefault(); if (input.value.trim()) form.requestSubmit(); } });
   form.addEventListener('submit', e => { e.preventDefault(); ask(input.value); });
@@ -416,7 +496,7 @@ if (askRoot) {
       await loadEngine();
       // 자주 묻는 질문은 정해 둔 공개 답을 그대로 보여 준다(검색 순위에 흔들리지 않게).
       const record = engine.records.get(btn.dataset.record);
-      const result = record ? { status: 'matched', records: [record], sourceIds: [record.sourceId], relatedIds: (record.relatedIds || []).slice(0, 2), brand: record.brand } : answer(btn.dataset.faq);
+      const result = record ? { status: 'matched', records: [record], sourceIds: [record.sourceId], relatedIds: (record.relatedIds || []).slice(0, 2), brand: record.brand } : await answer(btn.dataset.faq);
       if (record) context = { brand: ['lab', 'shift', 'pulse', 'path'].includes(record.brand) ? record.brand : context.brand, recordIds: [record.id] };
       panel.replaceChildren(renderAnswer(result, { inline: true })); panel.dataset.ready = '1';
     }
