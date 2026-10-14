@@ -162,10 +162,18 @@ function understandingOf({ accountSummary, activity, document, status, asOf }) {
     const statementHistory = uniqueRows(value.statementHistory === undefined ? [] : value.statementHistory, 20).map(row => {
       if (typeof row.active !== 'boolean') invalid();
       const meanings = uniqueRows(row.meanings, 8).map(meaning => {
-        if (typeof meaning.active !== 'boolean' || ![null, 'first-try', 'familiar', 'busy'].includes(meaning.condition)) invalid();
+        if (typeof meaning.active !== 'boolean' || ![null, 'first-try', 'familiar', 'busy', 'after-example', 'first-try-after-example', 'familiar-after-example', 'busy-after-example'].includes(meaning.condition)) invalid();
         return { id: meaning.id, line: unicodeText(meaning.line, 300), condition: meaning.condition, quote: unicodeText(meaning.quote, 500), active: meaning.active };
       });
-      return { id: row.id, text: unicodeText(row.text, 500), at: instant(row.at, asOf), active: row.active, meanings };
+      const answers = row.clarificationAnswers === undefined ? [] : row.clarificationAnswers;
+      if (!Array.isArray(answers) || answers.length > 12) invalid();
+      const answered = new Set();
+      const clarificationAnswers = answers.map(answer => {
+        if (!record(answer) || answered.has(answer.questionId)) invalid();
+        answered.add(answer.questionId);
+        return { questionId: id(answer.questionId), optionId: id(answer.optionId), questionLabel: unicodeText(answer.questionLabel, 900), optionLabel: unicodeText(answer.optionLabel, 300) };
+      });
+      return { id: row.id, text: unicodeText(row.text, 500), at: instant(row.at, asOf), active: row.active, meanings, clarificationAnswers };
     });
     return { status: 'ready', asOf, headline: text(value.headline), paragraphs: value.paragraphs.map(line => unicodeText(line, 900)), facets, history, statementHistory, relations, activities, limitations: value.limitations.map(line => text(line)) };
   } catch { return empty('error'); }

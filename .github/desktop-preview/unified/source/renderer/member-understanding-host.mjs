@@ -28,7 +28,9 @@ export function bindMemberUnderstandingEditor(root, { controller, getReport } = 
   const onSubmit = event => {
     if (event.target.matches?.('[data-insight-statement-editor]')) {
       event.preventDefault(); event.stopPropagation(); statementDraft(event.target);
-      if (controller.read().statementEditor?.stage === 'preview') void controller.confirmStatement(); else controller.previewStatement();
+      // Enter can request an interpretation, but only the explicit final action
+      // can persist it. Answer buttons are never form submitters.
+      if (controller.read().statementEditor?.stage === 'writing') controller.previewStatement();
       return;
     }
     if (!event.target.matches?.('[data-insight-editor]')) return;
@@ -55,6 +57,8 @@ export function bindMemberUnderstandingEditor(root, { controller, getReport } = 
     else if (action === 'understanding-describe') controller.describe();
     else if (action === 'understanding-preview') { statementDraft(button.closest('[data-insight-statement-editor]')); controller.previewStatement(); }
     else if (action === 'understanding-edit-text') controller.editStatementText();
+    else if (action === 'understanding-answer-statement') controller.answerStatement({ questionId: button.dataset.insightQuestion, optionId: button.dataset.insightOption });
+    else if (action === 'understanding-reset-answers') controller.resetStatementAnswers();
     else if (action === 'understanding-confirm-statement') { statementDraft(button.closest('[data-insight-statement-editor]')); void controller.confirmStatement(); }
     else if (action === 'understanding-remove-statement') {
       const row = current?.statementHistory?.find(item => item.id === button.dataset.insightId);
@@ -71,13 +75,15 @@ export function bindMemberUnderstandingEditor(root, { controller, getReport } = 
 export function captureMemberUnderstandingFocus(container) {
   const active = container.ownerDocument.activeElement;
   if (!active || !container.contains(active)) return () => {};
-  const attributes = ['id', 'data-insight-action', 'data-insight-facet', 'data-insight-verdict', 'data-insight-kind', 'data-insight-id', 'data-insight-target', 'data-insight-field', 'data-insight-proposal', 'name', 'value'];
+  const attributes = ['id', 'data-insight-action', 'data-insight-facet', 'data-insight-verdict', 'data-insight-kind', 'data-insight-id', 'data-insight-target', 'data-insight-field', 'data-insight-proposal', 'data-insight-question', 'data-insight-option', 'name', 'value'];
   const keys = attributes.map(key => [key, active.getAttribute(key)]).filter(([, value]) => value !== null);
   const start = active.selectionStart, end = active.selectionEnd;
   return () => {
     if (!keys.length) return;
     const next = [...container.querySelectorAll('a,button,input,select,textarea')].find(node => keys.every(([key, value]) => node.getAttribute(key) === value));
-    next?.focus({ preventScroll: true });
+    if (next) next.focus({ preventScroll: true });
+    else if (active.hasAttribute('data-insight-question') || active.getAttribute('data-insight-action') === 'understanding-reset-answers')
+      (container.querySelector('[data-insight-question-title]') || container.querySelector('[data-insight-editor-title]'))?.focus({ preventScroll: true });
     if (typeof start === 'number' && typeof next?.setSelectionRange === 'function') { try { next.setSelectionRange(start, end); } catch {} }
   };
 }

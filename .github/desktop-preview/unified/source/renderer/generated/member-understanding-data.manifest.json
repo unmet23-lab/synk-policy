@@ -1,10 +1,12 @@
 {
   "version": 1,
   "entry": "experiences/synk-account/src/member-understanding-data.mjs",
-  "sha256": "beea71ca7d096825d5e6a260badb9f234c57eda78913537ecf866d986942919e",
+  "sha256": "4717a59062b43798784a839ca0b2092cd6f41f00a428bc82df2231262e1a26d3",
   "sources": {
+    "atlas/ask.js": "5366b49994c61991e46d9b171547b534243120f2ba63cc48f3aa8297eae3d0dd",
     "atlas/member-understanding-contract.js": "5abde8c31c430662b3995e5505beea986e85aa890d83efd58cfe0f994af0f5a3",
-    "experiences/synk-account/src/member-statement-contract.cjs": "80af2773ef8f5870c8342dc8c6658d81dd0519fadbff5b80f3ad95295b9ea823",
-    "experiences/synk-account/src/member-understanding-data.mjs": "9cecf978f4ab6b1fe9ca59859fa27127788cbe9ac2d991db4d691252aea231e0"
+    "experiences/synk-account/src/member-statement-contract.cjs": "7e26a5dd658f02951ea7ff3fe302e8992f1d547f07e76fda30e693a3cb37c220",
+    "experiences/synk-account/src/member-statement-v1.cjs": "80af2773ef8f5870c8342dc8c6658d81dd0519fadbff5b80f3ad95295b9ea823",
+    "experiences/synk-account/src/member-understanding-data.mjs": "883d855ebb3a2de8d9ac144b9d26fd57c4cc36671710b094a5879c3981d9a4d5"
   }
 }

@@ -28,7 +28,7 @@ export function createMemberUnderstanding({ getIdentity, request, now = Date.now
   function read() {
     sync();
     const draft = editor ? { facetId: editor.facetId, mode: editor.mode, verdict: editor.verdict, values: [...editor.values], note: editor.note, facet: clone(editor.facet) } : null;
-    const statementDraft = statementEditor ? { text: statementEditor.text, preview: clone(statementEditor.preview), acceptedIds: [...statementEditor.acceptedIds], stage: statementEditor.stage } : null;
+    const statementDraft = statementEditor ? { text: statementEditor.text, preview: clone(statementEditor.preview), clarifications: clone(statementEditor.clarifications), acceptedIds: [...statementEditor.acceptedIds], stage: statementEditor.stage } : null;
     return { status, document: clone(document), revision, pending: pending > 0, editor: draft, statementEditor: statementDraft, message, error };
   }
   function emit() { if (!stopped) { const value = read(); for (const fn of listeners) fn(value); } }
@@ -133,7 +133,7 @@ export function createMemberUnderstanding({ getIdentity, request, now = Date.now
   }
   function describe() {
     sync(); if (stopped || status !== 'ready' || pending) return false;
-    editor = null; statementEditor = { text: '', preview: null, acceptedIds: [], stage: 'writing', baseline: clone(document) };
+    editor = null; statementEditor = { text: '', preview: null, previewInput: null, clarifications: [], acceptedIds: [], stage: 'writing', baseline: clone(document) };
     editToken++; message = ''; error = null; emit(); return true;
   }
   function updateStatementDraft({ text, acceptedIds } = {}) {
@@ -141,6 +141,7 @@ export function createMemberUnderstanding({ getIdentity, request, now = Date.now
     let changed = false;
     if (typeof text === 'string' && text !== statementEditor.text) {
       statementEditor.text = [...text].slice(0, 500).join(''); statementEditor.preview = null;
+      statementEditor.previewInput = null; statementEditor.clarifications = [];
       statementEditor.acceptedIds = []; statementEditor.stage = 'writing'; statementEditor.submission = null;
       changed = true;
     }
@@ -155,7 +156,9 @@ export function createMemberUnderstanding({ getIdentity, request, now = Date.now
   function previewStatement() {
     sync(); if (!statementEditor || pending) return false;
     try {
-      statementEditor.preview = previewMemberStatement({ text: statementEditor.text, document, asOf: new Date(now()).toISOString() });
+      const at = new Date(now()).toISOString();
+      statementEditor.preview = previewMemberStatement({ text: statementEditor.text, document, at, asOf: at, clarifications: statementEditor.clarifications });
+      statementEditor.previewInput = { text: statementEditor.text, at: statementEditor.preview.at, clarifications: clone(statementEditor.clarifications) };
       statementEditor.acceptedIds = []; statementEditor.stage = 'preview'; statementEditor.submission = null;
       error = null; message = '';
     } catch { error = 'interpretation'; message = '해석할 내용을 확인해 주세요. 500자 안에서 현재 원하는 방식을 적어 주세요.'; }
@@ -163,8 +166,36 @@ export function createMemberUnderstanding({ getIdentity, request, now = Date.now
   }
   function editStatementText() {
     sync(); if (!statementEditor || pending) return false;
-    statementEditor.preview = null; statementEditor.acceptedIds = []; statementEditor.stage = 'writing'; statementEditor.submission = null;
+    statementEditor.preview = null; statementEditor.previewInput = null; statementEditor.clarifications = [];
+    statementEditor.acceptedIds = []; statementEditor.stage = 'writing'; statementEditor.submission = null;
     error = null; message = ''; emit(); return true;
+  }
+  function hasCurrentPreview() {
+    return statementEditor?.stage === 'preview' && statementEditor.preview
+      && same(statementEditor.previewInput, { text: statementEditor.text, at: statementEditor.preview.at, clarifications: statementEditor.clarifications })
+      && statementEditor.preview.text === statementEditor.text
+      && same(statementEditor.preview.clarifications || [], statementEditor.clarifications);
+  }
+  function answerStatement({ questionId, optionId } = {}) {
+    sync(); if (stopped || pending || !hasCurrentPreview()) return false;
+    const question = statementEditor.preview.question;
+    if (!question || question.id !== questionId || !question.options.some(option => option.id === optionId)
+      || statementEditor.clarifications.some(answer => answer.questionId === questionId)) return false;
+    try {
+      const clarifications = [...statementEditor.clarifications, { questionId, optionId }];
+      const preview = previewMemberStatement({ text: statementEditor.text, document, at: statementEditor.preview.at, asOf: new Date(now()).toISOString(), clarifications });
+      statementEditor.clarifications = clarifications; statementEditor.preview = preview;
+      statementEditor.previewInput = { text: statementEditor.text, at: preview.at, clarifications: clone(clarifications) };
+      statementEditor.acceptedIds = []; statementEditor.submission = null;
+      error = null; message = '';
+    } catch { error = 'interpretation'; message = '질문과 답변을 다시 확인해 주세요. 원문을 고치면 질문부터 다시 살펴볼 수 있어요.'; }
+    emit(); return error === null;
+  }
+  function resetStatementAnswers() {
+    sync(); if (stopped || pending || !statementEditor) return false;
+    statementEditor.clarifications = []; statementEditor.preview = null; statementEditor.previewInput = null;
+    statementEditor.acceptedIds = []; statementEditor.submission = null;
+    return previewStatement();
   }
   function mutateStatement(action, expected, expectedEditor = null, baseline = null) {
     return enqueue(async (owner, token) => {
@@ -195,10 +226,13 @@ export function createMemberUnderstanding({ getIdentity, request, now = Date.now
     }, true);
   }
   function confirmStatement() {
-    sync(); if (!statementEditor?.preview || pending) return Promise.resolve(read());
+    sync(); if (!hasCurrentPreview() || pending) return Promise.resolve(read());
+    if (statementEditor.preview.question) {
+      error = 'interpretation'; message = '추가 질문을 먼저 확인해 주세요. 아직 모르겠다면 건너뛸 수 있어요.'; emit(); return Promise.resolve(read());
+    }
     let value;
     try {
-      value = statementEditor.submission || confirmMemberStatement({ preview: statementEditor.preview, acceptedIds: statementEditor.acceptedIds, id: uuid(), at: new Date(now()).toISOString() });
+      value = statementEditor.submission || confirmMemberStatement({ preview: statementEditor.preview, text: statementEditor.text, clarifications: statementEditor.clarifications, acceptedIds: statementEditor.acceptedIds, id: uuid(), at: new Date(now()).toISOString() });
     } catch { error = 'interpretation'; message = '반영할 해석을 선택해 주세요. 같은 상황의 서로 다른 뜻은 하나만 고를 수 있어요.'; emit(); return Promise.resolve(read()); }
     statementEditor.submission = clone(value);
     return mutateStatement({ type: 'statement', value, replaceId: null }, null, editToken, clone(statementEditor.baseline));
@@ -220,7 +254,7 @@ export function createMemberUnderstanding({ getIdentity, request, now = Date.now
       document = saved.document; revision = saved.revision; status = 'ready'; editor = null; statementEditor = null; editToken++; error = null; message = '확인·수정한 내용을 모두 지웠어요. 원래 이용·학습 기록은 그대로예요.';
     }, true);
   }
-  return Object.freeze({ read, begin, updateDraft, save, remove, clear, describe, updateStatementDraft, previewStatement, editStatementText, confirmStatement, removeStatement,
+  return Object.freeze({ read, begin, updateDraft, save, remove, clear, describe, updateStatementDraft, previewStatement, editStatementText, answerStatement, resetStatementAnswers, confirmStatement, removeStatement,
     refresh: () => enqueue(async (owner, token) => { await load(owner, token); if (!current(owner, token)) throw new Error('changed'); if (!editor && !statementEditor) { message = ''; error = null; } }),
     subscribe(fn) { listeners.add(fn); return () => listeners.delete(fn); },
     cancel() { sync(); if (!pending) { editor = null; statementEditor = null; editToken++; message = ''; error = null; emit(); } },
