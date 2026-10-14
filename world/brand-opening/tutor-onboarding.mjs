@@ -1,5 +1,6 @@
 import {TUTORS} from './tutor-profiles.mjs';
 import {readTutorChoice,saveTutorChoice,choiceKey,TUTOR_IDS} from './tutor-choice.mjs';
+import {tutorPhoto,profilePhoto,preloadTutorPhotos} from './tutor-photos.mjs';
 const escape=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const openings={marin:'배정 대기. …준비됐다.',kkamong:'…이 몸을 고르겠지? 당연히.',mongle:'어? 너구나! 같이 할래?'};
 const summaries={marin:'목표를 작게 나눠 차근차근 가고 싶다면 잘 맞아요.',kkamong:'티격태격하며 도전하는 게 좋다면 잘 맞아요.',mongle:'뭐든 같이 해 보고 싶다면 잘 맞아요.'};
@@ -17,8 +18,8 @@ export function createTutorOnboarding({home,asset,onChoice=()=>{},commitChoice=n
  const cancelMotion=()=>{timers.forEach(clearTimeout);timers.clear();stopSound();};
  function stopSound(){audio?.pause();audio=null;}
  const selected=()=>TUTORS.find(t=>t.id===draft);
- const picture=(t,emotion='기본')=>asset(`assets/tutors/${t.images[emotion]}`);
- function image(t,large=false){return `<span class="tutor-portrait ${large?'large':''}" data-character="${t.id}"><img class="tutor-body" src="${picture(t)}" alt="${t.name}" width="480" height="480">${large?`<img class="tutor-face" src="${picture(t)}" alt="" aria-hidden="true" width="480" height="480">`:''}</span>`;}
+ const picture=(t,emotion='기본')=>tutorPhoto(t.id,'onb',emotion);
+ function image(t,large=false){return `<span class="tutor-portrait ${large?'large':''}" data-character="${t.id}"><img class="tutor-body" src="${large?picture(t):profilePhoto(t.id)}" alt="${t.name}" width="512" height="512">${large?`<img class="tutor-face" src="${picture(t)}" alt="" aria-hidden="true" width="512" height="512">`:''}</span>`;}
  function soundButton(){return `<button class="tutor-sound" data-tutor-action="sound" aria-pressed="${sound}" aria-label="반응 소리 ${sound?'끄기':'켜기'}">반응 소리 ${sound?'켜짐':'꺼짐'}</button>`;}
  function header(){return `<div class="tutor-step-line"><span>${step==='choose'?'1 / 2 · 튜터 고르기':'2 / 2 · 시작하기'}</span>${soundButton()}</div>`;}
  function choiceStatus(){try{return getChoiceStatus(owner)||{};}catch{return {blocked:true,message:'튜터 선택의 저장 상태를 확인하지 못했어요. 잠시 뒤 다시 시도해 주세요.'};}}
@@ -33,7 +34,7 @@ export function createTutorOnboarding({home,asset,onChoice=()=>{},commitChoice=n
  function render(){
   cancelMotion();const t=selected();
   const html=step==='choose'?`${header()}<p class="tutor-intro">앞으로 한국어를 같이 배울 <strong>AI 튜터</strong>예요. 셋은 성격도, 응원하는 말투도 달라요.</p><div class="tutor-options" role="group" aria-label="AI 튜터 고르기">${TUTORS.map(t=>`<button class="tutor-option" data-tutor-id="${t.id}" aria-pressed="${t.id===draft}">${image(t)}<strong>${t.name}</strong><small>${escape(t.card.칩[0])}</small><span class="tutor-selected" aria-hidden="true">${t.id===draft?'보는 중':'보기'}</span></button>`).join('')}</div><div class="tutor-detail" ${t?`data-tutor="${t.id}"`:''}>${t?`<div class="tutor-stage"><button class="tutor-touch" data-tutor-action="touch" aria-label="${t.name}에게 인사하기">${image(t,true)}</button><div class="tutor-speech" data-character="${t.id}"><small id="tutor-speech-label">자기소개</small><p id="tutor-speech" aria-live="polite"></p></div></div><div class="tutor-about"><h3>${t.name}<span>${escape(t.card.정체)}</span></h3><div class="tutor-traits">${t.card.칩.map(label=>`<span>${escape(label)}</span>`).join('')}</div><p>${escape(t.card.매력)}</p><p class="tutor-match">${summaries[t.id]}</p><details class="tutor-more"><summary>성격 자세히 보기</summary><p>${escape(t.card.소개)}</p><p><b>좋아해요</b> ${t.card.좋아해요.map(escape).join(' · ')}</p><p><b>조금 서툴러요</b> ${escape(t.card.못해요)}</p></details></div><div class="tutor-samples" aria-label="말투 미리 듣기"><button data-tutor-reaction="intro" aria-pressed="true">자기소개</button><button data-tutor-reaction="success" aria-pressed="false">잘했을 때</button><button data-tutor-reaction="retry" aria-pressed="false">어려울 때</button></div>`:`<div class="tutor-empty"><p>위에서 튜터를 누르면 자기소개와 말투를 볼 수 있어요.</p></div>`}</div><div class="tutor-footer"><button class="tutor-primary" data-tutor-action="confirm" ${t?'':'disabled'}>${t?`${t.name}과 함께하기`:'튜터를 골라 주세요'}<span aria-hidden="true">→</span></button><p>언제든 설정에서 다시 고를 수 있어요.</p></div>`:
-  `${header()}<div class="tutor-welcome" data-tutor="${t.id}"><div class="tutor-stage"><button class="tutor-touch" data-tutor-action="touch" aria-label="${t.name}에게 인사하기">${image(t,true)}</button><div class="tutor-speech" data-character="${t.id}"><small id="tutor-speech-label">첫 인사</small><p id="tutor-speech" aria-live="polite"></p></div></div><p class="tutor-welcome-copy"><strong>${t.name}, 앞으로 잘 부탁해.</strong><span>${t.name}은 레슨과 놀이마다 옆에서 도와주는 AI 튜터예요. 놀이 조작법도 먼저 알려 줘요.</span></p><ol class="tutor-how"><li><span>01</span><div><strong>배우기</strong><p>방의 책을 펴면 짧은 생활 한국어 레슨이 나와요.</p></div></li><li><span>02</span><div><strong>놀이</strong><p>듣고 달리기, 글자 고르기, 박자 맞히기로 연습해요.</p></div></li><li><span>03</span><div><strong>복습</strong><p>헷갈린 표현은 며칠 뒤 다른 상황으로 다시 나와요.</p></div></li></ol></div><div class="tutor-footer"><button class="tutor-primary" data-tutor-action="finish">${continuation?'시작하기':'우리 방으로 가기'}<span aria-hidden="true">→</span></button><button class="tutor-back" data-tutor-action="back">다른 튜터 보기</button><p>선택은 이 기기에 기억해요.</p></div>`;
+  `${header()}<div class="tutor-welcome" data-tutor="${t.id}"><div class="tutor-stage"><button class="tutor-touch" data-tutor-action="touch" aria-label="${t.name}에게 인사하기">${image(t,true)}</button><div class="tutor-speech" data-character="${t.id}"><small id="tutor-speech-label">첫 인사</small><p id="tutor-speech" aria-live="polite"></p></div></div><p class="tutor-welcome-copy"><strong>${t.name}, 앞으로 잘 부탁해.</strong><span>${t.name}은 레슨과 놀이마다 옆에서 도와주는 AI 튜터예요. 놀이 조작법도 먼저 알려 줘요.</span></p><ol class="tutor-how"><li><span>01</span><div><strong>배우기</strong><p>방의 책을 펴면 짧은 생활 한국어 레슨이 나와요.</p></div></li><li><span>02</span><div><strong>놀이</strong><p>듣고 달리기, 글자 고르기, 박자 맞히기로 연습해요.</p></div></li><li><span>03</span><div><strong>복습</strong><p>헷갈린 표현은 며칠 뒤 다른 상황으로 다시 나와요.</p></div></li></ol></div><div class="tutor-footer"><button class="tutor-primary" data-tutor-action="finish">${continuation?'시작하기':'우리 동네로 가기'}<span aria-hidden="true">→</span></button><button class="tutor-back" data-tutor-action="back">다른 튜터 보기</button><p>선택은 이 기기에 기억해요.</p></div>`;
   const after=continuation;rendering=true;
   try{home.showPanel(step==='choose'?'AI 튜터 고르기':`${t.name}과 시작하기`,html,{type:'tutor',eyebrow:'MY AI TUTOR'});}finally{rendering=false;continuation=after;}
   document.querySelector('#world-panel').dataset.reduced=String(home.state.reduced);
@@ -42,7 +43,7 @@ export function createTutorOnboarding({home,asset,onChoice=()=>{},commitChoice=n
   refreshStatus();
   if(t){preload(t);react('intro',false);startIdle();}
  }
- function preload(t){for(const name of ['잔잔감음','놀람','기쁨',t.reactions.normal.뒤]){const img=new Image();img.src=picture(t,name);} }
+ function preload(t){preloadTutorPhotos(t.id,'onb');}
  function setFace(emotion){const t=selected(),face=content()?.querySelector('.tutor-face');if(face&&t)face.src=picture(t,emotion);}
  function speak(text,label){
   const node=content()?.querySelector('#tutor-speech');if(!node)return;
