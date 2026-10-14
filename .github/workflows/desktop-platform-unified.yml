@@ -67,6 +67,15 @@ jobs:
           TAG=$(node -p "require('./unified/release-input.json').releaseId")
           test "$(gh release view "$TAG" --repo "$GITHUB_REPOSITORY" --json isDraft --jq .isDraft)" = true
           gh release upload "$TAG" unified-out/${{ matrix.arch }}/dist/*.dmg --repo "$GITHUB_REPOSITORY"
+      - name: Save small release metadata for common publication
+        uses: actions/upload-artifact@v7
+        with:
+          name: platform-unified-metadata-${{ matrix.arch }}
+          path: |
+            .github/desktop-preview/unified-out/${{ matrix.arch }}/artifact.json
+            .github/desktop-preview/unified-out/${{ matrix.arch }}/build-report.json
+          if-no-files-found: error
+          retention-days: 14
       - name: Save native verification evidence
         if: always()
         uses: actions/upload-artifact@v7

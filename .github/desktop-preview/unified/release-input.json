@@ -2,35 +2,35 @@
   "schemaVersion": 1,
   "product": "platform",
   "channel": "preview",
-  "version": "0.4.4",
-  "releaseId": "platform-preview-0.4.4",
-  "buildId": "20261014.1",
+  "version": "0.4.5",
+  "releaseId": "platform-preview-0.4.5",
+  "buildId": "20261014.2",
   "manifestUrl": "https://synk.im/desktop/releases/preview.json",
   "baselines": [
     {
       "platform": "win32",
       "arch": "x64",
-      "url": "https://github.com/unmet23-lab/synk-policy/releases/download/platform-preview-0.4.3-signal.3-20261013/SYNK-Platform-Preview-0.4.3-Signal-win-x64.exe",
-      "bytes": 402711552,
-      "sha256": "1707e53d8a779d5ea86ee8e4fcb9a12d2d4cac89319e23bef274da0a32b75c72",
-      "backendSHA256": "3409fdf4be8808761b960b5ccd381dc116930d16b413dcecdc4e063cc743728f",
-      "asarSHA256": "22eefe865b8ae1baf62895f0a0f3e7f58d21ee1cbb6d8091fa95d62939f6c087"
+      "url": "https://github.com/unmet23-lab/synk-policy/releases/download/platform-preview-0.4.4/SYNK-Platform-Preview-0.4.4-Signal-win-x64.exe",
+      "bytes": 402719744,
+      "sha256": "625bb57b6aba4a1793531081e6199c7008cdad64b8282abd3d758f71bd01d046",
+      "asarSHA256": "483c4354e3d8a77c1e7f9e60e3483ac3fba47dc74040d145057bf769f29f2059",
+      "backendSHA256": "928153b3fa303f9b8a9ede3d65fe72b61844dd05bbe9ac87a778367dbb1c15f2"
     },
     {
       "platform": "darwin",
       "arch": "arm64",
-      "url": "https://github.com/unmet23-lab/synk-policy/releases/download/platform-preview-0.4.3-signal.3-20261013/SYNK-Platform-Preview-0.4.3-Signal-mac-arm64.dmg",
-      "bytes": 461989581,
-      "sha256": "1493bf35da001fc017498e6c56f6a3d83cacc4a15d2a1a5e0f968a0929f9ceac",
-      "asarSHA256": "d3b47ea777b43f3c88716a3881de071cbdb071d36b7175c12014e1ac2ad64227"
+      "url": "https://github.com/unmet23-lab/synk-policy/releases/download/platform-preview-0.4.4/SYNK-Platform-Preview-0.4.4-Signal-mac-arm64.dmg",
+      "bytes": 461999357,
+      "sha256": "32879c78a5184cc4462f5ff054e35f266b08df6eee75ffb439e1b5104febbc46",
+      "asarSHA256": "e5bcb1067e758ed85ef40ad1a246b28cddf2fff0921b3acf2e2c4318d70ed472"
     },
     {
       "platform": "darwin",
       "arch": "x64",
-      "url": "https://github.com/unmet23-lab/synk-policy/releases/download/platform-preview-0.4.3-signal.3-20261013/SYNK-Platform-Preview-0.4.3-Signal-mac-x64.dmg",
-      "bytes": 479616102,
-      "sha256": "e73b05dcca205d1d82e77f45365788f8c5e688b58530478e9de242efb89339fd",
-      "asarSHA256": "306ef424dd8122e6b6b9cf2f546bd97d8af14736a4edd71b2c8c4561059d8458"
+      "url": "https://github.com/unmet23-lab/synk-policy/releases/download/platform-preview-0.4.4/SYNK-Platform-Preview-0.4.4-Signal-mac-x64.dmg",
+      "bytes": 479638966,
+      "sha256": "33b441acbafcfd47bd93a6da58717f4315c156201a1ce472a03ec1b9133aaa9c",
+      "asarSHA256": "5f1a74177bf072343edcc72c1eb6c86eeb1f2648815f4088dc8463b1c77452eb"
     }
   ],
   "additionalLegacyPins": [
@@ -63,7 +63,7 @@
     }
   ],
   "electronVersion": "44.5.1",
-  "sourceHash": "758157a181493ee8f96e2ac38f8e73f5fd4a7e3b816cb865801066ed0ccf98b9",
+  "sourceHash": "cda05cdc147b40533b352c07f572d4de222216e202e36c452c5c6365195002a9",
   "sourceFiles": [
     {
       "path": "assets/launcher/button-soft.webp",
@@ -396,14 +396,29 @@
       "sha256": "9e7c03c4053cc30e52a9c2aab6ec48fcf7c7a37efef71970290e7d83e2578fda"
     },
     {
+      "path": "renderer/startup-update.css",
+      "bytes": 3933,
+      "sha256": "fb77563a812f960c31247425bfc3cd3b2eb14333c65381be2e9fbaa46571576f"
+    },
+    {
+      "path": "renderer/startup-update.html",
+      "bytes": 2393,
+      "sha256": "20ad5dc3211bd087108f4bff60fd3ad14f06fc52b4c26d543b333168136c1d94"
+    },
+    {
+      "path": "renderer/startup-update.mjs",
+      "bytes": 6983,
+      "sha256": "638ae3d9093e4cfa9eee1ba2e02151d6049f700ab61f4d7440e6a2466ccef487"
+    },
+    {
       "path": "renderer/state.mjs",
       "bytes": 15859,
       "sha256": "505f87bbf0a24e035b5d47778797765a7f64c0203a8788c74193910889df4991"
     },
     {
       "path": "renderer/update-view.mjs",
-      "bytes": 8044,
-      "sha256": "e50fee73935cb981ba5c64bf3e3799781e25591323c8d8ec4f6c4a3f7673423e"
+      "bytes": 9208,
+      "sha256": "cd91cc0c3ae6ca44123dfc10726cc2cfa802aed5983d1e6eb356bd0f2a9b0425"
     },
     {
       "path": "src/account-requests.cjs",
@@ -482,8 +497,8 @@
     },
     {
       "path": "src/desktop-preferences.cjs",
-      "bytes": 5929,
-      "sha256": "5af16ee82736a02dfc4548065d3dc4cbfbc147c0ebf0d2b0a7245dea47deb496"
+      "bytes": 5990,
+      "sha256": "e4f9cc92e9d1e809db7977c28a5e3ded58dc6a122ce24fd5fbf57f4eb72b5a56"
     },
     {
       "path": "src/diagnostics-clipboard.cjs",
@@ -527,8 +542,8 @@
     },
     {
       "path": "src/main.cjs",
-      "bytes": 32984,
-      "sha256": "3d255edaf77c9d1323c8375f4da56e696245fa3f1a9d17ef21c39c5839d704e2"
+      "bytes": 36625,
+      "sha256": "cafbf541c4162f406284baae2583a2c0c55ec1642407ff1b24a394ada88b8587"
     },
     {
       "path": "src/messenger-teacher.cjs",
@@ -556,14 +571,34 @@
       "sha256": "8aa34bd0839a5bcf948d7ad29e65a2dcfb9ecabc6f837d623be3efc6e01b050d"
     },
     {
+      "path": "src/platform-startup-update.cjs",
+      "bytes": 4096,
+      "sha256": "ef858731449d35c17950b801f7582d5292449fc4696cb2477270a32fac66b8ee"
+    },
+    {
+      "path": "src/platform-startup-window.cjs",
+      "bytes": 3101,
+      "sha256": "8cafd31dc123474dc11a114c6eb84de2307e2846dc924704e1c4c566f86ae9b4"
+    },
+    {
       "path": "src/platform-tray.cjs",
-      "bytes": 3672,
-      "sha256": "221d1bb2cefa8af3cca545f5b2167361cd22de58fceae32d809326fc8b2fcf1b"
+      "bytes": 3847,
+      "sha256": "338f5f923f55429c46a29a4e0a56ba0258b13fe5d9b1035340eceb4f701f4fd5"
+    },
+    {
+      "path": "src/platform-update-handoff.cjs",
+      "bytes": 1687,
+      "sha256": "560e4716dd484ac7465ed8f785a3d326645309360a9949d9987e41b741f7bb09"
+    },
+    {
+      "path": "src/platform-update-recovery.cjs",
+      "bytes": 4469,
+      "sha256": "ae451a04399b91f66324f3297ee841d63eead0a0897de928a894345597a50957"
     },
     {
       "path": "src/platform-update.cjs",
-      "bytes": 13876,
-      "sha256": "7e542007e1f7670180aa73df1417447aea778bb0b7517a7899f0301a7d4ae33b"
+      "bytes": 17092,
+      "sha256": "f9d74114959323e08b57640e11e8203dbb0b934f3e0839855ae941930b0daab1"
     },
     {
       "path": "src/preload.cjs",
@@ -614,6 +649,11 @@
       "path": "src/security.cjs",
       "bytes": 8386,
       "sha256": "9d928724f5f8b9addd6a6c94a56b174cffca5498337b057a023232c3651adb12"
+    },
+    {
+      "path": "src/startup-update-preload.cjs",
+      "bytes": 772,
+      "sha256": "fc945b85096265113860c59eb42ef338039c633da5acb453f4da28c94aa0bca3"
     },
     {
       "path": "src/suite-session.cjs",

@@ -13,7 +13,20 @@ function observe(config){
   // Only the read/launch root is substituted. The production installation
   // verifier still checks actual DMG-copied metadata, executables and archives.
   require(app.getAppPath()+'/src/program-root.cjs').resolveProgramRoot=()=>config.applications;
-  const requests=[],providerRequests=[],opened=[],checks=[],screenshots=[],errors=[],pageErrors=[];
+  const requests=[],providerRequests=[],opened=[],checks=[],screenshots=[],errors=[],pageErrors=[],startupStates=[];
+  let startupWindow,syntheticFeedRequests=0;
+  // The candidate version is not public yet. Exercise its real startup gate with
+  // a current-version manifest; do not disable the gate or permit installer IO.
+  if(config.client==='platform'){
+    const updates=require(app.getAppPath()+'/src/platform-update.cjs'),original=updates.createPlatformUpdater;
+    const runtime=JSON.parse(fs.readFileSync(app.getAppPath()+'/runtime.json','utf8'));
+    updates.createPlatformUpdater=options=>original({...options,request:async url=>{
+      if(url!==updates.MANIFEST_URL)throw Error('QA_INSTALLER_DOWNLOAD_FORBIDDEN');syntheticFeedRequests++;
+      await new Promise(resolve=>setTimeout(resolve,200));
+      const manifest={schemaVersion:1,product:'platform',channel:'preview',version:config.version,releaseId:runtime.update.releaseId,buildId:runtime.update.buildId,publishedAt:new Date().toISOString(),artifacts:[{platform:config.platform,arch:config.arch,url:'https://github.com/unmet23-lab/synk-policy/releases/download/'+runtime.update.releaseId+'/qa-never-downloaded.'+(config.platform==='win32'?'exe':'dmg'),bytes:1,sha256:'a'.repeat(64),asarSHA256:'b'.repeat(64)}]};
+      return {status:200,headers:{},body:require('node:stream').Readable.from([Buffer.from(JSON.stringify(manifest))])};
+    },onChange:value=>{startupStates.push(value.state);options.onChange?.(value);}});
+  }
   globalThis.fetch=async(...args)=>{providerRequests.push(String(args[0]));throw Error('QA_EMPTY_VAULT_MUST_NOT_FETCH');};
   shell.openExternal=async url=>{opened.push({kind:'external',url});};shell.openPath=async file=>{opened.push({kind:'file',file});return '';};
   let window,contents,finished=false,networkBlocked=config.mode==='world-offline';
@@ -25,6 +38,9 @@ function observe(config){
   async function click(selector,expected){await run(`document.querySelector(${JSON.stringify(selector)}).click()`);await waitFor(`location.href===${JSON.stringify(expected)}&&document.readyState==='complete'`,selector);}
   async function finish(ok){if(finished)return;finished=true;const local=requests.filter(r=>{try{const u=new URL(r.url);return ['127.0.0.1','localhost','[::1]'].includes(u.hostname)&&['4280','4191'].includes(u.port);}catch{return false;}});const result={ok:ok&&!errors.length&&!local.length&&!providerRequests.length,mode:config.mode,packaged:app.isPackaged,arch:process.arch,electron:process.versions.electron,archive:app.getAppPath(),visible:window?.isVisible(),profileIsolated:app.getPath('userData').startsWith(config.appData+path.sep),installationRoot:config.applications,checks,errors,pageErrors,requests,localhostDevelopmentRequests:local,providerRequests,openRequestsSuppressed:opened,screenshots,realAuthenticationPerformed:false,realProfileTouched:false,managedChildLaunched:false,unlimitedFrames:config.unlimitedFrames,graphicsBackend:config.softwareGpu?"CI-only SwiftShader":"default",runnerArch:config.runnerArch,translated:app.runningUnderARM64Translation===true};process.stdout.write(config.prefix+JSON.stringify(result)+'\n');setTimeout(()=>app.exit(result.ok?0:1),250);}
   app.on('browser-window-created',(_event,created)=>{
+    if(config.client==='platform'&&path.basename(created.webContents.getLastWebPreferences().preload||'')==='startup-update-preload.cjs'){
+      startupWindow=created;if(!config.visible){created.show=()=>{};created.showInactive=()=>{};}return;
+    }
     if(window)return;window=created;if(!config.visible){window.show=()=>{};window.showInactive=()=>{};}else{window.once('ready-to-show',()=>{window.show();window.focus();});}contents=window.webContents;contents.setBackgroundThrottling(false);contents.setAudioMuted(true);
     contents.session.webRequest.onBeforeRequest({urls:['http://*/*','https://*/*','ws://*/*','wss://*/*']},(details,callback)=>{requests.push({url:details.url,resourceType:details.resourceType,method:details.method,blocked:networkBlocked});callback({cancel:networkBlocked||config.client==='platform'});});
     contents.on('console-message',event=>{if(event.level==='error')pageErrors.push({message:event.message.slice(0,400),source:event.sourceId.split('?')[0],line:event.lineNumber});});
@@ -33,6 +49,7 @@ function observe(config){
       check('profile isolated before app initialization',app.getPath('userData').startsWith(config.appData+path.sep));
       check('window hidden',!window.isVisible());
       if(config.mode==='platform'){
+        check('startup gate checks the candidate before opening Platform',!!startupWindow&&startupStates.includes('checking')&&startupStates.includes('current')&&syntheticFeedRequests===1,{states:startupStates,syntheticFeedRequests});
         await waitFor("location.href==='synk-desktop://platform/index.html'&&document.documentElement.dataset.ready==='true'",'local-platform');
         const state=await run('(async()=>({environment:await window.synkDesktop.getEnvironment(),auth:await window.synkDesktop.authStatus(),clients:await window.synkDesktop.getClients(),node:typeof require,html:document.body.innerText.length}))()');
         check('Platform local renderer and native environment',state.environment.clientId==='platform'&&state.environment.platform===config.platform&&state.environment.arch===config.arch&&state.environment.version===config.version&&state.environment.nativeShell===true&&state.node==='undefined'&&state.html>100);
