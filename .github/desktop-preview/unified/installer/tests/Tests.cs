@@ -222,6 +222,8 @@ internal static class SignalInstallerTests
                             Assert(result.Message.Contains("일부 바뀐 상태")&&result.Message.Contains("복구 원본"),"Uncertain state not disclosed.");
                             InstallFailure failure=null;try { Engine(ReadSpec()).Preflight(); }catch(InstallFailure error){failure=error;}
                             Assert(failure!=null&&!failure.CanRetry,"New installer did not respect unresolved transaction barrier.");
+                            failure=null;try { Engine(ReadSpec()).PrepareAutomaticUpdate(exited.Id,new string('a',64),new string('b',64)); }catch(InstallFailure error){failure=error;}
+                            Assert(failure!=null&&!failure.CanRetry,"Automatic update did not reject the unresolved transaction before READY.");
                             string pending=Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),"SYNK","Installer","Pending",Spec.Guid+".txt");
                             Assert(File.Exists(pending),"Recovery marker missing.");
                             // Injected failure launched no backend, so this fixture alone can clear its barrier.

@@ -184,6 +184,9 @@ namespace Synk.SignalInstaller
         // registered copy at this product's configured per-user location is required.
         public AutomaticUpdateSession PrepareAutomaticUpdate(int parentPid, string nonce, string installerSHA256)
         {
+            // An unresolved previous transaction must be rejected before READY,
+            // while the caller still owns its normal quit/save decision.
+            CheckPendingTransaction();
             if (parentPid <= 0 || parentPid == Process.GetCurrentProcess().Id || !Regex.IsMatch(nonce ?? "", "^[a-f0-9]{64}$") || !Regex.IsMatch(installerSHA256 ?? "", "^[a-f0-9]{64}$")) throw new ArgumentException("자동 업데이트 실행 정보를 확인할 수 없습니다.");
             if (!Regex.IsMatch(spec.AppId ?? "", "^[A-Za-z0-9][A-Za-z0-9.-]{1,127}$") || Path.GetFileName(spec.ShortcutName) != spec.ShortcutName) throw new InvalidOperationException("자동 업데이트 제품 정보가 올바르지 않습니다.");
             string registered = ReadRegistry(RegistryHive.CurrentUser, RegistryKey, "InstallLocation");
@@ -242,8 +245,8 @@ namespace Synk.SignalInstaller
             catch (Exception failure)
             {
                 var unsafeFailure=failure as InstallFailure;
-                if(unsafeFailure!=null&&!unsafeFailure.BackendStopped)
-                    return new AutomaticUpdateResult { Message=RecoveryRequired(backup,failure).Message };
+                if(unsafeFailure!=null&&(!unsafeFailure.BackendStopped||!unsafeFailure.CanRetry))
+                    return new AutomaticUpdateResult { Message=backup==null?failure.Message:RecoveryRequired(backup,failure).Message };
                 try
                 {
                     if (mutationStarted) RestorePrevious(backup, progress);
