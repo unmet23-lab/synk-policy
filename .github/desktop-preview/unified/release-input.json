@@ -2,9 +2,9 @@
   "schemaVersion": 1,
   "product": "platform",
   "channel": "preview",
-  "version": "0.4.8",
-  "releaseId": "platform-preview-0.4.8",
-  "buildId": "20261014.5",
+  "version": "0.4.9",
+  "releaseId": "platform-preview-0.4.9",
+  "buildId": "20261014.6",
   "manifestUrl": "https://synk.im/desktop/releases/preview.json",
   "baselines": [
     {
@@ -63,7 +63,7 @@
     }
   ],
   "electronVersion": "44.5.1",
-  "sourceHash": "6f0e2ff315453da63186960763cdf12857c0342081684f54577563eadc705026",
+  "sourceHash": "8e677fc7e09e8738002c8bb13909a596ce2c643d9df8cbf152bf6251a5a354a1",
   "sourceFiles": [
     {
       "path": "assets/launcher/button-soft.webp",
@@ -337,8 +337,8 @@
     },
     {
       "path": "renderer/launcher.mjs",
-      "bytes": 63865,
-      "sha256": "593bdb82b788b5b3a504a27a586846780b681ec8030f78358d30db9467036f72"
+      "bytes": 64951,
+      "sha256": "c797d9000d137e0715a4785608682591d6b2f5643e1cdb64a66fe520199c701c"
     },
     {
       "path": "renderer/library.mjs",
@@ -387,8 +387,8 @@
     },
     {
       "path": "renderer/platform-continuity.mjs",
-      "bytes": 539850,
-      "sha256": "4d84e6b73cc38ce8b8787c65a4117c37a36d30d731ffa6aa44aff3ca9d285944"
+      "bytes": 541065,
+      "sha256": "b05c15902fee6125a2e12e62454d2a44da87b9312bba7b751d86647f3ed7e718"
     },
     {
       "path": "renderer/pulse-client.css",
