@@ -58,8 +58,9 @@ console.log('1. synk.im 반영 기다리기');
       }
     } catch { notes.push('마지막으로 통과한 점검을 못 찾아 바로 앞 커밋과 비교함'); }
   }
+  // 한글 같은 파일 이름을 git이 따옴표·8진수로 감싸 내보내면 그대로 경로로 못 쓴다(10-14 튜터 사진 kkamong-기본.webp).
   for (const from of [...new Set([since, 'HEAD~1'])]) {
-    try { listing = git('diff', '--name-status', from, 'HEAD').toString('utf8'); since = from; break; } catch {}
+    try { listing = git('-c', 'core.quotePath=false', 'diff', '--name-status', from, 'HEAD').toString('utf8'); since = from; break; } catch {}
   }
   if (!listing) notes.push('비교할 앞 커밋이 없거나 바뀐 파일이 없어 반영 기다리기를 건너뜀');
   console.log(`  비교: ${since === 'HEAD~1' ? '바로 앞 커밋' : '마지막 통과 ' + since.slice(0, 7)}부터`);
