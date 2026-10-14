@@ -1,0 +1,9 @@
+{
+  "version": 1,
+  "entry": "experiences/synk-account/src/member-understanding-data.mjs",
+  "sha256": "176a40f4550f2227ff85faf93893d45a8100572315165b04741bef75443a16bb",
+  "sources": {
+    "atlas/member-understanding-contract.js": "5abde8c31c430662b3995e5505beea986e85aa890d83efd58cfe0f994af0f5a3",
+    "experiences/synk-account/src/member-understanding-data.mjs": "2230620d2f8ea12e20756ac0db25f73610644bc50484ec677911ea0228aac3f1"
+  }
+}

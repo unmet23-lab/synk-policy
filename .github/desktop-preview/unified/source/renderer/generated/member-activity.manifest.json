@@ -1,0 +1,10 @@
+{
+  "version": 1,
+  "entry": "atlas/member-activity.js",
+  "sha256": "2dcd64dc85998dfe7a39694d8e5d77e54f079dedf66535c1b5c6b90afa9b24a8",
+  "sources": {
+    "atlas/member-activity.js": "afff9122dcbb38b1566d1e1f1e9061541b673ee9b915e15d0a82e818439ceb62",
+    "atlas/trail-periods.js": "4ec4419d3abe982bcc300993d4bba5dd2dd27b1174aca5c6d9bf3621171df637",
+    "atlas/vellum.js": "e4d115b58a6ca985c84a10e5695e996969d6fde48e20a6f8fc8fc12229b84b90"
+  }
+}

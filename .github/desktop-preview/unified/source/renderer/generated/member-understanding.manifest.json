@@ -1,0 +1,13 @@
+{
+  "version": 1,
+  "entry": "atlas/member-understanding.js",
+  "sha256": "0e48fbeb88df160a2cfbd9e8c402763a4694da71742771914dfec4a53b4953f8",
+  "sources": {
+    "atlas/domain.js": "950ae931d129fe5c4aebc4900aad20cf491012d4f997146e27626634fc8fe64f",
+    "atlas/interpretation.js": "ac43c5d2ee96ee2b24b7c39cde23b8bcb73089c76ce40a794dc1ea013a5d5f8e",
+    "atlas/member-understanding-contract.js": "5abde8c31c430662b3995e5505beea986e85aa890d83efd58cfe0f994af0f5a3",
+    "atlas/member-understanding.js": "d2941e099aaac5956b10792b985a7e171987d307ccf6ee133b789f617f424ac5",
+    "atlas/trail-periods.js": "4ec4419d3abe982bcc300993d4bba5dd2dd27b1174aca5c6d9bf3621171df637",
+    "atlas/vellum.js": "e4d115b58a6ca985c84a10e5695e996969d6fde48e20a6f8fc8fc12229b84b90"
+  }
+}

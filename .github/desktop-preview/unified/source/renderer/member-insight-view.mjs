@@ -1,4 +1,4 @@
-// Shared, read-only member view. The account controller owns loading and consent;
+// Shared member view. The account controller owns loading, consent and explicit saves;
 // this module only renders the server's Atlas projection and retains no data.
 const escape = value => String(value ?? '').replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[char]));
 const list = value => Array.isArray(value) ? value.filter(item => item && typeof item === 'object') : [];
@@ -6,6 +6,10 @@ const count = value => (Number.isFinite(value) && value >= 0 ? Math.floor(value)
 const text = (value, fallback = '') => typeof value === 'string' && value.trim() ? value : fallback;
 const statusLabels = new Map([['unseen', '기록 대기'], ['checking', '기록 확인 중'], ['practice', '연습 중'], ['supported', '도움과 함께 연습'], ['recent-independent', '최근 혼자 응답'], ['review', '다시 살펴보기']]);
 const statusLabel = value => statusLabels.get(value) || '';
+const activityTargets = new Map([['world', 'WORLD에서 연습 고르기'], ['messenger', 'Workspace 열기'], ['path', 'PATH 열기'], ['pulse', 'PULSE 열기']]);
+const verdictLabels = new Map([['agree', '맞아요'], ['disagree', '달라요'], ['contextual', '상황마다 달라요']]);
+const facetId = value => typeof value === 'string' && /^(?:topics|support|explanation|usage-repeat|practice-mode|practice-response|learning-topic:[A-Za-z0-9][A-Za-z0-9_.-]{0,79})$/.test(value);
+const personalFacets = new Set(['topics', 'support', 'explanation', 'usage-repeat']);
 const arrow = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5m6-6-6 6 6 6"/></svg>';
 
 function stamp(value) {
@@ -23,8 +27,42 @@ function dateLine(value, label) {
   return formatted ? `<span>${escape(label)} <time datetime="${escape(new Date(value).toISOString())}">${escape(formatted)}</time></span>` : '';
 }
 
-function action(name, label, primary = false) {
-  return `<button type="button" class="mi-button${primary ? ' mi-button-primary' : ''}" data-insight-action="${name}">${escape(label)}</button>`;
+function action(name, label, primary = false, disabled = false) {
+  return `<button type="button" class="mi-button${primary ? ' mi-button-primary' : ''}" data-insight-action="${name}"${disabled ? ' disabled' : ''}>${escape(label)}</button>`;
+}
+
+function activityAction(target, disabled = false) {
+  if (!activityTargets.has(target)) return '';
+  return `<button type="button" class="mi-button" data-insight-action="activity" data-insight-target="${target}"${disabled ? ' disabled' : ''}>${escape(activityTargets.get(target))}</button>`;
+}
+
+function difference(value, unit) {
+  if (!Number.isSafeInteger(value)) return '비교하지 않음';
+  return value === 0 ? '같음' : `${count(Math.abs(value))}${unit} ${value > 0 ? '더 많음' : '더 적음'}`;
+}
+
+function periodComparison(periods, kind) {
+  if (!periods || !periods.recent || !periods.previous) return `<p class="mi-period-unavailable">기간별 비교 정보가 아직 없어요. 연결된 기록이 준비되면 최근 30일과 이전 30일을 함께 보여드려요.</p>`;
+  const learning = kind === 'learning';
+  const metrics = learning ? [['answered', '응답 기록', '회'], ['independent', '혼자 응답', '회'], ['assisted', '도움 받고 응답', '회'], ['activeDays', '응답한 날짜', '일']] : [['observations', '앱 열기', '회'], ['activeDays', '앱을 연 날짜', '일']];
+  const comparable = periods.sufficient === true && periods.delta && typeof periods.delta === 'object';
+  return `<div class="mi-periods"><div class="mi-period-heading"><h3>${learning ? '기간별 연습 기록' : '기간별 앱 이용 기록'}</h3><span>${comparable ? '두 기간의 관측 횟수 비교' : '아직 비교하기 어려워요'}</span></div><p class="mi-period-reason">${escape(text(periods.reason, '충분한 기록이 쌓이면 두 기간을 비교해요.'))}</p><table class="mi-period-table"><caption class="mi-visually-hidden">${learning ? '연습 기록' : '앱 이용 기록'}의 최근 30일과 이전 30일 비교</caption><thead><tr><th scope="col">기록</th><th scope="col">이전 30일</th><th scope="col">최근 30일</th><th scope="col">관측 차이</th></tr></thead><tbody>${metrics.map(([key, label, unit]) => `<tr><th scope="row">${label}</th><td>${count(periods.previous[key])}<span>${unit}</span></td><td>${count(periods.recent[key])}<span>${unit}</span></td><td>${comparable ? escape(difference(periods.delta[key], unit)) : '<span aria-label="기록이 부족해 비교하지 않음">비교 보류</span>'}</td></tr>`).join('')}</tbody></table><details class="mi-period-dates"><summary>비교한 기간 보기</summary><p>${dateLine(periods.previous.from, '이전 30일 시작 이후')}${dateLine(periods.previous.to, '끝 시각까지')}</p><p>${dateLine(periods.recent.from, '최근 30일 시작 이후')}${dateLine(periods.recent.to, '끝 시각까지')}</p><p>시각은 한국 기준이에요. 각 기간은 정확히 30일이며, 양 끝에 일부만 포함되는 날짜가 있어 활동한 날짜는 최대 31일로 셀 수 있어요.</p></details></div>`;
+}
+
+function activityInterest(report, pending) {
+  const activity = report.activity || { status: 'unavailable' };
+  const enabled = ['ready', 'empty'].includes(activity.status);
+  const loading = activity.status === 'loading';
+  const interests = enabled ? list(activity.interests).filter(item => activityTargets.has(item.id) && ['favorite', 'opened'].includes(item.kind)) : [];
+  const suggestions = enabled && !list(report.understanding?.activities).length ? list(activity.activities).filter(item => activityTargets.has(item.targetId) && ['self-declared', 'observed'].includes(item.basis)) : [];
+  let body = `<div class="mi-activity-consent"><div><h3>앱 이용 기록으로 관심사 보기</h3><p>허용하면 이 계정으로 앱을 연 사실과 즐겨찾기를 살펴봐요. 메모 본문이나 고객 자료의 내용은 읽지 않아요.</p><p class="mi-consent-status">${enabled ? '앱 이용 기록 연결 켜짐 · 학습 기록 연결과 별도예요.' : loading ? '앱 이용 기록 연결 상태를 확인하고 있어요.' : activity.status === 'disabled' ? '현재 꺼져 있어요. 켠 뒤부터 기록을 모아요.' : activity.status === 'error' ? '앱 이용 기록을 불러오지 못했어요. 다시 연결을 확인해 주세요.' : '이 환경에서는 앱 이용 기록 연결 상태를 확인할 수 없어요.'}</p>${enabled ? '<p class="mi-consent-delete">끄면 지금까지 모은 앱 이용 관찰 기록도 지워져요.</p>' : ''}</div>${action(enabled ? 'disable-activity' : 'enable-activity', pending ? '처리 중…' : enabled ? '앱 이용 기록 연결 끄기' : '앱 이용 기록 연결 켜기', false, pending || loading)}</div>`;
+  if (enabled) {
+    body += `<div class="mi-observed"><h3>앱 선택과 실제 이용</h3>${interests.length ? `<ul class="mi-interest-list">${interests.map(item => `<li><div class="mi-interest-title"><h4>${escape(item.label)}</h4><span class="mi-basis">${item.kind === 'favorite' ? '직접 고른 즐겨찾기' : '실제 앱 열기에서 관찰'}</span></div><p>${escape(item.detail)}</p><p class="mi-interest-counts">앱 열기 관측 · 이전 30일 ${count(item.previousCount)}회 · 최근 30일 ${count(item.recentCount)}회</p>${dateLine(item.lastAt, '마지막 관측')}</li>`).join('')}</ul>` : empty('아직 앱 이용에서 확인할 관심 정보가 없어요.', '연결을 켠 뒤 앱을 열거나 즐겨찾기를 고르면, 직접 선택한 것과 실제 이용한 것을 구분해 보여드려요.')}</div>`;
+    body += periodComparison(activity.periods, 'activity');
+    if (suggestions.length) body += `<div class="mi-next-activities"><h3>이어서 해 볼 활동</h3><ul>${suggestions.map(item => `<li><div><span class="mi-basis">${item.basis === 'self-declared' ? '직접 고른 즐겨찾기에서' : '관찰한 앱 이용에서'}</span><p>${escape(item.reason)}</p></div>${activityAction(item.targetId, pending)}</li>`).join('')}</ul></div>`;
+    body += `<p class="mi-section-note">앱을 연 횟수만으로 관심의 강도나 구체적인 취향을 단정하지 않아요.${activity.enabledAt ? ` ${dateLine(activity.enabledAt, '기록 연결 시작')}` : ''}</p>`;
+  }
+  return `<div class="mi-member-activity" aria-busy="${pending || loading}">${body}</div>`;
 }
 
 function sectionHeading(number, id, title, description) {
@@ -35,7 +73,81 @@ function empty(title, description) {
   return `<div class="mi-empty"><p class="mi-empty-title">${title}</p><p>${description}</p></div>`;
 }
 
-function personalSection(report, declaredOnly) {
+function understandingAction(name, label, attributes = {}, disabled = false, primary = false) {
+  const data = Object.entries(attributes).map(([key, value]) => ` data-insight-${key}="${escape(value)}"`).join('');
+  return `<button type="button" class="mi-button${primary ? ' mi-button-primary' : ''}" data-insight-action="understanding-${name}"${data}${disabled ? ' disabled' : ''}>${escape(label)}</button>`;
+}
+
+function understandingEditor(facet, state) {
+  const editor = state.understandingEditor;
+  if (!editor || editor.facetId !== facet.id || !['review', 'override'].includes(editor.mode)) return '';
+  const busy = state.understandingPending === true;
+  const reviewing = editor.mode === 'review';
+  if (facet.available !== true || reviewing && (!facet.claim || !verdictLabels.has(editor.verdict))) return '';
+  const choices = list(facet.choices).filter(choice => typeof choice.id === 'string' && /^[A-Za-z0-9_.:-]{1,120}$/.test(choice.id));
+  const selected = new Set(Array.isArray(editor.values) ? editor.values : []);
+  const note = typeof editor.note === 'string' ? [...editor.note].slice(0, 200).join('') : '';
+  const heading = reviewing ? `이 설명에 “${verdictLabels.get(editor.verdict)}”라고 알려줄게요` : facet.id === 'topics' ? '내 관심 주제 고르기' : `${text(facet.title, '내 정보')} 수정하기`;
+  const selection = reviewing ? `<p class="mi-edit-preview">${escape(facet.line)}</p><p>${editor.verdict === 'disagree' ? '관찰한 기록은 유지하고, 이 해석에 동의하지 않는다는 점을 다음 설명에 반영해요.' : editor.verdict === 'contextual' ? '이 방식을 언제나 선호한다고 단정하지 않도록 알려줘요.' : '현재 설명이 나와 맞는다고 직접 확인한 내용으로 남겨요.'}</p>` : `<fieldset><legend>${facet.multiple ? '해당하는 관심 주제를 최대 5개 골라 주세요.' : '지금 나에게 맞는 설명을 하나 골라 주세요.'}</legend><div class="mi-choice-list">${choices.map(choice => `<label><input type="${facet.multiple ? 'checkbox' : 'radio'}" name="insight-choice" value="${escape(choice.id)}"${selected.has(choice.id) ? ' checked' : ''}${busy ? ' disabled' : ''}><span>${escape(choice.label)}</span></label>`).join('')}</div></fieldset>`;
+  return `<form class="mi-understanding-editor" data-insight-editor data-insight-facet="${escape(facet.id)}" aria-label="${escape(heading)}"${busy ? ' aria-busy="true"' : ''}><h4 tabindex="-1" data-insight-editor-title>${escape(heading)}</h4>${selection}${!reviewing && ['support', 'explanation'].includes(facet.id) ? '<p>이 화면의 설명에 쓸 선택이에요. 실제 앱 설정은 계정에서 바꿀 수 있어요.</p>' : ''}<label class="mi-note-label">덧붙이고 싶은 말 <span>선택 · 200자 이내</span><textarea data-insight-field="note" name="insight-note" maxlength="400" rows="3"${busy ? ' disabled' : ''}>${escape(note)}</textarea></label><p class="mi-save-explanation">다음 설명에 반영하도록 저장해요. 덧붙인 말은 직접 남긴 설명으로 표시하며, 의미를 추측하지 않아요.</p><div class="mi-editor-actions">${understandingAction('save', busy ? '저장 중…' : '이 내용으로 반영', {}, busy, true)}${understandingAction('cancel', '취소', {}, busy)}</div></form>`;
+}
+
+function understandingFacets(report, state, area) {
+  const understanding = report.understanding;
+  if (!understanding || understanding.status !== 'ready') return '';
+  const facets = list(understanding.facets).filter(facet => facetId(facet.id) && (area === 'personal' ? personalFacets.has(facet.id) : !personalFacets.has(facet.id)));
+  if (!facets.length) return '';
+  const busy = state.understandingPending === true;
+  return `<div class="mi-understanding-facets">${facets.map(facet => {
+    const reviewing = facet.available === true && facet.claim;
+    const editable = facet.available === true && list(facet.choices).length > 0;
+    const current = facet.review && verdictLabels.get(facet.review.verdict);
+    const basis = facet.review && !facet.override ? '기록에 대한 내 확인' : facet.basis === 'self-declared' ? '내가 직접 알려준 내용' : facet.basis === 'observed' ? '연결한 기록에서 관찰' : '아직 충분한 근거가 없어요';
+    const evidenceLine = text(facet.evidenceLine, facet.basis === 'self-declared' ? '직접 고른 내용을 바탕으로 정리했어요.' : '연결한 자료만으로는 아직 설명할 근거가 부족해요.');
+    return `<div class="mi-understanding-facet" data-insight-facet-row="${escape(facet.id)}"><div class="mi-facet-heading"><h3>${escape(facet.title)}</h3><span class="mi-basis">${basis}</span></div><p class="mi-facet-line">${escape(facet.line)}</p><details class="mi-facet-evidence"><summary>이 설명의 근거 보기</summary><p>${escape(evidenceLine)}</p></details>${current || facet.override ? `<p class="mi-confirmed">${current ? `내 확인: ${escape(current)}` : '내가 직접 고른 내용을 반영했어요.'}${dateLine(facet.review?.at || facet.override?.at, '저장')}</p>` : ''}${reviewing || editable ? `<div class="mi-facet-actions">${reviewing ? [...verdictLabels].map(([verdict, label]) => understandingAction('review', label, { facet: facet.id, verdict }, busy)).join('') : ''}${editable ? understandingAction('edit', facet.id === 'topics' ? '관심 주제 고르기' : '직접 수정하기', { facet: facet.id }, busy) : ''}</div>` : ''}${understandingEditor(facet, state)}</div>`;
+  }).join('')}</div>`;
+}
+
+function understandingHistory(report, state) {
+  const understanding = report.understanding;
+  if (!understanding || understanding.status !== 'ready') return '';
+  const rows = list(understanding.history).filter(row => ['review', 'override'].includes(row.kind) && facetId(row.facetId));
+  const busy = state.understandingPending === true;
+  return `<details class="mi-understanding-history"><summary>내가 확인·수정한 내용 <span>${count(rows.length)}건</span></summary><div><p>되돌리면 이 확인·수정을 이후 설명에 사용하지 않아요. 실제 이용 기록은 그대로 남아요.</p>${rows.length ? `<ul>${rows.map(row => `<li><div><h3>${escape(row.title)}</h3><p>${escape(row.line)}</p>${row.note ? `<p class="mi-history-note">내가 덧붙인 말: ${escape(row.note)}</p>` : ''}${dateLine(row.at, '저장')}</div>${understandingAction('remove', row.kind === 'review' ? '이 확인 되돌리기' : '이 수정 되돌리기', { kind: row.kind, id: row.id, facet: row.facetId }, busy)}</li>`).join('')}</ul><div class="mi-history-clear"><p>확인·수정한 내용과 덧붙인 말을 모두 지우고, 연결한 원래 기록을 기준으로 다시 설명해요.</p>${understandingAction('clear', '확인·수정한 내용 모두 지우기', {}, busy)}</div>` : '<p class="mi-history-empty">아직 직접 확인하거나 수정해 저장한 내용이 없어요.</p>'}</div></details>`;
+}
+
+function understandingNotice(report, state) {
+  const status = report.understanding?.status;
+  const message = text(state.understandingMessage);
+  if (message) return `<p class="mi-understanding-notice" role="status" aria-live="polite">${escape(message)}</p>`;
+  if (status === 'loading') return '<p class="mi-understanding-notice" role="status">직접 확인·수정한 내용을 불러오고 있어요.</p>';
+  if (status === 'error') return `<p class="mi-understanding-notice" role="status">확인·수정한 내용을 불러오지 못했어요. 새로 확인하기로 다시 불러와 주세요.</p>`;
+  return '';
+}
+
+function interruptedUnderstandingEditor(report, state) {
+  const editor = state.understandingEditor;
+  if (!editor?.facet || editor.facet.id !== editor.facetId || !facetId(editor.facetId)) return '';
+  if (report.understanding?.status === 'ready') {
+    const current = list(report.understanding.facets).find(facet => facet.id === editor.facetId);
+    if (current?.available && (editor.mode === 'override' || current.claim && verdictLabels.has(editor.verdict))) return '';
+    // A removed or disconnected observation cannot reuse its captured claim or choices.
+    // Keep the user's unsaved words accessible, with cancellation but no save action.
+    const note = typeof editor.note === 'string' ? [...editor.note].slice(0, 200).join('') : '';
+    return `<div class="mi-interrupted-editor"><p>현재 연결한 기록으로 이 항목을 확인할 수 없어 저장을 멈췄어요. 입력은 아직 저장되지 않았어요.</p><div class="mi-understanding-editor"><h4>저장 전 입력</h4>${note ? `<label class="mi-note-label">내가 덧붙인 말<textarea rows="3" readonly>${escape(note)}</textarea></label>` : '<p>덧붙인 말은 없어요.</p>'}<p>취소하거나 연결을 확인한 뒤 새로 확인해 주세요.</p><div class="mi-editor-actions">${understandingAction('cancel', '취소', {}, state.understandingPending === true)}</div></div></div>`;
+  }
+  // The captured facet belongs only to this unsaved editor, never the analysis.
+  return `<div class="mi-interrupted-editor"><p>저장되지 않은 입력이에요. 연결을 다시 확인한 뒤 반영하거나 취소할 수 있어요.</p>${understandingEditor(editor.facet, state)}</div>`;
+}
+
+function understandingActivities(report, state) {
+  if (report.understanding?.status !== 'ready') return '';
+  const activities = list(report.understanding.activities).filter(item => activityTargets.has(item.targetId) && item.basis === 'self-declared').slice(0, 3);
+  if (!activities.length) return '';
+  return `<div class="mi-next-activities mi-understanding-next"><h3>내가 알려준 관심에서 이어가기</h3><ul>${activities.map(item => `<li><div><p>${escape(item.reason)}</p></div>${activityAction(item.targetId, state.activityPending === true || state.understandingPending === true)}</li>`).join('')}</ul></div>`;
+}
+
+function personalSection(report, declaredOnly, pending, state) {
   const items = list(report.personal).filter(item => !declaredOnly || item.basis === 'self-declared');
   const interest = items.find(item => item.id === 'reasons' || item.id === 'goal');
   const settings = items.filter(item => item !== interest);
@@ -43,10 +155,10 @@ function personalSection(report, declaredOnly) {
   let body = interest ? `<dl class="mi-personal-list"><div class="mi-personal-row"><dt><span class="mi-basis">${interest.basis === 'self-declared' ? '직접 알려준 정보' : '이용 기록에서 확인'}</span><span>${escape(interest.title)}</span></dt><dd><p class="mi-personal-value">${escape(interest.value)}</p>${interest.detail ? `<p class="mi-row-detail">${escape(interest.detail)}</p>` : ''}${dateLine(interest.at, '정보 기록')}</dd></div></dl>` : '';
   if (settings.length) body += `<div class="mi-preferences"><h3>${allDeclared ? '직접 고른 이용 설정' : '이용 방식'}</h3><dl class="mi-preference-list">${settings.map(item => `<div><dt>${escape(item.title)}${allDeclared ? '' : `<span class="mi-basis">${item.basis === 'self-declared' ? '직접 알려준 정보' : '이용 기록에서 확인'}</span>`}</dt><dd>${escape(item.value)}</dd></div>`).join('')}</dl></div>`;
   if (!items.length) body = empty('아직 나를 소개할 정보가 없어요.', 'SYNK에서 직접 알려준 배우는 이유와 선호 설정이 모이면 이곳에서 함께 볼 수 있어요.');
-  return `<section class="mi-section" aria-labelledby="insight-personal-title">${sectionHeading('01', 'insight-personal-title', '나의 관심사·선호', '내가 알려준 선호와 이용 기록을 구분해서 살펴봐요.')}${body}<p class="mi-section-note">현재는 직접 고른 배우는 이유와 이용 설정을 중심으로 보여요.</p></section>`;
+  return `<section class="mi-section" aria-labelledby="insight-personal-title">${sectionHeading('01', 'insight-personal-title', '나의 관심사·선호', '내가 알려준 선호와 이용 기록을 구분해서 살펴봐요.')}${understandingFacets(report, state, 'personal')}${body}${activityInterest(report, pending)}</section>`;
 }
 
-function learningSection(report, declaredOnly) {
+function learningSection(report, declaredOnly, pending, state) {
   const learning = report.learning && typeof report.learning === 'object' ? report.learning : {};
   const skills = list(learning.skills), content = list(learning.content);
   const hasPractice = !declaredOnly && learning.empty !== true && (learning.answered > 0 || skills.length > 0 || content.length > 0);
@@ -58,14 +170,15 @@ function learningSection(report, declaredOnly) {
   } else {
     body = `<dl class="mi-counters"><div><dt>응답 기록</dt><dd>${count(learning.answered)}<span>회</span></dd></div><div><dt>혼자 응답</dt><dd>${count(learning.independent)}<span>회</span></dd></div><div><dt>도움 받고 응답</dt><dd>${count(learning.assisted)}<span>회</span></dd></div></dl><p class="mi-counter-note">혼자 응답한 기록에는 맞힌 답과 틀린 답이 함께 포함돼요. 같은 문항에 다시 응답한 기록도 셀 수 있어요.</p>`;
     if (skills.length) body += `<div class="mi-practice"><h3>연습에서 보인 것</h3><ul class="mi-skill-list">${skills.map(skill => `<li><div class="mi-skill-title"><h4>${escape(skill.label)}</h4>${statusLabel(skill.status) ? `<span class="mi-skill-status">${escape(statusLabel(skill.status))}</span>` : ''}</div><p>${escape(skill.line)}</p>${dateLine(skill.lastAt, '마지막 기록')}</li>`).join('')}</ul></div>`;
-    if (content.length) body += `<div class="mi-practice"><h3>이어서 살펴볼 내용</h3><ul class="mi-content-list">${content.map(item => `<li><span>${escape(item.label)}</span>${statusLabel(item.status) ? `<span>${escape(statusLabel(item.status))}</span>` : ''}</li>`).join('')}</ul></div>`;
+    if (content.length) body += `<div class="mi-practice"><h3>이어서 살펴볼 내용</h3><ul class="mi-content-list">${content.map(item => `<li><div><h4>${escape(item.label)}</h4><p>${item.status === 'review' ? '연결된 연습 기록에서 다시 살펴볼 내용으로 정리됐어요.' : '연결된 기록에서 연습 중인 내용이에요.'} WORLD에서 관련 연습을 골라 보세요.</p></div>${activityAction('world', pending)}</li>`).join('')}</ul></div>`;
   }
-  return `<section class="mi-section" aria-labelledby="insight-learning-title">${sectionHeading('02', 'insight-learning-title', '학습 성향·성장', '실제 연습 기록에서 응답한 내용과 도움을 쓴 순간을 돌아봐요.')}${body}<p class="mi-section-note">연습 요약이며 전체 실력이나 학습 효과를 판정하지 않아요.</p></section>`;
+  if (!declaredOnly) body += periodComparison(learning.periods, 'learning');
+  return `<section class="mi-section" aria-labelledby="insight-learning-title">${sectionHeading('02', 'insight-learning-title', '학습 성향·성장', '실제 연습 기록에서 응답한 내용과 도움을 쓴 순간을 돌아봐요.')}${understandingFacets(report, state, 'learning')}${body}<p class="mi-section-note">연습 요약이며 전체 실력이나 학습 효과를 판정하지 않아요.</p></section>`;
 }
 
 function evidence(report) {
   const reasons = list(report.reasons);
-  const limits = Array.isArray(report.limits) ? report.limits.filter(item => typeof item === 'string' && item.trim()) : [];
+  const limits = [...(Array.isArray(report.limits) ? report.limits : []), ...(report.understanding?.status === 'ready' && Array.isArray(report.understanding.limitations) ? report.understanding.limitations : [])].filter(item => typeof item === 'string' && item.trim());
   const detailGroups = new Map();
   for (const item of list(report.personal)) {
     if (item.id === 'reasons' || item.id === 'goal' || !item.detail || report.shared === 'declared-only' && item.basis !== 'self-declared') continue;
@@ -94,9 +207,15 @@ export function renderMemberInsight(state = {}, { native = false } = {}) {
   if (!report) body = pending({ ...state, status });
   else {
     const declaredOnly = report.shared === 'declared-only';
-    body = `<div class="mi-summary"><div><span class="mi-summary-label">지금 확인할 수 있는 나</span><h2>${escape(text(report.headline, '기록에서 나를 조금씩 알아가요.'))}</h2><p>${escape(text(report.description, '직접 알려준 내용과 연습한 기록을 함께 정리했어요.'))}</p></div>${action('refresh', '새로 확인하기', true)}</div>`;
-    if (declaredOnly) body += `<aside class="mi-consent" aria-label="학습 기록 연결 상태"><div><strong>학습 기록 연결이 꺼져 있어요.</strong><p>직접 알려준 배우는 이유만 보여요. 연결 설정은 계정에서 바꿀 수 있어요.</p></div>${action('account', '계정 설정')}</aside>`;
-    body += personalSection(report, declaredOnly) + learningSection(report, declaredOnly);
+    const understanding = report.understanding?.status === 'ready' ? report.understanding : null;
+    const paragraphs = understanding && Array.isArray(understanding.paragraphs) ? understanding.paragraphs.filter(line => typeof line === 'string').slice(0, 8) : [];
+    body = `<div class="mi-summary"><div><span class="mi-summary-label">${understanding ? '최근 기록을 이렇게 읽었어요' : '지금 확인할 수 있는 나'}</span><h2>${escape(text(understanding?.headline, text(report.headline, '기록에서 나를 조금씩 알아가요.')))}</h2>${paragraphs.length ? paragraphs.map(line => `<p>${escape(line)}</p>`).join('') : `<p>${escape(text(report.description, '직접 알려준 내용과 연습한 기록을 함께 정리했어요.'))}</p>`}</div>${action('refresh', '새로 확인하기', !state.understandingEditor, state.understandingPending === true)}</div>`;
+    body += understandingNotice(report, state);
+    body += interruptedUnderstandingEditor(report, state);
+    body += understandingActivities(report, state);
+    if (declaredOnly) body += `<aside class="mi-consent" aria-label="학습 기록 연결 상태"><div><strong>학습 기록 연결이 꺼져 있어요.</strong><p>학습 정보는 직접 알려준 배우는 이유만 보여요. 앱 이용 기록은 별도로 연결할 수 있어요.</p></div>${action('account', '계정 설정')}</aside>`;
+    body += personalSection(report, declaredOnly, state.activityPending === true, state) + learningSection(report, declaredOnly, state.activityPending === true, state);
+    body += understandingHistory(report, state);
     if (!declaredOnly) body += `<div class="mi-settings"><p>내 정보가 달라졌다면</p>${action('account', '내 정보·연결 설정 확인')}</div>`;
     body += evidence(report);
   }

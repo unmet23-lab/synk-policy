@@ -9466,6 +9466,7 @@ var esc = (value) => String(value).replace(/[&<>"']/g, (char) => ({ "&": "&amp;"
 var librarySequence = 0;
 function mountPlatformLibrary(root, { getHost, ensureReady = async () => {
 }, native = false, getDevice = () => ({}), getAppIds = () => ACTIVE_PLATFORM_APP_IDS, onChange = () => {
+}, onFavoritesChanged = () => {
 }, onOpen = () => {
 }, onLogin = () => {
 }, onManage = onLogin, storage = globalThis.localStorage } = {}) {
@@ -9474,6 +9475,8 @@ function mountPlatformLibrary(root, { getHost, ensureReady = async () => {
   let recoveryOwner = null;
   let accountAdapter = null, nativeVerification = null, nativeVerificationNotice = null;
   let documentOwner = null, documentReady = false;
+  let favoriteIntent = null;
+  const favoriteSignature = (value) => JSON.stringify(projectPlatformLibrary(value, { appIds: entryIds() }).favorites);
   const readyWaiters = /* @__PURE__ */ new Set();
   function readiness() {
     if (disposed || pageSuspended) return false;
@@ -9716,11 +9719,14 @@ function mountPlatformLibrary(root, { getHost, ensureReady = async () => {
   async function change(action) {
     if (!notebook?.canEdit) throw new Error("계정 연결과 저장 상태를 먼저 확인해 주세요.");
     const expected = modeVersion, next = updatePlatformLibrary(doc, action, Date.now(), entryIds());
+    const favoriteChange = ["favorite", "move-favorite"].includes(action.type) && favoriteSignature(next) !== favoriteSignature(doc) ? { version: expected, owner: documentOwner, signature: favoriteSignature(next) } : null;
+    if (favoriteChange) favoriteIntent = favoriteChange;
     doc = next;
     message = "";
     const result = notebook.change(next);
     render();
     if (!await result) {
+      if (favoriteIntent === favoriteChange) favoriteIntent = null;
       if (expected !== modeVersion) return false;
       throw new Error("변경을 보관하지 못했어요. 저장 상태를 확인해 주세요.");
     }
@@ -9757,6 +9763,7 @@ function mountPlatformLibrary(root, { getHost, ensureReady = async () => {
         description: "즐겨찾기·최근 열기·직접 적은 메모만 연결합니다. 앱 원문과 이용 권한은 각 앱에서 확인해요.",
         getState: () => doc,
         applyState: (value, { guest = false } = {}) => {
+          favoriteIntent = null;
           doc = validatePlatformLibrary(value);
           documentReady = !guest;
           clearNoteSession();
@@ -9769,7 +9776,19 @@ function mountPlatformLibrary(root, { getHost, ensureReady = async () => {
         deleteLabel: "계정 라이브러리 삭제·저장 끄기",
         deleteConfirmation: "이 계정의 즐겨찾기·최근 열기·이어쓰기 메모를 삭제하고 저장을 끌까요? 다른 기기에서도 이 목록을 다시 불러올 수 없어요. 각 앱의 원본 기록은 유지돼요.",
         onStatusChange: () => queueMicrotask(render),
+        // change() only queues the edit. Observe the validated server ACK, and
+        // only the latest still-visible choice in the same account generation.
+        onDocumentSaved: (value) => {
+          const intent = favoriteIntent;
+          if (!intent || disposed || pageSuspended || intent.version !== modeVersion || intent.owner !== documentOwner || favoriteSignature(value) !== intent.signature || favoriteSignature(doc) !== intent.signature) return;
+          favoriteIntent = null;
+          void Promise.resolve().then(() => {
+            if (!disposed && !pageSuspended && intent.version === modeVersion && intent.owner === documentOwner) return onFavoritesChanged();
+          }).catch(() => {
+          });
+        },
         onDocumentRemoved: () => {
+          favoriteIntent = null;
           void recovery.clear();
         },
         beforeNavigate: () => {
