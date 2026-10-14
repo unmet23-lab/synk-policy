@@ -135,7 +135,8 @@
       "product": "platform",
       "clientId": "0f9f91d5-4032-4ff3-bb8d-2af1c646633a",
       "redirectUris": [
-        "http://127.0.0.1:4298/"
+        "http://127.0.0.1:4298/",
+        "https://synk.im/album/"
       ]
     },
     {
