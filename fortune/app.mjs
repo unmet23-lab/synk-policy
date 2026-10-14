@@ -31,9 +31,9 @@ var FORTUNE_MODES = Object.freeze([
   Object.freeze({ id: "korean", label: "한국 사주", english: "Korean Saju" }),
   Object.freeze({ id: "western", label: "별자리 운세", english: "Horoscope" })
 ]);
-function getSigns(mode = "korean") {
-  if (mode === "korean") return ZODIAC;
-  if (mode === "western") return WESTERN_ZODIAC;
+function getSigns(mode2 = "korean") {
+  if (mode2 === "korean") return ZODIAC;
+  if (mode2 === "western") return WESTERN_ZODIAC;
   throw new TypeError("한국 운세와 별자리 운세 중 하나를 골라 주세요.");
 }
 var seoul = new Intl.DateTimeFormat("en-CA", {
@@ -52,162 +52,10 @@ function validateDateKey(date2) {
   if (!Number.isFinite(parsed.getTime()) || parsed.toISOString().slice(0, 10) !== date2) throw new TypeError("존재하지 않는 날짜입니다.");
   return date2;
 }
-function displayDate(date2) {
-  validateDateKey(date2);
-  return new Intl.DateTimeFormat("ko-KR", { timeZone: "Asia/Seoul", month: "long", day: "numeric", weekday: "long" }).format(/* @__PURE__ */ new Date(`${date2}T00:00:00+09:00`));
-}
 function millisecondsUntilNextSeoulDay(now = Date.now()) {
   const instant = new Date(now).getTime();
   const date2 = seoulDateKey(instant);
   return (/* @__PURE__ */ new Date(`${date2}T00:00:00+09:00`)).getTime() + 864e5 - instant;
-}
-var themes = [
-  ["작은 시작이 반가운 날", "크게 준비하기보다 손에 잡히는 일 하나로 시작해 보세요. 첫걸음의 가벼움을 즐겨도 좋아요."],
-  ["내 속도를 찾아가는 날", "주변의 속도보다 지금 내 리듬에 귀를 기울여 보세요. 천천히 마친 한 가지도 충분히 괜찮아요."],
-  ["익숙함 속 발견이 있는 날", "늘 보던 풍경을 한 번 더 바라보세요. 평범한 순간에서 마음에 드는 장면을 찾는 재미가 있어요."],
-  ["마음을 가볍게 비우는 날", "모든 일을 한꺼번에 해결하려 애쓰지 않아도 돼요. 오늘 필요한 한 가지부터 골라 보세요."],
-  ["다정한 말이 어울리는 날", "작은 고마움도 말로 꺼내 보세요. 다정한 한마디를 건네는 즐거움을 챙기는 날로 만들어 봐요."],
-  ["호기심을 따라가 보는 날", "문득 궁금한 것이 있다면 짧게 알아보세요. 정답을 찾기보다 새로 알게 되는 즐거움에 집중해 봐요."],
-  ["차근차근 쌓아 가는 날", "이미 해 온 일에서 다음 한 칸을 찾아보세요. 작은 마무리 하나를 오늘의 기분 좋은 기록으로 남겨요."],
-  ["기분 좋은 틈을 만드는 날", "빈 시간을 전부 채우지 않아도 괜찮아요. 좋아하는 노래 한 곡만큼 여유를 남겨 보세요."],
-  ["내 취향을 챙기는 날", "남들이 좋아하는 것보다 내가 좋아하는 작은 것을 떠올려 보세요. 익숙한 즐거움도 새삼 반가울 수 있어요."],
-  ["정돈하고 새로 보는 날", "눈앞의 한 곳만 가볍게 정리해 보세요. 비워 낸 자리에 무엇을 두고 싶은지 생각해 봐도 좋아요."],
-  ["함께하는 재미를 찾는 날", "거창한 약속 없이도 취향 하나를 나눌 수 있어요. 서로 좋아하는 것을 하나씩 물어보세요."],
-  ["나를 응원해 주는 날", "오늘 해낸 작은 일을 그냥 지나치지 마세요. 스스로에게 수고했다는 말을 한 번 건네 보세요."],
-  ["새로운 순서를 시도하는 날", "익숙한 일의 순서를 조금 바꿔 보세요. 나에게 더 편한 방법을 찾는 작은 실험이면 충분해요."],
-  ["좋은 장면을 모으는 날", "마음에 드는 색이나 문장을 발견하면 잠깐 기억해 두세요. 오늘의 반가운 순간을 하나 모아 봐요."],
-  ["어깨의 힘을 내려놓는 날", "완벽해야 한다는 마음을 잠깐 내려놓아도 돼요. 지금 할 수 있는 만큼만 해 보는 날로 정해 봐요."],
-  ["마무리가 기분 좋은 날", "길게 남겨 둔 일 가운데 아주 작은 것 하나만 끝내 보세요. 끝냈다는 기분을 충분히 누려도 좋아요."]
-];
-var relationships = [
-  "답을 서두르기보다 상대의 말을 끝까지 들어 보세요. 몰랐던 마음을 알아가는 대화가 될 수 있어요.",
-  "최근 고마웠던 사람을 떠올려 보세요. 부담 없는 한 줄로 마음을 전해도 충분해요.",
-  "먼저 가벼운 안부를 건네 보세요. 답장의 속도에 의미를 붙이지 않고 편하게 기다려도 좋아요.",
-  "취향이 다른 점을 틀린 것으로 여기지 않아도 돼요. 좋아하는 이유를 한 번 물어보세요.",
-  "오늘은 듣고 싶은 말을 먼저 다정하게 건네 보세요. 억지로 분위기를 바꿀 필요는 없어요.",
-  "혼자 쉬고 싶다면 그 마음도 존중해 주세요. 다음에 이야기하자는 편안한 한마디면 괜찮아요.",
-  "칭찬은 작은 장면을 구체적으로 짚어 보세요. 무엇이 고마웠는지 말하면 마음이 더 잘 전해져요.",
-  "친숙한 사람에게도 새로운 질문 하나를 던져 보세요. 요즘 즐기는 것부터 물어봐도 좋아요.",
-  "추측으로 마음을 정하기보다 차분히 물어보세요. 모르는 것은 모르는 채로 두어도 괜찮아요.",
-  "함께 웃었던 기억 하나를 떠올려 보세요. 반가운 추억을 짧게 나누는 것도 좋은 대화예요.",
-  "약속을 더하기 전에 내 여유를 먼저 살펴보세요. 편안한 범위를 솔직하게 말해도 좋아요.",
-  "내 이야기를 조금 나누고 상대의 이야기도 초대해 보세요. 대화의 빈틈을 급히 채우지 않아도 돼요."
-];
-var focus = [
-  "해야 할 일을 세 개 안으로 적고 가장 짧은 것부터 시작해 보세요.",
-  "시작하기 전에 필요한 물건만 가까이 두어 보세요. 준비를 작게 마치는 것도 시작이에요.",
-  "한 번에 여러 일을 하기보다 지금 하는 일 하나에 잠깐 머물러 보세요.",
-  "오래 멈춰 있던 일은 첫 단계만 적어 보세요. 오늘은 그 단계까지만 해도 괜찮아요.",
-  "메모를 한 곳에 모아 보세요. 지금 필요한 것과 나중에 볼 것을 나누면 찾기 쉬워져요.",
-  "할 일 사이에 짧은 여백을 넣어 보세요. 창밖을 보는 시간도 하루의 일부예요.",
-  "이미 끝낸 일을 하나 표시해 보세요. 남은 목록만큼 해낸 목록도 살펴봐요.",
-  "집중이 잘되는 자리를 떠올려 보세요. 빛이나 소리 한 가지만 편하게 바꿔 봐도 좋아요.",
-  "머릿속에 맴도는 생각을 한 줄로 적어 보세요. 지금 해결하지 않아도 기록해 둘 수 있어요.",
-  "완료의 기준을 작게 정해 보세요. 어느 정도면 오늘은 충분한지 먼저 정하면 편해져요.",
-  "자주 쓰는 파일이나 물건 하나만 정리해 보세요. 다음에 쉽게 찾을 수 있는 자리를 골라요.",
-  "오늘 잘 맞았던 방법 하나를 기억해 두세요. 내일도 써 보고 싶은 작은 요령이면 좋아요."
-];
-var actions = [
-  "지금 눈에 보이는 것 중 마음에 드는 색 하나를 찾아보세요.",
-  "좋아하는 노래 한 곡을 골라 끝까지 들어 보세요.",
-  "오늘 고마웠던 일 하나를 한 문장으로 적어 보세요.",
-  "책상 위 물건 세 개를 제자리로 돌려놓아 보세요.",
-  "친구에게 요즘 즐겨 듣는 노래를 물어보세요.",
-  "창밖 풍경을 잠깐 바라보고 눈에 들어온 것 하나를 기억해 보세요.",
-  "오늘 해낸 일 하나에 작은 체크를 남겨 보세요.",
-  "읽고 싶었던 책의 첫 페이지를 펼쳐 보세요.",
-  "나중에 하고 싶은 작은 즐거움 하나를 메모해 보세요.",
-  "지금의 기분을 한 단어로 적고 그대로 인정해 주세요.",
-  "가까운 사람에게 구체적인 고마움 한 가지를 전해 보세요.",
-  "내일의 나에게 짧은 응원 한 줄을 남겨 보세요."
-];
-var colors = ["버터 옐로", "맑은 파랑", "산뜻한 초록", "부드러운 코랄", "포근한 크림", "연한 보라"];
-var westernThemes = [
-  ["작은 용기에 불을 켜는 날", "마음속에만 두었던 아이디어를 밖으로 꺼내 보세요. 오늘의 모험은 거창할 필요 없이 첫 문장 하나면 충분해요."],
-  ["오감으로 하루를 즐기는 날", "좋아하는 향과 색, 편안한 촉감을 가까이 두어 보세요. 나에게 잘 맞는 감각을 발견하는 데서 오늘의 즐거움이 시작돼요."],
-  ["새로운 이야기가 궁금한 날", "평소 고르지 않던 주제를 잠깐 들여다보세요. 낯선 생각과 익숙한 생각이 만나는 지점을 메모해 봐도 좋아요."],
-  ["마음의 안식처를 찾는 날", "편안함을 느끼는 장소나 사람을 떠올려 보세요. 바깥의 소식에서 잠시 떨어져 내 마음을 돌보는 시간을 가져요."],
-  ["내 색깔을 드러내는 날", "오늘은 마음에 드는 취향을 숨기지 않아도 좋아요. 좋아하는 옷이나 음악으로 나다운 장면을 하나 만들어 보세요."],
-  ["작은 디테일이 빛나는 날", "지나치기 쉬운 부분 하나에 애정을 들여 보세요. 완벽하게 고치려는 마음보다 조금 더 편해지는 변화면 충분해요."],
-  ["균형을 다시 맞추는 날", "내가 원하는 것과 함께할 수 있는 것을 나란히 놓아 보세요. 둘 중 하나를 급히 고르기보다 편안한 접점을 찾아봐요."],
-  ["한 가지를 깊이 보는 날", "여러 가지를 얕게 훑기보다 궁금한 것 하나에 머물러 보세요. 다 알지 못해도 나만의 질문이 생겼다면 괜찮아요."],
-  ["시야를 넓혀 보는 날", "가 보고 싶은 곳이나 배워 보고 싶은 것을 떠올려 보세요. 오늘 바로 떠나지 않아도 작은 계획을 상상하는 재미가 있어요."],
-  ["나만의 목표를 세우는 날", "남들이 정한 성공보다 내가 기뻐할 마무리를 골라 보세요. 목표를 작게 나누면 오늘 남길 발자국도 또렷해져요."],
-  ["다른 각도로 생각하는 날", "늘 당연하게 여기던 방식에 가벼운 질문을 던져 보세요. 엉뚱해 보이는 발상도 메모해 두면 즐거운 실험이 될 수 있어요."],
-  ["상상에 여백을 주는 날", "마음에 떠오르는 장면을 그림이나 단어로 남겨 보세요. 잘 표현하려 애쓰지 않고 상상 자체를 즐겨도 좋아요."],
-  ["우연한 연결을 즐기는 날", "서로 관계없어 보이는 관심사 두 가지를 붙여 보세요. 새로운 답보다 예상하지 못한 질문을 발견하는 날로 만들어 봐요."],
-  ["나의 반짝임을 알아보는 날", "오늘 자연스럽게 잘했던 순간을 떠올려 보세요. 다른 사람의 평가를 기다리지 않고 그 장점을 스스로 알아줘도 좋아요."],
-  ["마음의 방향을 살피는 날", "무엇을 더 해야 할지보다 어디에 마음이 가는지 살펴보세요. 지금의 관심사를 한 단어로 적어 두는 것부터 시작해 봐요."],
-  ["새로운 가능성을 그리는 날", "같은 하루를 조금 다르게 보낼 방법을 상상해 보세요. 익숙한 선택 하나를 바꾸는 것만으로도 작은 모험이 돼요."]
-];
-var westernRelationships = [
-  "상대에게 요즘 가장 설레는 일이 무엇인지 물어보세요. 서로의 관심사가 달라도 즐겁게 들을 수 있어요.",
-  "함께하고 싶은 작은 경험을 하나 제안해 보세요. 일정이 맞지 않아도 제안한 마음은 가볍게 남겨 둬요.",
-  "대화에서 내 취향을 한 가지 더 보여 주세요. 같은 점을 찾는 만큼 다른 점을 알아가는 재미도 있어요.",
-  "마음에 남은 말을 혼자 해석하기보다 뜻을 물어보세요. 편하게 확인하는 대화가 오해를 줄여 줘요.",
-  "가까운 사람의 새로운 모습을 발견했다면 말로 전해 보세요. 언제나 알던 사이라고 생각하지 않아도 돼요.",
-  "함께 결정할 때 각자가 원하는 것을 하나씩 꺼내 보세요. 모든 의견을 바로 하나로 맞출 필요는 없어요.",
-  "오늘의 에너지가 적다면 짧고 따뜻한 인사만 건네도 좋아요. 관계에도 내 리듬을 지킬 자리가 있어요.",
-  "말로 설명하기 어려운 취향은 노래나 사진으로 나눠 보세요. 한 장면이 대화의 시작이 될 수 있어요."
-];
-var westernFocus = [
-  "아이디어를 평가하기 전에 세 가지 적어 보세요. 그중 가장 궁금한 하나를 골라 작은 실험을 시작해요.",
-  "막힌 일은 질문의 방향을 바꿔 보세요. 더 쉽게 할 수 있는 방법이 무엇인지 한 줄로 적어 봐요.",
-  "마음에 드는 작업 환경을 한 가지 만들어 보세요. 좋아하는 색의 메모 한 장도 작은 계기가 돼요.",
-  "오늘의 목표에 내가 좋아하는 요소를 더해 보세요. 해야 하는 일 속에서도 즐길 부분을 찾아봐요.",
-  "넓게 펼친 생각 중 연결되는 두 개를 골라 보세요. 완성된 답이 없어도 연결선을 그려 보는 것으로 충분해요.",
-  "혼자 오래 고민한 일은 다른 관점의 질문을 적어 보세요. 보는 위치를 바꾸는 연습부터 해도 좋아요.",
-  "새로운 방법을 시험할 시간을 짧게 정해 보세요. 맞지 않으면 원래 방식으로 돌아와도 괜찮아요.",
-  "마지막에 돌아볼 기록을 한 줄 남겨 보세요. 오늘 처음 알게 된 것이 무엇인지 적어 봐요."
-];
-function hash(value) {
-  let result = 2166136261;
-  for (const char of value) result = Math.imul(result ^ char.charCodeAt(0), 16777619) >>> 0;
-  return result;
-}
-function getFortune(signId, date2 = seoulDateKey(), mode = "korean") {
-  const signs2 = getSigns(mode);
-  const index = signs2.findIndex((sign) => sign.id === signId);
-  if (index < 0) throw new TypeError(mode === "western" ? "12가지 별자리 중 하나를 골라 주세요." : "12가지 띠 중 하나를 골라 주세요.");
-  validateDateKey(date2);
-  const western = mode === "western";
-  const modeLabel = western ? FORTUNE_MODES.find((item) => item.id === mode).label : "한국 운세 · 띠별";
-  const day = Math.floor((/* @__PURE__ */ new Date(`${date2}T00:00:00Z`)).getTime() / 864e5);
-  const themePool = western ? westernThemes : themes;
-  const theme = themePool[((day + index * 5) % themePool.length + themePool.length) % themePool.length];
-  const seed = western ? `${date2}/${mode}/${signId}` : `${date2}/${signId}`;
-  const pick = (category, choices) => choices[hash(`${seed}/${category}`) % choices.length];
-  return Object.freeze({
-    date: date2,
-    mode,
-    modeLabel,
-    signId,
-    signLabel: signs2[index].label,
-    title: theme[0],
-    overall: theme[1],
-    relationship: pick("relationship", western ? westernRelationships : relationships),
-    focus: pick("focus", western ? westernFocus : focus),
-    action: pick("action", actions),
-    color: pick("color", colors),
-    number: hash(`${seed}/number`) % 9 + 1
-  });
-}
-function fortuneText(fortune2) {
-  return [
-    `SYNK 무료 운세 · ${fortune2.date} · ${fortune2.modeLabel || "한국 운세 · 띠별"} · ${fortune2.signLabel}`,
-    fortune2.title,
-    "",
-    `총운 | ${fortune2.overall}`,
-    `관계 | ${fortune2.relationship}`,
-    `일상과 집중 | ${fortune2.focus}`,
-    "",
-    `오늘의 작은 행동 | ${fortune2.action}`,
-    `행운의 색 | ${fortune2.color}`,
-    `행운의 숫자 | ${fortune2.number}`,
-    "",
-    "가볍게 읽는 재미용 운세예요. 미래를 예측하지 않아요.",
-    fortune2.mode === "western" ? "일반적인 12궁을 바탕으로 한 창작 운세이며, 정밀 천체 계산을 하지 않아요." : "12띠로 보는 운세이며, 생년월일시로 풀이하는 사주는 아니에요."
-  ].join("\n");
 }
 
 // experiences/daily-fortune/vendor/lunar-javascript-1.7.7/lunar.mjs
@@ -12071,7 +11919,7 @@ function getSaju(input, today = seoulDateKey()) {
   todayChart.setSect(2);
   const todayPillar = pillar("today", "오늘의 일진", todayChart.getDay());
   const key = relationKey(dayMaster.element, todayPillar.stem.element);
-  const reading = readings[key];
+  const reading2 = readings[key];
   const symbol = elementRows.find((row) => row[1] === dayMaster.element)[3];
   return deepFreeze({
     date: today,
@@ -12088,30 +11936,12 @@ function getSaju(input, today = seoulDateKey()) {
     todayPillar,
     notes,
     convention: { ...SAJU_CONVENTION },
-    title: `${todayPillar.hangul}일, ${reading.phrase}`,
-    overall: `일간은 ${dayMaster.hanja}(${dayMaster.hangul}), 오행은 ${dayMaster.element}에 해당해요. 전통에서 ${dayMaster.element} 오행은 ${symbol}의 상징으로 읽어요. 오늘 일간 ${todayPillar.stem.hanja}(${todayPillar.stem.hangul})의 ${todayPillar.stem.element} 오행과 함께 ${reading.relation}을 가볍게 떠올려 보세요. 이 관계만으로 성격이나 길흉을 판단하지 않아요.`,
-    relationship: reading.relationship,
-    focus: reading.focus,
-    action: reading.action
+    title: `${todayPillar.hangul}일, ${reading2.phrase}`,
+    overall: `일간은 ${dayMaster.hanja}(${dayMaster.hangul}), 오행은 ${dayMaster.element}에 해당해요. 전통에서 ${dayMaster.element} 오행은 ${symbol}의 상징으로 읽어요. 오늘 일간 ${todayPillar.stem.hanja}(${todayPillar.stem.hangul})의 ${todayPillar.stem.element} 오행과 함께 ${reading2.relation}을 가볍게 떠올려 보세요. 이 관계만으로 성격이나 길흉을 판단하지 않아요.`,
+    relationship: reading2.relationship,
+    focus: reading2.focus,
+    action: reading2.action
   });
-}
-function sajuText(result) {
-  return [
-    `SYNK 무료 운세 · 한국 사주 · ${result.date}`,
-    result.title,
-    "",
-    ...result.pillars.map((item) => `${item.label} | ${item.known ? `${item.hanja} (${item.hangul})` : `미확정 · ${item.reason}`}`),
-    `일간 | ${result.dayMaster.hanja} (${result.dayMaster.hangul}) · ${result.dayMaster.element}`,
-    `겉글자 오행 | ${result.elements.map((item) => `${item.label} ${item.count}`).join(" · ")}`,
-    "",
-    `오늘의 읽을거리 | ${result.overall}`,
-    `관계 | ${result.relationship}`,
-    `일상과 집중 | ${result.focus}`,
-    "",
-    `오늘의 작은 행동 | ${result.action}`,
-    "",
-    ...result.notes
-  ].join("\n");
 }
 
 // experiences/daily-fortune/kit/josa.mjs
@@ -12169,10 +11999,10 @@ var profileRows = [
   ["aquarius", "air", "fixed", ["새 관점", "연결", "독립"], "물병자리는 당연한 방식을 다시 묻고 새로운 연결을 만드는 장면에 빗대요.", "늘 하던 방식에서 한 가지만 바꾼다면 무엇을 고를까요?"],
   ["pisces", "water", "mutable", ["상상", "공감", "여백"], "물고기자리는 상상과 감정의 흐름에 귀 기울이는 장면에 빗대요.", "말로 정리하기 전, 그대로 느껴 보아도 괜찮은 마음이 있나요?"]
 ];
-var ZODIAC_PROFILES = deepFreeze2(profileRows.map(([signId, elementId, modalityId, keywords, description, question]) => {
-  const sign = WESTERN_ZODIAC.find((item) => item.id === signId);
+var ZODIAC_PROFILES = deepFreeze2(profileRows.map(([signId2, elementId, modalityId, keywords, description, question]) => {
+  const sign = WESTERN_ZODIAC.find((item) => item.id === signId2);
   return {
-    signId,
+    signId: signId2,
     label: sign.label,
     english: sign.english,
     range: sign.range,
@@ -12184,8 +12014,8 @@ var ZODIAC_PROFILES = deepFreeze2(profileRows.map(([signId, elementId, modalityI
     note: "서양 점성술에서 쓰는 문화적 상징을 소개해요. 이 설명이 개인의 성격이나 미래를 정하지 않아요."
   };
 }));
-function getZodiacProfile(signId) {
-  const profile2 = ZODIAC_PROFILES.find((item) => item.signId === signId);
+function getZodiacProfile(signId2) {
+  const profile2 = ZODIAC_PROFILES.find((item) => item.signId === signId2);
   if (!profile2) throw new TypeError("12가지 별자리 중 하나를 골라 주세요.");
   return profile2;
 }
@@ -12225,60 +12055,6 @@ function suggestZodiac(birthDate) {
     nearBoundary,
     adjacentSign: adjacent ? { signId: adjacent.id, label: adjacent.label, english: adjacent.english } : null,
     note: isBoundaryDay ? "일반 생일 구간의 경계일이에요. 실제 태양 별자리는 출생 연도·시각에 따라 이웃 별자리일 수 있으니, 알고 있는 별자리가 있다면 직접 골라 주세요." : nearBoundary ? "별자리가 바뀌는 날짜와 가까워요. 일반적인 양력 생일 구간으로 추천했으며, 정확한 경계는 출생 연도·시각에 따라 달라져요." : "일반적인 양력 생일 구간으로 추천했어요. 정밀한 출생 차트 계산은 아니며 별자리를 직접 바꿀 수 있어요."
-  });
-}
-function getActionCard(fortune2) {
-  if (!fortune2 || !["korean", "western"].includes(fortune2.mode) || typeof fortune2.action !== "string" || !fortune2.action.trim()) {
-    throw new TypeError("운세 결과를 먼저 만들어 주세요.");
-  }
-  validateDateKey(fortune2.date);
-  const isSaju = fortune2.mode === "korean" && fortune2.signId === "saju";
-  const profileKey = isSaju ? fortune2.pillars.map((item) => item.known ? item.hanja : "_").join("-") : fortune2.signId;
-  if (typeof profileKey !== "string" || !profileKey) throw new TypeError("선택한 운세 정보를 확인해 주세요.");
-  return deepFreeze2({
-    key: `${fortune2.mode}:${fortune2.date}:${profileKey}`,
-    date: fortune2.date,
-    mode: fortune2.mode,
-    text: fortune2.action,
-    reflectionPrompt: "해 보니 어땠나요? 해낸 점이나 다음에 바꿔 보고 싶은 점을 한 줄로 남겨 보세요.",
-    completed: false,
-    reflection: ""
-  });
-}
-var weekdays = ["일", "월", "화", "수", "목", "금", "토"];
-function getReadingSeries(options) {
-  if (!options || typeof options !== "object" || Array.isArray(options)) throw new TypeError("운세 방식과 날짜를 골라 주세요.");
-  const { mode, signId, birthDate, birthTime = null, period = "today", date: date2 = seoulDateKey() } = options;
-  validateDateKey(date2);
-  if (date2 < SAJU_MIN_DATE || date2 > SAJU_MAX_DATE) throw new RangeError("지원하는 날짜 범위는 1900년부터 2100년까지예요.");
-  if (!["today", "week"].includes(period)) throw new TypeError("오늘과 이번 주 중 하나를 골라 주세요.");
-  if (!["korean", "western"].includes(mode)) throw new TypeError("한국 사주와 별자리 운세 중 하나를 골라 주세요.");
-  const readingAt = (day) => mode === "korean" ? getSaju({ birthDate, birthTime }, day) : getFortune(signId, day, "western");
-  const anchor = readingAt(date2);
-  const dayOfWeek = (/* @__PURE__ */ new Date(`${date2}T00:00:00Z`)).getUTCDay();
-  const startDate = period === "today" ? date2 : addDays(date2, -((dayOfWeek + 6) % 7));
-  const endDate = period === "today" ? date2 : addDays(startDate, 6);
-  const items = Array.from({ length: period === "today" ? 1 : 7 }, (_, index) => {
-    const day = addDays(startDate, index);
-    const unavailableReason = day < SAJU_MIN_DATE || day > SAJU_MAX_DATE ? "계산 지원 범위 밖의 날짜예요." : mode === "korean" && day < birthDate ? "출생일 이전 날짜예요." : null;
-    const fortune2 = unavailableReason ? null : day === date2 ? anchor : readingAt(day);
-    return {
-      date: day,
-      weekday: weekdays[(/* @__PURE__ */ new Date(`${day}T00:00:00Z`)).getUTCDay()],
-      isToday: day === date2,
-      fortune: fortune2,
-      action: fortune2 ? getActionCard(fortune2) : null,
-      unavailableReason
-    };
-  });
-  return deepFreeze2({
-    period,
-    label: period === "today" ? "오늘의 읽을거리" : "이번 주의 하루 한 가지",
-    startDate,
-    endDate,
-    referenceDate: date2,
-    items,
-    note: "날짜마다 제공하는 짧은 읽을거리와 행동 제안이에요. 한 주의 사건이나 길흉을 예측하지 않아요."
   });
 }
 var pillarGuide = {
@@ -12336,8 +12112,1620 @@ function getSajuGuide(result) {
   });
 }
 
+// experiences/daily-fortune/fortune-base.mjs
+function deepFreeze3(value) {
+  for (const child of Object.values(value)) if (child && typeof child === "object" && !Object.isFrozen(child)) deepFreeze3(child);
+  return Object.freeze(value);
+}
+var mod = (value, size) => (value % size + size) % size;
+var clamp = (value, min, max) => Math.min(max, Math.max(min, value));
+function hash(value) {
+  let result = 2166136261;
+  for (const char of String(value)) result = Math.imul(result ^ char.charCodeAt(0), 16777619) >>> 0;
+  return result;
+}
+function generator(seed2) {
+  let state = hash(seed2) || 1;
+  return () => {
+    state = state + 1831565813 >>> 0;
+    let t = state;
+    t = Math.imul(t ^ t >>> 15, t | 1);
+    t ^= t + Math.imul(t ^ t >>> 7, t | 61);
+    return ((t ^ t >>> 14) >>> 0) / 4294967296;
+  };
+}
+function shuffledOrder(size, seed2) {
+  const order = Array.from({ length: size }, (_, index) => index);
+  const next = generator(seed2);
+  for (let index = size - 1; index > 0; index--) {
+    const other = Math.floor(next() * (index + 1));
+    [order[index], order[other]] = [order[other], order[index]];
+  }
+  return order;
+}
+function rotationPick(pool, seed2, k) {
+  const order = shuffledOrder(pool.length, `${seed2}/order`);
+  return pool[order[mod(k + hash(`${seed2}/offset`), pool.length)]];
+}
+function dayNumber(date2) {
+  validateDateKey(date2);
+  return Math.round(Date.parse(`${date2}T00:00:00Z`) / 864e5);
+}
+function addDays2(date2, amount) {
+  return new Date((dayNumber(date2) + amount) * 864e5).toISOString().slice(0, 10);
+}
+function weekdayOf(date2) {
+  return ["일", "월", "화", "수", "목", "금", "토"][new Date(dayNumber(date2) * 864e5).getUTCDay()];
+}
+function assertSupportedDate(date2) {
+  validateDateKey(date2);
+  if (date2 < SAJU_MIN_DATE || date2 > SAJU_MAX_DATE) throw new RangeError("지원하는 날짜 범위는 1900년부터 2100년까지예요.");
+  return date2;
+}
+var ELEMENTS = deepFreeze3([
+  { id: "wood", label: "목", hanja: "木" },
+  { id: "fire", label: "화", hanja: "火" },
+  { id: "earth", label: "토", hanja: "土" },
+  { id: "metal", label: "금", hanja: "金" },
+  { id: "water", label: "수", hanja: "水" }
+]);
+var elementIndex = (label) => ELEMENTS.findIndex((item) => item.label === label);
+var STEMS = deepFreeze3([
+  ["甲", "갑", "목", "큰 나무"],
+  ["乙", "을", "목", "풀과 꽃"],
+  ["丙", "병", "화", "태양"],
+  ["丁", "정", "화", "촛불"],
+  ["戊", "무", "토", "큰 산"],
+  ["己", "기", "토", "너른 들"],
+  ["庚", "경", "금", "바위"],
+  ["辛", "신", "금", "보석"],
+  ["壬", "임", "수", "큰 바다"],
+  ["癸", "계", "수", "단비"]
+].map(([hanja, hangul, element, image], index) => ({ index, hanja, hangul, element, name: hangul + element, image, yang: index % 2 === 0 })));
+var BRANCHES = deepFreeze3([
+  ["子", "자", "수", "rat"],
+  ["丑", "축", "토", "ox"],
+  ["寅", "인", "목", "tiger"],
+  ["卯", "묘", "목", "rabbit"],
+  ["辰", "진", "토", "dragon"],
+  ["巳", "사", "화", "snake"],
+  ["午", "오", "화", "horse"],
+  ["未", "미", "토", "sheep"],
+  ["申", "신", "금", "monkey"],
+  ["酉", "유", "금", "rooster"],
+  ["戌", "술", "토", "dog"],
+  ["亥", "해", "수", "pig"]
+].map(([hanja, hangul, element, animalId], index) => ({ index, hanja, hangul, element, animalId })));
+var stemByHanja = (hanja) => STEMS.find((item) => item.hanja === hanja) || null;
+var branchByHanja = (hanja) => BRANCHES.find((item) => item.hanja === hanja) || null;
+function pillarFromIndex(index) {
+  const stem = STEMS[index % 10], branch = BRANCHES[index % 12];
+  return { index, stem, branch, hangul: stem.hangul + branch.hangul, hanja: stem.hanja + branch.hanja };
+}
+var DAY_GANZHI_OFFSET = 17;
+function dayPillar(date2) {
+  return pillarFromIndex(mod(dayNumber(date2) + DAY_GANZHI_OFFSET, 60));
+}
+function yearPillar(year) {
+  if (!Number.isInteger(year) || year < 1900 || year > 2100) throw new RangeError("1900년부터 2100년까지의 연도를 골라 주세요.");
+  return pillarFromIndex(mod(year - 4, 60));
+}
+function monthPillar(year, month) {
+  yearPillar(year);
+  if (!Number.isInteger(month) || month < 1 || month > 12) throw new RangeError("1월부터 12월까지 골라 주세요.");
+  const pair = Solar.fromYmdHms(year, month, 15, 11, 0, 0).getLunar().getEightChar().getMonth();
+  const stem = stemByHanja(pair[0]), branch = branchByHanja(pair[1]);
+  return { index: findIndex(stem, branch), stem, branch, hangul: stem.hangul + branch.hangul, hanja: pair };
+}
+function findIndex(stem, branch) {
+  for (let index = 0; index < 60; index++) if (index % 10 === stem.index && index % 12 === branch.index) return index;
+  throw new Error("간지를 계산하지 못했어요.");
+}
+function elementRelation(self, other) {
+  const a = elementIndex(self), b = elementIndex(other);
+  if (a < 0 || b < 0) throw new TypeError("오행을 확인하지 못했어요.");
+  if (a === b) return "same";
+  if (mod(b + 1, 5) === a) return "supported";
+  if (mod(a + 1, 5) === b) return "expressing";
+  if (mod(a + 2, 5) === b) return "organizing";
+  return "balancing";
+}
+var generatingOf = (label) => ELEMENTS[mod(elementIndex(label) - 1, 5)].label;
+var generatedBy = (label) => ELEMENTS[mod(elementIndex(label) + 1, 5)].label;
+var WONJIN = /* @__PURE__ */ new Set(["0-7", "1-6", "2-9", "3-8", "4-11", "5-10"]);
+function branchRelation(a, b) {
+  const x = typeof a === "number" ? a : a.index, y = typeof b === "number" ? b : b.index;
+  if (x === y) return "same";
+  if (Math.abs(x - y) === 6) return "clash";
+  if (mod(x + y, 12) === 1) return "sixHarmony";
+  if (x % 4 === y % 4) return "threeHarmony";
+  if (WONJIN.has(`${Math.min(x, y)}-${Math.max(x, y)}`)) return "wonjin";
+  return "none";
+}
+var THREE_HARMONY_NAMES = ["신자진", "사유축", "인오술", "해묘미"];
+var threeHarmonyName = (index) => THREE_HARMONY_NAMES[index % 4];
+var WESTERN_ELEMENTS = deepFreeze3({
+  fire: { id: "fire", label: "불" },
+  earth: { id: "earth", label: "흙" },
+  air: { id: "air", label: "바람" },
+  water: { id: "water", label: "물" }
+});
+var WESTERN_ELEMENT_IDS = Object.freeze(["fire", "earth", "air", "water"]);
+function signElement(signId2) {
+  return WESTERN_ELEMENTS[getZodiacProfile(signId2).element.id];
+}
+function westernRelation(a, b) {
+  if (a === b) return "same";
+  const pair = [a, b].sort().join("-");
+  if (pair === "air-fire" || pair === "earth-water") return "complement";
+  if (pair === "earth-fire" || pair === "air-water") return "neutral";
+  return "challenging";
+}
+function sajuShape(saju) {
+  if (!saju || saju.signId !== "saju" || !Array.isArray(saju.pillars) || saju.pillars.length !== 4) {
+    throw new TypeError("생년월일로 계산한 사주 결과가 필요해요.");
+  }
+  const day = saju.pillars[2];
+  if (!day?.known || !saju.dayMaster?.hanja) return null;
+  const stem = stemByHanja(saju.dayMaster.hanja), branch = branchByHanja(day.branch?.hanja);
+  if (!stem || !branch) return null;
+  const year = saju.pillars[0]?.known ? branchByHanja(saju.pillars[0].branch.hanja) : null;
+  return { stem, branch, yearBranch: year, birthDate: saju.birthDate, birthTime: saju.birthTime ?? null };
+}
+var NAME_TOKENS = Object.freeze([
+  ...Array.from({ length: 60 }, (_, index) => pillarFromIndex(index).hangul),
+  ...STEMS.map((item) => item.name),
+  "물병자리"
+]);
+
+// experiences/daily-fortune/daily.mjs
+var SAJU_POOLS = {
+  supported: {
+    headlines: [
+      "도움의 손길이 자연스럽게 닿는 날",
+      "배운 것이 쏙쏙 들어오는 날",
+      "기대도 괜찮은 날",
+      "든든한 응원을 받는 날",
+      "좋은 조언이 찾아오는 날",
+      "마음에 여유가 차오르는 날",
+      "쉬어 가며 힘을 채우는 날",
+      "받은 마음을 알아차리는 날",
+      "새로 익히기 딱 좋은 날",
+      "차분하게 충전되는 날",
+      "생각이 맑게 정리되는 날",
+      "귀한 정보를 얻는 날",
+      "고마운 사람이 떠오르는 날"
+    ],
+    messages: [
+      "오늘은 주변의 도움이 자연스럽게 모이는 흐름이에요. 혼자 다 하려고 하기보다 한 번 기대어 보면 일이 훨씬 가벼워져요.",
+      "새로 배우거나 읽은 것이 오래 남기 좋은 날이에요. 궁금했던 걸 하나 골라 천천히 알아보세요.",
+      "마음에 여유가 차오르면서 표정도 한결 부드러워져요. 서두르지 않아도 필요한 것이 제때 찾아올 거예요.",
+      "누군가의 한마디가 생각을 정리해 주는 날이에요. 조언을 들으면 고마운 마음을 짧게라도 전해 보세요.",
+      "오늘은 채우는 날에 가까워요. 잘 쉬는 것만으로도 내일 쓸 힘이 차곡차곡 쌓여요.",
+      "경험 많은 사람의 이야기에서 힌트를 얻기 쉬워요. 물어보는 걸 망설이지 않아도 괜찮아요.",
+      "받은 친절을 알아차리는 눈이 밝아지는 날이에요. 고마운 일을 하나 적어 두면 마음이 더 든든해져요.",
+      "머릿속이 맑아져서 복잡했던 일이 차례대로 보이기 시작해요. 메모 한 장으로 정리해 두면 좋아요.",
+      "오늘 얻은 정보나 요령이 생각보다 쓸모가 많아요. 잊지 않게 한곳에 모아 두세요."
+    ],
+    do: [
+      "궁금했던 것 하나를 찾아 읽어 보세요.",
+      "도움이 필요한 일을 한 가지 부탁해 보세요.",
+      "믿을 만한 사람에게 조언을 구해 보세요.",
+      "오늘 배운 요령을 메모해 두세요.",
+      "고마운 사람에게 짧은 인사를 보내 보세요.",
+      "좋아하는 차 한 잔과 함께 쉬는 시간을 가져 보세요.",
+      "읽다 만 책을 다시 펼쳐 보세요.",
+      "짧은 산책으로 머리를 식혀 보세요.",
+      "선배나 어른의 이야기를 들어 보세요."
+    ],
+    dont: [
+      "모든 걸 혼자 해결하려는 마음은 잠시 내려 두세요.",
+      "받은 도움을 당연하게 넘기는 건 미뤄 두고, 고맙다고 말해 보세요.",
+      "너무 많은 정보를 한꺼번에 담는 건 미뤄 두세요. 하나만 골라도 충분해요.",
+      "쉬는 시간을 줄여 가며 일을 늘리는 건 미뤄 두세요.",
+      "조언을 듣자마자 정해 버리는 건 미뤄 두고, 하루쯤 생각해 보세요.",
+      "기댈 곳이 있는데 괜찮은 척하는 건 내려놓아도 돼요.",
+      "늦은 밤까지 화면을 보는 건 오늘은 미뤄 두세요.",
+      "배운 걸 바로 완벽하게 하려는 욕심은 잠시 내려 두세요.",
+      "도움을 사양하는 습관은 오늘만큼은 쉬어 가세요."
+    ],
+    items: ["손때 묻은 책", "따뜻한 머그잔", "포근한 담요", "작은 메모 수첩", "좋아하는 차 티백", "손편지 카드", "부드러운 쿠션", "작은 화분"]
+  },
+  same: {
+    headlines: [
+      "내 속도가 가장 잘 맞는 날",
+      "나다운 선택이 빛나는 날",
+      "비슷한 사람과 손발이 맞는 날",
+      "자신감이 한 뼘 자라는 날",
+      "혼자서도 거뜬한 날",
+      "친구와 힘을 모으기 좋은 날",
+      "내 생각에 힘이 실리는 날",
+      "꾸준함이 보람으로 돌아오는 날",
+      "내 중심이 단단해지는 날",
+      "함께 걷는 사람이 반가운 날",
+      "하던 일을 밀고 가기 좋은 날",
+      "나를 믿어 봐도 좋은 날",
+      "익숙한 방식이 통하는 날"
+    ],
+    messages: [
+      "오늘은 내 리듬대로 움직일 때 가장 편안해요. 남의 속도에 맞추느라 애쓰지 않아도 괜찮아요.",
+      "나와 비슷한 생각을 가진 사람과 손발이 잘 맞아요. 함께하면 혼자 할 때보다 훨씬 즐거워요.",
+      "스스로를 믿는 마음이 단단해지는 날이에요. 망설이던 일이 있다면 작게 첫발을 떼 보세요.",
+      "하던 일을 꾸준히 이어 가기 좋은 흐름이에요. 새로 벌이기보다 지금 하는 일에 힘을 실어 보세요.",
+      "내 의견을 말할 때 힘이 실리는 날이에요. 상대의 이야기도 끝까지 들어 주면 대화가 더 부드러워져요.",
+      "친구나 동료와 나란히 걷는 기분이 드는 날이에요. 서로 응원하는 한마디가 큰 힘이 돼요.",
+      "익숙한 방식이 오늘은 가장 좋은 답이에요. 해 오던 대로 차근차근 해 보세요.",
+      "내가 좋아하는 것을 분명히 아는 날이에요. 작은 선택이라도 마음이 가는 쪽을 골라 보세요.",
+      "혼자 있는 시간도 함께 있는 시간도 모두 편안해요. 오늘은 둘 사이의 균형을 즐겨 보세요."
+    ],
+    do: [
+      "오늘 할 일을 내 순서대로 정해 보세요.",
+      "친구에게 먼저 연락해 안부를 물어보세요.",
+      "망설이던 일에 작게 첫발을 떼 보세요.",
+      "함께하는 사람과 역할을 나눠 보세요.",
+      "꾸준히 하던 일을 오늘도 이어 가세요.",
+      "내 의견을 한 문장으로 정리해 말해 보세요.",
+      "좋아하는 일을 위해 시간을 따로 비워 두세요.",
+      "동료의 수고를 알아주는 말을 건네 보세요.",
+      "나에게 잘 맞는 방식 하나를 적어 두세요."
+    ],
+    dont: [
+      "내 방식만 고집하는 건 잠시 미뤄 두세요.",
+      "친구와 비교하며 조급해하는 건 내려놓아도 괜찮아요.",
+      "혼자 결정해 버리는 건 미뤄 두고, 함께하는 사람에게 한 번 물어보세요.",
+      "경쟁하듯 서두르는 건 오늘은 미뤄 두세요.",
+      "듣기 전에 답부터 하는 건 잠시 참아 두세요.",
+      "고집을 세우는 대화는 내일로 미뤄 두세요.",
+      "무리해서 모든 약속에 나가는 건 미뤄 두세요.",
+      "내 몫을 양보만 하는 건 미뤄 두고, 필요한 건 말해 보세요.",
+      "같은 일을 너무 오래 붙잡는 건 미뤄 두고, 잠깐 쉬어 가세요."
+    ],
+    items: ["늘 쓰는 펜", "친구와 찍은 사진", "편한 운동화", "손목시계", "좋아하는 모자", "친구와 맞춘 키링", "가벼운 에코백", "이어폰"]
+  },
+  expressing: {
+    headlines: [
+      "말 한마디가 잘 전해지는 날",
+      "아이디어가 술술 나오는 날",
+      "솜씨를 보여 주기 좋은 날",
+      "마음을 표현하기 좋은 날",
+      "만드는 재미가 큰 날",
+      "나눌수록 즐거운 날",
+      "웃음이 많아지는 날",
+      "내 이야기가 반가운 날",
+      "손끝에서 좋은 결과가 나오는 날",
+      "새로운 시도가 즐거운 날",
+      "칭찬을 건네기 좋은 날",
+      "맛있는 것을 나누기 좋은 날",
+      "내 재능이 드러나는 날"
+    ],
+    messages: [
+      "머릿속 생각이 말과 글로 잘 풀려 나오는 날이에요. 떠오르는 아이디어는 바로 적어 두세요.",
+      "내 표현이 상대에게 기분 좋게 닿는 흐름이에요. 고마운 마음이 있다면 오늘 꺼내 보세요.",
+      "손으로 만들거나 꾸미는 일에 재미가 붙어요. 완성도보다 즐거움에 집중하면 결과도 좋아져요.",
+      "나누는 만큼 마음이 넉넉해지는 날이에요. 작은 간식이나 좋은 정보를 주변과 나눠 보세요.",
+      "웃음이 잦아지고 분위기를 밝히는 역할을 맡기 쉬워요. 가벼운 농담 한마디가 하루를 즐겁게 해요.",
+      "새로운 방법을 시험해 보기 좋은 날이에요. 결과가 어떻든 해 본 것 자체가 좋은 경험이 돼요.",
+      "내 재능이 자연스럽게 드러나는 날이에요. 칭찬을 들으면 겸손하게 넘기기보다 기쁘게 받아 주세요.",
+      "말이 잘 통하는 만큼 대화가 길어질 수 있어요. 하고 싶은 말과 들을 말의 균형만 챙겨 주세요.",
+      "표현하고 싶은 마음이 커지는 날이에요. 사진이나 짧은 글로 오늘의 장면을 남겨 보세요."
+    ],
+    do: [
+      "떠오른 아이디어를 바로 적어 두세요.",
+      "고마운 마음을 말로 표현해 보세요.",
+      "손으로 무언가를 만들어 보세요.",
+      "맛있는 간식을 주변과 나눠 보세요.",
+      "오늘의 장면을 사진으로 남겨 보세요.",
+      "새로운 방법을 한 번 시험해 보세요.",
+      "좋아하는 노래를 흥얼거려 보세요.",
+      "누군가에게 구체적인 칭찬을 건네 보세요.",
+      "짧은 글로 오늘 기분을 적어 보세요."
+    ],
+    dont: [
+      "말을 길게 늘이는 건 미뤄 두세요. 핵심 한 줄이면 충분해요.",
+      "기분 따라 고르는 충동구매는 하루만 미뤄 두세요.",
+      "농담이 지나치지 않게 한 번 더 살펴 주세요.",
+      "완벽하게 다듬느라 시작을 미루는 건 내려놓아도 돼요.",
+      "약속을 너무 쉽게 잡는 건 미뤄 두세요.",
+      "다른 사람 이야기를 옮기는 건 오늘은 미뤄 두세요.",
+      "감정을 한꺼번에 쏟아 내는 건 미뤄 두고, 짧게 나눠 말해 보세요.",
+      "한 번에 여러 일을 벌이는 건 미뤄 두세요.",
+      "칭찬을 기다리며 서운해하는 건 내려놓아도 괜찮아요."
+    ],
+    items: ["색연필", "촉촉한 립밤", "작은 블루투스 스피커", "귀여운 스티커", "필름 카메라", "향기 좋은 핸드크림", "달콤한 초콜릿", "알록달록 양말"]
+  },
+  organizing: {
+    headlines: [
+      "정리하는 만큼 개운해지는 날",
+      "계획이 손에 잡히는 날",
+      "작은 성과가 쌓이는 날",
+      "살림을 돌보기 좋은 날",
+      "꼼꼼함이 빛나는 날",
+      "해야 할 일이 술술 풀리는 날",
+      "내 몫을 챙기기 좋은 날",
+      "미뤄 둔 일을 끝내기 좋은 날",
+      "실속을 챙기는 날",
+      "결과가 눈에 보이는 날",
+      "우선순위가 또렷해지는 날",
+      "알뜰한 선택이 기분 좋은 날",
+      "마무리가 깔끔한 날"
+    ],
+    messages: [
+      "눈앞의 일을 하나씩 정리할수록 마음이 가벼워지는 날이에요. 작은 서랍 하나부터 시작해 보세요.",
+      "계획을 세우면 그대로 진행되기 쉬운 흐름이에요. 오늘 할 일을 세 가지만 골라 적어 보세요.",
+      "노력한 만큼 결과가 눈에 보이는 날이에요. 끝낸 일에 표시를 하며 성취감을 느껴 보세요.",
+      "살림과 일상을 챙기기 좋은 날이에요. 필요한 것과 없어도 되는 것을 나눠 보면 한결 깔끔해져요.",
+      "꼼꼼함이 빛을 보는 날이에요. 숫자나 일정을 한 번 더 살펴보면 든든해요.",
+      "미뤄 둔 일을 끝내기 좋은 흐름이에요. 가장 작은 것부터 하나씩 지워 나가 보세요.",
+      "내 몫을 차분하게 챙기기 좋은 날이에요. 받을 것과 줄 것을 정리해 두면 마음이 편해요.",
+      "우선순위가 또렷해지면서 고민이 줄어드는 날이에요. 중요한 일 하나에 먼저 힘을 써 보세요.",
+      "실속 있는 선택이 기분 좋게 돌아오는 날이에요. 꼭 필요한 것 위주로 고르면 만족도가 높아요."
+    ],
+    do: [
+      "책상이나 서랍 한 칸을 정리해 보세요.",
+      "오늘 할 일을 세 가지만 골라 적어 보세요.",
+      "이번 주 지출을 한 번 훑어보세요.",
+      "미뤄 둔 작은 일 하나를 끝내 보세요.",
+      "일정표를 열어 다음 주를 미리 살펴보세요.",
+      "쓰지 않는 구독이나 알림을 정리해 보세요.",
+      "끝낸 일에 체크 표시를 해 보세요.",
+      "장보기 목록을 미리 만들어 두세요.",
+      "파일과 사진을 폴더별로 정리해 보세요."
+    ],
+    dont: [
+      "큰 지출은 하루쯤 미뤄 두고 다시 살펴보세요.",
+      "모든 걸 한 번에 정리하려는 건 미뤄 두세요. 한 칸이면 충분해요.",
+      "숫자를 대충 넘기는 건 미뤄 두고, 한 번만 더 확인해 보세요.",
+      "남의 몫까지 챙기느라 내 일을 미루는 건 잠시 멈춰 두세요.",
+      "계획에 없던 약속을 늘리는 건 미뤄 두세요.",
+      "결과만 보고 과정을 서두르는 건 미뤄 두세요.",
+      "쓸 만한 물건을 충동적으로 버리는 건 하루 미뤄 두세요.",
+      "할인 문구에 마음이 흔들리는 건 잠시 미뤄 두세요.",
+      "일하는 시간을 끝없이 늘리는 건 미뤄 두세요."
+    ],
+    items: ["깔끔한 파일철", "작은 지갑", "라벨 스티커", "탁상 달력", "정리 바구니", "체크리스트 메모지", "집게 클립", "열쇠고리"]
+  },
+  balancing: {
+    headlines: [
+      "한 걸음씩 천천히 가면 좋은 날",
+      "기본을 챙기면 편안한 날",
+      "약속을 지키는 힘이 커지는 날",
+      "속도를 조금 늦춰도 괜찮은 날",
+      "차분함이 힘이 되는 날",
+      "맡은 일에 집중하기 좋은 날",
+      "순서대로 하면 술술 풀리는 날",
+      "쉬어 가는 용기가 필요한 날",
+      "단단하게 다져지는 날",
+      "내 기준을 다시 세우는 날",
+      "한 번 더 확인하면 든든한 날",
+      "오늘 할 만큼만 해도 충분한 날",
+      "책임감이 빛나는 날"
+    ],
+    messages: [
+      "오늘은 속도보다 방향을 챙기는 날이에요. 한 걸음씩 천천히 가도 충분히 잘하고 있어요.",
+      "해야 할 일과 지켜야 할 약속이 또렷해지는 흐름이에요. 기본을 챙기면 하루가 편안하게 흘러가요.",
+      "맡은 일에 대한 책임감이 커지는 날이에요. 혼자 다 떠안기보다 도움이 필요한 부분은 말해 보세요.",
+      "조금 빡빡하게 느껴질 수 있지만 그만큼 단단해지는 하루예요. 중간중간 숨 고를 틈을 꼭 만들어 주세요.",
+      "순서대로 차근차근 하면 생각보다 쉽게 풀려요. 서두르기보다 확인하며 가는 쪽이 오늘은 더 빨라요.",
+      "내 기준을 다시 세워 보기 좋은 날이에요. 무리한 부탁에는 부드럽게 거절해도 괜찮아요.",
+      "차분함이 가장 큰 힘이 되는 날이에요. 마음이 급해질 때는 물 한 잔 마시며 잠깐 쉬어 가세요.",
+      "오늘은 할 수 있는 만큼만 해도 충분해요. 남은 일은 내일의 나에게 맡겨도 괜찮아요.",
+      "약속을 지키는 모습이 믿음으로 돌아오는 날이에요. 작은 약속 하나를 잘 지켜 보세요."
+    ],
+    do: [
+      "오늘 꼭 할 일 하나만 정해 두세요.",
+      "일정 사이에 쉬는 틈을 넣어 두세요.",
+      "약속 시간을 한 번 더 확인해 보세요.",
+      "보내기 전에 한 번 더 읽어 보세요.",
+      "무리한 부탁은 부드럽게 거절해 보세요.",
+      "따뜻한 물 한 잔으로 숨을 골라 보세요.",
+      "해야 할 일을 순서대로 적어 보세요.",
+      "잠들기 전 내일 준비를 미리 해 두세요.",
+      "오늘 지킨 작은 약속을 스스로 칭찬해 주세요."
+    ],
+    dont: [
+      "급하게 결론 내리는 건 내일로 미뤄 두세요.",
+      "빡빡한 일정은 미뤄 두고, 한 가지를 덜어 내 보세요.",
+      "남의 기대에 모두 맞추려는 건 내려놓아도 괜찮아요.",
+      "날 선 말에 바로 답하는 건 미뤄 두고, 한숨 돌린 뒤 답해 보세요.",
+      "확인 없이 보내는 메시지는 잠시 미뤄 두세요.",
+      "새로운 일을 크게 벌이는 건 다음으로 미뤄 두세요.",
+      "스스로를 다그치는 건 오늘은 쉬어 가세요.",
+      "늦게까지 일을 붙잡는 건 미뤄 두세요.",
+      "정해진 순서를 건너뛰는 지름길은 오늘은 미뤄 두세요."
+    ],
+    items: ["따뜻한 텀블러", "면 손수건", "접이식 우산", "안경닦이", "손난로", "포근한 목도리", "은은한 향초", "작은 손거울"]
+  }
+};
+var WESTERN_POOLS = {
+  fire: {
+    headlines: [
+      "작은 불씨가 커지는 날",
+      "용기 내기 좋은 날",
+      "먼저 손을 내밀어 보는 날",
+      "시작 버튼을 누르기 좋은 날",
+      "열정이 반짝이는 날",
+      "몸을 움직이면 기분이 좋아지는 날",
+      "하고 싶은 일이 또렷해지는 날",
+      "망설임보다 실행이 어울리는 날",
+      "내 빛을 드러내기 좋은 날",
+      "활기가 넘치는 날",
+      "도전이 즐거운 날",
+      "마음이 뜨거워지는 날",
+      "앞장서 보기 좋은 날",
+      "새 목표를 세우기 좋은 날",
+      "웃음소리가 커지는 날",
+      "자신감에 불이 켜지는 날"
+    ],
+    messages: [
+      "오늘은 머릿속에만 있던 계획을 밖으로 꺼내기 좋은 날이에요. 거창하지 않아도 첫 문장 하나면 충분해요.",
+      "움직일수록 기분이 살아나는 흐름이에요. 짧게라도 몸을 움직이면 생각도 가벼워져요.",
+      "먼저 다가가는 쪽이 오늘의 주인공이 돼요. 반가운 사람에게 먼저 인사를 건네 보세요.",
+      "하고 싶은 일이 또렷하게 보이는 날이에요. 마음이 가는 쪽으로 한 발만 내디뎌 보세요.",
+      "열정이 커지는 만큼 속도도 빨라질 수 있어요. 중요한 일은 한 번 숨을 고른 뒤 시작해 보세요.",
+      "작은 도전이 큰 재미로 돌아오는 날이에요. 평소와 다른 길로 걸어 보는 것도 좋아요.",
+      "내 매력이 자연스럽게 드러나는 날이에요. 좋아하는 옷을 입고 기분을 한껏 올려 보세요.",
+      "오늘의 에너지는 시작하는 데 쓰면 가장 좋아요. 마무리는 내일의 나에게 맡겨도 괜찮아요.",
+      "앞장서서 분위기를 이끌기 좋은 날이에요. 다른 사람의 속도도 한 번씩 살펴 주면 더 좋아요.",
+      "웃음과 활기가 주변까지 전해지는 날이에요. 함께 즐길 작은 계획을 세워 보세요."
+    ],
+    do: [
+      "미뤄 둔 일 하나를 지금 시작해 보세요.",
+      "10분만 몸을 움직여 보세요.",
+      "반가운 사람에게 먼저 인사를 건네 보세요.",
+      "좋아하는 옷을 골라 입어 보세요.",
+      "평소와 다른 길로 걸어 보세요.",
+      "새 목표를 한 줄로 적어 보세요.",
+      "신나는 노래로 하루를 시작해 보세요.",
+      "작은 도전 하나에 손을 들어 보세요.",
+      "함께 즐길 약속을 하나 잡아 보세요.",
+      "오늘 잘한 일을 소리 내어 칭찬해 보세요."
+    ],
+    dont: [
+      "생각보다 말이 먼저 나가는 건 잠시 미뤄 두세요.",
+      "모든 일을 한꺼번에 시작하는 건 미뤄 두세요. 하나면 충분해요.",
+      "경쟁심에 서두르는 건 미뤄 두고, 내 속도를 지켜 보세요.",
+      "급하게 정하는 큰 결정은 내일로 미뤄 두세요.",
+      "다른 사람의 속도를 재촉하는 건 잠시 쉬어 가세요.",
+      "기분 따라 약속을 바꾸는 건 미뤄 두세요.",
+      "쉬지 않고 달리는 건 미뤄 두고, 중간에 숨을 골라 보세요.",
+      "날 선 말에 바로 맞받아치는 건 미뤄 두세요.",
+      "즉흥적인 지출은 하루만 미뤄 두세요.",
+      "혼자 다 해내려는 욕심은 잠시 내려 두세요."
+    ],
+    items: ["선글라스", "빨간 머리끈", "새 운동화", "스포츠 텀블러", "밝은 색 모자", "에너지 바", "손목 밴드", "오렌지 주스", "반짝이는 배지", "줄넘기"]
+  },
+  earth: {
+    headlines: [
+      "차근차근 쌓아 가는 날",
+      "손에 잡히는 결과가 반가운 날",
+      "감각이 예민하게 깨어나는 날",
+      "맛있는 한 끼가 행복한 날",
+      "꾸준함이 힘이 되는 날",
+      "일상을 단단히 다지는 날",
+      "실속을 챙기기 좋은 날",
+      "편안한 것이 가장 좋은 날",
+      "정성 들인 만큼 돌아오는 날",
+      "내 공간을 가꾸기 좋은 날",
+      "천천히 해도 확실한 날",
+      "좋은 습관이 자리 잡는 날",
+      "차분하게 계획을 다듬는 날",
+      "자연이 가까이 느껴지는 날",
+      "믿음직한 사람이 되는 날",
+      "작은 호사가 어울리는 날"
+    ],
+    messages: [
+      "오늘은 눈에 보이는 결과를 하나씩 쌓아 가는 날이에요. 작은 일이라도 끝까지 마무리하면 뿌듯함이 커요.",
+      "감각이 예민해져서 좋은 것을 알아보는 눈이 밝아요. 맛있는 음식이나 좋은 향으로 나를 챙겨 주세요.",
+      "꾸준히 해 온 일이 힘을 발휘하는 흐름이에요. 새로 시작하기보다 하던 일을 이어 가 보세요.",
+      "내 공간을 편안하게 가꾸기 좋은 날이에요. 자주 쓰는 자리 하나만 정돈해도 기분이 달라져요.",
+      "실속 있는 선택이 빛나는 날이에요. 꼭 필요한 것과 갖고 싶은 것을 나눠 생각해 보세요.",
+      "천천히 가도 확실하게 가는 날이에요. 서두르는 사람이 있어도 내 속도를 지켜 보세요.",
+      "몸과 마음이 편안한 것을 찾게 되는 날이에요. 빡빡한 일정보다 여유 있는 하루가 잘 어울려요.",
+      "정성을 들인 만큼 결과가 돌아오는 흐름이에요. 손이 많이 가는 일도 오늘은 즐겁게 할 수 있어요.",
+      "믿음직한 모습이 주변에 든든함을 주는 날이에요. 약속을 하나 잘 지키는 것만으로도 충분해요.",
+      "자연 가까이 있으면 마음이 차분해지는 날이에요. 창문을 열거나 잠깐 바깥 공기를 마셔 보세요."
+    ],
+    do: [
+      "자주 쓰는 자리 하나를 정돈해 보세요.",
+      "맛있는 한 끼를 천천히 즐겨 보세요.",
+      "하던 일을 한 단계만 더 이어 가 보세요.",
+      "좋아하는 향을 가까이 두어 보세요.",
+      "이번 주 할 일을 달력에 적어 보세요.",
+      "창문을 열고 바깥 공기를 마셔 보세요.",
+      "작은 화분에 물을 주어 보세요.",
+      "꼭 필요한 물건 목록을 만들어 보세요.",
+      "지킨 약속 하나를 체크해 보세요.",
+      "손으로 하는 일 하나에 집중해 보세요."
+    ],
+    dont: [
+      "익숙한 방식만 고집하는 건 잠시 미뤄 두세요.",
+      "완벽하게 준비될 때까지 기다리는 건 미뤄 두고, 작게 시작해 보세요.",
+      "걱정이 앞서 결정을 미루는 건 오늘은 내려놓아도 괜찮아요.",
+      "필요 없는 물건을 사 모으는 건 미뤄 두세요.",
+      "쉬는 날까지 일을 챙기는 건 미뤄 두세요.",
+      "작은 실수에 오래 머무는 건 내려놓아도 돼요.",
+      "변화를 무조건 피하는 건 미뤄 두고, 한 가지만 바꿔 보세요.",
+      "남의 속도와 비교하는 건 잠시 미뤄 두세요.",
+      "무리해서 모든 걸 챙기는 건 미뤄 두세요.",
+      "고집 센 대화는 하루쯤 미뤄 두세요."
+    ],
+    items: ["원목 연필", "작은 다육 화분", "리넨 손수건", "꿀 스틱", "도자기 컵", "향 좋은 비누", "라탄 코스터", "곡물 쿠키", "니트 장갑", "돌멩이 문진"]
+  },
+  air: {
+    headlines: [
+      "대화가 술술 풀리는 날",
+      "반가운 소식이 들려오는 날",
+      "새로운 사람과 통하는 날",
+      "아이디어가 바람처럼 스치는 날",
+      "가볍게 움직이기 좋은 날",
+      "질문이 답을 데려오는 날",
+      "메시지 하나가 하루를 바꾸는 날",
+      "생각을 나누면 커지는 날",
+      "호기심이 길을 여는 날",
+      "다른 시선이 반가운 날",
+      "배우는 재미가 큰 날",
+      "산뜻하게 기분을 바꾸는 날",
+      "연결이 연결을 부르는 날",
+      "부드럽게 의견을 맞추는 날",
+      "짧은 외출이 즐거운 날",
+      "머리가 맑게 돌아가는 날"
+    ],
+    messages: [
+      "오늘은 말이 잘 통하고 대화가 즐거운 날이에요. 미뤄 둔 연락이 있다면 가볍게 먼저 건네 보세요.",
+      "새로운 아이디어가 바람처럼 스쳐 가요. 떠오르는 생각은 잊기 전에 메모해 두세요.",
+      "낯선 사람과도 금방 통하는 흐름이에요. 처음 만나는 자리라면 편하게 질문을 던져 보세요.",
+      "호기심이 길을 열어 주는 날이에요. 궁금한 것이 생기면 짧게라도 알아보세요.",
+      "다양한 의견을 들으면 생각이 더 넓어지는 날이에요. 나와 다른 시선도 반갑게 들어 보세요.",
+      "반가운 소식이나 메시지가 오가기 쉬운 날이에요. 답장은 짧고 다정하게 보내 보세요.",
+      "기분 전환이 잘되는 날이에요. 짧은 외출이나 새로운 음악으로 분위기를 바꿔 보세요.",
+      "생각이 빠르게 돌아가는 만큼 할 일이 늘어날 수 있어요. 오늘은 가장 재미있는 것 하나에 집중해 보세요.",
+      "사람과 사람을 잇는 역할이 잘 어울리는 날이에요. 서로 도움이 될 두 사람을 소개해 보는 것도 좋아요.",
+      "배우는 재미가 커지는 날이에요. 짧은 글이나 영상 하나로 새로운 것을 알아 가 보세요."
+    ],
+    do: [
+      "미뤄 둔 연락을 가볍게 보내 보세요.",
+      "떠오르는 아이디어를 메모해 두세요.",
+      "처음 만난 사람에게 질문 하나를 건네 보세요.",
+      "궁금한 것 하나를 짧게 찾아보세요.",
+      "새로운 음악을 한 곡 들어 보세요.",
+      "친구에게 요즘 재미있는 걸 물어보세요.",
+      "짧은 산책으로 기분을 바꿔 보세요.",
+      "서로 도움이 될 두 사람을 이어 줘 보세요.",
+      "짧은 글 하나를 끝까지 읽어 보세요.",
+      "대화 중 들은 좋은 말을 적어 두세요."
+    ],
+    dont: [
+      "너무 많은 약속을 한꺼번에 잡는 건 미뤄 두세요.",
+      "확인되지 않은 이야기를 옮기는 건 미뤄 두세요.",
+      "생각만 하고 끝내는 건 미뤄 두고, 하나는 실제로 해 보세요.",
+      "메시지를 길게 늘이는 건 미뤄 두세요. 짧을수록 잘 전해져요.",
+      "여러 일을 동시에 붙잡는 건 미뤄 두세요.",
+      "가볍게 한 말에 오래 신경 쓰는 건 내려놓아도 돼요.",
+      "결정을 남에게만 맡기는 건 미뤄 두고, 내 생각도 말해 보세요.",
+      "화면을 오래 들여다보는 건 잠시 쉬어 가세요.",
+      "대답을 서두르는 건 미뤄 두고, 한 번 더 생각해 보세요.",
+      "기분 따라 계획을 자주 바꾸는 건 미뤄 두세요."
+    ],
+    items: ["줄 노트", "유선 이어폰", "책갈피", "그림엽서", "풍선", "바람개비", "교통카드", "가벼운 스카프", "형광펜", "작은 퍼즐"]
+  },
+  water: {
+    headlines: [
+      "마음의 소리에 귀 기울이는 날",
+      "다정함이 오가는 날",
+      "공감이 깊어지는 날",
+      "감성이 풍부해지는 날",
+      "쉬어 가며 채우는 날",
+      "직감을 믿어 봐도 좋은 날",
+      "가까운 사람과 더 가까워지는 날",
+      "상상력이 넓어지는 날",
+      "위로를 주고받는 날",
+      "조용한 시간이 소중한 날",
+      "추억이 반갑게 떠오르는 날",
+      "흐름에 몸을 맡겨도 좋은 날",
+      "따뜻한 말이 오래 남는 날",
+      "마음을 정리하기 좋은 날",
+      "음악이 잘 어울리는 날",
+      "부드럽게 흘러가는 날"
+    ],
+    messages: [
+      "오늘은 마음의 소리에 귀 기울이기 좋은 날이에요. 바쁜 와중에도 잠깐 내 기분을 살펴 주세요.",
+      "다정한 마음이 오가기 쉬운 흐름이에요. 가까운 사람에게 따뜻한 말을 먼저 건네 보세요.",
+      "다른 사람의 마음이 잘 느껴지는 날이에요. 들어 주는 것만으로도 큰 위로가 될 수 있어요.",
+      "감성이 풍부해져서 음악이나 영화가 더 깊게 다가와요. 마음에 남는 장면을 하나 기억해 두세요.",
+      "채우는 쉼이 필요한 날이에요. 일정을 조금 비워 두고 나를 위한 시간을 만들어 보세요.",
+      "직감이 잘 맞는 날이에요. 마음이 끌리는 쪽을 가볍게 따라가 보세요.",
+      "오래된 추억이 반갑게 떠오르는 날이에요. 그리운 사람에게 안부를 전해 보는 것도 좋아요.",
+      "상상력이 넓어지는 흐름이에요. 떠오르는 장면을 그림이나 글로 남겨 보세요.",
+      "흐름에 몸을 맡기면 더 편안한 날이에요. 계획이 조금 바뀌어도 너그럽게 받아들여 보세요.",
+      "조용한 시간에 마음이 정리되는 날이에요. 잠들기 전 오늘 좋았던 일 하나를 떠올려 보세요."
+    ],
+    do: [
+      "지금 기분을 한 단어로 적어 보세요.",
+      "가까운 사람에게 따뜻한 말을 건네 보세요.",
+      "누군가의 이야기를 끝까지 들어 주세요.",
+      "좋아하는 음악을 들으며 쉬어 보세요.",
+      "그리운 사람에게 안부를 보내 보세요.",
+      "따뜻한 물로 씻으며 하루를 풀어 보세요.",
+      "마음에 남는 장면을 사진으로 남겨 보세요.",
+      "잠들기 전 좋았던 일 하나를 떠올려 보세요.",
+      "일정 하나를 비우고 나를 위한 시간을 가져 보세요.",
+      "마음이 끌리는 쪽을 가볍게 골라 보세요."
+    ],
+    dont: [
+      "혼자 짐작해서 서운해하는 건 미뤄 두고, 한 번 물어보세요.",
+      "다른 사람의 감정까지 다 떠안는 건 내려놓아도 괜찮아요.",
+      "지난 일을 오래 곱씹는 건 미뤄 두세요.",
+      "기분이 가라앉을 때 큰 결정을 내리는 건 미뤄 두세요.",
+      "거절하지 못해 무리하는 건 미뤄 두세요.",
+      "늦은 밤 감정적인 메시지는 아침으로 미뤄 두세요.",
+      "비교하며 마음 쓰는 건 잠시 내려 두세요.",
+      "괜찮은 척하는 건 미뤄 두고, 솔직하게 말해 보세요.",
+      "기분 따라 하는 쇼핑은 하루만 미뤄 두세요.",
+      "쉬고 싶은 마음을 모른 척하는 건 미뤄 두세요."
+    ],
+    items: ["입욕제", "은은한 향수", "유리구슬", "조개껍데기", "수면 안대", "나만의 플레이리스트", "파란 머그컵", "진주 귀걸이", "아로마 오일", "일기장"]
+  }
+};
+var DAILY_POOLS = deepFreeze3({ korean: SAJU_POOLS, western: WESTERN_POOLS });
+var SAJU_RELATIONS = deepFreeze3({
+  supported: { label: "기운을 받는 날", overall: 5, love: 4, money: 3, work: 5 },
+  same: { label: "내 리듬의 날", overall: 4, love: 3, money: 3, work: 4 },
+  expressing: { label: "표현이 잘 풀리는 날", overall: 4, love: 5, money: 3, work: 4 },
+  organizing: { label: "정리가 잘되는 날", overall: 4, love: 3, money: 5, work: 4 },
+  balancing: { label: "천천히 다지는 날", overall: 3, love: 3, money: 3, work: 4 }
+});
+var WESTERN_RELATIONS = deepFreeze3({
+  same: { label: "같은 기운이 도는 날", overall: 5 },
+  complement: { label: "힘을 보태 주는 날", overall: 4 },
+  neutral: { label: "무난하게 흐르는 날", overall: 4 },
+  challenging: { label: "한 템포 쉬어 가는 날", overall: 3 }
+});
+var WESTERN_FLAVOR = { fire: "work", earth: "money", air: "love", water: "love" };
+var TAGS = deepFreeze3({
+  good: "기운이 좋은 날",
+  calm: "쉬어 가기 좋은 날",
+  care: "천천히 가면 좋은 날"
+});
+function tagFor(overall) {
+  if (overall >= 5) return "good";
+  if (overall <= 2) return "care";
+  if (overall === 3) return "calm";
+  return null;
+}
+var SAJU_COLORS = {
+  목: [["새싹 초록", "#7DBE7A"], ["민트", "#8FD3C1"], ["올리브 그린", "#8A9A5B"]],
+  화: [["부드러운 코랄", "#F4846B"], ["체리 레드", "#D9475A"], ["살구색", "#F6B38A"]],
+  토: [["버터 옐로", "#F6D776"], ["머스터드", "#D9A93B"], ["베이지", "#E3CBA8"]],
+  금: [["포근한 크림", "#F4EBD9"], ["은빛 회색", "#BFC3C9"], ["펄 화이트", "#F7F5F0"]],
+  수: [["깊은 남색", "#2F3E73"], ["맑은 파랑", "#5B8DEF"], ["먹색", "#33343A"]]
+};
+var WESTERN_COLORS = {
+  fire: [["선명한 주황", "#F28C38"], ["코랄 레드", "#E85D5D"], ["햇살 노랑", "#F7C948"]],
+  earth: [["올리브", "#7F8F4E"], ["테라코타", "#C8734E"], ["모카", "#A47551"]],
+  air: [["하늘색", "#8EC5F0"], ["라벤더", "#B9A7E6"], ["민트 그린", "#9ADBC8"]],
+  water: [["바다 파랑", "#3D7FC1"], ["청록", "#2E9C9A"], ["은은한 보라", "#8C7AB8"]]
+};
+var ELEMENT_NUMBERS = { 수: [1, 6], 화: [2, 7], 목: [3, 8], 금: [4, 9], 토: [5, 10] };
+var TIME_LABELS = {
+  3: "오전 5~7시",
+  4: "오전 7~9시",
+  5: "오전 9~11시",
+  6: "오전 11시~오후 1시",
+  7: "오후 1~3시",
+  8: "오후 3~5시",
+  9: "오후 5~7시",
+  10: "저녁 7~9시",
+  11: "밤 9~11시"
+};
+var NOTES = {
+  korean: "오늘 일진과 내 일간의 오행 관계로 고른 읽을거리예요. 미래를 예측하지 않아요.",
+  western: "날짜와 별자리 원소로 고른 창작 읽을거리예요. 실제 천체 위치를 계산하지 않아요."
+};
+function jitter(seed2, field) {
+  const value = hash(`${seed2}/${field}`) % 4;
+  return value === 0 ? -1 : value === 3 ? 1 : 0;
+}
+function sajuBasis(relation, mine, today) {
+  const t = `오늘 일진의 ${today.name}${josa(today.name, "이", "가")}`;
+  const m = `내 일간 ${mine.name}`;
+  if (relation === "same") return `${t} ${m}${josa(mine.name, "과", "와")} 같은 ${mine.element} 기운이라 내 리듬대로 가기 좋은 날이에요.`;
+  if (relation === "supported") return `${t} ${m}${josa(mine.name, "을", "를")} 살려 주는 날이에요.`;
+  if (relation === "expressing") return `${m}${josa(mine.name, "이", "가")} 오늘 일진의 ${today.name}${josa(today.name, "을", "를")} 키워 주는 날이라 표현이 잘 풀려요.`;
+  if (relation === "organizing") return `${m}${josa(mine.name, "이", "가")} 오늘 일진의 ${today.name}${josa(today.name, "을", "를")} 다스리는 날이라 정리가 잘돼요.`;
+  return `${t} ${m}${josa(mine.name, "을", "를")} 다듬어 주는 날이라 천천히 가면 좋아요.`;
+}
+function westernBasis(relation, sign, own, day) {
+  const opening = `오늘은 ${day.label} 기운이 도는 날이라,`;
+  if (relation === "same") return `${opening} 같은 ${own.label} 별자리인 ${sign}${josa(sign, "과", "와")} 잘 맞아요.`;
+  if (relation === "complement") return `${opening} ${own.label} 별자리인 ${sign}에게 힘을 보태 줘요.`;
+  if (relation === "neutral") return `${opening} ${own.label} 별자리인 ${sign}에게는 무난하게 흘러가요.`;
+  return `${opening} ${own.label} 별자리인 ${sign}${josa(sign, "은", "는")} 속도를 조금 늦추면 편안해요.`;
+}
+function westernDayElement(date2) {
+  const day = dayNumber(date2), block = Math.floor(day / 4);
+  const order = shuffledOrder(4, `western-day/${block}`);
+  return { element: WESTERN_ELEMENTS[WESTERN_ELEMENT_IDS[order[mod(day, 4)]]], block };
+}
+function koreanCard(saju, date2) {
+  const shape = sajuShape(saju);
+  if (!shape) return null;
+  if (shape.birthDate && date2 < shape.birthDate) throw new RangeError("출생일 이전 날짜예요.");
+  const day = dayNumber(date2), today = dayPillar(date2);
+  const relation = elementRelation(shape.stem.element, today.stem.element);
+  const cycle = Math.floor((day + 17) / 10);
+  const k = 2 * cycle + today.stem.index % 2;
+  const seed2 = `saju/${shape.birthDate}/${shape.birthTime ?? "?"}`;
+  const pools = SAJU_POOLS[relation], base = SAJU_RELATIONS[relation];
+  const branch = branchRelation(shape.branch, today.branch);
+  const shift = branch === "sixHarmony" ? 1 : branch === "clash" ? -1 : 0;
+  const daySeed = `${seed2}/${date2}`;
+  const overall = clamp(base.overall + shift, 2, 5);
+  const levels = { overall };
+  for (const field of ["love", "money", "work"]) {
+    levels[field] = clamp(base[field] + shift + (field === "love" && branch === "threeHarmony" ? 1 : 0) + jitter(daySeed, field), 2, 5);
+  }
+  const luckChoices = [generatingOf(shape.stem.element), shape.stem.element, generatedBy(shape.stem.element)];
+  const luckyElement = luckChoices[hash(`${daySeed}/luck`) % 3];
+  const [colorName, hex] = SAJU_COLORS[luckyElement][hash(`${daySeed}/color`) % 3];
+  const numbers = ELEMENT_NUMBERS[luckyElement];
+  const hours = BRANCHES.filter((item) => item.element === luckyElement && TIME_LABELS[item.index]);
+  const tag = tagFor(overall);
+  return {
+    date: date2,
+    mode: "korean",
+    weekday: weekdayOf(date2),
+    relation,
+    label: base.label,
+    tag,
+    tagLabel: tag ? TAGS[tag] : null,
+    headline: rotationPick(pools.headlines, `${seed2}/headline/${relation}`, k),
+    message: rotationPick(pools.messages, `${seed2}/message/${relation}`, k),
+    levels,
+    do: rotationPick(pools.do, `${seed2}/do/${relation}`, k),
+    dont: rotationPick(pools.dont, `${seed2}/dont/${relation}`, k),
+    luckyColor: { name: colorName, hex },
+    luckyNumber: numbers[hash(`${daySeed}/number`) % numbers.length],
+    luckyItem: rotationPick(pools.items, `${seed2}/item/${relation}`, k),
+    luckyTime: TIME_LABELS[hours[hash(`${daySeed}/time`) % hours.length].index],
+    basis: sajuBasis(relation, shape.stem, today.stem),
+    note: NOTES.korean,
+    signId: null,
+    signLabel: `${shape.stem.name} 일간`,
+    birthDate: shape.birthDate,
+    birthTime: shape.birthTime,
+    dayMaster: { hanja: shape.stem.hanja, name: shape.stem.name, image: shape.stem.image },
+    dayPillar: { hanja: today.hanja, hangul: today.hangul },
+    luckyElement
+  };
+}
+function westernCard(signId2, date2) {
+  const profile2 = getZodiacProfile(signId2);
+  const own = signElement(signId2);
+  const { element: dayElement, block } = westernDayElement(date2);
+  const relation = westernRelation(own.id, dayElement.id);
+  const seed2 = `western/${signId2}`, daySeed = `${seed2}/${date2}`;
+  const pools = WESTERN_POOLS[dayElement.id], base = WESTERN_RELATIONS[relation];
+  const overall = clamp(base.overall - (hash(`${daySeed}/overall`) % 6 === 0 ? 1 : 0), 2, 5);
+  const levels = { overall };
+  for (const field of ["love", "money", "work"]) {
+    levels[field] = clamp(base.overall - 1 + (WESTERN_FLAVOR[dayElement.id] === field ? 1 : 0) + jitter(daySeed, field), 2, 5);
+  }
+  const [colorName, hex] = WESTERN_COLORS[dayElement.id][hash(`${daySeed}/color`) % 3];
+  const tag = tagFor(overall);
+  return {
+    date: date2,
+    mode: "western",
+    weekday: weekdayOf(date2),
+    relation,
+    label: base.label,
+    tag,
+    tagLabel: tag ? TAGS[tag] : null,
+    headline: rotationPick(pools.headlines, `${seed2}/headline/${dayElement.id}`, block),
+    message: rotationPick(pools.messages, `${seed2}/message/${dayElement.id}`, block),
+    levels,
+    do: rotationPick(pools.do, `${seed2}/do/${dayElement.id}`, block),
+    dont: rotationPick(pools.dont, `${seed2}/dont/${dayElement.id}`, block),
+    luckyColor: { name: colorName, hex },
+    luckyNumber: hash(`${daySeed}/number`) % 9 + 1,
+    luckyItem: rotationPick(pools.items, `${seed2}/item/${dayElement.id}`, block),
+    luckyTime: null,
+    basis: westernBasis(relation, profile2.label, own, dayElement),
+    note: NOTES.western,
+    signId: signId2,
+    signLabel: profile2.label,
+    birthDate: null,
+    birthTime: null,
+    signElement: { ...own },
+    dayElement: { ...dayElement }
+  };
+}
+function getDailyCard({ mode: mode2, signId: signId2, saju, date: date2 = seoulDateKey() } = {}) {
+  if (!["western", "korean"].includes(mode2)) throw new TypeError("한국 사주와 별자리 운세 중 하나를 골라 주세요.");
+  assertSupportedDate(date2);
+  const card = mode2 === "korean" ? koreanCard(saju, date2) : westernCard(signId2, date2);
+  return card && deepFreeze3(card);
+}
+
+// experiences/daily-fortune/flow.mjs
+function getMonthFlow({ mode: mode2, signId: signId2, saju, startDate = seoulDateKey(), days = 30 } = {}) {
+  assertSupportedDate(startDate);
+  if (!Number.isInteger(days) || days < 1 || days > 62) throw new RangeError("흐름은 1일부터 62일까지 볼 수 있어요.");
+  const first = getDailyCard({ mode: mode2, signId: signId2, saju, date: startDate });
+  if (!first) return null;
+  const items = Array.from({ length: days }, (_, index) => {
+    const date2 = addDays2(startDate, index);
+    const reason = date2 > SAJU_MAX_DATE || date2 < SAJU_MIN_DATE ? "계산 지원 범위 밖의 날짜예요." : null;
+    if (reason) return { date: date2, weekday: weekdayOf(date2), available: false, overall: null, tag: null, tagLabel: null, label: reason };
+    const card = index === 0 ? first : getDailyCard({ mode: mode2, signId: signId2, saju, date: date2 });
+    return { date: date2, weekday: weekdayOf(date2), available: true, overall: card.levels.overall, tag: card.tag, tagLabel: card.tagLabel, label: card.label };
+  });
+  const pick = (tag) => items.filter((item) => item.tag === tag).map(({ date: date2, weekday, overall, label, tagLabel }) => ({ date: date2, weekday, overall, label, tagLabel }));
+  const goodDays = pick("good"), calmDays = pick("calm"), careDays = pick("care");
+  const parts = [];
+  if (goodDays.length) parts.push(`${TAGS.good}은 ${goodDays.length}일`);
+  if (careDays.length) parts.push(`${TAGS.care}은 ${careDays.length}일`);
+  return deepFreeze3({
+    mode: mode2,
+    startDate,
+    endDate: items.at(-1).date,
+    length: days,
+    items,
+    goodDays,
+    calmDays,
+    careDays,
+    summary: parts.length ? `앞으로 ${days}일 중 ${parts.join(", ")}이에요.` : `앞으로 ${days}일은 대체로 고르게 흘러가요.`,
+    note: mode2 === "korean" ? "날마다 오늘 일진과 내 일간의 관계로 고른 흐름이에요. 일정이나 결정을 정하는 기준으로 쓰지 않아요." : "날짜와 별자리 원소로 고른 창작 흐름이에요. 실제 천체 위치를 계산하지 않아요."
+  });
+}
+
+// experiences/daily-fortune/compat.mjs
+var ASPECT_TEXT = {
+  talk: {
+    title: "대화",
+    high: [
+      "말하지 않아도 통하는 순간이 많아요. 떠오르는 생각을 편하게 나누면 대화가 금방 깊어져요.",
+      "서로의 이야기에 쉽게 맞장구를 칠 수 있는 사이예요. 수다가 길어져도 즐거워요.",
+      "아이디어를 주고받을수록 재미가 커지는 사이예요. 함께 계획을 세워 보면 좋아요."
+    ],
+    mid: [
+      "대화의 속도는 조금 달라도 결국 같은 곳에 닿는 사이예요. 상대의 말을 끝까지 들어 주면 더 잘 통해요.",
+      "편안하게 이야기 나눌 수 있는 사이예요. 가끔은 마음속 이야기도 한 걸음 꺼내 보세요.",
+      "가벼운 대화가 잘 어울리는 사이예요. 중요한 이야기는 차분한 자리에서 나누면 좋아요."
+    ],
+    low: [
+      '표현하는 방식이 서로 달라서 처음엔 뜻이 엇갈릴 수 있어요. "이런 뜻이었어?" 하고 한 번 물어보면 금방 풀려요.',
+      "한 사람은 바로 말하고 한 사람은 생각한 뒤 말하는 편일 수 있어요. 대답을 조금 기다려 주면 대화가 편해져요.",
+      "말보다 행동으로 마음을 전하는 쪽이 더 잘 맞을 수 있어요. 짧은 메모나 문자로 마음을 보태 보세요."
+    ]
+  },
+  pace: {
+    title: "생활 속도",
+    high: [
+      "하루를 보내는 리듬이 잘 맞아요. 함께 움직이면 계획이 술술 풀려요.",
+      "같이 있을 때 시간이 자연스럽게 흘러가는 사이예요. 함께하는 일상을 하나 만들어 보세요.",
+      "서로의 일정과 속도를 맞추기 쉬운 사이예요. 여행이나 함께하는 취미가 잘 어울려요."
+    ],
+    mid: [
+      "각자의 속도가 있지만 맞춰 가기 어렵지 않은 사이예요. 일정을 미리 나누면 더 편해요.",
+      "함께할 때와 따로 쉴 때의 균형이 잘 잡히는 사이예요.",
+      "서로의 생활 방식을 존중하면 편안하게 오래 가는 사이예요."
+    ],
+    low: [
+      "한 사람은 빠르고 한 사람은 느긋한 편일 수 있어요. 중간 지점을 정해 두면 서로 편해져요.",
+      "하루의 리듬이 다를 수 있어요. 함께하는 시간을 미리 정해 두면 엇갈림이 줄어요.",
+      "움직이는 속도가 달라서 기다림이 생길 수 있어요. 각자의 시간을 존중해 주면 오히려 든든해져요."
+    ]
+  },
+  care: {
+    title: "마음 챙김",
+    high: [
+      "서로를 자연스럽게 챙겨 주는 사이예요. 고마운 마음을 자주 말로 전하면 더 따뜻해져요.",
+      "한 사람이 지칠 때 다른 사람이 기댈 곳이 되어 주는 사이예요.",
+      "작은 배려가 오가며 마음이 쌓이는 사이예요. 기념일을 함께 챙겨 보세요."
+    ],
+    mid: [
+      "필요할 때 손을 내밀 줄 아는 사이예요. 서운한 점은 쌓아 두지 말고 가볍게 이야기해 보세요.",
+      "각자의 방식으로 마음을 쓰는 사이예요. 상대가 좋아하는 챙김을 한 번 물어보세요.",
+      "편안하게 기댈 수 있는 사이예요. 가끔은 먼저 안부를 물어 주세요."
+    ],
+    low: [
+      "마음을 표현하는 방식이 서로 다를 수 있어요. 어떤 말이 힘이 되는지 서로 알려 주면 좋아요.",
+      "서운함이 작게 쌓이기 쉬운 사이라, 그때그때 짧게 말로 확인하면 마음이 편해져요.",
+      "서로 다른 점이 오히려 배울 점이 되는 사이예요. 상대의 방식을 한 번 따라 해 보세요."
+    ]
+  }
+};
+var HEADLINES = {
+  5: ["서로를 키워 주는 든든한 짝", "함께라서 더 즐거운 사이", "손발이 척척 맞는 사이"],
+  4: ["편안하게 오래 가는 사이", "서로에게 좋은 자극이 되는 사이", "함께할수록 잘 맞아 가는 사이"],
+  3: ["다른 점을 알아 가는 재미가 있는 사이", "천천히 맞춰 가면 좋은 사이", "서로에게 새로운 시선을 주는 사이"],
+  2: ["조금씩 맞춰 가며 가까워지는 사이", "배려가 힘이 되는 사이", "서로의 다름을 배워 가는 사이"]
+};
+var TIPS = {
+  talk: ['이번 주에는 "요즘 어때?" 한마디로 대화를 먼저 열어 보세요.', "중요한 이야기는 서로 여유 있는 시간에 천천히 나눠 보세요."],
+  pace: ["함께하는 시간을 미리 정해 두고, 각자 쉬는 시간도 존중해 보세요.", "약속 시간과 일정을 미리 나눠 두면 서로 편해져요."],
+  care: ["상대가 힘이 나는 말이 무엇인지 한 번 물어보세요.", "서운한 일은 쌓아 두지 말고 그날 짧게 이야기해 보세요."],
+  all: ["좋은 흐름을 이어 가도록 함께하는 작은 습관을 하나 만들어 보세요.", "서로에게 고마운 점을 하나씩 말해 보는 시간을 가져 보세요."]
+};
+var COMPAT_TEXT = deepFreeze3({ aspects: ASPECT_TEXT, headlines: HEADLINES, tips: TIPS });
+var SAJU_BASE = { generate: 5, same: 4, control: 3 };
+var ANIMAL_SHIFT = { threeHarmony: 1, sixHarmony: 1, same: 0, none: 0, unknown: 0, clash: -1, wonjin: -0.5 };
+var ZODIAC_SHIFT = { same: 0.5, complement: 0.5, neutral: 0, challenging: -0.5 };
+var TALK_BASE = { same: 4, complement: 5, neutral: 4, challenging: 3 };
+var PACE_BASE = { threeHarmony: 5, sixHarmony: 5, same: 4, none: 4, unknown: 4, clash: 3, wonjin: 3 };
+var level = (value) => clamp(Math.round(value), 2, 5);
+var band = (value) => value >= 5 ? "high" : value === 4 ? "mid" : "low";
+function readName(value) {
+  if (value === void 0 || value === null) return null;
+  if (typeof value !== "string" || /[\u0000-\u001f\u007f]/u.test(value)) throw new TypeError("이름은 1~20자로 적어 주세요.");
+  const name = value.trim();
+  if (!name || [...name].length > 20) throw new TypeError("이름은 1~20자로 적어 주세요.");
+  return name;
+}
+function readPerson(input, today) {
+  if (!input || typeof input !== "object" || Array.isArray(input)) throw new TypeError("두 사람의 생년월일을 입력해 주세요.");
+  const name = readName(input.name);
+  const birthTime = input.birthTime ?? null;
+  const saju = getSaju({ birthDate: input.birthDate, birthTime }, today);
+  const shape = sajuShape(saju);
+  const sign = suggestZodiac(input.birthDate);
+  return {
+    name,
+    birthDate: input.birthDate,
+    birthTime,
+    key: `${input.birthDate}|${birthTime ?? ""}|${name ?? ""}`,
+    stem: shape.stem,
+    yearBranch: shape.yearBranch,
+    sign,
+    signEl: signElement(sign.signId)
+  };
+}
+var who = (person) => person.name ? `${person.name} ` : "";
+var animalLabel = (branch) => ZODIAC[branch.index].label;
+function sajuLine(a, b, relation) {
+  const head = `일간 · ${who(a)}${a.stem.name}(${a.stem.image}) · ${who(b)}${b.stem.name}(${b.stem.image}) — `;
+  if (relation === "same") return `${head}같은 ${a.stem.element} 기운이라 비슷한 결을 가졌어요.`;
+  if (relation === "expressing" || relation === "supported") {
+    const [giver, receiver] = relation === "expressing" ? [a, b] : [b, a];
+    return `${head}${giver.stem.element}${josa(giver.stem.element, "이", "가")} ${receiver.stem.element}${josa(receiver.stem.element, "을", "를")} 키워 주는 상생이에요.`;
+  }
+  const [controller, shaped] = relation === "organizing" ? [a, b] : [b, a];
+  return `${head}${controller.stem.element}${josa(controller.stem.element, "이", "가")} ${shaped.stem.element}${josa(shaped.stem.element, "을", "를")} 다듬어 주는 사이라 서로 좋은 자극이 돼요.`;
+}
+function animalLine(a, b, relation) {
+  if (relation === "unknown") return "띠 · 입춘 무렵에 태어나 띠를 정하지 못한 사람이 있어 띠 궁합은 빼고 봤어요. 태어난 시간을 알면 띠를 정할 수 있어요.";
+  const head = `띠 · ${who(a)}${animalLabel(a.yearBranch)} · ${who(b)}${animalLabel(b.yearBranch)} — `;
+  const [low, high] = [a.yearBranch, b.yearBranch].sort((x, y) => x.index - y.index);
+  const text = {
+    same: "같은 띠라 생활 리듬이 비슷해요.",
+    threeHarmony: `${threeHarmonyName(a.yearBranch.index)} 삼합이라 함께 움직이기 좋아요.`,
+    sixHarmony: `${low.hangul}${high.hangul} 육합이라 서로 잘 어울려요.`,
+    clash: "서로 마주 보는 띠라 속도가 다를 수 있어요. 서로의 속도를 존중하면 오히려 균형이 잘 맞아요.",
+    wonjin: "마음 쓰는 방식이 서로 달라서, 서운한 일은 그때그때 말로 확인하면 좋아요.",
+    none: "특별한 합이나 충이 없는 무난한 사이예요."
+  }[relation];
+  return head + text;
+}
+function signLine(a, b, relation) {
+  const head = `별자리 · ${who(a)}${a.sign.label}(${a.signEl.label}) · ${who(b)}${b.sign.label}(${b.signEl.label}) — `;
+  const [x, y] = [a.signEl.label, b.signEl.label].sort();
+  let text;
+  if (relation === "same") text = `같은 ${x} 원소라 감각이 비슷해요.`;
+  else if (relation === "complement") text = `${x}${josa(x, "과", "와")} ${y}${josa(y, "은", "는")} 서로 북돋는 짝이에요.`;
+  else if (relation === "neutral") text = `${x}${josa(x, "과", "와")} ${y}${josa(y, "은", "는")} 무난하게 어울리는 사이예요.`;
+  else text = `${x}${josa(x, "과", "와")} ${y}${josa(y, "은", "는")} 표현 방식이 달라 서로 배울 점이 많아요.`;
+  const boundary = a.sign.isBoundaryDay || b.sign.isBoundaryDay ? " 별자리 경계일 생일은 이웃 별자리일 수도 있어요." : "";
+  return head + text + boundary;
+}
+function getCompatibility(first, second, { today = seoulDateKey() } = {}) {
+  const [a, b] = [readPerson(first, today), readPerson(second, today)].sort((x, y) => x.key < y.key ? -1 : x.key > y.key ? 1 : 0);
+  const sajuRelation = elementRelation(a.stem.element, b.stem.element);
+  const sajuKind = sajuRelation === "same" ? "same" : sajuRelation === "supported" || sajuRelation === "expressing" ? "generate" : "control";
+  const animal = a.yearBranch && b.yearBranch ? branchRelation(a.yearBranch, b.yearBranch) : "unknown";
+  const zodiac = westernRelation(a.signEl.id, b.signEl.id);
+  const seed2 = `compat/${a.key}#${b.key}`;
+  const choose = (pool, field) => pool[hash(`${seed2}/${field}`) % pool.length];
+  const overall = level(SAJU_BASE[sajuKind] + ANIMAL_SHIFT[animal] + ZODIAC_SHIFT[zodiac]);
+  const levels = {
+    talk: level(TALK_BASE[zodiac] + (sajuKind === "generate" ? 0.5 : 0)),
+    pace: level(PACE_BASE[animal] + (sajuKind === "same" ? 0.5 : 0)),
+    care: level(SAJU_BASE[sajuKind] + (animal === "sixHarmony" ? 0.5 : animal === "wonjin" ? -0.5 : 0))
+  };
+  const aspects = ["talk", "pace", "care"].map((id) => ({
+    id,
+    title: ASPECT_TEXT[id].title,
+    level: levels[id],
+    text: choose(ASPECT_TEXT[id][band(levels[id])], id)
+  }));
+  const lowest = aspects.reduce((min, item) => item.level < min.level ? item : min);
+  const tip = lowest.level >= 4 ? choose(TIPS.all, "tip") : choose(TIPS[lowest.id], "tip");
+  return deepFreeze3({
+    overall,
+    headline: choose(HEADLINES[overall], "headline"),
+    aspects,
+    tip,
+    relations: { dayMaster: sajuKind, animal, zodiac },
+    basis: [sajuLine(a, b, sajuRelation), animalLine(a, b, animal), signLine(a, b, zodiac)],
+    people: [a, b].map((person) => ({
+      name: person.name,
+      dayMaster: person.stem.name,
+      animal: person.yearBranch ? animalLabel(person.yearBranch) : null,
+      sign: person.sign.label
+    })),
+    note: "일간 오행·띠·별자리 원소의 전통 상징으로 보는 재미용 궁합이에요. 두 사람 관계의 좋고 나쁨을 정하지 않아요."
+  });
+}
+
+// experiences/daily-fortune/tarot.mjs
+var CARDS = [
+  [
+    "fool",
+    "바보",
+    "The Fool",
+    ["시작", "자유", "호기심"],
+    "새로운 길 앞에서 가볍게 첫발을 떼는 카드예요. 오늘은 계산보다 호기심을 따라가 보면 뜻밖의 재미를 만날 수 있어요.",
+    "평소 안 가 본 길로 한 번 걸어 보세요."
+  ],
+  [
+    "magician",
+    "마법사",
+    "The Magician",
+    ["재능", "실행", "집중"],
+    "이미 가진 도구로 충분히 해낼 수 있다는 카드예요. 오늘은 미뤄 둔 일 하나를 직접 손에 잡아 보세요.",
+    "오늘 할 일 하나를 정해 바로 시작해 보세요."
+  ],
+  [
+    "high-priestess",
+    "여사제",
+    "The High Priestess",
+    ["직감", "고요", "배움"],
+    "조용히 마음의 소리를 듣는 카드예요. 바로 답을 내기보다 한 번 더 살피면 필요한 것이 보여요.",
+    "잠깐 휴대폰을 내려놓고 5분 동안 조용히 있어 보세요."
+  ],
+  [
+    "empress",
+    "여황제",
+    "The Empress",
+    ["풍요", "돌봄", "감각"],
+    "넉넉한 마음과 돌봄이 피어나는 카드예요. 나와 주변을 아끼는 작은 손길이 하루를 풍성하게 해요.",
+    "나를 위한 맛있는 간식 하나를 챙겨 보세요."
+  ],
+  [
+    "emperor",
+    "황제",
+    "The Emperor",
+    ["질서", "책임", "계획"],
+    "단단한 기준과 계획이 힘이 되는 카드예요. 오늘은 우선순위를 정하면 일이 깔끔하게 흘러가요.",
+    "오늘 할 일의 순서를 세 줄로 적어 보세요."
+  ],
+  [
+    "hierophant",
+    "교황",
+    "The Hierophant",
+    ["배움", "전통", "조언"],
+    "믿을 만한 사람의 지혜를 빌리기 좋은 카드예요. 익숙한 방법 안에 오늘의 힌트가 숨어 있어요.",
+    "존경하는 사람에게 짧게 조언을 구해 보세요."
+  ],
+  [
+    "lovers",
+    "연인",
+    "The Lovers",
+    ["마음", "선택", "조화"],
+    "마음이 가는 쪽을 솔직하게 바라보는 카드예요. 소중한 사람과 생각을 맞춰 보면 선택이 쉬워져요.",
+    "고마운 사람에게 마음을 담은 한마디를 보내 보세요."
+  ],
+  [
+    "chariot",
+    "전차",
+    "The Chariot",
+    ["추진력", "의지", "방향"],
+    "목표를 향해 힘 있게 나아가는 카드예요. 방향만 분명하면 속도는 저절로 따라와요.",
+    "이번 주 목표 하나를 정해 눈에 띄는 곳에 적어 두세요."
+  ],
+  [
+    "strength",
+    "힘",
+    "Strength",
+    ["부드러운 용기", "인내", "다정함"],
+    "밀어붙이기보다 부드럽게 다독이는 힘을 뜻하는 카드예요. 오늘은 다정한 태도가 가장 큰 힘이 돼요.",
+    "애쓴 나에게 수고했다고 말해 주세요."
+  ],
+  [
+    "hermit",
+    "은둔자",
+    "The Hermit",
+    ["성찰", "혼자만의 시간", "지혜"],
+    "잠시 물러나 나만의 등불을 켜는 카드예요. 혼자 있는 시간이 생각을 또렷하게 정리해 줘요.",
+    "오늘 하루를 돌아보며 한 줄 일기를 써 보세요."
+  ],
+  [
+    "wheel-of-fortune",
+    "운명의 수레바퀴",
+    "Wheel of Fortune",
+    ["흐름", "변화", "기회"],
+    "돌고 도는 흐름 속에서 새로운 기회가 다가오는 카드예요. 작은 변화를 반갑게 맞이해 보세요.",
+    "늘 하던 순서 하나를 바꿔 보세요."
+  ],
+  [
+    "justice",
+    "정의",
+    "Justice",
+    ["균형", "공정", "솔직함"],
+    "균형과 솔직함이 빛나는 카드예요. 나에게도 남에게도 공정한 선택이 마음을 편하게 해요.",
+    "미뤄 둔 답장이나 약속 하나를 정리해 보세요."
+  ],
+  [
+    "hanged-man",
+    "매달린 사람",
+    "The Hanged Man",
+    ["새로운 시선", "기다림", "내려놓기"],
+    "거꾸로 보면 다른 풍경이 보인다는 카드예요. 서두르지 않고 기다리는 동안 새 아이디어가 찾아와요.",
+    "고민 하나를 상대 입장에서 다시 생각해 보세요."
+  ],
+  [
+    "transformation",
+    "변화",
+    "Transformation",
+    ["마무리", "새 출발", "변화"],
+    "한 장을 넘기고 새 장을 여는 카드예요. 끝난 일을 잘 정리하면 그 자리에 새로운 시작이 들어와요.",
+    "이제 쓰지 않는 물건 하나를 정리해 보세요."
+  ],
+  [
+    "temperance",
+    "절제",
+    "Temperance",
+    ["균형", "조율", "회복"],
+    "서로 다른 것을 알맞게 섞어 조화를 만드는 카드예요. 일과 쉼의 비율을 조금만 맞춰도 하루가 편안해져요.",
+    "일하는 중간에 10분 쉬는 시간을 넣어 보세요."
+  ],
+  [
+    "devil",
+    "악마",
+    "The Devil",
+    ["습관", "알아차림", "자유"],
+    "나를 붙잡는 습관을 알아차리게 해 주는 카드예요. 알아차리는 순간 이미 한 걸음 자유로워져요.",
+    "오늘 하루 줄여 보고 싶은 습관 하나를 정해 보세요."
+  ],
+  [
+    "tower",
+    "탑",
+    "The Tower",
+    ["깨달음", "전환", "새로 짓기"],
+    "익숙한 틀이 흔들리며 새로운 시야가 열리는 카드예요. 예상과 다른 일도 더 나은 방법을 찾는 계기가 될 수 있어요.",
+    "계획이 바뀌면 다른 방법 하나를 적어 보세요."
+  ],
+  [
+    "star",
+    "별",
+    "The Star",
+    ["희망", "회복", "영감"],
+    "어두운 밤에도 반짝이는 희망을 뜻하는 카드예요. 마음속 작은 바람을 다시 꺼내 보기 좋은 날이에요.",
+    "이루고 싶은 작은 소망 하나를 적어 보세요."
+  ],
+  [
+    "moon",
+    "달",
+    "The Moon",
+    ["상상", "직감", "꿈"],
+    "은은한 달빛 아래 상상력이 깨어나는 카드예요. 확실하지 않은 일은 천천히 살피고, 떠오르는 영감은 기록해 두세요.",
+    "잠들기 전 떠오른 생각을 메모해 두세요."
+  ],
+  [
+    "sun",
+    "태양",
+    "The Sun",
+    ["기쁨", "활력", "성취"],
+    "환한 햇살처럼 기쁨이 가득한 카드예요. 오늘은 웃음을 나눌수록 좋은 일이 더 커져요.",
+    "햇볕을 쬐며 잠깐 걸어 보세요."
+  ],
+  [
+    "judgement",
+    "심판",
+    "Judgement",
+    ["깨어남", "새 결심", "응답"],
+    "오래 기다린 부름에 응답하는 카드예요. 지난 경험을 돌아보면 다음에 갈 길이 또렷해져요.",
+    "예전에 미뤄 둔 계획 하나를 다시 꺼내 보세요."
+  ],
+  [
+    "world",
+    "세계",
+    "The World",
+    ["완성", "성취", "축하"],
+    "한 바퀴를 무사히 마치고 완성에 이르는 카드예요. 오늘은 그동안 해낸 것을 스스로 축하해 주세요.",
+    "최근 끝낸 일 하나를 떠올리며 나에게 작은 선물을 해 주세요."
+  ]
+];
+var MAJOR_ARCANA = deepFreeze3(CARDS.map(([id, name, english, keywords, meaning, practice], number) => ({
+  id,
+  number,
+  name,
+  english,
+  keywords,
+  meaning,
+  practice,
+  upright: true
+})));
+var SIZE = MAJOR_ARCANA.length;
+var BLOCK = SIZE;
+function rawBlock(seed2, block) {
+  return shuffledOrder(SIZE, `tarot/${seed2}/${block}`);
+}
+function blockOrder(seed2, block) {
+  const order = rawBlock(seed2, block);
+  const previousTail = new Set(rawBlock(seed2, block - 1).slice(-2));
+  for (const position of [0, 1]) {
+    if (!previousTail.has(order[position])) continue;
+    for (let other = 2; other < SIZE - 2; other++) {
+      if (!previousTail.has(order[other])) {
+        [order[position], order[other]] = [order[other], order[position]];
+        break;
+      }
+    }
+  }
+  return order;
+}
+function drawCard({ seed: seed2, date: date2 = seoulDateKey() } = {}) {
+  if (typeof seed2 !== "string" || !seed2.trim() || [...seed2].length > 200) throw new TypeError("카드를 뽑을 사람 정보를 확인해 주세요.");
+  assertSupportedDate(date2);
+  const day = dayNumber(date2), block = Math.floor(day / BLOCK);
+  const card = MAJOR_ARCANA[blockOrder(seed2, block)[mod(day, BLOCK)]];
+  return deepFreeze3({
+    date: date2,
+    ...card,
+    keywords: [...card.keywords],
+    note: "하루 한 장, 정방향으로만 읽는 카드예요. 오늘을 돌아볼 질문으로 가볍게 써 주세요."
+  });
+}
+
+// experiences/daily-fortune/year.mjs
+var SAJU_YEAR = {
+  supported: [
+    {
+      headline: "든든한 바람을 등에 업는 해",
+      keywords: ["배움", "도움", "충전"],
+      message: "올해의 기운이 내 일간을 살려 주는 흐름이라 배움과 도움이 자연스럽게 모여요. 새로 익히고 싶은 것을 하나 정해 꾸준히 이어 가 보세요."
+    },
+    {
+      headline: "배우고 채우는 해",
+      keywords: ["성장", "조언", "여유"],
+      message: "올해는 서두르기보다 안을 채울수록 힘이 붙는 해예요. 좋은 조언을 귀담아듣고 쉬는 시간도 넉넉히 챙겨 보세요."
+    }
+  ],
+  same: [
+    {
+      headline: "내 색깔이 또렷해지는 해",
+      keywords: ["자신감", "동료", "꾸준함"],
+      message: "올해의 기운이 내 일간과 같은 결이라 나다운 선택에 힘이 실려요. 하던 일을 꾸준히 밀고 가면 보람이 커져요."
+    },
+    {
+      headline: "함께 걸어갈 사람을 만나는 해",
+      keywords: ["협력", "독립", "중심"],
+      message: "비슷한 생각을 가진 사람들과 손발이 잘 맞는 해예요. 혼자 애쓰기보다 함께 나눌 때 일이 수월해져요."
+    }
+  ],
+  expressing: [
+    {
+      headline: "표현하고 펼쳐 보이는 해",
+      keywords: ["표현", "창작", "나눔"],
+      message: "내 일간이 올해의 기운을 키워 주는 흐름이라 생각과 재능을 밖으로 꺼내기 좋아요. 만들고 나누는 일을 하나 시작해 보세요."
+    },
+    {
+      headline: "재능이 꽃피는 해",
+      keywords: ["재능", "도전", "즐거움"],
+      message: "하고 싶던 일을 작게라도 시도해 보기 좋은 해예요. 결과보다 즐거움을 기준으로 고르면 한 해가 가볍게 흘러가요."
+    }
+  ],
+  organizing: [
+    {
+      headline: "실속을 거두는 해",
+      keywords: ["성과", "정리", "실속"],
+      message: "내 일간이 올해의 기운을 다스리는 흐름이라 계획한 일을 손에 쥐기 좋아요. 목표를 작게 나눠 하나씩 마무리해 보세요."
+    },
+    {
+      headline: "계획이 결실로 이어지는 해",
+      keywords: ["계획", "결실", "살림"],
+      message: "정리하고 챙기는 만큼 남는 것이 많은 해예요. 일정과 살림을 한 번씩 다듬어 두면 든든해져요."
+    }
+  ],
+  balancing: [
+    {
+      headline: "단단하게 다져지는 해",
+      keywords: ["기본", "책임", "성장"],
+      message: "올해의 기운이 내 일간을 다듬어 주는 흐름이라 기본을 챙길수록 단단해져요. 무리한 속도보다 꾸준한 걸음이 잘 어울려요."
+    },
+    {
+      headline: "책임감이 빛나는 해",
+      keywords: ["신뢰", "약속", "인내"],
+      message: "맡은 일을 차근차근 해내는 모습이 믿음으로 돌아오는 해예요. 힘에 부칠 때는 일을 덜어 내고 쉬어 가도 괜찮아요."
+    }
+  ]
+};
+var SAJU_MONTH_LINES = {
+  supported: [
+    "도움과 배움이 자연스럽게 모이는 달이에요.",
+    "새로 익힌 것이 오래 남는 달이에요. 배우고 싶던 걸 시작해 보세요.",
+    "쉬어 가며 힘을 채우기 좋은 달이에요.",
+    "좋은 조언을 만나기 쉬운 달이에요. 물어보는 걸 망설이지 마세요."
+  ],
+  same: [
+    "내 속도대로 밀고 나가기 좋은 달이에요.",
+    "친구나 동료와 힘을 모으면 일이 수월해지는 달이에요.",
+    "나다운 선택에 자신감이 붙는 달이에요.",
+    "하던 일을 꾸준히 이어 가면 보람이 큰 달이에요."
+  ],
+  expressing: [
+    "아이디어와 표현이 잘 풀리는 달이에요.",
+    "만들고 나누는 재미가 커지는 달이에요.",
+    "새로운 시도가 즐거운 달이에요. 작게 하나 해 보세요.",
+    "말과 글로 마음을 전하기 좋은 달이에요."
+  ],
+  organizing: [
+    "정리한 만큼 실속이 남는 달이에요.",
+    "계획을 세우면 그대로 진행되기 쉬운 달이에요.",
+    "미뤄 둔 일을 마무리하기 좋은 달이에요.",
+    "살림과 일정을 다듬기 좋은 달이에요."
+  ],
+  balancing: [
+    "속도를 조금 늦추고 기본을 다지면 좋은 달이에요.",
+    "맡은 일에 집중하면 믿음이 쌓이는 달이에요.",
+    "빡빡한 일정은 덜어 내고 여유를 챙기면 좋은 달이에요.",
+    "차근차근 확인하며 가면 편안한 달이에요."
+  ]
+};
+var SAJU_LEVEL = { supported: 5, same: 4, expressing: 4, organizing: 4, balancing: 3 };
+var WESTERN_YEAR = {
+  fire: [
+    {
+      headline: "용기를 내는 만큼 넓어지는 해",
+      keywords: ["시작", "용기", "무대"],
+      message: "새로운 무대에 서 보는 해예요. 하고 싶던 일을 작게라도 시작하면 한 해가 즐겁게 흘러가요."
+    },
+    {
+      headline: "열정을 오래 지키는 해",
+      keywords: ["꾸준함", "열정", "목표"],
+      message: "타오르는 마음을 꾸준함으로 이어 가는 해예요. 한 가지 목표를 정해 끝까지 함께해 보세요."
+    },
+    {
+      headline: "함께 빛나는 해",
+      keywords: ["협력", "표현", "축하"],
+      message: "혼자보다 함께일 때 더 크게 빛나는 해예요. 마음이 맞는 사람과 작은 일을 함께 꾸려 보세요."
+    }
+  ],
+  earth: [
+    {
+      headline: "차곡차곡 쌓아 올리는 해",
+      keywords: ["기반", "습관", "실속"],
+      message: "작은 습관이 단단한 기반이 되는 해예요. 매일 조금씩 이어 갈 일을 하나 정해 보세요."
+    },
+    {
+      headline: "나를 아끼는 법을 배우는 해",
+      keywords: ["휴식", "감각", "균형"],
+      message: "일만큼 쉼도 소중히 챙기는 해예요. 나를 편안하게 하는 시간과 공간을 넉넉히 마련해 보세요."
+    },
+    {
+      headline: "결실을 거두는 해",
+      keywords: ["결실", "계획", "안정"],
+      message: "그동안 쌓아 온 것이 모양을 갖추는 해예요. 계획을 차분히 다듬으며 한 걸음씩 나아가 보세요."
+    }
+  ],
+  air: [
+    {
+      headline: "새로운 연결이 열리는 해",
+      keywords: ["연결", "대화", "배움"],
+      message: "새로운 사람과 생각을 만나며 시야가 넓어지는 해예요. 관심 가는 모임이나 수업에 가볍게 들어가 보세요."
+    },
+    {
+      headline: "생각을 현실로 옮기는 해",
+      keywords: ["아이디어", "실행", "정리"],
+      message: "머릿속 아이디어를 하나씩 현실로 옮겨 보는 해예요. 떠오른 생각을 적어 두고 가장 쉬운 것부터 해 보세요."
+    },
+    {
+      headline: "가볍게 떠나 보는 해",
+      keywords: ["여행", "호기심", "변화"],
+      message: "익숙한 곳을 벗어나 새로운 바람을 쐬기 좋은 해예요. 짧은 여행이나 새로운 동네 산책도 충분해요."
+    }
+  ],
+  water: [
+    {
+      headline: "마음이 깊어지는 해",
+      keywords: ["공감", "회복", "관계"],
+      message: "가까운 사람과 마음을 깊이 나누는 해예요. 고마운 사람에게 마음을 자주 표현해 보세요."
+    },
+    {
+      headline: "상상이 모양을 갖추는 해",
+      keywords: ["상상", "창작", "직감"],
+      message: "마음속 상상을 글이나 그림으로 꺼내 보기 좋은 해예요. 직감이 이끄는 취미를 하나 시작해 보세요."
+    },
+    {
+      headline: "편안한 자리를 찾는 해",
+      keywords: ["안식", "가족", "정리"],
+      message: "나에게 편안한 자리와 사람을 다시 살피는 해예요. 머무는 공간을 아늑하게 가꿔 보세요."
+    }
+  ]
+};
+var WESTERN_MONTH_LINES = {
+  same: [
+    "같은 원소의 계절이라 마음먹은 일이 잘 맞물리는 달이에요.",
+    "내 장점이 자연스럽게 드러나는 달이에요.",
+    "익숙한 리듬으로 밀고 나가기 좋은 달이에요.",
+    "자신감이 붙어 새 계획을 세우기 좋은 달이에요."
+  ],
+  complement: [
+    "주변의 응원이 힘이 되는 달이에요.",
+    "대화와 협력이 잘 풀리는 달이에요.",
+    "부족한 부분을 채워 주는 사람을 만나기 좋은 달이에요.",
+    "하던 일에 새 바람이 드는 달이에요."
+  ],
+  neutral: [
+    "무난하게 흐르는 달이에요. 하던 일을 차분히 이어 가 보세요.",
+    "작은 변화 하나로 기분을 바꾸기 좋은 달이에요.",
+    "일과 쉼의 균형을 맞추기 좋은 달이에요.",
+    "새로운 취미를 가볍게 시험해 보기 좋은 달이에요."
+  ],
+  challenging: [
+    "속도를 조금 늦추고 기본을 챙기면 편안한 달이에요.",
+    "다른 생각을 가진 사람에게서 배울 점이 많은 달이에요.",
+    "빡빡한 약속은 덜어 내고 여유를 남겨 두면 좋은 달이에요.",
+    "천천히 확인하며 가면 든든한 달이에요."
+  ],
+  season: "내 별자리 시즌이에요. 나다운 모습이 가장 빛나는 달이에요."
+};
+var WESTERN_LEVEL = { same: 5, complement: 4, neutral: 4, challenging: 3 };
+var YEAR_TEXT = deepFreeze3({ korean: { year: SAJU_YEAR, months: SAJU_MONTH_LINES }, western: { year: WESTERN_YEAR, months: WESTERN_MONTH_LINES } });
+function readYear(year) {
+  yearPillar(year);
+  return year;
+}
+function getYearReading({ saju, year } = {}) {
+  readYear(year);
+  const shape = sajuShape(saju);
+  if (!shape) return null;
+  const pillar2 = yearPillar(year);
+  const relation = elementRelation(shape.stem.element, pillar2.stem.element);
+  const text = SAJU_YEAR[relation][shape.stem.yang === pillar2.stem.yang ? 0 : 1];
+  const seen = {};
+  const months = Array.from({ length: 12 }, (_, index) => {
+    const month = index + 1, monthly = monthPillar(year, month);
+    const monthRelation = elementRelation(shape.stem.element, monthly.stem.element);
+    const branch = branchRelation(shape.branch, monthly.branch);
+    const shift = branch === "sixHarmony" || branch === "threeHarmony" ? 1 : branch === "clash" ? -1 : 0;
+    const occurrence = seen[monthRelation] = (seen[monthRelation] ?? -1) + 1;
+    const lines = SAJU_MONTH_LINES[monthRelation];
+    return {
+      month,
+      level: clamp(SAJU_LEVEL[monthRelation] + shift, 2, 5),
+      relation: monthRelation,
+      line: lines[mod(occurrence + year, lines.length)],
+      ganji: monthly.hangul,
+      ganjiHanja: monthly.hanja
+    };
+  });
+  return deepFreeze3({
+    year,
+    mode: "korean",
+    ganji: pillar2.hangul,
+    ganjiHanja: pillar2.hanja,
+    relation,
+    headline: text.headline,
+    message: `${year}년은 ${pillar2.hangul}년, ${pillar2.stem.element} 기운의 해예요. ${text.message}`,
+    keywords: [...text.keywords],
+    months,
+    note: "월별 기운은 그달 15일에 걸린 절기 월건으로 봤어요(1월은 앞해의 축월). 한 해의 일을 예측하지 않는 읽을거리예요."
+  });
+}
+function getZodiacYear({ signId: signId2, year } = {}) {
+  readYear(year);
+  const profile2 = getZodiacProfile(signId2);
+  const own = signElement(signId2);
+  const signIndex = WESTERN_ZODIAC.findIndex((item) => item.id === signId2);
+  const text = WESTERN_YEAR[own.id][mod(year + signIndex, 3)];
+  const seen = {};
+  const months = Array.from({ length: 12 }, (_, index) => {
+    const month = index + 1;
+    const sun = suggestZodiac(`${year}-${String(month).padStart(2, "0")}-15`);
+    const sunElement = signElement(sun.signId);
+    const relation = westernRelation(own.id, sunElement.id);
+    const occurrence = seen[relation] = (seen[relation] ?? -1) + 1;
+    const lines = WESTERN_MONTH_LINES[relation];
+    const season = sun.signId === signId2;
+    return {
+      month,
+      level: season ? 5 : WESTERN_LEVEL[relation],
+      relation,
+      sunSign: sun.label,
+      line: season ? WESTERN_MONTH_LINES.season : lines[mod(occurrence + year, lines.length)]
+    };
+  });
+  return deepFreeze3({
+    year,
+    mode: "western",
+    signId: signId2,
+    signLabel: profile2.label,
+    headline: text.headline,
+    message: `${own.label} 별자리인 ${profile2.label}에게 ${year}년은 ${text.message}`,
+    keywords: [...text.keywords],
+    months,
+    note: "월별 기운은 그달 15일의 태양 별자리 원소와 내 별자리 원소의 관계로 고른 창작 읽을거리예요. 실제 천체 위치를 계산하지 않아요."
+  });
+}
+
+// experiences/daily-fortune/me.mjs
+var TRAITS = {
+  갑: "곧게 자라는 큰 나무처럼 한번 정한 방향을 꾸준히 밀고 가는 편이에요.",
+  을: "바람에 유연하게 휘는 풀꽃처럼 어디서든 자기 자리를 찾아 어울리는 편이에요.",
+  병: "모두를 비추는 햇살처럼 밝고 시원시원하게 분위기를 이끄는 편이에요.",
+  정: "은은한 촛불처럼 가까운 사람을 세심하게 밝혀 주는 편이에요.",
+  무: "든든한 산처럼 쉽게 흔들리지 않고 주변을 품어 주는 편이에요.",
+  기: "씨앗을 키우는 들판처럼 차분하게 사람과 일을 가꾸는 편이에요.",
+  경: "단단한 바위처럼 의리 있고 마음먹은 일을 시원하게 정하는 편이에요.",
+  신: "반짝이는 보석처럼 섬세하고 자기만의 기준이 분명한 편이에요.",
+  임: "넓은 바다처럼 생각의 폭이 크고 흐름을 읽는 데 밝은 편이에요.",
+  계: "조용히 스며드는 단비처럼 다정하고 감수성이 풍부한 편이에요."
+};
+var DAY_MASTER_TRAITS = deepFreeze3(STEMS.map((stem) => ({ hanja: stem.hanja, name: stem.name, image: stem.image, trait: TRAITS[stem.hangul] })));
+function elementSummary(elements) {
+  const total = elements.reduce((sum, item) => sum + item.count, 0);
+  const max = Math.max(...elements.map((item) => item.count));
+  const top = elements.filter((item) => item.count === max).map((item) => item.label);
+  const missing = elements.filter((item) => item.count === 0).map((item) => item.label);
+  const topText = top.join("·");
+  const first = `확인된 글자 ${total}개 중 ${topText}${josa(top.at(-1), "이", "가")} ${max}개로 가장 많아요.`;
+  const second = missing.length ? `${missing.join("·")}${josa(missing.at(-1), "은", "는")} 겉글자에 보이지 않지만, 그 기운이 없다는 뜻은 아니에요.` : "다섯 오행이 모두 한 번 이상 보여요.";
+  return { total, dominant: top, missing, text: `${first} ${second}` };
+}
+function getMeCard({ birthDate, birthTime = null, today = seoulDateKey() } = {}) {
+  const saju = getSaju({ birthDate, birthTime }, today);
+  const shape = sajuShape(saju);
+  const animal = shape.yearBranch ? {
+    id: ZODIAC[shape.yearBranch.index].id,
+    label: ZODIAC[shape.yearBranch.index].label,
+    name: ZODIAC[shape.yearBranch.index].label.replace(/띠$/, ""),
+    branch: shape.yearBranch.hangul,
+    hanja: shape.yearBranch.hanja
+  } : null;
+  const sign = suggestZodiac(birthDate);
+  const summary = elementSummary(saju.elements);
+  const notes = [
+    "띠는 입춘 절입 시각을 새해 경계로 정해요. 1월·2월 초 생일은 앞해의 띠일 수 있어요.",
+    "오행 개수는 확인된 천간·지지의 대표 오행만 센 단순 집계예요. 개수만으로 성격이나 강약을 정하지 않아요."
+  ];
+  if (!saju.timeKnown) notes.push("태어난 시간을 모르면 시주를 비워 두고 나머지 글자만 세요.");
+  return deepFreeze3({
+    birthDate,
+    birthTime: saju.birthTime,
+    timeKnown: saju.timeKnown,
+    animal,
+    animalNote: animal ? "입춘을 새해 경계로 정한 띠예요." : "입춘 당일에 태어나 띠를 정하지 못했어요. 태어난 시간을 알면 띠를 정할 수 있어요.",
+    dayMaster: {
+      hanja: shape.stem.hanja,
+      hangul: shape.stem.hangul,
+      element: shape.stem.element,
+      name: shape.stem.name,
+      image: shape.stem.image,
+      label: `${shape.stem.name} · ${shape.stem.image}`,
+      trait: TRAITS[shape.stem.hangul]
+    },
+    zodiac: {
+      signId: sign.signId,
+      label: sign.label,
+      english: sign.english,
+      range: sign.range,
+      element: { ...signElement(sign.signId) },
+      isBoundaryDay: sign.isBoundaryDay,
+      nearBoundary: sign.nearBoundary,
+      note: sign.note
+    },
+    elements: saju.elements.map((item) => ({ id: item.id, label: item.label, hanja: item.hanja, count: item.count })),
+    elementSummary: summary.text,
+    dominantElements: summary.dominant,
+    missingElements: summary.missing,
+    countedCharacters: summary.total,
+    notes
+  });
+}
+
 // experiences/synk-account/src/core.mjs
-var PRODUCTS = Object.freeze({ platform: "SYNK 플랫폼", world: "SYNK WORLD", messenger: "SYNK 사내 메신저", care: "SYNK 플레저", path: "SYNK PATH", "path-travel": "SYNK PATH 여행", rehearsal: "중요한 대화 리허설", "family-album": "가족 이야기 앨범" });
+var PRODUCTS = Object.freeze({ platform: "SYNK 플랫폼", world: "SYNK WORLD", messenger: "SYNK Workspace", care: "SYNK 플레저", path: "SYNK PATH", "path-travel": "SYNK PATH 여행", rehearsal: "중요한 대화 리허설", "family-album": "가족 이야기 앨범" });
 var nativeSchemes = /* @__PURE__ */ new Set(["synktalk:", "im.synk.platform:", "im.synk.world:", "im.synk.messenger:", "im.synk.care:"]);
 function callbackUrl(value) {
   const url = new URL(value);
@@ -12388,7 +13776,7 @@ function readConfig(value, base) {
   config.learningUrl = publicUrl(value.learningUrl || "../learning-hub/", { relative: true, base }).href;
   return config;
 }
-var base64url = (bytes) => btoa(String.fromCharCode(...bytes)).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+var base64url = (bytes2) => btoa(String.fromCharCode(...bytes2)).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
 async function createPKCE(cryptoAPI = globalThis.crypto) {
   const verifier = base64url(cryptoAPI.getRandomValues(new Uint8Array(32)));
   const state = base64url(cryptoAPI.getRandomValues(new Uint8Array(32)));
@@ -12444,8 +13832,8 @@ async function tokenRequest(config, fields, fetcher = fetch) {
     let data;
     try {
       data = await response.json();
-    } catch (error) {
-      if (response.ok && error?.name !== "SyntaxError") throw Object.assign(new Error("로그인 응답을 끝까지 받지 못했어요. 연결이 돌아오면 다시 확인해 주세요."), { code: "NETWORK", retryable: true });
+    } catch (error2) {
+      if (response.ok && error2?.name !== "SyntaxError") throw Object.assign(new Error("로그인 응답을 끝까지 받지 못했어요. 연결이 돌아오면 다시 확인해 주세요."), { code: "NETWORK", retryable: true });
       data = null;
     }
     if (!response.ok) {
@@ -12460,13 +13848,29 @@ async function tokenRequest(config, fields, fetcher = fetch) {
 }
 
 // experiences/daily-fortune/account-state.mjs
-var emptyState = () => ({ version: 1, profile: null, preferences: { mode: "western", signId: null }, entries: [] });
+var MAX_ENTRIES = 90;
+var MAX_PEOPLE = 12;
+var MAX_STATE_BYTES = 60 * 1024;
+var VERDICTS = Object.freeze(["hit", "meh", "miss"]);
+var VERDICT_LABELS = Object.freeze({ hit: "맞았어요", meh: "글쎄요", miss: "아니었어요" });
+var RELATIONS = Object.freeze(["family", "friend", "partner", "work", "other"]);
+var RELATION_LABELS = Object.freeze({ family: "가족", friend: "친구", partner: "연인·배우자", work: "동료", other: "그 밖" });
+var emptyState = () => ({ version: 2, profile: null, preferences: { mode: "western", signId: null }, entries: [], people: [] });
 var modes = /* @__PURE__ */ new Set(["western", "korean"]);
 var signs = new Set(WESTERN_ZODIAC.map((item) => item.id));
+var UUID = /^[a-f\d]{8}-[a-f\d]{4}-[1-5][a-f\d]{3}-[89ab][a-f\d]{3}-[a-f\d]{12}$/i;
+var V1_ENTRY_KEYS = ["id", "mode", "date", "signId", "birth", "title", "action", "note", "completed", "createdAt", "updatedAt"];
+var V2_ENTRY_KEYS = ["id", "mode", "date", "signId", "birth", "title", "action", "note", "completed", "verdict", "createdAt", "updatedAt"];
+var PERSON_KEYS = ["id", "name", "relation", "birthDate", "birthTime"];
 var plain = (value, max) => typeof value === "string" && [...value].length <= max && !/[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f]/u.test(value);
+var personName = (value) => typeof value === "string" && value === value.trim() && [...value].length >= 1 && [...value].length <= 20 && !/[\u0000-\u001f\u007f]/u.test(value);
 var exact = (value, keys) => value && typeof value === "object" && !Array.isArray(value) && Object.keys(value).length === keys.length && keys.every((key) => Object.hasOwn(value, key));
+var bytes = (value) => new TextEncoder().encode(JSON.stringify(value)).length;
 var fail = () => {
   throw new Error("저장할 운세 정보의 형식을 확인해 주세요.");
+};
+var full = () => {
+  throw new Error("보관함 용량이 가득 찼어요. 내보낸 뒤 오래된 기록을 정리해 주세요.");
 };
 function birthProfile(birthDate, birthTime = null, today = seoulDateKey()) {
   validateDateKey(birthDate);
@@ -12479,25 +13883,54 @@ function profile(value, today) {
   if (!exact(value, ["birthDate", "birthTime", "calendar", "timeZone"]) || value.calendar !== "solar" || value.timeZone !== "Asia/Seoul") fail();
   return birthProfile(value.birthDate, value.birthTime, today);
 }
+function readEntry(entry, version, ids, today) {
+  if (!exact(entry, version === 1 ? V1_ENTRY_KEYS : V2_ENTRY_KEYS)) fail();
+  if (typeof entry.id !== "string" || !UUID.test(entry.id) || ids.has(entry.id.toLowerCase())) fail();
+  ids.add(entry.id.toLowerCase());
+  validateDateKey(entry.date);
+  if (entry.date < "1900-01-01" || entry.date > "2100-12-31") fail();
+  if (!modes.has(entry.mode) || !plain(entry.title, 160) || !plain(entry.action, 400) || !plain(entry.note, 1e3) || typeof entry.completed !== "boolean") fail();
+  const verdict = version === 1 ? null : entry.verdict;
+  if (verdict !== null && !VERDICTS.includes(verdict)) fail();
+  for (const key of ["createdAt", "updatedAt"]) if (typeof entry[key] !== "string" || !/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/.test(entry[key]) || !Number.isFinite(Date.parse(entry[key])) || new Date(entry[key]).toISOString() !== entry[key]) fail();
+  if (entry.updatedAt < entry.createdAt) fail();
+  const birth2 = profile(entry.birth, today);
+  if (entry.mode === "western" ? !signs.has(entry.signId) || birth2 !== null : entry.signId !== null || birth2 === null || birth2.birthDate > entry.date) fail();
+  return {
+    id: entry.id,
+    mode: entry.mode,
+    date: entry.date,
+    signId: entry.signId,
+    birth: birth2,
+    title: entry.title,
+    action: entry.action,
+    note: entry.note,
+    completed: entry.completed,
+    verdict,
+    createdAt: entry.createdAt,
+    updatedAt: entry.updatedAt
+  };
+}
+function readPerson2(value, ids, today) {
+  if (!exact(value, PERSON_KEYS)) fail();
+  if (typeof value.id !== "string" || !UUID.test(value.id) || ids.has(value.id.toLowerCase())) fail();
+  ids.add(value.id.toLowerCase());
+  if (!personName(value.name) || !RELATIONS.includes(value.relation) || value.birthTime !== null && typeof value.birthTime !== "string") fail();
+  const birth2 = birthProfile(value.birthDate, value.birthTime, today);
+  return { id: value.id, name: value.name, relation: value.relation, birthDate: birth2.birthDate, birthTime: birth2.birthTime };
+}
 function validateState(value, today = seoulDateKey()) {
-  if (!exact(value, ["version", "profile", "preferences", "entries"]) || value.version !== 1 || !Array.isArray(value.entries) || value.entries.length > 90) fail();
+  const version = value && typeof value === "object" ? value.version : void 0;
+  if (version === 1 ? !exact(value, ["version", "profile", "preferences", "entries"]) : version === 2 ? !exact(value, ["version", "profile", "preferences", "entries", "people"]) : true) fail();
+  if (!Array.isArray(value.entries) || value.entries.length > MAX_ENTRIES) fail();
+  if (version === 2 && (!Array.isArray(value.people) || value.people.length > MAX_PEOPLE)) fail();
   if (!exact(value.preferences, ["mode", "signId"]) || !modes.has(value.preferences.mode) || value.preferences.signId !== null && !signs.has(value.preferences.signId)) fail();
-  const ids = /* @__PURE__ */ new Set();
-  const entries = value.entries.map((entry) => {
-    if (!exact(entry, ["id", "mode", "date", "signId", "birth", "title", "action", "note", "completed", "createdAt", "updatedAt"])) fail();
-    if (typeof entry.id !== "string" || !/^[a-f\d]{8}-[a-f\d]{4}-[1-5][a-f\d]{3}-[89ab][a-f\d]{3}-[a-f\d]{12}$/i.test(entry.id) || ids.has(entry.id.toLowerCase())) fail();
-    ids.add(entry.id.toLowerCase());
-    validateDateKey(entry.date);
-    if (entry.date < "1900-01-01" || entry.date > "2100-12-31") fail();
-    if (!modes.has(entry.mode) || !plain(entry.title, 160) || !plain(entry.action, 400) || !plain(entry.note, 1e3) || typeof entry.completed !== "boolean") fail();
-    for (const key of ["createdAt", "updatedAt"]) if (typeof entry[key] !== "string" || !/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/.test(entry[key]) || !Number.isFinite(Date.parse(entry[key])) || new Date(entry[key]).toISOString() !== entry[key]) fail();
-    if (entry.updatedAt < entry.createdAt) fail();
-    const birth2 = profile(entry.birth, today);
-    if (entry.mode === "western" ? !signs.has(entry.signId) || birth2 !== null : entry.signId !== null || birth2 === null || birth2.birthDate > entry.date) fail();
-    return { ...entry, birth: birth2 };
-  });
-  const result = { version: 1, profile: profile(value.profile, today), preferences: { ...value.preferences }, entries };
-  if (new TextEncoder().encode(JSON.stringify(result)).length > 60 * 1024) throw new Error("보관함 용량이 가득 찼어요. 내보낸 뒤 오래된 기록을 정리해 주세요.");
+  const entryIds = /* @__PURE__ */ new Set(), personIds = /* @__PURE__ */ new Set();
+  const entries = value.entries.map((entry) => readEntry(entry, version, entryIds, today));
+  const people = version === 2 ? value.people.map((person) => readPerson2(person, personIds, today)) : [];
+  const result = { version: 2, profile: profile(value.profile, today), preferences: { mode: value.preferences.mode, signId: value.preferences.signId }, entries, people };
+  const measured = version === 1 ? { version: 1, profile: result.profile, preferences: result.preferences, entries: entries.map(({ verdict, ...entry }) => entry) } : result;
+  if (bytes(measured) > MAX_STATE_BYTES) full();
   return result;
 }
 function readingKey(result) {
@@ -12516,23 +13949,57 @@ function recentReflections(state, today = seoulDateKey()) {
   });
   return { startDate: days[6].date, endDate: today, days };
 }
-function saveReading(state, result, { note = "", completed = false, now = (/* @__PURE__ */ new Date()).toISOString(), id = crypto.randomUUID() } = {}) {
-  const key = readingKey(result), previous = state.entries.find((item) => entryKey(item) === key);
-  if (!previous && state.entries.length >= 90) throw new Error("보관함에는 90개까지 담을 수 있어요. 내보낸 뒤 오래된 기록을 정리해 주세요.");
+function saveReading(state, result, { note = "", completed = false, verdict, now = (/* @__PURE__ */ new Date()).toISOString(), id = crypto.randomUUID() } = {}) {
+  const base = validateState(state);
+  const key = readingKey(result), previous = base.entries.find((item) => entryKey(item) === key);
+  if (!previous && base.entries.length >= MAX_ENTRIES) throw new Error("보관함에는 90개까지 담을 수 있어요. 내보낸 뒤 오래된 기록을 정리해 주세요.");
   const entry = {
     id: previous?.id || id,
     mode: result.mode,
     date: result.date,
     signId: result.mode === "western" ? result.signId : null,
     birth: result.mode === "korean" ? birthProfile(result.birthDate, result.birthTime) : null,
-    title: result.title,
-    action: result.action,
+    title: result.title ?? result.headline,
+    action: result.action ?? result.do,
     note,
     completed,
+    verdict: verdict === void 0 ? previous?.verdict ?? null : verdict,
     createdAt: previous?.createdAt || now,
     updatedAt: now
   };
-  return validateState({ ...state, entries: [entry, ...state.entries.filter((item) => item.id !== entry.id)] });
+  return validateState({ ...base, entries: [entry, ...base.entries.filter((item) => item.id !== entry.id)] });
+}
+function setVerdict(state, entryId, verdict, { now = (/* @__PURE__ */ new Date()).toISOString() } = {}) {
+  if (verdict !== null && !VERDICTS.includes(verdict)) throw new TypeError("맞았어요·글쎄요·아니었어요 중에서 골라 주세요.");
+  const base = validateState(state);
+  const target = typeof entryId === "string" ? entryId.toLowerCase() : "";
+  const index = base.entries.findIndex((item) => item.id.toLowerCase() === target);
+  if (index < 0) throw new Error("표시할 기록을 찾지 못했어요.");
+  const current = base.entries[index];
+  const updatedAt = now > current.updatedAt ? now : current.updatedAt;
+  return validateState({ ...base, entries: base.entries.map((item, at) => at === index ? { ...item, verdict, updatedAt } : item) });
+}
+function savePerson(state, person, { id = crypto.randomUUID(), today = seoulDateKey() } = {}) {
+  if (!person || typeof person !== "object" || Array.isArray(person)) throw new TypeError("저장할 사람 정보를 확인해 주세요.");
+  const base = validateState(state, today);
+  const name = typeof person.name === "string" ? person.name.trim() : person.name;
+  if (!personName(name)) throw new TypeError("이름은 1~20자로 적어 주세요.");
+  if (!RELATIONS.includes(person.relation)) throw new TypeError("관계를 골라 주세요.");
+  const birthTime = person.birthTime === void 0 || person.birthTime === "" ? null : person.birthTime;
+  birthProfile(person.birthDate, birthTime, today);
+  let previous = null;
+  if (person.id !== void 0 && person.id !== null) {
+    previous = base.people.find((item) => typeof person.id === "string" && item.id.toLowerCase() === person.id.toLowerCase());
+    if (!previous) throw new Error("고칠 사람을 찾지 못했어요.");
+  } else if (base.people.length >= MAX_PEOPLE) throw new Error("사람은 12명까지 저장할 수 있어요. 한 명을 지운 뒤 다시 저장해 주세요.");
+  const next = { id: previous?.id || id, name, relation: person.relation, birthDate: person.birthDate, birthTime };
+  const people = previous ? base.people.map((item) => item.id === previous.id ? next : item) : [...base.people, next];
+  return validateState({ ...base, people }, today);
+}
+function removePerson(state, personId, { today = seoulDateKey() } = {}) {
+  const base = validateState(state, today);
+  const target = typeof personId === "string" ? personId.toLowerCase() : "";
+  return validateState({ ...base, people: base.people.filter((item) => item.id.toLowerCase() !== target) }, today);
 }
 
 // experiences/synk-account/src/platform-entry.mjs
@@ -12656,7 +14123,7 @@ function createPlatformEntry({ clientKey, getUrl, replaceUrl }) {
     }
   };
 }
-var PUBLIC = Object.freeze({ care: "https://synk.im/care/", fortune: "https://synk.im/fortune/", rehearsal: "https://synk.im/rehearsal/" });
+var PUBLIC = Object.freeze({ world: "https://synk.im/account/client.html?product=world&play=learning-hub", care: "https://synk.im/care/", fortune: "https://synk.im/fortune/", rehearsal: "https://synk.im/rehearsal/" });
 
 // experiences/daily-fortune/account.mjs
 var changed = () => Object.assign(new Error("로그인 계정이 바뀌었어요. 다시 불러와 주세요."), { code: "ACCOUNT_CHANGED" });
@@ -12788,14 +14255,14 @@ function createFortuneAccount({
       guard(expected);
       if (!data?.ok) throw errorFor(data, data?.error?.status);
       return data;
-    } catch (error) {
+    } catch (error2) {
       guard(expected);
-      if (expected === epoch && (error.status === 401 || ["AUTH_REQUIRED", "SESSION_REVOKED", "AUTH_SESSION_MISSING"].includes(error.code)) && !(platformEntry?.accountId() && !account)) expire(error.message);
-      else if (expected === epoch && error.code === "ACCOUNT_UNAVAILABLE" && error.status === 403) {
+      if (expected === epoch && (error2.status === 401 || ["AUTH_REQUIRED", "SESSION_REVOKED", "AUTH_SESSION_MISSING"].includes(error2.code)) && !(platformEntry?.accountId() && !account)) expire(error2.message);
+      else if (expected === epoch && error2.code === "ACCOUNT_UNAVAILABLE" && error2.status === 403) {
         revision = null;
-        emit({ ready: false, message: error.message });
+        emit({ ready: false, message: error2.message });
       }
-      throw error;
+      throw error2;
     }
   }
   function accept(data) {
@@ -12827,9 +14294,9 @@ function createFortuneAccount({
       account = { synk_user_id: identity.account.synk_user_id, display_name: identity.account.profile?.display_name || identity.account.display_name || "SYNK 회원" };
       emit({ status: "signed-in", account });
       return accept(await invoke("fortuneGet"));
-    } catch (error) {
-      if (expected === epoch) emit({ ready: false, message: error.message });
-      throw error;
+    } catch (error2) {
+      if (expected === epoch) emit({ ready: false, message: error2.message });
+      throw error2;
     }
   }
   function load() {
@@ -12876,8 +14343,8 @@ function createFortuneAccount({
     if (native) {
       unsubscribe?.();
       unsubscribe = native.onAuthChanged((next) => {
-        void nativeState(next).catch((error) => {
-          if (error.code !== "ACCOUNT_CHANGED") emit({ message: error.message });
+        void nativeState(next).catch((error2) => {
+          if (error2.code !== "ACCOUNT_CHANGED") emit({ message: error2.message });
         });
       });
       const initial = await native.authStatus();
@@ -12897,9 +14364,9 @@ function createFortuneAccount({
       if (response.ok) {
         try {
           raw = await response.json();
-        } catch (error) {
-          if (error?.name !== "SyntaxError") throw networkFailure();
-          throw error;
+        } catch (error2) {
+          if (error2?.name !== "SyntaxError") throw networkFailure();
+          throw error2;
         }
       } else if (response.status !== 404) throw errorFor({ error: { code: "AUTH_CONFIG" } }, response.status);
     } finally {
@@ -12965,14 +14432,14 @@ function createFortuneAccount({
       guard(expected);
       platformEntry.stop();
       return result;
-    } catch (error) {
+    } catch (error2) {
       guard(expected);
-      if (!platformEntry.accountId() || !(error.status === 401 || ["AUTH_REQUIRED", "SESSION_REVOKED", "AUTH_SESSION_MISSING", "PLATFORM_ACCOUNT_MISMATCH"].includes(error.code))) throw error;
+      if (!platformEntry.accountId() || !(error2.status === 401 || ["AUTH_REQUIRED", "SESSION_REVOKED", "AUTH_SESSION_MISSING", "PLATFORM_ACCOUNT_MISMATCH"].includes(error2.code))) throw error2;
       session = null;
       storage.removeItem(key);
       if (await automaticSignIn(expected)) return snapshot();
       platformEntry.assertAccount(null);
-      throw error;
+      throw error2;
     }
   }
   async function automaticSignIn(expected) {
@@ -12991,12 +14458,12 @@ function createFortuneAccount({
     current.promise = Promise.resolve().then(() => {
       guard(current.epoch);
       return begin();
-    }).catch((error) => {
+    }).catch((error2) => {
       if (!disposed && current.epoch === epoch) {
-        if (!error.retryable) pendingExchange = null;
-        emit({ status: account ? "signed-in" : "error", ready: revision !== null, retryable: error.retryable === true, message: error.message });
+        if (!error2.retryable) pendingExchange = null;
+        emit({ status: account ? "signed-in" : "error", ready: revision !== null, retryable: error2.retryable === true, message: error2.message });
       }
-      throw error;
+      throw error2;
     }).finally(() => {
       if (starting === current) starting = null;
     });
@@ -13027,8 +14494,8 @@ function createFortuneAccount({
     let entryError;
     try {
       platformEntry?.cancel();
-    } catch (error) {
-      entryError = error;
+    } catch (error2) {
+      entryError = error2;
     }
     const previous = session;
     nativeAuthenticated = false;
@@ -13093,127 +14560,426 @@ function createFortuneAccount({
   };
 }
 
+// experiences/member-signal/signal.mjs
+var THEME_KEY = "synk.platform.theme";
+var THEMES = /* @__PURE__ */ new Set(["night", "day", "system"]);
+function initTheme(root = globalThis.document?.documentElement, storage = globalThis.localStorage) {
+  let value = "night";
+  try {
+    const saved = storage?.getItem(THEME_KEY);
+    if (THEMES.has(saved)) value = saved;
+  } catch {
+  }
+  if (root) root.dataset.theme = value === "night" ? "night" : value;
+  return value;
+}
+function cycleTheme(root = globalThis.document?.documentElement, storage = globalThis.localStorage) {
+  const order = ["night", "day", "system"];
+  const next = order[(order.indexOf(root?.dataset.theme || "night") + 1) % order.length];
+  if (root) root.dataset.theme = next;
+  try {
+    storage?.setItem(THEME_KEY, next);
+  } catch {
+  }
+  return next;
+}
+var THEME_LABEL = Object.freeze({ night: "밤 화면", day: "낮 화면", system: "기기 설정" });
+var esc = (value) => String(value ?? "").replace(/[&<>"']/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[char]);
+function keepDots(text) {
+  return esc(text).replace(/[^\s·]+(?:·[^\s·]+)+/gu, (chunk) => `<span class="nw">${chunk}</span>`);
+}
+function poster({ word = "", art = "", alt = "", label = "", chip = "", chipTone = "", sticker = "", size = "", extra = "" } = {}) {
+  const len = Math.max(1, Math.min(5, [...word].length || 1));
+  return `<div class="poster${size ? ` ${size}` : ""}" data-word="${esc(word)}" data-len="${len}">${label ? `<span class="label">${esc(label)}</span>` : ""}${chip ? `<span class="led-chip${chipTone ? ` ${chipTone}` : ""}">${esc(chip)}</span>` : ""}${sticker ? `<span class="sticker">${esc(sticker)}</span>` : ""}${art ? `<img class="cut" src="${esc(art)}" alt="${esc(alt)}" width="720" height="720" decoding="async">` : ""}${extra}</div>`;
+}
+function secHead(number, title, side = "") {
+  return `<div class="sec-head"><span class="n" aria-hidden="true">${String(number).padStart(2, "0")}</span><h2>${esc(title)}</h2>${side ? `<span class="side">${side}</span>` : ""}</div>`;
+}
+function level2(value, label = "") {
+  const n = Math.max(0, Math.min(5, Math.round(value)));
+  return `<span class="level" role="img" aria-label="${esc(label || `다섯 칸 중 ${n}칸`)}">${Array.from({ length: 5 }, (_, i) => `<i${i < n ? ' class="on"' : ""}></i>`).join("")}</span>`;
+}
+var ICONS = {
+  arrow: '<path d="M5 12h14M13 6l6 6-6 6"/>',
+  back: '<path d="M19 12H5M11 18l-6-6 6-6"/>',
+  close: '<path d="M6 6l12 12M18 6L6 18"/>',
+  plus: '<path d="M12 5v14M5 12h14"/>',
+  check: '<path d="M5 12.5l4.2 4.2L19 7"/>',
+  sun: '<circle cx="12" cy="12" r="4"/><path d="M12 2.5v2M12 19.5v2M4.6 4.6l1.4 1.4M18 18l1.4 1.4M2.5 12h2M19.5 12h2M4.6 19.4L6 18M18 6l1.4-1.4"/>',
+  moon: '<path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/>',
+  monitor: '<rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/>',
+  user: '<circle cx="12" cy="8" r="4"/><path d="M4 20c1.5-3.5 4.5-5 8-5s6.5 1.5 8 5"/>',
+  mic: '<rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21"/>',
+  stop: '<rect x="6.5" y="6.5" width="11" height="11" rx="2"/>',
+  play: '<path d="M8 5.5v13l10.5-6.5z"/>',
+  pause: '<path d="M8 5.5v13M16 5.5v13"/>',
+  download: '<path d="M12 4v11M7 10.5l5 5 5-5M5 20h14"/>',
+  upload: '<path d="M12 16V5M7 9.5l5-5 5 5M5 20h14"/>',
+  print: '<path d="M7 9V4h10v5M7 17H5a1.5 1.5 0 0 1-1.5-1.5v-5A1.5 1.5 0 0 1 5 9h14a1.5 1.5 0 0 1 1.5 1.5v5A1.5 1.5 0 0 1 19 17h-2M7 14h10v6H7z"/>',
+  copy: '<rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5.5A1.5 1.5 0 0 0 14.5 4h-9A1.5 1.5 0 0 0 4 5.5v9A1.5 1.5 0 0 0 5.5 16H8"/>',
+  share: '<circle cx="18" cy="5.5" r="2.5"/><circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="18.5" r="2.5"/><path d="M8.2 10.8l7.6-4.1M8.2 13.2l7.6 4.1"/>',
+  trash: '<path d="M4.5 7h15M9.5 7V4.5h5V7M6.5 7l1 13h9l1-13"/>',
+  edit: '<path d="M4 20h4L19 9l-4-4L4 16z"/>',
+  star: '<path d="M12 3.5l2.6 5.4 5.9.8-4.3 4.1 1 5.8L12 16.8l-5.2 2.8 1-5.8-4.3-4.1 5.9-.8z"/>',
+  calendar: '<rect x="3.5" y="5" width="17" height="15" rx="2"/><path d="M3.5 10h17M8 3v4M16 3v4"/>',
+  heart: '<path d="M12 20s-7.5-4.6-7.5-10A4.3 4.3 0 0 1 12 7.4 4.3 4.3 0 0 1 19.5 10c0 5.4-7.5 10-7.5 10z"/>',
+  book: '<path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5zM4 20.5A2.5 2.5 0 0 0 6.5 23H20v-5"/>',
+  home: '<path d="M4 11l8-7 8 7v9h-5v-6H9v6H4z"/>',
+  bell: '<path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15zM10 20.5a2 2 0 0 0 4 0"/>',
+  people: '<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c1-3.3 3.6-5 6.5-5s5.5 1.7 6.5 5M16 4.6a3.5 3.5 0 0 1 0 6.8M18 15.3c1.7.6 3 2.1 3.5 4.7"/>',
+  chat: '<path d="M4 5h16v11H9l-5 4z"/>',
+  image: '<rect x="3.5" y="4.5" width="17" height="15" rx="2"/><circle cx="9" cy="10" r="2"/><path d="M20.5 16l-5-5-9 8.5"/>',
+  clock: '<circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/>',
+  gift: '<rect x="3.5" y="8" width="17" height="4" rx="1"/><path d="M5 12v8h14v-8M12 8v12M12 8c-1.5-3.5-5.5-3.5-5.5-1S10 8 12 8zM12 8c1.5-3.5 5.5-3.5 5.5-1S14 8 12 8z"/>',
+  more: '<circle cx="5.5" cy="12" r="1.3"/><circle cx="12" cy="12" r="1.3"/><circle cx="18.5" cy="12" r="1.3"/>',
+  search: '<circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4.3-4.3"/>',
+  refresh: '<path d="M20 11a8 8 0 1 0-2.3 5.7M20 4.5V11h-6.5"/>',
+  sparkle: '<path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/>'
+};
+function icon(name, label = "") {
+  return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"${label ? ` role="img" aria-label="${esc(label)}"` : ' aria-hidden="true"'}>${ICONS[name] || ""}</svg>`;
+}
+function createToast(element) {
+  let timer;
+  return (text) => {
+    clearTimeout(timer);
+    element.textContent = text;
+    timer = setTimeout(() => {
+      element.textContent = "";
+    }, 6e3);
+  };
+}
+function createSheet(sheet2, { onClose = () => {
+} } = {}) {
+  let opener = null;
+  const panel = sheet2.querySelector(".sheet-panel");
+  const close = () => {
+    if (sheet2.hidden) return;
+    sheet2.hidden = true;
+    document.body.style.removeProperty("overflow");
+    onClose();
+    opener?.focus?.();
+    opener = null;
+  };
+  sheet2.addEventListener("click", (event) => {
+    if (event.target.closest("[data-sheet-close]") || event.target.classList.contains("sheet-backdrop")) close();
+  });
+  sheet2.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") {
+      event.stopPropagation();
+      close();
+      return;
+    }
+    if (event.key !== "Tab") return;
+    const focusable = [...panel.querySelectorAll('button,a[href],input,select,textarea,[tabindex]:not([tabindex="-1"])')].filter((node) => !node.disabled && !node.closest("[hidden]") && node.offsetParent !== null);
+    if (!focusable.length) return;
+    const first = focusable[0], last = focusable[focusable.length - 1];
+    if (event.shiftKey && document.activeElement === first) {
+      event.preventDefault();
+      last.focus();
+    } else if (!event.shiftKey && document.activeElement === last) {
+      event.preventDefault();
+      first.focus();
+    }
+  });
+  return {
+    open(from = document.activeElement) {
+      opener = from;
+      sheet2.hidden = false;
+      document.body.style.setProperty("overflow", "hidden");
+      panel.focus();
+    },
+    close,
+    get open_() {
+      return !sheet2.hidden;
+    }
+  };
+}
+function seoulDate(now = /* @__PURE__ */ new Date()) {
+  return new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Seoul", year: "numeric", month: "2-digit", day: "2-digit" }).format(now);
+}
+var WEEK = ["일", "월", "화", "수", "목", "금", "토"];
+function dayLabel(isoDate, { weekday = true, today = seoulDate() } = {}) {
+  const [y, m, d] = String(isoDate).slice(0, 10).split("-").map(Number);
+  if (!y || !m || !d) return "";
+  const w = WEEK[new Date(Date.UTC(y, m - 1, d)).getUTCDay()];
+  return `${String(today).slice(0, 4) === String(y) ? "" : `${y}년 `}${m}월 ${d}일${weekday ? ` (${w})` : ""}`;
+}
+
 // experiences/daily-fortune/app.mjs
-var $ = (id) => document.getElementById(id);
-var selectedMode = null;
-var selectedSign = null;
+var app = document.querySelector("#app");
+var toast = createToast(document.querySelector("#notice"));
+initTheme();
+var sheet = createSheet(document.querySelector("#account-sheet"));
+var WEEK2 = ["일", "월", "화", "수", "목", "금", "토"];
+var LEVELS = [["overall", "총운"], ["love", "애정"], ["money", "금전"], ["work", "일"]];
+var VERDICT = Object.freeze({ hit: "맞았어요", meh: "글쎄요", miss: "아니었어요" });
+var RELATION = Object.freeze({ family: "가족", friend: "친구", partner: "연인", work: "동료", other: "그 밖" });
+var TAG = Object.freeze({ good: "좋은 날", calm: "무난한 날", care: "천천히 가면 좋은 날" });
+var mode = null;
+var signId = null;
 var birth = null;
 var date = seoulDateKey();
 var readingDate = date;
 var view = "today";
+var setupOpen = false;
 var vault = emptyState();
-var accountState = { configured: false, status: "loading", ready: false };
+var accountState = { configured: false, status: "loading", ready: false, message: "계정 연결을 확인하고 있어요." };
 var accountBusy = false;
 var loadedIdentity = null;
 var screenVersion = 0;
+var deletePending = false;
+var vaultFilter = "all";
+var matchInput = { name: "", relation: "friend", birthDate: "", birthTime: "", timeUnknown: true };
+var matchResult = null;
+var myBirthForMatch = "";
 var drafts = /* @__PURE__ */ new Map();
-var fortune = null;
+var birthInput = null;
+var zodiacInput = "";
 var dayTimer;
-var noticeTimer;
-var scroll = (element) => element.scrollIntoView({ behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth", block: "start" });
-function notify(message) {
-  clearTimeout(noticeTimer);
-  $("notice").textContent = message;
-  $("notice").classList.add("visible");
-  noticeTimer = setTimeout(() => $("notice").classList.remove("visible"), 4500);
+var hasProfile = () => mode === "western" ? !!signId : mode === "korean" ? !!birth : false;
+function sajuFor(day = readingDate) {
+  return birth ? getSaju(birth, day) : null;
 }
-function clearCopy() {
-  $("manual-copy").hidden = true;
-  $("copy-text").value = "";
-  clearTimeout(noticeTimer);
-  $("notice").classList.remove("visible");
-  $("notice").textContent = "";
+function reading(day = readingDate) {
+  if (!hasProfile()) return null;
+  const saju = mode === "korean" ? sajuFor(day) : null;
+  const card = getDailyCard({ mode, signId, saju, date: day });
+  if (!card) return null;
+  return { ...card, mode, date: day, signId: mode === "western" ? signId : null, birthDate: birth?.birthDate, birthTime: birth?.birthTime ?? null, title: card.headline, action: card.do, saju };
 }
-function showDate() {
-  $("today").dateTime = date;
-  $("today").textContent = displayDate(date);
-  $("birth-date").max = date;
-  $("zodiac-birth").max = date;
+var seed = () => mode === "korean" ? `saju:${birth.birthDate}:${birth.birthTime ?? "?"}` : `sign:${signId}`;
+function addDays3(day, n) {
+  const d = /* @__PURE__ */ new Date(`${day}T00:00:00Z`);
+  d.setUTCDate(d.getUTCDate() + n);
+  return d.toISOString().slice(0, 10);
 }
-function textNode(tag, value, className) {
-  const node = document.createElement(tag);
-  node.textContent = value;
-  if (className) node.className = className;
-  return node;
+function weekDays(anchor) {
+  const dow = (/* @__PURE__ */ new Date(`${anchor}T00:00:00Z`)).getUTCDay(), start = addDays3(anchor, -((dow + 6) % 7));
+  return Array.from({ length: 7 }, (_, i) => addDays3(start, i));
 }
-function renderSaju(result) {
-  $("birth-summary").textContent = `양력 ${result.birthDate} · ${result.timeKnown ? result.birthTime : "태어난 시간 모름"} · 한국 표준시`;
-  $("pillars").replaceChildren(...result.pillars.map((pillar2) => {
-    const card = document.createElement("article");
-    card.className = "pillar";
-    card.dataset.pillar = pillar2.id;
-    card.append(textNode("h4", pillar2.label));
-    if (pillar2.known) {
-      for (const [kind, part] of [["천간", pillar2.stem], ["지지", pillar2.branch]]) {
-        const row = document.createElement("p");
-        row.className = "pillar-part";
-        row.setAttribute("aria-label", `${kind} ${part.hangul}, ${part.element}`);
-        row.append(textNode("span", part.hanja, "hanja"), textNode("span", `${part.hangul} · ${part.element}`, "hangul"));
-        card.append(row);
-      }
-    } else {
-      card.append(textNode("p", "—", "hanja"), textNode("p", "시각 확인 필요", "unknown"));
+var profileLabel = () => mode === "western" ? `${getZodiacProfile(signId).label}` : birth ? `${dayLabel(birth.birthDate, { weekday: false, today: "" })} · ${birth.birthTime ?? "시간 모름"}` : "";
+var wa = (name) => {
+  const c = name.charCodeAt(name.length - 1);
+  return c >= 44032 && c <= 55203 && (c - 44032) % 28 ? "과" : "와";
+};
+var shortDate = (day) => {
+  const [, m, d] = day.split("-").map(Number);
+  return `${m}.${d}`;
+};
+function intro() {
+  return `<section class="intro">
+    <div class="copy"><p class="kicker">SYNK FOR YOU · FORTUNE</p><h1 tabindex="-1">오늘의 좋은 기운,<br><span class="hl">내 방식으로.</span></h1>
+      <p class="lead">별자리나 한국 사주로 오늘의 기운을 가볍게 읽어요. 궁합과 올해의 흐름도 보고, 맞았는지 남겨 두면 다음에 더 재밌어져요.</p>
+      <ul class="meta"><li><small>01</small>별자리·사주</li><li><small>02</small>오늘의 기운</li><li><small>03</small>궁합</li><li><small>04</small>내 보관함</li></ul>
+      <p class="small muted">무료 · 광고 없음 · 비회원도 바로 · 로그인하면 기록 보관</p><div class="actions"><a class="btn soft" href="#setup">별자리·사주 고르기 ${icon("arrow")}</a></div></div>
+    <div class="art">${poster({ word: "운세", label: "01 / FORTUNE", chip: dayLabel(date), art: "./assets/art/shooting.webp", alt: "꼬리를 달고 날아가는 노란 펠트 별똥별" })}</div>
+  </section>`;
+}
+function setup() {
+  const signs2 = getSigns("western");
+  const shown = birthInput || { birthDate: birth?.birthDate || vault.profile?.birthDate || "", birthTime: birth?.birthTime || vault.profile?.birthTime || "", timeUnknown: birth ? birth.birthTime === null : vault.profile?.birthTime === null };
+  return `<section class="sec setup" id="setup">${secHead(1, "어떻게 볼까요?")}
+    <div class="seg mode-seg" role="group" aria-label="운세 방식"><button type="button" data-mode="western" aria-pressed="${mode !== "korean"}">별자리로</button><button type="button" data-mode="korean" aria-pressed="${mode === "korean"}">한국 사주로</button></div>
+    ${mode === "korean" ? `<form id="saju-form" class="saju-form">
+      <div class="field-row"><div class="field"><label for="birth-date">양력 생년월일</label><input id="birth-date" name="birthDate" type="date" min="1900-01-01" max="${date}" required value="${esc(shown.birthDate)}"></div>
+      <div class="field"><label for="birth-time">태어난 시간 <span class="opt-note">24시간 · 한국 표준시</span></label><input id="birth-time" name="birthTime" type="time" value="${esc(shown.birthTime)}" ${shown.timeUnknown ? "disabled" : ""}></div></div>
+      <label class="check"><input type="checkbox" name="timeUnknown" ${shown.timeUnknown ? "checked" : ""}><span>태어난 시간을 몰라요 <span class="small muted">시주는 비워 두고 볼 수 있어요</span></span></label>
+      <div class="actions"><button class="btn primary" type="submit">사주로 보기</button></div><p id="error" class="error-text" role="alert" tabindex="-1"></p></form>` : `<div class="signs" role="group" aria-label="별자리">${signs2.map((s) => `<button class="opt sign" type="button" data-sign="${s.id}" aria-pressed="${signId === s.id}"><span><strong>${esc(s.label)}</strong><small>${esc(s.range)}</small></span><span class="tag">${esc(s.english)}</span></button>`).join("")}</div>
+      <form id="find-sign" class="find-sign"><div class="field"><label for="zodiac-birth">생일로 내 별자리 찾기 <span class="opt-note">양력</span></label><div class="inline"><input id="zodiac-birth" name="birthDate" type="date" min="1900-01-01" max="${date}" value="${esc(zodiacInput)}"><button class="btn soft" type="submit">찾기</button></div></div><p id="error" class="error-text" role="alert" tabindex="-1"></p></form>`}
+  </section>`;
+}
+function profileStrip() {
+  const me = birth ? getMeCard(birth) : null;
+  return `<div class="profile-strip"><div class="who"><span class="eyebrow">${mode === "korean" ? "한국 사주" : "별자리"}</span><strong>${esc(profileLabel())}</strong></div>
+    ${me ? `<ul class="meta me" data-cols="3"><li><small class="ko">띠</small>${esc(me.animal?.label || me.animal || "")}</li><li><small class="ko">일간</small>${esc(me.dayMaster?.label || me.dayMaster || "확인 필요")}</li><li><small class="ko">별자리</small>${esc(me.zodiac?.label || me.zodiac || "")}</li></ul>` : ""}
+    <button class="btn small soft" type="button" data-action="change">바꾸기</button></div>`;
+}
+function todayView() {
+  if (!hasProfile() || setupOpen) return intro() + setup();
+  const r = reading();
+  if (!r) return profileStrip() + `<div class="empty"><strong>이 날은 계산할 수 없어요.</strong><p>태어난 날 이전이거나 일간을 확정할 수 없는 날이에요.</p></div>`;
+  const key = readingKey(r), saved = vault.entries.find((item) => entryKey(item) === key), draft = drafts.get(key);
+  const completed = draft ? draft.completed : !!saved?.completed, note = draft ? draft.note : saved?.note || "";
+  const tarot = drawCard({ seed: seed(), date: readingDate });
+  const isToday = readingDate === date;
+  return `${profileStrip()}
+  <div class="split today">
+    <div class="main">
+      <div class="day-nav"><p class="kicker">${isToday ? "TODAY" : "READING"} · <b class="ko">${esc(dayLabel(readingDate))}</b></p>${isToday ? "" : `<button class="linkbtn" type="button" data-action="back-today">오늘로 돌아가기</button>`}</div>
+      <h1 class="page-title" tabindex="-1">${keepDots(r.headline)}</h1>
+      <p class="lead">${keepDots(r.message)}</p>
+      <div class="grid four levels">${LEVELS.map(([id, label]) => `<div class="card lv"><span class="eyebrow">${label}</span>${level2(r.levels[id], `${label} 기운 다섯 칸 중 ${r.levels[id]}칸`)}</div>`).join("")}</div>
+      <div class="grid two dodont"><div class="card"><span class="eyebrow">해 보면 좋은 것</span><p class="big-line">${keepDots(r.do)}</p></div><div class="card"><span class="eyebrow">미뤄 두면 좋은 것</span><p class="big-line">${keepDots(r.dont)}</p></div></div>
+      <ul class="meta lucky"><li><small class="ko">행운의 색</small><span class="swatch" data-color="${esc(r.luckyColor?.hex || "")}"></span>${esc(r.luckyColor?.name || "")}</li><li><small class="ko">행운의 숫자</small><span class="num">${esc(r.luckyNumber)}</span></li><li><small class="ko">행운의 물건</small>${esc(r.luckyItem || "")}</li><li><small class="ko">${r.luckyTime ? "좋은 시간" : "방식"}</small>${esc(r.luckyTime || (mode === "western" ? "별자리" : "사주"))}</li></ul>
+      ${r.basis ? `<p class="note-line">${keepDots(r.basis)}</p>` : ""}
+      <form id="keep" class="card keep">
+        <div class="card-top"><span class="eyebrow">오늘의 작은 실천</span>${saved ? `<span class="led-chip plain">보관함에 있어요${saved.verdict ? ` · ${VERDICT[saved.verdict]}` : ""}</span>` : ""}</div>
+        <label class="check"><input type="checkbox" name="completed" ${completed ? "checked" : ""}><span>${keepDots(r.do)} <span class="small muted">해 봤어요</span></span></label>
+        <div class="field"><label for="note">한 줄 메모 <span class="opt-note" data-note-count>${[...note].length} / 1000</span></label><textarea id="note" name="note" maxlength="1000" placeholder="오늘 있었던 일, 맞았던 것, 기억하고 싶은 것">${esc(note)}</textarea></div>
+        <div class="actions"><button class="btn primary" type="submit" ${accountBusy || !accountState.ready ? "disabled" : ""}>보관함에 담기</button><button class="btn soft" type="button" data-action="copy">${icon("copy")} 복사</button>${accountState.ready ? "" : '<button class="linkbtn" type="button" data-action="account">로그인하면 담을 수 있어요</button>'}</div>
+        ${accountState.ready ? '<p class="small muted">결과·실천 여부·메모를 내 SYNK 계정에 저장해요. 담기 전 수정은 이 화면에만 남아요.</p>' : ""}
+        <div class="manual-copy" hidden><label for="copy-text">아래 글을 직접 복사해 주세요</label><textarea id="copy-text" readonly></textarea></div>
+      </form>
+    </div>
+    <aside class="side sticky-side">
+      ${poster({ word: "오늘", size: "low", label: `${isToday ? "TODAY" : "READING"} · ${shortDate(readingDate)}`, art: "./assets/art/sun.webp", alt: "노란 펠트 해" })}
+      ${tarot ? `<article class="card tarot"><div class="card-top"><span class="eyebrow">오늘의 카드 한 장</span><span class="mono muted">${esc(tarot.english || "")}</span></div><h3>${esc(tarot.name)}</h3><p class="keys">${(tarot.keywords || []).map((k) => `<span class="chip tag">${esc(k)}</span>`).join("")}</p><p>${keepDots(tarot.meaning)}</p>${tarot.practice ? `<p class="small muted">${keepDots(tarot.practice)}</p>` : ""}</article>` : ""}
+    </aside>
+  </div>
+  <section class="sec">${secHead(2, "이번 주")}<div class="week">${weekDays(date).map((day) => {
+    let c = null;
+    try {
+      c = getDailyCard({ mode, signId, saju: mode === "korean" ? sajuFor(day) : null, date: day });
+    } catch {
+      c = null;
     }
-    return card;
-  }));
-  $("day-master").textContent = `나의 일간 · ${result.dayMaster.hangul}(${result.dayMaster.hanja}) · ${result.dayMaster.element}`;
-  $("elements").replaceChildren(...result.elements.map((element) => {
-    const item = document.createElement("li");
-    item.append(textNode("span", `${element.label} ${element.hanja}`), textNode("strong", `${element.count}개`));
-    return item;
-  }));
-  $("saju-notes").replaceChildren(...result.notes.map((note) => textNode("li", note)));
+    return `<button class="day${day === readingDate ? " on" : ""}${day === date ? " today" : ""}" type="button" data-day="${day}" ${c ? "" : "disabled"}><span class="d">${WEEK2[(/* @__PURE__ */ new Date(`${day}T00:00:00Z`)).getUTCDay()]} <span class="num">${shortDate(day)}</span></span>${c ? `${level2(c.levels.overall, `총운 ${c.levels.overall}칸`)}<span class="t">${esc(c.headline)}</span>` : '<span class="t muted">계산할 수 없는 날</span>'}</button>`;
+  }).join("")}</div><p class="hint">날짜를 누르면 그날의 운세를 다시 열어요. 재미로 읽는 짧은 글이에요.</p></section>
+  <section class="sec">${secHead(3, mode === "korean" ? "내 사주 네 기둥" : "내 별자리 이야기")}${mode === "korean" ? sajuBlock(r.saju) : zodiacBlock()}</section>`;
 }
-function renderResult({ announce = true } = {}) {
-  screenVersion++;
-  const western = selectedMode === "western";
-  if (!selectedMode || (western ? !selectedSign : !birth)) {
-    fortune = null;
-    $("result").hidden = true;
-    renderWeek();
-    return;
+function sajuBlock(saju) {
+  if (!saju) return "";
+  const guide = getSajuGuide(saju);
+  return `<div class="pillars">${saju.pillars.map((p) => `<div class="pillar${p.known ? "" : " unknown"}"><span class="eyebrow">${esc(p.label)}</span>${p.known ? `<span class="hanja">${esc(p.stem.hanja)}${esc(p.branch.hanja)}</span><span class="small">${esc(p.stem.hangul)}${esc(p.branch.hangul)} · ${esc(p.stem.element)}${esc(p.branch.element)}</span>` : '<span class="hanja">—</span><span class="small muted">시각 확인 필요</span>'}</div>`).join("")}</div>
+  <ul class="meta elements">${saju.elements.map((e) => `<li><small class="ko">${esc(e.label)} ${esc(e.hanja)}</small><span class="num">${e.count}</span></li>`).join("")}</ul>
+  <details class="more"><summary>사주를 읽는 법</summary><p>${keepDots(guide.intro)}</p>${guide.pillars.map((item) => `<p><strong>${esc(item.label)} · ${esc(item.title)}</strong> ${esc(item.description)} ${esc(item.reading)}</p>`).join("")}<p><strong>${esc(guide.dayMaster.title)}</strong> ${esc(guide.dayMaster.description)}</p></details>
+  ${saju.notes.length ? `<ul class="notes">${saju.notes.map((n) => `<li>${esc(n)}</li>`).join("")}</ul>` : ""}`;
+}
+function zodiacBlock() {
+  const info = getZodiacProfile(signId);
+  return `<div class="grid three"><div class="card"><span class="eyebrow">${esc(info.keywords.join(" · "))}</span><p>${esc(info.description)}</p></div><div class="card"><span class="eyebrow">${esc(info.element.label)} · ${esc(info.element.english)}</span><p>${esc(info.element.description)}</p></div><div class="card"><span class="eyebrow">나에게 던지는 질문</span><p>${esc(info.question)}</p></div></div><p class="hint">점성술에서 쓰는 문화적 상징이에요. 이 설명만으로 성격이나 능력을 판단하지 않아요.</p>`;
+}
+function needProfile(title, word, art) {
+  return `<div class="split"><div class="main"><p class="kicker">FORTUNE</p><h1 class="page-title" tabindex="-1">${title}</h1><p class="lead">먼저 오늘 탭에서 별자리나 생년월일을 골라 주세요.</p><button class="btn primary" type="button" data-view="today">별자리·사주 고르기</button></div><aside class="side">${poster({ word, size: "low", art, alt: "" })}</aside></div>`;
+}
+function monthView() {
+  if (!hasProfile()) return needProfile('한 달의 흐름을<br><span class="hl">미리 살펴봐요.</span>', "흐름", "./assets/art/calendar.webp");
+  const flow = getMonthFlow({ mode, signId, saju: mode === "korean" ? sajuFor(date) : null, birth, startDate: date, days: 30 });
+  const days = flow.days || flow.items || flow;
+  const lead = (/* @__PURE__ */ new Date(`${days[0].date}T00:00:00Z`)).getUTCDay();
+  return `<div class="month-head"><div><p class="kicker">NEXT 30 DAYS · <b class="ko">${esc(profileLabel())}</b></p><h1 class="page-title" tabindex="-1">한 달의 흐름,<br><span class="hl">가볍게 미리.</span></h1><p class="lead">기운이 좋은 날과 천천히 가면 좋은 날을 모았어요. 날짜를 누르면 그날 운세를 열어요.</p></div>${poster({ word: "흐름", size: "low", label: "30 DAYS", art: "./assets/art/calendar.webp", alt: "펠트 달력" })}</div>
+  <div class="cal" role="grid" aria-label="30일 흐름">${WEEK2.map((w) => `<span class="wk" role="columnheader">${w}</span>`).join("")}${'<span class="blank"></span>'.repeat(lead)}${days.map((d) => `<button class="cell${d.tag ? ` ${d.tag}` : ""}${d.date === date ? " today" : ""}" type="button" role="gridcell" data-day="${d.date}" aria-label="${dayLabel(d.date)} 총운 ${d.overall}칸${d.tag ? ` · ${TAG[d.tag]}` : ""}"><span class="num">${Number(d.date.slice(8))}</span>${level2(d.overall, "")}${d.tag ? `<span class="tagdot" aria-hidden="true"></span>` : ""}</button>`).join("")}</div>
+  <div class="legend"><span><i class="tagdot good"></i>좋은 날</span><span><i class="tagdot care"></i>천천히 가면 좋은 날</span></div>
+  <div class="grid two days-two"><div class="card"><span class="eyebrow">기운이 좋은 날</span><ul class="daylist">${(flow.goodDays || days.filter((d) => d.tag === "good")).slice(0, 6).map((d) => `<li><button class="linkbtn" type="button" data-day="${d.date}">${dayLabel(d.date)}</button><span class="small muted">${esc(d.label || "")}</span></li>`).join("") || '<li class="muted">이번 30일에는 따로 고른 날이 없어요.</li>'}</ul></div>
+  <div class="card"><span class="eyebrow">천천히 가면 좋은 날</span><ul class="daylist">${(flow.careDays || days.filter((d) => d.tag === "care")).slice(0, 6).map((d) => `<li><button class="linkbtn" type="button" data-day="${d.date}">${dayLabel(d.date)}</button><span class="small muted">${esc(d.label || "")}</span></li>`).join("") || '<li class="muted">특별히 천천히 갈 날이 없어요.</li>'}</ul></div></div>
+  <p class="hint">재미로 보는 흐름이에요. 중요한 일정이나 결정을 이 표로 정하지 않아요.</p>`;
+}
+function matchView() {
+  const myBirth = birth?.birthDate || vault.profile?.birthDate || "";
+  const people = vault.people || [];
+  const r = matchResult;
+  return `<div class="split match">
+    <div class="main">
+      <p class="kicker">COMPATIBILITY</p><h1 class="page-title" tabindex="-1">우리 둘은<br><span class="hl">어떤 결일까요?</span></h1>
+      <p class="lead">두 사람의 생년월일로 대화·속도·배려 세 가지 결을 가볍게 읽어요. 같은 두 사람은 언제나 같은 결과예요.</p>
+      <form id="match-form" class="card match-form">
+        ${myBirth ? `<p class="small muted">나 · 양력 ${esc(dayLabel(myBirth, { weekday: false, today: "" }))}${birth?.birthTime ? ` · ${esc(birth.birthTime)}` : ""}</p>` : `<div class="field"><label for="my-birth">내 양력 생년월일</label><input id="my-birth" name="myBirth" type="date" min="1900-01-01" max="${date}" required value="${esc(myBirthForMatch)}"></div>`}
+        ${people.length ? `<fieldset><legend>저장한 사람</legend><div class="chips">${people.map((p) => `<button class="chip" type="button" data-person="${esc(p.id)}">${esc(p.name)} <span class="small muted">${RELATION[p.relation] || ""}</span></button>`).join("")}</div></fieldset>` : ""}
+        <div class="field-row"><div class="field"><label for="partner-name">상대 이름 <span class="opt-note">선택</span></label><input id="partner-name" name="name" maxlength="20" value="${esc(matchInput.name)}" placeholder="예: 지민"></div>
+        <div class="field"><label for="partner-relation">관계</label><select id="partner-relation" name="relation">${Object.entries(RELATION).map(([id, label]) => `<option value="${id}" ${matchInput.relation === id ? "selected" : ""}>${label}</option>`).join("")}</select></div></div>
+        <div class="field-row"><div class="field"><label for="partner-birth">상대 양력 생년월일</label><input id="partner-birth" name="birthDate" type="date" min="1900-01-01" max="${date}" required value="${esc(matchInput.birthDate)}"></div>
+        <div class="field"><label for="partner-time">태어난 시간 <span class="opt-note">모르면 비워 두세요</span></label><input id="partner-time" name="birthTime" type="time" value="${esc(matchInput.birthTime)}"></div></div>
+        <div class="actions"><button class="btn primary" type="submit">궁합 보기</button>${r && accountState.ready ? `<button class="btn soft" type="button" data-action="save-person">${icon("plus")} 이 사람 저장</button>` : ""}</div>
+        <p id="error" class="error-text" role="alert" tabindex="-1"></p>
+      </form>
+    </div>
+    <aside class="side sticky-side">${poster({ word: "궁합", size: "low", label: "TWO OF US", art: "./assets/art/heart.webp", alt: "분홍 실로 꿰맨 크림색 펠트 하트" })}<div class="card tip"><span class="eyebrow">가볍게 봐요</span><p>사주 일간의 오행, 띠의 어울림, 별자리 원소를 함께 읽은 재미용 결과예요. 관계를 판단하는 기준으로 쓰지 않아요.</p></div></aside>
+  </div>
+  ${r ? `<section class="sec match-result" aria-labelledby="match-title"><p class="eyebrow">${esc(matchInput.name ? `${matchInput.name}${wa(matchInput.name)}` : "상대와")} 나</p><h2 id="match-title" class="result-title" tabindex="-1">${keepDots(r.headline)}</h2><div class="overall">${level2(r.overall, `전체 결 다섯 칸 중 ${r.overall}칸`)}</div>
+        <div class="grid three">${r.aspects.map((a) => `<div class="card"><div class="card-top"><span class="eyebrow">${esc(a.title)}</span>${level2(a.level, `${a.title} ${a.level}칸`)}</div><p>${keepDots(a.text)}</p></div>`).join("")}</div>
+        ${r.tip ? `<p class="note-line">${keepDots(r.tip)}</p>` : ""}
+        ${r.basis?.length ? `<details class="more"><summary>이렇게 읽었어요</summary><ul class="notes">${r.basis.map((b) => `<li>${esc(b)}</li>`).join("")}</ul></details>` : ""}</section>` : ""}`;
+}
+function yearView() {
+  const year = Number(date.slice(0, 4));
+  if (!hasProfile()) return needProfile(`${year}년,<br><span class="hl">나의 한 해.</span>`, String(year), "./assets/art/firework.webp");
+  const y = mode === "korean" ? getYearReading({ saju: sajuFor(date), year }) : getZodiacYear({ signId, year });
+  const month = Number(date.slice(5, 7));
+  return `<div class="month-head"><div><p class="kicker">${year} · <b class="ko">${esc(y.ganji ? `${y.ganji}년` : profileLabel())}</b></p><h1 class="page-title" tabindex="-1">${keepDots(y.headline)}</h1><p class="lead">${keepDots(y.message)}</p>${y.keywords?.length ? `<div class="chips">${y.keywords.map((k) => `<span class="chip tag">${esc(k)}</span>`).join("")}</div>` : ""}</div>${poster({ word: String(year), size: "low", label: "THIS YEAR", art: "./assets/art/firework.webp", alt: "알록달록한 펠트 폭죽" })}</div>
+  <section class="sec">${secHead(1, "달마다")}<div class="months">${(y.months || []).map((m) => `<div class="card mon${m.month === month ? " now" : ""}"><div class="card-top"><span class="eyebrow">${m.month}월${m.month === month ? " · 이번 달" : ""}</span>${level2(m.level, `${m.month}월 ${m.level}칸`)}</div><p>${keepDots(m.line)}</p></div>`).join("")}</div></section>
+  <p class="hint">신년 운세처럼 가볍게 읽는 한 해 이야기예요. 실제 사건이나 성패를 예측하지 않아요.</p>`;
+}
+function vaultView() {
+  if (!accountState.ready) return `<div class="split"><div class="main"><p class="kicker">MY FORTUNE</p><h1 class="page-title" tabindex="-1">맞았는지,<br><span class="hl">남겨 두면 재밌어요.</span></h1><p class="lead">SYNK ID로 로그인하면 오늘의 운세와 메모를 담고, 맞았는지 표시하고, 최근 7일을 돌아볼 수 있어요.</p><button class="btn primary" type="button" data-action="account">SYNK ID로 이어가기</button></div><aside class="side">${poster({ word: "보관함", size: "low", art: "./assets/art/star.webp", alt: "노란 펠트 별" })}</aside></div>`;
+  const entries = vault.entries.filter((e) => vaultFilter === "all" || (vaultFilter === "completed" ? e.completed : ["hit", "meh", "miss"].includes(vaultFilter) ? e.verdict === vaultFilter : e.mode === vaultFilter));
+  const hits = vault.entries.filter((e) => e.verdict === "hit").length, judged = vault.entries.filter((e) => e.verdict).length;
+  const recent = recentReflections(vault, date);
+  return `<div class="month-head"><div><p class="kicker">MY FORTUNE</p><h1 class="page-title" tabindex="-1">내 보관함</h1>
+    <ul class="meta"><li><small class="ko">담은 운세</small><span class="big">${vault.entries.length}</span></li><li><small class="ko">해 본 실천</small><span class="big">${vault.entries.filter((e) => e.completed).length}</span></li><li><small class="ko">맞았어요</small><span class="big">${hits}${judged ? `<span class="small muted"> / ${judged}</span>` : ""}</span></li><li><small class="ko">한도</small>90개</li></ul></div>${poster({ word: "보관함", size: "low", art: "./assets/art/star.webp", alt: "노란 펠트 별" })}</div>
+  <section class="sec">${secHead(1, "담아 둔 운세")}
+    <div class="seg filters" role="group" aria-label="보관함 거르기">${[["all", "전체"], ["western", "별자리"], ["korean", "사주"], ["completed", "실천"], ["hit", "맞았어요"]].map(([id, label]) => `<button type="button" data-filter="${id}" aria-pressed="${vaultFilter === id}">${label}</button>`).join("")}</div>
+    ${entries.length ? `<ul class="rows entries">${entries.map((e) => `<li><div><span class="s">${dayLabel(e.date)} · ${e.mode === "korean" ? "한국 사주" : esc(getZodiacProfile(e.signId).label)}${e.completed ? " · 실천했어요" : ""}</span><span class="t">${esc(e.title)}</span>${e.note ? `<span class="note">${esc(e.note)}</span>` : ""}</div>
+      <div class="row-actions"><div class="seg verdict" role="group" aria-label="이날 운세가 맞았나요">${Object.entries(VERDICT).map(([id, label]) => `<button type="button" data-verdict="${id}" data-entry="${esc(e.id)}" aria-pressed="${e.verdict === id}" ${accountBusy ? "disabled" : ""}>${label}</button>`).join("")}</div><button class="btn small soft" type="button" data-open="${esc(e.id)}">다시 보기</button><button class="btn small ghost danger" type="button" data-remove="${esc(e.id)}" ${accountBusy ? "disabled" : ""}>삭제</button></div></li>`).join("")}</ul>` : `<div class="empty"><strong>아직 담은 운세가 없어요.</strong><p>오늘의 운세에서 「보관함에 담기」를 눌러 보세요.</p></div>`}
+  </section>
+  <section class="sec">${secHead(2, "최근 7일 돌아보기", `<span class="small">${esc(recent.startDate)} – ${esc(recent.endDate)}</span>`)}
+    <div class="recent">${recent.days.map((day) => `<div class="rday${day.entries.length ? "" : " empty-day"}"><span class="d">${day.date === date ? "오늘" : dayLabel(day.date)}</span>${day.entries.length ? day.entries.map((e) => `<button class="rec" type="button" data-open="${esc(e.id)}"><strong>${esc(e.title)}</strong>${e.completed ? `<span class="small">실천 · ${esc(e.action)}</span>` : ""}${e.note.trim() ? `<span class="small muted">“${esc(e.note)}”</span>` : ""}</button>`).join("") : '<span class="small muted">남긴 기록 없음</span>'}</div>`).join("")}</div>
+  </section>
+  ${(vault.people || []).length ? `<section class="sec">${secHead(3, "저장한 사람")}<ul class="rows">${vault.people.map((p) => `<li><div><span class="t">${esc(p.name)}</span><span class="s">${RELATION[p.relation] || ""} · ${esc(dayLabel(p.birthDate, { weekday: false, today: "" }))}${p.birthTime ? ` · ${esc(p.birthTime)}` : ""}</span></div><div class="row-actions"><button class="btn small soft" type="button" data-person="${esc(p.id)}" data-go-match>궁합 보기</button><button class="btn small ghost danger" type="button" data-remove-person="${esc(p.id)}" ${accountBusy ? "disabled" : ""}>삭제</button></div></li>`).join("")}</ul></section>` : ""}`;
+}
+function accountBody() {
+  const signedIn = accountState.status === "signed-in";
+  return `<div class="acct-status"><span class="led-chip ${accountState.ready ? "" : signedIn ? "check" : "plain"}">${accountState.ready ? "연결됨" : signedIn ? "확인 중" : accountState.status === "signing-in" ? "로그인 중" : "로그인 전"}</span><p>${esc(accountState.account?.display_name ? `${accountState.account.display_name}님 · ` : "")}${esc(accountState.message || "")}</p></div>
+  <div class="actions">${!signedIn && (accountState.configured || accountState.retryable) ? `<button class="btn primary" type="button" data-acct="login" ${accountBusy || accountState.status === "signing-in" ? "disabled" : ""}>${accountState.retryable ? "계정 연결 다시 확인" : "SYNK ID로 로그인"}</button>` : ""}${accountState.status === "signing-in" ? '<button class="btn soft" type="button" data-acct="cancel">취소</button>' : ""}${signedIn ? `<button class="btn soft" type="button" data-acct="reload" ${accountBusy ? "disabled" : ""}>${icon("refresh")} 다시 불러오기</button><button class="btn ghost" type="button" data-acct="logout">로그아웃</button>` : ""}</div>
+  ${accountState.ready ? `<section class="acct-sec"><h3>내 정보</h3><p class="small muted">${vault.profile ? `저장된 출생정보 · 양력 ${esc(vault.profile.birthDate)} · ${esc(vault.profile.birthTime ?? "시간 모름")} · 한국 표준시` : "저장된 출생정보가 없어요. 화면에서 고른 정보를 저장할 수 있어요."}</p><button class="btn small soft" type="button" data-acct="save-profile" ${accountBusy || !hasProfile() ? "disabled" : ""}>지금 고른 방식과 정보 저장</button></section>
+  <section class="acct-sec"><h3>내 기록</h3><p class="small muted">출생정보·메모가 들어간 파일로 내보내거나, 이 계정의 운세 정보만 지울 수 있어요. SYNK 계정 자체는 지우지 않아요.</p><div class="actions"><button class="btn small soft" type="button" data-acct="export" ${accountBusy ? "disabled" : ""}>${icon("download")} 내보내기</button><button class="btn small ghost danger" type="button" data-acct="delete" ${accountBusy ? "disabled" : ""}>운세 정보 전체 삭제</button></div>
+    ${deletePending ? `<div class="notice-box alert"><span class="lbl">확인</span><strong>저장한 출생정보·선호·보관함을 모두 지울까요?</strong><p>지운 뒤에는 되돌릴 수 없어요.</p><div class="actions"><button class="btn small primary" type="button" data-acct="confirm-delete" ${accountBusy ? "disabled" : ""}>모두 지우기</button><button class="btn small soft" type="button" data-acct="cancel-delete">취소</button></div></div>` : ""}</section>` : ""}
+  <p class="small muted">비회원 입력은 이 화면 메모리에만 있어요. 출생정보는 저장 단추를 누를 때만 계정으로 보내요.</p>`;
+}
+var VIEWS = { today: todayView, month: monthView, match: matchView, year: yearView, vault: vaultView };
+function render({ focus = true } = {}) {
+  app.innerHTML = VIEWS[view]();
+  for (const swatch of app.querySelectorAll("[data-color]")) if (/^#[0-9a-f]{6}$/i.test(swatch.dataset.color)) swatch.style.setProperty("--sw", swatch.dataset.color);
+  for (const meta of app.querySelectorAll(".meta[data-cols]")) meta.style.setProperty("--cols", meta.dataset.cols);
+  paintNav();
+  paintAccount();
+  if (focus) {
+    window.scrollTo({ top: 0, behavior: "instant" });
+    app.querySelector("h1[tabindex]")?.focus({ preventScroll: true });
   }
-  fortune = western ? getFortune(selectedSign, readingDate, "western") : getSaju(birth, readingDate);
-  $("saju-details").hidden = western;
-  $("lucky-pair").hidden = !western;
-  $("overall-label").textContent = western ? "총운" : "사주를 읽는 첫 단서";
-  $("copy").textContent = western ? "오늘의 운세 복사" : "사주 결과 복사";
-  $("change").textContent = western ? "다른 별자리도 보기" : "출생정보 다시 보기";
-  if (western) {
-    for (const button of $("signs").children) button.setAttribute("aria-pressed", String(button.dataset.sign === selectedSign));
-    $("result-label").textContent = `${readingDate.replaceAll("-", ".")} · 별자리 운세 · ${fortune.signLabel}`;
-    for (const field of ["color", "number"]) $(field).textContent = fortune[field];
-    $("result-note").textContent = "같은 날, 같은 별자리에는 같은 운세가 나와요. 내일은 새로운 한 장을 만나 보세요.";
-  } else {
-    $("result-label").textContent = `${readingDate.replaceAll("-", ".")} · 한국 사주`;
-    renderSaju(fortune);
-    $("result-note").textContent = "네 기둥은 태어난 때를 기준으로 해요. 풀이는 전통 상징을 참고한 가벼운 제안이며, 성격이나 미래를 확정하지 않아요.";
+  document.documentElement.dataset.ready = "true";
+}
+function paintNav() {
+  for (const b of document.querySelectorAll(".tabs [data-view], .tabbar [data-view]")) {
+    if (b.dataset.view === view) b.setAttribute("aria-current", "page");
+    else b.removeAttribute("aria-current");
   }
-  $("fortune-title").textContent = fortune.title;
-  for (const field of ["overall", "relationship", "focus", "action"]) $(field).textContent = fortune[field];
-  const saved = drafts.get(readingKey(fortune)) || vault.entries.find((item) => entryKey(item) === readingKey(fortune));
-  $("complete-action").checked = saved?.completed || false;
-  $("reflection-note").value = saved?.note || "";
-  updateNoteCount();
-  renderGuide();
-  renderWeek();
-  updateAccountControls();
-  clearCopy();
-  $("result").hidden = view !== "today";
-  if (announce) {
-    $(view === "week" ? "week-title" : "fortune-title").focus({ preventScroll: true });
-    scroll($(view === "week" ? "week-panel" : "result"));
+  const count = document.querySelector("[data-vault-count]");
+  if (count) count.textContent = accountState.ready && vault.entries.length ? String(vault.entries.length) : "";
+}
+function paintAccount() {
+  const chip = document.querySelector('[data-action="account"].acct');
+  if (chip) {
+    chip.dataset.state = accountState.ready ? "ok" : ["loading", "signing-in"].includes(accountState.status) ? "busy" : accountState.status === "error" || accountState.retryable ? "alert" : "";
+    chip.querySelector("span").textContent = accountState.ready ? accountState.account?.display_name || "내 계정" : accountState.status === "signing-in" ? "로그인 중" : accountState.status === "signed-in" ? "확인 중" : "로그인";
   }
+  const body = document.querySelector("#account-body");
+  if (body && !sheet.open_) body.innerHTML = accountBody();
+  else if (body) {
+    const focused = document.activeElement?.dataset?.acct;
+    body.innerHTML = accountBody();
+    if (focused) body.querySelector(`[data-acct="${focused}"]`)?.focus();
+  }
+}
+function paintTheme() {
+  const button = document.querySelector('[data-action="theme"]'), theme = document.documentElement.dataset.theme || "night";
+  button.innerHTML = icon(theme === "day" ? "sun" : theme === "system" ? "monitor" : "moon");
+  button.setAttribute("aria-label", `화면 밝기: ${THEME_LABEL[theme]} (눌러서 바꾸기)`);
+}
+function error(text) {
+  const t = app.querySelector("#error");
+  if (t) {
+    t.textContent = text;
+    t.focus();
+  } else toast(text);
 }
 function refreshDay() {
   const current = seoulDateKey();
   if (current === date) return false;
   if (readingDate === date) readingDate = current;
   date = current;
-  showDate();
-  renderResult({ announce: false });
-  renderReflection();
-  notify("한국 시간이 새날로 바뀌어 오늘의 내용을 새로 준비했어요.");
+  render({ focus: false });
+  toast("한국 시간이 새날로 바뀌어 오늘의 내용을 새로 준비했어요.");
   return true;
 }
 function scheduleDay() {
@@ -13223,261 +14989,232 @@ function scheduleDay() {
     scheduleDay();
   }, millisecondsUntilNextSeoulDay() + 100);
 }
-function chooseMode(mode, { announce = true } = {}) {
-  if (!FORTUNE_MODES.some((item) => item.id === mode)) return;
-  refreshDay();
-  selectedMode = mode;
-  clearCopy();
-  const western = mode === "western";
-  document.documentElement.dataset.fortuneMode = mode;
-  for (const button of document.querySelectorAll("[data-mode]")) button.setAttribute("aria-pressed", String(button.dataset.mode === mode));
-  $("picker").hidden = !western;
-  $("saju-input").hidden = western;
-  $("profile-tools").hidden = false;
-  if (western) {
-    $("choose-title").textContent = "내 별자리는 무엇인가요?";
-    $("choose-help").textContent = "별자리를 고르면 오늘의 운세가 바로 열려요.";
-    $("mode-note").textContent = "날짜는 일반적인 양력 생일 구간이에요. 경계일은 출생 연도·시간에 따라 달라질 수 있어요.";
-    $("signs").replaceChildren();
-    for (const sign of getSigns("western")) {
-      const button = document.createElement("button");
-      button.type = "button";
-      button.className = "sign";
-      button.dataset.sign = sign.id;
-      button.setAttribute("aria-pressed", String(selectedSign === sign.id));
-      button.append(textNode("span", sign.label, "sign-label"), textNode("span", sign.english, "sign-english"), textNode("span", sign.range, "sign-range"));
-      button.addEventListener("click", () => {
-        refreshDay();
-        readingDate = date;
-        selectedSign = sign.id;
-        renderResult();
-        scheduleDay();
-      });
-      $("signs").append(button);
-    }
-  }
-  renderResult({ announce: false });
-  if (announce) {
-    $(western ? "choose-title" : "saju-title").focus({ preventScroll: true });
-    scroll($(western ? "picker" : "saju-input"));
-  }
-  scheduleDay();
-}
-for (const button of document.querySelectorAll("[data-mode]")) button.addEventListener("click", () => chooseMode(button.dataset.mode));
-function invalidateBirth() {
-  screenVersion++;
-  birth = null;
-  $("saju-error").hidden = true;
-  clearCopy();
-  if (selectedMode === "korean") {
-    fortune = null;
-    $("result").hidden = true;
-    $("week-panel").hidden = true;
-  }
-}
-$("birth-date").addEventListener("input", invalidateBirth);
-$("birth-time").addEventListener("input", invalidateBirth);
-$("time-unknown").addEventListener("change", () => {
-  $("birth-time").disabled = $("time-unknown").checked;
-  $("birth-time").required = !$("time-unknown").checked;
-  invalidateBirth();
-});
-$("saju-form").addEventListener("submit", (event) => {
-  event.preventDefault();
-  if (selectedMode !== "korean") return;
-  refreshDay();
-  const input = { birthDate: $("birth-date").value, birthTime: $("time-unknown").checked ? null : $("birth-time").value };
-  try {
-    getSaju(input, date);
-    birth = input;
-    readingDate = date;
-    $("saju-error").hidden = true;
-    renderResult();
-  } catch (error) {
-    birth = null;
-    fortune = null;
-    $("result").hidden = true;
-    clearCopy();
-    $("saju-error").textContent = error.message || "생년월일과 태어난 시간을 확인해 주세요.";
-    $("saju-error").hidden = false;
-  }
-});
-$("change").addEventListener("click", () => {
-  if (selectedMode === "western") {
-    $("signs").querySelector(`[data-sign="${selectedSign}"]`)?.focus();
-    scroll($("choose-title"));
-  } else {
-    $("birth-date").focus({ preventScroll: true });
-    scroll($("saju-input"));
-  }
-});
-$("copy").addEventListener("click", async () => {
-  refreshDay();
-  if (!fortune) return;
-  const copiedFortune = fortune;
-  const text = selectedMode === "korean" ? sajuText(copiedFortune) : fortuneText(copiedFortune);
-  try {
-    if (!navigator.clipboard?.writeText) throw new Error("clipboard unavailable");
-    await navigator.clipboard.writeText(text);
-    if (fortune !== copiedFortune) return;
-    notify("결과를 복사했어요.");
-  } catch {
-    if (fortune !== copiedFortune) return;
-    $("copy-text").value = text;
-    $("manual-copy").hidden = false;
-    $("copy-text").focus();
-    $("copy-text").select();
-    notify("자동 복사가 어려워 직접 복사할 글을 열었어요.");
-  }
-});
-function clearScreen({ announce = true } = {}) {
-  screenVersion++;
-  drafts.clear();
-  selectedMode = null;
-  selectedSign = null;
-  birth = null;
-  fortune = null;
-  $("saju-form").reset();
-  $("birth-time").disabled = false;
-  $("birth-time").required = true;
-  $("zodiac-birth").value = "";
-  $("zodiac-hint").textContent = "";
-  $("reflection-note").value = "";
-  $("complete-action").checked = false;
-  $("guide-content").replaceChildren();
-  $("week-grid").replaceChildren();
-  readingDate = date;
-  $("signs").replaceChildren();
-  $("pillars").replaceChildren();
-  $("elements").replaceChildren();
-  $("saju-notes").replaceChildren();
-  $("birth-summary").textContent = "";
-  $("day-master").textContent = "";
-  $("result-label").textContent = "";
-  $("fortune-title").textContent = "";
-  for (const field of ["overall", "relationship", "focus", "action", "color", "number"]) $(field).textContent = "";
-  for (const id of ["picker", "saju-input", "saju-details", "result", "saju-error", "week-panel", "profile-tools"]) $(id).hidden = true;
-  for (const button of document.querySelectorAll("[data-mode]")) button.setAttribute("aria-pressed", "false");
-  delete document.documentElement.dataset.fortuneMode;
-  clearCopy();
-  if (announce) {
-    setView("today");
-    $("mode-title").focus({ preventScroll: true });
-    scroll($("mode-title"));
-    notify("화면의 입력과 결과를 지웠어요. 계정에 저장한 기록은 보관함에 남아 있어요.");
-  }
-}
-$("clear-input").addEventListener("click", () => clearScreen());
-function updateNoteCount() {
-  $("note-count").textContent = `${[...$("reflection-note").value].length} / 1000`;
-}
-function rememberDraft() {
-  screenVersion++;
-  if (fortune) drafts.set(readingKey(fortune), { note: $("reflection-note").value, completed: $("complete-action").checked });
-  updateNoteCount();
-}
-$("reflection-note").addEventListener("input", rememberDraft);
-$("complete-action").addEventListener("change", rememberDraft);
-$("zodiac-birth").addEventListener("input", () => {
-  screenVersion++;
-});
-function guideBlock(title, copy) {
-  const block = document.createElement("article");
-  block.append(textNode("h4", title), textNode("p", copy));
-  return block;
-}
-function renderGuide() {
-  const target = $("guide-content");
-  target.replaceChildren();
-  if (!fortune) return;
-  if (fortune.mode === "western") {
-    const info = getZodiacProfile(fortune.signId);
-    $("guide-title").textContent = `${info.label}를 더 알아보기 · ${info.english}`;
-    target.append(
-      guideBlock(info.keywords.join(" · "), info.description),
-      guideBlock(`${info.element.label} · ${info.element.english}`, info.element.description),
-      guideBlock(`${info.modality.label} · ${info.modality.english}`, info.modality.description),
-      guideBlock("나에게 던지는 질문", info.question)
-    );
-    target.append(textNode("p", "점성술에서 쓰는 문화적 상징이에요. 이 설명만으로 성격이나 능력을 판단하지 않아요.", "helper"));
-  } else {
-    const info = getSajuGuide(fortune);
-    $("guide-title").textContent = "내 사주를 읽는 법 · 기둥부터 오행까지";
-    target.append(textNode("p", info.intro));
-    for (const item of info.pillars) target.append(guideBlock(`${item.label} · ${item.title}`, `${item.description} ${item.reading}`));
-    target.append(guideBlock(info.dayMaster.title, `${info.dayMaster.description} ${info.dayMaster.question}`));
-    for (const item of info.elements) target.append(guideBlock(`${item.label} · ${item.symbol}`, `${item.description} ${item.reading} ${item.question}`));
-  }
-}
-function renderWeek() {
-  const available = selectedMode === "western" ? !!selectedSign : !!birth;
-  $("week-panel").hidden = view !== "week" || !available;
-  if (!available || !selectedMode) return;
-  const series = getReadingSeries({ mode: selectedMode, signId: selectedSign, ...birth || {}, period: "week", date });
-  $("week-range").textContent = `${series.startDate} – ${series.endDate}`;
-  $("week-grid").replaceChildren(...series.items.map((item) => {
-    const card = document.createElement("article");
-    card.className = `week-card${item.isToday ? " is-today" : ""}`;
-    card.append(textNode("p", `${item.date.slice(5)} · ${item.weekday}${item.isToday ? " · 오늘" : ""}`, "eyebrow"));
-    if (!item.fortune) {
-      card.append(textNode("p", item.unavailableReason));
-      return card;
-    }
-    card.append(textNode("h3", item.fortune.title), textNode("p", item.action.text));
-    const button = textNode("button", "이날 자세히 보기", "soft-button");
-    button.type = "button";
-    button.addEventListener("click", () => {
-      readingDate = item.date;
-      setView("today");
-      renderResult();
-    });
-    card.append(button);
-    return card;
-  }));
-}
 function setView(next) {
-  view = next;
-  document.documentElement.dataset.view = next;
-  for (const button of document.querySelectorAll("[data-view]")) button.setAttribute("aria-pressed", String(button.dataset.view === next));
-  $("reading-area").hidden = next === "history" || next === "reflection";
-  $("history-panel").hidden = next !== "history";
-  $("reflection-panel").hidden = next !== "reflection";
-  $("result").hidden = next !== "today" || !fortune;
-  renderWeek();
-  if (next === "history") renderHistory();
-  if (next === "reflection") renderReflection();
-}
-for (const button of document.querySelectorAll("[data-view]")) button.addEventListener("click", () => {
+  if (!VIEWS[next]) return;
   refreshDay();
-  setView(button.dataset.view);
-});
-$("find-zodiac").addEventListener("click", () => {
-  try {
-    birthProfile($("zodiac-birth").value);
-    const suggestion = suggestZodiac($("zodiac-birth").value);
-    selectedSign = suggestion.signId;
-    readingDate = date;
-    renderResult();
-    $("zodiac-hint").textContent = `${suggestion.label} · ${suggestion.note}`;
-  } catch {
-    $("zodiac-hint").textContent = "1900년부터 오늘 사이의 양력 생일을 입력해 주세요.";
+  view = next;
+  setupOpen = false;
+  render();
+}
+function captureDraft() {
+  const form = app.querySelector("#keep");
+  if (!form || !hasProfile()) return;
+  const r = reading();
+  if (!r) return;
+  drafts.set(readingKey(r), { note: form.elements.note.value, completed: form.elements.completed.checked });
+}
+var touched = () => {
+  screenVersion++;
+};
+function keepSetupInput(form) {
+  if (form?.id === "saju-form") birthInput = { birthDate: form.elements.birthDate.value, birthTime: form.elements.birthTime.value, timeUnknown: form.elements.timeUnknown.checked };
+  else if (form?.id === "find-sign") zodiacInput = form.elements.birthDate.value;
+}
+app.addEventListener("input", (event) => {
+  touched();
+  keepSetupInput(event.target.form);
+  if (event.target.name === "note" || event.target.name === "completed") {
+    captureDraft();
+    const c = app.querySelector("[data-note-count]");
+    if (c) c.textContent = `${[...app.querySelector("#note").value].length} / 1000`;
+  }
+  if (event.target.form?.id === "match-form") {
+    const f = event.target.form;
+    if (f.elements.myBirth) myBirthForMatch = f.elements.myBirth.value;
+    matchInput = { ...matchInput, name: f.elements.name.value, relation: f.elements.relation.value, birthDate: f.elements.birthDate.value, birthTime: f.elements.birthTime.value };
   }
 });
-function updateAccountControls() {
-  const signedIn = accountState.status === "signed-in";
-  $("account-login").hidden = !accountState.configured && !accountState.retryable || signedIn;
-  $("account-login").textContent = accountState.retryable ? "계정 연결 다시 확인" : "SYNK ID로 로그인";
-  $("account-login").disabled = accountBusy || accountState.status === "signing-in";
-  $("account-cancel").hidden = accountState.status !== "signing-in";
-  $("account-logout").hidden = !signedIn;
-  $("account-reload").hidden = !signedIn;
-  $("account-reload").disabled = accountBusy || !signedIn;
-  for (const id of ["save-profile", "save-reading", "export-records", "delete-data", "confirm-delete-data"]) $(id).disabled = accountBusy || !accountState.ready;
-  $("save-reading").disabled ||= !fortune;
-  $("reading-save-note").textContent = accountState.ready ? "결과·실천 여부·메모를 내 SYNK 계정에 저장해요. 저장 단추를 누르기 전 수정은 이 화면에만 남아요." : "로그인하고 계정 저장이 연결되면 결과와 메모를 보관할 수 있어요.";
-  $("saved-profile").hidden = !accountState.ready;
-  $("saved-profile").textContent = vault.profile ? `저장된 내 정보 · 양력 ${vault.profile.birthDate} · ${vault.profile.birthTime ?? "시간 모름"} · 한국 표준시` : "저장된 출생정보가 없어요. 아래에서 입력한 뒤 계정에 저장해 주세요.";
-  renderReflection();
+app.addEventListener("change", (event) => {
+  touched();
+  if (event.target.name === "completed") captureDraft();
+  if (event.target.name === "timeUnknown") {
+    const time = app.querySelector("#birth-time");
+    time.disabled = event.target.checked;
+    if (event.target.checked) time.value = "";
+  }
+  keepSetupInput(event.target.form);
+});
+app.addEventListener("submit", (event) => {
+  event.preventDefault();
+  const form = event.target;
+  try {
+    refreshDay();
+    if (form.id !== "keep") touched();
+    if (form.id === "saju-form") {
+      const unknown = form.elements.timeUnknown.checked, input = { birthDate: form.elements.birthDate.value, birthTime: unknown ? null : form.elements.birthTime.value || null };
+      if (!unknown && !input.birthTime) throw new Error("태어난 시간을 적거나 「태어난 시간을 몰라요」를 골라 주세요.");
+      getSaju(input, date);
+      birth = input;
+      birthInput = null;
+      mode = "korean";
+      readingDate = date;
+      setupOpen = false;
+      render();
+    } else if (form.id === "find-sign") {
+      birthProfile(form.elements.birthDate.value);
+      const s = suggestZodiac(form.elements.birthDate.value);
+      signId = s.signId;
+      zodiacInput = "";
+      mode = "western";
+      readingDate = date;
+      setupOpen = false;
+      render();
+      toast(`${s.label} · ${s.note}`);
+    } else if (form.id === "keep") {
+      void accountTask(async () => {
+        const r = reading();
+        if (!r) return;
+        const key = readingKey(r), submitted = drafts.get(key);
+        const next = saveReading(vault, r, { note: form.elements.note.value.trim(), completed: form.elements.completed.checked });
+        next.preferences = { mode, signId };
+        if (mode === "korean") next.profile = birthProfile(birth.birthDate, birth.birthTime);
+        await connection.save(next);
+        if (drafts.get(key) === submitted) drafts.delete(key);
+        applyAccount();
+      }, "오늘의 운세와 한 줄을 보관함에 담았어요.");
+    } else if (form.id === "match-form") {
+      const me = birth?.birthDate ? { birthDate: birth.birthDate, birthTime: birth.birthTime } : vault.profile ? { birthDate: vault.profile.birthDate, birthTime: vault.profile.birthTime } : { birthDate: form.elements.myBirth.value, birthTime: null };
+      if (!me.birthDate) throw new Error("내 생년월일을 먼저 적어 주세요.");
+      if (!matchInput.birthDate) throw new Error("상대의 생년월일을 적어 주세요.");
+      birthProfile(me.birthDate);
+      birthProfile(matchInput.birthDate, matchInput.birthTime || null);
+      matchResult = getCompatibility({ birthDate: me.birthDate, birthTime: me.birthTime ?? null }, { birthDate: matchInput.birthDate, birthTime: matchInput.birthTime || null, name: matchInput.name });
+      render({ focus: false });
+      app.querySelector("#match-title")?.focus();
+    }
+  } catch (err) {
+    error(err.message || "입력을 확인해 주세요.");
+  }
+});
+document.addEventListener("click", (event) => {
+  const t = event.target.closest("button,[data-view]");
+  if (!t) return;
+  if (t.dataset.view) {
+    event.preventDefault();
+    captureDraft();
+    setView(t.dataset.view);
+    return;
+  }
+  if (t.dataset.mode || t.dataset.sign || t.dataset.day || t.dataset.person) touched();
+  if (t.dataset.mode) {
+    mode = t.dataset.mode;
+    render({ focus: false });
+    return;
+  }
+  if (t.dataset.sign) {
+    refreshDay();
+    signId = t.dataset.sign;
+    mode = "western";
+    readingDate = date;
+    setupOpen = false;
+    render();
+    return;
+  }
+  if (t.dataset.day) {
+    captureDraft();
+    readingDate = t.dataset.day;
+    view = "today";
+    render();
+    return;
+  }
+  if (t.dataset.filter) {
+    vaultFilter = t.dataset.filter;
+    render({ focus: false });
+    return;
+  }
+  if (t.dataset.verdict) {
+    const id = t.dataset.entry, value = t.dataset.verdict, entry = vault.entries.find((e) => e.id === id);
+    void accountTask(async () => {
+      await connection.save(setVerdict(vault, id, entry?.verdict === value ? null : value));
+      applyAccount();
+    }, "표시를 남겼어요.");
+    return;
+  }
+  if (t.dataset.open) {
+    const e = vault.entries.find((item) => item.id === t.dataset.open);
+    if (e) openEntry(e);
+    return;
+  }
+  if (t.dataset.remove) {
+    void accountTask(async () => {
+      await connection.save({ ...vault, entries: vault.entries.filter((e) => e.id !== t.dataset.remove) });
+      applyAccount();
+    }, "기록을 삭제했어요.");
+    return;
+  }
+  if (t.dataset.removePerson) {
+    void accountTask(async () => {
+      await connection.save(removePerson(vault, t.dataset.removePerson));
+      applyAccount();
+    }, "저장한 사람을 지웠어요.");
+    return;
+  }
+  if (t.dataset.person) {
+    const p = (vault.people || []).find((item) => item.id === t.dataset.person);
+    if (p) {
+      matchInput = { name: p.name, relation: p.relation, birthDate: p.birthDate, birthTime: p.birthTime || "", timeUnknown: !p.birthTime };
+      matchResult = null;
+      view = "match";
+      render();
+    }
+    return;
+  }
+  if (t.dataset.acct) {
+    accountAction(t.dataset.acct);
+    return;
+  }
+  const action = t.dataset.action;
+  if (action === "theme") {
+    const next = cycleTheme();
+    paintTheme();
+    toast(`${THEME_LABEL[next]}으로 바꿨어요.`);
+  } else if (action === "account") sheet.open(t);
+  else if (action === "change") {
+    setupOpen = true;
+    render();
+    app.querySelector("#setup")?.scrollIntoView({ block: "start" });
+  } else if (action === "back-today") {
+    captureDraft();
+    readingDate = date;
+    render();
+  } else if (action === "copy") void copyReading();
+  else if (action === "save-person") void accountTask(async () => {
+    await connection.save(savePerson(vault, { name: matchInput.name || "이름 없음", relation: matchInput.relation, birthDate: matchInput.birthDate, birthTime: matchInput.birthTime || null }));
+    applyAccount();
+  }, "이 사람을 저장했어요. 다음엔 바로 궁합을 볼 수 있어요.");
+});
+async function copyReading() {
+  refreshDay();
+  const r = reading();
+  if (!r) return;
+  const text = [`${dayLabel(r.date)} · ${mode === "korean" ? "한국 사주" : getZodiacProfile(signId).label}`, r.headline, r.message, `해 보면 좋은 것: ${r.do}`, `행운의 색: ${r.luckyColor?.name} · 숫자: ${r.luckyNumber}`, "SYNK 무료 운세 · synk.im/fortune"].join("\n");
+  try {
+    if (!navigator.clipboard?.writeText) throw new Error("clipboard");
+    await navigator.clipboard.writeText(text);
+    toast("오늘의 운세를 복사했어요.");
+  } catch {
+    const box = app.querySelector(".manual-copy");
+    box.hidden = false;
+    const area = box.querySelector("textarea");
+    area.value = text;
+    area.focus();
+    area.select();
+    toast("자동 복사가 어려워 직접 복사할 글을 열었어요.");
+  }
+}
+function openEntry(entry) {
+  if (entry.mode === "western") {
+    mode = "western";
+    signId = entry.signId;
+  } else {
+    mode = "korean";
+    birth = { birthDate: entry.birth.birthDate, birthTime: entry.birth.birthTime };
+    birthInput = null;
+  }
+  readingDate = entry.date;
+  view = "today";
+  setupOpen = false;
+  render();
 }
 function applyAccount({ restore = false } = {}) {
   const snapshot = connection.snapshot();
@@ -13487,198 +15224,109 @@ function applyAccount({ restore = false } = {}) {
   if (restore || loadedIdentity !== identity) {
     loadedIdentity = identity;
     if (vault.profile) {
-      $("birth-date").value = vault.profile.birthDate;
-      $("zodiac-birth").value = vault.profile.birthDate;
-      $("birth-time").value = vault.profile.birthTime || "";
-      $("time-unknown").checked = vault.profile.birthTime === null;
-      $("birth-time").disabled = vault.profile.birthTime === null;
-      $("birth-time").required = vault.profile.birthTime !== null;
       birth = { birthDate: vault.profile.birthDate, birthTime: vault.profile.birthTime };
+      birthInput = null;
     }
-    selectedSign = vault.preferences.signId;
+    mode = vault.preferences.mode;
+    signId = vault.preferences.signId;
     readingDate = date;
-    chooseMode(vault.preferences.mode, { announce: false });
+    if (mode === "western" && !signId) mode = birth ? "korean" : null;
   }
-  renderHistory();
-  updateAccountControls();
+  render({ focus: false });
+}
+function clearScreen() {
+  drafts.clear();
+  mode = null;
+  signId = null;
+  birth = null;
+  birthInput = null;
+  zodiacInput = "";
+  readingDate = date;
+  matchResult = null;
+  matchInput = { name: "", relation: "friend", birthDate: "", birthTime: "", timeUnknown: true };
+  myBirthForMatch = "";
+  deletePending = false;
 }
 var connection = createFortuneAccount({
   onState(next) {
     accountState = next;
-    $("account-status").textContent = `${next.account?.display_name ? `${next.account.display_name}님 · ` : ""}${next.message}`;
     if (next.ready) applyAccount();
-    updateAccountControls();
+    else {
+      render({ focus: false });
+    }
   },
   onReset() {
     vault = emptyState();
     loadedIdentity = null;
-    clearScreen({ announce: false });
-    renderHistory();
+    clearScreen();
+    render({ focus: false });
   }
 });
 async function accountTask(action, success) {
   if (accountBusy) return;
   accountBusy = true;
-  updateAccountControls();
+  paintAccount();
+  render({ focus: false });
   try {
     const message = await action();
-    if (success) notify(typeof message === "string" ? message : success);
-  } catch (error) {
-    if (error.code !== "ACCOUNT_CHANGED") notify(error.message || "계정 연결을 확인해 주세요.");
+    if (success) toast(typeof message === "string" ? message : success);
+  } catch (err) {
+    if (err.code !== "ACCOUNT_CHANGED") toast(err.message || "계정 연결을 확인해 주세요.");
   } finally {
     accountBusy = false;
-    updateAccountControls();
+    render({ focus: false });
   }
 }
-$("account-login").addEventListener("click", () => accountTask(() => connection.signIn()));
-$("account-cancel").addEventListener("click", () => accountTask(() => connection.cancel()));
-$("account-logout").addEventListener("click", () => {
-  void connection.signOut().catch((error) => notify(error.message));
-});
-$("account-reload").addEventListener("click", () => accountTask(async () => {
-  const expectedScreen = screenVersion;
-  await connection.load();
-  if (expectedScreen !== screenVersion) {
-    applyAccount();
-    return "계정의 최신 정보를 불러왔어요. 기다리는 동안 바꾼 입력은 아직 저장하지 않고 화면에 남겨 두었어요.";
-  }
-  clearScreen({ announce: false });
-  applyAccount({ restore: true });
-}, "계정의 최신 정보를 불러왔어요."));
-function currentProfile() {
-  if (selectedMode === "korean") return birthProfile($("birth-date").value, $("time-unknown").checked ? null : $("birth-time").value);
-  if ($("zodiac-birth").value) return birthProfile($("zodiac-birth").value, vault.profile?.birthDate === $("zodiac-birth").value ? vault.profile.birthTime : null);
-  return vault.profile;
-}
-var preferences = () => ({ mode: selectedMode || "western", signId: selectedSign });
-$("save-profile").addEventListener("click", () => accountTask(async () => {
-  await connection.save({ ...vault, profile: currentProfile(), preferences: preferences() });
-  applyAccount();
-}, "내 정보와 선호 방식을 계정에 저장했어요."));
-$("save-reading").addEventListener("click", () => accountTask(async () => {
-  if (!fortune) return;
-  const next = saveReading(vault, fortune, { note: $("reflection-note").value.trim(), completed: $("complete-action").checked });
-  const key = readingKey(fortune);
-  const submittedDraft = drafts.get(key);
-  next.preferences = preferences();
-  if (fortune.mode === "korean") next.profile = birthProfile(fortune.birthDate, fortune.birthTime);
-  await connection.save(next);
-  if (drafts.get(key) === submittedDraft) drafts.delete(key);
-  applyAccount();
-}, "결과와 한 줄 기록을 계정에 저장했어요."));
-function renderHistory() {
-  renderReflection();
-  $("history-count").textContent = String(vault.entries.length);
-  $("history-summary").textContent = accountState.ready ? `${vault.entries.length}개 보관 · ${vault.entries.filter((item) => item.completed).length}개 실천 · 최대 90개` : "SYNK ID로 로그인하면 다른 기기에서도 내 기록을 불러올 수 있어요.";
-  const filter = $("history-filter").value;
-  const entries = vault.entries.filter((item) => filter === "all" || filter === "completed" ? filter !== "completed" || item.completed : item.mode === filter);
-  $("history-list").replaceChildren();
-  if (!entries.length) $("history-list").append(textNode("p", "아직 보관한 기록이 없어요. 마음에 드는 운세와 한 줄 메모를 담아 보세요.", "empty-state"));
-  for (const entry of entries) {
-    const row = document.createElement("article");
-    row.className = "history-card";
-    row.append(textNode("p", `${entry.date} · ${entry.mode === "korean" ? "한국 사주" : getZodiacProfile(entry.signId).label}${entry.completed ? " · 실천했어요" : ""}`, "eyebrow"), textNode("h3", entry.title), textNode("p", entry.action));
-    if (entry.note) row.append(textNode("blockquote", entry.note));
-    const controls = document.createElement("div");
-    controls.className = "history-row-actions";
-    const open = textNode("button", "다시 보기 · 메모 수정", "soft-button");
-    open.type = "button";
-    open.addEventListener("click", () => openEntry(entry));
-    const remove = textNode("button", "기록 삭제", "text-button");
-    remove.type = "button";
-    remove.disabled = accountBusy || !accountState.ready;
-    remove.addEventListener("click", () => accountTask(async () => {
-      await connection.save({ ...vault, entries: vault.entries.filter((item) => item.id !== entry.id) });
+function accountAction(name) {
+  if (name === "login") void accountTask(() => connection.signIn());
+  else if (name === "cancel") void accountTask(() => connection.cancel());
+  else if (name === "logout") void connection.signOut().catch((err) => toast(err.message));
+  else if (name === "reload") void accountTask(async () => {
+    const expected = screenVersion;
+    await connection.load();
+    if (expected !== screenVersion) {
       applyAccount();
-    }, "기록을 삭제했어요."));
-    controls.append(open, remove);
-    row.append(controls);
-    $("history-list").append(row);
-  }
-}
-function openEntry(entry) {
-  if (entry.mode === "western") selectedSign = entry.signId;
-  else {
-    birth = { birthDate: entry.birth.birthDate, birthTime: entry.birth.birthTime };
-    $("birth-date").value = birth.birthDate;
-    $("birth-time").value = birth.birthTime || "";
-    $("time-unknown").checked = birth.birthTime === null;
-    $("birth-time").disabled = birth.birthTime === null;
-    $("birth-time").required = birth.birthTime !== null;
-  }
-  readingDate = entry.date;
-  setView("today");
-  chooseMode(entry.mode, { announce: false });
-  renderResult();
-}
-function renderReflection() {
-  const target = $("reflection-days");
-  target.replaceChildren();
-  $("reflection-range").textContent = "";
-  if (!accountState.ready) {
-    $("reflection-empty").hidden = false;
-    $("reflection-empty").textContent = accountState.status === "signed-in" ? "계정 연결을 확인한 뒤 저장된 기록을 돌아볼 수 있어요. 위에서 계정 정보를 다시 불러와 주세요." : "SYNK ID로 로그인하면 계정에 저장한 메모와 실천한 행동을 모아 볼 수 있어요.";
-    return;
-  }
-  const recent = recentReflections(vault, date);
-  $("reflection-range").textContent = `${recent.startDate} – ${recent.endDate} · 한국 날짜`;
-  $("reflection-empty").hidden = recent.days.some((day) => day.entries.length);
-  $("reflection-empty").textContent = "이 기간에 저장한 메모나 실천한 행동이 아직 없어요. 오늘의 작은 행동을 해 보고 한 줄을 남겨 보세요.";
-  for (const day of recent.days) {
-    const section = document.createElement("section");
-    section.className = "reflection-day";
-    section.dataset.date = day.date;
-    section.append(textNode("h3", `${day.date === date ? "오늘 · " : ""}${displayDate(day.date)}`));
-    if (!day.entries.length) section.append(textNode("p", "남긴 메모나 완료한 행동이 없어요.", "helper"));
-    for (const entry of day.entries) {
-      const row = document.createElement("article");
-      row.className = "reflection-record";
-      row.append(textNode("p", entry.mode === "korean" ? "한국 사주" : `별자리 · ${getZodiacProfile(entry.signId).label}`, "eyebrow"), textNode("h4", entry.title));
-      if (entry.completed) row.append(textNode("p", "실천한 행동", "reflection-label"), textNode("p", entry.action, "reflection-action"));
-      if (entry.note.trim()) row.append(textNode("p", "내가 남긴 메모", "reflection-label"), textNode("blockquote", entry.note));
-      const open = textNode("button", "다시 보기 · 메모 수정", "soft-button");
-      open.type = "button";
-      open.addEventListener("click", () => {
-        const current = vault.entries.find((item) => item.id === entry.id);
-        if (accountState.ready && current) openEntry(current);
-      });
-      row.append(open);
-      section.append(row);
+      return "계정의 최신 정보를 불러왔어요. 기다리는 동안 바꾼 입력은 저장하지 않고 화면에 남겨 두었어요.";
     }
-    target.append(section);
-  }
+    clearScreen();
+    applyAccount({ restore: true });
+  }, "계정의 최신 정보를 불러왔어요.");
+  else if (name === "save-profile") void accountTask(async () => {
+    const profile2 = birth ? birthProfile(birth.birthDate, birth.birthTime) : vault.profile;
+    await connection.save({ ...vault, profile: profile2, preferences: { mode: mode || "western", signId } });
+    applyAccount();
+  }, "내 정보와 보는 방식을 계정에 저장했어요.");
+  else if (name === "export") {
+    if (!accountState.ready) return;
+    const file = new Blob([JSON.stringify({ exportedAt: (/* @__PURE__ */ new Date()).toISOString(), ...vault }, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(file), link = document.createElement("a");
+    link.href = url;
+    link.download = "synk-fortune.json";
+    link.click();
+    setTimeout(() => URL.revokeObjectURL(url), 3e4);
+    toast("출생정보와 메모가 들어간 내 기록 파일을 준비했어요.");
+  } else if (name === "delete") {
+    deletePending = true;
+    paintAccount();
+  } else if (name === "cancel-delete") {
+    deletePending = false;
+    paintAccount();
+  } else if (name === "confirm-delete") void accountTask(async () => {
+    const expected = screenVersion;
+    await connection.remove();
+    const changed2 = expected !== screenVersion;
+    if (!changed2) clearScreen();
+    deletePending = false;
+    applyAccount();
+    if (changed2) return "계정의 운세 정보와 기록을 삭제했어요. 기다리는 동안 바꾼 입력은 화면에 남겨 두었어요.";
+  }, "계정에 저장한 운세 정보와 기록을 삭제했어요.");
 }
-$("history-filter").addEventListener("change", renderHistory);
-$("export-records").addEventListener("click", () => {
-  if (!accountState.ready) return;
-  const file = new Blob([JSON.stringify({ exportedAt: (/* @__PURE__ */ new Date()).toISOString(), ...vault }, null, 2)], { type: "application/json" });
-  const url = URL.createObjectURL(file), link = document.createElement("a");
-  link.href = url;
-  link.download = "synk-fortune.json";
-  link.click();
-  setTimeout(() => URL.revokeObjectURL(url), 3e4);
-  notify("출생정보와 메모가 포함된 내 기록 파일을 준비했어요.");
-});
-$("delete-data").addEventListener("click", () => {
-  $("delete-confirm").hidden = false;
-});
-$("cancel-delete-data").addEventListener("click", () => {
-  $("delete-confirm").hidden = true;
-});
-$("confirm-delete-data").addEventListener("click", () => accountTask(async () => {
-  const expectedScreen = screenVersion;
-  await connection.remove();
-  const changedScreen = expectedScreen !== screenVersion;
-  if (!changedScreen) clearScreen({ announce: false });
-  applyAccount();
-  $("delete-confirm").hidden = true;
-  if (changedScreen) return "계정에 저장한 운세 정보와 기록을 삭제했어요. 기다리는 동안 바꾼 입력은 계정에 저장하지 않고 화면에 남겨 두었어요.";
-}, "계정에 저장한 운세 정보와 기록을 삭제했어요."));
+for (const slot of document.querySelectorAll(".tabbar [data-icon]")) slot.outerHTML = icon(slot.dataset.icon);
+document.querySelector("[data-sheet-close]").innerHTML = icon("close");
+paintTheme();
+render({ focus: false });
+scheduleDay();
 window.addEventListener("focus", () => {
-  refreshDay();
-  scheduleDay();
-});
-window.addEventListener("pageshow", () => {
   refreshDay();
   scheduleDay();
 });
@@ -13688,12 +15336,9 @@ document.addEventListener("visibilitychange", () => {
     scheduleDay();
   }
 });
-showDate();
-scheduleDay();
-document.documentElement.dataset.ready = "true";
-void connection.start().catch((error) => {
-  $("account-status").textContent = error.message;
-  updateAccountControls();
+void connection.start().catch((err) => {
+  accountState = { ...accountState, message: err.message };
+  paintAccount();
 });
 window.addEventListener("pagehide", () => connection.dispose());
 window.addEventListener("pageshow", (event) => {
