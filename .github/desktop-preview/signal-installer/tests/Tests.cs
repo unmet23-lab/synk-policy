@@ -71,6 +71,30 @@ internal static class SignalInstallerTests
             var sentinelHash = Hash(sentinel);
 
             var engine = Engine(Spec);
+            Check("known-folder shortcut guard accepts Cloud variants but rejects symlinks, junctions and unknown reparse tags", delegate
+            {
+                for(uint variant=0;variant<16;variant++)
+                {
+                    uint tag=0x9000001au|(variant<<12);
+                    Assert(InstallerEngine.IsCloudPlaceholderTag(tag),"Cloud placeholder variant was rejected.");
+                    InstallerEngine.ValidateShortcutEntryAttributes(FileAttributes.ReparsePoint|FileAttributes.Directory,tag);
+                    InstallerEngine.ValidateShortcutEntryAttributes(FileAttributes.ReparsePoint|FileAttributes.Archive,tag);
+                }
+                foreach(uint tag in new uint[]{0xa000000cu,0xa0000003u,0x9000001bu,0x8000001au,0u})
+                {
+                    Assert(!InstallerEngine.IsCloudPlaceholderTag(tag),"Unsafe reparse tag was accepted as Cloud.");
+                    ExpectFailure(delegate { InstallerEngine.ValidateShortcutEntryAttributes(FileAttributes.ReparsePoint,tag); });
+                }
+                InstallerEngine.ValidateShortcutEntryAttributes(FileAttributes.Normal,0);
+            });
+            Check("only exact current-user known-folder shortcut paths get the Cloud exception", delegate
+            {
+                engine.ValidateShortcutPath(StartMenuShortcut());engine.ValidateShortcutPath(DesktopShortcut());
+                ExpectFailure(delegate { engine.ValidateShortcutPath(Path.Combine(Root,Spec.ShortcutName+".lnk")); });
+                ExpectFailure(delegate { engine.ValidateShortcutPath(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory),"other-shortcut.lnk")); });
+                foreach(string known in new [] { Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory),Environment.GetFolderPath(Environment.SpecialFolder.Programs) })
+                    if((File.GetAttributes(known)&FileAttributes.ReparsePoint)!=0)ExpectFailure(delegate { InstallerEngine.RejectReparsePoints(known); });
+            });
             Check("read-only preflight", delegate
             {
                 Assert(Same(engine.Preflight(), Spec.InstallDirectory), "Preflight chose another folder.");

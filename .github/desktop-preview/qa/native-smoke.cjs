@@ -14,7 +14,8 @@ function observe(config){
   // verifier still checks actual DMG-copied metadata, executables and archives.
   require(app.getAppPath()+'/src/program-root.cjs').resolveProgramRoot=()=>config.applications;
   const requests=[],providerRequests=[],opened=[],checks=[],screenshots=[],errors=[],pageErrors=[],startupStates=[];
-  let startupWindow,syntheticFeedRequests=0;
+  let startupWindow,syntheticFeedRequests=0,startupReadyResolve;
+  const startupReady=new Promise(resolve=>{startupReadyResolve=resolve;});
   // The candidate version is not public yet. Exercise its real startup gate with
   // a current-version manifest; do not disable the gate or permit installer IO.
   if(config.client==='platform'){
@@ -22,7 +23,7 @@ function observe(config){
     const runtime=JSON.parse(fs.readFileSync(app.getAppPath()+'/runtime.json','utf8'));
     updates.createPlatformUpdater=options=>original({...options,request:async url=>{
       if(url!==updates.MANIFEST_URL)throw Error('QA_INSTALLER_DOWNLOAD_FORBIDDEN');syntheticFeedRequests++;
-      await new Promise(resolve=>setTimeout(resolve,200));
+      await startupReady;
       const manifest={schemaVersion:1,product:'platform',channel:'preview',version:config.version,releaseId:runtime.update.releaseId,buildId:runtime.update.buildId,publishedAt:new Date().toISOString(),artifacts:[{platform:config.platform,arch:config.arch,url:'https://github.com/unmet23-lab/synk-policy/releases/download/'+runtime.update.releaseId+'/qa-never-downloaded.'+(config.platform==='win32'?'exe':'dmg'),bytes:1,sha256:'a'.repeat(64),asarSHA256:'b'.repeat(64)}]};
       return {status:200,headers:{},body:require('node:stream').Readable.from([Buffer.from(JSON.stringify(manifest))])};
     },onChange:value=>{startupStates.push(value.state);options.onChange?.(value);}});
@@ -36,18 +37,27 @@ function observe(config){
   async function waitFor(code,label,timeout=30000){const start=Date.now();while(Date.now()-start<timeout){try{if(await run(code))return;}catch{}await sleep(100);}throw Error('TIMEOUT_'+label);}
   async function screenshot(name){await run('document.fonts.ready.then(()=>true)');await sleep(350);const file=path.join(config.out,name+'.png');fs.writeFileSync(file,(await contents.capturePage()).toPNG());screenshots.push(file);}
   async function click(selector,expected){await run(`document.querySelector(${JSON.stringify(selector)}).click()`);await waitFor(`location.href===${JSON.stringify(expected)}&&document.readyState==='complete'`,selector);}
-  async function finish(ok){if(finished)return;finished=true;const local=requests.filter(r=>{try{const u=new URL(r.url);return ['127.0.0.1','localhost','[::1]'].includes(u.hostname)&&['4280','4191'].includes(u.port);}catch{return false;}});const result={ok:ok&&!errors.length&&!local.length&&!providerRequests.length,mode:config.mode,packaged:app.isPackaged,arch:process.arch,electron:process.versions.electron,archive:app.getAppPath(),visible:window?.isVisible(),profileIsolated:app.getPath('userData').startsWith(config.appData+path.sep),installationRoot:config.applications,checks,errors,pageErrors,requests,localhostDevelopmentRequests:local,providerRequests,openRequestsSuppressed:opened,screenshots,realAuthenticationPerformed:false,realProfileTouched:false,managedChildLaunched:false,unlimitedFrames:config.unlimitedFrames,graphicsBackend:config.softwareGpu?"CI-only SwiftShader":"default",runnerArch:config.runnerArch,translated:app.runningUnderARM64Translation===true};process.stdout.write(config.prefix+JSON.stringify(result)+'\n');setTimeout(()=>app.exit(result.ok?0:1),250);}
-  app.on('browser-window-created',(_event,created)=>{
-    if(config.client==='platform'&&path.basename(created.webContents.getLastWebPreferences().preload||'')==='startup-update-preload.cjs'){
-      startupWindow=created;if(!config.visible){created.show=()=>{};created.showInactive=()=>{};}return;
-    }
-    if(window)return;window=created;if(!config.visible){window.show=()=>{};window.showInactive=()=>{};}else{window.once('ready-to-show',()=>{window.show();window.focus();});}contents=window.webContents;contents.setBackgroundThrottling(false);contents.setAudioMuted(true);
-    contents.session.webRequest.onBeforeRequest({urls:['http://*/*','https://*/*','ws://*/*','wss://*/*']},(details,callback)=>{requests.push({url:details.url,resourceType:details.resourceType,method:details.method,blocked:networkBlocked});callback({cancel:networkBlocked||config.client==='platform'});});
+  async function finish(ok){if(finished)return;finished=true;const local=requests.filter(r=>{try{const u=new URL(r.url);return ['127.0.0.1','localhost','[::1]'].includes(u.hostname)&&['4280','4191'].includes(u.port);}catch{return false;}});const result={ok:ok&&!errors.length&&!local.length&&!providerRequests.length,mode:config.mode,packaged:app.isPackaged,arch:process.arch,electron:process.versions.electron,archive:app.getAppPath(),visible:window&&!window.isDestroyed()?window.isVisible():false,profileIsolated:app.getPath('userData').startsWith(config.appData+path.sep),installationRoot:config.applications,checks,errors,pageErrors,requests,localhostDevelopmentRequests:local,providerRequests,openRequestsSuppressed:opened,screenshots,realAuthenticationPerformed:false,realProfileTouched:false,managedChildLaunched:false,unlimitedFrames:config.unlimitedFrames,graphicsBackend:config.softwareGpu?"CI-only SwiftShader":"default",runnerArch:config.runnerArch,translated:app.runningUnderARM64Translation===true};process.stdout.write(config.prefix+JSON.stringify(result)+'\n');setTimeout(()=>app.exit(result.ok?0:1),250);}
+  const instrumented=new Set();
+  function instrument(contents){
+    if(instrumented.has(contents))return;instrumented.add(contents);contents.setBackgroundThrottling(false);contents.setAudioMuted(true);
+    contents.session.webRequest.onBeforeRequest({urls:['http://*/*','https://*/*','ws://*/*','wss://*/*']},(details,callback)=>{requests.push({url:details.url,resourceType:details.resourceType,method:details.method,blocked:networkBlocked||config.client==='platform'});callback({cancel:networkBlocked||config.client==='platform'});});
     contents.on('console-message',event=>{if(event.level==='error')pageErrors.push({message:event.message.slice(0,400),source:event.sourceId.split('?')[0],line:event.lineNumber});});
+  }
+  function observeWindow(created){
+    if(config.client==='platform'&&created.webContents.getURL()==='synk-desktop://platform/startup-update.html'){
+      startupWindow=created;
+      void(async()=>{const end=Date.now()+10000;while(Date.now()<end){if(await created.webContents.executeJavaScript("document.documentElement.dataset.startupReady==='true'",true)){
+        const state=await created.webContents.executeJavaScript("(async()=>({status:await window.synkStartupUpdate.getStatus(),desktop:typeof window.synkDesktop,node:typeof require}))()",true);
+        check('startup renderer receives its isolated checking IPC',state.status.state==='checking'&&state.desktop==='undefined'&&state.node==='undefined'&&!window,state);
+        startupReadyResolve();return;
+      }await sleep(50);}throw Error('STARTUP_UI_NOT_READY');})().catch(error=>{errors.push(error.message);void finish(false);});return;
+    }
+    if(window)return;window=created;if(!config.visible){window.show=()=>{};window.showInactive=()=>{};}else{window.once('ready-to-show',()=>{window.show();window.focus();});}contents=window.webContents;instrument(contents);
     (async()=>{try{
       check('actual packaged native architecture',app.isPackaged&&app.getAppPath()===config.archive&&process.arch===config.arch);
       check('profile isolated before app initialization',app.getPath('userData').startsWith(config.appData+path.sep));
-      check('window hidden',!window.isVisible());
+      check('window visibility matches requested QA mode',!window.isVisible()||config.visible);
       if(config.mode==='platform'){
         check('startup gate checks the candidate before opening Platform',!!startupWindow&&startupStates.includes('checking')&&startupStates.includes('current')&&syntheticFeedRequests===1,{states:startupStates,syntheticFeedRequests});
         await waitFor("location.href==='synk-desktop://platform/index.html'&&document.documentElement.dataset.ready==='true'",'local-platform');
@@ -99,6 +109,10 @@ function observe(config){
       }
       check('no account provider request with empty vault',providerRequests.length===0);check('no localhost development server requests',requests.every(r=>!/^https?:\/\/(?:127\.0\.0\.1|localhost):(?:4280|4191)(?:\/|$)/.test(r.url)));check('QA window visibility matches requested mode',window.isVisible()===config.visible);await finish(true);
     }catch(error){errors.push(error.stack||error.message);try{await screenshot('failure');checks.push({name:'failure snapshot',ok:false,detail:await run("({url:location.href,text:document.body.innerText.slice(0,1600),runner:window.synkRunner?.info,frameProbe:{...window.__macFrameProbe,now:performance.now(),visibility:document.visibilityState,focus:document.hasFocus()}})")});}catch{}await finish(false);}})();
+  }
+  app.on('browser-window-created',(_event,created)=>{
+    if(config.client==='platform'){if(!config.visible){created.show=()=>{};created.showInactive=()=>{};}instrument(created.webContents);created.webContents.once('did-finish-load',()=>observeWindow(created));}
+    else observeWindow(created);
   });
   return {appData:app.getPath('appData'),archive:app.getAppPath()};
 }

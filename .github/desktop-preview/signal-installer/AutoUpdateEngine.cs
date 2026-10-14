@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Json;
 using System.Security.AccessControl;
@@ -95,6 +96,54 @@ namespace Synk.SignalInstaller
 
     public sealed partial class InstallerEngine
     {
+        [StructLayout(LayoutKind.Sequential, CharSet=CharSet.Unicode)]
+        struct ShortcutFindData
+        {
+            public uint Attributes;
+            public System.Runtime.InteropServices.ComTypes.FILETIME Creation, Access, Write;
+            public uint SizeHigh, SizeLow, ReparseTag, Reserved;
+            [MarshalAs(UnmanagedType.ByValTStr, SizeConst=260)] public string Name;
+            [MarshalAs(UnmanagedType.ByValTStr, SizeConst=14)] public string AlternateName;
+        }
+        [DllImport("kernel32.dll", CharSet=CharSet.Unicode, SetLastError=true)]
+        static extern IntPtr FindFirstFileW(string path, out ShortcutFindData data);
+        [DllImport("kernel32.dll")]
+        static extern bool FindClose(IntPtr handle);
+
+        // Cloud placeholders do not redirect a path like symlinks/junctions.
+        // This exception is used only for this product's two known-folder links;
+        // installation, backup, cache and recovery roots keep the strict guard.
+        internal static bool IsCloudPlaceholderTag(uint tag) { return (tag & 0xffff0fffu) == 0x9000001au; }
+        internal static void ValidateShortcutEntryAttributes(FileAttributes attributes, uint tag)
+        {
+            if ((attributes & FileAttributes.ReparsePoint) != 0 && !IsCloudPlaceholderTag(tag)) throw new IOException("바로가기 경로의 연결을 확인할 수 없습니다.");
+        }
+        string[] KnownShortcutPaths()
+        {
+            if (String.IsNullOrWhiteSpace(spec.ShortcutName) || Path.GetFileName(spec.ShortcutName) != spec.ShortcutName) throw new IOException("바로가기 이름이 올바르지 않습니다.");
+            return new [] { Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Programs),spec.ShortcutName+".lnk"), Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory),spec.ShortcutName+".lnk") };
+        }
+        internal void ValidateShortcutPath(string shortcut)
+        {
+            if (!KnownShortcutPaths().Any(known=>SamePath(known,shortcut))) throw new IOException("바로가기 위치가 올바르지 않습니다.");
+            for (string current=Path.GetFullPath(shortcut); current!=null; )
+            {
+                FileAttributes attributes=0;
+                try { attributes=File.GetAttributes(current); }
+                catch (FileNotFoundException) { }
+                catch (DirectoryNotFoundException) { }
+                uint tag=0;
+                if ((attributes & FileAttributes.ReparsePoint) != 0)
+                {
+                    ShortcutFindData data; IntPtr handle=FindFirstFileW(current,out data);
+                    if (handle == new IntPtr(-1)) throw new IOException("바로가기 경로의 연결 정보를 확인할 수 없습니다.");
+                    try { tag=data.ReparseTag; }
+                    finally { FindClose(handle); }
+                }
+                ValidateShortcutEntryAttributes(attributes,tag);
+                DirectoryInfo parent=Directory.GetParent(current);current=parent==null?null:parent.FullName;
+            }
+        }
         static bool SamePath(string left, string right) { return String.Equals(Path.GetFullPath(left).TrimEnd('\\'), Path.GetFullPath(right).TrimEnd('\\'), StringComparison.OrdinalIgnoreCase); }
         static T ReadJson<T>(string file) { using (var stream = File.OpenRead(file)) return (T)new DataContractJsonSerializer(typeof(T)).ReadObject(stream); }
         static void WriteJson<T>(string file, T value) { using (var stream = new FileStream(file, FileMode.Create, FileAccess.Write, FileShare.None)) { new DataContractJsonSerializer(typeof(T)).WriteObject(stream, value); stream.Flush(true); } }
@@ -235,11 +284,11 @@ namespace Synk.SignalInstaller
                 if (HashFile(target)!=file.SHA256) throw new IOException("복구 파일 확인에 실패했습니다.");
                 progress("복구 파일을 준비합니다","기존 앱을 보존합니다.",++done*100/files.Count);
             }
-            foreach (string shortcut in new [] { Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Programs),spec.ShortcutName+".lnk"),Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory),spec.ShortcutName+".lnk") })
+            foreach (string shortcut in KnownShortcutPaths())
             {
-                RejectReparsePoints(Path.GetDirectoryName(shortcut));
+                ValidateShortcutPath(shortcut);
                 var item = new ShortcutSnapshot { Path=shortcut, Exists=File.Exists(shortcut), BackupPath=Path.Combine(backup.Directory,"shortcut-"+backup.Shortcuts.Count+".lnk") };
-                if (item.Exists) { if ((File.GetAttributes(shortcut)&FileAttributes.ReparsePoint)!=0) throw new IOException("바로가기 연결을 확인할 수 없습니다."); VerifyShortcut(shortcut,Path.Combine(session.Directory,spec.ExecutableName)); item.SHA256=HashFile(shortcut); File.Copy(shortcut,item.BackupPath,false); if (HashFile(item.BackupPath)!=item.SHA256) throw new IOException("바로가기 보존에 실패했습니다."); }
+                if (item.Exists) { VerifyShortcut(shortcut,Path.Combine(session.Directory,spec.ExecutableName)); item.SHA256=HashFile(shortcut); File.Copy(shortcut,item.BackupPath,false); if (HashFile(item.BackupPath)!=item.SHA256) throw new IOException("바로가기 보존에 실패했습니다."); }
                 backup.Shortcuts.Add(item);
             }
             backup.State="prepared";WriteJson(Path.Combine(backup.Directory,"transaction.json"),backup);return backup;
@@ -257,7 +306,7 @@ namespace Synk.SignalInstaller
             if (Directory.Exists(backup.OriginalDirectory)) foreach (var item in Inventory(backup.OriginalDirectory)) if (!old.Contains(item.RelativePath)) { if (!permittedNew.Contains(item.RelativePath)) throw new IOException("설치 폴더에 알 수 없는 파일이 있어 복구 원본을 보존했습니다."); File.Delete(Inside(backup.OriginalDirectory,item.RelativePath)); }
             foreach (var file in backup.Files) { string target=Inside(backup.OriginalDirectory,file.RelativePath);Directory.CreateDirectory(Path.GetDirectoryName(target));if(File.Exists(target))File.SetAttributes(target,FileAttributes.Normal);File.Copy(Inside(Path.Combine(backup.Directory,"application"),file.RelativePath),target,true);File.SetLastWriteTimeUtc(target,new DateTime(file.LastWriteTicks,DateTimeKind.Utc));File.SetAttributes(target,(FileAttributes)file.Attributes); }
             using (var hive=Microsoft.Win32.RegistryKey.OpenBaseKey(RegistryHive.CurrentUser,RegistryView.Registry64)) foreach (var key in backup.Registry) { hive.DeleteSubKeyTree(key.Name,false); if(key.Exists)WriteRegistryTree(hive,key); }
-            foreach(var shortcut in backup.Shortcuts) { RejectReparsePoints(Path.GetDirectoryName(shortcut.Path));if(shortcut.Exists) { if(HashFile(shortcut.BackupPath)!=shortcut.SHA256)throw new IOException("바로가기 복구 원본을 확인할 수 없습니다.");Directory.CreateDirectory(Path.GetDirectoryName(shortcut.Path));File.Copy(shortcut.BackupPath,shortcut.Path,true); } else if(File.Exists(shortcut.Path)) File.Delete(shortcut.Path); }
+            foreach(var shortcut in backup.Shortcuts) { ValidateShortcutPath(shortcut.Path);if(shortcut.Exists) { if(HashFile(shortcut.BackupPath)!=shortcut.SHA256)throw new IOException("바로가기 복구 원본을 확인할 수 없습니다.");Directory.CreateDirectory(Path.GetDirectoryName(shortcut.Path));File.Copy(shortcut.BackupPath,shortcut.Path,true); } else if(File.Exists(shortcut.Path)) File.Delete(shortcut.Path); }
             var restored=Inventory(backup.OriginalDirectory);if(restored.Count!=backup.Files.Count||restored.Where((item,index)=>item.RelativePath!=backup.Files[index].RelativePath||item.SHA256!=backup.Files[index].SHA256).Any())throw new IOException("이전 앱 파일 복구를 확인할 수 없습니다.");
             using(var hive=Microsoft.Win32.RegistryKey.OpenBaseKey(RegistryHive.CurrentUser,RegistryView.Registry64))foreach(var key in backup.Registry)if(RegistryDigest(ReadRegistryTree(hive,key.Name))!=RegistryDigest(key))throw new IOException("설치 등록 복구를 확인할 수 없습니다.");
             foreach(var shortcut in backup.Shortcuts)if(File.Exists(shortcut.Path)!=shortcut.Exists||shortcut.Exists&&HashFile(shortcut.Path)!=shortcut.SHA256)throw new IOException("바로가기 복구를 확인할 수 없습니다.");
