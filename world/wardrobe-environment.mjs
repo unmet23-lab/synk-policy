@@ -11,7 +11,7 @@ async function loadBakedBytes({signal,timeoutMs}){
   signal?.addEventListener('abort',abort,{once:true});
   try{
     const loading=(async()=>{
-      const response=await fetch(new URL('./assets/wardrobe-environment-v1.bin.gz?v=wardrobe-startup-20261012',import.meta.url),{signal:request.signal});
+      const response=await fetch(new URL('./assets/wardrobe-environment-v1.bin.gz',import.meta.url),{signal:request.signal});
       if(!response.ok)throw Error('WARDROBE_ENVIRONMENT_ASSET');
       request.signal.throwIfAborted();
       // Abort both fetch and the decoding pipe, including a body that stops

@@ -1,7 +1,7 @@
 import * as THREE from './scene-assets/three.module.js';
 import { SSAOPass } from './scene-assets/rendering/SSAOPass.js';
 import { OutputPass } from './scene-assets/rendering/OutputPass.js';
-import { waitForShaderPrograms, yieldForShaderPreparation, runShaderPreparationTasks } from './shader-preparation.mjs?v=wardrobe-startup-20261012';
+import { waitForShaderPrograms, yieldForShaderPreparation, runShaderPreparationTasks } from './shader-preparation.mjs';
 
 // Optional contact AO. The beauty buffer remains full resolution; normals/AO
 // are half resolution and capped. Mobile balanced/light allocate no buffers.

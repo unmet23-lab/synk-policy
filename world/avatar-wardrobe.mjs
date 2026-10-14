@@ -1,7 +1,7 @@
 import * as THREE from './scene-assets/three.module.js';
 import {wardrobeItem} from './wardrobe-catalog.mjs';
 import {buildWardrobeGarmentV8} from './wardrobe-garments-v8.mjs';
-import {wardrobeFabricProfile} from './avatar-textiles.mjs?v=wardrobe-startup-20261012';
+import {wardrobeFabricProfile} from './avatar-textiles.mjs';
 
 const TAU=Math.PI*2;
 const radii=[[.2,.90],[.35,.874],[.49,.852],[.83,.820],[1.0,.803],[1.12,.782],[1.43,.690]];

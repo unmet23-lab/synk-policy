@@ -1,4 +1,4 @@
-import {practiceStep} from './tutor-practice-core.mjs?v=tutor-4e57536c0';
+import {practiceStep} from './tutor-practice-core.mjs';
 
 const types=['control','timing','language','unanswered','audio'];
 const clean=(value,max=200)=>typeof value==='string'?value.replace(/[\u0000-\u001f]/g,' ').replace(/\s+/g,' ').trim().slice(0,max):'';

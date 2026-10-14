@@ -1,5 +1,5 @@
-import {TUTOR_GAME_EVENT,TUTOR_GAME_COMMAND} from './game-tutor-contract.mjs?v=tutor-4e57536c0';
-import {TUTOR_IDS} from './tutor-choice.mjs?v=tutor-4e57536c0';
+import {TUTOR_GAME_EVENT,TUTOR_GAME_COMMAND} from './game-tutor-contract.mjs';
+import {TUTOR_IDS} from './tutor-choice.mjs';
 
 // Optional, same-origin frame companion. Existing games remain playable alone.
 export function connectGameTutor(game,{onHelp=()=>{},onHelpClose=()=>{},onPracticeComplete=()=>{},onResumeAfterHelp=()=>{}}={}){

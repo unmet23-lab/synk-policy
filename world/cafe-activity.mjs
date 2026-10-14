@@ -1,4 +1,4 @@
-import {lessonById} from './life-content.mjs?v=tutor-4e57536c0';
+import {lessonById} from './life-content.mjs';
 
 export const CAFE_LESSON_ID='cafe-apply';
 export const CAFE_COMPOSE_ID='cafe-compose';

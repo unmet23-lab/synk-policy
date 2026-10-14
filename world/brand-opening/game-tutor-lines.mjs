@@ -1,4 +1,4 @@
-import {TUTORS} from './tutor-profiles.mjs?v=tutor-4e57536c0';
+import {TUTORS} from './tutor-profiles.mjs';
 
 // These are game directions and authored reactions, not generated assessment.
 // The game's existing answer/physics code owns whether a response was correct.

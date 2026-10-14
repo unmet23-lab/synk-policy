@@ -1,5 +1,5 @@
-import {CAFE_COMPOSE_ID,CAFE_LESSON_IDS,isCafeLesson,isCafeCheckpoint,isCafeOrder,isCafeListen} from './cafe-activity.mjs?v=tutor-4e57536c0';
-import {readWorldLearningProfile,updateWorldLearningProfile,clearWorldLearningProfile,worldLearningProfileValues} from './world-learning-profile.mjs?v=personalization-20261013';
+import {CAFE_COMPOSE_ID,CAFE_LESSON_IDS,isCafeLesson,isCafeCheckpoint,isCafeOrder,isCafeListen} from './cafe-activity.mjs';
+import {readWorldLearningProfile,updateWorldLearningProfile,clearWorldLearningProfile,worldLearningProfileValues} from './world-learning-profile.mjs';
 // One bounded record owns the life-Korean curriculum. The official PlayHost can
 // supply its storage port; guest/device records remain in their owner's namespace.
 export const LIFE_PROGRESS_KEY='synk.life-korean.progress.v1';

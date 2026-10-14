@@ -1,11 +1,11 @@
 import * as THREE from './scene-assets/three.module.js';
 import { makeCourtyard, makeLandscape } from './scene-v3-garden.mjs';
-import { createMongleAvatar } from './avatar-v3.mjs?v=wardrobe-startup-20261012';
+import { createMongleAvatar } from './avatar-v3.mjs';
 import { createEnvironmentFinish } from './environment-v4.mjs';
 import { addCourtyardDetails } from './courtyard-details-v5.mjs';
 import { createGardenBreeze } from './garden-breeze-v5.mjs';
 import { createSurfaceLibrary } from './surface-library-v6.mjs';
-import { createContactLight } from './contact-light-v6.mjs?v=wardrobe-startup-20261012';
+import { createContactLight } from './contact-light-v6.mjs';
 import { createEnvironmentOptics } from './environment-optics-v7.mjs';
 import { createRiverLife } from './river-life-v8.mjs';
 

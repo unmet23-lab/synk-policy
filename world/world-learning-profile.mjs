@@ -1,4 +1,4 @@
-import Personalization from './world-learning-profile-core.mjs?v=personalization-20261013';
+import Personalization from './world-learning-profile-core.mjs';
 
 // Product storage only: Core owns declaration, consent, provenance and revision.
 // These choices describe requested help; they never assert ability or personality.

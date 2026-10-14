@@ -1,5 +1,5 @@
-import {createLifeTutor} from './life-tutor.mjs?v=tutor-4e57536c0';
-import {homeTutorDayLine} from './home-tutor-days.mjs?v=tutor-4e57536c0';
+import {createLifeTutor} from './life-tutor.mjs';
+import {homeTutorDayLine} from './home-tutor-days.mjs';
 const esc=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 export function createHomeTutorRecap({container,tutorId,days,status,onFinish,onClose,reduced=()=>false}){
  let closed=false,signature='';

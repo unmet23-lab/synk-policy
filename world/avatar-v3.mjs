@@ -1,6 +1,6 @@
 import * as THREE from './scene-assets/three.module.js';
-import {loadAvatarTextiles} from './avatar-textiles.mjs?v=wardrobe-startup-20261012';
-import {createAvatarWardrobe,wardrobeFabricKinds} from './avatar-wardrobe.mjs?v=wardrobe-startup-20261012';
+import {loadAvatarTextiles} from './avatar-textiles.mjs';
+import {createAvatarWardrobe,wardrobeFabricKinds} from './avatar-wardrobe.mjs';
 import {WARDROBE_OUTFITS,slotsForOutfit,outfitForSlots} from './wardrobe-catalog.mjs';
 
 // Shared runtime asset: +Z front, +Y up, foot origin; bounds are exposed by metrics().

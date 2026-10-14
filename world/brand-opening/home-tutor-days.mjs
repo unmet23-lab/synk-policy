@@ -1,5 +1,5 @@
-import {lifeTutorExpression} from './life-tutor-lines.mjs?v=tutor-4e57536c0';
-import {getTutor} from './game-tutor-lines.mjs?v=tutor-4e57536c0';
+import {lifeTutorExpression} from './life-tutor-lines.mjs';
+import {getTutor} from './game-tutor-lines.mjs';
 export const homeDayKey=at=>new Date(at+9*3600000).toISOString().slice(0,10);
 const activity=item=>Math.max(item.observedAt||0,item.guidedAt||0);
 

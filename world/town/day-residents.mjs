@@ -1,5 +1,5 @@
 import * as THREE from '/world/scene-assets/three.module.js';
-import { createAvatarTextiles } from '/world/avatar-textiles.mjs?v=wardrobe-startup-20261012';
+import { createAvatarTextiles } from '/world/avatar-textiles.mjs';
 import { TOWN_BRAND } from './day-materials.mjs';
 
 // Town residents are their own cast, not recolours of the player's Mongle.

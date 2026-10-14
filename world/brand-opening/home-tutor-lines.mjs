@@ -1,5 +1,5 @@
-import {lifeTutorExpression} from './life-tutor-lines.mjs?v=tutor-4e57536c0';
-import {homeDayKey,homeTutorDays,homeTutorMemoryLine} from './home-tutor-days.mjs?v=tutor-4e57536c0';
+import {lifeTutorExpression} from './life-tutor-lines.mjs';
+import {homeDayKey,homeTutorDays,homeTutorMemoryLine} from './home-tutor-days.mjs';
 
 // Recommendations read the existing owner-scoped progress; they never grade it.
 export function homeTutorRecommendation({owner,summary,snapshot,lessons=[],practised=new Map(),now=Date.now()}={}){

@@ -1,9 +1,9 @@
 import * as THREE from '/world/scene-assets/three.module.js';
-import { createMongleAvatar, AVATAR_OUTFITS } from '/world/avatar-v3.mjs?v=wardrobe-startup-20261012';
-import {normalizeWardrobeDyes} from '/world/avatar-wardrobe.mjs?v=wardrobe-startup-20261012';
+import { createMongleAvatar, AVATAR_OUTFITS } from '/world/avatar-v3.mjs';
+import {normalizeWardrobeDyes} from '/world/avatar-wardrobe.mjs';
 import {slotsForOutfit} from '/world/wardrobe-catalog.mjs';
 import { makeTownCharacter } from './day-character.mjs';
-import { makeTownResident } from './day-residents.mjs?v=wardrobe-startup-20261012';
+import { makeTownResident } from './day-residents.mjs';
 import { buildTownEnvironment } from './day-environment.mjs';
 import { applyTownMaterials, TOWN_BRAND } from './day-materials.mjs';
 import { createTownRendering } from './day-rendering.mjs';

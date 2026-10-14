@@ -1,4 +1,4 @@
-import {normalizeSupport} from './game-tutor-support.mjs?v=tutor-4e57536c0';
+import {normalizeSupport} from './game-tutor-support.mjs';
 export const TUTOR_GAME_EVENT='synk:tutor:game';
 export const TUTOR_GAME_COMMAND='synk:tutor:command';
 export const GAME_EVENTS=Object.freeze(['ready','lobby','playing','paused','listening','picked','success','retry','finish']);

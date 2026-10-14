@@ -1,4 +1,4 @@
-import {TUTOR_IDS} from './tutor-choice.mjs?v=tutor-4e57536c0';
+import {TUTOR_IDS} from './tutor-choice.mjs';
 import {KEY_ACTIONS} from '../korean-runner/controls.mjs';
 
 // A safe control rehearsal. It never creates learning evidence or awards coins.
