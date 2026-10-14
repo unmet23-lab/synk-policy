@@ -10,16 +10,20 @@ const activityTargets = new Map([['world', 'WORLD에서 연습 고르기'], ['me
 const verdictLabels = new Map([['agree', '맞아요'], ['disagree', '달라요'], ['contextual', '상황마다 달라요']]);
 const facetId = value => typeof value === 'string' && /^(?:topics|support|explanation|usage-repeat|practice-mode|practice-response|learning-topic:[A-Za-z0-9][A-Za-z0-9_.-]{0,79})$/.test(value);
 const personalFacets = new Set(['topics', 'support', 'explanation', 'usage-repeat']);
+const conditionLabels = new Map([['first-try', '처음 시도할 때'], ['familiar', '익숙한 내용일 때'], ['busy', '바쁠 때']]);
+const evidenceLabels = new Map([['statement', '내가 확인한 서술'], ['selection', '직접 고른 내용'], ['observation', '실제 이용 기록'], ['period', '기간별 기록']]);
+const safeId = value => typeof value === 'string' && /^[A-Za-z0-9_.:-]{1,120}$/.test(value);
 const arrow = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5m6-6-6 6 6 6"/></svg>';
+const stampFormatter = new Intl.DateTimeFormat('ko-KR', {
+  timeZone: 'Asia/Seoul', year: 'numeric', month: 'long', day: 'numeric',
+  hour: 'numeric', minute: '2-digit',
+});
 
 function stamp(value) {
   if (typeof value !== 'string' && typeof value !== 'number') return '';
   const date = new Date(value);
   if (!Number.isFinite(date.getTime())) return '';
-  return new Intl.DateTimeFormat('ko-KR', {
-    timeZone: 'Asia/Seoul', year: 'numeric', month: 'long', day: 'numeric',
-    hour: 'numeric', minute: '2-digit',
-  }).format(date);
+  return stampFormatter.format(date);
 }
 
 function dateLine(value, label) {
@@ -108,12 +112,44 @@ function understandingFacets(report, state, area) {
   }).join('')}</div>`;
 }
 
+function relationEvidence(row) {
+  if (!list(row.evidence).length) return '';
+  return `<details class="mi-facet-evidence mi-relation-evidence"><summary>이 설명을 연결한 근거</summary><p class="mi-relation-certainty">${row.certainty === 'declared' ? '내가 확인한 내용에서 연결했어요.' : row.certainty === 'observed' ? '연결한 기록에서 함께 살펴봤어요.' : '확정하기 전에 함께 확인할 부분이에요.'}</p><ul>${list(row.evidence).slice(0, 6).map(item => `<li><span>${escape(evidenceLabels.get(item.kind) || '연결된 근거')}</span>${escape(item.label)}</li>`).join('')}</ul></details>`;
+}
+
+function understandingRelations(report, summarized = []) {
+  if (report.understanding?.status !== 'ready') return '';
+  const relations = list(report.understanding.relations).slice(0, 4).filter(row => !summarized.includes(row.line));
+  if (!relations.length) return '';
+  return `<section class="mi-relations" aria-label="관심과 이용 방식을 함께 살펴본 설명"><h3>관심과 이용 방식을 함께 보면</h3>${relations.map(row => `<div class="mi-relation"><p>${escape(row.line)}</p>${relationEvidence(row)}</div>`).join('')}</section>`;
+}
+
+function statementPanel(report, state) {
+  const editor = state.understandingStatementEditor;
+  const busy = state.understandingPending === true;
+  if (!editor) {
+    if (report.understanding?.status !== 'ready' || state.understandingEditor) return '';
+    return `<div class="mi-statement-entry"><div><h3>내 말로 설명을 고쳐 볼까요?</h3><p>좋아하는 것과 편한 방식, 상황에 따라 다른 점을 적고 해석을 확인할 수 있어요.</p></div>${understandingAction('describe', '내 말로 고치기', {}, busy)}</div>`;
+  }
+  const source = typeof editor.text === 'string' ? [...editor.text].slice(0, 500).join('') : '';
+  const preview = editor.stage === 'preview' && editor.preview?.text === source ? editor.preview : null;
+  if (!preview) return `<form class="mi-understanding-editor mi-statement-editor" data-insight-statement-editor aria-label="내 말로 설명 고치기"${busy ? ' aria-busy="true"' : ''}><h3 tabindex="-1" data-insight-editor-title>내 말로 설명 고치기</h3><label class="mi-note-label">나에 대해 알려 주세요 <span>500자 이내</span><textarea data-insight-field="statement" name="insight-statement" maxlength="1000" rows="5" placeholder="예: 혼자 하는 게 좋아요. 처음에는 예시가 필요해요."${busy ? ' disabled' : ''}>${escape(source)}</textarea></label><p>적은 내용에서 이해한 뜻을 먼저 보여드려요. 다음 설명에는 직접 확인한 해석만 반영해요.</p><div class="mi-editor-actions">${understandingAction('preview', busy ? '확인 중…' : '해석 미리보기', {}, busy || !source.trim(), true)}${understandingAction('cancel', '취소', {}, busy)}</div></form>`;
+  const proposals = list(preview.proposals).filter(row => safeId(row.id) && ['prefer', 'avoid'].includes(row.polarity) && [null, 'first-try', 'familiar', 'busy'].includes(row.condition) && ['pending', 'conflict'].includes(row.status) && typeof row.confirmable === 'boolean').slice(0, 8);
+  const accepted = new Set(Array.isArray(editor.acceptedIds) ? editor.acceptedIds : []);
+  const selected = proposals.filter(row => row.confirmable === true && accepted.has(row.id));
+  const unresolved = list(preview.unresolved).slice(0, 12);
+  const question = preview.question && typeof preview.question.label === 'string' ? preview.question : null;
+  return `<div class="mi-understanding-editor mi-statement-editor" data-insight-statement-editor aria-label="내 서술의 해석 미리보기"${busy ? ' aria-busy="true"' : ''}><h3 tabindex="-1" data-insight-editor-title>이렇게 이해했어요</h3><p>맞는 해석만 골라 주세요. 선택하지 않은 뜻과 아래의 미해석 부분은 반영하지 않아요.</p><details class="mi-statement-source"><summary>내가 쓴 원문</summary><blockquote>${escape(source)}</blockquote></details>${question ? `<div class="mi-statement-question"><p>${escape(question.label)}</p>${list(question.options).length ? `<ul>${list(question.options).map(option => `<li>${escape(option.label)}</li>`).join('')}</ul>` : ''}</div>` : ''}${proposals.length ? `<div class="mi-statement-proposals">${proposals.map(row => `<div class="mi-statement-proposal"><label><input type="checkbox" name="insight-proposal" data-insight-proposal="${escape(row.id)}" value="${escape(row.id)}"${row.confirmable === true && accepted.has(row.id) ? ' checked' : ''}${busy || row.confirmable !== true ? ' disabled' : ''}><span>${escape(row.summary)}</span></label><p class="mi-statement-meaning">${row.polarity === 'avoid' ? '선호하지 않음' : '선호하는 내용'}${conditionLabels.has(row.condition) ? ` · ${escape(conditionLabels.get(row.condition))}에만` : ' · 별도 조건 없음'}</p><blockquote>${escape(row.evidence?.quote || '')}</blockquote>${row.reasonLabel ? `<p class="mi-statement-reason">${escape(row.reasonLabel)}</p>` : ''}</div>`).join('')}</div>` : '<p class="mi-statement-empty">아직 확인해 반영할 해석을 찾지 못했어요. 아래 내용을 참고해 말을 조금 바꿔 보세요.</p>'}${unresolved.length ? `<div class="mi-unresolved"><h4>아직 반영하지 않은 부분</h4><p>뜻이나 적용 범위를 단정하기 어려워 남겨 두었어요.</p>${unresolved.map(row => `<div><blockquote>${escape(row.quote)}</blockquote><p>${escape(text(row.reasonLabel, '이 부분의 뜻을 아직 확인하지 못했어요.'))}</p></div>`).join('')}</div>` : ''}<p class="mi-save-explanation">선택한 해석과 그 근거가 된 원문을 저장하고 다음 설명에 반영해요. 실제 앱 설정이나 이용 기록은 바꾸지 않아요.</p><div class="mi-editor-actions">${proposals.some(row => row.confirmable === true) ? understandingAction('confirm-statement', busy ? '반영 중…' : `선택한 해석 ${count(selected.length)}개 반영`, {}, busy || !selected.length, true) : ''}${understandingAction('edit-text', '원문 고치기', {}, busy)}${understandingAction('cancel', '취소', {}, busy)}</div></div>`;
+}
+
 function understandingHistory(report, state) {
   const understanding = report.understanding;
   if (!understanding || understanding.status !== 'ready') return '';
   const rows = list(understanding.history).filter(row => ['review', 'override'].includes(row.kind) && facetId(row.facetId));
+  const statements = list(understanding.statementHistory).filter(row => safeId(row.id)).slice(0, 20);
   const busy = state.understandingPending === true;
-  return `<details class="mi-understanding-history"><summary>내가 확인·수정한 내용 <span>${count(rows.length)}건</span></summary><div><p>되돌리면 이 확인·수정을 이후 설명에 사용하지 않아요. 실제 이용 기록은 그대로 남아요.</p>${rows.length ? `<ul>${rows.map(row => `<li><div><h3>${escape(row.title)}</h3><p>${escape(row.line)}</p>${row.note ? `<p class="mi-history-note">내가 덧붙인 말: ${escape(row.note)}</p>` : ''}${dateLine(row.at, '저장')}</div>${understandingAction('remove', row.kind === 'review' ? '이 확인 되돌리기' : '이 수정 되돌리기', { kind: row.kind, id: row.id, facet: row.facetId }, busy)}</li>`).join('')}</ul><div class="mi-history-clear"><p>확인·수정한 내용과 덧붙인 말을 모두 지우고, 연결한 원래 기록을 기준으로 다시 설명해요.</p>${understandingAction('clear', '확인·수정한 내용 모두 지우기', {}, busy)}</div>` : '<p class="mi-history-empty">아직 직접 확인하거나 수정해 저장한 내용이 없어요.</p>'}</div></details>`;
+  const statementRows = statements.map(row => `<li class="mi-statement-history-row"><div><h3>내 말로 확인한 내용</h3><p>${row.active ? '현재 설명에 반영 중이에요.' : '현재 설명에는 반영되지 않는 내역이에요.'}</p><div class="mi-statement-meanings">${list(row.meanings).slice(0, 8).map(meaning => `<div><p>${escape(meaning.line)}</p><span>${conditionLabels.has(meaning.condition) ? escape(conditionLabels.get(meaning.condition)) + '에만 · ' : ''}${meaning.active ? '현재 반영' : '현재 미반영'}</span></div>`).join('')}</div><details class="mi-statement-source"><summary>내 원문과 해석 근거 보기</summary><blockquote>${escape(row.text)}</blockquote>${list(row.meanings).map(meaning => `<p>${escape(meaning.line)}</p><blockquote>${escape(meaning.quote)}</blockquote>`).join('')}</details>${dateLine(row.at, '확인·저장')}</div>${understandingAction('remove-statement', '이 서술 되돌리기', { id: row.id }, busy)}</li>`).join('');
+  return `<details class="mi-understanding-history"><summary>내가 확인·수정한 내용 <span>${count(rows.length + statements.length)}건</span></summary><div><p>되돌리면 이 확인·수정을 이후 설명에 사용하지 않아요. 실제 이용 기록은 그대로 남아요.</p>${rows.length || statements.length ? `<ul>${statementRows}${rows.map(row => `<li><div><h3>${escape(row.title)}</h3><p>${escape(row.line)}</p>${row.note ? `<p class="mi-history-note">내가 덧붙인 말: ${escape(row.note)}</p>` : ''}${dateLine(row.at, '저장')}</div>${understandingAction('remove', row.kind === 'review' ? '이 확인 되돌리기' : '이 수정 되돌리기', { kind: row.kind, id: row.id, facet: row.facetId }, busy)}</li>`).join('')}</ul><div class="mi-history-clear"><p>확인·수정한 내용과 직접 쓴 서술을 모두 지우고, 연결한 원래 기록을 기준으로 다시 설명해요.</p>${understandingAction('clear', '확인·수정한 내용 모두 지우기', {}, busy)}</div>` : '<p class="mi-history-empty">아직 직접 확인하거나 수정해 저장한 내용이 없어요.</p>'}</div></details>`;
 }
 
 function understandingNotice(report, state) {
@@ -152,9 +188,12 @@ function personalSection(report, declaredOnly, pending, state) {
   const interest = items.find(item => item.id === 'reasons' || item.id === 'goal');
   const settings = items.filter(item => item !== interest);
   const allDeclared = settings.every(item => item.basis === 'self-declared');
+  const understanding = report.understanding?.status === 'ready' ? report.understanding : null;
+  const hasDeclaredUnderstanding = list(understanding?.facets).some(facet => facet.available === true && facet.basis === 'self-declared')
+    || list(understanding?.statementHistory).some(statement => statement.active === true && list(statement.meanings).some(meaning => meaning.active === true));
   let body = interest ? `<dl class="mi-personal-list"><div class="mi-personal-row"><dt><span class="mi-basis">${interest.basis === 'self-declared' ? '직접 알려준 정보' : '이용 기록에서 확인'}</span><span>${escape(interest.title)}</span></dt><dd><p class="mi-personal-value">${escape(interest.value)}</p>${interest.detail ? `<p class="mi-row-detail">${escape(interest.detail)}</p>` : ''}${dateLine(interest.at, '정보 기록')}</dd></div></dl>` : '';
   if (settings.length) body += `<div class="mi-preferences"><h3>${allDeclared ? '직접 고른 이용 설정' : '이용 방식'}</h3><dl class="mi-preference-list">${settings.map(item => `<div><dt>${escape(item.title)}${allDeclared ? '' : `<span class="mi-basis">${item.basis === 'self-declared' ? '직접 알려준 정보' : '이용 기록에서 확인'}</span>`}</dt><dd>${escape(item.value)}</dd></div>`).join('')}</dl></div>`;
-  if (!items.length) body = empty('아직 나를 소개할 정보가 없어요.', 'SYNK에서 직접 알려준 배우는 이유와 선호 설정이 모이면 이곳에서 함께 볼 수 있어요.');
+  if (!items.length && !hasDeclaredUnderstanding) body = empty('아직 나를 소개할 정보가 없어요.', 'SYNK에서 직접 알려준 배우는 이유와 선호 설정이 모이면 이곳에서 함께 볼 수 있어요.');
   return `<section class="mi-section" aria-labelledby="insight-personal-title">${sectionHeading('01', 'insight-personal-title', '나의 관심사·선호', '내가 알려준 선호와 이용 기록을 구분해서 살펴봐요.')}${understandingFacets(report, state, 'personal')}${body}${activityInterest(report, pending)}</section>`;
 }
 
@@ -209,8 +248,14 @@ export function renderMemberInsight(state = {}, { native = false } = {}) {
     const declaredOnly = report.shared === 'declared-only';
     const understanding = report.understanding?.status === 'ready' ? report.understanding : null;
     const paragraphs = understanding && Array.isArray(understanding.paragraphs) ? understanding.paragraphs.filter(line => typeof line === 'string').slice(0, 8) : [];
-    body = `<div class="mi-summary"><div><span class="mi-summary-label">${understanding ? '최근 기록을 이렇게 읽었어요' : '지금 확인할 수 있는 나'}</span><h2>${escape(text(understanding?.headline, text(report.headline, '기록에서 나를 조금씩 알아가요.')))}</h2>${paragraphs.length ? paragraphs.map(line => `<p>${escape(line)}</p>`).join('') : `<p>${escape(text(report.description, '직접 알려준 내용과 연습한 기록을 함께 정리했어요.'))}</p>`}</div>${action('refresh', '새로 확인하기', !state.understandingEditor, state.understandingPending === true)}</div>`;
+    const summaryParagraph = line => {
+      const relation = list(understanding?.relations).find(row => row.line === line);
+      return `<div class="mi-summary-paragraph"><p>${escape(line)}</p>${relation ? relationEvidence(relation) : ''}</div>`;
+    };
+    body = `<div class="mi-summary"><div><span class="mi-summary-label">${understanding ? '최근 기록을 이렇게 읽었어요' : '지금 확인할 수 있는 나'}</span><h2>${escape(text(understanding?.headline, text(report.headline, '기록에서 나를 조금씩 알아가요.')))}</h2>${paragraphs.length ? paragraphs.map(summaryParagraph).join('') : `<p>${escape(text(report.description, '직접 알려준 내용과 연습한 기록을 함께 정리했어요.'))}</p>`}</div>${action('refresh', '새로 확인하기', !state.understandingEditor && !state.understandingStatementEditor, state.understandingPending === true)}</div>`;
     body += understandingNotice(report, state);
+    body += understandingRelations(report, paragraphs);
+    body += statementPanel(report, state);
     body += interruptedUnderstandingEditor(report, state);
     body += understandingActivities(report, state);
     if (declaredOnly) body += `<aside class="mi-consent" aria-label="학습 기록 연결 상태"><div><strong>학습 기록 연결이 꺼져 있어요.</strong><p>학습 정보는 직접 알려준 배우는 이유만 보여요. 앱 이용 기록은 별도로 연결할 수 있어요.</p></div>${action('account', '계정 설정')}</aside>`;

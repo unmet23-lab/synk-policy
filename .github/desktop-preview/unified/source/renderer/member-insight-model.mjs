@@ -20,6 +20,7 @@ const text = (value, max = 500) => typeof value === 'string' && value.trim() && 
 // A user's explicit explanation is literal text, including angle brackets and
 // line breaks. The view escapes it; it is never interpreted as markup or data.
 const literalText = (value, max = 900) => typeof value === 'string' && value.trim() && value.length <= max && !/[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]|[\uD800-\uDFFF]/u.test(value) ? value : invalid();
+const unicodeText = (value, max) => typeof value === 'string' && value.trim() && [...value].length <= max && !/[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]|[\uD800-\uDFFF]/u.test(value) ? value : invalid();
 const id = value => typeof value === 'string' && /^[A-Za-z0-9_.:-]{1,120}$/.test(value) ? value : invalid();
 function instant(value, asOf = null) {
   if (typeof value !== 'string' || !Number.isFinite(Date.parse(value)) || new Date(value).toISOString() !== value || asOf && Date.parse(value) > Date.parse(asOf)) invalid();
@@ -103,7 +104,7 @@ function practiceOf(value, asOf) {
 }
 
 function understandingOf({ accountSummary, activity, document, status, asOf }) {
-  const empty = state => ({ status: state, headline: '', paragraphs: [], facets: [], history: [], activities: [], limitations: [] });
+  const empty = state => ({ status: state, headline: '', paragraphs: [], facets: [], history: [], statementHistory: [], relations: [], activities: [], limitations: [] });
   if (status !== 'ready') return empty(['loading', 'error'].includes(status) ? status : 'unavailable');
   try {
     instant(asOf);
@@ -149,7 +150,24 @@ function understandingOf({ accountSummary, activity, document, status, asOf }) {
       targets.add(row.targetId);
       return { targetId: row.targetId, label: ACTIVITY_TARGETS[row.targetId], reason: text(row.reason), basis: 'self-declared' };
     });
-    return { status: 'ready', asOf, headline: text(value.headline), paragraphs: value.paragraphs.map(line => literalText(line)), facets, history, activities, limitations: value.limitations.map(line => text(line)) };
+    const relations = uniqueRows(value.relations === undefined ? [] : value.relations, 4).map(row => {
+      if (!['conditional-preference', 'preference-change', 'preference-observation', 'activity-change'].includes(row.kind)
+        || !['declared', 'observed', 'needs-check'].includes(row.certainty) || !Array.isArray(row.evidence) || row.evidence.length > 6) invalid();
+      const evidence = row.evidence.map(item => {
+        if (!record(item) || !['statement', 'selection', 'observation', 'period'].includes(item.kind)) invalid();
+        return { kind: item.kind, ref: id(item.ref), label: unicodeText(item.label, 120) };
+      });
+      return { id: row.id, kind: row.kind, line: unicodeText(row.line, 700), evidence, certainty: row.certainty };
+    });
+    const statementHistory = uniqueRows(value.statementHistory === undefined ? [] : value.statementHistory, 20).map(row => {
+      if (typeof row.active !== 'boolean') invalid();
+      const meanings = uniqueRows(row.meanings, 8).map(meaning => {
+        if (typeof meaning.active !== 'boolean' || ![null, 'first-try', 'familiar', 'busy'].includes(meaning.condition)) invalid();
+        return { id: meaning.id, line: unicodeText(meaning.line, 300), condition: meaning.condition, quote: unicodeText(meaning.quote, 500), active: meaning.active };
+      });
+      return { id: row.id, text: unicodeText(row.text, 500), at: instant(row.at, asOf), active: row.active, meanings };
+    });
+    return { status: 'ready', asOf, headline: text(value.headline), paragraphs: value.paragraphs.map(line => unicodeText(line, 900)), facets, history, statementHistory, relations, activities, limitations: value.limitations.map(line => text(line)) };
   } catch { return empty('error'); }
 }
 

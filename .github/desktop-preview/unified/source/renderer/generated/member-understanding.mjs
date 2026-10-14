@@ -699,6 +699,696 @@ var require_trail_periods = __commonJS({
   }
 });
 
+// atlas/conditional-preference.js
+var require_conditional_preference = __commonJS({
+  "atlas/conditional-preference.js"(exports, module) {
+    (function(root, factory) {
+      if (typeof module === "object" && module.exports) module.exports = factory(require_domain());
+      else root.SynkAtlasConditionalPreference = factory(root.SynkAtlasDomain);
+    })(typeof globalThis !== "undefined" ? globalThis : exports, function(Domain) {
+      "use strict";
+      const VERSION = "core-conditional-preference-1";
+      const plain = (value) => !!value && Object.getPrototypeOf(value) === Object.prototype;
+      const own = (value, key) => Object.hasOwn(value, key);
+      const exact = (value, keys, required = keys) => plain(value) && Object.keys(value).every((key) => keys.includes(key)) && required.every((key) => own(value, key));
+      const token = (value) => typeof value === "string" && /^[A-Za-z0-9_.:@-]{1,160}$/.test(value) && !["__proto__", "constructor", "prototype"].includes(value);
+      const fail = (message) => {
+        throw new TypeError(`Conditional preference: ${message}`);
+      };
+      const copy = (value) => JSON.parse(JSON.stringify(value));
+      const canonical = (value) => JSON.stringify(value, (_key, item) => plain(item) ? Object.fromEntries(Object.keys(item).sort().map((key) => [key, item[key]])) : item);
+      function time(at) {
+        if (typeof at !== "string" || at.length > 40 || !Number.isFinite(Date.parse(at)) || new Date(at).toISOString() !== at) fail("explicit ISO UTC time required");
+        return Date.parse(at);
+      }
+      function checkScope(scope) {
+        if (!exact(scope, ["personId", "productId", "contextId", "domain"]) || Object.values(scope).some((value) => !token(value))) fail("invalid scope");
+      }
+      function checkSource(source) {
+        if (!exact(source, ["eventId", "source", "duration", "encounterId", "at", "until"], ["eventId", "source", "duration", "encounterId", "at"]) || !token(source.eventId) || source.source !== "explicit" || !["ongoing", "once"].includes(source.duration) || !token(source.encounterId)) fail("invalid explicit source");
+        time(source.at);
+        if (own(source, "until") && time(source.until) <= time(source.at)) fail("invalid source deadline");
+      }
+      function validateRule(input = {}) {
+        if (!exact(input, ["contract", "scope", "rule"])) fail("unsupported rule input");
+        const { contract, scope, rule } = input;
+        if (!Domain?.validateContract) fail("Core Domain required");
+        Domain.validateContract(contract);
+        checkScope(scope);
+        if (!exact(rule, ["version", "id", "scope", "field", "feature", "primary", "alternative", "when", "target", "encounterId", "at", "until", "source"]) || rule.version !== VERSION || !token(rule.id) || !token(rule.encounterId) || !["baseline", "context"].includes(rule.target)) fail("invalid rule");
+        checkScope(rule.scope);
+        if (canonical(rule.scope) !== canonical(scope)) fail("foreign rule scope");
+        const fields = new Map(contract.fields.map((field) => [field.id, field]));
+        const preferred = fields.get(rule.field), feature = fields.get(rule.feature);
+        if (!preferred || preferred.kind !== "enum" || !feature || feature.kind !== "enum" || !preferred.values.includes(rule.primary) || !preferred.values.includes(rule.alternative) || rule.primary === rule.alternative || !feature.values.includes(rule.primary) || !feature.values.includes(rule.alternative)) fail("invalid primary or alternative");
+        if (!exact(rule.when, ["field", "value"]) || fields.get(rule.when.field)?.kind !== "enum" || !fields.get(rule.when.field).values.includes(rule.when.value) || rule.when.field === rule.feature) fail("invalid condition");
+        checkSource(rule.source);
+        if (time(rule.at) < time(rule.source.at) || rule.target === "baseline" && rule.source.duration !== "ongoing" || rule.source.duration === "once" && rule.source.encounterId !== rule.encounterId) fail("rule cannot widen its source scope");
+        if (rule.until !== null && time(rule.until) <= time(rule.at)) fail("rule deadline must be later than declaration");
+        if (rule.source.until && (time(rule.source.until) <= time(rule.at) || rule.until !== null && time(rule.until) > time(rule.source.until))) fail("rule outlives its source");
+        return copy(rule);
+      }
+      function assess(input = {}) {
+        if (!exact(input, ["contract", "scope", "rule", "preference", "facts", "encounterId", "at", "invalidated"], ["contract", "scope", "rule", "preference", "encounterId", "at"])) fail("unsupported comparison input");
+        const { contract, scope, rule, preference, facts = {}, encounterId, at, invalidated = false } = input;
+        validateRule({ contract, scope, rule });
+        const cutoff = time(at);
+        if (!token(encounterId) || typeof invalidated !== "boolean" || !exact(preference, ["value", "source", "usable", "required"]) || typeof preference.usable !== "boolean" || typeof preference.required !== "boolean") fail("invalid current preference");
+        if (preference.source !== null) checkSource(preference.source);
+        const fields = new Map(contract.fields.map((field) => [field.id, field]));
+        if (preference.value !== null && !fields.get(rule.field).values.includes(preference.value)) fail("invalid current preference value");
+        if (!exact(facts, [rule.feature, rule.when.field], [])) fail("unsupported candidate facts");
+        for (const [field, fact] of Object.entries(facts)) {
+          if (!exact(fact, ["value", "usable", "until"], ["value", "usable"]) || typeof fact.usable !== "boolean" || !fields.get(field).values.includes(fact.value)) fail("invalid candidate fact");
+          if (own(fact, "until")) time(fact.until);
+        }
+        const inactive = (reason) => ({ status: "inactive", conditionStatus: "inactive", reason, ruleId: rule.id, evidence: [] });
+        if (cutoff < time(rule.at)) return inactive("not-yet-declared");
+        if (invalidated) return inactive("source-changed");
+        if (preference.required) return inactive("required-primary");
+        if (rule.target === "context" && rule.encounterId !== encounterId) return inactive("context-ended");
+        if (rule.until !== null && cutoff >= time(rule.until)) return inactive("rule-expired");
+        if (rule.source.until && cutoff >= time(rule.source.until)) return inactive("source-expired");
+        if (!preference.usable || preference.value !== rule.primary || !preference.source || canonical(preference.source) !== canonical(rule.source)) return inactive("source-changed");
+        const usable = (field) => own(facts, field) && facts[field].usable && (!own(facts[field], "until") || cutoff < time(facts[field].until));
+        if (!usable(rule.feature)) return { status: "unknown", conditionStatus: "unknown", reason: "feature-unknown", ruleId: rule.id, evidence: [rule.source.eventId] };
+        if (facts[rule.feature].value === rule.primary) return { status: "primary", conditionStatus: "not-needed", reason: "primary-match", ruleId: rule.id, evidence: [rule.source.eventId] };
+        if (facts[rule.feature].value !== rule.alternative) return { status: "different", conditionStatus: "not-needed", reason: "outside-alternative", ruleId: rule.id, evidence: [rule.source.eventId] };
+        if (!usable(rule.when.field)) return { status: "different", conditionStatus: "unknown", reason: "condition-unknown", ruleId: rule.id, evidence: [rule.source.eventId] };
+        const passed = facts[rule.when.field].value === rule.when.value;
+        return { status: passed ? "conditional" : "different", conditionStatus: passed ? "satisfied" : "different", reason: passed ? "explicit-alternative" : "condition-different", ruleId: rule.id, evidence: [rule.source.eventId] };
+      }
+      return Object.freeze({ VERSION, validateRule, assess });
+    });
+  }
+});
+
+// atlas/ask.js
+var require_ask = __commonJS({
+  "atlas/ask.js"(exports, module) {
+    (function(root, factory) {
+      if (typeof module === "object" && module.exports) module.exports = factory();
+      else root.SynkAsk = factory();
+    })(typeof globalThis !== "undefined" ? globalThis : exports, function() {
+      "use strict";
+      const VERSION = "ask-1.1";
+      const MAX_OPTIONS = 64;
+      const KINDS = ["setting", "confirm", "choice", "refresh", "follow_up"];
+      const DAY = 864e5;
+      const id = (value) => typeof value === "string" && /^[a-zA-Z0-9_.:-]{1,120}$/.test(value);
+      const canonical = (value) => JSON.stringify(value, (_key, entry) => entry && typeof entry === "object" && !Array.isArray(entry) ? Object.fromEntries(Object.keys(entry).sort().map((key) => [key, entry[key]])) : entry);
+      const time = (value) => {
+        const n = Date.parse(value);
+        if (typeof value !== "string" || !Number.isFinite(n)) throw new TypeError("Ask: invalid time");
+        return n;
+      };
+      const finite = (value) => typeof value === "number" && Number.isFinite(value);
+      const owns = (value, key) => Object.hasOwn(value, key);
+      function probabilities(q) {
+        const supplied = q.options.filter((option) => owns(option, "p")).length;
+        if (!supplied) return q.options.map(() => 1 / q.options.length);
+        if (supplied !== q.options.length || q.options.some((option) => !finite(option.p) || option.p < 0 || option.p > 1)) throw new TypeError(`Ask: invalid probabilities in ${q.id}`);
+        const total = q.options.reduce((sum, option) => sum + option.p, 0);
+        if (Math.abs(total - 1) > 1e-9) throw new TypeError(`Ask: probabilities must sum to one in ${q.id}`);
+        return q.options.map((option) => option.p / total);
+      }
+      function validate(questions) {
+        if (!Array.isArray(questions)) throw new TypeError("Ask: questions must be an array");
+        const ids = /* @__PURE__ */ new Set();
+        for (const q of questions) {
+          if (!q || !id(q.id) || ids.has(q.id) || !KINDS.includes(q.kind ?? "setting") || !id(q.about ?? q.id) || !Array.isArray(q.options) || q.options.length < 2 || q.options.length > MAX_OPTIONS) throw new TypeError(`Ask: invalid question ${q && q.id}`);
+          ids.add(q.id);
+          const options = /* @__PURE__ */ new Set();
+          for (const option of q.options) {
+            if (!option || !id(option.id) || options.has(option.id)) throw new TypeError(`Ask: invalid option in ${q.id}`);
+            options.add(option.id);
+          }
+          probabilities(q);
+          if (owns(q, "cost") && (!finite(q.cost) || q.cost < 0)) throw new TypeError(`Ask: invalid question cost in ${q.id}`);
+          if (owns(q, "responseProbability") && (!finite(q.responseProbability) || q.responseProbability < 0 || q.responseProbability > 1)) throw new TypeError(`Ask: invalid response probability in ${q.id}`);
+        }
+        return questions;
+      }
+      function difference(a, b) {
+        if (a && b && typeof a === "object" && typeof b === "object" && ("content" in a || "shape" in a)) {
+          return (canonical(a.content) !== canonical(b.content) ? 2 : 0) + (canonical(a.shape) !== canonical(b.shape) ? 1 : 0);
+        }
+        return canonical(a) === canonical(b) ? 0 : 1;
+      }
+      function decisionValue(evaluate, context) {
+        const value = evaluate(context);
+        if (!value || typeof value !== "object" || Array.isArray(value) || Object.keys(value).some((key) => !["utility", "loss"].includes(key)) || !owns(value, "utility") && !owns(value, "loss") || owns(value, "utility") && !finite(value.utility) || owns(value, "loss") && (!finite(value.loss) || value.loss < 0)) throw new TypeError("Ask: evaluate must return finite utility and/or nonnegative loss");
+        const result = (value.utility ?? 0) - (value.loss ?? 0);
+        if (!finite(result)) throw new TypeError("Ask: nonfinite decision value");
+        return result;
+      }
+      function rank({ questions, decide, answers = {}, denied = [], asked = {}, now = null, quietDays = 7, evaluate } = {}) {
+        validate(questions);
+        if (typeof decide !== "function" || !answers || typeof answers !== "object" || !Array.isArray(denied) || !asked || typeof asked !== "object") throw new TypeError("Ask: invalid input");
+        if (evaluate !== void 0 && typeof evaluate !== "function") throw new TypeError("Ask: evaluate must be a function");
+        const valued = typeof evaluate === "function";
+        if (!valued && questions.some((q) => owns(q, "cost") || owns(q, "responseProbability"))) throw new TypeError("Ask: question cost and response probability require evaluate");
+        const current = decide({ ...answers });
+        const result = [];
+        for (const q of questions) {
+          const about = q.about ?? q.id;
+          if (Object.hasOwn(answers, about)) continue;
+          if (denied.includes(q.id)) {
+            result.push({ id: q.id, kind: q.kind ?? "setting", about, impact: 0, skippable: true, reason: "denied" });
+            continue;
+          }
+          if (Object.hasOwn(asked, q.id) && now !== null && time(now) - time(asked[q.id]) < quietDays * DAY) {
+            result.push({ id: q.id, kind: q.kind ?? "setting", about, impact: 0, skippable: true, reason: "asked-recently" });
+            continue;
+          }
+          const chances = probabilities(q);
+          const outcomes = /* @__PURE__ */ Object.create(null);
+          let impact = 0, expectedGain = 0;
+          q.options.forEach((option, index) => {
+            const scenario = { ...answers, [about]: owns(option, "value") ? option.value : option.id };
+            const decided = decide({ ...scenario });
+            outcomes[option.id] = decided;
+            impact += chances[index] * difference(current, decided);
+            if (valued && chances[index] > 0) {
+              const context = { answers: scenario, question: q, option };
+              const gain = decisionValue(evaluate, { ...context, decision: decided }) - decisionValue(evaluate, { ...context, decision: current });
+              if (!finite(gain)) throw new TypeError("Ask: nonfinite decision gain");
+              expectedGain += chances[index] * gain;
+            }
+          });
+          const distinct = new Set(Object.values(outcomes).map(canonical)).size;
+          const cost = q.cost ?? 0, responseProbability = q.responseProbability ?? 1, value = responseProbability * expectedGain - cost;
+          if (valued && (!finite(expectedGain) || !finite(value))) throw new TypeError("Ask: nonfinite expected decision value");
+          const skippable = impact === 0 || valued && value <= 0;
+          result.push({
+            id: q.id,
+            kind: q.kind ?? "setting",
+            about,
+            impact: Math.round(impact * 1e3) / 1e3,
+            distinct,
+            skippable,
+            reason: impact === 0 ? "no-change" : valued ? value > 0 ? "positive-decision-value" : "no-positive-decision-value" : "changes-decision",
+            outcomes,
+            ...valued ? { basis: "declared-decision-value", expectedGain, responseProbability, cost, value } : {}
+          });
+        }
+        const score = (entry) => valued ? entry.value ?? 0 : entry.impact;
+        return result.map((entry, order) => ({ ...entry, order })).sort((a, b) => score(b) - score(a) || a.order - b.order).map(({ order, ...entry }) => entry);
+      }
+      function choose({ budget = 1, usedToday = 0, ...input } = {}) {
+        if (!Number.isInteger(budget) || budget < 0 || !Number.isInteger(usedToday) || usedToday < 0) throw new TypeError("Ask: invalid budget");
+        const ranked = rank(input);
+        if (usedToday >= budget) return { version: VERSION, status: "none", reason: "budget", ranked };
+        const valued = typeof input.evaluate === "function";
+        const best = ranked.find((entry) => !entry.skippable && (valued ? entry.value > 0 : entry.impact > 0));
+        if (!best) return { version: VERSION, status: "none", reason: valued ? "no-question-has-positive-decision-value" : "no-question-changes-the-decision", ranked };
+        return {
+          version: VERSION,
+          status: "ask",
+          question: input.questions.find((q) => q.id === best.id),
+          impact: best.impact,
+          reason: best.reason,
+          ranked,
+          ...valued ? { value: best.value, basis: best.basis } : {}
+        };
+      }
+      function fromAtlas({ engine, events = [], scope, at, experienceId, candidates, levers = [], questions, ...rest } = {}) {
+        if (!engine || typeof engine.decide !== "function") throw new TypeError("Ask: Core engine required");
+        validate(questions);
+        const byAbout = new Map(questions.map((q) => [q.about ?? q.id, q]));
+        const decide = (answers) => {
+          const extra = [];
+          for (const [about, value] of Object.entries(answers)) {
+            const q = byAbout.get(about);
+            if (!q) continue;
+            const base = { schema: 1, id: `ask-virtual-${q.id}`, scope, at, recordedAt: at };
+            if (q.kind === "confirm") extra.push({ ...base, type: "estimate.responded", line: q.line, value });
+            else extra.push({ ...base, type: "context.set", field: q.field ?? about, value, until: null });
+          }
+          const plan = engine.decide({ events: [...events, ...extra], scope, at, experienceId, candidates, levers });
+          if (plan.status !== "ready") return { content: "unavailable", shape: null };
+          const classes = Object.fromEntries(levers.map((lever) => [lever.id, lever.class]));
+          const content = [plan.selected.id], shape = [];
+          for (const [lever, pick] of Object.entries(plan.bundle)) if (lever !== "mode") (classes[lever] === "content" ? content : shape).push(`${lever}=${pick.option}`);
+          return { content, shape };
+        };
+        return choose({ ...rest, questions, decide });
+      }
+      return Object.freeze({ VERSION, MAX_OPTIONS, KINDS, rank, choose, fromAtlas });
+    });
+  }
+});
+
+// experiences/synk-account/src/member-statement-contract.cjs
+var require_member_statement_contract = __commonJS({
+  "experiences/synk-account/src/member-statement-contract.cjs"(exports, module) {
+    "use strict";
+    var PARSER_VERSION = "member-statement-ko-1";
+    var MEMBER_STATEMENT_LIMITS = Object.freeze({ text: 500, statements: 20, meanings: 8, unresolved: 12 });
+    var VALUES = Object.freeze({
+      support: Object.freeze(["independent", "example", "step", "choose", "together"]),
+      explanation: Object.freeze(["brief", "standard", "detailed"]),
+      "practice-mode": Object.freeze(["listening", "reading", "mixed"]),
+      topic: Object.freeze(["travel-planning", "travel-food", "travel-stay", "career-interview", "career-planning", "content-video", "content-design", "ai-tools", "work-collaboration"])
+    });
+    var LABELS = Object.freeze({
+      independent: "혼자 시도하기",
+      example: "예시를 먼저 보기",
+      step: "단계별 도움",
+      choose: "필요할 때 도움 선택",
+      together: "함께 하기",
+      brief: "짧은 설명",
+      standard: "보통 길이의 설명",
+      detailed: "자세한 설명",
+      listening: "듣기 연습",
+      reading: "읽기 연습",
+      mixed: "듣기와 읽기를 함께",
+      "travel-planning": "여행 일정·동선",
+      "travel-food": "여행지 음식·주문",
+      "travel-stay": "여행지 숙소",
+      "career-interview": "면접 준비",
+      "career-planning": "진로 탐색",
+      "content-video": "영상 제작",
+      "content-design": "디자인 제작",
+      "ai-tools": "AI 도구 활용",
+      "work-collaboration": "업무 협업"
+    });
+    var CONDITIONS = Object.freeze({ "first-try": "처음 시도할 때", familiar: "익숙한 내용일 때", busy: "바쁠 때" });
+    var REASONS = Object.freeze({
+      other: "다른 사람의 이야기여서 본인의 선호로 사용하지 않아요.",
+      past: "과거의 설명을 현재 선호로 바꾸지 않았어요.",
+      hypothetical: "가정한 내용을 현재 선호로 사용하지 않아요.",
+      uncertain: "확실하지 않은 뜻은 확인 가능한 선호로 정하지 않았어요.",
+      quotation: "인용된 말의 주체와 뜻을 분명하게 확인하지 못했어요.",
+      condition: "이 조건의 범위를 정확히 이해하지 못했어요.",
+      unsupported: "이 문장의 뜻을 현재 지원하는 항목으로 정확히 옮기지 못했어요.",
+      limit: "이번에 확인할 수 있는 범위를 넘어 남겨 두었어요.",
+      duplicate: "같은 뜻이 앞의 제안에 이미 포함되어 있어요."
+    });
+    var plain = (x) => x !== null && typeof x === "object" && !Array.isArray(x) && [Object.prototype, null].includes(Object.getPrototypeOf(x));
+    var data = (x, key) => {
+      const d = Object.getOwnPropertyDescriptor(x, key);
+      return d?.enumerable === true && Object.hasOwn(d, "value");
+    };
+    var exact = (x, fields) => plain(x) && Reflect.ownKeys(x).length === fields.length && fields.every((key) => data(x, key));
+    var list = (x, max) => Array.isArray(x) && x.length <= max && Reflect.ownKeys(x).length === x.length + 1 && Array.from({ length: x.length }, (_, i) => data(x, String(i))).every(Boolean);
+    var fail = () => {
+      throw new TypeError("Member statement: invalid confirmed statement");
+    };
+    var literal = (x) => typeof x === "string" && x.trim() && [...x].length <= MEMBER_STATEMENT_LIMITS.text && !/[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f]|[\uD800-\uDFFF]/u.test(x);
+    var instant = (x) => typeof x === "string" && Number.isFinite(Date.parse(x)) && new Date(x).toISOString() === x ? Date.parse(x) : fail();
+    var semanticKey = (m) => [m.field, m.value, m.polarity, m.condition || "general"].join(":");
+    function clauses(text) {
+      const result = [], separators = /\s+(?:하지만|그런데|그리고|반면에)\s+|(?:지만|는데)(?=\s)|[.!?;\n]+/g;
+      let start = 0, match;
+      function push(end) {
+        while (start < end && /\s/u.test(text[start])) start++;
+        while (end > start && /\s/u.test(text[end - 1])) end--;
+        if (end > start) result.push({ start, end, quote: text.slice(start, end) });
+      }
+      while (match = separators.exec(text)) {
+        push(match.index + (/^(?:지만|는데)$/.test(match[0]) ? match[0].length : 0));
+        start = match.index + match[0].length;
+      }
+      push(text.length);
+      return result;
+    }
+    var SUBJECTS = [
+      ["support", "independent", /^(?:혼자(?:서)?(?:하는|해보는|시도하는|시도해보는)?(?:게|것(?:이|은|을)?|걸|건|하기|하길)?)/],
+      ["support", "together", /^(?:같이|함께)(?:하는|해보는|시도하는)?(?:게|것(?:이|은|을)?|걸|건|하기|하길)?/],
+      ["support", "example", /^(?:예시|예제)(?:를|가|는|부터|먼저)?(?:보는(?:게|것)?|보여주는(?:게|것)?)?/],
+      ["support", "step", /^(?:단계별(?:로)?(?:도움|안내|설명)?|차근차근(?:한)?(?:도움|안내|설명)?)/],
+      ["support", "choose", /^필요할때(?:만)?(?:도움(?:을)?(?:받는(?:게|것)?|선택하는(?:게|것)?)?)/],
+      ["explanation", "brief", /^(?:(?:설명(?:은|을)?)?(?:짧게|간단하게)(?:설명(?:하는|해주는)(?:게|것)?)?|(?:짧은|간단한)설명)/],
+      ["explanation", "detailed", /^(?:(?:설명(?:은|을)?)?(?:자세히|길게)(?:설명(?:하는|해주는)(?:게|것)?)?|(?:자세한|긴)설명)/],
+      ["explanation", "standard", /^(?:보통길이(?:의)?설명)/],
+      ["practice-mode", "mixed", /^(?:듣기와읽기(?:를)?함께(?:하는게)?)/],
+      ["practice-mode", "listening", /^(?:듣기(?:연습)?|듣는연습)/],
+      ["practice-mode", "reading", /^(?:읽기(?:연습)?|읽는연습)/],
+      ["topic", "travel-planning", /^(?:여행일정(?:짜기)?|여행동선|여행계획)/],
+      ["topic", "travel-food", /^(?:여행지음식|현지음식|음식주문)/],
+      ["topic", "travel-stay", /^(?:여행지숙소|여행숙소)/],
+      ["topic", "career-interview", /^(?:면접준비|면접)/],
+      ["topic", "career-planning", /^(?:진로탐색|진로계획)/],
+      ["topic", "content-video", /^(?:영상제작|영상만들기|동영상제작)/],
+      ["topic", "content-design", /^(?:디자인제작|디자인)/],
+      ["topic", "ai-tools", /^(?:AI도구(?:활용)?|인공지능도구(?:활용)?)/i],
+      ["topic", "work-collaboration", /^(?:업무협업|업무에서협업)/]
+    ];
+    var positive = /^(?:좋(?:아(?:해(?:요)?|요)?|다|습니다)?|선호(?:해(?:요)?|한다|합니다)|원(?:해(?:요)?|한다|합니다)|필요(?:해(?:요)?|하다|합니다)|(?:하고|받고|보고)싶(?:어(?:요)?|다)|관심(?:이)?있(?:어(?:요)?|다|습니다)|해줘(?:요)?|보고싶(?:어(?:요)?|다))$/;
+    var negative = /^(?:싫(?:어(?:요)?|다|습니다)|좋(?:아하지|지는?|아하진)않(?:아(?:요)?|다|습니다)|선호하지않(?:아(?:요)?|는다|습니다)|원하지않(?:아(?:요)?|는다|습니다)|필요(?:가)?없(?:어(?:요)?|다|습니다)|필요하지않(?:아(?:요)?|다|습니다)|관심(?:이)?없(?:어(?:요)?|다|습니다))$/;
+    function recognize(evidence) {
+      let body = evidence.quote.replace(/\s/gu, "").replace(/(?:지만|는데)$/, "");
+      if (/["“”‘’]/u.test(body) || /(?:라고|다고)(?:했|말|들)/u.test(body)) return { reason: "quotation" };
+      if (/^(?:(?:내|제)?(?:친구|동료|엄마|아빠|어머니|아버지)|그사람|다른사람|그녀|그|너|당신)(?:은|는|이|가)/u.test(body)) return { reason: "other" };
+      if (/(?:것같|듯|모르|아마|어쩌면|일지도|글쎄|수도|싫지않|없지않|않지는않)/u.test(body)) return { reason: "uncertain" };
+      if (/(?:예전|과거|전에는|좋아했|선호했|필요했|원했|했었)/u.test(body)) return { reason: "past" };
+      body = body.replace(/^(?:저는|나는|난|제가|내가|저|나)(?=.)/u, "").replace(/^(?:요즘(?:은|엔)?|지금(?:은|엔)?|현재(?:는)?|평소(?:에는|엔|는)|보통은|일반적으로는)/u, "");
+      let condition = null;
+      const conditions = [["first-try", /^(?:처음(?:에는|엔|은)|처음(?:시도)?할때(?:는)?|처음시도할때(?:는)?)/], ["familiar", /^(?:익숙할때(?:는)?|익숙한내용일때(?:는)?)/], ["busy", /^(?:바쁠때(?:는)?|시간이없을때(?:는)?)/]];
+      for (const [id, pattern] of conditions) if (pattern.test(body)) {
+        condition = id;
+        body = body.replace(pattern, "");
+        break;
+      }
+      if (/(?:만약|라면|다면|으면|한다면|때|땐|바쁠|경우|상황|동안|오늘만|내일만|이번만|퇴근후|출근전)/u.test(body) && !/^필요할때/u.test(body)) return { reason: /(?:만약|라면|다면|으면)/u.test(body) ? "hypothetical" : "condition" };
+      for (const [field, value, pattern] of SUBJECTS) {
+        const match = pattern.exec(body);
+        if (!match) continue;
+        let predicate = body.slice(match[0].length).replace(/^(?:을|를|이|가|은|는|에|엔)/u, "");
+        if (/(?:지만|는데)$/u.test(evidence.quote)) predicate = predicate.replace(/^(필요|선호|원)하$/u, "$1해");
+        const polarity = negative.test(predicate) ? "avoid" : positive.test(predicate) ? "prefer" : null;
+        if (polarity) return { field, value, polarity, condition };
+      }
+      return { reason: condition ? "condition" : "unsupported" };
+    }
+    function parseMemberStatement(text) {
+      if (!literal(text)) fail();
+      const meanings = [], unresolved = [], seen = /* @__PURE__ */ new Set(), pieces = clauses(text);
+      let inherited = null, priorCondition = false, stopped = false;
+      function unresolvedPiece(evidence, reason) {
+        if (unresolved.length === MEMBER_STATEMENT_LIMITS.unresolved - 1 && evidence !== pieces.at(-1)) {
+          unresolved.push({ start: evidence.start, end: text.length, quote: text.slice(evidence.start), reason: "limit", reasonLabel: REASONS.limit });
+          stopped = true;
+        } else unresolved.push({ ...evidence, reason, reasonLabel: REASONS[reason] });
+      }
+      for (let cursor = 0; cursor < pieces.length && !stopped; cursor++) {
+        const evidence = pieces[cursor];
+        const compact = evidence.quote.replace(/\s/gu, "");
+        if (inherited === "other" && /^(?:나는|난|저는|제가|내가)/u.test(compact)) inherited = null;
+        if (inherited === "past" && /^(?:(?:나는|난|저는|제가|내가))?(?:지금|요즘|현재)/u.test(compact)) inherited = null;
+        if (inherited === "condition" && /^(?:(?:나는|난|저는|제가|내가))?(?:평소|보통은|일반적으로)/u.test(compact)) inherited = null;
+        const result = inherited ? { reason: inherited } : recognize(evidence);
+        if (priorCondition && !result.reason && !result.condition && !/^(?:(?:나는|난|저는|제가|내가))?(?:평소|보통은|일반적으로)/u.test(compact)) {
+          unresolvedPiece(evidence, "condition");
+          priorCondition = /(?:지만|는데)$/u.test(compact);
+          continue;
+        }
+        priorCondition = !!result.condition && /(?:지만|는데)$/u.test(compact);
+        if (["other", "past", "hypothetical", "condition", "uncertain", "quotation"].includes(result.reason)) inherited = result.reason;
+        if (result.reason) {
+          unresolvedPiece(evidence, result.reason);
+          continue;
+        }
+        if (meanings.length >= MEMBER_STATEMENT_LIMITS.meanings) {
+          unresolvedPiece(evidence, "limit");
+          continue;
+        }
+        const key = semanticKey(result);
+        if (seen.has(key)) {
+          unresolvedPiece(evidence, "duplicate");
+          continue;
+        }
+        seen.add(key);
+        meanings.push({ id: "p" + meanings.length, ...result, evidence });
+      }
+      return { parserVersion: PARSER_VERSION, meanings, unresolved };
+    }
+    function meaningsConflict(a, b) {
+      if (a.field !== b.field || a.condition !== b.condition) return false;
+      if (a.value === b.value) return a.polarity !== b.polarity;
+      return a.field !== "topic" && a.polarity === "prefer" && b.polarity === "prefer";
+    }
+    function meaningLabel(m) {
+      return `${m.condition ? CONDITIONS[m.condition] + " · " : ""}${m.polarity === "avoid" ? "선호하지 않는 내용" : "원하는 내용"}: ${LABELS[m.value]}`;
+    }
+    function validateMemberStatement(row, { now = Date.now(), enforceTime = false } = {}) {
+      if (!exact(row, ["id", "parserVersion", "text", "at", "confirmedAt", "meanings"]) || typeof row.id !== "string" || !/^[a-f0-9]{8}-[a-f0-9]{4}-[1-8][a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/i.test(row.id) || row.parserVersion !== PARSER_VERSION || !literal(row.text) || !list(row.meanings, MEMBER_STATEMENT_LIMITS.meanings) || !row.meanings.length) fail();
+      const at = instant(row.at), confirmed = instant(row.confirmedAt), cutoff = enforceTime ? typeof now === "string" ? instant(now) : Number.isSafeInteger(now) ? now : fail() : null;
+      if (confirmed < at || enforceTime && confirmed > cutoff) fail();
+      const parsed = parseMemberStatement(row.text), ids = /* @__PURE__ */ new Set(), meanings = row.meanings.map((m) => {
+        if (!exact(m, ["id", "field", "value", "polarity", "condition", "evidence"]) || !exact(m.evidence, ["start", "end", "quote"]) || ids.has(m.id)) fail();
+        ids.add(m.id);
+        const expected = parsed.meanings.find((x) => x.id === m.id);
+        if (!expected) fail();
+        for (const field of ["field", "value", "polarity", "condition"]) if (m[field] !== expected[field]) fail();
+        for (const field of ["start", "end", "quote"]) if (m.evidence[field] !== expected.evidence[field]) fail();
+        return { id: expected.id, field: expected.field, value: expected.value, polarity: expected.polarity, condition: expected.condition, evidence: { ...expected.evidence } };
+      }).sort((a, b) => Number(a.id.slice(1)) - Number(b.id.slice(1)));
+      if (meanings.some((a, i) => meanings.slice(i + 1).some((b) => meaningsConflict(a, b)))) fail();
+      return { id: row.id.toLowerCase(), parserVersion: PARSER_VERSION, text: row.text, at: row.at, confirmedAt: row.confirmedAt, meanings };
+    }
+    module.exports = {
+      PARSER_VERSION,
+      MEMBER_STATEMENT_LIMITS,
+      MEMBER_STATEMENT_VALUES: VALUES,
+      MEMBER_STATEMENT_LABELS: LABELS,
+      MEMBER_STATEMENT_CONDITIONS: CONDITIONS,
+      parseMemberStatement,
+      validateMemberStatement,
+      meaningsConflict,
+      meaningLabel
+    };
+  }
+});
+
+// experiences/synk-account/src/member-statement.cjs
+var require_member_statement = __commonJS({
+  "experiences/synk-account/src/member-statement.cjs"(exports, module) {
+    "use strict";
+    var Interpretation = require_interpretation();
+    var Domain = require_domain();
+    var Conditional = require_conditional_preference();
+    var Ask = require_ask();
+    var Contract = require_member_statement_contract();
+    var {
+      parseMemberStatement,
+      validateMemberStatement,
+      meaningsConflict,
+      meaningLabel,
+      PARSER_VERSION,
+      MEMBER_STATEMENT_VALUES: VALUES,
+      MEMBER_STATEMENT_LABELS: LABELS,
+      MEMBER_STATEMENT_CONDITIONS: CONDITIONS
+    } = Contract;
+    var SCOPE = Object.freeze({ domain: "SYNK", workspace: "member-understanding", subject: "authorized-member" });
+    var CONDITIONAL_SCOPE = Object.freeze({ personId: "authorized-member", productId: "synk-account", contextId: "member-understanding", domain: "SYNK" });
+    var fail = () => {
+      throw new TypeError("Member statement: refresh the interpretation before confirming");
+    };
+    var instant = (x) => typeof x === "string" && Number.isFinite(Date.parse(x)) && new Date(x).toISOString() === x ? Date.parse(x) : fail();
+    var copy = (x) => JSON.parse(JSON.stringify(x));
+    var canonical = (x) => JSON.stringify(x, (_key, v) => v && typeof v === "object" && !Array.isArray(v) ? Object.fromEntries(Object.keys(v).sort().map((key) => [key, v[key]])) : v);
+    var slot = (m) => m.field === "topic" ? `topic.${m.value}.${m.condition || "general"}` : m.polarity === "avoid" ? `avoid.${m.field}.${m.value}.${m.condition || "general"}` : `prefer.${m.field}.${m.condition || "general"}`;
+    var value = (m) => m.field === "topic" ? m.polarity === "prefer" : m.polarity === "avoid" ? true : m.value;
+    var definition = (m) => m.field === "topic" || m.polarity === "avoid" ? { id: slot(m), kind: "boolean", maxAgeDays: 36500 } : { id: slot(m), kind: "enum", values: [...VALUES[m.field]], maxAgeDays: 36500 };
+    var domainContract = (fields) => ({ id: "member-statement", version: "1", purpose: "member-self-understanding", fields, criteria: [] });
+    function packet({ id = "draft", text, at }, asOf) {
+      instant(at);
+      instant(asOf);
+      const parsed = parseMemberStatement(text), fields = new Map(parsed.meanings.map((m) => [slot(m), definition(m)]));
+      return {
+        contract: domainContract([...fields.values()].length ? [...fields.values()] : [{ id: "empty", kind: "boolean", maxAgeDays: 36500 }]),
+        scope: SCOPE,
+        sources: [{ id: "s." + id, scope: SCOPE, at, text, actor: "self" }],
+        proposals: parsed.meanings.map((m) => ({ id: m.id, field: slot(m), value: value(m), subject: "self", stance: "current", evidence: [{ sourceId: "s." + id, ...m.evidence }] })),
+        reviews: [],
+        at: asOf
+      };
+    }
+    function previewMemberStatement({ text, document = null, asOf } = {}) {
+      instant(asOf);
+      const parsed = parseMemberStatement(text), p = packet({ text, at: asOf }, asOf), prepared = Interpretation.prepare(p);
+      const proposals = parsed.meanings.map((m) => {
+        const state = prepared.proposals.find((row) => row.id === m.id), conflict = state.status === "conflict" || parsed.meanings.some((other) => other.id !== m.id && meaningsConflict(m, other));
+        return {
+          ...copy(m),
+          summary: meaningLabel(m),
+          status: conflict ? "conflict" : "pending",
+          confirmable: state.status !== "blocked",
+          reason: conflict ? "conflicting-meanings" : null,
+          reasonLabel: conflict ? "같은 상황에서 함께 적용하기 어려운 뜻이에요. 맞는 뜻만 선택해 주세요." : ""
+        };
+      });
+      const questions = proposals.filter((p2) => p2.status === "conflict").map((p2) => ({
+        id: "clarify." + p2.id,
+        about: "choice." + p2.id,
+        kind: "choice",
+        label: "현재 원하는 뜻을 하나 골라 확인해 주세요.",
+        options: [p2, ...proposals.filter((other) => other.id !== p2.id && meaningsConflict(p2, other))].map((row) => ({ id: row.id, label: row.summary, value: row.id }))
+      })).filter((q) => q.options.length > 1);
+      const question = Ask.choose({ questions, decide: (answers) => Object.entries(answers).sort(), now: asOf });
+      return {
+        version: 1,
+        parserVersion: PARSER_VERSION,
+        text,
+        at: asOf,
+        proposals,
+        unresolved: parsed.unresolved,
+        question: question.status === "ask" ? { id: question.question.id, label: question.question.label, options: question.question.options.map(({ id, label }) => ({ id, label })) } : null
+      };
+    }
+    function replay(row, asOf) {
+      const p = packet(row, asOf), accepted = new Set(row.meanings.map((m) => m.id)), reviews = [];
+      for (const proposal of p.proposals.filter((p2) => !accepted.has(p2.id))) reviews.push(Interpretation.review({ ...p, reviews, id: `r.${row.id}.${proposal.id}`, proposalId: proposal.id, action: "reject", at: row.confirmedAt }));
+      for (const meaning of row.meanings) reviews.push(Interpretation.review({ ...p, reviews, id: `r.${row.id}.${meaning.id}`, proposalId: meaning.id, action: "confirm", at: row.confirmedAt }));
+      return Interpretation.resolve({ ...p, reviews });
+    }
+    function confirmMemberStatement({ preview, acceptedIds, id, at } = {}) {
+      if (!preview || preview.version !== 1 || preview.parserVersion !== PARSER_VERSION || instant(at) < instant(preview.at) || !Array.isArray(acceptedIds) || !acceptedIds.length || acceptedIds.length > 8 || new Set(acceptedIds).size !== acceptedIds.length) fail();
+      const fresh = previewMemberStatement({ text: preview.text, asOf: preview.at });
+      if (canonical(fresh) !== canonical(preview) || acceptedIds.some((id2) => !fresh.proposals.some((p) => p.id === id2 && p.confirmable))) fail();
+      const parsed = parseMemberStatement(preview.text), row = validateMemberStatement({
+        id,
+        parserVersion: PARSER_VERSION,
+        text: preview.text,
+        at: preview.at,
+        confirmedAt: at,
+        meanings: parsed.meanings.filter((m) => acceptedIds.includes(m.id))
+      }, { now: at, enforceTime: true });
+      const result = replay(row, at);
+      if (row.meanings.some((m) => !result.understanding.fields.some((field) => field.id === slot(m) && field.usable && field.value === value(m)))) fail();
+      return row;
+    }
+    function explicitSource(entry) {
+      return { eventId: `statement.${entry.row.id}.${entry.meaning.id}`, source: "explicit", duration: "ongoing", encounterId: "member-understanding", at: entry.row.confirmedAt };
+    }
+    function resolveMemberStatements(statements = [], asOf) {
+      instant(asOf);
+      if (!Array.isArray(statements) || statements.length > 20) fail();
+      const ids = /* @__PURE__ */ new Set(), rows = statements.map((row) => {
+        const checked = validateMemberStatement(row, { now: asOf, enforceTime: true });
+        if (ids.has(checked.id)) fail();
+        ids.add(checked.id);
+        return checked;
+      }).sort((a, b) => a.confirmedAt.localeCompare(b.confirmedAt) || a.id.localeCompare(b.id));
+      const entries = [], fields = /* @__PURE__ */ new Map(), observations = [];
+      for (const row of rows) {
+        const resolved = replay(row, asOf);
+        for (const meaning of row.meanings) {
+          const state = resolved.understanding.fields.find((field) => field.id === slot(meaning));
+          entries.push({ row, meaning, active: false, verified: !!state?.usable });
+          fields.set(slot(meaning), definition(meaning));
+        }
+        observations.push(...resolved.observations);
+      }
+      for (const field of fields.values()) {
+        let state;
+        try {
+          state = Domain.understand({ contract: domainContract([field]), scope: SCOPE, at: asOf, observations: observations.filter((row) => row.field === field.id) }).fields[0];
+        } catch (error) {
+          if (!/ambiguous observation order/.test(error.message)) throw error;
+          continue;
+        }
+        if (!state.usable) continue;
+        const matching = entries.filter((entry) => entry.verified && slot(entry.meaning) === field.id && value(entry.meaning) === state.value);
+        const latest = matching.at(-1);
+        if (latest) latest.active = true;
+      }
+      const currentlyActive = entries.filter((e) => e.active);
+      for (const entry of currentlyActive.filter((e) => e.meaning.field !== "topic")) {
+        const opposite = currentlyActive.filter((e) => e.meaning.field === entry.meaning.field && e.meaning.value === entry.meaning.value && e.meaning.condition === entry.meaning.condition && e.meaning.polarity !== entry.meaning.polarity).at(-1);
+        if (opposite && opposite.row.confirmedAt >= entry.row.confirmedAt) entry.active = false;
+      }
+      return { rows, entries };
+    }
+    function conditionalPair(base, alternative, current, asOf) {
+      const field = alternative.meaning.field, source = explicitSource(base), currentSource = current ? explicitSource(current) : null;
+      const contract = { id: "member-condition", version: "1", purpose: "member-self-understanding", fields: [
+        { id: "preference", kind: "enum", values: [...VALUES[field]] },
+        { id: "candidate", kind: "enum", values: [...VALUES[field]] },
+        { id: "context", kind: "enum", values: ["first-try", "familiar", "busy", "other"] }
+      ], criteria: [] };
+      const rule = {
+        version: Conditional.VERSION,
+        id: `condition.${alternative.row.id}.${alternative.meaning.id}`,
+        scope: CONDITIONAL_SCOPE,
+        field: "preference",
+        feature: "candidate",
+        primary: base.meaning.value,
+        alternative: alternative.meaning.value,
+        when: { field: "context", value: alternative.meaning.condition },
+        target: "baseline",
+        encounterId: "member-understanding",
+        at: alternative.row.confirmedAt,
+        until: null,
+        source
+      };
+      return Conditional.assess({
+        contract,
+        scope: CONDITIONAL_SCOPE,
+        rule,
+        preference: { value: current?.meaning.value ?? null, source: currentSource, usable: current?.active === true, required: false },
+        facts: { candidate: { value: alternative.meaning.value, usable: true }, context: { value: alternative.meaning.condition, usable: true } },
+        encounterId: "member-understanding",
+        at: asOf
+      });
+    }
+    function completePeriods(periods, asOf) {
+      if (!periods || periods.days !== 30 || periods.sufficient !== true || !periods.delta) return false;
+      try {
+        const recent = periods.recent, previous = periods.previous;
+        if (instant(recent.to) - instant(recent.from) !== 30 * 864e5 || instant(previous.to) - instant(previous.from) !== 30 * 864e5 || recent.from !== previous.to || instant(recent.to) > instant(asOf) || recent.answered < 1 || previous.answered < 1) return false;
+        return ["answered", "independent", "assisted", "activeDays"].every((key) => Number.isSafeInteger(recent[key]) && recent[key] >= 0 && Number.isSafeInteger(previous[key]) && previous[key] >= 0 && periods.delta[key] === recent[key] - previous[key]) && [recent, previous].every((p) => p.independent <= p.answered && p.assisted <= p.answered && p.activeDays <= 30);
+      } catch {
+        return false;
+      }
+    }
+    var evidence = (entry) => ({ kind: "statement", ref: `statement.${entry.row.id}.${entry.meaning.id}`, label: [...entry.meaning.evidence.quote].slice(0, 120).join("") });
+    function summarizeStatementRelations({ document, facets, summary, activity, learning, asOf } = {}) {
+      const resolved = resolveMemberStatements(document?.version === 2 ? document.statements : [], asOf), { entries } = resolved, relations = [], coveredFacets = /* @__PURE__ */ new Set();
+      const available = () => true;
+      for (const entry of entries) {
+        const manual = facets.find((f) => f.id === (entry.meaning.field === "topic" ? "topics" : entry.meaning.field))?.override;
+        if (manual && manual.at >= entry.row.confirmedAt) entry.active = false;
+      }
+      const active = entries.filter((e) => e.active), newest = (rows) => [...rows].sort((a, b) => b.row.confirmedAt.localeCompare(a.row.confirmedAt));
+      const add = (kind, id, line, proof, certainty) => relations.push({ id, kind, line, evidence: proof, certainty });
+      for (const alt of newest(active.filter((e) => e.meaning.condition && e.meaning.polarity === "prefer" && e.meaning.field !== "topic"))) {
+        const priorBases = entries.filter((e) => e.verified && available(e) && e.meaning.field === alt.meaning.field && !e.meaning.condition && e.meaning.polarity === "prefer" && e.row.confirmedAt <= alt.row.confirmedAt);
+        const base = priorBases.at(-1), current = active.find((e) => e.meaning.field === alt.meaning.field && !e.meaning.condition && e.meaning.polarity === "prefer");
+        if (!base || base.meaning.value === alt.meaning.value) continue;
+        const assessed = conditionalPair(base, alt, current, asOf);
+        if (assessed.status === "conditional") {
+          add("conditional-preference", `condition.${alt.row.id}.${alt.meaning.id}`, `평소 원하는 방식은 ‘${LABELS[current.meaning.value]}’이고, ${CONDITIONS[alt.meaning.condition]}는 ‘${LABELS[alt.meaning.value]}’를 원한다고 확인했어요. 기본 선호와 그 상황의 도움을 함께 반영했어요.`, [evidence(current), evidence(alt)], "declared");
+          coveredFacets.add(alt.meaning.field);
+        } else if (assessed.status === "inactive" && assessed.reason === "source-changed") {
+          alt.active = false;
+          const changed = current ? `기본 선호가 ‘${LABELS[base.meaning.value]}’에서 ‘${LABELS[current.meaning.value]}’로 바뀌었어요.` : `이전 기본 선호인 ‘${LABELS[base.meaning.value]}’를 현재 선호로 적용하지 않고 있어요.`;
+          const latest = current || newest(active.filter((e) => e.meaning.field === alt.meaning.field && !e.meaning.condition)).at(0);
+          add("conditional-preference", `condition.${alt.row.id}.${alt.meaning.id}`, `${changed} 이전의 ‘${CONDITIONS[alt.meaning.condition]}: ${LABELS[alt.meaning.value]}’ 조건을 지금도 적용할지는 아직 확인하지 않았어요.`, [evidence(base), ...latest ? [evidence(latest)] : [], evidence(alt)], "needs-check");
+        }
+      }
+      for (const entry of newest(entries.filter((e) => e.active && !e.meaning.condition))) {
+        const prior = entries.filter((e) => e !== entry && e.verified && e.meaning.field === entry.meaning.field && e.meaning.condition === null && e.row.confirmedAt < entry.row.confirmedAt && (e.meaning.field !== "topic" || e.meaning.value === entry.meaning.value)).at(-1);
+        if (!prior || prior.meaning.value === entry.meaning.value && prior.meaning.polarity === entry.meaning.polarity) continue;
+        add("preference-change", `change.${entry.row.id}.${entry.meaning.id}`, `앞서 확인한 내용은 ‘${meaningLabel(prior.meaning)}’였고, 이번에는 ‘${meaningLabel(entry.meaning)}’로 알려 줬어요. 다음 설명은 이번 확인을 기준으로 해요.`, [evidence(prior), evidence(entry)], "declared");
+        coveredFacets.add(entry.meaning.field);
+      }
+      const mode = facets.find((f) => f.id === "practice-mode"), declaredMode = newest(entries.filter((e) => e.active && e.meaning.field === "practice-mode" && e.meaning.condition === null)).at(0);
+      const choice = declaredMode ? { value: declaredMode.meaning.value, polarity: declaredMode.meaning.polarity, evidence: evidence(declaredMode) } : mode?.selected.length === 1 && ["listening", "reading"].includes(mode.selected[0]) ? { value: mode.selected[0], polarity: "prefer", evidence: { kind: "selection", ref: "facet.practice-mode", label: "직접 고른 학습 방식" } } : null;
+      if (learning && mode?.claim && choice) {
+        const matches = choice.polarity === "prefer" && choice.value === mode.claim.reference;
+        add("preference-observation", "relationship.practice-mode", `직접 밝힌 내용은 ‘${choice.polarity === "avoid" ? "선호하지 않음: " : ""}${LABELS[choice.value]}’예요. 최근 기록에는 ${LABELS[mode.claim.reference]} 응답이 ${mode.claim.activeDays}일에 걸쳐 ${mode.claim.count}건 있어요. ${matches ? "직접 고른 방식과 반복된 기록이 일치해요." : "기록에 많이 나타난 방식과 현재 원하는 방식을 구분해 반영해요."}`, [choice.evidence, { kind: "observation", ref: "facet.practice-mode", label: mode.evidenceLine.slice(0, 120) }], matches ? "declared" : "needs-check");
+        coveredFacets.add("practice-mode");
+      }
+      const periods = learning ? summary?.practice?.periods : null;
+      const support = newest(entries.filter((e) => e.active && e.meaning.field === "support" && !e.meaning.condition && e.meaning.polarity === "prefer")).at(0);
+      if (support && completePeriods(periods, asOf) && ["independent", "step", "example"].includes(support.meaning.value)) {
+        const key = support.meaning.value === "independent" ? "independent" : "assisted", label = key === "independent" ? "도움 없이 한 응답" : "도움을 받은 응답";
+        add("activity-change", "relationship.practice-period", `현재 ‘${LABELS[support.meaning.value]}’를 원한다고 확인했어요. 같은 길이의 두 기간에서 ${label}은 ${periods.previous[key]}건에서 ${periods.recent[key]}건으로 ${periods.delta[key] === 0 ? "같았어요" : "바뀌었어요"}. 이 차이를 선호의 원인이나 실력 변화로 단정하지 않아요.`, [evidence(support), { kind: "period", ref: "period.practice", label: "동일한 30일 구간의 실제 응답 수" }], "observed");
+      }
+      const proofEntries = (relation) => entries.filter((entry) => relation.evidence.some((item) => item.kind === "statement" && item.ref === `statement.${entry.row.id}.${entry.meaning.id}`));
+      const relationTime = (relation) => proofEntries(relation).map((entry) => entry.row.confirmedAt).sort().at(-1) || "";
+      relations.sort((a, b) => relationTime(b).localeCompare(relationTime(a)));
+      relations.splice(4);
+      coveredFacets.clear();
+      for (const relation of relations) for (const entry of proofEntries(relation)) coveredFacets.add(entry.meaning.field);
+      const statementHistory = [...resolved.rows].reverse().map((row) => ({
+        id: row.id,
+        text: row.text,
+        at: row.confirmedAt,
+        active: entries.some((e) => e.row.id === row.id && e.active),
+        meanings: row.meanings.map((m) => ({ id: m.id, line: meaningLabel(m), condition: m.condition, quote: m.evidence.quote, active: !!entries.find((e) => e.row.id === row.id && e.meaning.id === m.id)?.active }))
+      }));
+      const lineItems = newest(entries.filter((e) => e.active && !coveredFacets.has(e.meaning.field))).map((entry) => ({ line: `직접 확인한 내용은 ‘${meaningLabel(entry.meaning)}’예요.`, at: entry.row.confirmedAt }));
+      const paragraphs = [...relations.map((row) => ({ line: row.line, at: relationTime(row) })), ...lineItems].sort((a, b) => b.at.localeCompare(a.at)).map((row) => row.line).slice(0, 4);
+      return { relations, statementHistory, paragraphs, lines: lineItems.map((row) => row.line), coveredFacets: [...coveredFacets], active: entries.filter((e) => e.active).map((e) => ({ ...copy(e.meaning), at: e.row.confirmedAt, statementId: e.row.id })) };
+    }
+    module.exports = { ...Contract, previewMemberStatement, confirmMemberStatement, resolveMemberStatements, summarizeStatementRelations };
+  }
+});
+
 // atlas/member-understanding.js
 var require_member_understanding = __commonJS({
   "atlas/member-understanding.js"(exports, module) {
@@ -707,6 +1397,7 @@ var require_member_understanding = __commonJS({
     var Contract = require_member_understanding_contract();
     var { memberUnderstandingLine, memberUnderstandingNote, memberUnderstandingActivityReason } = require_vellum();
     var Periods = require_trail_periods();
+    var Statements = require_member_statement();
     var { understandingFacet, validateUnderstandingClaim, validateUnderstandingValues } = Contract;
     var SCOPE = Object.freeze({ domain: "SYNK", workspace: "member-understanding", subject: "authorized-member" });
     var REASONS = Object.freeze({ culture: "한국 문화", travel: "여행", people: "사람들과 대화", life: "한국 생활", study: "학업", work: "일", career: "진로", exam: "시험", hobby: "취미", other: "다른 이유" });
@@ -725,7 +1416,7 @@ var require_member_understanding = __commonJS({
     var semantic = (c) => canonical(Object.fromEntries(["version", "kind", "source", "generation", "reference", "value"].map((key) => [key, c[key]])));
     function documentOf(document, asOf) {
       if (document == null) return { version: 1, reviews: [], overrides: [] };
-      if (!exact(document, ["version", "reviews", "overrides"]) || document.version !== 1) fail();
+      if (![1, 2].includes(document.version) || !exact(document, document.version === 2 ? ["version", "reviews", "overrides", "statements"] : ["version", "reviews", "overrides"])) fail();
       const ids = /* @__PURE__ */ new Set();
       for (const [key, fields] of [["reviews", ["id", "facetId", "verdict", "claim", "note", "at"]], ["overrides", ["id", "facetId", "values", "note", "at"]]]) {
         if (!Array.isArray(document[key]) || document[key].length > 50) fail();
@@ -740,6 +1431,14 @@ var require_member_understanding = __commonJS({
             validateUnderstandingClaim(row.claim, { facetId: row.facetId });
             if (Date.parse(row.claim.to) > Date.parse(row.at)) fail();
           } else validateUnderstandingValues(row.facetId, row.values);
+        }
+      }
+      if (document.version === 2) {
+        if (!Array.isArray(document.statements) || document.statements.length > 20) fail();
+        for (const row of document.statements) {
+          const checked = Statements.validateMemberStatement(row, { now: asOf, enforceTime: true });
+          if (ids.has(checked.id)) fail();
+          ids.add(checked.id);
         }
       }
       return copy(document);
@@ -977,13 +1676,45 @@ var require_member_understanding = __commonJS({
         targets.add(row.targetId);
         return true;
       }).slice(0, 3).map(({ at, ...row }) => row);
+      const synthesis = Statements.summarizeStatementRelations({ document: stored, facets, summary, activity, learning, asOf });
+      const originalFacetLines = new Map(facets.map((facet) => [facet.id, facet.line]));
+      const originalTopics = [...facets.find((facet) => facet.id === "topics").selected];
+      const spokenFields = new Set(synthesis.active.filter((row) => row.condition === null).map((row) => row.field === "topic" ? "topics" : row.field));
+      for (const facet of facets) {
+        const meanings = synthesis.active.filter((row) => row.condition === null && (row.field === "topic" ? "topics" : row.field) === facet.id);
+        if (!meanings.length) continue;
+        const positives = meanings.filter((row) => row.polarity === "prefer"), choices = positives.map((row) => row.value).filter((value) => facet.choices.some((choice) => choice.id === value));
+        const kept = facet.selected.filter((value) => !meanings.some((row) => row.value === value && row.polarity === "avoid"));
+        facet.line = meanings.map((row) => `직접 확인한 내용은 ‘${Statements.meaningLabel(row)}’예요.`).join(" ");
+        if (facet.id === "topics") choices.splice(0, choices.length, .../* @__PURE__ */ new Set([...kept, ...choices]));
+        else if (!positives.length) choices.push(...kept);
+        choices.splice(understandingFacet(facet.id).max);
+        facet.basis = "self-declared";
+        facet.selected = choices;
+        facet.available = true;
+      }
+      const suppressed = new Set([...spokenFields, ...synthesis.coveredFacets].map((id) => originalFacetLines.get(id)));
+      const finalParagraphs = synthesis.paragraphs.length ? [.../* @__PURE__ */ new Set([...synthesis.paragraphs, ...paragraphs.filter((line) => !suppressed.has(line) && !line.startsWith("지금은 자신을 설명할 자료가 충분하지 않아요."))])].slice(0, 4) : paragraphs;
+      const statementTargets = { "career-interview": "path", "career-planning": "path", "content-video": "pulse", "content-design": "pulse", "work-collaboration": "messenger" };
+      const textActivities = [];
+      for (const row of synthesis.active.filter((row2) => row2.field === "topic" && row2.polarity === "prefer" && row2.condition === null)) {
+        const targetId = statementTargets[row.value];
+        if (!targetId || textActivities.some((a) => a.targetId === targetId)) continue;
+        textActivities.push({ targetId, label: targetLabels[targetId], reason: memberUnderstandingActivityReason({ kind: "topic", labels: [Statements.MEMBER_STATEMENT_LABELS[row.value]] }), basis: "self-declared" });
+      }
+      const originalTopicTargets = new Set(originalTopics.map((id) => statementTargets[id]).filter(Boolean));
+      const currentTopicTargets = new Set(facets.find((f) => f.id === "topics").selected.map((id) => statementTargets[id]).filter(Boolean));
+      const appTarget = app.available && app.override ? app.selected[0] : null;
+      const finalActivities = [...textActivities, ...activities.filter((row) => !textActivities.some((a) => a.targetId === row.targetId) && (!spokenFields.has("topics") || !originalTopicTargets.has(row.targetId) || currentTopicTargets.has(row.targetId) || appTarget === row.targetId))].slice(0, 3);
       return {
         version: 1,
         headline: "지금의 기록과 내가 확인한 나",
-        paragraphs,
+        paragraphs: finalParagraphs,
         facets,
         history,
-        activities,
+        activities: finalActivities,
+        relations: synthesis.relations,
+        statementHistory: synthesis.statementHistory,
         limitations: [
           "앱을 연 사실에서 구체적인 취향이나 활동 완료를 추측하지 않아요.",
           "학습에서 다룬 내용과 직접 밝힌 관심을 구분해요. 성격·실력·학습 효과를 단정하지 않아요.",
@@ -991,7 +1722,13 @@ var require_member_understanding = __commonJS({
         ]
       };
     }
-    module.exports = { ...Contract, summarizeMemberUnderstanding };
+    module.exports = {
+      ...Contract,
+      previewMemberStatement: Statements.previewMemberStatement,
+      confirmMemberStatement: Statements.confirmMemberStatement,
+      validateMemberStatement: Statements.validateMemberStatement,
+      summarizeMemberUnderstanding
+    };
   }
 });
 export default require_member_understanding();

@@ -20,7 +20,12 @@ function personalRequestSpec(operation, params = {}, product, resource) {
     if (Buffer.byteLength(state, 'utf8') > LIMITS[resource]) invalid();
     return { path: 'synk-personal', body: { resource, action: 'save', expected_revision: revision(params.expected_revision), state: JSON.parse(state) } };
   }
-  if (operation === 'personalDelete') { keys(['expected_revision']); return { path: 'synk-personal', body: { resource, action: 'delete', expected_revision: revision(params.expected_revision) } }; }
+  if (operation === 'personalDelete') {
+    keys(['expected_revision', ...(resource === 'member-understanding' ? ['document_version'] : [])]);
+    if (Object.hasOwn(params, 'document_version') && ![1, 2].includes(params.document_version)) invalid();
+    return { path: 'synk-personal', body: { resource, action: 'delete', expected_revision: revision(params.expected_revision),
+      ...(Object.hasOwn(params, 'document_version') ? { document_version: params.document_version } : {}) } };
+  }
   if (resource !== 'family-album') invalid();
   if (operation === 'personalAssetPrepare') {
     keys(['kind', 'mime', 'size', 'sha256']);
