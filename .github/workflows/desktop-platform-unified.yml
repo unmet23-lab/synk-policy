@@ -200,6 +200,7 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: platform-unified-qa-win32-x64
+          include-hidden-files: true
           path: |
             .github/desktop-preview/qa-results/win32-x64/report.json
             .github/desktop-preview/qa-results/win32-x64/native-result.json
