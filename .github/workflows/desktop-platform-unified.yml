@@ -1,6 +1,12 @@
 name: SYNK Platform unified Preview
 on:
   workflow_dispatch:
+    inputs:
+      targets:
+        description: Native targets to build (a completed Windows draft can be retained)
+        type: choice
+        options: [all, mac]
+        default: all
 permissions:
   contents: read
 jobs:
@@ -96,15 +102,17 @@ jobs:
             .github/desktop-preview/qa-results/${{ matrix.arch }}/*-process.log
             .github/desktop-preview/unified-out/${{ matrix.arch }}/icon-native/report.json
             .github/desktop-preview/unified-out/${{ matrix.arch }}/icon-native/*.png
-            .github/desktop-preview/qa-results/${{ matrix.arch }}/application-location/**/*.json
-            .github/desktop-preview/qa-results/${{ matrix.arch }}/application-location/**/*.jsonl
-            .github/desktop-preview/qa-results/${{ matrix.arch }}/application-location/**/*.log
+            .github/desktop-preview/qa-results/${{ matrix.arch }}/application-location/report.json
+            .github/desktop-preview/qa-results/${{ matrix.arch }}/application-location/*/done.json
+            .github/desktop-preview/qa-results/${{ matrix.arch }}/application-location/*/events.jsonl
+            .github/desktop-preview/qa-results/${{ matrix.arch }}/application-location/*/process.log
           if-no-files-found: ignore
           retention-days: 14
 # Job fragment: insert `windows` under the unified workflow's existing jobs.
 # Requires unified/tools/verify-windows-startup-native.cjs and the reviewed
 # unified/installer source, tests, fonts, posters, manifest and ICO files.
   windows:
+    if: github.event.inputs.targets != 'mac'
     name: Platform Windows x64
     permissions:
       contents: write

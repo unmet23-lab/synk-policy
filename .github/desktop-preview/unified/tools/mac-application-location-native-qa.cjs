@@ -12,7 +12,7 @@ function command(file,args){const result=cp.spawnSync(file,args,{encoding:'utf8'
 function fixtureMain(){
   const {app,dialog}=require('electron'),fs=require('node:fs'),path=require('node:path');
   const config=require('./config.json'),{createMacApplicationLocationGate}=require('./mac-application-location.cjs');
-  app.setPath('appData',config.profile);app.setPath('userData',path.join(config.profile,'synthetic'));app.setPath('sessionData',path.join(config.profile,'session'));app.setName('SYNK Location QA');app.disableHardwareAcceleration();
+  app.setPath('appData',config.profile);app.setPath('userData',path.join(config.profile,'synthetic'));app.setPath('sessionData',path.join(config.profile,'session'));app.disableHardwareAcceleration();
   const append=value=>fs.appendFileSync(config.events,JSON.stringify({at:new Date().toISOString(),pid:process.pid,...value})+'\n');
   app.on('before-quit',()=>append({event:'before-quit'}));app.on('will-quit',()=>append({event:'will-quit'}));
   app.whenReady().then(async()=>{
@@ -49,13 +49,15 @@ async function run(options){
       const eventFile=path.join(caseRoot,'events.jsonl'),done=path.join(caseRoot,'done.json');
       json(path.join(stage,'package.json'),{name:'synk-location-qa',version:'0.0.0',main:'main.cjs'});json(path.join(stage,'config.json'),{...scenario,profile,events:eventFile,done});fs.writeFileSync(path.join(stage,'mac-application-location.cjs'),helper);fs.writeFileSync(path.join(stage,'main.cjs'),'('+fixtureMain.toString()+')();\n');await asar.createPackage(stage,path.join(resources,'app.asar'));
       const plist=path.join(fixture,'Contents/Info.plist'),executableName=command('/usr/libexec/PlistBuddy',['-c','Print :CFBundleExecutable',plist]);
-      command('/usr/libexec/PlistBuddy',['-c','Set :CFBundleIdentifier im.synk.locationqa.'+runId+'.'+scenario.name,plist]);command('/usr/libexec/PlistBuddy',['-c','Set :CFBundleName SYNKLocationQA-'+runId,plist]);
+      // Preserve CFBundleName: Electron locates its existing Helper bundles by
+      // this name before JavaScript starts. The .app path and ID remain unique.
+      command('/usr/libexec/PlistBuddy',['-c','Set :CFBundleIdentifier im.synk.locationqa.'+runId+'.'+scenario.name,plist]);
       cp.spawnSync('/usr/libexec/PlistBuddy',['-c','Delete :ElectronAsarIntegrity',plist],{encoding:'utf8'});
       command('/usr/bin/codesign',['--force','--deep','--sign','-',fixture]);
       if(scenario.existing){command('/bin/cp',['-cR',fixture,destination]);fs.writeFileSync(path.join(destination,'Contents/Resources/previous-version-marker'),'keep until confirmed');}
       const previousArchive=scenario.existing?sha(fs.readFileSync(path.join(destination,'Contents/Resources/app.asar'))):null;
       const child=cp.spawn(path.join(fixture,'Contents/MacOS',executableName),[],{cwd:caseRoot,stdio:['ignore','pipe','pipe']});let stderr='',stdout='',closed=false;child.stdout.on('data',value=>{stdout+=value;});child.stderr.on('data',value=>{stderr+=value;});child.once('exit',()=>{closed=true;});
-      const expires=Date.now()+50000;while(Date.now()<expires&&!fs.existsSync(done))await sleep(100);
+      const expires=Date.now()+50000;while(Date.now()<expires&&!fs.existsSync(done)){if(closed&&!fs.existsSync(eventFile))break;await sleep(100);}
       if(!fs.existsSync(done)){if(!closed)child.kill('SIGTERM');fs.writeFileSync(path.join(caseRoot,'process.log'),stdout+'\n'+stderr);throw Error('Native location timeout: '+scenario.name);}
       for(let i=0;i<100&&!closed;i++)await sleep(50);
       const result=JSON.parse(fs.readFileSync(done,'utf8')),events=fs.readFileSync(eventFile,'utf8').trim().split('\n').map(JSON.parse),starts=events.filter(value=>value.event==='started'),moved=scenario.status==='in-applications';
