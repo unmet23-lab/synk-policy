@@ -10,8 +10,27 @@ export function bindMemberUnderstandingEditor(root, { controller, getReport } = 
     controller.updateDraft({ note,
       values: [...form.querySelectorAll('[name="insight-choice"]:checked')].map(input => input.value) });
   }
-  const onInput = event => { const form = event.target.closest?.('[data-insight-editor]'); if (form && root.contains(form)) draft(form); };
+  function statementDraft(form) {
+    if (!form) return;
+    const input = form.querySelector('[data-insight-field="statement"]');
+    if (input) {
+      const text = [...input.value].slice(0, 500).join('');
+      if (input.value !== text) input.value = text;
+      controller.updateStatementDraft({ text });
+    }
+    controller.updateStatementDraft({ acceptedIds: [...form.querySelectorAll('[data-insight-proposal]:checked')].map(input => input.dataset.insightProposal) });
+  }
+  const onInput = event => {
+    const statementForm = event.target.closest?.('[data-insight-statement-editor]');
+    if (statementForm && root.contains(statementForm)) { statementDraft(statementForm); return; }
+    const form = event.target.closest?.('[data-insight-editor]'); if (form && root.contains(form)) draft(form);
+  };
   const onSubmit = event => {
+    if (event.target.matches?.('[data-insight-statement-editor]')) {
+      event.preventDefault(); event.stopPropagation(); statementDraft(event.target);
+      if (controller.read().statementEditor?.stage === 'preview') void controller.confirmStatement(); else controller.previewStatement();
+      return;
+    }
     if (!event.target.matches?.('[data-insight-editor]')) return;
     event.preventDefault(); event.stopPropagation(); draft(event.target); void controller.save();
   };
@@ -33,6 +52,14 @@ export function bindMemberUnderstandingEditor(root, { controller, getReport } = 
       const row = current?.history?.find(item => item.id === button.dataset.insightId && item.kind === button.dataset.insightKind);
       if (row) void controller.remove({ kind: row.kind, id: row.id, facetId: row.facetId });
     } else if (action === 'understanding-clear') void controller.clear();
+    else if (action === 'understanding-describe') controller.describe();
+    else if (action === 'understanding-preview') { statementDraft(button.closest('[data-insight-statement-editor]')); controller.previewStatement(); }
+    else if (action === 'understanding-edit-text') controller.editStatementText();
+    else if (action === 'understanding-confirm-statement') { statementDraft(button.closest('[data-insight-statement-editor]')); void controller.confirmStatement(); }
+    else if (action === 'understanding-remove-statement') {
+      const row = current?.statementHistory?.find(item => item.id === button.dataset.insightId);
+      if (row) void controller.removeStatement({ id: row.id });
+    }
   };
   root.addEventListener('click', onClick, true);
   root.addEventListener('input', onInput);
@@ -44,7 +71,7 @@ export function bindMemberUnderstandingEditor(root, { controller, getReport } = 
 export function captureMemberUnderstandingFocus(container) {
   const active = container.ownerDocument.activeElement;
   if (!active || !container.contains(active)) return () => {};
-  const attributes = ['id', 'data-insight-action', 'data-insight-facet', 'data-insight-verdict', 'data-insight-kind', 'data-insight-id', 'data-insight-target', 'data-insight-field', 'name', 'value'];
+  const attributes = ['id', 'data-insight-action', 'data-insight-facet', 'data-insight-verdict', 'data-insight-kind', 'data-insight-id', 'data-insight-target', 'data-insight-field', 'data-insight-proposal', 'name', 'value'];
   const keys = attributes.map(key => [key, active.getAttribute(key)]).filter(([, value]) => value !== null);
   const start = active.selectionStart, end = active.selectionEnd;
   return () => {

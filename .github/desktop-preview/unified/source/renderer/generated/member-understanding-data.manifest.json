@@ -1,9 +1,10 @@
 {
   "version": 1,
   "entry": "experiences/synk-account/src/member-understanding-data.mjs",
-  "sha256": "176a40f4550f2227ff85faf93893d45a8100572315165b04741bef75443a16bb",
+  "sha256": "beea71ca7d096825d5e6a260badb9f234c57eda78913537ecf866d986942919e",
   "sources": {
     "atlas/member-understanding-contract.js": "5abde8c31c430662b3995e5505beea986e85aa890d83efd58cfe0f994af0f5a3",
-    "experiences/synk-account/src/member-understanding-data.mjs": "2230620d2f8ea12e20756ac0db25f73610644bc50484ec677911ea0228aac3f1"
+    "experiences/synk-account/src/member-statement-contract.cjs": "80af2773ef8f5870c8342dc8c6658d81dd0519fadbff5b80f3ad95295b9ea823",
+    "experiences/synk-account/src/member-understanding-data.mjs": "9cecf978f4ab6b1fe9ca59859fa27127788cbe9ac2d991db4d691252aea231e0"
   }
 }

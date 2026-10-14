@@ -1,11 +1,13 @@
 import { emptyMemberUnderstanding, validateMemberUnderstanding, updateMemberUnderstanding } from './generated/member-understanding-data.mjs';
+import MemberUnderstanding from './generated/member-understanding.mjs';
+const { previewMemberStatement, confirmMemberStatement } = MemberUnderstanding;
 
 // The host owns identity. Only explicitly submitted corrections are persisted;
 // editor drafts and account-bound response snapshots stay in memory.
 export function createMemberUnderstanding({ getIdentity, request, now = Date.now, uuid = () => crypto.randomUUID(), timeoutMs = 12000 } = {}) {
   let binding = '', epoch = 0, queue = Promise.resolve(), stopped = false;
   let document = null, revision = 0, status = 'unavailable', pending = 0;
-  let editor = null, editToken = 0, message = '', error = null;
+  let editor = null, statementEditor = null, editToken = 0, message = '', error = null;
   const listeners = new Set();
   const clone = value => value === null ? null : structuredClone(value);
   const identity = () => { const v = getIdentity?.() || {}; return { ...v, accountId: v.accountId || v.account?.synk_user_id }; };
@@ -19,14 +21,15 @@ export function createMemberUnderstanding({ getIdentity, request, now = Date.now
     const owner = identity(), next = key(owner);
     if (next !== binding) {
       binding = next; epoch++; queue = Promise.resolve(); document = null; revision = 0;
-      status = signed(owner) ? 'loading' : 'unavailable'; pending = 0; editor = null; editToken++; message = ''; error = null;
+      status = signed(owner) ? 'loading' : 'unavailable'; pending = 0; editor = null; statementEditor = null; editToken++; message = ''; error = null;
     }
     return owner;
   }
   function read() {
     sync();
     const draft = editor ? { facetId: editor.facetId, mode: editor.mode, verdict: editor.verdict, values: [...editor.values], note: editor.note, facet: clone(editor.facet) } : null;
-    return { status, document: clone(document), revision, pending: pending > 0, editor: draft, message, error };
+    const statementDraft = statementEditor ? { text: statementEditor.text, preview: clone(statementEditor.preview), acceptedIds: [...statementEditor.acceptedIds], stage: statementEditor.stage } : null;
+    return { status, document: clone(document), revision, pending: pending > 0, editor: draft, statementEditor: statementDraft, message, error };
   }
   function emit() { if (!stopped) { const value = read(); for (const fn of listeners) fn(value); } }
   const current = (owner, token) => !stopped && token === epoch && owner === key(identity()) && signed(identity());
@@ -64,9 +67,10 @@ export function createMemberUnderstanding({ getIdentity, request, now = Date.now
       try { await work(owner, token); }
       catch (failure) {
         if (current(owner, token)) {
-          error = failure?.code === 'UNDERSTANDING_CONFLICT' ? 'conflict' : 'save-failed';
+          error = failure?.code === 'UNDERSTANDING_CONFLICT' ? 'conflict' : failure?.code === 'PERSONAL_DOCUMENT_VERSION_CONFLICT' ? 'version-conflict' : 'save-failed';
           if (!document) status = 'error';
           message = error === 'conflict' ? '다른 곳에서 이 내용을 바꿨어요. 최신 내용을 확인한 뒤 다시 수정해 주세요.'
+            : error === 'version-conflict' ? '저장 형식이 업데이트됐어요. 최신 플랫폼에서 다시 열어 주세요.'
             : mutation ? '저장하지 못했어요. 입력한 내용은 그대로 있으니 다시 시도해 주세요.' : '확인·수정한 내용을 불러오지 못했어요. 다시 불러와 주세요.';
         }
       } finally { if (current(owner, token)) { if (mutation) pending--; emit(); } }
@@ -104,6 +108,7 @@ export function createMemberUnderstanding({ getIdentity, request, now = Date.now
   function begin({ facetId, mode = 'review', verdict = 'agree', claim = null, values = [], facet = null } = {}) {
     sync(); if (stopped || status !== 'ready' || pending || !['review', 'override'].includes(mode) || !['agree', 'disagree', 'contextual'].includes(verdict)) return false;
     const previous = entry(document, mode, facetId);
+    statementEditor = null;
     editor = { facetId, mode, verdict, claim: clone(claim), values: [...values], note: previous?.note || '', expected: clone(previous), facet: clone(facet) };
     editToken++; message = ''; error = null; emit(); return true;
   }
@@ -126,22 +131,100 @@ export function createMemberUnderstanding({ getIdentity, request, now = Date.now
     if (!previous || previous.id !== id) { error = 'conflict'; message = '내용이 바뀌었어요. 최신 확인·수정 내역을 살펴봐 주세요.'; emit(); return Promise.resolve(read()); }
     return mutate({ type: 'remove-' + kind, facetId }, clone(previous));
   }
+  function describe() {
+    sync(); if (stopped || status !== 'ready' || pending) return false;
+    editor = null; statementEditor = { text: '', preview: null, acceptedIds: [], stage: 'writing', baseline: clone(document) };
+    editToken++; message = ''; error = null; emit(); return true;
+  }
+  function updateStatementDraft({ text, acceptedIds } = {}) {
+    sync(); if (!statementEditor || pending) return false;
+    let changed = false;
+    if (typeof text === 'string' && text !== statementEditor.text) {
+      statementEditor.text = [...text].slice(0, 500).join(''); statementEditor.preview = null;
+      statementEditor.acceptedIds = []; statementEditor.stage = 'writing'; statementEditor.submission = null;
+      changed = true;
+    }
+    if (Array.isArray(acceptedIds) && statementEditor.preview) {
+      const allowed = new Set(statementEditor.preview.proposals.filter(p => p.confirmable).map(p => p.id));
+      const selected = [...new Set(acceptedIds)].filter(id => allowed.has(id));
+      if (!same(selected, statementEditor.acceptedIds)) { statementEditor.acceptedIds = selected; statementEditor.submission = null; changed = true; }
+    }
+    if (changed) emit();
+    return true;
+  }
+  function previewStatement() {
+    sync(); if (!statementEditor || pending) return false;
+    try {
+      statementEditor.preview = previewMemberStatement({ text: statementEditor.text, document, asOf: new Date(now()).toISOString() });
+      statementEditor.acceptedIds = []; statementEditor.stage = 'preview'; statementEditor.submission = null;
+      error = null; message = '';
+    } catch { error = 'interpretation'; message = '해석할 내용을 확인해 주세요. 500자 안에서 현재 원하는 방식을 적어 주세요.'; }
+    emit(); return error === null;
+  }
+  function editStatementText() {
+    sync(); if (!statementEditor || pending) return false;
+    statementEditor.preview = null; statementEditor.acceptedIds = []; statementEditor.stage = 'writing'; statementEditor.submission = null;
+    error = null; message = ''; emit(); return true;
+  }
+  function mutateStatement(action, expected, expectedEditor = null, baseline = null) {
+    return enqueue(async (owner, token) => {
+      for (let attempt = 0; attempt < 2; attempt++) {
+        await load(owner, token); if (!current(owner, token)) throw new Error('changed');
+        const targetId = action.type === 'statement' ? action.value.id : action.id;
+        const previous = document.statements?.find(row => row.id === targetId) || null;
+        const alreadySaved = action.type === 'statement' && same(previous, action.value);
+        if (!alreadySaved && !same(previous, expected)) throw conflict();
+        // Preserve concurrent statements: never silently supersede a change made
+        // after this user opened the interpretation preview.
+        if (!alreadySaved && baseline && !same(document.statements || [], baseline.statements || [])) throw conflict();
+        if (!alreadySaved) {
+          const next = updateMemberUnderstanding(document, action, now());
+          try {
+            const saved = await call('understandingSave', { state: next, expected_revision: revision }, owner, token);
+            if (!current(owner, token)) throw new Error('changed');
+            document = saved.document; revision = saved.revision; status = 'ready';
+          } catch (failure) {
+            if (attempt === 0 && ['REVISION_CONFLICT', 'PERSONAL_REVISION_CONFLICT'].includes(failure.code)) continue;
+            throw failure;
+          }
+        }
+        if (expectedEditor !== null && expectedEditor === editToken) statementEditor = null;
+        error = null; message = action.type === 'remove-statement' ? '이 해석의 반영을 되돌렸어요. 기존 기록은 그대로예요.' : '확인한 해석을 저장했어요. 다음 분석에도 이 뜻을 반영해요.';
+        return;
+      }
+    }, true);
+  }
+  function confirmStatement() {
+    sync(); if (!statementEditor?.preview || pending) return Promise.resolve(read());
+    let value;
+    try {
+      value = statementEditor.submission || confirmMemberStatement({ preview: statementEditor.preview, acceptedIds: statementEditor.acceptedIds, id: uuid(), at: new Date(now()).toISOString() });
+    } catch { error = 'interpretation'; message = '반영할 해석을 선택해 주세요. 같은 상황의 서로 다른 뜻은 하나만 고를 수 있어요.'; emit(); return Promise.resolve(read()); }
+    statementEditor.submission = clone(value);
+    return mutateStatement({ type: 'statement', value, replaceId: null }, null, editToken, clone(statementEditor.baseline));
+  }
+  function removeStatement({ id } = {}) {
+    sync(); if (status !== 'ready' || pending) return Promise.resolve(read());
+    const previous = document.statements?.find(row => row.id === id);
+    if (!previous) return Promise.resolve(read());
+    return mutateStatement({ type: 'remove-statement', id }, clone(previous));
+  }
   function clear() {
     sync(); if (status !== 'ready' || pending) return Promise.resolve(read());
     const expected = clone(document);
     return enqueue(async (owner, token) => {
       await load(owner, token); if (!current(owner, token)) throw new Error('changed'); if (!same(document, expected)) throw conflict();
       // Delete advances the existing revision even when no correction exists.
-      const saved = await call('understandingDelete', { expected_revision: revision }, owner, token);
+      const saved = await call('understandingDelete', { expected_revision: revision, document_version: document.version }, owner, token);
       if (!current(owner, token)) throw new Error('changed');
-      document = saved.document; revision = saved.revision; status = 'ready'; editor = null; editToken++; error = null; message = '확인·수정한 내용을 모두 지웠어요. 원래 이용·학습 기록은 그대로예요.';
+      document = saved.document; revision = saved.revision; status = 'ready'; editor = null; statementEditor = null; editToken++; error = null; message = '확인·수정한 내용을 모두 지웠어요. 원래 이용·학습 기록은 그대로예요.';
     }, true);
   }
-  return Object.freeze({ read, begin, updateDraft, save, remove, clear,
-    refresh: () => enqueue(async (owner, token) => { await load(owner, token); if (!current(owner, token)) throw new Error('changed'); if (!editor) { message = ''; error = null; } }),
+  return Object.freeze({ read, begin, updateDraft, save, remove, clear, describe, updateStatementDraft, previewStatement, editStatementText, confirmStatement, removeStatement,
+    refresh: () => enqueue(async (owner, token) => { await load(owner, token); if (!current(owner, token)) throw new Error('changed'); if (!editor && !statementEditor) { message = ''; error = null; } }),
     subscribe(fn) { listeners.add(fn); return () => listeners.delete(fn); },
-    cancel() { sync(); if (!pending) { editor = null; editToken++; message = ''; error = null; emit(); } },
-    hide() { epoch++; binding = ''; document = null; revision = 0; status = 'unavailable'; pending = 0; editor = null; editToken++; message = ''; error = null; queue = Promise.resolve(); },
-    stop() { stopped = true; epoch++; document = null; editor = null; listeners.clear(); },
+    cancel() { sync(); if (!pending) { editor = null; statementEditor = null; editToken++; message = ''; error = null; emit(); } },
+    hide() { epoch++; binding = ''; document = null; revision = 0; status = 'unavailable'; pending = 0; editor = null; statementEditor = null; editToken++; message = ''; error = null; queue = Promise.resolve(); },
+    stop() { stopped = true; epoch++; document = null; editor = null; statementEditor = null; listeners.clear(); },
   });
 }
