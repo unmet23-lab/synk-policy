@@ -1,18 +1,19 @@
 {
   "version": 1,
   "entry": "atlas/member-understanding.js",
-  "sha256": "fa31a5c4e8933f04fc7ae64cdff5b3b9d70b86f1656856ffdd6d105d7c37b887",
+  "sha256": "cd6df33bbb1388ec06bf043501d5554387094a64504d594bc5dce17ebc037e3a",
   "sources": {
     "atlas/ask.js": "5366b49994c61991e46d9b171547b534243120f2ba63cc48f3aa8297eae3d0dd",
     "atlas/conditional-preference.js": "6b814ec429c7a29643f958b6cb09ef4efc96f22913d3e873dbb095f8f09e3d4e",
     "atlas/domain.js": "950ae931d129fe5c4aebc4900aad20cf491012d4f997146e27626634fc8fe64f",
     "atlas/interpretation.js": "ac43c5d2ee96ee2b24b7c39cde23b8bcb73089c76ce40a794dc1ea013a5d5f8e",
     "atlas/member-understanding-contract.js": "5abde8c31c430662b3995e5505beea986e85aa890d83efd58cfe0f994af0f5a3",
-    "atlas/member-understanding.js": "ba4606d3b2c3fda73a9689f1187e9537333ebfdac43b885df2a02215530f65e0",
+    "atlas/member-understanding.js": "7ee24262e112779ef3c10f35b34f5b85dcc1b06ee3f11c52b3bc0620ee6f1548",
     "atlas/trail-periods.js": "4ec4419d3abe982bcc300993d4bba5dd2dd27b1174aca5c6d9bf3621171df637",
     "atlas/vellum.js": "e4d115b58a6ca985c84a10e5695e996969d6fde48e20a6f8fc8fc12229b84b90",
-    "experiences/synk-account/src/member-statement-contract.cjs": "7e26a5dd658f02951ea7ff3fe302e8992f1d547f07e76fda30e693a3cb37c220",
+    "experiences/synk-account/src/member-statement-contract.cjs": "8eadd4133d3474150d577c6b4e86286ed6370030956bccbdbfb248883d15f271",
     "experiences/synk-account/src/member-statement-v1.cjs": "80af2773ef8f5870c8342dc8c6658d81dd0519fadbff5b80f3ad95295b9ea823",
-    "experiences/synk-account/src/member-statement.cjs": "1455f504854863b481e2765cd4e18ba86134783cb6f14ddd5238edda922b5337"
+    "experiences/synk-account/src/member-statement-v2.cjs": "7e26a5dd658f02951ea7ff3fe302e8992f1d547f07e76fda30e693a3cb37c220",
+    "experiences/synk-account/src/member-statement.cjs": "c0b406d14b0718846094de415a3c0db88ea6eb34e8931e8f3bdd57a2586b1817"
   }
 }

@@ -11,7 +11,8 @@ const verdictLabels = new Map([['agree', '맞아요'], ['disagree', '달라요']
 const facetId = value => typeof value === 'string' && /^(?:topics|support|explanation|usage-repeat|practice-mode|practice-response|learning-topic:[A-Za-z0-9][A-Za-z0-9_.-]{0,79})$/.test(value);
 const personalFacets = new Set(['topics', 'support', 'explanation', 'usage-repeat']);
 const conditionLabels = new Map([['first-try', '처음 시도할 때'], ['familiar', '익숙한 내용일 때'], ['busy', '바쁠 때'],
-  ['after-example', '예시를 본 다음'], ['first-try-after-example', '처음 시도하며 예시를 본 다음'], ['familiar-after-example', '익숙한 내용의 예시를 본 다음'], ['busy-after-example', '바쁠 때 예시를 본 다음']]);
+  ['after-example', '예시를 본 다음'], ['first-try-after-example', '처음 시도하며 예시를 본 다음'], ['familiar-after-example', '익숙한 내용의 예시를 본 다음'], ['busy-after-example', '바쁠 때 예시를 본 다음'],
+  ['meeting', '회의할 때'], ['teamwork', '함께 일할 때'], ['planning', '계획을 세울 때'], ['decision', '결정할 때']]);
 const evidenceLabels = new Map([['statement', '내가 확인한 서술'], ['selection', '직접 고른 내용'], ['observation', '실제 이용 기록'], ['period', '기간별 기록']]);
 const safeId = value => typeof value === 'string' && /^[A-Za-z0-9_.:-]{1,120}$/.test(value);
 const arrow = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5m6-6-6 6 6 6"/></svg>';
@@ -141,7 +142,7 @@ function statementPanel(report, state) {
   const source = typeof editor.text === 'string' ? [...editor.text].slice(0, 500).join('') : '';
   const preview = editor.stage === 'preview' && editor.preview?.text === source
     && JSON.stringify(editor.preview.clarifications || []) === JSON.stringify(editor.clarifications || []) ? editor.preview : null;
-  if (!preview) return `<form class="mi-understanding-editor mi-statement-editor" data-insight-statement-editor aria-label="내 말로 설명 고치기"${busy ? ' aria-busy="true"' : ''}><h3 tabindex="-1" data-insight-editor-title>내 말로 설명 고치기</h3><label class="mi-note-label">나에 대해 알려 주세요 <span>500자 이내</span><textarea data-insight-field="statement" name="insight-statement" maxlength="1000" rows="5" placeholder="예: 혼자 하는 게 좋아요. 처음에는 예시가 필요해요."${busy ? ' disabled' : ''}>${escape(source)}</textarea></label><p>적은 내용에서 이해한 뜻을 먼저 보여드려요. 다음 설명에는 직접 확인한 해석만 반영해요.</p><div class="mi-editor-actions">${understandingAction('preview', busy ? '확인 중…' : '해석 미리보기', {}, busy || !source.trim(), true)}${understandingAction('cancel', '취소', {}, busy)}</div></form>`;
+  if (!preview) return `<form class="mi-understanding-editor mi-statement-editor" data-insight-statement-editor aria-label="내 말로 설명 고치기"${busy ? ' aria-busy="true"' : ''}><h3 tabindex="-1" data-insight-editor-title>내 말로 설명 고치기</h3><label class="mi-note-label">나에 대해 알려 주세요 <span>500자 이내</span><textarea data-insight-field="statement" name="insight-statement" maxlength="1000" rows="5" placeholder="예: 회의에서는 다른 사람의 의견을 듣고 정리하는 편이에요."${busy ? ' disabled' : ''}>${escape(source)}</textarea></label><p>배우는 방식, 소통과 일 처리 방식, 관심사를 적어 주세요. 이해한 뜻을 먼저 보여드리고, 직접 확인한 해석만 다음 설명에 반영해요.</p><div class="mi-editor-actions">${understandingAction('preview', busy ? '확인 중…' : '해석 미리보기', {}, busy || !source.trim(), true)}${understandingAction('cancel', '취소', {}, busy)}</div></form>`;
   const proposals = list(preview.proposals).filter(row => safeId(row.id) && ['prefer', 'avoid'].includes(row.polarity) && (row.condition === null || conditionLabels.has(row.condition)) && ['pending', 'conflict'].includes(row.status) && typeof row.confirmable === 'boolean').slice(0, 8);
   const accepted = new Set(Array.isArray(editor.acceptedIds) ? editor.acceptedIds : []);
   const selected = proposals.filter(row => row.confirmable === true && accepted.has(row.id));

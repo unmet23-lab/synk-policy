@@ -162,7 +162,7 @@ function understandingOf({ accountSummary, activity, document, status, asOf }) {
     const statementHistory = uniqueRows(value.statementHistory === undefined ? [] : value.statementHistory, 20).map(row => {
       if (typeof row.active !== 'boolean') invalid();
       const meanings = uniqueRows(row.meanings, 8).map(meaning => {
-        if (typeof meaning.active !== 'boolean' || ![null, 'first-try', 'familiar', 'busy', 'after-example', 'first-try-after-example', 'familiar-after-example', 'busy-after-example'].includes(meaning.condition)) invalid();
+        if (typeof meaning.active !== 'boolean' || ![null, 'first-try', 'familiar', 'busy', 'after-example', 'first-try-after-example', 'familiar-after-example', 'busy-after-example', 'meeting', 'teamwork', 'planning', 'decision'].includes(meaning.condition)) invalid();
         return { id: meaning.id, line: unicodeText(meaning.line, 300), condition: meaning.condition, quote: unicodeText(meaning.quote, 500), active: meaning.active };
       });
       const answers = row.clarificationAnswers === undefined ? [] : row.clarificationAnswers;
