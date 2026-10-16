@@ -1,0 +1,111 @@
+{
+  "repository": "unmet23-lab/synk-policy",
+  "version": "0.4.23",
+  "buildId": "20261016.6",
+  "sourceHash": "077145ac68b90a78790b9f6a875d6efb374cfce2682f002c4107afe54fe1dafa",
+  "nativeRun": {
+    "id": 38876867551,
+    "head_sha": "3e9425a6aeb7c1aea9516f1574352a10f634288d",
+    "run_attempt": 1,
+    "workflow_id": 383884644,
+    "status": "completed",
+    "conclusion": "success",
+    "event": "workflow_dispatch",
+    "path": ".github/workflows/desktop-platform-unified.yml"
+  },
+  "targets": [
+    {
+      "target": "win32-x64",
+      "job": {
+        "id": 116893908015,
+        "name": "Platform Windows x64",
+        "started_at": "2026-10-16T08:54:56Z",
+        "completed_at": "2026-10-16T08:57:57Z",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      "artifacts": [
+        {
+          "kind": "metadata",
+          "id": 12035159226,
+          "name": "platform-unified-metadata-win32-x64",
+          "digest": "sha256:8844d46f0083b607b6fe979b530f178a5e88beb48a8563112b1ff9c2fa4da59c",
+          "size_in_bytes": 11682,
+          "created_at": "2026-10-16T08:57:52Z",
+          "expired": false
+        },
+        {
+          "kind": "qa",
+          "id": 12035433817,
+          "name": "platform-unified-qa-win32-x64",
+          "digest": "sha256:fb65e86120048c101b24a5047d3469d3d525f54801373f1aaf8e2670142f0e27",
+          "size_in_bytes": 52477665,
+          "created_at": "2026-10-16T08:57:54Z",
+          "expired": false
+        }
+      ]
+    },
+    {
+      "target": "arm64",
+      "job": {
+        "id": 116893908189,
+        "name": "Platform macOS arm64",
+        "started_at": "2026-10-16T08:55:01Z",
+        "completed_at": "2026-10-16T08:58:38Z",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      "artifacts": [
+        {
+          "kind": "metadata",
+          "id": 12035354157,
+          "name": "platform-unified-metadata-arm64",
+          "digest": "sha256:fee44b87368556328bfce628142fffe74eed9cadab67f558f8858e868ec3c07e",
+          "size_in_bytes": 2381,
+          "created_at": "2026-10-16T08:58:33Z",
+          "expired": false
+        },
+        {
+          "kind": "qa",
+          "id": 12035822570,
+          "name": "platform-unified-qa-arm64",
+          "digest": "sha256:550196e8b3ab7778bc76ff5a831991cc9fa98adaf3821e79b3778a95d3c04017",
+          "size_in_bytes": 3543511,
+          "created_at": "2026-10-16T08:58:35Z",
+          "expired": false
+        }
+      ]
+    },
+    {
+      "target": "x64",
+      "job": {
+        "id": 116893908185,
+        "name": "Platform macOS x64",
+        "started_at": "2026-10-16T08:54:57Z",
+        "completed_at": "2026-10-16T09:06:29Z",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      "artifacts": [
+        {
+          "kind": "metadata",
+          "id": 12036730493,
+          "name": "platform-unified-metadata-x64",
+          "digest": "sha256:d72ba6ffcedf1a55e865237ddb34007696dbe5731af13a436f94f4067f395920",
+          "size_in_bytes": 2379,
+          "created_at": "2026-10-16T09:06:19Z",
+          "expired": false
+        },
+        {
+          "kind": "qa",
+          "id": 12036730500,
+          "name": "platform-unified-qa-x64",
+          "digest": "sha256:8667564beda19c9277927fd3e1dbc4702bfbacd99212cf45eb1c29d985f18773",
+          "size_in_bytes": 4339338,
+          "created_at": "2026-10-16T09:06:20Z",
+          "expired": false
+        }
+      ]
+    }
+  ]
+}
