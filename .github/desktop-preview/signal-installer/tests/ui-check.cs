@@ -28,7 +28,7 @@ internal static class SignalUiCheck
             string version = product.Id == "world" ? "0.4.1" : product.Id == "messenger" ? "0.4.0" : "0.4.3";
             string folder = product.Id == "world" ? "SYNKWorldPreview" : product.Id == "messenger" ? "SYNKMessengerPreview" : "SYNKPlatformPreview";
             SignalWindow window = new SignalWindow(fonts, version, product);
-            window.SetInstallLocation(@"C:\Users\q1212\AppData\Local\Programs\" + folder, (product.Id == "platform" ? 3L : 1L) * 1024 * 1024 * 1024);
+            window.SetInstallLocation(@"C:\Users\Example\AppData\Local\Programs\" + folder, (product.Id == "platform" ? 3L : 1L) * 1024 * 1024 * 1024);
             FrameworkElement surface = (FrameworkElement)window.Content;
             HashSet<string> renderedFonts = new HashSet<string>();
             Action<string> render = delegate(string state) {
