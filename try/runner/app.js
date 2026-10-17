@@ -1,4 +1,3 @@
-import { recordTrialStarted } from '/social-conversion.js';
 // 바람길 — 화면과 흐름. 판정·코스는 core.js, 3D 펠트 길은 world.js, 좌표 기준은 course-motion.js, 학습 기록 연결은 learning.js(아틀라스).
 // 한 판: 90초. 바람이 짧은 한국어 부탁(방향·동작·하지 말라는 말·두 동작의 순서)을 하면 표시선 전에 그대로 움직인다(←·→·점프·숙이기).
 // 달리는 중에는 부탁의 글을 보이지 않는다 — ‘글로 보기’를 누르면 그 부탁만 보이고 도움으로 남는다. 목소리를 틀 수 없으면 달리기를 멈춘다
@@ -11,9 +10,13 @@ import { KeyboardInput, KEY_ACTIONS } from './controls.js';
 import { InstructionAudio } from './audio.js';
 import { instructionMetadata, chooseInstruction, actionEvidence, FLOW_RUN, TIRED_RUN, FLOW_WORDS, paceOf, runObservation } from './learning.js';
 import { mountListeningCheck } from './listening-check-ui.js';
-import { scoreRun, skillReport, skillOf, SKILL_LABEL, STEP_WORD } from './report.js';
+import { scoreRun, skillReport, skillOf, SKILL_LABEL, STEP_WORD } from './report.js?v=runner-listening-scope-20261014';
 import { drawHeroRoad } from './hero.js';
 import { preloadImages } from './kit/lab.js';
+import {runnerSupport,obstacleSupport,runnerCheckSupport} from './shared/brand-opening/game-tutor-support.js';
+
+let gameTutor=null;
+const tutorEvent=(kind,detail)=>gameTutor?.emit(kind,detail);
 
 // Restore the verified account before reading progress or enabling play.
 await globalThis.SynkPlayAccount.ready();
@@ -26,6 +29,12 @@ const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&l
 const announce = (text) => { const n = byId('sr-live'); n.textContent = ''; requestAnimationFrame(() => { n.textContent = text; }); };
 const punch = (node) => { if (!node || reduced()) return; node.classList.remove('punch'); void node.offsetWidth; node.classList.add('punch'); };
 const meters = (n) => `${Math.floor(n).toLocaleString('ko-KR')}m`;
+// ── WORLD 안(2026-10-14 3차): world-host.js가 붙인 data-host=world일 때만 쓰는 장면·문구·소리·결과 한 장.
+// LAB 단독 화면은 이 분기를 하나도 타지 않는다(r2/games/standalone-proof.cjs로 계산 스타일·DOM·캔버스 픽셀 차이 0 확인).
+const WORLD = document.documentElement?.dataset?.host === 'world';
+const wt = (lab, world) => (WORLD ? world : lab);   // 보이는 글: LAB 그대로 · WORLD 새 문구
+let worldSound = null;   // 공통 소리·진동·연출 스위치(brand-opening/world-sound.js) — WORLD 안에서만 불러오고, 못 불러오면 조용히 넘어간다
+if (WORLD) import('../brand-opening/world-sound.js').then((m) => { worldSound = m; m.bindTaps(document); }).catch(() => {});
 // 공통 코인 스크립트(collection.js)를 읽지 못했으면 코인 줄을 숨긴다(모듈은 본문 끝 스크립트 뒤에 돈다).
 if (!globalThis.SynkPlayCollection) for (const n of document.querySelectorAll('.synk-collection-line')) n.hidden = true;
 
@@ -108,10 +117,12 @@ const qa = { scale: 1, auto: false, plan: [] };
 
 function show(id) {
   screen = id;
+  if(id==='lobby')tutorEvent('lobby');
   for (const s of ['lobby', 'game', 'results']) byId(s).hidden = s !== id;
   document.body.classList.toggle('playing', id === 'game');
   window.scrollTo(0, 0);
-  if (id === 'lobby') requestAnimationFrame(() => drawHeroRoad(byId('hero-road')));
+  if (id === 'lobby' && !WORLD) requestAnimationFrame(() => drawHeroRoad(byId('hero-road')));   // WORLD 입구는 펠트 사진 인화지(그림 캔버스는 숨김)
+  if (id === 'lobby' && WORLD) requestAnimationFrame(lobbyMotion);
   if (id === 'game') requestAnimationFrame(() => world?.resize());
 }
 const dialogs = ['pause-dialog', 'audio-dialog'];
@@ -138,7 +149,7 @@ function syncToggles() {
     if (t.hasAttribute('data-sound-label')) t.textContent = sound ? '소리 켜짐' : '소리 꺼짐';
     else t.setAttribute('aria-label', sound ? '소리 끄기' : '소리 켜기');
   }
-  byId('resume').querySelector('span').textContent = sound ? '이어 하기' : '소리 켜고 이어 하기';
+  byId('resume').querySelector('span').textContent = sound ? wt('이어 하기', '이어서 하기') : '소리 켜고 이어 하기';
   byId('pause-copy').textContent = sound ? '바람과 목소리가 함께 멈췄어요. 이어 하면 멈춘 곳부터 다시 들려요.' : '바람길은 소리를 듣고 달려요. 이어 하면 소리가 켜지고 멈춘 곳부터 이어서 들려요.';
   byId('sound-note').hidden = sound;
 }
@@ -152,7 +163,7 @@ function setSound(value) {
 /* ── 한 판 ── */
 function ensureWorld() {
   if (!worldReady) {
-    worldReady = import('./world.js?v=performance-20261012').then(({ createWorld }) => createWorld(byId('world'), { reduced }))
+    worldReady = import('./world.js').then(({ createWorld }) => createWorld(byId('world'), { reduced, theme: WORLD ? 'world' : 'lab' }))
       .then((w) => { world = w; return w; })
       .catch((e) => { worldReady = null; throw e; });
   }
@@ -163,7 +174,7 @@ async function start() {
   if (starting || listeningCheck.open) return;
   starting = true; running = false; paused = false; ending = false; model = null;
   keyboard.reset(); cancelVoice(); setSound(true); closeDialogs(); document.activeElement?.blur?.();   // 초점이 단추에 남으면 Space(점프)가 그 단추를 누른다
-  show('game'); resetRunUI(); world?.clear(); tip('바람을 부르고 있어요…', 0, { silent: true });
+  show('game'); resetRunUI(); world?.clear(); tip(wt('바람을 부르고 있어요…', '길을 준비하고 있어요'), 0, { silent: true });
   try {
     const [, voices] = await Promise.all([ensureWorld(), ensureVoices()]);
     if (!voices) { starting = false; tip(null); audioFault(() => start()); return; }
@@ -180,9 +191,10 @@ async function start() {
   world.clear(); world.resize(); world.resetFrameBudget(); updateHud(true);
   lastFrame = performance.now();
   const opening = (() => { try { return live?.intro().line?.text || null; } catch { return null; } })();
-  tip(opening || '바람이 길을 알려 줘요. 잘 듣고 움직여요!', 2600);
+  tip(opening || wt('바람이 길을 알려 줘요. 잘 듣고 움직여요!', '바람이 말한 대로 움직여요'), 2600);
   announce('한국어 부탁을 듣고 바람길을 달려요. 왼쪽·오른쪽 화살표로 길을 바꾸고, 위는 점프, 아래는 숙이기예요.');
   starting = false;
+  tutorEvent('playing');
   recordTrialStarted();
 }
 
@@ -206,23 +218,26 @@ function closeUnanswered() {
 
 function handle(n) {
   switch (n.type) {
-    case 'instruction': showInstruction(n.mission); break;
+    case 'instruction': showInstruction(n.mission); tutorEvent('listening'); break;
     case 'stepResult': renderSteps(n.mission); break;
     case 'step': world?.light(n.step); SFX.step(); sparkle(); break;
     case 'correct': {
       const rec = model.answers[resolvedSeen++]; if (rec) rec.texted = !!n.mission.texted;
-      recordAction(n.mission, true); sayDone(n.mission); SFX.correct();
-      popText(model.combo >= 3 ? `좋아요! 연속 ${model.combo}` : '좋아요!', 'ok', model.combo);
+      recordAction(n.mission, true); sayDone(n.mission);
+      if (WORLD && worldSound) worldSound.verdict(true); else SFX.correct();   // WORLD: 판정 소리는 공통 verdict 하나(겹치지 않게)
+      tutorEvent('success',{answer:true});
+      popText(model.combo >= 3 ? wt(`좋아요! 연속 ${model.combo}`, `연속 ${model.combo}`) : wt('좋아요!', '좋아요'), 'ok', model.combo);
       punch(byId('g-combo-wrap')); break;
     }
     case 'wrong': {
       const rec = model.answers[resolvedSeen++]; if (rec) rec.texted = !!n.mission.texted;
-      recordAction(n.mission, false); sayMissed(n.mission, n.record || rec); break;
+      if (WORLD) worldSound?.verdict(false);
+      recordAction(n.mission, false); sayMissed(n.mission, n.record || rec); tutorEvent('retry',{answer:true,support:runnerSupport(n.record||rec)}); break;
     }
-    case 'earnedShield': shields += 1; SFX.shield(); setTimeout(() => { if (running && !model?.finished) popText('바람막!', 'shield'); }, 520);
-      if (shields === 1) tip('세 번 연속! 바람막이 한 번은 부딪혀도 지켜 줘요.', 2600); break;
-    case 'shield': world?.knock(model); SFX.block(); popText('막았어요!', 'shield'); break;
-    case 'hit': world?.knock(model); SFX.bump(); popText('쿵!', 'bump'); punch(byId('g-guard')); break;
+    case 'earnedShield': shields += 1; SFX.shield(); setTimeout(() => { if (running && !model?.finished) popText(wt('바람막!', '바람막'), 'shield'); }, 520);
+      if (shields === 1) tip(wt('세 번 연속! 바람막이 한 번은 부딪혀도 지켜 줘요.', '세 번 연속이에요. 바람막이 한 번 부딪혀도 막아 줘요.'), 2600); break;
+    case 'shield': world?.knock(model); SFX.block(); popText(wt('막았어요!', '막았어요'), 'shield'); break;
+    case 'hit': world?.knock(model); SFX.bump(); popText(wt('쿵!', '쿵'), 'bump'); punch(byId('g-guard')); tutorEvent('retry',{reason:'obstacle',support:n.mission?[]:obstacleSupport(n.obstacle)}); break;
     case 'jump': SFX.jump(); break;
     case 'slide': SFX.slide(); break;
     case 'finish': finish(); break;
@@ -245,7 +260,7 @@ function sayShow(m) {
 }
 function sayPhase(p) {
   say.dataset.phase = p;
-  if (p === 'move' && !say.classList.contains('texted')) byId('say-line').textContent = '들은 대로 움직여요!';
+  if (p === 'move' && !say.classList.contains('texted')) byId('say-line').textContent = wt('들은 대로 움직여요!', '들은 대로 움직여요');
 }
 function sayText(m) {
   say.classList.add('texted'); byId('say-line').textContent = `“${m.text}”`; byId('say-text').hidden = true; placeTip();
@@ -254,7 +269,7 @@ function sayText(m) {
 function sayDone(m) {
   clearTimeout(sayTimer);
   say.dataset.phase = 'done'; say.classList.remove('texted');
-  byId('say-line').textContent = '좋아요!';
+  byId('say-line').textContent = wt('좋아요!', '맞아요');
   byId('say-hint').textContent = m.steps.length > 1 ? '두 동작 모두 해냈어요. 등불이 켜졌어요.' : '해냈어요. 등불이 켜졌어요.';
   byId('say-text').hidden = true; renderSteps(m); placeTip();
   sayTimer = setTimeout(sayHide, reduced() ? 1600 : 1300);
@@ -263,7 +278,7 @@ function sayDone(m) {
 function sayMissed(m, record) {
   clearTimeout(sayTimer);
   say.dataset.phase = 'missed'; say.classList.remove('texted', 'soon');
-  byId('say-tag').textContent = '이렇게 부탁했어요';
+  byId('say-tag').textContent = wt('이렇게 부탁했어요', '이렇게 말했어요');
   byId('say-line').textContent = `“${m.text}”`;
   const steps = record?.steps || m.steps, timingOnly = steps.every((s) => s.status === 'done' || s.status === 'timing') && steps.some((s) => s.status === 'timing');
   const hint = byId('say-hint'); hint.textContent = '';
@@ -375,11 +390,13 @@ function pause() {
   paused = true; keyboard.reset(); gesture = null; voiceBank?.pause().catch(() => {});
   world?.resetFrameBudget();
   openDialog('pause-dialog'); announce('잠깐 멈췄어요.');
+  tutorEvent('paused');
 }
 function audioFault(retry) {
   retryAudio = retry;
   if (running) { paused = true; keyboard.reset(); voiceBank?.pause().catch(() => {}); }
   openDialog('audio-dialog');
+  tutorEvent('paused');
 }
 async function resume() {
   if (!running || !model || model.finished || resuming) return;
@@ -388,6 +405,7 @@ async function resume() {
     if (!await ensureVoices()) { audioFault(resume); return; }
     if (pendingInstruction) { if (!voiceBank.play(pendingInstruction)) { audioFault(resume); return; } pendingInstruction = null; }
     closeDialogs(); document.activeElement?.blur?.(); lastFrame = performance.now(); world?.resetFrameBudget(); paused = false;
+    tutorEvent('playing');
   } catch { audioFault(resume); } finally { resuming = false; }
 }
 function home() {
@@ -410,20 +428,24 @@ function finish() {
   ending = true; refreshRecommendation();
   const completed = model.reason === 'tour', distance = Math.floor(model.distance), newBest = distance > best;
   if (newBest) { best = distance; store('best', best); }
-  SFX.finish(); popText(completed ? '도착!' : '여기까지!', 'end');
-  renderResults({ completed, distance, newBest });
+  if (!WORLD) SFX.finish();   // WORLD: 끝 소리는 결과 한 장이 나올 때 공통 'reward'/'done' 한 번
+  const snap = WORLD ? world?.snapshot?.(model) : null;   // WORLD: 그 판의 마지막 장면 한 장(결과의 인화지)
+  popText(completed ? wt('도착!', '도착') : wt('여기까지!', '여기까지'), 'end');
+  renderResults({ completed, distance, newBest, quiet: WORLD });
+  if (WORLD) worldResults(snap, completed);
+  tutorEvent('finish',{completed});
   announce(`달리기 끝. ${distance}미터, 부탁 ${model.correct}개를 해냈어요.`);
-  setTimeout(() => { if (ending && screen === 'game') { ending = false; show('results'); byId('r-title').focus({ preventScroll: true }); } }, reduced() ? 700 : 1500);
+  setTimeout(() => { if (ending && screen === 'game') { ending = false; show('results'); if (WORLD) worldArrive(completed); byId('r-title').focus({ preventScroll: true }); } }, reduced() || WORLD ? 700 : 1500);
 }
 
-function renderResults({ completed, distance, newBest }) {
+function renderResults({ completed, distance, newBest, quiet = false }) {
   const s = scoreRun(model.answers, { completed });
   byId('r-kicker').textContent = newBest && best > 0 ? `바람길 · 새 최고 거리 ${meters(distance)}` : `바람길 · 90초`;
   byId('r-title').textContent = completed ? '도착!' : '여기까지 왔어요!';
   byId('r-correct').textContent = String(s.correct); byId('r-total').textContent = String(s.total);
   byId('r-stars').innerHTML = [1, 2, 3].map((i) => `<i class="${i <= s.stars ? 'on' : ''}"></i>`).join('');
   byId('r-stars').setAttribute('aria-label', `별 3개 중 ${s.stars}개`);
-  for (let i = 0; i < s.stars; i++) tone([523.25, 659.26, 783.99][i], 0.22, 'sine', 0.2, 0.5 + i * 0.22);
+  if (!quiet) for (let i = 0; i < s.stars; i++) tone([523.25, 659.26, 783.99][i], 0.22, 'sine', 0.2, 0.5 + i * 0.22);   // WORLD(quiet): 끝 소리는 공통 'reward'/'done' 한 번
   byId('r-mongle').src = s.stars >= 2 ? 'kit/brand/mongle-cheer.webp' : 'kit/brand/mongle-smile.webp';
   const notes = [`달린 거리 ${meters(distance)}`, `최고 연속 ${model.maxCombo}번`];
   if (shields) notes.push(`바람막 ${shields}번`);
@@ -433,7 +455,7 @@ function renderResults({ completed, distance, newBest }) {
   // 공통 코인: 끝까지 마친 판에 완주 15 + 해낸 비율 × 10(다른 게임과 같은 규칙). 부딪혀 멈춘 판·그만둔 판은 받지 않는다.
   const coinRound = collectionRoundId; collectionRoundId = null;
   const coins = byId('r-coins'); coins.textContent = '공통 코인을 계산하고 있어요.';
-  const award = globalThis.SynkPlayCollection?.award({ game: 'runner', total: s.total, correct: s.correct, completed, automatic: false, roundId: coinRound });
+  const award = globalThis.SynkPlayCollection?.award({ game: 'runner', total: s.total, correct: s.correct, completed, automatic: false, roundId: coinRound, metrics: { bestCombo: model.maxCombo } });
   if (award) award.then((result) => { coins.textContent = globalThis.SynkPlayCollection.rewardText(result); });
   else coins.textContent = '';
   // 이번 달리기의 부탁(지난 순서). 해낸 것은 펠트 체크, 다시 들을 것은 크림 원에 번호. 다시 듣기는 MP3 그대로
@@ -452,6 +474,11 @@ function renderResults({ completed, distance, newBest }) {
   });
   byId('r-log-note').textContent = s.timing ? `동작은 맞았지만 표시선에서 조금 이르거나 늦은 곳 ${s.timing}개는 ‘타이밍 놓침’으로 남겼어요.` : '';
   byId('r-log-note').hidden = !s.timing;
+  renderResultLearning(s);
+}
+// Listening checks can add evidence after this run ended. Refresh only the
+// learning report and next plan; the run's score, replay list and award stay put.
+function renderResultLearning(s) {
   renderSkills(s);
   byId('r-next-reason').textContent = learningBroken() ? '학습 기록을 저장할 수 없어서 다음에도 기본 부탁으로 달려요.'
     : `${nextPlan?.reason || '아직 안 들어 본 부탁부터 준비해요.'} 다음 달리기에는 그런 부탁을 먼저 넣어요.`;
@@ -473,6 +500,103 @@ async function preview(item) {
   if (revision !== previewRevision || screen !== 'results') return;
   if (!voiceBank.play(item)) toast('목소리를 틀지 못했어요. 다시 듣기를 한 번 더 눌러 주세요.');
 }
+/* ── WORLD 안: 입구 문구 · 결과 한 장(마지막 장면 인화지 + 오늘 들은 말 셋 + 다시 들어 볼 말 하나 + 얻은 것 + 흰 알약 「우리 동네로」) ── */
+const WORLD_COPY = [
+  ['#lobby .hero-copy>.kicker', '01 · LISTEN & RUN'],
+  ['#lobby .hero .lede', '들은 말대로 90초 동안 달려요'],
+  ['#lobby .hero .sub', '바람이 한국어로 짧게 말하면 그대로 움직여요. 왼쪽·오른쪽으로 길을 바꾸고, 울타리는 뛰어넘고, 표지판 아래로는 숙여서 지나가요.'],
+  ['.start-card>.tag', 'UP NEXT'],
+  ['#start>span', '달리기 시작'],
+  ['#how-title', '하는 법'],
+  ['.how-steps li:nth-child(1) strong', '듣기'],
+  ['.how-steps li:nth-child(1) span', '바람이 짧게 말해요. 글은 숨겨 두고, 꼭 필요할 때만 ‘글로 보기’를 눌러요.'],
+  ['.how-steps li:nth-child(2) strong', '움직이기'],
+  ['.how-steps li:nth-child(2) span', '왼쪽·오른쪽으로 길을 바꾸고, 울타리는 점프, 표지판은 숙이기. ‘하지 마세요’와 두 동작의 순서도 들어요.'],
+  ['.how-steps li:nth-child(3) strong', '끝까지 달리기'],
+  ['.how-steps li:nth-child(3) span', '해낸 부탁마다 등불이 켜져요. 세 번 연속이면 바람막이 한 번 막아 줘요.'],
+  ['.how .world-only', '휴대폰은 아래 단추나 화면 밀기, 컴퓨터는 방향키(A·D·W·S, 점프는 Space)로 움직여요. Esc를 누르면 멈춰요.'],
+  ['.lobby-foot>p:nth-child(1)', 'TOPIK I 듣기의 짧은 지시(방향·동작·하지 말라는 말·순서)를 몸으로 연습해요. 성공 수는 TOPIK 급수와 상관없어요.'],
+  ['.lobby-foot>p:nth-child(2)', '달리기 동작은 화면을 보고도 할 수 있어서 듣기 기록에 넣지 않아요. 기록은 ‘듣기 확인’에서 끝까지 듣고 고른 답만 남아요.'],
+  ['#back-home', '게임 처음으로'],
+  ['#restart>span', '다시 달리기'],
+  ['#result-listening-check', '듣기 확인'],
+  ['.log>.tag', '오늘 들은 말'],
+];
+/* ── WORLD 움직임(10-17 유호님 「시안에 있는 움직임 전부」): 입구 큰 글자는 아래에서 한 자씩 솟고, 90은 굴러 멈추고,
+   운동화 인화지는 몇 초마다 달릴 듯 들썩이고(world-skin.css), 시작 알약엔 빛이 스치고, 누르면 쏙 들어갔다 통 튀어나온다.
+   WORLD 「움직임 줄이기」(부모 문서 data-motion)와 기기 「동작 줄이기」에서는 모두 멈춘다. 이 게임 폴더는 혼자 서야 해서 WORLD 모듈을 가져오지 않는다. */
+function worldMotion() {
+  let parentReduced = false; try { parentReduced = window.parent !== window && window.parent.document.documentElement.dataset.motion === 'reduced'; } catch {}
+  const on = !reduced() && !parentReduced; document.documentElement.dataset.motion = on ? 'full' : 'reduced'; return on;
+}
+function lobbyMotion() {
+  if (!worldMotion()) return;
+  const title = document.querySelector('#lobby .hero h1');
+  if (title && !title.querySelector('.w-pop')) { const text = title.textContent; title.setAttribute('aria-label', text); title.textContent = ''; for (const ch of text) { const s = document.createElement('span'); s.className = 'w-pop'; s.setAttribute('aria-hidden', 'true'); s.textContent = ch; title.append(s); } }
+  title?.querySelectorAll('.w-pop').forEach((s, i) => s.animate([{ opacity: 0, transform: 'translateY(70%) scaleY(.45)', fontWeight: 400 }, { opacity: 1, transform: 'translateY(-9%) scaleY(1.1)', offset: .55, fontWeight: 900 }, { transform: 'translateY(2%) scaleY(.96)', offset: .8 }, { transform: 'none', fontWeight: 900 }], { duration: 700, delay: 380 + i * 110, easing: 'cubic-bezier(.25,.9,.3,1)', fill: 'backwards' }));
+  const lede = document.querySelector('#lobby .hero .lede');
+  if (lede) { const text = lede.textContent; lede.textContent = ''; let k = 0; for (const part of text.split(/(\d+)/)) { if (!/^\d+$/.test(part)) { lede.append(part); continue; } for (const ch of part) { const d = document.createElement('span'); d.className = 'w-roll'; d.style.setProperty('--d', ch); const t = document.createElement('span'); t.className = 'w-roll-t'; t.textContent = ch; const strip = document.createElement('i'); strip.setAttribute('aria-hidden', 'true'); strip.style.setProperty('--rd', `${700 + k * 120}ms`); strip.style.setProperty('--rt', `${1100 + k * 160}ms`); d.append(t, strip); lede.append(d); k++; } } }
+}
+function bindPressWorld(selector) {
+  let held = null;
+  document.addEventListener('pointerdown', e => { const b = e.target.closest?.(selector); if (!b || b.disabled || document.documentElement.dataset.motion !== 'full') return; held?.a?.cancel(); held = { b, a: b.animate([{ transform: 'scale(1)' }, { transform: 'scale(.93)' }], { duration: 110, easing: 'ease-out', fill: 'forwards' }) }; });
+  const up = () => { if (!held) return; const { b, a } = held; held = null; b.animate([{ transform: 'scale(.93)' }, { transform: 'scale(1.05)', offset: .45 }, { transform: 'scale(.985)', offset: .75 }, { transform: 'scale(1)' }], { duration: 480, easing: 'cubic-bezier(.3,.7,.3,1)' }); a.cancel(); };
+  for (const t of ['pointerup', 'pointercancel']) document.addEventListener(t, up);
+}
+function setupWorld() {
+  for (const [sel, text] of WORLD_COPY) { const n = document.querySelector(sel); if (n) n.textContent = text; }
+  worldMotion(); bindPressWorld('#start,#listening-check,#w-room,#restart');
+  document.querySelector('.start-card>.tag')?.classList.add('w-mono');
+  byId('moves').dataset.sound = 'none';   // 움직이기 키는 게임 소리(점프·숙이기)가 맡는다 — 단추 탭 소리는 겹치지 않게 뺀다
+  const hero = document.querySelector('.res-hero');
+  const snap = document.createElement('figure'); snap.className = 'w-snap'; snap.hidden = true;
+  snap.innerHTML = '<img alt="이번 달리기의 마지막 장면" width="320" height="400">'; hero.append(snap);
+  const gain = document.querySelector('.res-hero .synk-collection-line');   // 얻은 것(공통 코인)은 목록 아래 한 줄로
+  if (gain) { gain.classList.add('w-gain'); document.querySelector('.res-grid .log').after(gain); }
+  const more = document.createElement('button'); more.type = 'button'; more.className = 'text-link w-more'; more.hidden = true;
+  more.addEventListener('click', () => { const log = document.querySelector('.res-grid .log'); const all = log.classList.toggle('w-all'); more.textContent = all ? '접기' : more.dataset.label; });
+  document.querySelector('.res-grid .log').append(more);
+  const bar = document.createElement('div'); bar.className = 'w-room-bar';
+  bar.innerHTML = '<button id="w-room" class="felt-cta w-room" type="button"><span>우리 동네로</span><i class="disc" aria-hidden="true"></i></button>';
+  bar.firstChild.addEventListener('click', backToRoom); byId('results').append(bar);
+  if (!byId('lobby').hidden) requestAnimationFrame(lobbyMotion);
+}
+/** 결과 → 우리 동네: WORLD 홈이 동네로 돌아가기(goTown)를 알면 그걸 부르고, 아니면 게임 창의 닫기(#panel-close)를 누른다(같은 출처 틀). 닿지 않으면 게임 입구로. */
+function backToRoom() {
+  cancelVoice();
+  try { const town = window.parent?.__synkHome?.goTown; if (town) { town(); return; } const close = window.parent?.document?.getElementById('panel-close'); if (close) { close.click(); return; } } catch { /* 다른 출처 */ }
+  home();
+}
+function worldResults(snap, completed) {
+  byId('r-title').textContent = completed ? '바람길, 끝!' : '여기까지 달렸어요';
+  const fig = document.querySelector('.res-hero .w-snap'), hero = document.querySelector('.res-hero');
+  if (fig) { fig.hidden = !snap; if (snap) fig.querySelector('img').src = snap; hero.classList.toggle('has-snap', !!snap); }
+  // 오늘 들은 말: 해낸 것 셋 + 다시 들어 볼 것 하나만 먼저 보인다(나머지는 「전체 보기」)
+  const log = byId('r-log'), items = [...log.children].filter((li) => li.matches('li.ok,li.ko'));
+  let picked = 0;
+  for (const li of items) if (li.classList.contains('ok') && picked < 3) { li.classList.add('w-pick'); picked += 1; }
+  const again = items.find((li) => li.classList.contains('ko'));
+  if (again) {
+    again.classList.add('w-again');
+    const label = document.createElement('li'); label.className = 'w-again-label'; label.setAttribute('aria-hidden', 'true'); label.textContent = '다시 들어 볼 말';
+    again.before(label); log.append(label, again);
+  }
+  const hidden = items.length - picked - (again ? 1 : 0), more = document.querySelector('.w-more');
+  document.querySelector('.res-grid .log')?.classList.remove('w-all');
+  if (more) { more.dataset.label = `전체 ${items.length}개 보기`; more.textContent = more.dataset.label; more.hidden = hidden <= 0; }
+}
+/** 결과가 나올 때 한 번: 첫 완주만 200ms 페이드 + 'reward', 그 뒤는 'done'. 「보상 연출」을 끄면 연출 없이 결과만. */
+function worldArrive(completed) {
+  const ws = worldSound;
+  if (!ws?.getPref || !ws.getPref('celebrate')) return;
+  const key = 'synk.world.first-finish.runner';
+  let first = false;
+  if (completed) { try { first = !localStorage.getItem(key); if (first) localStorage.setItem(key, '1'); } catch { first = false; } }
+  if (first && !reduced()) { const r = byId('results'); r.classList.remove('w-arrive'); void r.offsetWidth; r.classList.add('w-arrive'); }
+  ws.play(first ? 'reward' : 'done'); ws.haptic?.('done');
+}
+if (WORLD) setupWorld();
+
 byId('restart').addEventListener('click', () => { cancelVoice(); start(); });
 byId('result-home').addEventListener('click', () => { cancelVoice(); home(); });
 byId('start').addEventListener('click', () => start());
@@ -503,7 +627,9 @@ byId('world').addEventListener('pointerup', (e) => {
   const value = Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? 'right' : 'left') : dy > 0 ? 'slide' : 'jump';
   action(value); flash(value);
 });
-byId('world').addEventListener('pointercancel', () => { gesture = null; });
+function cancelGesture(e) { if (!e || gesture?.id === e.pointerId) gesture = null; }
+byId('world').addEventListener('pointercancel', cancelGesture);
+byId('world').addEventListener('lostpointercapture', cancelGesture);
 stageEl.addEventListener('contextmenu', (e) => e.preventDefault());
 document.addEventListener('visibilitychange', () => { if (document.hidden && running && !paused && model && !model.finished) pause(); });
 window.addEventListener('blur', () => { keyboard.reset(); if (running && !paused && model && !model.finished) pause(); });
@@ -519,10 +645,17 @@ byId('learning-reset').addEventListener('click', () => {
   catch (error) { if (error?.code !== 'ACCOUNT_RESET_REQUIRED') learningFailed = true; }
   renderLobby();
 });
-const listeningCheck = mountListeningCheck({ coach, beforeOpen: () => { if (running && !model?.finished) return false; cancelVoice(); return true; } });
+function closeListeningCheck() {
+  if (screen === 'results' && model?.finished) {
+    refreshRecommendation();
+    renderResultLearning(scoreRun(model.answers, { completed: model.reason === 'tour' }));
+  }
+  tutorEvent('lobby');
+}
+const listeningCheck = mountListeningCheck({ coach, beforeOpen: () => { if (running && !model?.finished) return false; cancelVoice(); return true; },onListen:()=>tutorEvent('listening'),onFeedback:(correct,detail)=>tutorEvent(correct?'success':'retry',{answer:true,support:!correct&&detail?runnerCheckSupport(detail.item,detail.choice,detail.feedback):[]}),onClose:closeListeningCheck });
 
 let resizeT = 0;
-window.addEventListener('resize', () => { clearTimeout(resizeT); resizeT = setTimeout(() => { if (screen === 'lobby') drawHeroRoad(byId('hero-road')); placeTip(); }, 140); });
+window.addEventListener('resize', () => { cancelGesture(); clearTimeout(resizeT); resizeT = setTimeout(() => { if (screen === 'lobby') drawHeroRoad(byId('hero-road')); placeTip(); }, 140); });
 // 입구에서 펠트 그림과 3D 무대를 미리 받아 둔다(시작 단추를 누른 뒤 기다림이 짧게)
 preloadImages(['tex-cream', 'tex-coral', 'badge-cream', 'badge-check', 'badge-coral', 'sparkle', 'cushion-blush-strip', 'cushion-butter-strip', 'cushion-lapis-strip'].map((n) => `kit/felt/${n}.webp`));
 (window.requestIdleCallback || ((fn) => setTimeout(fn, 700)))(() => { ensureWorld().catch(() => { /* 시작할 때 다시 시도하고 안내한다 */ }); }, { timeout: 2500 });
@@ -580,3 +713,10 @@ if (QA) {
     summary: () => learn('summary'),
   };
 }
+
+// Install only after account restoration and the game's pause/check state exist.
+if(globalThis.parent&&globalThis.parent!==globalThis)void import('../brand-opening/game-tutor-channel.js').then(({connectGameTutor})=>{
+ gameTutor=connectGameTutor('runner',{onHelp:()=>{pause();if(listeningCheck.open){listeningCheck.interrupt();tutorEvent('paused');}},onPracticeComplete:()=>{if(listeningCheck.open)return;if(screen==='game'&&running&&!model?.finished)void resume();else void start();},onResumeAfterHelp:()=>{if(screen==='game'&&running&&!model?.finished)void resume();}});
+ if(screen==='game'&&running&&!model?.finished)tutorEvent(paused?'paused':'playing');else if(screen==='results')tutorEvent('finish',{completed:model?.reason==='tour'});else tutorEvent('lobby');
+}).catch(()=>{});
+import { recordTrialStarted } from '/social-conversion.js';

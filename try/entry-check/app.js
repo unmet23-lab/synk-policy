@@ -294,7 +294,7 @@ async function nextGuest() {
   // 지난 손님 뒤에 돋보기 시점이 바뀌었으면 무엇이 바뀌었는지만 한 줄로 알린다.
   if (state.flowLine) { $('#dock-hint').hidden = false; $('#dock-hint').textContent = state.flowLine; announce(state.flowLine); state.flowLine = null; }
   if (state.checkNotice?.id === item.id || item.textOnly) {
-    const line = [state.checkNotice?.id === item.id ? state.checkNotice.line : '', item.textOnly ? '이 확인 손님은 음성 없이 글로 읽어요.' : ''].filter(Boolean).join(' ');
+    const line = [state.checkNotice?.id === item.id ? state.checkNotice.line : '', item.textOnly ? '이 손님은 목소리 없이 글로만 나와요.' : ''].filter(Boolean).join(' ');
     $('#dock-hint').hidden = false; $('#dock-hint').textContent += ` ${line}`; announce(line); state.checkNotice = null;
   }
   scheduleMagnifier(token);
@@ -529,7 +529,7 @@ function showFeedback(item, choice, result) {
   $('#fb-correction').hidden = !correction; $('#fb-correction').textContent = correction;
   $('#fb-recheck').hidden = !state.cur.recheck?.line; $('#fb-recheck').textContent = state.cur.recheck?.line || '';
   const followup = state.cur.followup;
-  $('#fb-followup').hidden = !followup; $('#fb-followup').textContent = followup ? `${followup.line}${followup.item?.textOnly ? ' 다음 확인은 음성 없이 글로 읽어요.' : ''}` : '';
+  $('#fb-followup').hidden = !followup; $('#fb-followup').textContent = followup ? `${followup.line}${followup.item?.textOnly ? ' 다음 손님은 목소리 없이 글로만 나와요.' : ''}` : '';
   const wrongPassOrReject = !result.correct && (choice === 'pass' || item.answer === 'pass');
   $('#fb-oops').hidden = !wrongPassOrReject; $('#fb-oops-text').textContent = item.oops;
   $('#btn-next').querySelector('span').textContent = state.index + 1 >= state.queue.length ? '근무 마치기'

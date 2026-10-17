@@ -932,7 +932,7 @@ function judgeGate(){
   const reviewing=needsPractice||!!gate.recheck?.line;
   const follow=needsPractice&&gate.learning?.verdict!=='unassessed'?linkRacingRecheck(learn(c=>racingFollowUp(c,{current:gate.q,remaining:questionBank.slice(gateIndex+1),stage:selectedStage,audioAvailable:soundEnabled&&!narrationUnavailable})),gate.learning):null;
   if(follow)questionBank.splice(gateIndex+1,questionBank.length-gateIndex-1,...follow.remaining);
-  const nextNote=follow?.status==='new'?' 같은 영역의 새 문제로 확인해 봐요.':follow?.status==='unavailable'?' 같은 목표의 새 문제를 확인하지 못해 예정된 코스를 이어가요.':'';
+  const nextNote=follow?.status==='new'?' 비슷한 새 문제로 한 번 더 확인해 봐요.':follow?.status==='unavailable'?' 비슷한 새 문제가 없어서 원래 코스대로 이어 달려요.':'';
   hud.answerQuestion({ok:success,word:gate.q.word,why:[answerFeedback(gate.q,chosen),gate.recheck?.line,nextNote].filter(Boolean).join(' '),hold:reviewing?null:4200});
   gate.reviewing=reviewing;
   if(reviewing){
