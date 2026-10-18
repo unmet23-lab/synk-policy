@@ -13,15 +13,15 @@ SYNK 플랫폼은 SYNK의 앱과 회원 혜택을 한곳에서 쓰는 입구입�
 - 이어지는 경험 — 고른 말과 남긴 이야기가 다음 경험으로 이어지게 만들고 있습니다. 기억할 내용은 직접 고르고 고칩니다.
 - 내 라이브러리 — 자주 여는 앱을 이 기기에 담아 두고, 계정 라이브러리를 켜면 다른 기기와도 이어집니다.
 
-Windows 64비트와 Mac(Apple Silicon·Intel, macOS 13 이상)용 Preview 0.4.24입니다. WORLD는 인터넷에 연결하면 별도 개발 서버 없이 사용할 수 있습니다. 아직 정식 코드 서명·Apple 공증을 받지 않은 개발판으로, 설치할 때 보안 알림이 표시될 수 있습니다.
+Windows 64비트와 Mac(Apple Silicon·Intel, macOS 13 이상)용 Preview 0.4.25입니다. WORLD는 인터넷에 연결하면 별도 개발 서버 없이 사용할 수 있습니다. 아직 정식 코드 서명·Apple 공증을 받지 않은 개발판으로, 설치할 때 보안 알림이 표시될 수 있습니다.
 
 [SYNK 플랫폼 열기](https://synk.im/account/platform.html#home)
 
-[Windows용 다운로드](https://github.com/unmet23-lab/synk-policy/releases/download/platform-preview-0.4.24/SYNK-Platform-Preview-0.4.24-Signal-win-x64.exe)
+[Windows용 다운로드](https://github.com/unmet23-lab/synk-policy/releases/download/platform-preview-0.4.25/SYNK-Platform-Preview-0.4.25-Signal-win-x64.exe)
 
-[Mac용 · Apple Silicon](https://github.com/unmet23-lab/synk-policy/releases/download/platform-preview-0.4.24/SYNK-Platform-Preview-0.4.24-Signal-mac-arm64.dmg)
+[Mac용 · Apple Silicon](https://github.com/unmet23-lab/synk-policy/releases/download/platform-preview-0.4.25/SYNK-Platform-Preview-0.4.25-Signal-mac-arm64.dmg)
 
-[Mac용 · Intel](https://github.com/unmet23-lab/synk-policy/releases/download/platform-preview-0.4.24/SYNK-Platform-Preview-0.4.24-Signal-mac-x64.dmg)
+[Mac용 · Intel](https://github.com/unmet23-lab/synk-policy/releases/download/platform-preview-0.4.25/SYNK-Platform-Preview-0.4.25-Signal-mac-x64.dmg)
 
 ## 네 사업
 
