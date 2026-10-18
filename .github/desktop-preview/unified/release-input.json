@@ -2,35 +2,35 @@
   "schemaVersion": 1,
   "product": "platform",
   "channel": "preview",
-  "version": "0.4.26",
-  "releaseId": "platform-preview-0.4.26",
-  "buildId": "20261018.3",
+  "version": "0.4.27",
+  "releaseId": "platform-preview-0.4.27",
+  "buildId": "20261018.4",
   "manifestUrl": "https://synk.im/desktop/releases/preview.json",
   "baselines": [
     {
       "platform": "win32",
       "arch": "x64",
-      "url": "https://github.com/unmet23-lab/synk-policy/releases/download/platform-preview-0.4.25/SYNK-Platform-Preview-0.4.25-Signal-win-x64.exe",
-      "bytes": 407655936,
-      "sha256": "95ee09b46ea885275a1748cde08e74275bb1d2987eecaf03d21b9af753b8a8fb",
-      "asarSHA256": "f3cd477af87887741dc0d629262c85afe309edbaa06a652b0c75333684cc5728",
-      "backendSHA256": "0ba244861175bfe625a4db9f58216fe180dee9fc9d5493b7bc97197811f8ba6d"
+      "url": "https://github.com/unmet23-lab/synk-policy/releases/download/platform-preview-0.4.26/SYNK-Platform-Preview-0.4.26-Signal-win-x64.exe",
+      "bytes": 407678464,
+      "sha256": "880c8642a63080a8724c5c390a52c9868b3dcc1de9f040d7b3c1df2fc0421309",
+      "asarSHA256": "c3c2c1ec615c28990a76d16366a72fe4ab8c0fa9b3fec8eeb6f9d37f7cdda811",
+      "backendSHA256": "330ca0b16202bc35ee6a567caee3d9b08c67b882cfd1097da7d57fc4b443567f"
     },
     {
       "platform": "darwin",
       "arch": "arm64",
-      "url": "https://github.com/unmet23-lab/synk-policy/releases/download/platform-preview-0.4.25/SYNK-Platform-Preview-0.4.25-Signal-mac-arm64.dmg",
-      "bytes": 460395514,
-      "sha256": "0f9666613275d8664a371da45876b1566bc6247301844139e6055dd403f6b806",
-      "asarSHA256": "aeeb3a856a45186adadfff09bb2ad84675b85b204b048c0619b65ba190dc757a"
+      "url": "https://github.com/unmet23-lab/synk-policy/releases/download/platform-preview-0.4.26/SYNK-Platform-Preview-0.4.26-Signal-mac-arm64.dmg",
+      "bytes": 460440863,
+      "sha256": "d6d5a16873b4152b6e3206b4ffa49e125051c4df1d8ef6535c0d7f87cfd674e5",
+      "asarSHA256": "ff59d166228bc095fb643fa6930c4e015cea004a3fa7e8020397254f8e7da76b"
     },
     {
       "platform": "darwin",
       "arch": "x64",
-      "url": "https://github.com/unmet23-lab/synk-policy/releases/download/platform-preview-0.4.25/SYNK-Platform-Preview-0.4.25-Signal-mac-x64.dmg",
-      "bytes": 478051121,
-      "sha256": "67482bf487743283f92c7b61c2a3eecd2513a99993993ac7b0bb38d338afa7c1",
-      "asarSHA256": "4d8290d4c5cbe34409994b6319bd53ea555d82c75cb7b0ed3a78eec792dee5f9"
+      "url": "https://github.com/unmet23-lab/synk-policy/releases/download/platform-preview-0.4.26/SYNK-Platform-Preview-0.4.26-Signal-mac-x64.dmg",
+      "bytes": 478079518,
+      "sha256": "efe7999eed8d4e9e9cb0f07e18337a85f80876612c01dc07869f742749850f68",
+      "asarSHA256": "7014947d1f7d915835adc0d23dcf48a292778a79f6ffdfc5b8b1da561150bfe8"
     }
   ],
   "additionalLegacyPins": [
@@ -63,7 +63,7 @@
     }
   ],
   "electronVersion": "44.5.1",
-  "sourceHash": "7f6ce6a102b0f7660073b683a0ed8b79064450251f050d28d77a6d13815d43be",
+  "sourceHash": "51c42c8bfe6195d8f18231fca98461dd0715ab252c807eec1342ee41bbdc6a7a",
   "sourceFiles": [
     {
       "path": "assets/launcher/benefit-care.webp",
@@ -327,8 +327,8 @@
     },
     {
       "path": "renderer/benefits.mjs",
-      "bytes": 6011,
-      "sha256": "93486f5a64ae5c0864220dc139c2f8da790d62dc9de003d5f8bdb7f34ef44726"
+      "bytes": 6111,
+      "sha256": "d206ebba2d3c253ce7dd8d1566a54a1f925973fdd05fb5c9a9ab2bcc0e9f4edb"
     },
     {
       "path": "renderer/care-notifications.mjs",
@@ -522,13 +522,13 @@
     },
     {
       "path": "renderer/subscriptions.css",
-      "bytes": 34272,
-      "sha256": "2002724a47e13707053adbcdd9abc9ebfcf8e24741e4bfdd7ac5b3048de70738"
+      "bytes": 34156,
+      "sha256": "3fe19249f7444221ee8bf3640d4659cebaa5006e76e40bf60cc7de655815cf68"
     },
     {
       "path": "renderer/subscriptions.mjs",
-      "bytes": 80710,
-      "sha256": "6e294812e8fa9d3ef51e08e302cbc66f89f18c37e29e4d9552195087294591b7"
+      "bytes": 81481,
+      "sha256": "d1881ca79fbf967f6a758b77e67f0e1c4d7a21520bad57e80a8a3f340db17e0e"
     },
     {
       "path": "renderer/update-view.mjs",
