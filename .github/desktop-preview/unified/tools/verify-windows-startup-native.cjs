@@ -59,6 +59,9 @@ function observe(config){
     setTimeout(()=>app.quit(),100);
   }
   const deadline=setTimeout(()=>{errors.push('QA internal deadline');void finish(false);},65000);
+  // Surface a packaged startup exception before Electron opens a blocking error dialog.
+  process.on('uncaughtException',error=>{errors.push('MAIN_STARTUP_EXCEPTION: '+(error.stack||error.message));void finish(false);});
+  process.on('unhandledRejection',error=>{errors.push('MAIN_STARTUP_REJECTION: '+(error?.stack||error));void finish(false);});
   app.on('browser-window-created',(_event,created)=>{process.stderr.write('SYNK_QA_TRACE window-created\n');
     created.show=()=>{};created.showInactive=()=>{};created.focus=()=>{};
     const contents=created.webContents;contents.setBackgroundThrottling(false);contents.setAudioMuted(true);blockNetwork(contents);
