@@ -74,7 +74,9 @@
   const next = (ladder, x) => ladder.find(t => t > x + 1e-9) || ladder[ladder.length - 1];
   const storageUp = x => STORAGE.find(t => t >= x - 1e-9) || STORAGE[STORAGE.length - 1];
   const gbText = n => (n >= 1000 ? `${n / 1000}TB` : `${n}GB`);
-  const r = (t, src = 'synk') => ({ t, src });
+  // Codes preserve the meaning of conditional actions/conflicts for consumers;
+  // wording and source attribution remain the existing display contract.
+  const r = (t, src = 'synk', code) => ({ t, src, ...(code ? { code } : {}) });
   // 받침 유무로 조사를 고른다. 한글이 아닌 끝 글자는 읽는 소리 기준(모니터→를, TB→가)으로 본다.
   // 끝에 괄호로 덧붙인 말은 건너뛰고 괄호 앞말에 맞춘다: 데스크톱(맥 미니)을. 숫자는 영·일·삼·육·칠·팔만 받침이 있다.
   const josa = (word, withBatchim, without) => {
@@ -165,10 +167,10 @@
       if (pick === 'win' && game) reasons.push(r('PC 게임은 윈도우만 지원하는 경우가 많아요.'));
       if (pick === 'either') reasons.push(r('고른 작업은 맥과 윈도우 모두에서 잘 돼요. 익숙한 쪽을 고르세요.'));
     }
-    if (pick === 'win' && fcp) conflicts.push(r('파이널 컷 프로는 맥 전용이에요. 윈도우라면 다빈치 리졸브·프리미어 프로·캡컷으로 편집할 수 있어요.', 'apple-fcp'));
-    if (pick === 'mac' && image) conflicts.push(r('맥에서도 이미지 생성 AI를 쓸 수 있지만, 엔비디아 그래픽카드를 단 윈도우보다 느린 편이에요.', 'comfy-community'));
-    if (pick === 'mac' && game) conflicts.push(r('하고 싶은 게임이 맥을 지원하는지 먼저 확인하세요. 윈도우만 지원하는 게임이 많아요.'));
-    if (has(a, 'code') && a.code === 'mobile' && pick !== 'mac') conflicts.push(r('아이폰 앱까지 만들려면 맥이 필요해요. 애플의 개발 도구 Xcode는 맥에서만 돌아가요.', 'apple-xcode'));
+    if (pick === 'win' && fcp) conflicts.push(r('파이널 컷 프로는 맥 전용이에요. 윈도우라면 다빈치 리졸브·프리미어 프로·캡컷으로 편집할 수 있어요.', 'apple-fcp', 'fcp-requires-mac'));
+    if (pick === 'mac' && image) conflicts.push(r('맥에서도 이미지 생성 AI를 쓸 수 있지만, 엔비디아 그래픽카드를 단 윈도우보다 느린 편이에요.', 'comfy-community', 'image-ai-mac-tradeoff'));
+    if (pick === 'mac' && game) conflicts.push(r('하고 싶은 게임이 맥을 지원하는지 먼저 확인하세요. 윈도우만 지원하는 게임이 많아요.', 'synk', 'check-game-support'));
+    if (has(a, 'code') && a.code === 'mobile' && pick !== 'mac') conflicts.push(r('아이폰 앱까지 만들려면 맥이 필요해요. 애플의 개발 도구 Xcode는 맥에서만 돌아가요.', 'apple-xcode', 'ios-development-requires-mac'));
     return { pick, reasons, conflicts };
   }
 
@@ -281,7 +283,8 @@
     const roomyNote = roomy > value
       ? (upgradable ? `여유가 되면 ${roomy}GB. 데스크톱은 나중에 램을 더 꽂을 수 있으니 지금은 ${value}GB로 시작해도 돼요.` : `여유가 되면 ${roomy}GB. ${os === 'mac' ? '맥은' : '노트북은'} 나중에 늘릴 수 없어서, 오래 쓸 거라면 처음에 고르세요.`)
       : `${value}GB면 충분해요. 이 용도엔 램을 더 늘려도 차이가 적으니, 남는 돈은 ${form.pick === 'desktop' ? '모니터·저장공간' : '무게·화면·보증'}에 쓰세요.`;
-    return { value, roomy, officialMin, workable, used, upgradable, roomyNote, reasons };
+    const proNote = os === 'mac' && form.pick === 'desktop' && roomy > value && roomy > 32 && value <= 32 ? ` ${roomy}GB는 맥 미니 M5 Pro부터 고를 수 있어요.` : '';
+    return { value, roomy, officialMin, workable, used, upgradable, roomyNote: roomyNote + proNote, reasons };
   }
 
   function computeStorage(a, w, os, form) {
@@ -349,7 +352,7 @@
     const llm = w.find(x => x.id === 'llm');
     if (llm && llm.size === 'huge') reasons.push(r('그래픽 메모리 48GB는 일반 그래픽카드로는 어려워요. 맥 스튜디오(최대 128GB)나 웹 AI 구독이 현실적이에요.', 'apple-mac-desktop'));
     else if (llm && llm.size === 'large') reasons.push(r('24GB 이상은 RTX 5090급뿐이라 그래픽카드만 수백만 원이에요. 맥 미니(M5 Pro) 48GB나 웹 AI 구독이 가성비일 수 있어요.', 'apple-mac-desktop'));
-    const roomyText = vramRoomy > buy ? `여유가 되면 ${vramRoomy}GB(${GPU_EXAMPLE[vramRoomy] || ''})` : '';
+    const roomyText = vramRoomy > buy ? `여유가 되면 ${GPU_EXAMPLE[vramRoomy] || `${vramRoomy}GB`}` : '';
     return { kind: 'dedicated', vram: buy, need, vramRoomy, short: `그래픽 ${buy}GB`, text: `외장 그래픽카드 · 그래픽 메모리 ${buy}GB 이상`, example: GPU_EXAMPLE[buy] || '', roomyText, ai, reasons };
   }
 
@@ -406,30 +409,30 @@
     let verdict = 'unknown';
     if (gb != null) {
       verdict = gb >= ram.value ? 'enough' : gb >= ram.workable ? 'workable' : gb >= ram.officialMin ? 'tight' : 'short';
-      reasons.push(r({ enough: `지금 램 ${gb}GB는 가성비 추천 ${ram.value}GB를 채워요.`, workable: `지금 램 ${gb}GB로 시작할 수 있어요. 가성비 추천 ${ram.value}GB보다는 작아서, 무거운 작업을 할 땐 다른 창을 닫아 주세요.`, tight: `지금 램 ${gb}GB로 돌아가긴 하지만 자주 느려질 거예요. 가성비 추천은 ${ram.value}GB예요.`, short: `지금 램 ${gb}GB는 고른 작업의 공식 최소(${ram.officialMin}GB)보다 작아요.` }[verdict]));
+      reasons.push(r({ enough: `지금 램 ${gb}GB는 가성비 추천 ${ram.value}GB를 채워요.`, workable: `지금 램 ${gb}GB로 시작할 수 있어요. 가성비 추천 ${ram.value}GB보다는 작아서, 무거운 작업을 할 땐 다른 창을 닫아 주세요.`, tight: `지금 램 ${gb}GB로 돌아가긴 하지만 자주 느려질 거예요. 가성비 추천은 ${ram.value}GB예요.`, short: `지금 램 ${gb}GB는 고른 작업에 필요한 최소(${ram.officialMin}GB)보다 작아요.` }[verdict]));
       for (const x of w) {
         const ok = x.weight === 'light' ? 8 : (x.value || 16);
         can.push({ label: x.id === 'web' ? USE_LABEL.web : x.label, level: gb >= ok ? 'ok' : gb >= (x.min || 8) ? 'maybe' : 'no' });
       }
     } else {
       reasons.push(r('램 용량을 모르면 판단이 어려워요. 아래 방법으로 1분 안에 확인할 수 있어요.'));
-      actions.push(r('윈도우: 시작 → 설정 → 시스템 → 정보 → ‘설치된 RAM’. 맥: 화면 왼쪽 위 애플 메뉴 → 이 Mac에 관하여 → ‘메모리’.'));
+      actions.push(r('윈도우: 시작 → 설정 → 시스템 → 정보 → ‘설치된 RAM’. 맥: 화면 왼쪽 위 애플 메뉴 → 이 Mac에 관하여 → ‘메모리’.', 'synk', 'check-current-memory'));
     }
     if (form.heavy && c.kind === 'laptop') {
       const now = c.feel === 'slow' || ['tight', 'short'].includes(verdict);
       actions.push(r(now
         ? '작업이 무거우니 지금 노트북은 밖에서 계속 쓰고, 무거운 작업용 데스크톱을 더하세요. 노트북을 바꾸는 것보다 가성비가 좋아요.'
-        : '먼저 지금 노트북으로 해 보세요. 막히면 노트북을 바꾸지 말고 무거운 작업용 데스크톱을 더하세요. 노트북은 밖에서 계속 쓰면 돼요.'));
+        : '먼저 지금 노트북으로 해 보세요. 막히면 노트북을 바꾸지 말고 무거운 작업용 데스크톱을 더하세요. 노트북은 밖에서 계속 쓰면 돼요.', 'synk', now ? 'add-desktop-for-heavy-work' : 'try-current-laptop-first'));
     }
-    if (['tight', 'short'].includes(verdict) && c.kind === 'desktop') actions.push(r('지금 컴퓨터가 데스크톱이라면 램만 더 꽂는 게 가장 싸요. 빈 램 슬롯이 있는지 먼저 보세요.'));
-    if (['tight', 'short'].includes(verdict) && !c.kind) actions.push(r('데스크톱이라면 램만 추가할 수 있는 경우도 있어요. 빈 램 슬롯이 있는지 확인해 보세요.'));
-    if (c.os === 'win10') actions.push(r('윈도우 10은 2025년 10월 14일에 일반 지원이 끝났어요. ‘PC 상태 검사’ 앱으로 윈도우 11로 바꿀 수 있는지부터 확인하세요.', 'ms-win10'));
-    if (c.os === 'mac_intel') actions.push(r('인텔 맥은 macOS 26 Tahoe가 마지막 macOS예요. 앞으로 새 프로그램 지원이 줄어요.', 'apple-tahoe'));
-    if (c.os === 'mac_intel' && has(a, 'photo') && a.photo === '3d') actions.push(r('블렌더 5부터는 애플 실리콘(M1 이후) 맥만 지원해요.', 'blender'));
-    if (c.feel === 'slow') actions.push(r('느린 원인이 램이 아닐 수도 있어요. 저장공간이 거의 찼는지, 켤 때 함께 실행되는 프로그램이 많은지도 확인해 보세요.'));
-    if (c.feel === 'untried') actions.push(r('사기 전에 하려는 작업을 지금 컴퓨터로 한 번 해 보세요. 실제로 막히는 순간이 가장 정확한 기준이에요.'));
-    if (['enough', 'workable'].includes(verdict) && c.feel !== 'slow') actions.push(r('지금처럼 쓰다가 실제로 막히는 순간이 생기면 그때 바꿔도 늦지 않아요.'));
-    actions.push(r('윈도우는 작업 관리자 → 성능 → 메모리에서, 맥은 활성 상태 보기 → 메모리에서 지금 얼마나 쓰는지 볼 수 있어요.'));
+    if (['tight', 'short'].includes(verdict) && c.kind === 'desktop') actions.push(r('지금 컴퓨터가 데스크톱이라면 램만 더 꽂는 게 가장 싸요. 빈 램 슬롯이 있는지 먼저 보세요.', 'synk', 'consider-ram-upgrade'));
+    if (['tight', 'short'].includes(verdict) && !c.kind) actions.push(r('데스크톱이라면 램만 추가할 수 있는 경우도 있어요. 빈 램 슬롯이 있는지 확인해 보세요.', 'synk', 'check-ram-upgrade'));
+    if (c.os === 'win10') actions.push(r('윈도우 10은 2025년 10월 14일에 일반 지원이 끝났어요. ‘PC 상태 검사’ 앱으로 윈도우 11로 바꿀 수 있는지부터 확인하세요.', 'ms-win10', 'check-win11-upgrade'));
+    if (c.os === 'mac_intel') actions.push(r('인텔 맥은 macOS 26 Tahoe가 마지막 macOS예요. 앞으로 새 프로그램 지원이 줄어요.', 'apple-tahoe', 'check-intel-mac-support'));
+    if (c.os === 'mac_intel' && has(a, 'photo') && a.photo === '3d') actions.push(r('블렌더 5부터는 애플 실리콘(M1 이후) 맥만 지원해요.', 'blender', 'blender-requires-apple-silicon'));
+    if (c.feel === 'slow') actions.push(r('느린 원인이 램이 아닐 수도 있어요. 저장공간이 거의 찼는지, 켤 때 함께 실행되는 프로그램이 많은지도 확인해 보세요.', 'synk', 'check-slowness-cause'));
+    if (c.feel === 'untried') actions.push(r('사기 전에 하려는 작업을 지금 컴퓨터로 한 번 해 보세요. 실제로 막히는 순간이 가장 정확한 기준이에요.', 'synk', 'try-workload-before-buying'));
+    if (['enough', 'workable'].includes(verdict) && c.feel !== 'slow') actions.push(r('지금처럼 쓰다가 실제로 막히는 순간이 생기면 그때 바꿔도 늦지 않아요.', 'synk', 'keep-until-limited'));
+    actions.push(r('윈도우는 작업 관리자 → 성능 → 메모리에서, 맥은 활성 상태 보기 → 메모리에서 지금 얼마나 쓰는지 볼 수 있어요.', 'synk', 'monitor-memory-usage'));
     return { gb, verdict, reasons, actions, can };
   }
 
