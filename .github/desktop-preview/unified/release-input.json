@@ -2,35 +2,35 @@
   "schemaVersion": 1,
   "product": "platform",
   "channel": "preview",
-  "version": "0.4.25",
-  "releaseId": "platform-preview-0.4.25",
-  "buildId": "20261018.2",
+  "version": "0.4.26",
+  "releaseId": "platform-preview-0.4.26",
+  "buildId": "20261018.3",
   "manifestUrl": "https://synk.im/desktop/releases/preview.json",
   "baselines": [
     {
       "platform": "win32",
       "arch": "x64",
-      "url": "https://github.com/unmet23-lab/synk-policy/releases/download/platform-preview-0.4.24/SYNK-Platform-Preview-0.4.24-Signal-win-x64.exe",
+      "url": "https://github.com/unmet23-lab/synk-policy/releases/download/platform-preview-0.4.25/SYNK-Platform-Preview-0.4.25-Signal-win-x64.exe",
       "bytes": 407655936,
-      "sha256": "881972bb7a159c096f90306225fdd022a3f74d5f0c1c0dc6816fdbdcfc93ee62",
-      "asarSHA256": "0ffbe4331c820553ca63db20e24a94a0c6a79e7d963f9cfa4d1d4b51b0dc9416",
-      "backendSHA256": "5b510ebbb7c75c778cd230ef9aefbd49ac39225258dba2ddc39bc3772fa5899a"
+      "sha256": "95ee09b46ea885275a1748cde08e74275bb1d2987eecaf03d21b9af753b8a8fb",
+      "asarSHA256": "f3cd477af87887741dc0d629262c85afe309edbaa06a652b0c75333684cc5728",
+      "backendSHA256": "0ba244861175bfe625a4db9f58216fe180dee9fc9d5493b7bc97197811f8ba6d"
     },
     {
       "platform": "darwin",
       "arch": "arm64",
-      "url": "https://github.com/unmet23-lab/synk-policy/releases/download/platform-preview-0.4.24/SYNK-Platform-Preview-0.4.24-Signal-mac-arm64.dmg",
-      "bytes": 460394541,
-      "sha256": "b13af4ab1941cd1e70cafca3882846da38729d26f0daf3942c3b04db033d7cb2",
-      "asarSHA256": "313df211542df1d5a92bd09e91c909b4ff9b8e22d95c53cab45a0cb092f0454d"
+      "url": "https://github.com/unmet23-lab/synk-policy/releases/download/platform-preview-0.4.25/SYNK-Platform-Preview-0.4.25-Signal-mac-arm64.dmg",
+      "bytes": 460395514,
+      "sha256": "0f9666613275d8664a371da45876b1566bc6247301844139e6055dd403f6b806",
+      "asarSHA256": "aeeb3a856a45186adadfff09bb2ad84675b85b204b048c0619b65ba190dc757a"
     },
     {
       "platform": "darwin",
       "arch": "x64",
-      "url": "https://github.com/unmet23-lab/synk-policy/releases/download/platform-preview-0.4.24/SYNK-Platform-Preview-0.4.24-Signal-mac-x64.dmg",
-      "bytes": 478050999,
-      "sha256": "6db77707fb3defb870ed56735df9a45ddd4bf362f52a905a9734694eb0a79814",
-      "asarSHA256": "21122f9723f36be3161eb772bfe617ff69ffd0b7d75833329dcfa859b074025c"
+      "url": "https://github.com/unmet23-lab/synk-policy/releases/download/platform-preview-0.4.25/SYNK-Platform-Preview-0.4.25-Signal-mac-x64.dmg",
+      "bytes": 478051121,
+      "sha256": "67482bf487743283f92c7b61c2a3eecd2513a99993993ac7b0bb38d338afa7c1",
+      "asarSHA256": "4d8290d4c5cbe34409994b6319bd53ea555d82c75cb7b0ed3a78eec792dee5f9"
     }
   ],
   "additionalLegacyPins": [
@@ -63,7 +63,7 @@
     }
   ],
   "electronVersion": "44.5.1",
-  "sourceHash": "f591f43b120201a4150ae6729ed8b0112aef3fb2038d606a15f054cc1fe0e254",
+  "sourceHash": "1a62cdcf0a291477698abb7253b8e3d61bf10fe5a766c87f6d3461080ee4c13a",
   "sourceFiles": [
     {
       "path": "assets/launcher/benefit-care.webp",
@@ -331,6 +331,11 @@
       "sha256": "93486f5a64ae5c0864220dc139c2f8da790d62dc9de003d5f8bdb7f34ef44726"
     },
     {
+      "path": "renderer/care-notifications.mjs",
+      "bytes": 3855,
+      "sha256": "a509596b05c85a1074752537ff80591dab354343a1f284b0c25c0fe9a517deb8"
+    },
+    {
       "path": "renderer/convenience-state.mjs",
       "bytes": 5544,
       "sha256": "0146dee50b5924801251802882e8a077c0ef14b2118f76d2c79669c7e95d8afb"
@@ -342,8 +347,8 @@
     },
     {
       "path": "renderer/convenience.mjs",
-      "bytes": 26531,
-      "sha256": "15b1b5cf4701aef2586847f58c4accc92c4ac05d66012ce44ec3f3a9bd9c50e3"
+      "bytes": 26651,
+      "sha256": "b1f56cb238da1b624f3679c21466da9c7bfa780394d603752b08e1e9f14974a4"
     },
     {
       "path": "renderer/draft-recovery.mjs",
@@ -566,6 +571,16 @@
       "sha256": "f215bbce6146f7a079ea3b2602808088730b2200c789fdccac2d8684f24045cb"
     },
     {
+      "path": "src/care-notification-model.cjs",
+      "bytes": 101135,
+      "sha256": "b0b524f25a88b9c8c81a68f922c6f0284b1ce5b40aadffd88e4d4fbcfa7c0f7d"
+    },
+    {
+      "path": "src/care-notifications.cjs",
+      "bytes": 8248,
+      "sha256": "2d3eedd73a6a4ee43e34f8187aa6f6686629f8c12878f8c26ccc721a6995bdba"
+    },
+    {
       "path": "src/care-preload.cjs",
       "bytes": 1076,
       "sha256": "8646605dea88f8f07fcd0704498adc268058e19cef32f5c42c522fd2ccfc9a1b"
@@ -662,8 +677,8 @@
     },
     {
       "path": "src/main.cjs",
-      "bytes": 39720,
-      "sha256": "3fb53ab23dfca3d44d683b3521bb7b0698fc0d279db2ca81ae828548785db4df"
+      "bytes": 41636,
+      "sha256": "7c4f61d4284f35c12d3a228b3745edfa7e1fb0b3ca73a530747c39ab3ab37704"
     },
     {
       "path": "src/messenger-teacher.cjs",
@@ -722,8 +737,8 @@
     },
     {
       "path": "src/preload.cjs",
-      "bytes": 7508,
-      "sha256": "c80d834c065b03696fa2e85bdd1772be1a83d183e5ac5e2c12d0ba9185f2492c"
+      "bytes": 7847,
+      "sha256": "f57bb941118d0514576150273a92963c81bb689d26d0d5f1e3587081aee56782"
     },
     {
       "path": "src/product-main.cjs",
