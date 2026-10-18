@@ -63,20 +63,6 @@
     },
     {
       "product": "platform",
-      "clientId": "4c37ab30-0c36-401d-af5c-09f526a4d0b6",
-      "redirectUris": [
-        "http://127.0.0.1:43827/synk/oauth/rehearsal/callback"
-      ]
-    },
-    {
-      "product": "platform",
-      "clientId": "c99b0dfb-fe25-4cdb-a54a-bb359f025557",
-      "redirectUris": [
-        "http://127.0.0.1:43828/synk/oauth/family-album/callback"
-      ]
-    },
-    {
-      "product": "platform",
       "clientId": "bc01247d-72f6-47e7-83fc-d06f0d3acae5",
       "redirectUris": [
         "http://127.0.0.1:43829/synk/oauth/path/callback"
@@ -108,20 +94,6 @@
       "clientId": "6dfbdd79-cec2-434f-821e-2683ca6813cd",
       "redirectUris": [
         "http://127.0.0.1:4296/"
-      ]
-    },
-    {
-      "product": "platform",
-      "clientId": "c8aa0179-c6fb-47a6-bb19-f25135bb1c22",
-      "redirectUris": [
-        "http://127.0.0.1:4297/"
-      ]
-    },
-    {
-      "product": "platform",
-      "clientId": "a8da0389-47d6-44bb-88b5-ee37d80e2b7e",
-      "redirectUris": [
-        "http://127.0.0.1:4298/"
       ]
     },
     {

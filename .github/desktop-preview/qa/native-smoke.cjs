@@ -8,6 +8,7 @@ const sha=file=>crypto.createHash('sha256').update(fs.readFileSync(file)).digest
 const isolation=path.join(out,'profile');fs.mkdirSync(isolation);fs.mkdirSync(path.join(out,'tmp'));
 const input={...config,platform:process.platform,client,mode:args.mode,out,appData:isolation,archive:bundle.archive,version:bundle.version,runnerArch:process.env.RUNNER_ARCH||null,softwareGpu:process.env.SYNK_QA_SOFTWARE_GPU==="1",visible:process.env.SYNK_QA_VISIBLE==="1",unlimitedFrames:process.env.SYNK_QA_UNLIMITED_FRAMES==="1",prefix:'SYNK_MAC_QA '};
 function observe(config){
+  process.stderr.write('SYNK_QA_TRACE observer-installed\n');
   const {app,shell}=require('electron'),fs=require('node:fs'),path=require('node:path');
   app.setPath('appData',config.appData);app.once('ready',()=>{if(!config.visible)app.dock?.hide();});
   // Only the read/launch root is substituted. The production installation
@@ -110,7 +111,10 @@ function observe(config){
       check('no account provider request with empty vault',providerRequests.length===0);check('no localhost development server requests',requests.every(r=>!/^https?:\/\/(?:127\.0\.0\.1|localhost):(?:4280|4191)(?:\/|$)/.test(r.url)));check('QA window visibility matches requested mode',window.isVisible()===config.visible);await finish(true);
     }catch(error){errors.push(error.stack||error.message);try{await screenshot('failure');checks.push({name:'failure snapshot',ok:false,detail:await run("({url:location.href,text:document.body.innerText.slice(0,1600),runner:window.synkRunner?.info,frameProbe:{...window.__macFrameProbe,now:performance.now(),visibility:document.visibilityState,focus:document.hasFocus()}})")});}catch{}await finish(false);}})();
   }
-  app.on('browser-window-created',(_event,created)=>{
+  // Surface a packaged startup exception before Electron opens a blocking error dialog.
+  process.on('uncaughtException',error=>{errors.push('MAIN_STARTUP_EXCEPTION: '+(error.stack||error.message));void finish(false);});
+  process.on('unhandledRejection',error=>{errors.push('MAIN_STARTUP_REJECTION: '+(error?.stack||error));void finish(false);});
+  app.on('browser-window-created',(_event,created)=>{process.stderr.write('SYNK_QA_TRACE window-created\n');
     if(config.client==='platform'){if(!config.visible){created.show=()=>{};created.showInactive=()=>{};}instrument(created.webContents);created.webContents.once('did-finish-load',()=>observeWindow(created));}
     else observeWindow(created);
   });
@@ -121,8 +125,9 @@ const graphicsArgs=input.softwareGpu?['--use-gl=angle','--use-angle=swiftshader'
 const frameArgs=input.unlimitedFrames?['--disable-frame-rate-limit','--disable-gpu-vsync']:[];
 const child=spawn(bundle.executable,[...graphicsArgs,...frameArgs,'--inspect-brk=127.0.0.1:0','--log-file='+path.join(out,'electron.log')],{cwd:out,windowsHide:true,env:{...process.env,TMPDIR:path.join(out,'tmp'),TEMP:path.join(out,'tmp'),TMP:path.join(out,'tmp')},stdio:['ignore','pipe','pipe']});
 let stdout='',stderr='',ws,connected=false,sequence=0,injected=false,error=null;const pending=new Map();
-const rpc=(method,params={})=>new Promise((resolve,reject)=>{const id=++sequence;pending.set(id,{resolve,reject});ws.send(JSON.stringify({id,method,params}));});
-function connect(url){ws=new WebSocket(url);ws.addEventListener('open',async()=>{await rpc('Debugger.enable');await rpc('Runtime.runIfWaitingForDebugger');});ws.addEventListener('message',async event=>{const m=JSON.parse(event.data);if(m.id){const p=pending.get(m.id);if(p){pending.delete(m.id);m.error?p.reject(Error(m.error.message)):p.resolve(m.result);}return;}if(m.method==='Debugger.paused'&&!injected){injected=true;try{const result=await rpc('Debugger.evaluateOnCallFrame',{callFrameId:m.params.callFrames[0].callFrameId,expression:'('+observe.toString()+')('+JSON.stringify(input)+')',returnByValue:true});if(result.exceptionDetails)throw Error(JSON.stringify(result.exceptionDetails));await rpc('Debugger.resume');}catch(e){error=e.message;child.kill('SIGKILL');}}});}
+const trace=(event,detail={})=>process.stderr.write('SYNK_QA_TRACE '+JSON.stringify({event,...detail})+'\n');
+const rpc=(method,params={})=>new Promise((resolve,reject)=>{const id=++sequence;trace('send',{id,method});const timer=setTimeout(()=>{pending.delete(id);reject(Error('INSPECTOR_TIMEOUT_'+method));},10000);pending.set(id,{resolve:v=>{clearTimeout(timer);resolve(v);},reject:e=>{clearTimeout(timer);reject(e);}});ws.send(JSON.stringify({id,method,params}));});
+function connect(url){trace('connect');ws=new WebSocket(url);ws.addEventListener('open',async()=>{trace('open');try{await rpc('Debugger.enable');await rpc('Runtime.runIfWaitingForDebugger');}catch(e){error=e.message;trace('connect-error',{error});ws.close();}});ws.addEventListener('message',async event=>{const m=JSON.parse(event.data);if(m.id||m.method==='Debugger.paused'||m.method==='Debugger.resumed')trace('receive',{id:m.id,method:m.method,reason:m.params?.reason,url:m.params?.callFrames?.[0]?.url});if(m.id){const p=pending.get(m.id);if(p){pending.delete(m.id);m.error?p.reject(Error(m.error.message)):p.resolve(m.result);}return;}if(m.method==='Debugger.paused'&&!injected){injected=true;try{const result=await rpc('Debugger.evaluateOnCallFrame',{callFrameId:m.params.callFrames[0].callFrameId,expression:'('+observe.toString()+')('+JSON.stringify(input)+')',returnByValue:true});if(result.exceptionDetails)throw Error(JSON.stringify(result.exceptionDetails));await rpc('Debugger.resume');}catch(e){error=e.message;child.kill('SIGKILL');}}});}
 const timer=setTimeout(()=>{error='Native QA timeout';child.kill('SIGKILL');},170000);
 child.stdout.on('data',data=>{stdout+=data;if(stdout.includes(input.prefix))ws?.close();});child.stderr.on('data',data=>{stderr+=data;const m=stderr.match(/Debugger listening on (ws:\/\/127\.0\.0\.1:\d+\/[^\s]+)/);if(m&&!connected){connected=true;connect(m[1]);}});child.on('error',e=>{error=e.message;});
 child.on('close',code=>{clearTimeout(timer);ws?.close();let result;try{result=JSON.parse(stdout.split(/\r?\n/).find(x=>x.startsWith(input.prefix)).slice(input.prefix.length));}catch{}

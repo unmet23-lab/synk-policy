@@ -674,9 +674,10 @@ function validatePlatformLibrary(value) {
 }
 function projectPlatformLibrary(value, { appIds = ACTIVE_PLATFORM_APP_IDS } = {}) {
   const next = validatePlatformLibrary(value);
-  next.favorites = [...new Set(next.favorites.map((id2) => platformDisplayAppId(id2, appIds)))];
+  next.favorites = [...new Set(next.favorites.filter((id2) => !["rehearsal","family-album"].includes(id2)).map((id2) => platformDisplayAppId(id2, appIds)))];
   const recent = /* @__PURE__ */ new Map();
   for (const row of next.recent) {
+    if (["rehearsal","family-album"].includes(row.id)) continue;
     const id2 = platformDisplayAppId(row.id, appIds), previous = recent.get(id2);
     if (!previous || row.at > previous.at) recent.set(id2, { ...row, id: id2, ...row.id === "teacher" && id2 !== row.id ? { entryId: "teacher" } : {} });
   }
@@ -738,7 +739,7 @@ var PLATFORM_APP_IDS, ACTIVE_PLATFORM_APP_IDS, platformAppId, platformDisplayApp
 var init_platform_library_data = __esm({
   "experiences/synk-account/src/platform-library-data.mjs"() {
     PLATFORM_APP_IDS = Object.freeze(["world", "messenger", "teacher", "path", "pulse", "partners", "care", "fortune", "rehearsal", "family-album"]);
-    ACTIVE_PLATFORM_APP_IDS = Object.freeze(PLATFORM_APP_IDS.filter((id2) => id2 !== "partners"));
+    ACTIVE_PLATFORM_APP_IDS = Object.freeze(PLATFORM_APP_IDS.filter((id2) => !["partners","rehearsal","family-album"].includes(id2)));
     platformAppId = (id2) => id2 === "partners" ? "pulse" : id2;
     platformDisplayAppId = (id2, appIds = ACTIVE_PLATFORM_APP_IDS) => platformAppId(id2) === "teacher" && appIds.includes("teacher") && appIds.includes("messenger") ? "messenger" : platformAppId(id2);
     platformDisplayAppIds = (appIds = ACTIVE_PLATFORM_APP_IDS) => [...new Set(appIds.filter((id2) => ACTIVE_PLATFORM_APP_IDS.includes(id2)).map((id2) => platformDisplayAppId(id2, appIds)))];
@@ -9461,7 +9462,7 @@ function createLibraryRecovery({ getHost, getOwner, canUse, getPayload, onChange
 }
 
 // experiences/synk-account/src/platform-library-view.mjs
-var names = { world: "WORLD", messenger: "워크스페이스", teacher: "워크스페이스 · 내 수업", path: "PATH", pulse: "PULSE", partners: "PULSE · 이전 Partners 기록", care: "플레저", fortune: "운세", rehearsal: "대화 리허설", "family-album": "가족 앨범" };
+var names = { world: "WORLD", messenger: "워크스페이스", teacher: "워크스페이스 · 내 수업", path: "PATH", pulse: "PULSE", partners: "PULSE · 이전 Partners 기록", care: "플레저", fortune: "운세" };
 var esc = (value) => String(value).replace(/[&<>"']/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[char]);
 var librarySequence = 0;
 function mountPlatformLibrary(root, { getHost, ensureReady = async () => {
@@ -9546,7 +9547,7 @@ function mountPlatformLibrary(root, { getHost, ensureReady = async () => {
   }
   function summary() {
     const available = !pageSuspended && !disposed && !!notebook?.active && notebook.canEdit && doc.consent;
-    const note2 = available ? doc.notes.find((row) => !row.done) : null, recent = available ? projectPlatformLibrary(doc, { appIds: entryIds() }).recent[0] : null, hasDraft = available && (!!draft.title.trim() || !!parkedDraft?.title.trim());
+    const note2 = available ? doc.notes.find((row) => !row.done && ACTIVE_PLATFORM_APP_IDS.includes(platformAppId(row.appId))) : null, recent = available ? projectPlatformLibrary(doc, { appIds: entryIds() }).recent[0] : null, hasDraft = available && (!!draft.title.trim() || !!parkedDraft?.title.trim());
     resumeId = note2?.appId || recent?.entryId || recent?.id || null;
     root.querySelector("[data-library-title]").textContent = hasDraft ? editing ? "수정 중인 메모가 있어요" : "작성 중인 메모가 있어요" : note2?.title || (recent ? "다시 " + names[recent.id] + "에서" : "계정으로 이어가기");
     root.querySelector("[data-library-detail]").textContent = message || (hasDraft ? "접어두어도 이 화면의 입력은 유지돼요." : note2 ? names[note2.appId] + " · 남겨 둔 다음 할 일" : recent ? "최근 열었던 공간을 바로 열 수 있어요." : available ? "다음에 할 일을 남겨 두면 여기서 바로 이어갈 수 있어요." : "즐겨찾기와 다음에 할 일을 같은 SYNK ID로 이어가세요.");
@@ -9633,11 +9634,11 @@ function mountPlatformLibrary(root, { getHost, ensureReady = async () => {
     focusDraft();
   }
   function noteCard(row) {
-    return '<article tabindex="-1" data-note-id="' + esc(row.id) + '"><strong>' + esc(row.title) + "</strong><p>" + names[row.appId] + '</p><div class="continuity-note-actions"><button type="button" data-cloud="open" data-id="' + row.appId + '">이어가기</button><button type="button" data-cloud="edit-note" data-id="' + esc(row.id) + '" aria-label="' + esc(row.title) + ' 수정">수정</button><button type="button" data-cloud="toggle-note" data-id="' + esc(row.id) + '" aria-pressed="' + row.done + '">' + (row.done ? "완료됨 · 다시 열기" : "완료 표시") + '</button><button type="button" data-cloud="remove-note" data-id="' + esc(row.id) + '" aria-label="' + esc(row.title) + ' 삭제">메모 삭제</button></div></article>';
+    return '<article tabindex="-1" data-note-id="' + esc(row.id) + '"><strong>' + esc(row.title) + "</strong><p>" + (names[row.appId] || "이전 앱의 메모") + '</p><div class="continuity-note-actions">' + (ACTIVE_PLATFORM_APP_IDS.includes(platformAppId(row.appId)) ? '<button type="button" data-cloud="open" data-id="' + row.appId + '">이어가기</button>' : '') + '<button type="button" data-cloud="edit-note" data-id="' + esc(row.id) + '" aria-label="' + esc(row.title) + ' 수정">수정</button><button type="button" data-cloud="toggle-note" data-id="' + esc(row.id) + '" aria-pressed="' + row.done + '">' + (row.done ? "완료됨 · 다시 열기" : "완료 표시") + '</button><button type="button" data-cloud="remove-note" data-id="' + esc(row.id) + '" aria-label="' + esc(row.title) + ' 삭제">메모 삭제</button></div></article>';
   }
   function matchingNotes(query = "", filter = "all") {
     const terms = String(query).normalize("NFKC").toLocaleLowerCase("ko-KR").trim().split(/\s+/).filter(Boolean);
-    return doc.notes.filter((row) => (filter === "all" || row.done === (filter === "done")) && terms.every((term) => (row.title + " " + names[row.appId]).normalize("NFKC").toLocaleLowerCase("ko-KR").includes(term)));
+    return doc.notes.filter((row) => (filter === "all" || row.done === (filter === "done")) && terms.every((term) => (row.title + " " + (names[row.appId] || "이전 앱의 메모")).normalize("NFKC").toLocaleLowerCase("ko-KR").includes(term)));
   }
   function favoritesMarkup() {
     const favorites = projectPlatformLibrary(doc, { appIds: entryIds() }).favorites.filter((id2) => displayIds().includes(id2));
