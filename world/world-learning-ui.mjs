@@ -10,7 +10,7 @@ const rows=(name,options,value)=>Object.entries(options).map(([id,[label,note]])
 // WORLD supplies meaningful candidates; the existing Core decides among them.
 // This controller owns no identity, grading, second event log, or server API.
 export function createWorldEducation({home,getProgress,engine,createPlan,launchGame,startLesson,startReview,prepare=async()=>{},target=globalThis}){
- let stopped=false,coach=null,coachHost=null,current=null,refreshing=false,applied=null;
+ let stopped=false,coach=null,coachHost=null,current=null,refreshing=false;
  const owner=getProgress().owner;
  const empty=engine.engine.createGame({gameId:'world-home-empty',storage:null,historyComplete:false}).summary();
  const check=()=>{if(stopped||getProgress()?.owner!==owner)throw Error('학습 계정이 바뀌었어요. 설정을 다시 열어 주세요.');};
@@ -18,19 +18,20 @@ export function createWorldEducation({home,getProgress,engine,createPlan,launchG
   check();const source=target.SYNKLearningHost||null;
   if(!source&&owner!=='guest')return null;
   if(coach&&coachHost===source){try{coach.summary();return coach;}catch{coach.disconnect?.();coach=null;}}
-  if(coachHost!==source){coach?.disconnect?.();coach=null;coachHost=source;applied=null;}
+  if(coachHost!==source){coach?.disconnect?.();coach=null;coachHost=source;}
   if(!coach)coach=source?source.createGame({gameId:'world-home'},engine.engine.createGame,engine.createLearningSync):engine.engine.createGame({gameId:'world-home',storage:target.localStorage});
   return coach;
  }
- function applyPreferences(){
+ // Restoring a product profile is a read, not a new account-wide choice.
+ // Launchers keep this hook; only the form's explicit save/clear may write Core.
+ function applyPreferences({explicit=false}={}){
+  if(!explicit){check();return true;}
   check();const progress=getProgress(),profile=progress.learningProfile().profile;
-  if(['new','skipped'].includes(profile.status))return;
+  if(['new','skipped'].includes(profile.status))return true;
   const values=progress.learningProfileValues(),source=target.SYNKLearningHost||null;
   const presentation=Object.fromEntries(['support','explanation','textSize','motion'].filter(k=>values[k]).map(k=>[k,values[k]]));
-  const signature=JSON.stringify(presentation);
-  if(applied?.source===source&&applied.signature===signature)return;
   const preferences=source?.preferences?.()||readCoach();
-  if(preferences){if(preferences.setPresentation(Object.keys(presentation).length?presentation:null)===false)return false;applied={source,signature};}
+  if(preferences&&preferences.setPresentation(Object.keys(presentation).length?presentation:null)===false)return false;
   return true;
  }
  function refresh(){
@@ -79,7 +80,7 @@ export function createWorldEducation({home,getProgress,engine,createPlan,launchG
   const form=target.document.querySelector('#world-study-form');if(!form)return;
   const status=form.querySelector('.study-save-status');let busy=false;
   const valid=()=>{check();if(progress!==getProgress()||!form.isConnected)throw Error('설정을 다시 열어 주세요.');};
-  const run=async operation=>{if(busy)return;busy=true;form.querySelectorAll('button').forEach(b=>b.disabled=true);try{valid();operation();revision=progress.learningProfile().profile.revision;await progress.flush();valid();if(applyPreferences()===false)throw Error('도움 방식 저장을 다시 확인해 주세요.');refresh();home.closePanel();if(continueAfter)await next();else home.toast('목표에 맞춰 다음 연습을 바꿨어요.');}catch(error){if(form.isConnected)status.textContent=error.message||'저장을 확인한 뒤 다시 시도해 주세요.';}finally{busy=false;if(form.isConnected)form.querySelectorAll('button').forEach(b=>b.disabled=false);}};
+  const run=async operation=>{if(busy)return;busy=true;form.querySelectorAll('button').forEach(b=>b.disabled=true);try{valid();operation();revision=progress.learningProfile().profile.revision;await progress.flush();valid();if(progress.learningProfile().profile.status!=='skipped'){await prepare();valid();if(applyPreferences({explicit:true})===false)throw Error('도움 방식 저장을 다시 확인해 주세요.');}refresh();home.closePanel();if(continueAfter)await next();else home.toast('목표에 맞춰 다음 연습을 바꿨어요.');}catch(error){if(form.isConnected)status.textContent=error.message||'저장을 확인한 뒤 다시 시도해 주세요.';}finally{busy=false;if(form.isConnected)form.querySelectorAll('button').forEach(b=>b.disabled=false);}};
   form.addEventListener('submit',event=>{event.preventDefault();if(!form.elements.consent.checked){status.textContent='저장하려면 「저장하기」 스위치를 켜 주세요. 건너뛰어도 기본 연습은 할 수 있어요.';return;}
    const reason=form.elements.reason.value,minutes=Number(form.elements.minutes.value);
    void run(()=>progress.updateLearningProfile({consent:true,expectedRevision:revision,values:{reasons:reason?[reason]:null,primaryReason:reason||null,goal:null,support:form.elements.support.value,explanation:form.elements.explanation.value},today:{...(minutes?{minutes}:{}),audio:form.elements.audio.value}}));

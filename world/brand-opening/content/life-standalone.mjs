@@ -15057,7 +15057,7 @@ var radios = (name, options, value) => (Array.isArray(options) ? options : Objec
 var rows = (name, options, value) => Object.entries(options).map(([id, [label, note]]) => `<label class="study-option"><input type="radio" name="${name}" value="${id}" ${value === id ? "checked" : ""}><span><strong>${label}</strong><small>${note}</small></span></label>`).join("");
 function createWorldEducation({ home, getProgress, engine, createPlan, launchGame, startLesson, startReview, prepare = async () => {
 }, target = globalThis }) {
-  let stopped = false, coach = null, coachHost = null, current = null, refreshing = false, applied = null;
+  let stopped = false, coach = null, coachHost = null, current = null, refreshing = false;
   const owner = getProgress().owner;
   const empty2 = engine.engine.createGame({ gameId: "world-home-empty", storage: null, historyComplete: false }).summary();
   const check3 = () => {
@@ -15080,24 +15080,22 @@ function createWorldEducation({ home, getProgress, engine, createPlan, launchGam
       coach?.disconnect?.();
       coach = null;
       coachHost = source;
-      applied = null;
     }
     if (!coach) coach = source ? source.createGame({ gameId: "world-home" }, engine.engine.createGame, engine.createLearningSync) : engine.engine.createGame({ gameId: "world-home", storage: target.localStorage });
     return coach;
   }
-  function applyPreferences() {
+  function applyPreferences({ explicit = false } = {}) {
+    if (!explicit) {
+      check3();
+      return true;
+    }
     check3();
     const progress2 = getProgress(), profile = progress2.learningProfile().profile;
-    if (["new", "skipped"].includes(profile.status)) return;
+    if (["new", "skipped"].includes(profile.status)) return true;
     const values = progress2.learningProfileValues(), source = target.SYNKLearningHost || null;
     const presentation = Object.fromEntries(["support", "explanation", "textSize", "motion"].filter((k) => values[k]).map((k) => [k, values[k]]));
-    const signature = JSON.stringify(presentation);
-    if (applied?.source === source && applied.signature === signature) return;
     const preferences = source?.preferences?.() || readCoach();
-    if (preferences) {
-      if (preferences.setPresentation(Object.keys(presentation).length ? presentation : null) === false) return false;
-      applied = { source, signature };
-    }
+    if (preferences && preferences.setPresentation(Object.keys(presentation).length ? presentation : null) === false) return false;
     return true;
   }
   function refresh() {
@@ -15195,7 +15193,11 @@ function createWorldEducation({ home, getProgress, engine, createPlan, launchGam
         revision2 = progress2.learningProfile().profile.revision;
         await progress2.flush();
         valid();
-        if (applyPreferences() === false) throw Error("\uB3C4\uC6C0 \uBC29\uC2DD \uC800\uC7A5\uC744 \uB2E4\uC2DC \uD655\uC778\uD574 \uC8FC\uC138\uC694.");
+        if (progress2.learningProfile().profile.status !== "skipped") {
+          await prepare();
+          valid();
+          if (applyPreferences({ explicit: true }) === false) throw Error("\uB3C4\uC6C0 \uBC29\uC2DD \uC800\uC7A5\uC744 \uB2E4\uC2DC \uD655\uC778\uD574 \uC8FC\uC138\uC694.");
+        }
         refresh();
         home.closePanel();
         if (continueAfter) await next();
