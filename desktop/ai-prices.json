@@ -1,0 +1,70 @@
+{
+  "schemaVersion": 1,
+  "kind": "synk-ai-prices",
+  "services": {
+    "s1": {
+      "checked": "2026-10-19",
+      "source": "s1-plans",
+      "currency": "USD",
+      "tax": "excluded",
+      "krVat": 0.1,
+      "plans": {
+        "pro": {
+          "month": 20,
+          "year": 200
+        },
+        "max5x": {
+          "month": 100
+        },
+        "max20x": {
+          "month": 200
+        }
+      }
+    },
+    "s2": {
+      "checked": "2026-10-19",
+      "source": "s2-pricing",
+      "currency": "USD",
+      "tax": "excluded",
+      "annualLock": true,
+      "plans": {
+        "starter": {
+          "month": 19,
+          "year": 228,
+          "credits": 270
+        },
+        "plus": {
+          "month": 59,
+          "year": 564,
+          "credits": 1200
+        },
+        "ultra": {
+          "month": 129,
+          "year": 1188,
+          "credits": 3000
+        }
+      }
+    },
+    "s3": {
+      "checked": "2026-10-19",
+      "source": "s3-api",
+      "currency": "USD",
+      "tax": null,
+      "plans": {
+        "free": {
+          "month": 0,
+          "credits": 15000
+        },
+        "lite": {
+          "month": 15,
+          "credits": 200000
+        },
+        "plus": {
+          "month": 280,
+          "credits": 4000000
+        }
+      }
+    }
+  },
+  "deals": []
+}
