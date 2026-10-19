@@ -990,6 +990,8 @@ thead th{background:var(--plate-2)}
 .foot-channels>h2{margin:0;font-family:var(--mono);font-size:12px;letter-spacing:.06em;color:#7d7d86;font-weight:400;text-transform:uppercase}
 .foot-channels .foot-col h3{margin:0 0 12px;font-size:13px;font-weight:700;letter-spacing:0;color:#a1a1aa}
 .foot-channels .foot-col h3 .ko{font-weight:800}
+/* 한글 꼬리표는 13px 이상, 고정폭 글꼴로 쓰지 않는다(2026-10-19 유호님 「질문창 머리 12.5px, 바닥글 칸 이름 12px 고정폭 … 고쳐서」): 한국어 쪽 바닥글 칸 이름은 SUIT 13px, 영문 쪽은 고정폭 대문자 그대로 */
+html[lang="ko"] .foot-col h2,html[lang="ko"] .foot-channels>h2{font-family:var(--sans);font-size:13px;font-weight:600;letter-spacing:0;text-transform:none}
 .foot-channels a{color:#e4e4e7}
 .foot-channels+.foot-bottom{margin-top:28px}
 @media (max-width:900px){.foot-channels{grid-template-columns:repeat(3,minmax(0,1fr));gap:18px 24px}.foot-channels>h2{grid-column:1/-1}}
@@ -1003,6 +1005,7 @@ thead th{background:var(--plate-2)}
 #questions{--qx-col:48px}
 #questions>.qx-head{display:flex;align-items:center;gap:14px;width:100%;margin:0 0 4px;letter-spacing:0}
 #questions>.qx-head::after{content:'';flex:1;height:1px;background:var(--line-2)}
+#questions>.qx-head .ko{font-size:13px}
 .qx-count{order:1;font-family:var(--mono);font-size:12.5px;letter-spacing:.04em;color:var(--ink-3);white-space:nowrap}
 .faq{border-top:0}
 .faq>li{border-bottom:1px solid var(--line)}
