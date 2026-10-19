@@ -1,5 +1,5 @@
 {
-  "version": "2026-09-15-selected-experiences-copy-9bfc4e4ce8-rhythm-20261001-copy-3910676d01-release-copy-3e4ed3be6d-en-002b14631325-bm-platform-20261007-a885b0d303-travel-20261007-ce148dd860-real-20261007-ab58ee7076-homepage-current-20261009-033c24b61f29-homepage-v10-20261010-0f500d32ad2d",
+  "version": "2026-09-15-selected-experiences-copy-9bfc4e4ce8-rhythm-20261001-copy-3910676d01-release-copy-3e4ed3be6d-en-002b14631325-bm-platform-20261007-a885b0d303-travel-20261007-ce148dd860-real-20261007-ab58ee7076-homepage-current-20261009-033c24b61f29-homepage-v10-20261010-0e6de077a98d",
   "updatedAt": "2026-10-19",
   "docs": [
     {
@@ -458,11 +458,15 @@
         "Move-in and daily life — move-in date, what to bring, how the facilities work: what you need at the start.",
         "When something goes wrong — we help you report facility or living problems to the operator.",
         "Partner operators, areas and costs are not decided yet. Contracts and building management are handled by the operator.",
-        "PATH plans travel around your tastes, budget and the people you travel with. We are not featuring a travel planner on this website right now.",
-        "We do not take bookings or payments for travel or cultural experiences. To ask about visiting Korea or a cultural experience, contact PATH.",
-        "Study and career preparation, VR interview practice and housing support are on the PATH page."
+        "PATH’s Seoul planner plans a day for you from real places around Jongno, Bukchon and Seochon, checked against official information. You only choose what you feel like and how much time you have. It is free, needs no sign-up and is in Korean.",
+        "What you feel like — pick up to three: a good meal, a cup of tea, an exhibition, palaces, alleys or a market. Skip it and you get a mix of places nearby.",
+        "Time — anything from an hour to a full day. It tells you first how many places will fit. You can change the starting point, or set the date, group size and budget yourself.",
+        "Your day — the order of stops, arrival times, walking and time at each place, all in one view. Swap one stop, walk less or stay indoors, or see it on a map.",
+        "Places — restaurants, tea houses, palaces and museums are included only after checking their official information. Places to stay are in the place list with their official pages too.",
+        "After your trip — note what you liked or missed, and only the tastes you choose to keep carry into your next plan. Sign in with SYNK ID to continue on another device, or carry on with a trip file without signing in.",
+        "Check opening hours and prices before you visit. We do not take bookings or payments for travel or cultural experiences or give live directions; to ask about visiting Korea or a cultural experience, contact PATH. For now it plans days around Jongno, Bukchon and Seochon in Seoul only."
       ],
-      "updatedAt": "2026-10-10"
+      "updatedAt": "2026-10-19"
     }
   ],
   "records": [
@@ -4147,16 +4151,16 @@
         "Is the Seoul planner free?",
         "I want to plan a day in Seoul"
       ],
-      "answer": "PATH plans travel around your tastes, budget and the people you travel with. We are not featuring a travel planner on this website right now.\n\nWe do not take bookings or payments for travel or cultural experiences. To ask about visiting Korea or a cultural experience, contact PATH.\n\nStudy and career preparation, VR interview practice and housing support are on the PATH page.",
+      "answer": "PATH’s Seoul planner plans a day for you from real places around Jongno, Bukchon and Seochon, checked against official information. You only choose what you feel like and how much time you have. It is free, needs no sign-up and is in Korean.\n\nWhat you feel like — pick up to three: a good meal, a cup of tea, an exhibition, palaces, alleys or a market. Skip it and you get a mix of places nearby.\n\nTime — anything from an hour to a full day. It tells you first how many places will fit. You can change the starting point, or set the date, group size and budget yourself.\n\nYour day — the order of stops, arrival times, walking and time at each place, all in one view. Swap one stop, walk less or stay indoors, or see it on a map.\n\nPlaces — restaurants, tea houses, palaces and museums are included only after checking their official information. Places to stay are in the place list with their official pages too.\n\nAfter your trip — note what you liked or missed, and only the tastes you choose to keep carry into your next plan. Sign in with SYNK ID to continue on another device, or carry on with a trip file without signing in.\n\nCheck opening hours and prices before you visit. We do not take bookings or payments for travel or cultural experiences or give live directions; to ask about visiting Korea or a cultural experience, contact PATH. For now it plans days around Jongno, Bukchon and Seochon in Seoul only.",
       "relatedIds": [
         "path-intro",
         "path-philosophy"
       ],
       "action": {
-        "label": "See study and work",
-        "href": "/en/path/#study"
+        "label": "See the Seoul planner",
+        "href": "/en/path/#travel"
       },
-      "reviewedAt": "2026-10-10",
+      "reviewedAt": "2026-10-19",
       "aliases": [
         "PATH의 개인화 여행은 무엇인가요?",
         "PATH는 맛집과 숙소를 어떻게 추천하나요?",

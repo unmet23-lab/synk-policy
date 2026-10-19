@@ -79,11 +79,11 @@ SYNK PULSE는 제품 광고, 브랜드필름, AI 모델 룩북, 사용법 영상
 
 SYNK PATH는 취향과 예산에 맞춘 여행 일정을 짜고, 한국 유학·취업과 정착을 준비하도록 돕습니다.
 
-한국 유학·취업 준비와 VR 면접 연습, 주거·정착 지원을 준비하고 있습니다.
+서울 하루 일정은 지금 무료로 짜 볼 수 있고, 한국 유학·취업 준비와 VR 면접 연습, 주거·정착 지원을 준비하고 있습니다.
 
+- 서울 하루 일정 · 무료, 가입 없이
 - 유학 계획·지원 서류·면접 준비
 - VR 면접·생활 연습
-- 주거·정착 지원
 
 [SYNK PATH 보기](https://synk.im/path/)
 
@@ -140,7 +140,7 @@ An engine that fits you better the more you use it. SYNK builds Atlas, a persona
 - SYNK LAB — Learn Korean, and get ready for Korea. SYNK LAB makes Korean textbooks, learning games and a personalized learning app. We are preparing a full-time one-year course aimed at TOPIK Level 4, and our learning games are available when you sign in with SYNK ID. A one-year course aimed at TOPIK Level 4, textbooks, learning games and a personalized learning app.
 - SYNK SHIFT — Personal guidance for everyone, built from your material. SYNK SHIFT brings personalized services to work where every person needs different guidance — advice, onboarding, coaching and staff training. We connect your product information and rules to Atlas, and after launch we check with you that it is really used. Purchase advice, product onboarding, expert coaching and staff training: work where every customer or employee needs different guidance, built from the company’s own material.
 - SYNK PULSE — Ads and model videos, plus our own music and characters. SYNK PULSE makes product ads, brand films, AI model lookbooks and how-to videos, from planning to the final cut. We also create the music and stories of Mongle, Kkamong and Marin, and look for partners to license them or make something together. Product ads, brand films, AI model lookbooks and how-to videos. We also make the music and stories of Mongle, Kkamong and Marin.
-- SYNK PATH — From travel to life in Korea, planned around you. SYNK PATH plans trips around your tastes and budget and helps you prepare to study, work and settle in Korea. Support for studying and working in Korea, VR interview practice and housing is in preparation.
+- SYNK PATH — From travel to life in Korea, planned around you. SYNK PATH plans trips around your tastes and budget and helps you prepare to study, work and settle in Korea. Plan a day in Seoul for free now; support for studying and working in Korea, VR interview practice and housing is in preparation.
 
 Atlas: Atlas is the personalization engine SYNK builds. Eight engines understand a person’s goal and situation, fit the content, screens, words and sound to them, and check whether it helped.
 

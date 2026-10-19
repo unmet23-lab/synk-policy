@@ -229,6 +229,15 @@ $$('[data-orb]').forEach(o => { mountOrb(o); o.addEventListener('click', goAsk);
 $$('[data-ask-start]').forEach(b => b.addEventListener('click', goAsk));
 
 /* 나타나기 */
+// 옆으로 넘기는 띠(PATH 서울 여행 세 단계, 900px 아래): 넘칠 때만 탭으로 닿고 이름을 단다.
+for (const el of document.querySelectorAll('[data-scroll-x]')) {
+  const sync = () => {
+    if (el.scrollWidth > el.clientWidth + 1) { el.tabIndex = 0; el.setAttribute('role', 'region'); el.setAttribute('aria-label', el.dataset.scrollLabel || ''); }
+    else { el.removeAttribute('tabindex'); el.removeAttribute('role'); el.removeAttribute('aria-label'); }
+  };
+  sync();
+  addEventListener('resize', sync, { passive: true });
+}
 const reveals = $$('.reveal');
 if ('IntersectionObserver' in window && !reduced.matches) {
   const io = new IntersectionObserver(entries => { for (const en of entries) if (en.isIntersecting) { en.target.classList.add('in'); io.unobserve(en.target); } }, { rootMargin: '0px 0px -8% 0px', threshold: 0.06 });

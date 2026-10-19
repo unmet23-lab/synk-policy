@@ -398,7 +398,7 @@ html[lang="en"] .cover-title{font-size:clamp(36px,4.4vw,64px);letter-spacing:-.0
   .biz-stage{aspect-ratio:4/3;padding-top:64px}
   .biz-stage img.obj{max-width:62%;max-height:70%}
   .biz-stage img.logo{height:26px;left:20px;top:20px}
-  .biz-stage .status{right:18px;top:19px;font-size:12.5px}
+  .biz-stage .status{right:18px;top:19px;font-size:13px}
 }
 /* 861~1180px(두 칸 그대로지만 좁음)에서는 물건이 상태 칩에 닿아 무대 위를 비운다(Fable 2차 P2-5) */
 @media (min-width:861px) and (max-width:1180px){.biz-stage{padding-top:44px}}
@@ -490,7 +490,7 @@ html[lang="en"] .cover-title{font-size:clamp(36px,4.4vw,64px);letter-spacing:-.0
 .offer-index a:last-child{border-right:0}
 .offer-index .mono{font-size:12px;color:var(--ink-3)}
 .offer-index strong{font-size:16.5px;letter-spacing:-.015em}
-.offer-index .status{font-size:12.5px}
+.offer-index .status{font-size:13px}
 .offer-index a:hover strong{text-decoration:underline;text-underline-offset:4px}
 @media (max-width:900px){.offer-index{grid-template-columns:repeat(2,minmax(0,1fr))}.offer-index a:nth-child(odd){padding-left:0}.offer-index a:nth-child(even){border-right:0}.offer-index a:nth-child(n+3){border-top:1px solid var(--line)}}
 
@@ -1136,3 +1136,29 @@ body[data-site="path"] .qa-term:hover{--term:#d3e8be}
 .svc-try p{margin:0;font-size:14px;line-height:1.55;color:var(--ink-3);max-width:30em}
 @media (max-width:340px){#questions{--qx-col:28px}.ask .ask-form{column-gap:8px}}
 @media (max-width:640px){.svc-result{grid-template-columns:minmax(0,1fr)}.svc-steps{margin-left:8px;padding-left:18px}.svc-steps li::before{left:-18px;width:10px}}
+
+/* ── PATH 서울 여행(2026-10-19) ─────────────────────────────────────
+   유호님 「PATH 페이지에 여행 구역 다시 넣어 줘」. 여행 앱의 실제 화면 세 장을, 앱의 경로 줄(1 → 2 → 3, 점선)처럼 잇는다.
+   화면은 초록 무대 바닥에서 올라오고 아래는 무대 끝에서 잘린다. 넓은 화면은 세 칸(줄 맞춤은 subgrid), 900px 아래는 옆으로 넘겨 본다. */
+.trip-go{margin-top:26px}
+.trip{--trip-gap:20px;list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));grid-template-rows:auto auto auto 1fr;column-gap:var(--trip-gap)}
+.trip-step{display:grid;grid-row:span 4;grid-template-rows:subgrid;row-gap:0;min-width:0}
+.trip-pin{display:flex;align-items:center;margin-bottom:22px}
+.trip-pin b{flex:none;display:grid;place-items:center;width:36px;height:36px;border-radius:50%;background:var(--path-ink);color:#0b0b0d;font:400 15px/1 var(--mono)}
+.trip-pin::after{content:'';flex:1;margin:0 calc(-1 * var(--trip-gap)) 0 12px;border-top:2px dashed color-mix(in srgb,var(--path-ink) 38%,transparent)}
+.trip-step:last-child .trip-pin::after{display:none}
+.trip-q{margin:0 0 10px;font-size:clamp(20px,1.75vw,24px);font-weight:680;letter-spacing:-.024em;line-height:1.3}
+.trip-text{margin:0 0 26px;font-size:15.5px;line-height:1.62;color:var(--ink-2);max-width:30em}
+.trip-shot{position:relative;margin:0;align-self:end;overflow:hidden;aspect-ratio:10/11;display:flex;justify-content:center;align-items:flex-start;padding:30px 30px 0;border-radius:var(--r-lg);background:radial-gradient(120% 110% at 50% 0%,#2a3a2c 0%,#141a14 74%);box-shadow:0 0 0 1px rgba(255,255,255,.05) inset}
+.trip-shot::after{content:'';position:absolute;left:0;right:0;bottom:0;height:64px;background:linear-gradient(to bottom,rgba(20,26,20,0),#141a14 92%);pointer-events:none}
+.trip-shot img{display:block;width:100%;max-width:300px;height:auto;border-radius:20px 20px 0 0;box-shadow:0 0 0 1px rgba(255,255,255,.06),0 30px 50px -24px rgba(0,0,0,.8)}
+.trip-scroll:focus-visible{outline:2px solid var(--ink);outline-offset:6px;border-radius:var(--r-lg)}
+@media (max-width:900px){
+  .trip-scroll{margin-inline:calc(-1 * var(--gut));overflow-x:auto;scroll-snap-type:x mandatory;scroll-padding-inline:var(--gut);overscroll-behavior-x:contain;scrollbar-width:none}
+  .trip-scroll::-webkit-scrollbar{display:none}
+  .trip{--trip-gap:14px;width:max-content;padding-inline:var(--gut);grid-template-columns:repeat(3,min(76vw,320px))}
+  .trip-step{scroll-snap-align:start}
+  .trip-pin{margin-bottom:18px}
+  .trip-text{margin-bottom:20px}
+  .trip-shot{padding:22px 22px 0}
+}
