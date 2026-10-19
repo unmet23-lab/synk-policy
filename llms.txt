@@ -6,14 +6,28 @@
 
 ## SYNK 플랫폼
 
-SYNK 플랫폼은 SYNK의 앱과 회원 혜택을 한곳에서 쓰는 입구입니다. 로그인하면 계정과 연결된 기록을 한자리에서 이어 봅니다.
+SYNK 플랫폼은 SYNK의 앱과 회원 혜택을 한곳에서 쓰는 입구입니다. 웹에서 바로 열거나 PC 앱으로 받아 쓰고, 로그인하면 진도 같은 기록이 SYNK ID에 남습니다.
 
-- 하나의 SYNK ID — 앱마다 따로 가입하지 않고, 같은 계정으로 이어 씁니다.
-- 나에게 필요한 앱만 — 소속과 이용권에 맞는 앱만 보이고, 고른 관심사에 따라 추천이 달라지게 만들고 있습니다.
-- 이어지는 경험 — 고른 말과 남긴 이야기가 다음 경험으로 이어지게 만들고 있습니다. 기억할 내용은 직접 고르고 고칩니다.
-- 내 라이브러리 — 자주 여는 앱을 이 기기에 담아 두고, 계정 라이브러리를 켜면 다른 기기와도 이어집니다.
+### SYNK WORLD · 웹 · PC 앱 — 우리 동네에서 배우는 한국어
 
-Windows 64비트와 Mac(Apple Silicon·Intel, macOS 13 이상)용 Preview 0.4.29입니다. WORLD는 인터넷에 연결하면 별도 개발 서버 없이 사용할 수 있습니다. 아직 정식 코드 서명·Apple 공증을 받지 않은 개발판으로, 설치할 때 보안 알림이 표시될 수 있습니다.
+함께할 튜터를 고르고 동네의 카페·편의점·버스 정류장을 누르면, 그곳에서 쓰는 한국어를 배웁니다. 우리 집에서는 내 방을 꾸미고, 놀이에서는 한국어 게임을 합니다.
+
+- 장소마다 생활 표현 한 묶음 — 인사·주문·약속·길 찾기
+- 한국어 게임 여덟 가지가 한 학습 기록을 쓰고, 아틀라스가 그 기록으로 다음 연습을 고릅니다
+- SYNK ID로 로그인하면 진도와 꾸민 방이 계정에 남습니다
+
+[SYNK WORLD 열기](https://synk.im/world/)
+
+### 회원 혜택
+
+모두 무료입니다. 플레저와 운세는 가입 없이도 씁니다.
+
+- 내 성향 확인하기 (웹 · PC 앱) — 내가 고른 관심사·선호와 실제 학습 기록을 나눠 보여 주고, 그렇게 판단한 근거도 열어 볼 수 있습니다.
+- AI 구독 계정판 (PC 앱) — 여러 AI 구독의 이번 주 사용량과 초기화 시각을 한 화면에 모으고, 오늘 먼저 쓸 계정을 추천합니다. 기록은 내 PC에만 둡니다.
+- 플레저 (웹) — 오늘 연락할 사람과 음력으로 맞춘 생일·기념일, 주고받은 경조사를 한곳에 모아 둡니다.
+- 무료 운세 (웹) — 별자리와 한국 사주로 오늘의 기운부터 궁합·이번 달·올해까지, 광고나 잠금 없이 봅니다.
+
+Windows 64비트와 Mac(Apple Silicon·Intel, macOS 13 이상)용 Preview 0.4.29입니다. 아직 정식 코드 서명·Apple 공증 전인 미리보기판이라 설치할 때 보안 알림이 나올 수 있습니다.
 
 [SYNK 플랫폼 열기](https://synk.im/account/platform.html#home)
 
@@ -131,6 +145,12 @@ An engine that fits you better the more you use it. SYNK builds Atlas, a persona
 Atlas: Atlas is the personalization engine SYNK builds. Eight engines understand a person’s goal and situation, fit the content, screens, words and sound to them, and check whether it helped.
 
 Most programs are offered in Korean. What is live and what is still in preparation is labelled on every page, and no effect is promised that has not been measured.
+
+## 채널
+
+- LAB — [YouTube](https://www.youtube.com/@synkkorean) · [Instagram](https://www.instagram.com/synk.mn/) · [Facebook](https://www.facebook.com/synkworld)
+- SHIFT — [YouTube](https://www.youtube.com/@synkbrief) · [Instagram](https://www.instagram.com/synkbrief/)
+- 창업자 — [YouTube](https://www.youtube.com/@yuhobuilds) · [Instagram](https://www.instagram.com/yuhobuilds/)
 
 ## Contact
 

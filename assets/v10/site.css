@@ -932,3 +932,64 @@ thead th{background:var(--plate-2)}
 /* 바닥: 펠트 마당 그림 아래는 한 단 더 깊은 밤 */
 .foot-body{background:#050608}
 .foot-bottom{border-top-color:var(--line)}
+
+/* ── 플랫폼 구역 · 회원 혜택 · 채널(2026-10-19) ─────────────────────────
+   유호님 「전부 만들어주되 조잡하면 안돼. 실용적이어야하고 이 브랜드의 가치를 제대로 보여줄수있는거 위주로」:
+   머리(제목 · 설명 + 받기) → SYNK WORLD(실제 우리 동네 사진) → 회원 혜택 넷(플랫폼 혜택 카드와 같은 --face 색 포스터, 큰 한글, 펠트 물건).
+   글자 단계는 플랫폼 시그널 실측 값(제목 720 · 카드 제목 680 · 본문 450, 한글 13px 이상)을 따른다. 움직임은 더하지 않는다. */
+.pf-status{margin:-8px 0 18px}
+.pf-head{align-items:start}
+.pf-note{margin-top:18px;font-size:14px;max-width:34em}
+#platform-get{scroll-margin-top:96px}
+.pf-get .btns{margin-top:24px}
+.pf-get .pf-open{margin-top:10px}
+.pf-world{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:clamp(24px,3.6vw,52px);align-items:center;padding:14px clamp(24px,3.6vw,48px) 14px 14px;border-radius:var(--r-xl);background:var(--plate)}
+.pf-world-media{margin:0;border-radius:calc(var(--r-xl) - 12px);overflow:hidden;background:#a7cff0;aspect-ratio:1672/941}
+.pf-world-media img{display:block;width:100%;height:100%;object-fit:cover}
+.pf-kicker{margin:0 0 14px;font-size:13px;letter-spacing:.06em;color:var(--ink-3)}
+.pf-world-body h3{font-size:clamp(26px,2.5vw,34px);line-height:1.2;letter-spacing:-.03em;font-weight:720;text-wrap:balance}
+.pf-world-body>p:not(.pf-kicker){margin-top:14px;color:var(--ink-2);text-wrap:pretty}
+.pf-world-body .ticks{margin-top:20px;gap:10px}
+.pf-world-body .ticks li{font-size:15.5px}
+.pf-world-body .btns{margin-top:26px}
+.pf-perks-head{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 14px;margin:clamp(52px,6vw,80px) 0 22px}
+.pf-perks-head h3{font-size:clamp(22px,2.1vw,27px);line-height:1.25;letter-spacing:-.025em;font-weight:720}
+.pf-perks-head p{margin:0;font-size:15.5px;color:var(--ink-3)}
+.pf-all{margin-left:auto;display:inline-flex;align-items:center;gap:6px;font-size:15px;font-weight:650;color:var(--ink);text-decoration:none;white-space:nowrap}
+.pf-all:hover{text-decoration:underline;text-underline-offset:4px}
+.pf-all .arr,.perk-go .arr{font-family:var(--mono);transition:transform .2s var(--ease)}
+.pf-all:hover .arr,.perk-row:hover .perk-go .arr{transform:translate(2px,-2px)}
+.pf-perks{list-style:none;margin:0;padding:0;border-top:1px solid var(--line)}
+.perk{border-bottom:1px solid var(--line)}
+.perk-insight{--face:#f96859}
+.perk-subscriptions{--face:#7db45a}
+.perk-care{--face:#3d6bc9}
+.perk-fortune{--face:#e05c97}
+.perk-row{display:grid;grid-template-columns:72px minmax(0,1fr) auto minmax(132px,auto);grid-template-areas:"icon main where go";align-items:center;gap:8px 28px;padding:18px 6px;color:var(--ink);text-decoration:none;border-radius:var(--r-md);transition:background .2s}
+.perk-row:hover{background:var(--plate)}
+.perk-icon{grid-area:icon;width:72px;height:72px;border-radius:18px;display:grid;place-items:center;overflow:hidden;
+  background:radial-gradient(120% 85% at 28% -10%,rgba(255,255,255,.18),transparent 58%),linear-gradient(180deg,transparent 55%,rgba(0,0,0,.1)),var(--face)}
+.perk-icon img{width:auto;height:auto;max-width:76%;max-height:76%;filter:drop-shadow(0 6px 8px rgba(0,0,0,.24))}
+.perk-main{grid-area:main;display:grid;gap:4px;min-width:0}
+.perk-main strong{font-size:19px;line-height:1.3;letter-spacing:-.02em;font-weight:680}
+.perk-text{font-size:15.5px;line-height:1.55;color:var(--ink-2);text-wrap:pretty}
+.perk-where{grid-area:where;justify-self:end;padding:6px 11px;border-radius:999px;border:1px solid var(--line-2);font-size:13px;font-weight:600;line-height:1.2;color:var(--ink-2);white-space:nowrap}
+.perk-go{grid-area:go;justify-self:end;display:inline-flex;align-items:center;gap:6px;font-size:14.5px;font-weight:700;white-space:nowrap}
+@media (max-width:900px){
+  .pf-world{grid-template-columns:minmax(0,1fr);gap:22px;padding:12px 12px 28px}
+  .pf-world-body{padding:0 12px}
+  .perk-where{justify-self:start}
+}
+@media (max-width:900px){.perk-row{grid-template-columns:64px minmax(0,1fr) auto;grid-template-areas:"icon main go" "icon where go";gap:10px 18px}.perk-icon{width:64px;height:64px;border-radius:16px;align-self:start}.perk-go{align-self:center}}
+@media (max-width:560px){.perk-row{grid-template-columns:56px minmax(0,1fr) 18px;column-gap:14px;padding:16px 2px}.perk-icon{width:56px;height:56px;border-radius:14px}.perk-main strong{font-size:17px}.perk-text{font-size:14.5px}.perk-row{grid-template-columns:56px minmax(0,1fr) auto;grid-template-areas:"icon main main" "icon where go";row-gap:10px}.perk-go{font-size:14px}}
+.offer-try{margin-top:18px;padding-top:16px;border-top:1px solid var(--line);display:grid;gap:10px;justify-items:start}
+.offer-try .btn{min-height:44px;padding:0 18px;font-size:15px}
+.offer-try p{margin:0;font-size:14px;line-height:1.55;color:var(--ink-3)}
+.sec-go{margin-top:22px}
+.foot-channels{margin-top:40px;padding-top:24px;border-top:1px solid var(--line);display:grid;grid-template-columns:minmax(0,1.6fr) repeat(4,minmax(0,1fr));gap:32px}
+.foot-channels>h2{margin:0;font-family:var(--mono);font-size:12px;letter-spacing:.06em;color:#7d7d86;font-weight:400;text-transform:uppercase}
+.foot-channels .foot-col h3{margin:0 0 12px;font-size:13px;font-weight:700;letter-spacing:0;color:#a1a1aa}
+.foot-channels .foot-col h3 .ko{font-weight:800}
+.foot-channels a{color:#e4e4e7}
+.foot-channels+.foot-bottom{margin-top:28px}
+@media (max-width:900px){.foot-channels{grid-template-columns:repeat(3,minmax(0,1fr));gap:18px 24px}.foot-channels>h2{grid-column:1/-1}}

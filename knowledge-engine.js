@@ -400,7 +400,7 @@ export function createKnowledgeEngine(data){
     if(/(?:몽골어|모국어|현지어|러시아어|중국어|베트남어|우즈벡어|카자흐어)(?:로|로도)(?:설명|수업|가르|진행|통역)|통역/.test(c)&&/수업|선생|강의|설명/.test(c))return {...unknown(brand),relatedIds:['lab-languages','lab-start']};
     if((c.match(/chatgpt|챗gpt|claude|클로드|gemini|제미나이|미드저니|midjourney|copilot|코파일럿|퍼플렉시티|perplexity|(?<![a-z])ai(?![a-z])/g)||[]).length>=2&&/중에|중|vs|비교|보다|랑|과|와|이랑/.test(c)&&/(?:뭐가|어느게|어떤게|어떤걸|뭘|누가)(?:더)?(?:나아|낫|좋|추천|쓸까|써야|골라)|더나아|더낫|더좋|추천/.test(c))return {...unknown(brand),relatedIds:['shift-ai','guide-contact']};
     if(/엑셀|vlookup|파워포인트|포토샵|한글파일|워드문서/.test(c)&&/쓰는법|사용법|하는법|방법|알려|만드는법/.test(c))return unknown(brand);
-    if(/월세|전세|원룸|집값|조회수|부동산|생활비|물가|교통비|서류작성|세무|회계|노무|법률자문|인테리어|이사업체|대출|보험|팔로워|구독자늘|스마트폰|게임중독|날씨|일기예보|주가|주식|코인|환율|대통령|선거|파스타|삼성|애플|주차장|카페메뉴|점심메뉴|저녁메뉴|메뉴추천|음식추천|뭐먹을지|뭐먹지|치료법|약물|콘서트|팬미팅|연예인|bts|블랙핑크|뉴진스|맛집|레시피|요리법|여행지|숙소예약|호텔|항공권|비행기표|로또|운세|수학문제|번역해줘|숙제해줘|코딩해줘/.test(c)&&!/수업|학원|가르치|배우|공부|활동|k컬처|한국어|브랜딩|로고|홍보/.test(c))return unknown(brand);
+    if(/월세|전세|원룸|집값|조회수|부동산|생활비|물가|교통비|서류작성|세무|회계|노무|법률자문|인테리어|이사업체|대출|보험|팔로워|구독자늘|스마트폰|게임중독|날씨|일기예보|주가|주식|코인|환율|대통령|선거|파스타|삼성|애플|주차장|카페메뉴|점심메뉴|저녁메뉴|메뉴추천|음식추천|뭐먹을지|뭐먹지|치료법|약물|콘서트|팬미팅|연예인|bts|블랙핑크|뉴진스|맛집|레시피|요리법|여행지|숙소예약|호텔|항공권|비행기표|로또|수학문제|번역해줘|숙제해줘|코딩해줘/.test(c)&&!/수업|학원|가르치|배우|공부|활동|k컬처|한국어|브랜딩|로고|홍보/.test(c))return unknown(brand);
     // Everyday conversation: greetings, thanks, short acknowledgements and questions about this assistant.
     const plain=input.trim().toLowerCase().replace(/[~!?？.,…ㅎㅋ^\s]+$/g,'').replace(/\s+/g,' ');
     if(/^(?:안녕(?:하세요|하십니까|하세여)?|하이(?:요)?|헬로|hello|hi|hey|ㅎㅇ|반가워(?:요)?|반갑습니다)(?:[~!?.,\s]*(?:질문|문의|궁금한\s*(?:게|것|점))(?:이|가)?\s*(?:있어요|있습니다|있는데요?|있어서요?|드려요|드립니다|할게요|해도\s*될까요)?)?$/i.test(plain))return from(['synk-choose'],'greeting');
