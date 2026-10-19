@@ -13,6 +13,7 @@ const {configuration}=require('./auth-config.cjs');
 const {resolveAuthConfigPath}=require('./auth-config-path.cjs');
 const {createTokenStore}=require('./auth-store.cjs');
 const {createAuthService,publicError}=require('./auth-service.cjs');
+const {WORLD_ROUTE_NAMES}=require('./world-requests.cjs');
 const {suiteKey,createSuiteStore,createSuitePublisher,createSuiteFollower}=require('./suite-session.cjs');
 const {createCompanyRequests}=require('./company-requests.cjs');
 const {createTeacherPreview}=require('./teacher-preview.cjs');
@@ -112,7 +113,7 @@ const productPreviews=createProductPreviews({packaged,mode:runtime.mode,clientId
 let aiSubscriptions=null;
 // Typecast처럼 API 키로 읽는 서비스의 키는 safeStorage(Windows DPAPI·macOS 키체인)로만 이 PC에 둔다.
 const subscriptionSecrets={available:()=>{try{return ['win32','darwin'].includes(process.platform)&&safeStorage.isEncryptionAvailable()&&safeStorage.getSelectedStorageBackend?.()!=='basic_text';}catch{return false;}},encrypt:value=>safeStorage.encryptString(value),decrypt:data=>safeStorage.decryptString(data)};
-function subscriptions(){if(runtime.clientId!=='platform'||smoke)return null;if(!aiSubscriptions)aiSubscriptions=createAiSubscriptions({root:path.join(app.getPath('userData'),'AiSubscriptions'),secrets:subscriptionSecrets,openExternal:url=>shell.openExternal(url),onChange:snapshot=>sendDesktop('synk:subscriptions-changed',snapshot)});return aiSubscriptions;}
+function subscriptions(){if(runtime.clientId!=='platform'||smoke)return null;if(!aiSubscriptions)aiSubscriptions=createAiSubscriptions({root:path.join(app.getPath('userData'),'AiSubscriptions'),secrets:subscriptionSecrets,priceFetch:typeof globalThis.fetch==='function'?globalThis.fetch.bind(globalThis):null,openExternal:url=>shell.openExternal(url),onChange:snapshot=>sendDesktop('synk:subscriptions-changed',snapshot)});return aiSubscriptions;}
 function subscriptionCall(operation){const service=subscriptions();if(!service)return {ok:false,code:'LAUNCHER_ONLY'};if(accountStatus()?.signedIn!==true)return {ok:false,code:'SIGN_IN_REQUIRED'};return operation(service);}
 // 계정판 자동 읽기(지난 7일 사용량 기록용): 로그인한 회원이 계정판을 써 본 PC에서만, 앱이 켜 있는 동안 2분마다 읽을 때인지 본다.
 // 읽을 때는 ai-subscriptions.cjs의 autoDue가 정한다(마지막 확인 6시간 뒤 · 계정마다 주간 초기화 10분 전 · 결제일 아침). 끄는 중에는 새로 읽지 않는다.
@@ -294,7 +295,7 @@ function createWindow(){
   window.on('focus',async()=>{try{send('synk:clients-changed',await installations.getClients());}catch{}});
   const companyRequest=createCompanyRequests({entry,clientId:runtime.clientId,session:ownSession,auth});
   const handlers={
-    'synk:environment':()=>({clientId:runtime.clientId,mode:runtime.mode,platform:process.platform,arch:process.arch,version:app.getVersion(),sessionScope:current.sessionScope,nativeShell:isPlatform,closeToTray:!!platformTray?.isActive()&&desktopPreferences?.snapshot().preferences.closeToTray!==false,teacherPreviewAvailable:teacherPreview.available(),productPreviewsAvailable:productPreviews.available(),publicAppsAvailable:publicApps.available()}),
+    'synk:environment':()=>({clientId:runtime.clientId,mode:runtime.mode,platform:process.platform,arch:process.arch,version:app.getVersion(),sessionScope:current.sessionScope,nativeShell:isPlatform,closeToTray:!!platformTray?.isActive()&&desktopPreferences?.snapshot().preferences.closeToTray!==false,teacherPreviewAvailable:teacherPreview.available(),productPreviewsAvailable:productPreviews.available(),publicAppsAvailable:publicApps.available(),...(runtime.clientId==='world'?{worldRoutes:WORLD_ROUTE_NAMES}:{})}),
     'synk:desktop-preferences':()=>desktopSnapshot(),
     'synk:care-notifications-status':()=>isPlatform?careNotifications.status():{ok:false,code:'LAUNCHER_ONLY'},
     'synk:care-notifications-configure':configureCareNotifications,
