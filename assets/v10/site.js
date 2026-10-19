@@ -5,8 +5,8 @@ const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => [...r.querySelectorAll(s)];
 const lang = document.documentElement.lang === 'en' ? 'en' : 'ko';
 const T = lang === 'en'
-  ? { copied: 'Email address copied.', copyFail: 'Select hello@synk.im to copy it.', more: 'Read more', related: 'Ask next', sources: 'Source', reviewed: 'Checked against public notes', synk: 'SYNK', loadFail: 'Could not load the notes. Please ask again in a moment.', tooLong: 'Please keep questions under 500 characters.', loading: 'Looking for the answer…', copyAnswer: 'Copy answer', answerCopied: 'Answer copied.', noCopy: 'Copy is not available here.' }
-  : { copied: '이메일 주소를 복사했어요.', copyFail: 'hello@synk.im 주소를 선택해 복사해 주세요.', more: '자세히 보기', related: '이어서 물어보기', sources: '안내 자료', reviewed: '공개 자료 확인', synk: 'SYNK 안내', loadFail: '안내 자료를 불러오지 못했어요. 잠시 뒤 다시 물어봐 주세요.', tooLong: '질문은 500자 안으로 적어 주세요.', loading: '답을 찾는 중…', copyAnswer: '답변 복사', answerCopied: '답변을 복사했어요.', noCopy: '복사를 쓸 수 없어요. 답을 선택해 복사해 주세요.' };
+  ? { copied: 'Email address copied.', copyFail: 'Select hello@synk.im to copy it.', more: 'Keep reading', mine: 'Your question', follow: 'Follow-up', termOpen: 'open the note', related: 'Ask next', sources: 'Source', reviewed: 'Checked against public notes', synk: 'SYNK', loadFail: 'Could not load the notes. Please ask again in a moment.', tooLong: 'Please keep questions under 500 characters.', loading: 'Looking for the answer…', copyAnswer: 'Copy', answerCopied: 'Answer copied.', noCopy: 'Copy is not available here.' }
+  : { copied: '이메일 주소를 복사했어요.', copyFail: 'hello@synk.im 주소를 선택해 복사해 주세요.', more: '이어서 읽기', mine: '내 질문', follow: '이어서', termOpen: '안내 열기', related: '이어서 물어보기', sources: '안내 자료', reviewed: '공개 자료 확인', synk: 'SYNK 안내', loadFail: '안내 자료를 불러오지 못했어요. 잠시 뒤 다시 물어봐 주세요.', tooLong: '질문은 500자 안으로 적어 주세요.', loading: '답을 찾는 중…', copyAnswer: '복사', answerCopied: '답변을 복사했어요.', noCopy: '복사를 쓸 수 없어요. 답을 선택해 복사해 주세요.' };
 const reduced = matchMedia('(prefers-reduced-motion: reduce)');
 
 /* 답 링크 규칙: 빌드가 아래 자리에 src/public-actions.js의 허용 목록과 isPublicActionHref를 넣는다 */
@@ -410,47 +410,91 @@ function loadEngine() {
 const el = (tag, cls, text) => { const n = document.createElement(tag); if (cls) n.className = cls; if (text !== undefined) n.textContent = text; return n; };
 const paras = (parent, text) => String(text || '').split(/\n\n/).filter(Boolean).forEach(p => parent.append(el('p', '', p)));
 
+// 답 안의 제품·사업 이름: 형광 줄로 표시하고, 누르면 그 이름의 공개 안내를 바로 연다(검색을 거치지 않는다).
+// 긴 이름부터 찾고, 답 하나에 셋까지, 지금 답과 같은 기록은 표시하지 않는다.
+const TERMS = (lang === 'en'
+  ? [['SYNK platform', 'synk-platform'], ['SYNK WORLD', 'synk-platform'], ['member benefits', 'synk-benefits'], ['Atlas', 'synk-atlas'], ['SYNK LAB', 'lab-intro'], ['SYNK SHIFT', 'shift-intro'], ['SYNK PULSE', 'pulse-intro'], ['PATH', 'path-intro']]
+  : [['SYNK 플랫폼', 'synk-platform'], ['SYNK WORLD', 'synk-platform'], ['회원 혜택', 'synk-benefits'], ['무료 체험', 'synk-products'], ['아틀라스', 'synk-atlas'], ['SYNK LAB', 'lab-intro'], ['SYNK SHIFT', 'shift-intro'], ['SYNK PULSE', 'pulse-intro'], ['PATH', 'path-intro']]
+).sort((a, b) => b[0].length - a[0].length);
+const termRe = new RegExp(TERMS.map(([t]) => t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|'), 'g');
+const latin = ch => /[A-Za-z0-9]/.test(ch || '');
+function markTerms(p, text, used) {
+  let last = 0;
+  for (const m of String(text).matchAll(termRe)) {
+    const [term] = m, id = TERMS.find(([t]) => t === term)?.[1];
+    const edge = latin(term[0]) && latin(text[m.index - 1]) || latin(term.at(-1)) && latin(text[m.index + term.length]);
+    if (!id || edge || used.has(id) || used.size >= used.cap || !engine?.records.has(id)) continue;
+    used.add(id);
+    p.append(text.slice(last, m.index));
+    const b = el('button', 'qa-term', term); b.type = 'button'; b.dataset.askRecord = id;
+    b.setAttribute('aria-label', term + (lang === 'en' ? ': ' : ' ') + T.termOpen); b.title = T.termOpen;
+    p.append(b); last = m.index + term.length;
+  }
+  p.append(text.slice(last));
+  return p;
+}
+
+// 2026-10-19 유호님 「너무 ai스러워 … 싱ㅋ처럼 힙한 느낌, 전달력·사용성」: 말풍선·둥근 상자·같은 모양 알약 대신 질문 색인과 같은 줄 문법의 답 시트.
+// 왼쪽 「A」 꼬리표와 가는 선, 큰 첫 문장, 주 행동 하나, 「이어서 물어보기」 번호 줄, 맨 아래 확인 날짜·자료·복사 한 줄.
 function renderAnswer(result, { inline = false } = {}) {
-  const wrap = el('div', inline ? 'answer' : 'msg-answer');
-  if (!inline) { const lab = el('p', 'msg-label', T.synk); wrap.append(lab); }
-  const body = el('div', 'answer');
-  if (result.message) paras(body, result.message);
-  for (const record of result.records || []) {
-    if ((result.records || []).length > 1) body.append(el('h4', '', record.title));
+  const records = result.records || [];
+  const wrap = el('div', 'qa-a' + (inline ? ' is-inline' : ''));
+  const rail = el('p', 'qa-rail'); rail.setAttribute('aria-hidden', 'true'); rail.append(el('span', 'qa-mark', 'A')); wrap.append(rail);
+  const body = el('div', 'qa-body');
+  const used = Object.assign(new Set(records.map(r => r.id)), { cap: records.length + 3 });
+  let first = true;
+  const say = (parent, text) => { parent.append(markTerms(el('p', first ? 'qa-lead' : ''), text, used)); first = false; };
+  if (result.message) String(result.message).split(/\n\n/).filter(Boolean).forEach(t => say(body, t));
+  for (const record of records) {
+    if (records.length > 1) { body.append(el('h4', 'qa-sub', record.title)); first = true; }
     const parts = String(record.answer || '').split(/\n\n/);
     const focus = result.focus?.[record.id];
-    paras(body, parts[0]);
-    if (focus > 0 && focus < parts.length) paras(body, parts[focus]);
+    say(body, parts[0]);
+    if (focus > 0 && focus < parts.length) say(body, parts[focus]);
     const rest = parts.filter((_, i) => i > 0 && i !== focus);
-    if (rest.length) { const d = el('details'); d.append(el('summary', '', T.more)); const inner = el('div'); rest.forEach(p => paras(inner, p)); d.append(inner); body.append(d); }
-  }
-  wrap.append(body);
-  const foot = el('div', 'answer-foot');
-  const seen = new Set();
-  for (const record of result.records || []) {
-    const a = record.action;
-    // 검토한 주소만 링크로 만든다(규칙은 빌드 때 src/public-actions.js에서 들어온다). 영어 안내의 링크는 이미 /en/ 판이다.
-    if (a?.href && !seen.has(a.href) && typeof a.label === 'string' && a.label.trim() && isPublicActionHref(a.href)) {
-      seen.add(a.href);
-      const link = el('a', 'primary', a.label + ' ↗');
-      link.href = a.href;
-      foot.append(link);
+    if (rest.length) {
+      const d = el('details', 'qa-more'), s = el('summary');
+      s.append(el('span', '', T.more), el('span', 'qa-count', '+' + rest.length));
+      const inner = el('div'); rest.forEach(t => inner.append(markTerms(el('p'), t, used)));
+      d.append(s, inner); body.append(d);
     }
   }
+  // 주 행동: 검토한 주소만 링크로 만든다(규칙은 빌드 때 src/public-actions.js에서 들어온다). 영어 안내의 링크는 이미 /en/ 판이다.
+  const seen = new Set(), go = el('div', 'qa-go');
+  for (const record of records) {
+    const a = record.action;
+    if (a?.href && !seen.has(a.href) && typeof a.label === 'string' && a.label.trim() && isPublicActionHref(a.href)) {
+      seen.add(a.href);
+      const link = el('a', seen.size === 1 ? 'qa-go-main' : 'qa-go-more'); link.href = a.href;
+      link.append(el('span', '', a.label), el('span', 'arr', '↗'));
+      go.append(link);
+    }
+  }
+  if (go.children.length) body.append(go);
+  const related = (result.relatedIds || []).slice(0, result.status === 'clarify' ? 3 : 2).map(id => engine?.records.get(id)).filter(Boolean);
+  if (related.length) {
+    const next = el('div', 'qa-next'), list = el('ul');
+    next.append(el('p', 'qa-label', T.related));
+    related.forEach((r, i) => {
+      const b = el('button'); b.type = 'button'; b.dataset.askQ = r.questionExamples?.[0] || r.title;
+      b.append(el('span', 'qa-text', r.title), el('span', 'arr', '→'));
+      const li = el('li'); li.append(b); list.append(li);
+    });
+    next.append(list); body.append(next);
+  }
+  const meta = el('p', 'qa-meta');
+  const dates = [...new Set(records.map(r => r.reviewedAt).filter(Boolean))].sort();
+  meta.append(el('span', '', T.synk));
+  if (dates.length) { const d = el('span'); d.append(T.reviewed + ' ', el('span', 'qa-date', dates.at(-1).replace(/-/g, '.'))); meta.append(d); }
   (result.sourceIds || []).slice(0, 2).forEach(id => {
     const doc = engine?.docs.get(id); if (!doc) return;
-    const b = el('button', '', T.sources + ' · ' + doc.title.split(' — ')[0]); b.type = 'button'; b.dataset.doc = id; foot.append(b);
+    const b = el('button', '', T.sources + ' · ' + doc.title.split(' — ')[0]); b.type = 'button'; b.dataset.doc = id; meta.append(b);
   });
   const copy = el('button', '', T.copyAnswer); copy.type = 'button';
-  copy.addEventListener('click', async () => { try { await navigator.clipboard.writeText([result.message, ...(result.records || []).map(r => r.answer)].filter(Boolean).join('\n\n')); toast(T.answerCopied); } catch { toast(T.noCopy); } });
-  foot.append(copy);
-  (result.relatedIds || []).slice(0, result.status === 'clarify' ? 3 : 2).forEach(id => {
-    const r = engine?.records.get(id); if (!r) return;
-    const b = el('button', '', r.title); b.type = 'button'; b.dataset.askQ = r.questionExamples?.[0] || r.title; foot.append(b);
-  });
-  wrap.append(foot);
-  const dates = [...new Set((result.records || []).map(r => r.reviewedAt).filter(Boolean))].sort();
-  if (dates.length) wrap.append(el('p', 'answer-date', T.reviewed + ' · ' + dates.at(-1)));
+  copy.addEventListener('click', async () => { try { await navigator.clipboard.writeText([result.message, ...records.map(r => r.answer)].filter(Boolean).join('\n\n')); toast(T.answerCopied); } catch { toast(T.noCopy); } });
+  meta.append(copy);
+  body.append(meta);
+  wrap.append(body);
   return wrap;
 }
 
@@ -461,18 +505,34 @@ async function answer(question) {
   return result;
 }
 
-async function ask(text, { scroll = true } = {}) {
+// 직접 물은 질문은 자주 묻는 질문 번호를 이어 받아 색인 한 줄이 된다(말풍선 없음).
+let asked = 0;
+function entry(question, result, typed = true) {
+  const art = el('article', 'qa-entry'), head = el('div', 'qa-q');
+  head.append(el('span', 'qa-no', String($$('.faq-q').length + ++asked).padStart(2, '0')), el('h3', 'qa-q-text', question), el('span', 'qa-tag', typed ? T.mine : T.follow));
+  art.append(head, renderAnswer(result));
+  // 머리줄 개수: 자주 묻는 질문 수 + 직접 물은 수(움직임 없이 글자만 바뀐다)
+  const count = $('#questions .qx-count'), pad = n => String(n).padStart(2, '0');
+  if (count) count.textContent = pad($$('.faq-q').length) + ' + ' + pad(asked);
+  messages.append(art);
+  while (messages.children.length > 12) messages.firstElementChild.remove();
+  return head;
+}
+async function ask(text, { scroll = true, record = null, typed = false } = {}) {
   const q = String(text || '').trim();
   if (!q || busy) return;
   if (q.length > 500) { toast(T.tooLong); return; }
   busy = true; form?.setAttribute('aria-busy', 'true'); syncSend();
   try {
     await loadEngine();
-    const user = el('div', 'msg-user', q); messages.append(user);
-    messages.append(renderAnswer(await answer(q)));
-    while (messages.children.length > 24) messages.firstElementChild.remove();
-    input.value = ''; autosize();
-    if (scroll) user.scrollIntoView({ behavior: reduced.matches ? 'auto' : 'smooth', block: 'start' });
+    // 답 안의 이름을 누르면 그 기록을 그대로 연다(자주 묻는 질문과 같은 방식).
+    const r = record && engine.records.get(record);
+    let result;
+    if (r) { result = { status: 'matched', records: [r], sourceIds: [r.sourceId], relatedIds: (r.relatedIds || []).slice(0, 2), brand: r.brand }; context = { brand: ['lab', 'shift', 'pulse', 'path'].includes(r.brand) ? r.brand : context.brand, recordIds: [r.id] }; }
+    else result = await answer(q);
+    const head = entry(q, result, typed);
+    if (typed) { input.value = ''; autosize(); }
+    if (scroll) head.scrollIntoView({ behavior: reduced.matches ? 'auto' : 'smooth', block: 'start' });
   } catch { toast(T.loadFail); }
   finally { busy = false; form?.setAttribute('aria-busy', 'false'); syncSend(); }
 }
@@ -483,7 +543,7 @@ if (askRoot) {
   input.addEventListener('focus', () => { loadEngine().then(startQueryWorker).catch(() => {}); });
   input.addEventListener('input', () => { autosize(); syncSend(); });
   input.addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey && !e.isComposing) { e.preventDefault(); if (input.value.trim()) form.requestSubmit(); } });
-  form.addEventListener('submit', e => { e.preventDefault(); ask(input.value); });
+  form.addEventListener('submit', e => { e.preventDefault(); ask(input.value, { typed: true }); });
   // 자주 묻는 질문: 누르면 그 자리에서 펼쳐 답한다
   $$('[data-faq]').forEach(btn => btn.addEventListener('click', async () => {
     const panel = document.getElementById(btn.getAttribute('aria-controls'));
@@ -507,11 +567,12 @@ if (askRoot) {
 }
 // 다른 곳의 "이 질문 묻기" 단추(바닥의 사업자 정보, 관련 질문)
 document.addEventListener('click', e => {
-  const b = e.target.closest('[data-ask-q]');
+  const b = e.target.closest('[data-ask-q],[data-ask-record]');
   if (!b || !askRoot) return;
   e.preventDefault();
-  $('#contact')?.scrollIntoView({ behavior: reduced.matches ? 'auto' : 'smooth', block: 'start' });
-  ask(b.dataset.askQ, { scroll: false });
+  // 새 색인 줄(질문 머리)로 바로 간다. 답 안의 이름은 그 기록의 대표 질문으로 묻는다.
+  const r = b.dataset.askRecord && engine?.records.get(b.dataset.askRecord);
+  ask(r ? (r.questionExamples?.[0] || r.title) : b.dataset.askQ, { record: r ? r.id : null });
 });
 
 /* 안내 자료 창 */
@@ -528,4 +589,50 @@ document.addEventListener('click', async e => {
     for (const r of engine.records.values()) { if (r.sourceId !== b.dataset.doc) continue; const s = el('section'); s.append(el('h3', '', r.title)); paras(s, r.answer); body.append(s); }
     docDialog.showModal();
   } catch { toast(T.loadFail); }
+});
+
+/* 서비스 목록(SHIFT·PULSE, 2026-10-19): 넓은 화면은 왼쪽 큰 글자 목록에서 하나를 골라 오른쪽에 보인다.
+   좁은 화면과 JS가 없을 때는 모두 펼친다. 주소의 #service-N·#film-N(위 이동 줄 포함)으로 오면 그 서비스를 연다. */
+$$('[data-svc]').forEach(root => {
+  const tabs = $$('[data-svc-tab]', root), panels = $$('.svc-panel', root), list = $('.svc-list', root);
+  const wide = matchMedia('(min-width: 901px)');
+  let on = 0;
+  const show = (i, focus) => {
+    on = i;
+    tabs.forEach((t, k) => { t.setAttribute('aria-selected', String(k === i)); t.tabIndex = k === i ? 0 : -1; });
+    panels.forEach((p, k) => p.classList.toggle('is-on', k === i));
+    if (focus) tabs[i].focus();
+  };
+  const apply = () => {
+    const tabsMode = wide.matches;
+    root.classList.toggle('is-tabs', tabsMode);
+    if (tabsMode) { list.setAttribute('role', 'tablist'); list.setAttribute('aria-orientation', 'vertical'); tabs.forEach(t => t.setAttribute('role', 'tab')); panels.forEach((p, k) => { p.setAttribute('role', 'tabpanel'); p.setAttribute('aria-labelledby', tabs[k].id); }); }
+    else { ['role', 'aria-orientation'].forEach(a => list.removeAttribute(a)); tabs.forEach(t => t.removeAttribute('role')); panels.forEach(p => { p.removeAttribute('role'); p.removeAttribute('aria-labelledby'); }); }
+    show(on);
+  };
+  tabs.forEach((t, i) => {
+    t.addEventListener('click', () => show(i));
+    t.addEventListener('keydown', e => {
+      const d = { ArrowDown: 1, ArrowRight: 1, ArrowUp: -1, ArrowLeft: -1 }[e.key];
+      if (d) { e.preventDefault(); show((i + d + tabs.length) % tabs.length, true); }
+      else if (e.key === 'Home' || e.key === 'End') { e.preventDefault(); show(e.key === 'Home' ? 0 : tabs.length - 1, true); }
+    });
+  });
+  const go = (hash, smooth) => {
+    const i = panels.findIndex(p => '#' + p.id === hash);
+    if (i < 0) return false;
+    show(i);
+    if (wide.matches) root.scrollIntoView({ behavior: smooth && !reduced.matches ? 'smooth' : 'auto', block: 'start' });
+    return true;
+  };
+  document.addEventListener('click', e => {
+    const a = e.target.closest('a[href*="#"]');
+    if (!a || !wide.matches) return;
+    const url = new URL(a.href, location.href);
+    if (url.pathname !== location.pathname || !go(url.hash, true)) return;
+    e.preventDefault(); history.replaceState(null, '', url.hash);
+  });
+  wide.addEventListener('change', apply);
+  apply(); go(location.hash, false);
+  addEventListener('hashchange', () => go(location.hash, true));
 });
