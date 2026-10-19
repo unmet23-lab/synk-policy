@@ -1,0 +1,54 @@
+{
+  "name": "townwide-merged",
+  "builtAt": "2026-10-18T15:28:33.098Z",
+  "textures": {
+    "mode": "etc1s",
+    "pc": 2048,
+    "phone": 1024,
+    "uastc": "neighbours_wall"
+  },
+  "geometry": "meshopt-high",
+  "parts": [
+    {
+      "id": "ground",
+      "url": "townwide-merged-ground.glb",
+      "phone": "townwide-merged-ground-phone.glb"
+    },
+    {
+      "id": "home",
+      "placeId": "home",
+      "url": "townwide-merged-home.glb",
+      "phone": "townwide-merged-home-phone.glb"
+    },
+    {
+      "id": "cafe",
+      "placeId": "cafe",
+      "url": "townwide-merged-cafe.glb",
+      "phone": "townwide-merged-cafe-phone.glb"
+    },
+    {
+      "id": "workshop",
+      "placeId": "workshop",
+      "url": "townwide-merged-workshop.glb",
+      "phone": "townwide-merged-workshop-phone.glb"
+    },
+    {
+      "id": "greenhouse",
+      "placeId": "greenhouse",
+      "url": "townwide-merged-greenhouse.glb",
+      "phone": "townwide-merged-greenhouse-phone.glb"
+    },
+    {
+      "id": "ring",
+      "defer": true,
+      "url": "townwide-merged-ring.glb",
+      "phone": "townwide-merged-ring-phone.glb"
+    },
+    {
+      "id": "neighbours",
+      "defer": true,
+      "url": "townwide-merged-neighbours.glb",
+      "phone": "townwide-merged-neighbours-phone.glb"
+    }
+  ]
+}
