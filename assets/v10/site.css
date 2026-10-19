@@ -120,8 +120,8 @@ button,input,textarea{font:inherit;color:inherit}
 .eyebrow{display:inline-flex;align-items:center;gap:10px;font-family:var(--mono);font-size:12.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3);margin:0 0 22px}
 .eyebrow .dot{width:7px;height:7px;border-radius:50%;background:var(--accent)}
 .eyebrow-ko{font-family:var(--sans);text-transform:none;letter-spacing:-.005em;font-size:14px;font-weight:650;color:var(--ink-2)}
-/* 고정폭 라벨 안의 한글(build.mjs가 span.ko로 감싼다): SUIT, 자간 0, 대문자 변환 없음 */
-.ko{font-family:var(--sans);letter-spacing:-.005em;text-transform:none;font-weight:500}
+/* 고정폭 라벨 안의 한글(build.mjs가 span.ko로 감싼다): SUIT 550, 자간 0, 대문자 변환 없음, 13px 아래로 내려가지 않음(2026-10-19 — 라틴·숫자 부분은 라벨 크기 그대로) */
+.ko{font-family:var(--sans);letter-spacing:-.005em;text-transform:none;font-weight:550;font-size:max(1em,13px)}
 html[lang="ko"] .answer-date{font-family:var(--sans);letter-spacing:0}
 h1,h2,h3,h4{margin:0;font-weight:760;letter-spacing:-.035em;line-height:1.1;text-wrap:balance}
 .display{font-size:clamp(42px,7.2vw,100px);line-height:1.02;letter-spacing:-.05em;font-weight:780}
@@ -311,7 +311,7 @@ html[lang="en"] .cover-title{font-size:clamp(36px,4.4vw,64px);letter-spacing:-.0
   .cover-title{font-size:clamp(34px,9.6vw,44px)}
   .cover .btns .btn{flex:1 1 auto}
   .cover-stats>div{padding:16px 12px 0}
-  .cover-stats dt{font-size:12.5px}
+  .cover-stats dt{font-size:13px}
 }
 
 #goals figure img{width:100%;height:100%;object-fit:cover;object-position:50% 15%}
@@ -1005,7 +1005,6 @@ html[lang="ko"] .foot-col h2,html[lang="ko"] .foot-channels>h2{font-family:var(-
 #questions{--qx-col:48px}
 #questions>.qx-head{display:flex;align-items:center;gap:14px;width:100%;margin:0 0 4px;letter-spacing:0}
 #questions>.qx-head::after{content:'';flex:1;height:1px;background:var(--line-2)}
-#questions>.qx-head .ko{font-size:13px}
 .qx-count{order:1;font-family:var(--mono);font-size:12.5px;letter-spacing:.04em;color:var(--ink-3);white-space:nowrap}
 .faq{border-top:0}
 .faq>li{border-bottom:1px solid var(--line)}
