@@ -10299,7 +10299,11 @@ var SynkLearning = (() => {
           state: flowPort.state,
           merge: flowPort.merge,
           subscribe: flowPort.subscribe,
-          flow: flowPort
+          flow: flowPort,
+          pending: flowPort.pending,
+          prepare: flowPort.prepare,
+          acknowledge: flowPort.acknowledge,
+          epoch: flowPort.epoch
         });
         api.live = createLive({ coach: api, port: flowPort, clock: monotonicClock });
         return api;
