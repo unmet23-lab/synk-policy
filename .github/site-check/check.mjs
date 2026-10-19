@@ -232,8 +232,9 @@ console.log('5. 질문창');
     s = await open(devices[0], '/lab/');
     const before = await s.page.locator('#messages > *').count();
     await s.page.evaluate(q => { const input = document.querySelector('#question'); input.value = q; input.dispatchEvent(new Event('input', {bubbles: true})); document.querySelector('#question-form').requestSubmit(); }, 'SYNK LAB은 무엇을 하나요?');
-    await s.page.waitForFunction(n => document.querySelectorAll('#messages > *').length >= n + 2, before, {timeout: 20000});
-    const answer = await s.page.evaluate(() => { const all = document.querySelectorAll('#messages > *'); return all[all.length - 1].innerText.replace(/\s+/g, ' ').trim(); });
+    // 2026-10-19 질문창 새 틀: 질문 하나가 #messages 안의 한 묶음(질문 머리 + 답 시트 .qa-a)이 된다. 옛 판(말풍선 + 답 두 덩어리)도 그대로 알아본다.
+    await s.page.waitForFunction(n => { const all = document.querySelectorAll('#messages > *'); return all.length >= n + 2 || (all.length >= n + 1 && !!all[all.length - 1].querySelector('.qa-a')); }, before, {timeout: 20000});
+    const answer = await s.page.evaluate(() => { const all = document.querySelectorAll('#messages > *'); const last = all[all.length - 1]; return (last.querySelector('.qa-a') || last).innerText.replace(/\s+/g, ' ').trim(); });
     if (answer.length < 30) fail('질문창', `답이 너무 짧음: ${answer}`);
     if (s.errors.length) fail('질문창', s.errors.slice(0, 2).join(' | '));
     console.log(`  답: ${answer.slice(0, 60)}…`);
