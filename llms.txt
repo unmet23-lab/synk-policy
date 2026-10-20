@@ -27,15 +27,15 @@ SYNK 플랫폼은 SYNK의 앱과 회원 혜택을 한곳에서 쓰는 입구입�
 - 플레저 (웹) — 오늘 연락할 사람과 음력으로 맞춘 생일·기념일, 주고받은 경조사를 한곳에 모아 둡니다.
 - 무료 운세 (웹) — 별자리와 한국 사주로 오늘의 기운부터 궁합·이번 달·올해까지, 광고나 잠금 없이 봅니다.
 
-Windows 64비트와 Mac(Apple Silicon·Intel, macOS 13 이상)용 Preview 0.4.33입니다. 아직 정식 코드 서명·Apple 공증 전인 미리보기판이라 설치할 때 보안 알림이 나올 수 있습니다.
+Windows 64비트와 Mac(Apple Silicon·Intel, macOS 13 이상)용 Preview 0.4.34입니다. 아직 정식 코드 서명·Apple 공증 전인 미리보기판이라 설치할 때 보안 알림이 나올 수 있습니다.
 
 [SYNK 플랫폼 열기](https://synk.im/account/platform.html#home)
 
-[Windows용 다운로드](https://github.com/unmet23-lab/synk-policy/releases/download/platform-preview-0.4.33/SYNK-Platform-Preview-0.4.33-Signal-win-x64.exe)
+[Windows용 다운로드](https://github.com/unmet23-lab/synk-policy/releases/download/platform-preview-0.4.34/SYNK-Platform-Preview-0.4.34-Signal-win-x64.exe)
 
-[Mac용 · Apple Silicon](https://github.com/unmet23-lab/synk-policy/releases/download/platform-preview-0.4.33/SYNK-Platform-Preview-0.4.33-Signal-mac-arm64.dmg)
+[Mac용 · Apple Silicon](https://github.com/unmet23-lab/synk-policy/releases/download/platform-preview-0.4.34/SYNK-Platform-Preview-0.4.34-Signal-mac-arm64.dmg)
 
-[Mac용 · Intel](https://github.com/unmet23-lab/synk-policy/releases/download/platform-preview-0.4.33/SYNK-Platform-Preview-0.4.33-Signal-mac-x64.dmg)
+[Mac용 · Intel](https://github.com/unmet23-lab/synk-policy/releases/download/platform-preview-0.4.34/SYNK-Platform-Preview-0.4.34-Signal-mac-x64.dmg)
 
 ## 네 사업
 
