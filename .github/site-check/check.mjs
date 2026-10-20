@@ -94,8 +94,8 @@ console.log('2. 제작 도구 이름');
   // 질문창 엔진은 “그림 만드는 AI는 뭘 써요?” 같은 질문을 알아듣는 단어 목록을 코드로 갖고 있다(표기가 아니다).
   const skipFile = /(^|\/)knowledge-engine\.js$/;
   const listOf = b64 => new RegExp(Buffer.from(b64, 'base64').toString('utf8'), 'i');
-  const words = listOf('c3Vub3xoaWdnc2ZpZWxkfG5hbm8gYmFuYW5hfG1pZGpvdXJuZXl8Z3B0Wy0gXWltYWdlfGVkZ2VbLV8gXXR0c3xlbGV2ZW5sYWJzfGdlbWluaS1bMC05XVtcdy4tXSp0dHN8a28tS1ItW0EtWmEtel0rTmV1cmFsfG1hZGUgd2l0aCAoc3Vub3x1ZGlvKQ==');
-  const tagWords = listOf('c3Vub3xcYnVkaW9cYnxnZW1pbml8ZWxldmVubGFic3xvcGVuYWl8ZWRnZVstXyBdP3R0cw==');
+  const words = listOf('c3Vub3xoaWdnc2ZpZWxkfG5hbm8gYmFuYW5hfG1pZGpvdXJuZXl8Z3B0Wy0gXWltYWdlfGVkZ2VbLV8gXXR0c3xlbGV2ZW5sYWJzfHR5cGVjYXN0fGdlbWluaS1bMC05XVtcdy4tXSp0dHN8a28tS1ItW0EtWmEtel0rTmV1cmFsfG1hZGUgd2l0aCAoc3Vub3x1ZGlvKQ==');
+  const tagWords = listOf('c3Vub3xcYnVkaW9cYnxnZW1pbml8ZWxldmVubGFic3x0eXBlY2FzdHxvcGVuYWl8ZWRnZVstXyBdP3R0cw==');
   const files = git('ls-files', '-z').toString('utf8').split('\0').filter(Boolean);
   let scanned = 0;
   for (const f of files) {

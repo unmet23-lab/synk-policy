@@ -9,7 +9,7 @@ export class BeginnerVoice {
     const timeout = setTimeout(() => controller.abort(), 20000);
     const staged = new Map();
     try {
-      const root = new URL('./assets/beginner/', import.meta.url);
+      const root = new URL('./beginner-assets/beginner/', import.meta.url);
       const response = await fetch(new URL('voices.json', root), { signal: controller.signal, cache: 'no-cache' });
       if (!response.ok) throw new Error('소리 목록을 불러오지 못했어요. 연결을 확인하고 다시 눌러 주세요.');
       const manifest = await response.json(); validateVoiceManifest(manifest);
