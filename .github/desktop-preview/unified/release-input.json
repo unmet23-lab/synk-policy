@@ -2,35 +2,35 @@
   "schemaVersion": 1,
   "product": "platform",
   "channel": "preview",
-  "version": "0.4.35",
-  "releaseId": "platform-preview-0.4.35",
-  "buildId": "20261020.3",
+  "version": "0.4.36",
+  "releaseId": "platform-preview-0.4.36",
+  "buildId": "20261020.4",
   "manifestUrl": "https://synk.im/desktop/releases/preview.json",
   "baselines": [
     {
       "platform": "win32",
       "arch": "x64",
-      "url": "https://github.com/unmet23-lab/synk-policy/releases/download/platform-preview-0.4.34/SYNK-Platform-Preview-0.4.34-Signal-win-x64.exe",
-      "bytes": 407663104,
-      "sha256": "31493ed294498f9c7456badd8735a8fff5368dc25127281c779cb384d9aacdf7",
-      "asarSHA256": "7cac1a570280ce01ed6d701ee594f3fc039b22c5f104d9959fc741c99a0cc3ba",
-      "backendSHA256": "8ccd9279216f7654b1e9ee6c71e2023aad6c81a14b8df02bf847ae1ce2b95717"
+      "url": "https://github.com/unmet23-lab/synk-policy/releases/download/platform-preview-0.4.35/SYNK-Platform-Preview-0.4.35-Signal-win-x64.exe",
+      "bytes": 407663616,
+      "sha256": "acfffbeb409881f613bc34736eb6c9d01f895e63c8036cad7a8942db1e0e23c6",
+      "asarSHA256": "35865f1e74466b534fef3b5b31ae5216044383c7263cb4ab5312891b733d0155",
+      "backendSHA256": "017fe99a428b15190a440237d799dba30d38f248862cffddb5eccffd2ec04db0"
     },
     {
       "platform": "darwin",
       "arch": "arm64",
-      "url": "https://github.com/unmet23-lab/synk-policy/releases/download/platform-preview-0.4.34/SYNK-Platform-Preview-0.4.34-Signal-mac-arm64.dmg",
-      "bytes": 460425895,
-      "sha256": "0bf921e0d9482866dd3c0298ef17d904ca4c1c1c0fe8caa21779c4ff9219994d",
-      "asarSHA256": "0f3919bb32bed02ba3e0926610b83364594fd164504bb92b377783dd29fdfc4a"
+      "url": "https://github.com/unmet23-lab/synk-policy/releases/download/platform-preview-0.4.35/SYNK-Platform-Preview-0.4.35-Signal-mac-arm64.dmg",
+      "bytes": 460426818,
+      "sha256": "06862010769b4f1249e4d5ad451df0558447a48698575b3e157914cb332198f9",
+      "asarSHA256": "7a622585ef5e2ec323567fbec9dac16ff8c91da9a7762cf57c6da96aed56b370"
     },
     {
       "platform": "darwin",
       "arch": "x64",
-      "url": "https://github.com/unmet23-lab/synk-policy/releases/download/platform-preview-0.4.34/SYNK-Platform-Preview-0.4.34-Signal-mac-x64.dmg",
-      "bytes": 478054074,
-      "sha256": "be2117b4bebf88df1bfbcbfab5efc22175590a590095f02d08775cdcbb757083",
-      "asarSHA256": "3206cdb1b003aed15ada3ca8cf8ac58117b0da92b8a9090e5b1ad5d3996f7110"
+      "url": "https://github.com/unmet23-lab/synk-policy/releases/download/platform-preview-0.4.35/SYNK-Platform-Preview-0.4.35-Signal-mac-x64.dmg",
+      "bytes": 478055146,
+      "sha256": "0ce4cff68d35e03ea6c0cfa25418e61b37a5b9bdc31049a6931bd5be64397cd3",
+      "asarSHA256": "28159aff67fc29b86c3450b120775d8d8051851a0c9da26c2229a75aadfed9e8"
     }
   ],
   "additionalLegacyPins": [
@@ -63,7 +63,7 @@
     }
   ],
   "electronVersion": "44.5.1",
-  "sourceHash": "0991eab53b7fe3d1daee6901825febbf51d5b287f299ceebf3b1702d9b8d6883",
+  "sourceHash": "db4d28daa4056a36e7b7d0702f896384ead4925d3b5073becfeb3efc15c5b264",
   "sourceFiles": [
     {
       "path": "assets/launcher/benefit-care.webp",
@@ -452,8 +452,8 @@
     },
     {
       "path": "renderer/member-settings.mjs",
-      "bytes": 8663,
-      "sha256": "6e04c2e6b549655b243bcd3dd62472d9c7ba993d9621ed4e77f5e1c536559f53"
+      "bytes": 8706,
+      "sha256": "0d30224d07cb6c20a58319b4dfc1184dddad568bfd45f659133ebc7306554c70"
     },
     {
       "path": "renderer/member-understanding-controller.mjs",
@@ -617,8 +617,8 @@
     },
     {
       "path": "src/classroom-requests.cjs",
-      "bytes": 3481,
-      "sha256": "70707323d464404f9bab709b210ff2f5b93fa893d40282c69f39047a02ecd349"
+      "bytes": 3832,
+      "sha256": "a9209a6629b93dddc776d4d88a9bd7fa70dc956452a8c86f3082dec8af056df6"
     },
     {
       "path": "src/client-lifecycle.cjs",
@@ -812,8 +812,8 @@
     },
     {
       "path": "src/teacher-account.cjs",
-      "bytes": 1924,
-      "sha256": "aa8706f942a93710c89e2bfb3840663244c5b33a4cb8c417dd878085a34010f0"
+      "bytes": 2022,
+      "sha256": "aa1ba13c9e30286d6f7158ab27634bafaeaae78524957f3430d4bfce849ca650"
     },
     {
       "path": "src/teacher-main.cjs",
@@ -842,8 +842,8 @@
     },
     {
       "path": "src/world-requests.cjs",
-      "bytes": 5764,
-      "sha256": "e124a0d81d5b240f3605b6487a9b79984624542bccb54ba786a606f4a62626e2"
+      "bytes": 8274,
+      "sha256": "78b2e81b9ab1e0f4eaa37a67d5126f2251109dd3df2a5533206334ef05328b06"
     }
   ]
 }
