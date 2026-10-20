@@ -1,7 +1,7 @@
 // synk.im 배포 점검(2026-10-03). synk-policy main에 올라갈 때마다 GitHub Actions에서 돈다(.github/workflows/site-check.yml).
 // 손으로 하던 공개 확인을 그대로 옮겼다:
 // 1. 반영 기다리기 — 이번 커밋에서 바뀐 파일이 synk.im에서 저장소와 바이트가 같아질 때까지(지운 파일은 404까지) 기다린다.
-// 2. 도구 이름 — 공개 글·데이터·MP3 태그에 제작 도구 이름(음악·영상·그림·음성 생성 도구와 음성 모델 이름)이 없는지 저장소 파일로 본다.
+// 2. 도구 이름 — 공개 글·데이터·MP3 태그에 제작 도구 이름(음악·영상·그림·음성 생성 도구와 음성 모델 이름, 한글 표기 포함)과 작업 PC의 경로가 없는지 저장소 파일로 본다.
 //    개인정보·약관처럼 처리 업체를 적어야 하는 곳과 도구 사용법 안내(brief)는 뺀다(2026-10-02 원칙).
 //    찾을 이름 목록은 이 저장소가 공개라 검색에 걸리지 않게 base64로 적었다.
 // 3. 페이지 — 주요 페이지를 컴퓨터·휴대폰으로 열어 콘솔 오류·실패한 요청·가로 넘침이 없는지 본다.
@@ -94,7 +94,8 @@ console.log('2. 제작 도구 이름');
   // 질문창 엔진은 “그림 만드는 AI는 뭘 써요?” 같은 질문을 알아듣는 단어 목록을 코드로 갖고 있다(표기가 아니다).
   const skipFile = /(^|\/)knowledge-engine\.js$/;
   const listOf = b64 => new RegExp(Buffer.from(b64, 'base64').toString('utf8'), 'i');
-  const words = listOf('c3Vub3xoaWdnc2ZpZWxkfG5hbm8gYmFuYW5hfG1pZGpvdXJuZXl8Z3B0Wy0gXWltYWdlfGVkZ2VbLV8gXXR0c3xlbGV2ZW5sYWJzfHR5cGVjYXN0fGdlbWluaS1bMC05XVtcdy4tXSp0dHN8a28tS1ItW0EtWmEtel0rTmV1cmFsfG1hZGUgd2l0aCAoc3Vub3x1ZGlvKQ==');
+  // 다른 낱말 속에 든 꼴에 걸리지 않게 몇 이름은 앞 글자 조건을 붙였다(2026-10-20).
+  const words = listOf('c3Vub3xoaWdnc2ZpZWxkfG5hbm8gYmFuYW5hfG1pZGpvdXJuZXl8Z3B0Wy0gXWltYWdlfGVkZ2VbLV8gXXR0c3xlbGV2ZW5sYWJzfHR5cGVjYXN0fGdlbWluaS1bMC05XVtcdy4tXSp0dHN8a28tS1ItW0EtWmEtel0rTmV1cmFsfG1hZGUgd2l0aCAoc3Vub3x1ZGlvKXxncHRbLSBdP+ydtOuvuOyngHzsp4DtlLzti7B8Y29kZXh8c2VlZGFuY2V8XGJrbGluZ3xkZW11Y3N87YOA7J6F7LqQ7Iqk7Yq4fO2eieyKpO2VhOuTnHzrgpjrhbggP+uwlOuCmOuCmHxzeW5rLXZlbmRvcnwoPzwhW1x3Li1dKVwudG1wW1xcL118KD88IVvqsIAt7Z6jXSkoPzrtgbTroZzrk5x87KCc66+464KY7J20fOyImOuFuCk=');
   const tagWords = listOf('c3Vub3xcYnVkaW9cYnxnZW1pbml8ZWxldmVubGFic3x0eXBlY2FzdHxvcGVuYWl8ZWRnZVstXyBdP3R0cw==');
   const files = git('ls-files', '-z').toString('utf8').split('\0').filter(Boolean);
   let scanned = 0;
