@@ -124,7 +124,7 @@ function renderStatus(){
  if((snap?.accountId||'guest')!==lifeOwner||client.generation!==lifeGeneration)initializeLife();
  renderHomeHanger(snap);
  if(!snap&&townSession){townSession.dispose();townSession=null;delete window.SYNKWorldTownHost;}
- if(!snap&&['world-play','world-retry','world-reward','world-profile','world-device-records','game','world-game-loading','world-game-error','world-game-conflict'].includes(screen)){draftRun=null;answers=[];lastCompletion=null;close();}
+ if(!snap&&['world-play','world-retry','world-reward','world-profile','world-device-records','game','world-game-loading','world-game-error','world-game-conflict','world-speaking'].includes(screen)){draftRun=null;answers=[];lastCompletion=null;close();}
  if(!home.isMaru){if(snap){home.setEquipment(snap.avatar?.slots,snap.avatar?.dyes);$('.page-heading h1').textContent=snap.activeRun?'하던 놀이가 있어요':'첫 문장 놀이부터 시작해요';$('.hero-copy .felt-button').innerHTML=`${snap.activeRun?'이어서 하기':'첫 문장 놀이 시작하기'} <span aria-hidden="true">→</span>`;}
  else {home.setEquipment({});$('.page-heading h1').textContent='첫 문장 놀이부터 시작해요';$('.hero-copy .felt-button').innerHTML='첫 놀이 시작하기 <span aria-hidden="true">→</span>';}
  }
@@ -262,7 +262,7 @@ function initializeLife(){
 }
 function mountLifeLearning(){
  education?.dispose();education=null;
- lifeUI=createLifeExperience({home,getProgress:()=>lifeProgress,asset:path=>worldUrl('brand-opening/assets/'+path),show:(title,html,options)=>show(title,html,options.type,{eyebrow:options.eyebrow,nav:options.nav}),onSummary:()=>education?.refresh(),onNext:()=>education?.next(),presentation:()=>education?.presentation(),moreRows:print=>[education?.planRow?.(print),writingRow(print),reminders?.askMarkup()].filter(Boolean).join(''),positionTotal:()=>education?.positionTotal?.()});
+ lifeUI=createLifeExperience({home,getProgress:()=>lifeProgress,asset:path=>worldUrl('brand-opening/assets/'+path),show:(title,html,options)=>show(title,html,options.type,{eyebrow:options.eyebrow,nav:options.nav}),onSummary:()=>education?.refresh(),onNext:()=>education?.next(),presentation:()=>education?.presentation(),moreRows:print=>[education?.planRow?.(print),writingRow(print),speakingModule?.speakingRow?.(print),reminders?.askMarkup()].filter(Boolean).join(''),positionTotal:()=>education?.positionTotal?.()});
  // 공개판(계정 모드)의 손님은 GUEST_GAMES와 체험이 남은 게임만 바로 열고 나머지는 로그인부터 연다(launchGame). 추천도 같은 목록을 써야 로그인 창을 맴돌지 않는다.
  const createPlan=options=>createWorldLearningPlan({...options,answers:topicAnswers&&topicAnswers.owner===lifeOwner?topicAnswers:null,openGames:operating&&!client.snapshot?guestGames():null});
  // 내 위치(10-19 결정): 짧은 진단 듣기 문항의 녹음은 게임 폴더(korean-runner·korean-rhythm)에서 부른다.
@@ -270,6 +270,12 @@ function mountLifeLearning(){
   launchGame,startLesson:id=>lifeUI.start(id),startReview:(id,ids)=>lifeUI.reviewStart(id,ids),
   // 시험 계획(10-20): 온라인 반 「이번 주 과제」를 그 주의 연습으로 먼저 세고, TOPIK II 쓰기 연습은 문항이 열렸을 때만 계획에 넣는다.
   readClasswork:classworkThisWeek,writingPractice:{candidates:()=>writingReady()?WRITING_CANDIDATES:[],open:route=>openWriting({dataset:{writingRoute:route}}),attempts:()=>readWritingSummary({storage:localStorage,owner:writingOwnerId()}).times},
+  // 말하기 연습(10-21 공개 판 · 기본 켜짐): 모듈이 문항을 읽은 뒤에만 시험 정보의 「말하기 평가도 준비해요」(이 기기 기록)와 이번 주 계획의 말하기 칸이 생긴다
+  // (이 기기에서 끄는 스위치를 켰으면 모듈을 부르지 않아 지금과 같다 — 아래 speakingOn).
+  // 이 파일은 모듈을 정적으로 부르지 않으므로 그 모듈의 읽기·쓰기 함수를 감싸 넘긴다. owner는 학습 화면의 주인(계정·손님)이다.
+  speakingPractice:{available:()=>!!speakingModule?.speakingReady(),candidates:()=>speakingModule?.speakingReady()?speakingModule.SPEAKING_CANDIDATES.filter(row=>row.exam==='speaking'):[],
+   chosen:owner=>!!speakingModule&&speakingModule.readSpeakingExam({storage:localStorage,owner}),choose:(owner,on)=>!!speakingModule&&speakingModule.writeSpeakingExam({storage:localStorage,owner,on}),
+   week:(owner,week)=>speakingModule?speakingModule.speakingWeek({storage:localStorage,owner,week}):null,open:route=>openSpeaking({dataset:{speakingRoute:route}})},
   prepare:async()=>{if(operating&&client.snapshot&&!window.SYNKLearningHost)await account.prepareGame({target:window});}});
  home.connectEducation?.(education);window.__synkEducation=education;
  // 학습 알림(10-19 결정 · 1단 기기 예약, world-reminder-device.mjs): 주인마다 이 기기에 따로 두고, 무엇을 알릴지는 복습 일정·이번 주 시험 계획·Core 추천에서 읽는다.
@@ -300,6 +306,8 @@ function studyTimes(snapshot){
  for(const day of Object.values(snapshot?.daily?.days||{}))for(const item of Object.values(day?.items||{}))add(item?.observedAt);
  for(const at of reminderTrail?.read()||[])add(at);
  try{for(const at of readWritingSummary({storage:localStorage,owner:writingOwnerId()}).times)add(at);}catch{}
+ // 말하기 연습(모듈을 불렀을 때만): 이번 주 계획의 말하기 칸도 남은 연습으로 세므로, 말한 날은 그날 이미 공부한 날이다.
+ try{if(speakingModule)for(const at of speakingModule.readSpeakingSummary({storage:localStorage,owner:writingOwnerId()}).times)add(at);}catch{}
  return times;
 }
 // 알림을 누르면 그 알림이 가리키는 자리로: 돌아온 복습은 나의 복습 화면, 이번 주 연습은 이번 주 계획, 시험 점검 카드의 주 단추는
@@ -344,6 +352,28 @@ function openWriting(button){
     coach=source?source.createGame({gameId:'world-writing'},worldLearning.engine.createGame,worldLearning.createLearningSync):worldLearning.engine.createGame({gameId:'world-writing',storage:localStorage});return coach;}});
  }
  return writing.open(button?.dataset?.writingRoute||'writing');
+}
+// 말하기 연습(10-21 공개 판, world-speaking-practice.mjs · 설계 qa/speaking-pilot-20261021/설계.md): 플래그 없이 모듈을 동적으로 불러 문항을 읽으면
+// 배우기 판에 줄을 더한다. 끄는 비상 스위치는 이 기기 설정 synk.world.speaking.preview=0 하나다(화면 글 없음) — 그 기기에서는 모듈을 부르지 않는다.
+// 자동 피드백 통로: 계정 모드는 SYNK-talk world-speaking 함수(account.speakingRequest, 웹만 — 쓰기 연습과 같은 규칙), 리허설은 로컬 개발 서버의
+// /api/world/speaking. 로그인해야 붙고, 서버 플래그가 꺼져 있거나 문항 판이 다르면 단추 없이 스스로 확인만 보인다.
+let speakingModule=null,speaking=null,speakingOwner=null;
+const speakingOn=(()=>{try{return localStorage.getItem('synk.world.speaking.preview')!=='0';}catch{return true;}})();
+const repaintSpeakingRow=()=>{if(lifeUI&&document.querySelector('#world-panel[open] #panel-content .life-hub')&&!document.querySelector('#panel-content [data-world="speaking"]'))lifeUI.packs();};
+// 은행을 다 읽으면 배우기 줄을 그리고, 추천·이번 주 계획을 다시 세운다 — 시험 정보에서 말하기를 고른 학생의 말하기 칸은 문항이 열려야 생긴다(쓰기와 같다).
+if(speakingOn)void import('./world-speaking-practice.mjs').then(module=>{speakingModule=module;return module.loadSpeakingBank();}).then(()=>{repaintSpeakingRow();education?.refresh();}).catch(()=>{});
+function openSpeaking(button){
+ if(!speakingModule)return;
+ const owner=writingOwnerId();
+ if(!speaking||speakingOwner!==owner){
+  speaking?.dispose();speakingOwner=owner;let coach=null;
+  const feedback=operating?(client.snapshot&&account?.supportsSpeaking?{status:()=>account.speakingRequest({action:'status'}),request:payload=>account.speakingRequest(payload)}:null)
+   :client?.snapshot?{status:()=>client.request('speaking',{method:'POST',body:{action:'status'}}),request:payload=>client.request('speaking',{method:'POST',body:payload})}:null;
+  speaking=speakingModule.createSpeakingPractice({show:(title,html)=>show(title,html,'world-speaking',{eyebrow:'SPEAKING'}),home,getOwner:writingOwnerId,tutor:()=>home.tutor?.()?.tutor||null,feedback,
+   coach:()=>{if(writingOwnerId()!==owner)return null;if(coach)return coach;const source=window.SYNKLearningHost||null;if(!source&&owner!=='guest')return null;
+    coach=source?source.createGame({gameId:'world-speaking'},worldLearning.engine.createGame,worldLearning.createLearningSync):worldLearning.engine.createGame({gameId:'world-speaking',storage:localStorage});return coach;}});
+ }
+ return speaking.open(button?.dataset?.speakingRoute||'speaking');
 }
 async function openLife(method,...args){
  if(!lifeReady)initializeLife();
@@ -522,6 +552,7 @@ const commands={
  // 로그아웃: 이 뒤에 생긴 손님 기록만 다음 로그인에 옮길지 묻는다(device-records.mjs — 앞 사람의 손님 기록이 다음 사람에게 가지 않게).
  logout:async()=>{accountActionPending=true;entryGate?.invalidate();const leaving=client.snapshot?.accountId;try{await client.logout();const signedOutAt=Date.now();if(leaving)noteDeviceAccount(localStorage,leaving,signedOutAt);noteDeviceSignOut(localStorage,signedOutAt);sessionConfirmed=false;close();if(home.isMaru)await entryGate.start();else welcome();}catch(e){if(e.code==='STALE_RESPONSE')return;home.toast(t('account.logoutFailed'));if(home.isMaru)showEntryRecovery();else welcome();}finally{accountActionPending=false;}},
 };
+commands.speaking=openSpeaking;
 document.addEventListener('click',event=>{
  const button=event.target.closest('button');if(!button)return;
  if(button.dataset.worldGame){event.preventDefault();event.stopImmediatePropagation();void launchGame(button.dataset.worldGame);return;}
@@ -539,7 +570,7 @@ document.addEventListener('click',event=>{
  }
 },true);
 document.addEventListener('change',event=>{const control=event.target;if(control.matches?.('[data-world-learning]')){control.disabled=true;const enabled=control.checked;void account.setLearning(enabled,Number(control.dataset.revision)).then(()=>{if(screen==='world-profile')profile();}).catch(error=>{control.checked=!enabled;home.toast(errorText(error));}).finally(()=>{control.disabled=false;});return;}if(!control.matches?.('[data-town-sharing]'))return;control.disabled=true;const enabled=control.checked,revision=Number(control.dataset.revision);void client.request('town/sharing',{method:'POST',body:{enabled,revision}}).then(()=>town()).catch(error=>{control.checked=!enabled;home.toast(errorText(error));}).finally(()=>{control.disabled=false;});});
-window.addEventListener('pagehide',()=>{writing?.dispose();education?.dispose();disposeReminders();localLearning?.dispose();lifeEpoch++;lifeUI?.dispose();lifeProgress?.stop();lifePort?.dispose();townSession?.dispose();delete window.SYNKWorldTownHost;account?.stop();});
+window.addEventListener('pagehide',()=>{writing?.dispose();speaking?.dispose();education?.dispose();disposeReminders();localLearning?.dispose();lifeEpoch++;lifeUI?.dispose();lifeProgress?.stop();lifePort?.dispose();townSession?.dispose();delete window.SYNKWorldTownHost;account?.stop();});
 window.addEventListener('online',()=>{if(client.snapshot)client.refresh().then(refreshTutorAccount).catch(()=>{});});
 // Switching between side-by-side web and desktop windows need not hide either
 // document. Refocus must also restore the latest selected companion.
