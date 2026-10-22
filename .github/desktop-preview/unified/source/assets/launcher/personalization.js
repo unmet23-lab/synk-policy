@@ -19,16 +19,30 @@
     textSize: Object.freeze(['standard', 'large']),
     explanation: Object.freeze(['brief', 'standard', 'detailed']),
     motion: Object.freeze(['full', 'reduced']),
+    // The test a person preparing for one names (계약/배우는이유_선택응답_계약.json r2 시험정보): an input to a product's
+    // practice plan, never evidence of ability, level or likely result. targetGrade, examDate and weeklyMinutes are below.
+    examType: Object.freeze(['topik1', 'topik2', 'unknown']),
+    examMode: Object.freeze(['pbt', 'ibt', 'unknown']),
   });
   const DEFAULT_PRESENTATION = Object.freeze({ textSize: 'standard', explanation: 'standard', motion: 'full', support: 'choose', audio: 'available' });
-  // Learning reasons a person may declare (계약/배우는이유_선택응답_계약.json r1, 공개판 설계 #learn-reasons).
+  // Learning reasons a person may declare (계약/배우는이유_선택응답_계약.json r1~, 공개판 설계 #learn-reasons).
   // A reason shapes situations, examples and exam guidance through the broad goal below; it is
   // never evidence of ability, level, age or gender. `other` has no goal and its text stays with the host.
   const REASON_GOAL = Object.freeze({ culture: 'explore', travel: 'expression', people: 'expression', life: 'expression',
     study: 'study', work: 'work', career: 'work', exam: 'prepare', hobby: 'explore', other: null });
   const REASONS = Object.freeze(Object.keys(REASON_GOAL));
   const MAX_REASONS = 3;
-  const FIELDS = Object.freeze([...Object.keys(OPTIONS), 'minutes', 'reasons', 'primaryReason']);
+  const WEEKLY_MINUTES = Object.freeze([30, 60, 120, 180]);
+  // A target grade belongs to its test (contract r2 시험정보 목표급: TOPIK I 1–2, TOPIK II 3–6).
+  const EXAM_GRADES = Object.freeze({ topik1: Object.freeze([1, 2]), topik2: Object.freeze([3, 4, 5, 6]) });
+  const gradeFits = values => !Object.hasOwn(values, 'targetGrade') || (EXAM_GRADES[values.examType] || []).includes(values.targetGrade);
+  // The exam details are asked only of a person who named the exam reason, and changing the reasons forgets them (contract r2 시험정보 묻는때).
+  const EXAM_FIELDS = Object.freeze(['examType', 'targetGrade', 'examDate', 'examMode', 'weeklyMinutes']);
+  const examFits = values => (values.reasons || []).includes('exam') || !EXAM_FIELDS.some(field => Object.hasOwn(values, field));
+  const FIELDS = Object.freeze([...Object.keys(OPTIONS), 'minutes', 'reasons', 'primaryReason', 'targetGrade', 'examDate', 'weeklyMinutes']);
+  // A test month (2027-01) or day (2027-01-11) that exists on the calendar.
+  const examDay = value => typeof value === 'string' && /^\d{4}-(0[1-9]|1[0-2])(-(0[1-9]|[12]\d|3[01]))?$/.test(value)
+    && (value.length === 7 || new Date(`${value}T00:00:00Z`).toISOString().startsWith(value));
   const copy = value => JSON.parse(JSON.stringify(value));
   const fail = message => { throw new TypeError(`Personalization: ${message}`); };
   const record = value => value !== null && typeof value === 'object' && !Array.isArray(value) && [Object.prototype, null].includes(Object.getPrototypeOf(value));
@@ -54,6 +68,9 @@
           || value.some(reason => !REASONS.includes(reason))) fail('invalid reasons (choose one to three known reasons)');
       } else if (field === 'primaryReason') {
         if (!REASONS.includes(value)) fail('invalid primaryReason');
+      } else if (['targetGrade', 'examDate', 'weeklyMinutes'].includes(field)) {
+        if (field === 'targetGrade' ? !Number.isInteger(value) || value < 1 || value > 6
+          : field === 'examDate' ? !examDay(value) : !WEEKLY_MINUTES.includes(value)) fail(`invalid ${field}`);
       } else if (field === 'minutes' ? !Number.isInteger(value) || value < 1 || value > 240 : !OPTIONS[field].includes(value)) fail(`invalid ${field}`);
     }
     return values;
@@ -80,6 +97,7 @@
       || typeof profile.consent !== 'boolean' || (profile.status === 'active') !== profile.consent) fail('invalid profile');
     checkScope(profile.scope); checkValues(profile.values);
     if (Object.hasOwn(profile.values, 'primaryReason') && !(profile.values.reasons || []).includes(profile.values.primaryReason)) fail('primary reason must be one of the declared reasons');
+    if (!gradeFits(profile.values)) fail('target grade must fit the declared exam type');
     if (instant(profile.updatedAt) < instant(profile.createdAt)) fail('profile time reversal');
     if (!exact(profile.provenance, Object.keys(profile.values)) || Object.keys(profile.values).some(key => !Object.hasOwn(profile.provenance, key))) fail('invalid provenance');
     for (const source of Object.values(profile.provenance)) {
@@ -133,6 +151,21 @@
     if (Object.hasOwn(next.values, 'primaryReason') && !(next.values.reasons || []).includes(next.values.primaryReason)) {
       if (patch.values.primaryReason != null) fail('primary reason must be one of the declared reasons');
       delete next.values.primaryReason; delete next.provenance.primaryReason;
+      if (next.generation === profile.generation) next.generation += 1;
+    }
+    // The same for a target grade and its test: naming a grade the declared test does not have is a
+    // host error; changing the test later forgets a grade that no longer fits.
+    if (!gradeFits(next.values)) {
+      if (patch.values?.targetGrade != null) fail('target grade must fit the declared exam type');
+      delete next.values.targetGrade; delete next.provenance.targetGrade;
+      if (next.generation === profile.generation) next.generation += 1;
+    }
+    // And for the exam details and the exam reason: naming them without that reason is a host error; changing the
+    // reasons later forgets them. A stored profile that still holds them stays readable (checkProfile does not
+    // refuse it) and loses them on its next change; products read them only next to the exam reason.
+    if (!examFits(next.values)) {
+      if (EXAM_FIELDS.some(field => patch.values?.[field] != null)) fail('exam details need the exam reason');
+      for (const field of EXAM_FIELDS) { delete next.values[field]; delete next.provenance[field]; }
       if (next.generation === profile.generation) next.generation += 1;
     }
     return copy(checkProfile(next));
@@ -428,7 +461,7 @@
     return copy(preferenceReplay({ contract, scope, events: [...prior, event], encounterId, at }).events);
   }
   const preferences = Object.freeze({ project: projectPreferences, record: recordPreference, layers: preferenceLayers, toDomain: preferencesToDomain });
-  return Object.freeze({ VERSION, PREFERENCE_VERSION, preferences, OPTIONS, FIELDS, REASONS, REASON_GOAL, MAX_REASONS, DEFAULT_PRESENTATION, createProfile, updateProfile, clearProfile,
+  return Object.freeze({ VERSION, PREFERENCE_VERSION, preferences, OPTIONS, FIELDS, WEEKLY_MINUTES, REASONS, REASON_GOAL, MAX_REASONS, DEFAULT_PRESENTATION, createProfile, updateProfile, clearProfile,
     selectPersonalization, recordCompletion, recordFeedback, coreScope, validateProfile: checkProfile,
     // Optional Core capability: products that need field-based decisions load it.
     get domain() { const domain = getDomain(); if (!domain?.decide) fail('load Core domain capability first'); return domain; } });
