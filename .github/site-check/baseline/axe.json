@@ -296,6 +296,8 @@
    ]
   }
  },
+ "/prompts/|desktop": {},
+ "/prompts/|mobile": {},
  "/pulse/|desktop": {
   "aria-allowed-role": {
    "impact": "minor",
