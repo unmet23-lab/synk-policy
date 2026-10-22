@@ -109,6 +109,8 @@
  },
  "/listen/|desktop": {},
  "/listen/|mobile": {},
+ "/mn/|desktop": {},
+ "/mn/|mobile": {},
  "/name/family/|desktop": {
   "color-contrast": {
    "impact": "serious",

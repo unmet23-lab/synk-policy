@@ -273,6 +273,20 @@
     "run": 39700254781
    }
   },
+  "/mn/": {
+   "desktop": {
+    "file": "desktop/mn.jpg",
+    "sha256": "88a069609ee8f5addc360a920d396d4ad333b141b8fa5b8cb4f3af70643d6119",
+    "cssHeight": 5611,
+    "run": 39738723264
+   },
+   "mobile": {
+    "file": "mobile/mn.jpg",
+    "sha256": "4a9f07ccc90fb414d5cd962abc9d3d96619b9bc6f61ace03f0f84123d0417102",
+    "cssHeight": 7212,
+    "run": 39738723264
+   }
+  },
   "/name/": {
    "desktop": {
     "file": "desktop/name.jpg",
