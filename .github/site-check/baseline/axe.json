@@ -1,0 +1,418 @@
+{
+ "/atlas/|desktop": {},
+ "/atlas/|mobile": {},
+ "/builds/manual/|desktop": {},
+ "/builds/manual/|mobile": {},
+ "/builds/move/|desktop": {},
+ "/builds/move/|mobile": {},
+ "/builds/|desktop": {},
+ "/builds/|mobile": {},
+ "/care/|desktop": {},
+ "/care/|mobile": {},
+ "/data-deletion/|desktop": {},
+ "/data-deletion/|mobile": {},
+ "/en/atlas/|desktop": {},
+ "/en/atlas/|mobile": {},
+ "/en/founder/|desktop": {},
+ "/en/founder/|mobile": {},
+ "/en/lab/|desktop": {
+  "empty-table-header": {
+   "impact": "minor",
+   "count": 1,
+   "targets": [
+    "#topik > .wrap > .table-wrap.reveal.in > table > thead > tr > th[scope=\"col\"]:nth-child(1)"
+   ]
+  }
+ },
+ "/en/lab/|mobile": {
+  "empty-table-header": {
+   "impact": "minor",
+   "count": 1,
+   "targets": [
+    "#topik > .wrap > .table-wrap.reveal.in > table > thead > tr > th[scope=\"col\"]:nth-child(1)"
+   ]
+  }
+ },
+ "/en/path/|desktop": {},
+ "/en/path/|mobile": {},
+ "/en/pulse/|desktop": {
+  "aria-allowed-role": {
+   "impact": "minor",
+   "count": 1,
+   "targets": [
+    "#film-1"
+   ]
+  },
+  "color-contrast": {
+   "impact": "serious",
+   "count": 6,
+   "targets": [
+    "#film-tab-2 > .mono",
+    "#film-tab-2 > .svc-name",
+    "#film-tab-3 > .mono"
+   ]
+  }
+ },
+ "/en/pulse/|mobile": {},
+ "/en/shift/|desktop": {
+  "aria-allowed-role": {
+   "impact": "minor",
+   "count": 1,
+   "targets": [
+    "#service-1"
+   ]
+  },
+  "color-contrast": {
+   "impact": "serious",
+   "count": 6,
+   "targets": [
+    "#service-tab-2 > .mono",
+    "#service-tab-2 > .svc-name",
+    "#service-tab-3 > .mono"
+   ]
+  }
+ },
+ "/en/shift/|mobile": {},
+ "/en/|desktop": {},
+ "/en/|mobile": {},
+ "/fortune/|desktop": {},
+ "/fortune/|mobile": {},
+ "/founder/|desktop": {},
+ "/founder/|mobile": {},
+ "/lab/topik4/|mobile": {
+  "region": {
+   "impact": "moderate",
+   "count": 1,
+   "targets": [
+    ".t4-dock > span[data-t=\"cta\"]"
+   ]
+  }
+ },
+ "/lab/|desktop": {
+  "empty-table-header": {
+   "impact": "minor",
+   "count": 1,
+   "targets": [
+    "#topik > .wrap > .table-wrap.reveal.in > table > thead > tr > th[scope=\"col\"]:nth-child(1)"
+   ]
+  }
+ },
+ "/lab/|mobile": {
+  "empty-table-header": {
+   "impact": "minor",
+   "count": 1,
+   "targets": [
+    "#topik > .wrap > .table-wrap.reveal.in > table > thead > tr > th[scope=\"col\"]:nth-child(1)"
+   ]
+  }
+ },
+ "/listen/|desktop": {},
+ "/listen/|mobile": {},
+ "/name/family/|desktop": {
+  "color-contrast": {
+   "impact": "serious",
+   "count": 7,
+   "targets": [
+    "button[data-set=\"mn\"]",
+    ".caption > .mn",
+    ".label"
+   ]
+  },
+  "landmark-one-main": {
+   "impact": "moderate",
+   "count": 1,
+   "targets": [
+    "html"
+   ]
+  },
+  "region": {
+   "impact": "moderate",
+   "count": 17,
+   "targets": [
+    ".home",
+    "h1 > .mn",
+    ".lead > .mn"
+   ]
+  }
+ },
+ "/name/family/|mobile": {
+  "color-contrast": {
+   "impact": "serious",
+   "count": 7,
+   "targets": [
+    "button[data-set=\"mn\"]",
+    ".caption > .mn",
+    ".label"
+   ]
+  },
+  "landmark-one-main": {
+   "impact": "moderate",
+   "count": 1,
+   "targets": [
+    "html"
+   ]
+  },
+  "region": {
+   "impact": "moderate",
+   "count": 17,
+   "targets": [
+    ".home",
+    "h1 > .mn",
+    ".lead > .mn"
+   ]
+  }
+ },
+ "/name/|desktop": {
+  "color-contrast": {
+   "impact": "serious",
+   "count": 6,
+   "targets": [
+    "button[data-set=\"mn\"]",
+    "th:nth-child(1) > .mn",
+    "th:nth-child(2) > .mn"
+   ]
+  },
+  "landmark-one-main": {
+   "impact": "moderate",
+   "count": 1,
+   "targets": [
+    "html"
+   ]
+  },
+  "region": {
+   "impact": "moderate",
+   "count": 19,
+   "targets": [
+    ".home",
+    "h1 > .mn",
+    ".lead > .mn"
+   ]
+  }
+ },
+ "/name/|mobile": {
+  "color-contrast": {
+   "impact": "serious",
+   "count": 6,
+   "targets": [
+    "button[data-set=\"mn\"]",
+    "th:nth-child(1) > .mn",
+    "th:nth-child(2) > .mn"
+   ]
+  },
+  "landmark-one-main": {
+   "impact": "moderate",
+   "count": 1,
+   "targets": [
+    "html"
+   ]
+  },
+  "region": {
+   "impact": "moderate",
+   "count": 19,
+   "targets": [
+    ".home",
+    "h1 > .mn",
+    ".lead > .mn"
+   ]
+  }
+ },
+ "/nombre/|desktop": {
+  "color-contrast": {
+   "impact": "serious",
+   "count": 15,
+   "targets": [
+    ".home > b",
+    ".langbtn[data-ui=\"es\"]",
+    "p[data-t=\"privacy\"]"
+   ]
+  },
+  "region": {
+   "impact": "moderate",
+   "count": 1,
+   "targets": [
+    ".bar"
+   ]
+  }
+ },
+ "/nombre/|mobile": {
+  "color-contrast": {
+   "impact": "serious",
+   "count": 15,
+   "targets": [
+    ".home > b",
+    ".langbtn[data-ui=\"es\"]",
+    "p[data-t=\"privacy\"]"
+   ]
+  },
+  "region": {
+   "impact": "moderate",
+   "count": 1,
+   "targets": [
+    ".bar"
+   ]
+  }
+ },
+ "/path/|desktop": {},
+ "/path/|mobile": {},
+ "/practice/|desktop": {
+  "aria-allowed-role": {
+   "impact": "minor",
+   "count": 1,
+   "targets": [
+    "#service-1"
+   ]
+  },
+  "color-contrast": {
+   "impact": "serious",
+   "count": 6,
+   "targets": [
+    "#service-tab-2 > .mono",
+    "#service-tab-2 > .svc-name",
+    "#service-tab-3 > .mono"
+   ]
+  }
+ },
+ "/practice/|mobile": {},
+ "/privacy/|desktop": {
+  "landmark-unique": {
+   "impact": "moderate",
+   "count": 2,
+   "targets": [
+    ".tbl-scroll[aria-label=\"개인정보 안내 표\"][role=\"region\"]:nth-child(24)",
+    ".tbl-scroll[aria-label=\"Privacy information table\"][role=\"region\"]:nth-child(12)"
+   ]
+  }
+ },
+ "/privacy/|mobile": {
+  "landmark-unique": {
+   "impact": "moderate",
+   "count": 2,
+   "targets": [
+    ".tbl-scroll[aria-label=\"개인정보 안내 표\"][role=\"region\"]:nth-child(24)",
+    ".tbl-scroll[aria-label=\"Privacy information table\"][role=\"region\"]:nth-child(12)"
+   ]
+  }
+ },
+ "/pulse/|desktop": {
+  "aria-allowed-role": {
+   "impact": "minor",
+   "count": 1,
+   "targets": [
+    "#film-1"
+   ]
+  },
+  "color-contrast": {
+   "impact": "serious",
+   "count": 6,
+   "targets": [
+    "#film-tab-2 > .mono",
+    "#film-tab-2 > .svc-name",
+    "#film-tab-3 > .mono"
+   ]
+  }
+ },
+ "/pulse/|mobile": {},
+ "/rl/|desktop": {
+  "color-contrast": {
+   "impact": "serious",
+   "count": 20,
+   "targets": [
+    ".home > b",
+    ".tag",
+    ".primary"
+   ]
+  },
+  "region": {
+   "impact": "moderate",
+   "count": 1,
+   "targets": [
+    ".bar"
+   ]
+  }
+ },
+ "/rl/|mobile": {
+  "color-contrast": {
+   "impact": "serious",
+   "count": 20,
+   "targets": [
+    ".home > b",
+    ".tag",
+    ".primary"
+   ]
+  },
+  "region": {
+   "impact": "moderate",
+   "count": 1,
+   "targets": [
+    ".bar"
+   ]
+  }
+ },
+ "/shift/|desktop": {
+  "aria-allowed-role": {
+   "impact": "minor",
+   "count": 1,
+   "targets": [
+    "#service-1"
+   ]
+  },
+  "color-contrast": {
+   "impact": "serious",
+   "count": 6,
+   "targets": [
+    "#service-tab-2 > .mono",
+    "#service-tab-2 > .svc-name",
+    "#service-tab-3 > .mono"
+   ]
+  }
+ },
+ "/shift/|mobile": {},
+ "/terms/|desktop": {},
+ "/terms/|mobile": {},
+ "/world/hangul-stage/|desktop": {
+  "aria-prohibited-attr": {
+   "impact": "serious",
+   "count": 3,
+   "targets": [
+    "div[aria-label=\"한\"]",
+    "div[aria-label=\"국\"]",
+    "div[aria-label=\"어\"]"
+   ]
+  },
+  "color-contrast": {
+   "impact": "serious",
+   "count": 2,
+   "targets": [
+    ".later > .stop[aria-hidden=\"true\"]",
+    ".later > .glyphs[aria-hidden=\"true\"]"
+   ]
+  }
+ },
+ "/world/hangul-stage/|mobile": {
+  "aria-prohibited-attr": {
+   "impact": "serious",
+   "count": 3,
+   "targets": [
+    "div[aria-label=\"한\"]",
+    "div[aria-label=\"국\"]",
+    "div[aria-label=\"어\"]"
+   ]
+  },
+  "color-contrast": {
+   "impact": "serious",
+   "count": 2,
+   "targets": [
+    ".later > .stop[aria-hidden=\"true\"]",
+    ".later > .glyphs[aria-hidden=\"true\"]"
+   ]
+  }
+ },
+ "/world/korean-rhythm/|desktop": {},
+ "/world/korean-rhythm/|mobile": {},
+ "/world/korean-runner/|desktop": {},
+ "/world/korean-runner/|mobile": {},
+ "/world/|desktop": {},
+ "/world/|mobile": {},
+ "/|desktop": {},
+ "/|mobile": {}
+}
