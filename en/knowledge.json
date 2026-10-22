@@ -1,6 +1,6 @@
 {
-  "version": "2026-09-15-selected-experiences-copy-9bfc4e4ce8-rhythm-20261001-copy-3910676d01-release-copy-3e4ed3be6d-en-002b14631325-bm-platform-20261007-a885b0d303-travel-20261007-ce148dd860-real-20261007-ab58ee7076-homepage-current-20261009-033c24b61f29-homepage-v10-20261010-0e6de077a98d",
-  "updatedAt": "2026-10-19",
+  "version": "2026-09-15-selected-experiences-copy-9bfc4e4ce8-rhythm-20261001-copy-3910676d01-release-copy-3e4ed3be6d-en-002b14631325-bm-platform-20261007-a885b0d303-travel-20261007-ce148dd860-real-20261007-ab58ee7076-homepage-current-20261009-033c24b61f29-homepage-v10-20261010-e07002d95da9",
+  "updatedAt": "2026-10-22",
   "docs": [
     {
       "id": "company",
@@ -8,27 +8,27 @@
       "paragraphs": [
         "SYNK builds Atlas, a personalization engine. We started in Korean education. Today we are building the SYNK platform, where one SYNK ID carries you across SYNK apps, and we use the same engine for business services and video production.",
         "It began in a classroom in Ulaanbaatar, Mongolia. Every student was good at different things, got stuck in different places and had different reasons for learning. Atlas is our attempt to tailor teaching to each person with technology.",
-        "SYNK LAB makes Korean textbooks, learning games and a personalized learning app, and is preparing a one-year course aimed at TOPIK Level 4. SYNK SHIFT brings personalized services to company work where each person needs different guidance, such as purchase advice, onboarding, coaching and staff training. SYNK PULSE makes ads and model videos and grows our own music and character stories. SYNK PATH helps with travel plans and with studying, working and settling in Korea.",
+        "SYNK LAB makes Korean textbooks, learning games and a personalized learning app, and is preparing a one-year course aimed at TOPIK Level 4. SYNK SHIFT gives AI-era lectures on careers and work at schools, companies and institutions, and automates repetitive work with AI for companies that took a lecture. SYNK PULSE makes ads and model videos and grows our own music and character stories. SYNK PATH helps with travel plans and with studying, working and settling in Korea.",
         "The SYNK platform is open now as a web preview. Anything still in preparation is labelled as such on each business page.",
         "To build an engine that fits you better the more you use it — so that anyone, in their 20s or their 60s, gets help that matches their goal and situation when they play, study or ask for advice.",
-        "LAB covers Korean education, SHIFT personalized services for companies, PULSE ads, model videos, music and characters, and PATH personalized travel plus study, work and settling in Korea. All four use the Atlas engines they need.",
+        "LAB covers Korean education, SHIFT AI lectures and work automation, PULSE ads, model videos, music and characters, and PATH personalized travel plus study, work and settling in Korea. All four use the Atlas engines they need.",
         "LAB — Korean textbooks, learning games and a personalized learning app, with a full-time one-year course aimed at TOPIK Level 4 in preparation.",
-        "SHIFT — personalized services for company work where each person needs different guidance: purchase advice, product onboarding, expert coaching and staff training. We are taking enquiries now.",
+        "SHIFT — AI lectures at schools, companies and institutions (including AI career lectures for schools), instructors assigned to fit each request, and AI automation of repetitive work for companies that took a lecture. We are taking enquiries now.",
         "PULSE — product ads, brand films, AI model lookbooks and how-to videos, plus the music and stories of Mongle, Kkamong and Marin. AI profiles, introduction decks and studio rental are in preparation.",
         "PATH — travel days planned around your taste and budget. Study and career support, VR interview practice and help with housing are in preparation.",
         "The four businesses are how SYNK divides its work. It does not mean there are four companies or that all four are fully operating.",
         "The Korean games are available when you sign in with SYNK ID, and the SYNK platform is open as a Windows and Mac Preview and a web preview. PULSE is taking ad and model video projects, and the other services are in preparation.",
         "LAB — we have made eight Korean games and three beginner games, and you can play all of them in SYNK WORLD on the SYNK platform by signing in with SYNK ID. SYNK WORLD keeps supported game progress and outfits in your account. All eight textbooks are written; the one-year course, the learning app and VR interview practice are in preparation.",
-        "SHIFT — taking enquiries. Purchase advice, onboarding, coaching and staff training are candidate services; launch scope, prices and client results have not been set or measured yet.",
+        "SHIFT — taking enquiries for lectures and work automation. Prices and the terms for assigning instructors are not set yet, and results at client companies have not been checked yet.",
         "PULSE — making ads and model videos, and making music and character stories. AI profiles, introduction decks and studio rental are in preparation and not taking bookings.",
         "PATH — the VR caregiver interview test is available; VR practice for visa interviews and university life, study and career support, and housing support are in preparation.",
-        "Start from what you want to do. LAB if you want to learn Korean, SHIFT if you want a personalized service for your company, PULSE for ads, model videos, music or characters, and PATH if you are planning travel or study and work in Korea.",
+        "Start from what you want to do. LAB if you want to learn Korean, SHIFT if you need an AI lecture or work automation, PULSE for ads, model videos, music or characters, and PATH if you are planning travel or study and work in Korea.",
         "If you would rather try SYNK apps first, start with the SYNK platform. The company’s direction and Atlas are on the SYNK home page and the Atlas page.",
         "The SYNK characters you meet on this website are Mongle, Kkamong, and Marin.",
         "Meet Mongle, with a coral-colored body and stitching; Kkamong, with green eyes and brown fur; and Marin, with a navy helmet and yellow eyes.",
         "I wanted to give every student the attention they needed. When I worked at an academy in Mongolia, I knew each student needed different help, but I never had time to tailor it to each one. I started SYNK to do that with technology.",
         "The near-term goal is for students to reach TOPIK Level 4, and the ultimate goal is to help students who learn this way become leaders. The approach I built for one student at a time is now used in four kinds of work, from travel to company services and video production.",
-        "Start by deciding what you need now. Learning Korean, a personalized service for your company, video or music, or travel and study plans each point to a different page.",
+        "Start by deciding what you need now. Learning Korean, an AI lecture or work automation, video or music, or travel and study plans each point to a different page.",
         "Each business page separates what you can do today from what is in preparation, and what you would receive and on what terms. Looking around the SYNK platform web preview first is another way in.",
         "We do not claim proven effects or superiority over other companies based on the examples on our site. Ask through the contact form or hello@synk.im and we will tell you what is possible today.",
         "The site does not yet show a business registration number. We are preparing a new business registration and will publish the actual registration details once it is complete. If you need confirmation, write to hello@synk.im.",
@@ -48,10 +48,10 @@
         "Atlas is the personalization engine SYNK builds, and eight engines share the work. They understand the goal and situation (Core, Strata, Trail), fit the content, screens, words and sound to the person (Loom, Vellum, Reed), and check whether it helped (Prism, Temper).",
         "The same person needs different practice when the goal changes: preparing for university, working at a Korean company and talking with family call for different language. Atlas changes tasks and explanations by the goal a person sets and their recent results, not by age.",
         "Core decides what is needed now. Strata maps what to learn and in what order (in development). Trail records the process and the change. Loom builds screens that respond to touch. Vellum gives explanations and hints people understand. Reed handles music and sound for the scene. Prism finds patterns across many results. Temper checks whether it helped.",
-        "LAB uses the engines for Korean practice and games, SHIFT for personalized company services, PULSE for the picture and sound of ads and model videos, and PATH for travel plans and study and interview preparation.",
+        "LAB uses the engines for Korean practice and games, SHIFT for AI lectures and work reviews, PULSE for the picture and sound of ads and model videos, and PATH for travel plans and study and interview preparation.",
         "Atlas runs today in the Korean games, and we are extending it to the learning app and business services. Each service shows what is actually in use.",
         "Core decides what is needed now. It looks at what someone is trying to do and where they are stuck, decides the next step and the help needed, and records why something was recommended or left out.",
-        "In the Korean games it picks the next question from the shared learning record, and SHIFT services use the same judgement.",
+        "In the Korean games it picks the next question from the shared learning record, and SHIFT is preparing to use the same judgement in its lectures and reviews.",
         "Loom builds screens that respond to touch. It brings felt textures to life with light and motion for screens and characters, making scenes that react naturally to what people do.",
         "It is used for the screens of LAB games and for scene layout and motion in PULSE videos.",
         "Vellum gives explanations people understand. It offers explanations and hints that fit the current task and the person’s answer — why this practice, and what to look at when stuck.",
@@ -81,7 +81,7 @@
         "Prism finds recurring difficulties across many people’s results. Temper checks whether someone can now do it without help and uses that to improve the help offered.",
         "Atlas chooses the next suggestion from what you told us and what you actually did. It never guesses from age, gender or nationality, and anything AI inferred is marked so you can check and correct it.",
         "Each program stores progress differently. Guest progress stays in that browser; with a SYNK ID, supported records are kept in your account. Anything done before signing up does not move to your account automatically.",
-        "In business services (SHIFT), user conditions and records are used only for the purpose and consent agreed when the service is set up. You can find how each service keeps, shows and deletes data in the privacy policy."
+        "In SHIFT lectures and work automation, material and records are used only for the purpose and consent agreed with whoever made the request. You can find how each service keeps, shows and deletes data in the privacy policy."
       ],
       "updatedAt": "2026-10-19"
     },
@@ -230,69 +230,77 @@
     },
     {
       "id": "shift",
-      "title": "SYNK SHIFT — Personal guidance for everyone, built from your material",
+      "title": "SYNK SHIFT — AI lectures, plus work automation",
       "paragraphs": [
-        "SYNK SHIFT brings personalized services to the work of companies and organizations where each person needs different guidance. We pick one task — personalized purchase advice, product onboarding, expert coaching, or sales and service training — and connect the company’s product information and rules to Atlas.",
-        "We start by agreeing the task and what “done” means, test it in the real environment, and agree who runs it and handles exceptions. Staff training and consulting, workflow automation, and branding for the service’s explanations and screens come with the setup where it needs them. After launch we check together that it is really used and what it costs to run.",
-        "These four are candidate services. Features, who runs them, schedule and price are agreed with each company, and results for your customers are checked together after launch.",
-        "To give everyone personal guidance, built from a company’s own material.",
-        "SYNK SHIFT brings personalized services to work where every person needs different guidance — advice, onboarding, coaching and staff training. We connect your product information and rules to Atlas, and after launch we check with you that it is really used.",
-        "Companies and organisations whose customers or staff need guidance tailored to each person — for example retailers with many products and options, software companies whose new customers stall at setup, trainers and consultants who repeat the same tasks, and sales and CS teams whose staff freeze in front of real customers.",
-        "Rather than company size, we first look at whether there is material to use, whether the results can be checked and who will run the service.",
-        "A personalized service built for one task at your company, and the know-how for your staff to use and run it. We first agree the users and what “done” means, the material and system connections, and who is responsible for operation.",
-        "Features, deliverables, which source files you can edit, schedule and price are set in each contract, and client results are checked together after launch.",
-        "SHIFT services use Atlas to give each person different guidance. For the companies that adopt them, we also teach staff to use the service on real work material and check the results.",
-        "We never present features under test as client results. What problem we set out to solve, what we asked AI to do and why a person revised the result are explained from real work.",
+        "SYNK SHIFT teaches the skills the AI era calls for at schools, companies and institutions. For schools we give AI career lectures on how to steer a career in the AI era and what to prepare, and as an instructor agency we find AI and AI-career instructors and assign them to fit each request.",
+        "When a company that took a lecture wants it, we pick one repetitive task and automate it with AI to help cut fixed costs. In a half-day review we map the workflow together and demonstrate one automation, then agree scope and cost up front, build it and check it every month. Consulting, branding, market research and product testing come with lectures and automation where they need them.",
+        "Prices for lectures and automation and the terms for assigning instructors are not set yet and are agreed per request. We do not promise learning results or savings in advance; we check them with you afterwards.",
+        "To teach careers and work for the AI era, and to automate repetitive tasks.",
+        "SYNK SHIFT teaches the skills the AI era calls for at schools, companies and institutions, then automates repetitive work with AI for companies that took a lecture, to cut fixed costs. In schools we also give AI career lectures on how to steer a career in the AI era and what to prepare for it. We also run an instructor agency that finds instructors and assigns them to fit each request.",
+        "Schools, companies and institutions getting ready for the AI era. Lectures and the instructor agency are for schools that want career education to reflect how AI is changing work, companies and public bodies that want staff to use AI in real work, and anyone with a topic who struggles to find a fitting instructor.",
+        "Work automation suits small companies paying fixed costs for entry, sorting and reporting that people repeat. Rather than company size, we first look at whether there is one clear task to automate, whether before and after can be compared, and who will check the results.",
+        "There are no open courses for individuals yet. If you run a business on your own, you can still ask about automating repetitive work.",
+        "Each person leaves a lecture with one thing made. Students take a page on what AI is changing in their field and what they will prepare; staff take a piece of work from their own job and a request–check–fix routine to reuse.",
+        "Learning goals, prior knowledge needed, the tools allowed and any extra cost, material that must stay out of practice, and which questions we take are agreed with whoever books the lecture beforehand. We do not present one lecture’s results as every attendee’s skill gain.",
+        "In lectures, rather than introducing lots of AI tools, we have people make something with a tool that fits their work and practise checking and fixing the result. Which tools to use, and whether they cost extra, is agreed before the lecture.",
+        "In work automation, we split the steps AI handles from those a person checks, and make sure that when AI gets something wrong or stops, it alerts you and a person takes over. We never present features under test as client results.",
         "Because the result alone does not tell you what method was used or whether you could use it yourself. SYNK writes down the methods tried, the failures and the reasons for each fix, so that you can judge the method and take it into your own work.",
         "For example, when we made the site logo we put stitch decoration on both the SYNK letters and the business names, and the letters became hard to read. We kept the soft texture and took the stitches off the SYNK letters only, so the word that has to be read first comes first. The felt characters and objects on screen were designed as things you could hold in your hand, and the Loom engine was built to carry that texture onto the screen.",
-        "Today you can see this process in the trials and cases on the home page and on the founder page. SHIFT introductions work the same way: the person in charge tries the service with real material, checks the results and learns to fix things.",
-        "SHIFT’s work is bringing a personalized service to one task at a company. Training and consulting, automation and system connections, and service copy and screen branding are taken on as part of that.",
-        "Training and consulting — staff learn to use the service on real work material, check results and handle exceptions.",
-        "Automation and system connections — split the steps the service handles from those a person checks, and connect repetitive work to existing systems.",
-        "Service copy and screen branding — make it obvious who gets what help, with copy, screens and guides that fit the brand.",
-        "Yes. SHIFT is set up so that companies new to AI can adopt it: we start by agreeing which task to use it for and what “done” means.",
-        "So that staff new to AI can run the service, we practise writing requests, checking results and revising them with real work material during setup.",
-        "Start with the service examples on the SHIFT page. Each one shows who it is for, what we build and what changes.",
-        "If you need a service or training for company work, tell us who will use it, what problem it should solve and what you need delivered, and we will confirm scope and schedule.",
-        "Not only AI lectures. SHIFT’s work is bringing personalized services into company work, and training is provided for the staff who will use and run them.",
-        "Staff practise making requests with real work material, comparing and revising results and handling exceptions. Participants, schedule and cost are set per project, and this does not mean an accredited course or institutional agreement is in operation.",
-        "We do not guarantee the same results. The cases on the site were made by SYNK ourselves, and operation at real client companies, its effect and its profitability have not been verified yet. Nor do we claim that using AI makes a business succeed.",
-        "SHIFT introduces a personalized service to one task at one company and checks task completion, errors, handling time and support load against how things were before. Results depend on the company’s material, the task and the people using it.",
-        "Costs are split into an initial setup fee, a regular usage and operation fee, and extra usage or development. We set the scope with each company first, then quote.",
-        "For work we can show publicly, we present the fixes as well as the finished result: where we got stuck and why we changed the method, based on the actual work. On the home page, “How these trials were made” lists the starting problem, what we built, what it can do now and what to know before using it, in the same order each time.",
+        "Today you can see this process on the founder page and on the founder’s yuhobuilds channel. SHIFT lectures work the same way: people try things with real material, check the results and learn to fix them.",
+        "SHIFT’s work is AI lectures at schools, companies and institutions (including AI career lectures for schools), an instructor agency, and automating work for companies that took a lecture. Consulting, branding, market research and product testing are taken on to support that work.",
+        "Consulting — work out which tasks to hand to AI first, and where a person should check.",
+        "Branding — fit lecture material, notices and the screens automation adds to your company’s voice and look.",
+        "Market research and product testing — interview the people who will use it, watch them try it, and report where they get stuck.",
+        "Yes. SHIFT lectures are planned so that people new to AI can make one thing from their own work. The prior knowledge needed and the tools to use are checked before the lecture.",
+        "Work automation can start without knowing much about AI too. A lecture first looks at what can be handed to AI, then in a half-day review we map the current workflow with you and agree what can be handed over and where a person checks.",
+        "“What we do” on the SHIFT page sets out, for each lecture and for automation, who it fits, an example, what you get and what is agreed first. There are no lecture materials or textbooks to download yet.",
+        "AI news and how to use the tools are on SHIFT’s synkbrief channels (YouTube and Instagram). If you need a lecture or automation for your school or company, tell us the audience and the problem to solve, and we will confirm scope and schedule.",
+        "We agree the learning goals, audience and time with whoever books the lecture, then pick practice tasks from the audience’s real work or interests. Lectures are SHIFT’s main work, alongside assigning instructors and automating work.",
+        "The tools allowed and any extra cost, and material that must stay out of practice, are agreed in advance, and each person leaves with one thing made and a way to do it again.",
+        "Audience, schedule and cost are agreed per request, and this does not mean an accredited course or institutional agreement is in operation.",
+        "We do not guarantee the same results. SHIFT’s lectures and automation are the way we have prepared to work, and their effect and the savings at real client companies have not been verified yet. Nor do we claim that using AI makes a business succeed.",
+        "Savings from automation are measured before and after under the same conditions, and we tell you what we compared against. We do not stretch one demonstration into a savings figure, and results depend on the company’s work and the people using it.",
+        "We agree the scope of each request first, then quote.",
+        "For work we can show publicly, we present the fixes as well as the finished result: where we got stuck and why we changed the method, based on the actual work.",
         "There is no collection of the exact prompts we sent to AI tools. The cases do explain what we asked for and what came back. Students’ and clients’ material and private operational documents are not published.",
-        "SHIFT brings a personalized service to one task at a company. The four candidates are personalized purchase advice, product onboarding, an expert coaching service and sales and customer service training.",
-        "Along the way we can also take on staff training and consulting, automation and system connections, and service copy and screen branding. Interviewing the people who will use the service and watching them try it are part of the process.",
-        "Start with one task and make sure it is really used. We choose one piece of work where each person needs different guidance and begin by agreeing who has to finish what.",
-        "We do not build a new engine for each company; we add modules for product information and expert standards to Atlas. After launch we review real use and running costs with your staff and keep improving.",
-        "These four are candidate services. Features, who runs them, schedule and price are agreed with each company, and results for your customers are checked together after launch. An API and engine licensing are directions we will consider later, not products for sale now.",
-        "In four steps: agree the task and what “done” means, research and test with the people who will use it, connect company material and systems, and review results and operations after launch.",
-        "Task and definition of done — who finishes what and how it is done today, plus the material to use, the scope of personal data and exceptions a person must check.",
-        "User research and testing — interview the people who will use it and watch where they stop when they try it.",
-        "Connection and staff readiness — connect company material and systems, and train staff to check results and handle exceptions.",
-        "Results and operations — review completions, errors, handling time and support load together, and decide the next improvement.",
-        "Work that helps customers choose and use products, and work that tailors expert coaching and staff training to each person. The four candidates are personalized purchase advice, product onboarding, an expert coaching service and sales and customer service training.",
-        "Personalized purchase advice — customers enter their budget, use and existing equipment and first see a matching setup, the reasons for it and the options they can skip. Staff receive the summary and start with a quote.",
-        "Product onboarding — based on the customer’s role, goal and progress, show the next step one at a time. Customers do not wait for support, and the support team spends time on problems that need a person.",
-        "Expert coaching service — the expert’s methods and standards become personal tasks and feedback. The service handles repeated guidance and experts focus on judgement.",
-        "Sales and customer service training — staff rehearse realistic situations with the company’s products and standards. What they miss comes back next time, and managers see what each person misses.",
-        "We research the people and environment the service is for, have them try it and find what to fix. Market research and product testing are being prepared as part of setup support.",
-        "User and market research — define who will use it and what they must finish, then confirm their conditions and current difficulties through interviews and data.",
+        "SHIFT gives AI lectures at schools, companies and institutions, runs an instructor agency, and automates work. Lectures come first; when a company that took a lecture wants it, we move on to automation.",
+        "AI career lectures for schools — not a general careers talk, but how to steer a career in the AI era and which skills to build. Each student leaves with a one-page plan for their own career.",
+        "AI lectures for organisations — staff practise on their own work and leave with one piece of work and a request–check–fix routine they can reuse.",
+        "Instructor agency — we find AI and AI-career instructors who fit the goal and audience of each request and assign them. You know exactly which instructor is coming before you sign.",
+        "AI work automation — we pick one repetitive task and automate it to help cut fixed costs, in the order half-day review, build one task, monthly care.",
+        "Consulting, branding, market research and product testing come with lectures and automation where they need them.",
+        "Lectures that leave each person with something made, and automation we stay responsible for even when it stops. A lecture is judged by what people made from their own career plans or work, not by how many tools were shown.",
+        "For automation we settle what happens when it stops before what it looks like running: where a person checks, how errors and exceptions are flagged, and who fixes it after handover. Savings are reported only from before-and-after measurements under the same conditions.",
+        "In four steps: a lecture, a half-day review, building one task, and monthly care.",
+        "Lecture — first, look together at what your company can hand to AI and what should stay with people.",
+        "Half-day review — we map the workflow with you, demonstrate one automation on the spot, then send a proposal with scope and cost. You decide whether to build after reading it, and you can stop after the review.",
+        "Build one task — scope and price are agreed up front, then we automate one task, including where a person checks and how it alerts you when it stops. Connections to your existing systems are agreed within this scope.",
+        "Monthly care — each month we check it still runs and adjust it when the work or the services it uses change. Time and cost saved are measured before and after under the same conditions.",
+        "We do not take on system builds that change many tasks at once; we go one task at a time. Where a person’s judgement differs a lot each time, the review looks at whether sorting out the work should come before automating it.",
+        "Not as a separate service any more. SHIFT now focuses on AI lectures at schools, companies and institutions, an instructor agency, and automating repetitive work for companies that took a lecture.",
+        "If you want AI to take repetitive work off your team, ask us about work automation. A lecture first looks at what your company can hand to AI, then in a half-day review we pick one task we can take on and agree scope and cost up front.",
+        "Atlas is not something SHIFT sells separately; it is the technology inside, used to fit lectures and reviews to the people and companies taking them.",
+        "Market research and product testing are being prepared as support for lectures and automation; they are not a main service we sell on their own.",
+        "User and market research — define who will use it and what they must finish, then confirm their current difficulties through interviews and data.",
         "Usability testing — watch where participants stop and what explanation they need while they try it.",
-        "Results and running costs — review completions, errors, handling time and the work of launch and support, separating observation from interpretation, and decide the next improvement.",
-        "Participants, conditions, consent, compensation, schedule and cost are set within the project. We do not generalise a few reactions to the whole market.",
-        "Instead of building a new engine for each company, we add modules for product information and expert standards to the shared personalization of Atlas. So the service asks only what matters, recommends with reasons and changes the next step from the result.",
-        "A typical chatbot stops at answering. A SHIFT service remembers each person’s conditions and results to change the next question, recommendation or practice, and shows why something is recommended or left out.",
-        "We first check real use and support costs, then whether the same service can be supplied to several companies, before looking at an API and engine licensing. Launch, pricing and client results have not been set or measured yet.",
-        "Not now. We first check whether a service helps in one company’s real work and what supply and support cost, and only after confirming it can be supplied to several companies will we look at an API and engine licensing.",
-        "The order is one task in operation → proven repeat supply → API and engine licensing. Launch dates, prices and terms are not set.",
-        "Costs are split into initial setup for building the service, a subscription and operation fee afterwards, and extra usage and development for anything beyond the plan.",
-        "Initial setup — organise the task and material, configure the service and connect it to existing systems, with agreed deliverables and acceptance criteria.",
-        "Subscription and operation — service use, quality checks and agreed operational support, with usage, content updates and error response defined.",
-        "Extra usage and development — usage beyond the plan, new connections or feature changes go ahead only after scope and cost are confirmed.",
-        "Prices and contract terms are not set yet and are agreed per project."
+        "Participants, conditions, consent, compensation, schedule and cost are set within the request. We do not generalise a few reactions to the whole market.",
+        "Atlas is not something SHIFT sells separately; it is the technology inside, used to fit lectures and reviews to the people and companies taking them. We are preparing it to choose practice tasks and explanations to fit each student’s interests or each company’s work, even on the same topic.",
+        "SHIFT does not build and sell chatbot-style services; it teaches people how to use AI and automates repetitive work. We do not sell an API or engine licence for plugging Atlas into your systems.",
+        "No. SHIFT’s work today is AI lectures at schools, companies and institutions, an instructor agency and work automation. An API and engine licensing might be considered far in the future, but they are not part of the current business plan.",
+        "The business grows from lectures into automating work for companies that took a lecture. Atlas is not something SHIFT sells separately; it is the technology inside, used to fit lectures and reviews to the people and companies taking them.",
+        "We have not set a price list for lectures or automation. We agree the audience and scope for each request, then quote.",
+        "Lectures — set by audience and size, length and number of sessions, the practice material to prepare and the venue. When we assign another instructor, their terms are confirmed too.",
+        "Automation build — scope and price for one task are agreed in the half-day review. It depends on how many exceptions there are and which services it must connect to, and the price is based on the cost the automation removes.",
+        "Monthly care — we agree how often we check and what we fix, and take it on month by month. Fees for external services the automation uses may be extra, and if the work changes enough to need a rebuild, scope and cost are agreed again.",
+        "The earlier split into setup fees and operating fees is no longer used.",
+        "Not a general careers talk: a lecture for schools on how to steer a career in the AI era and which skills to build for it. Students look at how AI is changing work in a field they care about, then pick the skills that work needs and what they can start on now.",
+        "Each student leaves with a one-page plan for their own career: what AI is changing in their field and what they will prepare. Year group and class size, lesson time, and the devices and tools students can use are agreed with the school beforehand.",
+        "Schedule and cost are agreed with each school. The lecture does not decide a student’s career for them.",
+        "Yes. We hear the goal and the audience of the request, then find an AI or AI-career instructor who fits and assign them. First we show an evidence card for each instructor: whose work they teach, what they have made themselves, samples they can share, and what stays after the class.",
+        "You know exactly which instructor is coming before you sign. Running the day, a substitute if the instructor cannot come, cancellation and questions after the lecture are written into the contract only as far as we can really promise.",
+        "We do not lead with a headcount or a roster; for each request we find an instructor who fits and show you their evidence card. We have not posted for instructors yet. If you would like to teach with us, tell us your field and what you have made yourself at hello@synk.im. Selection criteria, payment and rights to teaching material will be shared once they are set."
       ],
-      "updatedAt": "2026-10-10"
+      "updatedAt": "2026-10-22"
     },
     {
       "id": "pulse",
@@ -327,7 +335,7 @@
         "Characters and world — appearance, personality, relationships and stories are managed together so the characters stay recognisable in every new work.",
         "Listening to published works is different from using them commercially. If you want to use them somewhere, please ask first.",
         "We make ads that introduce brands through PULSE’s music and characters. We fit music, video and characters to the message and channel, and agree purpose, rights, usage terms and any required ad labelling first.",
-        "Commissioned product ads, brand films and AI model videos are handled under PULSE video production. Personalized services for company work are SHIFT’s job.",
+        "Commissioned product ads, brand films and AI model videos are handled under PULSE video production. AI lectures and work automation are SHIFT’s job.",
         "Yes. We make product ads, brand films and commercials, AI model lookbooks and service how-to videos from plan to final cut, sized for websites, product pages and social channels. We choose AI video, live shooting or both, whichever suits the brand.",
         "Product ads — short ads showing the product’s details and real use, plus cuts for each channel from the same footage.",
         "Brand films and commercials — one film that shows what the company does and what it does well, with cuts for the website, sales and events.",
@@ -367,7 +375,7 @@
         "We look at whether it helped, not just whether it was finished — whether people can now do more without help, whether the suggestion was right, and whether it was easy to use.",
         "We check that explanations are clear, screens are easy to use and promised features work. A new method is not rolled out if results get worse for anyone, in their 20s or their 60s.",
         "People can choose large text, shorter explanations or a sound-free mode, and first-time users should always see their next step.",
-        "Repeated guidance, sorting and record-keeping go to the service; exceptions that need judgement, relationships between people and important decisions stay with people. At LAB the teacher runs the class and sets the direction; at SHIFT the person in charge checks results and handles exceptions.",
+        "Repeated guidance, sorting and record-keeping go to the service; exceptions that need judgement, relationships between people and important decisions stay with people. At LAB the teacher runs the class and sets the direction; in SHIFT work automation the person in charge at the company checks results and handles exceptions.",
         "The standard for using technology is the six principles on the home page. We do not guess from age, gender or nationality; we fit to the settings you chose and what you actually did. Finishing something is not proof of progress, so we check separately whether you can do more without help.",
         "What you wrote and what you actually did stay as the original record. Anything the AI inferred is marked separately so you can check and correct it. Anything still in preparation is labelled as such, and we do not promise results we have not confirmed."
       ],
@@ -401,7 +409,8 @@
         "If you need it for a collaboration review, send the purpose and what you want to confirm to hello@synk.im. We will reply after checking what can be shared.",
         "The question box on this website does not receive consultation requests or retrieve student records. What you type here remains only in the page you have open.",
         "Keeping, viewing and deleting records from actual classes, consultations and apps follow that service’s privacy policy and its identity or guardian checks. That this question box keeps nothing does not mean other services keep no consultation records. Email hello@synk.im with the service you used and what you need.",
-        "There is no open job or instructor posting right now. If you tell us your field and what you can do at hello@synk.im, we will say whether we can let you know when a position opens.",
+        "There is no open job or instructor posting right now. If you are a school, company or institution looking for an instructor to teach, the SHIFT instructor agency finds one who fits your request and assigns them.",
+        "If you would like to work with us, tell us your field and what you can do at hello@synk.im, and we will say whether we can let you know when a position opens. If you would like to teach as an AI or AI-career instructor with SHIFT, include your field and what you have made yourself.",
         "This question box does not accept applications. Please confirm that a position is open before sending anything with personal details, such as a CV.",
         "Each SYNK business has its own public channels. LAB is on YouTube @synkkorean, Instagram @synk.mn and Facebook synkworld; SHIFT is on YouTube and Instagram @synkbrief (SYNK Briefing); the founder is on YouTube and Instagram @yuhobuilds. They are also linked in the channels row at the bottom of every page.",
         "For consultations and collaboration enquiries, email hello@synk.im.",
@@ -411,7 +420,7 @@
         "Could you tell me a little more about what you want to know — Atlas, Korean education, services for companies, study and career support, or music and creative work? For individual advice, please use the contact form or email.",
         "Thank you. Ask again whenever something comes up. For consultations or collaboration proposals, write to hello@synk.im and a person will reply."
       ],
-      "updatedAt": "2026-10-19"
+      "updatedAt": "2026-10-22"
     },
     {
       "id": "vision",
@@ -420,7 +429,7 @@
         "In one line each:",
         "SYNK — An engine that fits you better the more you use it.",
         "SYNK LAB — Learn Korean, and get ready for Korea.",
-        "SYNK SHIFT — Personal guidance for everyone, built from your material.",
+        "SYNK SHIFT — AI lectures, plus work automation.",
         "SYNK PULSE — Ads and model videos, plus our own music and characters.",
         "SYNK PATH — From travel to life in Korea, planned around you.",
         "Each business page separates what you can use today from what is still in preparation."
@@ -489,7 +498,7 @@
         "Tell me about SYNK’s work",
         "Where can I read about the company?"
       ],
-      "answer": "SYNK builds Atlas, a personalization engine. We started in Korean education. Today we are building the SYNK platform, where one SYNK ID carries you across SYNK apps, and we use the same engine for business services and video production.\n\nIt began in a classroom in Ulaanbaatar, Mongolia. Every student was good at different things, got stuck in different places and had different reasons for learning. Atlas is our attempt to tailor teaching to each person with technology.\n\nSYNK LAB makes Korean textbooks, learning games and a personalized learning app, and is preparing a one-year course aimed at TOPIK Level 4. SYNK SHIFT brings personalized services to company work where each person needs different guidance, such as purchase advice, onboarding, coaching and staff training. SYNK PULSE makes ads and model videos and grows our own music and character stories. SYNK PATH helps with travel plans and with studying, working and settling in Korea.\n\nThe SYNK platform is open now as a web preview. Anything still in preparation is labelled as such on each business page.",
+      "answer": "SYNK builds Atlas, a personalization engine. We started in Korean education. Today we are building the SYNK platform, where one SYNK ID carries you across SYNK apps, and we use the same engine for business services and video production.\n\nIt began in a classroom in Ulaanbaatar, Mongolia. Every student was good at different things, got stuck in different places and had different reasons for learning. Atlas is our attempt to tailor teaching to each person with technology.\n\nSYNK LAB makes Korean textbooks, learning games and a personalized learning app, and is preparing a one-year course aimed at TOPIK Level 4. SYNK SHIFT gives AI-era lectures on careers and work at schools, companies and institutions, and automates repetitive work with AI for companies that took a lecture. SYNK PULSE makes ads and model videos and grows our own music and character stories. SYNK PATH helps with travel plans and with studying, working and settling in Korea.\n\nThe SYNK platform is open now as a web preview. Anything still in preparation is labelled as such on each business page.",
       "sourceId": "company",
       "relatedIds": [
         "synk-vision",
@@ -562,7 +571,7 @@
         "What are the visions of SYNK LAB, SHIFT, and PULSE?",
         "How do the visions of LAB, SHIFT, and PULSE differ?"
       ],
-      "answer": "In one line each:\n\nSYNK — An engine that fits you better the more you use it.\n\nSYNK LAB — Learn Korean, and get ready for Korea.\n\nSYNK SHIFT — Personal guidance for everyone, built from your material.\n\nSYNK PULSE — Ads and model videos, plus our own music and characters.\n\nSYNK PATH — From travel to life in Korea, planned around you.\n\nEach business page separates what you can use today from what is still in preparation.",
+      "answer": "In one line each:\n\nSYNK — An engine that fits you better the more you use it.\n\nSYNK LAB — Learn Korean, and get ready for Korea.\n\nSYNK SHIFT — AI lectures, plus work automation.\n\nSYNK PULSE — Ads and model videos, plus our own music and characters.\n\nSYNK PATH — From travel to life in Korea, planned around you.\n\nEach business page separates what you can use today from what is still in preparation.",
       "sourceId": "vision",
       "relatedIds": [
         "synk-vision",
@@ -604,7 +613,7 @@
         "Tell me about your business structure",
         "How are the four brands different?"
       ],
-      "answer": "LAB covers Korean education, SHIFT personalized services for companies, PULSE ads, model videos, music and characters, and PATH personalized travel plus study, work and settling in Korea. All four use the Atlas engines they need.\n\nLAB — Korean textbooks, learning games and a personalized learning app, with a full-time one-year course aimed at TOPIK Level 4 in preparation.\n\nSHIFT — personalized services for company work where each person needs different guidance: purchase advice, product onboarding, expert coaching and staff training. We are taking enquiries now.\n\nPULSE — product ads, brand films, AI model lookbooks and how-to videos, plus the music and stories of Mongle, Kkamong and Marin. AI profiles, introduction decks and studio rental are in preparation.\n\nPATH — travel days planned around your taste and budget. Study and career support, VR interview practice and help with housing are in preparation.\n\nThe four businesses are how SYNK divides its work. It does not mean there are four companies or that all four are fully operating.",
+      "answer": "LAB covers Korean education, SHIFT AI lectures and work automation, PULSE ads, model videos, music and characters, and PATH personalized travel plus study, work and settling in Korea. All four use the Atlas engines they need.\n\nLAB — Korean textbooks, learning games and a personalized learning app, with a full-time one-year course aimed at TOPIK Level 4 in preparation.\n\nSHIFT — AI lectures at schools, companies and institutions (including AI career lectures for schools), instructors assigned to fit each request, and AI automation of repetitive work for companies that took a lecture. We are taking enquiries now.\n\nPULSE — product ads, brand films, AI model lookbooks and how-to videos, plus the music and stories of Mongle, Kkamong and Marin. AI profiles, introduction decks and studio rental are in preparation.\n\nPATH — travel days planned around your taste and budget. Study and career support, VR interview practice and help with housing are in preparation.\n\nThe four businesses are how SYNK divides its work. It does not mean there are four companies or that all four are fully operating.",
       "sourceId": "company",
       "relatedIds": [
         "lab-intro",
@@ -642,7 +651,7 @@
         "What stage are the services at?",
         "Have your services launched?"
       ],
-      "answer": "The Korean games are available when you sign in with SYNK ID, and the SYNK platform is open as a Windows and Mac Preview and a web preview. PULSE is taking ad and model video projects, and the other services are in preparation.\n\nLAB — we have made eight Korean games and three beginner games, and you can play all of them in SYNK WORLD on the SYNK platform by signing in with SYNK ID. SYNK WORLD keeps supported game progress and outfits in your account. All eight textbooks are written; the one-year course, the learning app and VR interview practice are in preparation.\n\nSHIFT — taking enquiries. Purchase advice, onboarding, coaching and staff training are candidate services; launch scope, prices and client results have not been set or measured yet.\n\nPULSE — making ads and model videos, and making music and character stories. AI profiles, introduction decks and studio rental are in preparation and not taking bookings.\n\nPATH — the VR caregiver interview test is available; VR practice for visa interviews and university life, study and career support, and housing support are in preparation.",
+      "answer": "The Korean games are available when you sign in with SYNK ID, and the SYNK platform is open as a Windows and Mac Preview and a web preview. PULSE is taking ad and model video projects, and the other services are in preparation.\n\nLAB — we have made eight Korean games and three beginner games, and you can play all of them in SYNK WORLD on the SYNK platform by signing in with SYNK ID. SYNK WORLD keeps supported game progress and outfits in your account. All eight textbooks are written; the one-year course, the learning app and VR interview practice are in preparation.\n\nSHIFT — taking enquiries for lectures and work automation. Prices and the terms for assigning instructors are not set yet, and results at client companies have not been checked yet.\n\nPULSE — making ads and model videos, and making music and character stories. AI profiles, introduction decks and studio rental are in preparation and not taking bookings.\n\nPATH — the VR caregiver interview test is available; VR practice for visa interviews and university life, study and career support, and housing support are in preparation.",
       "sourceId": "company",
       "relatedIds": [
         "lab-intro",
@@ -676,7 +685,7 @@
         "Which brand is right for me?",
         "I’m new here"
       ],
-      "answer": "Start from what you want to do. LAB if you want to learn Korean, SHIFT if you want a personalized service for your company, PULSE for ads, model videos, music or characters, and PATH if you are planning travel or study and work in Korea.\n\nIf you would rather try SYNK apps first, start with the SYNK platform. The company’s direction and Atlas are on the SYNK home page and the Atlas page.",
+      "answer": "Start from what you want to do. LAB if you want to learn Korean, SHIFT if you need an AI lecture or work automation, PULSE for ads, model videos, music or characters, and PATH if you are planning travel or study and work in Korea.\n\nIf you would rather try SYNK apps first, start with the SYNK platform. The company’s direction and Atlas are on the SYNK home page and the Atlas page.",
       "sourceId": "company",
       "relatedIds": [
         "lab-intro",
@@ -1129,7 +1138,7 @@
         "What does SHIFT do?",
         "Do you cover branding for solo businesses?"
       ],
-      "answer": "SYNK SHIFT brings personalized services to the work of companies and organizations where each person needs different guidance. We pick one task — personalized purchase advice, product onboarding, expert coaching, or sales and service training — and connect the company’s product information and rules to Atlas.\n\nWe start by agreeing the task and what “done” means, test it in the real environment, and agree who runs it and handles exceptions. Staff training and consulting, workflow automation, and branding for the service’s explanations and screens come with the setup where it needs them. After launch we check together that it is really used and what it costs to run.\n\nThese four are candidate services. Features, who runs them, schedule and price are agreed with each company, and results for your customers are checked together after launch.",
+      "answer": "SYNK SHIFT teaches the skills the AI era calls for at schools, companies and institutions. For schools we give AI career lectures on how to steer a career in the AI era and what to prepare, and as an instructor agency we find AI and AI-career instructors and assign them to fit each request.\n\nWhen a company that took a lecture wants it, we pick one repetitive task and automate it with AI to help cut fixed costs. In a half-day review we map the workflow together and demonstrate one automation, then agree scope and cost up front, build it and check it every month. Consulting, branding, market research and product testing come with lectures and automation where they need them.\n\nPrices for lectures and automation and the terms for assigning instructors are not set yet and are agreed per request. We do not promise learning results or savings in advance; we check them with you afterwards.",
       "sourceId": "shift",
       "relatedIds": [
         "shift-vision",
@@ -1144,7 +1153,7 @@
         "label": "See SHIFT",
         "href": "/en/shift/"
       },
-      "reviewedAt": "2026-10-10",
+      "reviewedAt": "2026-10-22",
       "aliases": [
         "SYNK SHIFT를 소개해 주세요",
         "SHIFT는 어떤 일을 하나요?",
@@ -1170,7 +1179,7 @@
         "What future does SHIFT envision?",
         "What does SYNK SHIFT aim to become?"
       ],
-      "answer": "To give everyone personal guidance, built from a company’s own material.\n\nSYNK SHIFT brings personalized services to work where every person needs different guidance — advice, onboarding, coaching and staff training. We connect your product information and rules to Atlas, and after launch we check with you that it is really used.",
+      "answer": "To teach careers and work for the AI era, and to automate repetitive tasks.\n\nSYNK SHIFT teaches the skills the AI era calls for at schools, companies and institutions, then automates repetitive work with AI for companies that took a lecture, to cut fixed costs. In schools we also give AI career lectures on how to steer a career in the AI era and what to prepare for it. We also run an instructor agency that finds instructors and assigns them to fit each request.",
       "sourceId": "shift",
       "relatedIds": [
         "shift-intro",
@@ -1181,7 +1190,7 @@
         "label": "See SHIFT",
         "href": "/en/shift/"
       },
-      "reviewedAt": "2026-10-10",
+      "reviewedAt": "2026-10-22",
       "aliases": [
         "SHIFT의 비전은 무엇인가요?",
         "시프트가 꿈꾸는 미래는 무엇인가요?",
@@ -1208,7 +1217,7 @@
         "Who is SHIFT for?",
         "Is SHIFT for both companies and individuals?"
       ],
-      "answer": "Companies and organisations whose customers or staff need guidance tailored to each person — for example retailers with many products and options, software companies whose new customers stall at setup, trainers and consultants who repeat the same tasks, and sales and CS teams whose staff freeze in front of real customers.\n\nRather than company size, we first look at whether there is material to use, whether the results can be checked and who will run the service.",
+      "answer": "Schools, companies and institutions getting ready for the AI era. Lectures and the instructor agency are for schools that want career education to reflect how AI is changing work, companies and public bodies that want staff to use AI in real work, and anyone with a topic who struggles to find a fitting instructor.\n\nWork automation suits small companies paying fixed costs for entry, sorting and reporting that people repeat. Rather than company size, we first look at whether there is one clear task to automate, whether before and after can be compared, and who will check the results.\n\nThere are no open courses for individuals yet. If you run a business on your own, you can still ask about automating repetitive work.",
       "sourceId": "shift",
       "relatedIds": [
         "shift-takeaway",
@@ -1218,10 +1227,10 @@
         "path-support"
       ],
       "action": {
-        "label": "See the services",
+        "label": "See what we do",
         "href": "/en/shift/#services"
       },
-      "reviewedAt": "2026-10-10",
+      "reviewedAt": "2026-10-22",
       "aliases": [
         "SHIFT는 누구에게 맞나요?",
         "혼자 사업을 준비하는 사람도 대상인가요?",
@@ -1249,7 +1258,7 @@
         "Can I apply what I learn to my work?",
         "I'd like to understand the approach to lessons and practice"
       ],
-      "answer": "A personalized service built for one task at your company, and the know-how for your staff to use and run it. We first agree the users and what “done” means, the material and system connections, and who is responsible for operation.\n\nFeatures, deliverables, which source files you can edit, schedule and price are set in each contract, and client results are checked together after launch.",
+      "answer": "Each person leaves a lecture with one thing made. Students take a page on what AI is changing in their field and what they will prepare; staff take a piece of work from their own job and a request–check–fix routine to reuse.\n\nLearning goals, prior knowledge needed, the tools allowed and any extra cost, material that must stay out of practice, and which questions we take are agreed with whoever books the lecture beforehand. We do not present one lecture’s results as every attendee’s skill gain.",
       "sourceId": "shift",
       "relatedIds": [
         "shift-ai",
@@ -1259,10 +1268,10 @@
         "path-support"
       ],
       "action": {
-        "label": "See the process",
-        "href": "/en/shift/#process"
+        "label": "How we teach",
+        "href": "/en/shift/#how"
       },
-      "reviewedAt": "2026-10-10",
+      "reviewedAt": "2026-10-22",
       "aliases": [
         "SHIFT 수업은 무엇이 남도록 설계하나요?",
         "배운 방법을 제 일에 쓸 수 있나요?",
@@ -1287,19 +1296,23 @@
         "How does SHIFT approach AI tools?",
         "Is the AI training relevant to real work?"
       ],
-      "answer": "SHIFT services use Atlas to give each person different guidance. For the companies that adopt them, we also teach staff to use the service on real work material and check the results.\n\nWe never present features under test as client results. What problem we set out to solve, what we asked AI to do and why a person revised the result are explained from real work.",
+      "answer": "In lectures, rather than introducing lots of AI tools, we have people make something with a tool that fits their work and practise checking and fixing the result. Which tools to use, and whether they cost extra, is agreed before the lecture.\n\nIn work automation, we split the steps AI handles from those a person checks, and make sure that when AI gets something wrong or stops, it alerts you and a person takes over. We never present features under test as client results.",
       "sourceId": "shift",
       "relatedIds": [
         "shift-takeaway",
         "shift-making",
         "philosophy-people"
       ],
-      "reviewedAt": "2026-10-10",
+      "reviewedAt": "2026-10-22",
       "aliases": [
         "AI 활용도 가르치나요?",
         "SHIFT는 AI 도구를 어떻게 다루나요?",
         "실무에서 쓸 AI 수업인가요?"
-      ]
+      ],
+      "action": {
+        "label": "How we teach",
+        "href": "/en/shift/#how"
+      }
     },
     {
       "id": "shift-making",
@@ -1332,7 +1345,7 @@
         "Why did you remove stitching from SYNK?",
         "Show me an actual revision"
       ],
-      "answer": "Because the result alone does not tell you what method was used or whether you could use it yourself. SYNK writes down the methods tried, the failures and the reasons for each fix, so that you can judge the method and take it into your own work.\n\nFor example, when we made the site logo we put stitch decoration on both the SYNK letters and the business names, and the letters became hard to read. We kept the soft texture and took the stitches off the SYNK letters only, so the word that has to be read first comes first. The felt characters and objects on screen were designed as things you could hold in your hand, and the Loom engine was built to carry that texture onto the screen.\n\nToday you can see this process in the trials and cases on the home page and on the founder page. SHIFT introductions work the same way: the person in charge tries the service with real material, checks the results and learns to fix things.",
+      "answer": "Because the result alone does not tell you what method was used or whether you could use it yourself. SYNK writes down the methods tried, the failures and the reasons for each fix, so that you can judge the method and take it into your own work.\n\nFor example, when we made the site logo we put stitch decoration on both the SYNK letters and the business names, and the letters became hard to read. We kept the soft texture and took the stitches off the SYNK letters only, so the word that has to be read first comes first. The felt characters and objects on screen were designed as things you could hold in your hand, and the Loom engine was built to carry that texture onto the screen.\n\nToday you can see this process on the founder page and on the founder’s yuhobuilds channel. SHIFT lectures work the same way: people try things with real material, check the results and learn to fix them.",
       "sourceId": "shift",
       "relatedIds": [
         "shift-takeaway",
@@ -1343,7 +1356,7 @@
         "label": "See SHIFT",
         "href": "/en/shift/"
       },
-      "reviewedAt": "2026-10-10",
+      "reviewedAt": "2026-10-22",
       "aliases": [
         "직접 만든 과정을 왜 보여 주나요?",
         "SHIFT의 제작 이야기는 무엇을 담나요?",
@@ -1656,7 +1669,7 @@
         "What guides your use of technology?",
         "How do you see the teacher’s role?"
       ],
-      "answer": "Repeated guidance, sorting and record-keeping go to the service; exceptions that need judgement, relationships between people and important decisions stay with people. At LAB the teacher runs the class and sets the direction; at SHIFT the person in charge checks results and handles exceptions.\n\nThe standard for using technology is the six principles on the home page. We do not guess from age, gender or nationality; we fit to the settings you chose and what you actually did. Finishing something is not proof of progress, so we check separately whether you can do more without help.\n\nWhat you wrote and what you actually did stay as the original record. Anything the AI inferred is marked separately so you can check and correct it. Anything still in preparation is labelled as such, and we do not promise results we have not confirmed.",
+      "answer": "Repeated guidance, sorting and record-keeping go to the service; exceptions that need judgement, relationships between people and important decisions stay with people. At LAB the teacher runs the class and sets the direction; in SHIFT work automation the person in charge at the company checks results and handles exceptions.\n\nThe standard for using technology is the six principles on the home page. We do not guess from age, gender or nationality; we fit to the settings you chose and what you actually did. Finishing something is not proof of progress, so we check separately whether you can do more without help.\n\nWhat you wrote and what you actually did stay as the original record. Anything the AI inferred is marked separately so you can check and correct it. Anything still in preparation is labelled as such, and we do not promise results we have not confirmed.",
       "sourceId": "philosophy",
       "relatedIds": [
         "lab-personal",
@@ -1861,7 +1874,7 @@
         "What other services is SHIFT preparing?",
         "I'd like to know about SHIFT's other business directions"
       ],
-      "answer": "SHIFT’s work is bringing a personalized service to one task at a company. Training and consulting, automation and system connections, and service copy and screen branding are taken on as part of that.\n\nTraining and consulting — staff learn to use the service on real work material, check results and handle exceptions.\n\nAutomation and system connections — split the steps the service handles from those a person checks, and connect repetitive work to existing systems.\n\nService copy and screen branding — make it obvious who gets what help, with copy, screens and guides that fit the brand.",
+      "answer": "SHIFT’s work is AI lectures at schools, companies and institutions (including AI career lectures for schools), an instructor agency, and automating work for companies that took a lecture. Consulting, branding, market research and product testing are taken on to support that work.\n\nConsulting — work out which tasks to hand to AI first, and where a person should check.\n\nBranding — fit lecture material, notices and the screens automation adds to your company’s voice and look.\n\nMarket research and product testing — interview the people who will use it, watch them try it, and report where they get stuck.",
       "sourceId": "shift",
       "relatedIds": [
         "shift-making",
@@ -1873,7 +1886,7 @@
         "label": "Ask SHIFT",
         "href": "/en/shift/#contact"
       },
-      "reviewedAt": "2026-10-10",
+      "reviewedAt": "2026-10-22",
       "aliases": [
         "SHIFT가 준비하는 다른 사업은 무엇인가요?",
         "SHIFT의 다른 사업 방향도 궁금해요"
@@ -1938,7 +1951,7 @@
         "label": "See the four businesses",
         "href": "/en/#business"
       },
-      "answer": "Start by deciding what you need now. Learning Korean, a personalized service for your company, video or music, or travel and study plans each point to a different page.\n\nEach business page separates what you can do today from what is in preparation, and what you would receive and on what terms. Looking around the SYNK platform web preview first is another way in.\n\nWe do not claim proven effects or superiority over other companies based on the examples on our site. Ask through the contact form or hello@synk.im and we will tell you what is possible today.",
+      "answer": "Start by deciding what you need now. Learning Korean, an AI lecture or work automation, video or music, or travel and study plans each point to a different page.\n\nEach business page separates what you can do today from what is in preparation, and what you would receive and on what terms. Looking around the SYNK platform web preview first is another way in.\n\nWe do not claim proven effects or superiority over other companies based on the examples on our site. Ask through the contact form or hello@synk.im and we will tell you what is possible today.",
       "reviewedAt": "2026-10-10",
       "aliases": [
         "SYNK의 강점은 무엇인가요?",
@@ -2300,7 +2313,7 @@
       "sourceId": "shift",
       "brand": "shift",
       "title": "Can I explore SHIFT with no AI experience?",
-      "answer": "Yes. SHIFT is set up so that companies new to AI can adopt it: we start by agreeing which task to use it for and what “done” means.\n\nSo that staff new to AI can run the service, we practise writing requests, checking results and revising them with real work material during setup.",
+      "answer": "Yes. SHIFT lectures are planned so that people new to AI can make one thing from their own work. The prior knowledge needed and the tools to use are checked before the lecture.\n\nWork automation can start without knowing much about AI too. A lecture first looks at what can be handed to AI, then in a half-day review we map the current workflow with you and agree what can be handed over and where a person checks.",
       "questionExamples": [
         "Can I explore SHIFT with no AI experience?",
         "I'd like to create work using AI",
@@ -2317,10 +2330,10 @@
         "shift-materials"
       ],
       "action": {
-        "label": "See SHIFT services",
+        "label": "See what we do",
         "href": "/en/shift/#services"
       },
-      "reviewedAt": "2026-10-10",
+      "reviewedAt": "2026-10-22",
       "aliases": [
         "AI를 잘 몰라도 SHIFT를 볼 수 있나요?",
         "AI로 제 일을 만들고 싶어요",
@@ -2332,12 +2345,14 @@
       "sourceId": "shift",
       "brand": "shift",
       "title": "Are there resources I can try in my own work?",
-      "answer": "Start with the service examples on the SHIFT page. Each one shows who it is for, what we build and what changes.\n\nIf you need a service or training for company work, tell us who will use it, what problem it should solve and what you need delivered, and we will confirm scope and schedule.",
+      "answer": "“What we do” on the SHIFT page sets out, for each lecture and for automation, who it fits, an example, what you get and what is agreed first. There are no lecture materials or textbooks to download yet.\n\nAI news and how to use the tools are on SHIFT’s synkbrief channels (YouTube and Instagram). If you need a lecture or automation for your school or company, tell us the audience and the problem to solve, and we will confirm scope and schedule.",
       "questionExamples": [
         "Are there resources I can try in my own work?",
         "I'm building a brand on my own. Is there something I can read first?",
         "Where can I find SHIFT resources?",
-        "Do I need to sign up to download resources?"
+        "Do I need to sign up to download resources?",
+        "Can we get the lecture materials?",
+        "Do you provide handouts or slides?"
       ],
       "keywords": [
         "resource library",
@@ -2353,10 +2368,10 @@
         "shift-education"
       ],
       "action": {
-        "label": "See SHIFT services",
+        "label": "See what we do",
         "href": "/en/shift/#services"
       },
-      "reviewedAt": "2026-10-10",
+      "reviewedAt": "2026-10-22",
       "aliases": [
         "제 일에 먼저 써볼 자료가 있나요?",
         "혼자 브랜드를 만들고 있는데 먼저 볼 자료가 있을까요?",
@@ -2368,12 +2383,18 @@
       "id": "shift-education",
       "sourceId": "shift",
       "brand": "shift",
-      "title": "Does SHIFT only offer AI lectures?",
-      "answer": "Not only AI lectures. SHIFT’s work is bringing personalized services into company work, and training is provided for the staff who will use and run them.\n\nStaff practise making requests with real work material, comparing and revising results and handling exceptions. Participants, schedule and cost are set per project, and this does not mean an accredited course or institutional agreement is in operation.",
+      "title": "How do SHIFT AI lectures work?",
+      "answer": "We agree the learning goals, audience and time with whoever books the lecture, then pick practice tasks from the audience’s real work or interests. Lectures are SHIFT’s main work, alongside assigning instructors and automating work.\n\nThe tools allowed and any extra cost, and material that must stay out of practice, are agreed in advance, and each person leaves with one thing made and a way to do it again.\n\nAudience, schedule and cost are agreed per request, and this does not mean an accredited course or institutional agreement is in operation.",
       "questionExamples": [
         "Does SHIFT only offer AI lectures?",
         "Can I inquire about AI training or workshops?",
-        "Is SHIFT an AI training brand?"
+        "Is SHIFT an AI training brand?",
+        "How do lectures for organisations work?",
+        "Can our staff take AI training with you?",
+        "Do you teach AI at public bodies?",
+        "How does SHIFT deliver training and consulting?",
+        "How do I book a lecture?",
+        "How do we request a lecture?"
       ],
       "keywords": [
         "AI training",
@@ -2383,16 +2404,14 @@
         "education"
       ],
       "relatedIds": [
-        "shift-intro",
-        "guide-collaboration",
-        "shift-services",
-        "path-support"
+        "shift-career",
+        "shift-agency"
       ],
       "action": {
         "label": "Ask SHIFT",
         "href": "/en/shift/#contact"
       },
-      "reviewedAt": "2026-10-10",
+      "reviewedAt": "2026-10-22",
       "aliases": [
         "SHIFT는 AI 강의만 하는 곳인가요?",
         "AI 교육이나 실습을 신청할 수 있나요?",
@@ -2404,10 +2423,12 @@
       "sourceId": "shift",
       "brand": "shift",
       "title": "Will SHIFT's methods give me the same business results?",
-      "answer": "We do not guarantee the same results. The cases on the site were made by SYNK ourselves, and operation at real client companies, its effect and its profitability have not been verified yet. Nor do we claim that using AI makes a business succeed.\n\nSHIFT introduces a personalized service to one task at one company and checks task completion, errors, handling time and support load against how things were before. Results depend on the company’s material, the task and the people using it.\n\nCosts are split into an initial setup fee, a regular usage and operation fee, and extra usage or development. We set the scope with each company first, then quote.",
+      "answer": "We do not guarantee the same results. SHIFT’s lectures and automation are the way we have prepared to work, and their effect and the savings at real client companies have not been verified yet. Nor do we claim that using AI makes a business succeed.\n\nSavings from automation are measured before and after under the same conditions, and we tell you what we compared against. We do not stretch one demonstration into a savings figure, and results depend on the company’s work and the people using it.\n\nWe agree the scope of each request first, then quote.",
       "questionExamples": [
         "Will SHIFT's methods give me the same business results?",
-        "Will using AI make my business successful?"
+        "Will using AI make my business successful?",
+        "Do you promise savings?",
+        "How much will automation save us?"
       ],
       "keywords": [
         "business results",
@@ -2422,10 +2443,10 @@
         "path-support"
       ],
       "action": {
-        "label": "See the services",
-        "href": "/en/shift/#services"
+        "label": "See pricing",
+        "href": "/en/shift/#pricing"
       },
-      "reviewedAt": "2026-10-10",
+      "reviewedAt": "2026-10-22",
       "aliases": [
         "SHIFT 방법을 쓰면 같은 사업 성과를 얻나요?",
         "AI만 쓰면 사업이 성공하나요?"
@@ -2436,7 +2457,7 @@
       "sourceId": "shift",
       "brand": "shift",
       "title": "Do you share failures and sample AI prompts?",
-      "answer": "For work we can show publicly, we present the fixes as well as the finished result: where we got stuck and why we changed the method, based on the actual work. On the home page, “How these trials were made” lists the starting problem, what we built, what it can do now and what to know before using it, in the same order each time.\n\nThere is no collection of the exact prompts we sent to AI tools. The cases do explain what we asked for and what came back. Students’ and clients’ material and private operational documents are not published.",
+      "answer": "For work we can show publicly, we present the fixes as well as the finished result: where we got stuck and why we changed the method, based on the actual work.\n\nThere is no collection of the exact prompts we sent to AI tools. The cases do explain what we asked for and what came back. Students’ and clients’ material and private operational documents are not published.",
       "questionExamples": [
         "Do you share failures and sample AI prompts?",
         "Do you publish prompts?",
@@ -2457,7 +2478,7 @@
         "label": "See SHIFT",
         "href": "/en/shift/"
       },
-      "reviewedAt": "2026-10-10",
+      "reviewedAt": "2026-10-22",
       "aliases": [
         "실패나 AI 요청 예시도 공개하나요?",
         "프롬프트를 공개하나요?",
@@ -2602,7 +2623,9 @@
       "questionExamples": [
         "Do you have verified results or competitor comparison data?",
         "How many times more did revenue grow compared with other companies?",
-        "How much did revenue multiply?"
+        "How much did revenue multiply?",
+        "Do you have case studies?",
+        "Do you have client references?"
       ],
       "keywords": [
         "comparison data",
@@ -2768,11 +2791,13 @@
       "sourceId": "guide",
       "brand": "synk",
       "title": "Are you hiring staff or instructors?",
-      "answer": "There is no open job or instructor posting right now. If you tell us your field and what you can do at hello@synk.im, we will say whether we can let you know when a position opens.\n\nThis question box does not accept applications. Please confirm that a position is open before sending anything with personal details, such as a CV.",
+      "answer": "There is no open job or instructor posting right now. If you are a school, company or institution looking for an instructor to teach, the SHIFT instructor agency finds one who fits your request and assigns them.\n\nIf you would like to work with us, tell us your field and what you can do at hello@synk.im, and we will say whether we can let you know when a position opens. If you would like to teach as an AI or AI-career instructor with SHIFT, include your field and what you have made yourself.\n\nThis question box does not accept applications. Please confirm that a position is open before sending anything with personal details, such as a CV.",
       "questionExamples": [
         "Are you hiring staff or instructors?",
         "Are you recruiting?",
-        "Are you looking for instructors?"
+        "Are you looking for instructors?",
+        "I want to work as an AI instructor",
+        "Can I teach with SHIFT?"
       ],
       "keywords": [
         "hiring",
@@ -2782,9 +2807,10 @@
         "employment"
       ],
       "relatedIds": [
+        "shift-agency",
         "guide-contact"
       ],
-      "reviewedAt": "2026-10-10",
+      "reviewedAt": "2026-10-22",
       "action": {
         "label": "Contact us",
         "href": "/en/#contact"
@@ -2913,7 +2939,7 @@
       "brand": "shift",
       "category": "service",
       "title": "What services does SHIFT offer?",
-      "answer": "SHIFT brings a personalized service to one task at a company. The four candidates are personalized purchase advice, product onboarding, an expert coaching service and sales and customer service training.\n\nAlong the way we can also take on staff training and consulting, automation and system connections, and service copy and screen branding. Interviewing the people who will use the service and watching them try it are part of the process.\n\nTraining and consulting — staff learn to use the service on real work material, check results and handle exceptions.\n\nAutomation and system connections — split the steps the service handles from those a person checks, and connect repetitive work to existing systems.\n\nService copy and screen branding — make it obvious who gets what help, with copy, screens and guides that fit the brand.\n\nThese four are candidate services. Features, who runs them, schedule and price are agreed with each company, and results for your customers are checked together after launch.",
+      "answer": "SHIFT gives AI lectures at schools, companies and institutions, runs an instructor agency, and automates work. Lectures come first; when a company that took a lecture wants it, we move on to automation.\n\nAI career lectures for schools — not a general careers talk, but how to steer a career in the AI era and which skills to build. Each student leaves with a one-page plan for their own career.\n\nAI lectures for organisations — staff practise on their own work and leave with one piece of work and a request–check–fix routine they can reuse.\n\nInstructor agency — we find AI and AI-career instructors who fit the goal and audience of each request and assign them. You know exactly which instructor is coming before you sign.\n\nAI work automation — we pick one repetitive task and automate it to help cut fixed costs, in the order half-day review, build one task, monthly care.\n\nConsulting, branding, market research and product testing come with lectures and automation where they need them.\n\nPrices for lectures and automation and the terms for assigning instructors are not set yet and are agreed per request. We do not promise learning results or savings in advance; we check them with you afterwards.",
       "questionExamples": [
         "What services does SHIFT offer?",
         "Do you offer both corporate AI training and branding?",
@@ -2921,7 +2947,10 @@
         "What services can companies and institutions get from SHIFT?",
         "Does SHIFT teach classes too?",
         "I'd like to discuss corporate training and consulting",
-        "Does SHIFT also handle branding?"
+        "Does SHIFT also handle branding?",
+        "Can SHIFT give a lecture or automate our work?",
+        "Can you give an AI lecture at our school?",
+        "Can you train our staff on AI?"
       ],
       "keywords": [
         "shift",
@@ -2932,19 +2961,26 @@
         "AI lessons and workshops",
         "business consulting",
         "company branding",
-        "workflow automation"
+        "workflow automation",
+        "lecture",
+        "lectures",
+        "instructor",
+        "instructors",
+        "AI lecture",
+        "corporate training",
+        "instructor agency"
       ],
       "relatedIds": [
-        "shift-atlas-value",
-        "shift-personalization",
-        "shift-intro",
-        "shift-philosophy"
+        "shift-career",
+        "shift-agency",
+        "shift-delivery",
+        "shift-contract"
       ],
       "action": {
-        "label": "See the services",
+        "label": "See what we do",
         "href": "/en/shift/#services"
       },
-      "reviewedAt": "2026-10-10",
+      "reviewedAt": "2026-10-22",
       "aliases": [
         "SHIFT는 어떤 서비스를 제공하나요?",
         "기업 AI 교육과 브랜딩을 함께 제공하나요?",
@@ -3037,7 +3073,7 @@
       "brand": "shift",
       "category": "philosophy",
       "title": "What is SYNK SHIFT's philosophy?",
-      "answer": "Start with one task and make sure it is really used. We choose one piece of work where each person needs different guidance and begin by agreeing who has to finish what.\n\nWe do not build a new engine for each company; we add modules for product information and expert standards to Atlas. After launch we review real use and running costs with your staff and keep improving.\n\nThese four are candidate services. Features, who runs them, schedule and price are agreed with each company, and results for your customers are checked together after launch. An API and engine licensing are directions we will consider later, not products for sale now.",
+      "answer": "Lectures that leave each person with something made, and automation we stay responsible for even when it stops. A lecture is judged by what people made from their own career plans or work, not by how many tools were shown.\n\nFor automation we settle what happens when it stops before what it looks like running: where a person checks, how errors and exceptions are flagged, and who fixes it after handover. Savings are reported only from before-and-after measurements under the same conditions.\n\nPrices for lectures and automation and the terms for assigning instructors are not set yet and are agreed per request. We do not promise learning results or savings in advance; we check them with you afterwards.",
       "questionExamples": [
         "What is SYNK SHIFT's philosophy?",
         "I'd like to know SHIFT's philosophy",
@@ -3058,7 +3094,7 @@
         "label": "See SHIFT",
         "href": "/en/shift/"
       },
-      "reviewedAt": "2026-10-10",
+      "reviewedAt": "2026-10-22",
       "aliases": [
         "SYNK SHIFT의 철학은 무엇인가요?",
         "SHIFT의 철학이 궁금해요",
@@ -3309,29 +3345,40 @@
       "brand": "shift",
       "category": "service",
       "sourceId": "shift",
-      "title": "How does a SHIFT project run?",
+      "title": "How does SHIFT work automation run?",
       "keywords": [
         "shift",
+        "automation",
+        "automate",
+        "half-day review",
+        "review",
+        "build",
+        "monthly care",
+        "maintenance",
         "process",
-        "approach",
-        "understand the task and goal",
-        "learn practice and create",
-        "review and handover",
-        "service design"
+        "steps",
+        "integration"
       ],
       "questionExamples": [
-        "How does SHIFT deliver training and consulting?"
+        "How does SHIFT work automation run?",
+        "How does automation work?",
+        "What happens in the half-day review?",
+        "Can we just do the half-day review?",
+        "Can we stop after the review?",
+        "What are the steps if we ask you to automate something?",
+        "Can it connect to our existing systems?",
+        "Who fixes the automation when it stops?"
       ],
-      "answer": "In four steps: agree the task and what “done” means, research and test with the people who will use it, connect company material and systems, and review results and operations after launch.\n\nTask and definition of done — who finishes what and how it is done today, plus the material to use, the scope of personal data and exceptions a person must check.\n\nUser research and testing — interview the people who will use it and watch where they stop when they try it.\n\nConnection and staff readiness — connect company material and systems, and train staff to check results and handle exceptions.\n\nResults and operations — review completions, errors, handling time and support load together, and decide the next improvement.",
+      "answer": "In four steps: a lecture, a half-day review, building one task, and monthly care.\n\nLecture — first, look together at what your company can hand to AI and what should stay with people.\n\nHalf-day review — we map the workflow with you, demonstrate one automation on the spot, then send a proposal with scope and cost. You decide whether to build after reading it, and you can stop after the review.\n\nBuild one task — scope and price are agreed up front, then we automate one task, including where a person checks and how it alerts you when it stops. Connections to your existing systems are agreed within this scope.\n\nMonthly care — each month we check it still runs and adjust it when the work or the services it uses change. Time and cost saved are measured before and after under the same conditions.\n\nWe do not take on system builds that change many tasks at once; we go one task at a time. Where a person’s judgement differs a lot each time, the review looks at whether sorting out the work should come before automating it.",
       "relatedIds": [
-        "shift-intro",
-        "shift-philosophy"
+        "shift-contract",
+        "shift-results"
       ],
       "action": {
-        "label": "See the process",
+        "label": "See automation",
         "href": "/en/shift/#process"
       },
-      "reviewedAt": "2026-10-10",
+      "reviewedAt": "2026-10-22",
       "aliases": [
         "SHIFT는 교육과 컨설팅을 어떻게 진행하나요?"
       ]
@@ -3417,7 +3464,7 @@
       "questionExamples": [
         "What advertising work does PULSE do?"
       ],
-      "answer": "We make ads that introduce brands through PULSE’s music and characters. We fit music, video and characters to the message and channel, and agree purpose, rights, usage terms and any required ad labelling first.\n\nCommissioned product ads, brand films and AI model videos are handled under PULSE video production. Personalized services for company work are SHIFT’s job.",
+      "answer": "We make ads that introduce brands through PULSE’s music and characters. We fit music, video and characters to the message and channel, and agree purpose, rights, usage terms and any required ad labelling first.\n\nCommissioned product ads, brand films and AI model videos are handled under PULSE video production. AI lectures and work automation are SHIFT’s job.",
       "relatedIds": [
         "pulse-intro",
         "pulse-philosophy"
@@ -3965,7 +4012,7 @@
       "brand": "shift",
       "category": "service",
       "sourceId": "shift",
-      "title": "Which kinds of company work does SHIFT personalize?",
+      "title": "Can SHIFT build a personalized service for my company?",
       "keywords": [
         "shift",
         "personalization",
@@ -3981,6 +4028,8 @@
         "expert coaching service"
       ],
       "questionExamples": [
+        "Can SHIFT build a personalized service for my company?",
+        "Which kinds of company work does SHIFT personalize?",
         "What personalized services is SHIFT developing?",
         "Can an expert’s coaching be personalized?",
         "Can you develop buying advice tailored to each customer?",
@@ -3989,16 +4038,16 @@
         "Can SHIFT build a service for my company?",
         "Can you build purchase advice for us?"
       ],
-      "answer": "Work that helps customers choose and use products, and work that tailors expert coaching and staff training to each person. The four candidates are personalized purchase advice, product onboarding, an expert coaching service and sales and customer service training.\n\nPersonalized purchase advice — customers enter their budget, use and existing equipment and first see a matching setup, the reasons for it and the options they can skip. Staff receive the summary and start with a quote.\n\nProduct onboarding — based on the customer’s role, goal and progress, show the next step one at a time. Customers do not wait for support, and the support team spends time on problems that need a person.\n\nExpert coaching service — the expert’s methods and standards become personal tasks and feedback. The service handles repeated guidance and experts focus on judgement.\n\nSales and customer service training — staff rehearse realistic situations with the company’s products and standards. What they miss comes back next time, and managers see what each person misses.\n\nThese four are candidate services. Features, who runs them, schedule and price are agreed with each company, and results for your customers are checked together after launch.",
+      "answer": "Not as a separate service any more. SHIFT now focuses on AI lectures at schools, companies and institutions, an instructor agency, and automating repetitive work for companies that took a lecture.\n\nIf you want AI to take repetitive work off your team, ask us about work automation. A lecture first looks at what your company can hand to AI, then in a half-day review we pick one task we can take on and agree scope and cost up front.\n\nAtlas is not something SHIFT sells separately; it is the technology inside, used to fit lectures and reviews to the people and companies taking them.",
       "relatedIds": [
-        "shift-intro",
-        "shift-philosophy"
+        "shift-services",
+        "shift-delivery"
       ],
       "action": {
-        "label": "See the services",
+        "label": "See what we do",
         "href": "/en/shift/#services"
       },
-      "reviewedAt": "2026-10-10",
+      "reviewedAt": "2026-10-22",
       "aliases": [
         "SHIFT의 초개인화 서비스는 무엇인가요?",
         "전문가의 코칭을 개인화할 수 있나요?",
@@ -4032,16 +4081,16 @@
         "Can SHIFT help with user testing?",
         "I want to research responses from overseas consumers"
       ],
-      "answer": "We research the people and environment the service is for, have them try it and find what to fix. Market research and product testing are being prepared as part of setup support.\n\nUser and market research — define who will use it and what they must finish, then confirm their conditions and current difficulties through interviews and data.\n\nUsability testing — watch where participants stop and what explanation they need while they try it.\n\nResults and running costs — review completions, errors, handling time and the work of launch and support, separating observation from interpretation, and decide the next improvement.\n\nParticipants, conditions, consent, compensation, schedule and cost are set within the project. We do not generalise a few reactions to the whole market.",
+      "answer": "Market research and product testing are being prepared as support for lectures and automation; they are not a main service we sell on their own.\n\nUser and market research — define who will use it and what they must finish, then confirm their current difficulties through interviews and data.\n\nUsability testing — watch where participants stop and what explanation they need while they try it.\n\nParticipants, conditions, consent, compensation, schedule and cost are set within the request. We do not generalise a few reactions to the whole market.",
       "relatedIds": [
         "shift-intro",
         "shift-philosophy"
       ],
       "action": {
-        "label": "See the process",
+        "label": "What we also take on",
         "href": "/en/shift/#process"
       },
-      "reviewedAt": "2026-10-10",
+      "reviewedAt": "2026-10-22",
       "aliases": [
         "시장조사와 제품 테스트는 어떻게 준비하나요?",
         "SHIFT에서 사용자 테스트를 맡길 수 있나요?",
@@ -4210,7 +4259,7 @@
       "brand": "shift",
       "category": "service",
       "sourceId": "shift",
-      "title": "What does Atlas contribute to SHIFT’s services?",
+      "title": "How does SHIFT use Atlas?",
       "keywords": [
         "SHIFT",
         "Atlas",
@@ -4222,19 +4271,19 @@
       "questionExamples": [
         "What does Atlas contribute to SHIFT’s services?",
         "How does SHIFT use Atlas?",
-        "How is SHIFT different from a generic chatbot?"
+        "How is SHIFT different from a generic chatbot?",
+        "Can my company use Atlas?"
       ],
-      "answer": "Instead of building a new engine for each company, we add modules for product information and expert standards to the shared personalization of Atlas. So the service asks only what matters, recommends with reasons and changes the next step from the result.\n\nA typical chatbot stops at answering. A SHIFT service remembers each person’s conditions and results to change the next question, recommendation or practice, and shows why something is recommended or left out.\n\nWe first check real use and support costs, then whether the same service can be supplied to several companies, before looking at an API and engine licensing. Launch, pricing and client results have not been set or measured yet.",
+      "answer": "Atlas is not something SHIFT sells separately; it is the technology inside, used to fit lectures and reviews to the people and companies taking them. We are preparing it to choose practice tasks and explanations to fit each student’s interests or each company’s work, even on the same topic.\n\nSHIFT does not build and sell chatbot-style services; it teaches people how to use AI and automates repetitive work. We do not sell an API or engine licence for plugging Atlas into your systems.",
       "relatedIds": [
-        "shift-personalization",
         "shift-services",
         "shift-expansion"
       ],
       "action": {
-        "label": "How it works",
-        "href": "/en/shift/#how"
+        "label": "See what we do",
+        "href": "/en/shift/#services"
       },
-      "reviewedAt": "2026-10-10",
+      "reviewedAt": "2026-10-22",
       "aliases": [
         "SHIFT는 Atlas로 어떤 차이를 만드나요?",
         "SHIFT는 Atlas를 어떻게 활용하나요?",
@@ -4305,7 +4354,7 @@
         "How is Atlas used by each brand?",
         "What does it mean for Atlas to evolve with the user?"
       ],
-      "answer": "Atlas is the personalization engine SYNK builds, and eight engines share the work. They understand the goal and situation (Core, Strata, Trail), fit the content, screens, words and sound to the person (Loom, Vellum, Reed), and check whether it helped (Prism, Temper).\n\nThe same person needs different practice when the goal changes: preparing for university, working at a Korean company and talking with family call for different language. Atlas changes tasks and explanations by the goal a person sets and their recent results, not by age.\n\nCore decides what is needed now. Strata maps what to learn and in what order (in development). Trail records the process and the change. Loom builds screens that respond to touch. Vellum gives explanations and hints people understand. Reed handles music and sound for the scene. Prism finds patterns across many results. Temper checks whether it helped.\n\nLAB uses the engines for Korean practice and games, SHIFT for personalized company services, PULSE for the picture and sound of ads and model videos, and PATH for travel plans and study and interview preparation.\n\nAtlas runs today in the Korean games, and we are extending it to the learning app and business services. Each service shows what is actually in use.",
+      "answer": "Atlas is the personalization engine SYNK builds, and eight engines share the work. They understand the goal and situation (Core, Strata, Trail), fit the content, screens, words and sound to the person (Loom, Vellum, Reed), and check whether it helped (Prism, Temper).\n\nThe same person needs different practice when the goal changes: preparing for university, working at a Korean company and talking with family call for different language. Atlas changes tasks and explanations by the goal a person sets and their recent results, not by age.\n\nCore decides what is needed now. Strata maps what to learn and in what order (in development). Trail records the process and the change. Loom builds screens that respond to touch. Vellum gives explanations and hints people understand. Reed handles music and sound for the scene. Prism finds patterns across many results. Temper checks whether it helped.\n\nLAB uses the engines for Korean practice and games, SHIFT for AI lectures and work reviews, PULSE for the picture and sound of ads and model videos, and PATH for travel plans and study and interview preparation.\n\nAtlas runs today in the Korean games, and we are extending it to the learning app and business services. Each service shows what is actually in use.",
       "relatedIds": [
         "synk-intro",
         "lab-personalization",
@@ -4339,7 +4388,7 @@
         "What does Core do?",
         "What is the Core engine?"
       ],
-      "answer": "Core decides what is needed now. It looks at what someone is trying to do and where they are stuck, decides the next step and the help needed, and records why something was recommended or left out.\n\nIn the Korean games it picks the next question from the shared learning record, and SHIFT services use the same judgement.\n\nAtlas runs today in the Korean games, and we are extending it to the learning app and business services. Each service shows what is actually in use.",
+      "answer": "Core decides what is needed now. It looks at what someone is trying to do and where they are stuck, decides the next step and the help needed, and records why something was recommended or left out.\n\nIn the Korean games it picks the next question from the shared learning record, and SHIFT is preparing to use the same judgement in its lectures and reviews.\n\nAtlas runs today in the Korean games, and we are extending it to the learning app and business services. Each service shows what is actually in use.",
       "relatedIds": [
         "synk-atlas",
         "lab-personalization"
@@ -4581,16 +4630,16 @@
         "Does SHIFT sell APIs or engine licenses?",
         "How will SHIFT expand its business?"
       ],
-      "answer": "Not now. We first check whether a service helps in one company’s real work and what supply and support cost, and only after confirming it can be supplied to several companies will we look at an API and engine licensing.\n\nThe order is one task in operation → proven repeat supply → API and engine licensing. Launch dates, prices and terms are not set.",
+      "answer": "No. SHIFT’s work today is AI lectures at schools, companies and institutions, an instructor agency and work automation. An API and engine licensing might be considered far in the future, but they are not part of the current business plan.\n\nThe business grows from lectures into automating work for companies that took a lecture. Atlas is not something SHIFT sells separately; it is the technology inside, used to fit lectures and reviews to the people and companies taking them.",
       "relatedIds": [
         "shift-intro",
         "shift-philosophy"
       ],
       "action": {
-        "label": "See pricing",
-        "href": "/en/shift/#pricing"
+        "label": "See SHIFT",
+        "href": "/en/shift/"
       },
-      "reviewedAt": "2026-10-10",
+      "reviewedAt": "2026-10-22",
       "aliases": [
         "SHIFT는 API나 엔진 라이선스를 판매하나요?",
         "SHIFT는 사업을 어떤 순서로 넓히나요?",
@@ -4603,7 +4652,7 @@
       "brand": "shift",
       "category": "service",
       "sourceId": "shift",
-      "title": "How does SHIFT separate setup fees from operating fees?",
+      "title": "How is SHIFT pricing decided?",
       "keywords": [
         "shift",
         "setup fee",
@@ -4612,22 +4661,33 @@
         "pricing",
         "contract",
         "usage",
-        "development"
+        "development",
+        "price",
+        "cost",
+        "quote",
+        "lecture fee",
+        "automation cost",
+        "monthly fee"
       ],
       "questionExamples": [
         "How does SHIFT separate setup fees from operating fees?",
-        "How are SHIFT service fees structured?"
+        "How are SHIFT service fees structured?",
+        "How is SHIFT pricing decided?",
+        "How is pricing decided?",
+        "How much does a SHIFT lecture cost?",
+        "How is the cost of building an automation decided?",
+        "Is there a monthly fee?"
       ],
-      "answer": "Costs are split into initial setup for building the service, a subscription and operation fee afterwards, and extra usage and development for anything beyond the plan.\n\nInitial setup — organise the task and material, configure the service and connect it to existing systems, with agreed deliverables and acceptance criteria.\n\nSubscription and operation — service use, quality checks and agreed operational support, with usage, content updates and error response defined.\n\nExtra usage and development — usage beyond the plan, new connections or feature changes go ahead only after scope and cost are confirmed.\n\nPrices and contract terms are not set yet and are agreed per project.",
+      "answer": "We have not set a price list for lectures or automation. We agree the audience and scope for each request, then quote.\n\nLectures — set by audience and size, length and number of sessions, the practice material to prepare and the venue. When we assign another instructor, their terms are confirmed too.\n\nAutomation build — scope and price for one task are agreed in the half-day review. It depends on how many exceptions there are and which services it must connect to, and the price is based on the cost the automation removes.\n\nMonthly care — we agree how often we check and what we fix, and take it on month by month. Fees for external services the automation uses may be extra, and if the work changes enough to need a rebuild, scope and cost are agreed again.\n\nThe earlier split into setup fees and operating fees is no longer used.",
       "relatedIds": [
-        "shift-intro",
-        "shift-philosophy"
+        "shift-delivery",
+        "shift-results"
       ],
       "action": {
         "label": "See pricing",
         "href": "/en/shift/#pricing"
       },
-      "reviewedAt": "2026-10-10",
+      "reviewedAt": "2026-10-22",
       "aliases": [
         "SHIFT의 도입비와 운영료는 어떻게 나뉘나요?",
         "SHIFT 서비스 비용은 어떻게 구성되나요?",
@@ -4800,7 +4860,7 @@
         "How is my data used?",
         "How does Atlas use my records?"
       ],
-      "answer": "Atlas chooses the next suggestion from what you told us and what you actually did. It never guesses from age, gender or nationality, and anything AI inferred is marked so you can check and correct it.\n\nEach program stores progress differently. Guest progress stays in that browser; with a SYNK ID, supported records are kept in your account. Anything done before signing up does not move to your account automatically.\n\nIn business services (SHIFT), user conditions and records are used only for the purpose and consent agreed when the service is set up. You can find how each service keeps, shows and deletes data in the privacy policy.",
+      "answer": "Atlas chooses the next suggestion from what you told us and what you actually did. It never guesses from age, gender or nationality, and anything AI inferred is marked so you can check and correct it.\n\nEach program stores progress differently. Guest progress stays in that browser; with a SYNK ID, supported records are kept in your account. Anything done before signing up does not move to your account automatically.\n\nIn SHIFT lectures and work automation, material and records are used only for the purpose and consent agreed with whoever made the request. You can find how each service keeps, shows and deletes data in the privacy policy.",
       "sourceId": "company",
       "relatedIds": [
         "synk-atlas",
@@ -4812,6 +4872,79 @@
         "href": "/privacy/"
       },
       "reviewedAt": "2026-10-10"
+    },
+    {
+      "id": "shift-career",
+      "title": "What do SHIFT’s AI career lectures cover?",
+      "brand": "shift",
+      "keywords": [
+        "AI career",
+        "career lecture",
+        "career lectures",
+        "careers talk",
+        "career education",
+        "skills for the AI era",
+        "school lecture"
+      ],
+      "questionExamples": [
+        "What do SHIFT’s AI career lectures cover?",
+        "What do the AI career lectures cover?",
+        "How is an AI career lecture different from a normal careers talk?",
+        "Can you give an AI careers talk at our school?",
+        "Do you teach students what to prepare for the AI era?"
+      ],
+      "answer": "Not a general careers talk: a lecture for schools on how to steer a career in the AI era and which skills to build for it. Students look at how AI is changing work in a field they care about, then pick the skills that work needs and what they can start on now.\n\nEach student leaves with a one-page plan for their own career: what AI is changing in their field and what they will prepare. Year group and class size, lesson time, and the devices and tools students can use are agreed with the school beforehand.\n\nSchedule and cost are agreed with each school. The lecture does not decide a student’s career for them.",
+      "sourceId": "shift",
+      "relatedIds": [
+        "shift-education",
+        "shift-agency",
+        "shift-services"
+      ],
+      "action": {
+        "label": "AI career lectures for schools",
+        "href": "/en/shift/#service-1"
+      },
+      "reviewedAt": "2026-10-22"
+    },
+    {
+      "id": "shift-agency",
+      "title": "Can SHIFT find and assign an instructor?",
+      "brand": "shift",
+      "keywords": [
+        "instructor agency",
+        "find an instructor",
+        "assign an instructor",
+        "book an instructor",
+        "speaker",
+        "AI instructor",
+        "career instructor",
+        "substitute instructor"
+      ],
+      "questionExamples": [
+        "Can SHIFT find and assign an instructor?",
+        "Can you find and assign an instructor?",
+        "Can you book an AI instructor for us?",
+        "We are looking for an AI instructor",
+        "Can you recommend an instructor?",
+        "We need a speaker for our school",
+        "Can you find an instructor for a school careers week?",
+        "Will we know which instructor is coming?",
+        "What if the instructor cannot come?",
+        "How many instructors do you have?",
+        "Who are the instructors?"
+      ],
+      "answer": "Yes. We hear the goal and the audience of the request, then find an AI or AI-career instructor who fits and assign them. First we show an evidence card for each instructor: whose work they teach, what they have made themselves, samples they can share, and what stays after the class.\n\nYou know exactly which instructor is coming before you sign. Running the day, a substitute if the instructor cannot come, cancellation and questions after the lecture are written into the contract only as far as we can really promise.\n\nWe do not lead with a headcount or a roster; for each request we find an instructor who fits and show you their evidence card. We have not posted for instructors yet. If you would like to teach with us, tell us your field and what you have made yourself at hello@synk.im. Selection criteria, payment and rights to teaching material will be shared once they are set.",
+      "sourceId": "shift",
+      "relatedIds": [
+        "shift-education",
+        "shift-career",
+        "shift-contract"
+      ],
+      "action": {
+        "label": "See the instructor agency",
+        "href": "/en/shift/#service-3"
+      },
+      "reviewedAt": "2026-10-22"
     }
   ],
   "visions": {
@@ -4827,8 +4960,8 @@
     },
     "shift": {
       "name": "SYNK SHIFT",
-      "headline": "Personal guidance for everyone, built from your material",
-      "subtext": "SYNK SHIFT brings personalized services to work where every person needs different guidance — advice, onboarding, coaching and staff training. We connect your product information and rules to Atlas, and after launch we check with you that it is really used."
+      "headline": "AI lectures, plus work automation",
+      "subtext": "SYNK SHIFT teaches the skills the AI era calls for at schools, companies and institutions, then automates repetitive work with AI for companies that took a lecture, to cut fixed costs. In schools we also give AI career lectures on how to steer a career in the AI era and what to prepare for it. We also run an instructor agency that finds instructors and assigns them to fit each request."
     },
     "pulse": {
       "name": "SYNK PULSE",
