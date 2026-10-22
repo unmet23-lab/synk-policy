@@ -1,5 +1,5 @@
 {
-  "version": "2026-09-15-selected-experiences-copy-9bfc4e4ce8-rhythm-20261001-copy-3910676d01-release-copy-3e4ed3be6d-en-002b14631325-bm-platform-20261007-a885b0d303-travel-20261007-ce148dd860-real-20261007-ab58ee7076-homepage-current-20261009-033c24b61f29-homepage-v10-20261010-5619cc6985fa",
+  "version": "2026-09-15-selected-experiences-copy-9bfc4e4ce8-rhythm-20261001-copy-3910676d01-release-copy-3e4ed3be6d-en-002b14631325-bm-platform-20261007-a885b0d303-travel-20261007-ce148dd860-real-20261007-ab58ee7076-homepage-current-20261009-033c24b61f29-homepage-v10-20261010-151558f40b1a",
   "updatedAt": "2026-10-22",
   "docs": [
     {
@@ -83,7 +83,7 @@
         "Each program stores progress differently. Guest progress stays in that browser; with a SYNK ID, supported records are kept in your account. Anything done before signing up does not move to your account automatically.",
         "In SHIFT lectures and work automation, material and records are used only for the purpose and consent agreed with whoever made the request. You can find how each service keeps, shows and deletes data in the privacy policy."
       ],
-      "updatedAt": "2026-10-19"
+      "updatedAt": "2026-10-22"
     },
     {
       "id": "lab",
@@ -4806,9 +4806,9 @@
       ],
       "action": {
         "label": "See the member benefits",
-        "href": "/en/#platform"
+        "href": "/account/platform.html#benefits"
       },
-      "reviewedAt": "2026-10-19"
+      "reviewedAt": "2026-10-22"
     },
     {
       "id": "atlas-engines",

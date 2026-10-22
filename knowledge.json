@@ -1,5 +1,5 @@
 {
-  "version": "2026-09-15-selected-experiences-copy-9bfc4e4ce8-rhythm-20261001-copy-3910676d01-release-copy-3e4ed3be6d-bm-platform-20261007-aeb1f10aeb-travel-20261007-0d37d456af-real-20261007-05098f38f2-homepage-current-20261009-0ee91e08458f-homepage-v10-20261010-56a6602dd0da",
+  "version": "2026-09-15-selected-experiences-copy-9bfc4e4ce8-rhythm-20261001-copy-3910676d01-release-copy-3e4ed3be6d-bm-platform-20261007-aeb1f10aeb-travel-20261007-0d37d456af-real-20261007-05098f38f2-homepage-current-20261009-0ee91e08458f-homepage-v10-20261010-cc1ec4817dd5",
   "updatedAt": "2026-10-22",
   "docs": [
     {
@@ -83,7 +83,7 @@
         "기록을 저장하는 방식은 프로그램마다 다릅니다. 로그인하지 않은 체험 기록은 그 브라우저에만 남고, SYNK ID로 로그인하면 지원되는 기록을 계정에 보관합니다. 가입 전에 남긴 기록이 계정으로 자동으로 옮겨지지는 않습니다.",
         "SHIFT의 강의와 업무 자동화에서는 의뢰한 곳과 정한 목적과 동의 범위 안에서만 자료와 기록을 씁니다. 각 서비스의 보관·열람·삭제는 개인정보처리방침에서 확인할 수 있습니다."
       ],
-      "updatedAt": "2026-10-19"
+      "updatedAt": "2026-10-22"
     },
     {
       "id": "lab",
@@ -4185,9 +4185,9 @@
       ],
       "action": {
         "label": "회원 혜택 보기",
-        "href": "/#platform"
+        "href": "/account/platform.html#benefits"
       },
-      "reviewedAt": "2026-10-19"
+      "reviewedAt": "2026-10-22"
     },
     {
       "id": "atlas-engines",
