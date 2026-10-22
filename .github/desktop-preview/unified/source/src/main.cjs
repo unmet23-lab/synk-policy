@@ -2,7 +2,7 @@
 const {app,BrowserWindow,ipcMain,session,protocol,Menu,Tray,shell,dialog,safeStorage,screen,globalShortcut,clipboard,Notification}=require('electron');
 const fs=require('node:fs'),path=require('node:path'),{spawn}=require('node:child_process');
 const {CLIENTS,DEV_URLS,PLATFORM_ENTRY,identity,sourceScope}=require('./catalog.cjs');
-const {safeEntry,assertSender,trustedEntry,preferences,allowedNavigation,externalDestination,contentSecurityPolicy,nativeContentSecurityPolicy}=require('./security.cjs');
+const {safeEntry,assertSender,trustedEntry,worldNotificationAllowed,preferences,allowedNavigation,externalDestination,contentSecurityPolicy,nativeContentSecurityPolicy}=require('./security.cjs');
 const {createClientLifecycle}=require('./client-lifecycle.cjs');
 const {resolveProgramRoot}=require('./program-root.cjs');
 const {loadDevelopmentReleases}=require('./local-releases.cjs');
@@ -98,7 +98,7 @@ async function openAccountSignUp(){
 }
 async function signOutAccount(){
   const owner=accountStatus()?.account?.synk_user_id;
-  if(suitePublisher&&!suitePublisher.signOut())return {ok:false,status:accountStatus(),error:{code:'SUITE_UNAVAILABLE',message:'앱 계정 연결을 저장하지 못해 로그아웃을 완료하지 못했어요.'}};
+  if(suitePublisher&&!suitePublisher.signOut())return {ok:false,status:accountStatus(),error:{code:'SUITE_UNAVAILABLE',message:'로그인 기록을 지우지 못해 로그아웃을 마치지 못했어요. 다시 해 주세요.'}};
   const result=await auth.signOut();
   // Authentication has its own confirmed result. An encrypted draft cleanup
   // failure must not discard its server flags or become an auth failure.
@@ -225,8 +225,10 @@ function createWindow(){
     void teacherService.initialize();
   }
   // Same page permissions are not implicit desktop permissions. Media remains unavailable until a deliberate consent flow is implemented.
-  ownSession.setPermissionRequestHandler((_contents,_permission,callback)=>callback(false));
-  ownSession.setPermissionCheckHandler(()=>false);
+  // The one exception is WORLD's study reminders: notifications its own trusted page asks for in the main window (security.cjs).
+  const worldNotification=(contents,permission,url,isMainFrame)=>!!window&&!window.isDestroyed()&&contents===window.webContents&&worldNotificationAllowed({clientId:runtime.clientId,permission,url,entry,isMainFrame});
+  ownSession.setPermissionRequestHandler((contents,permission,callback,details)=>callback(worldNotification(contents,permission,details?.requestingUrl,details?.isMainFrame)));
+  ownSession.setPermissionCheckHandler((contents,permission,_origin,details)=>worldNotification(contents,permission,details?.requestingUrl||contents?.getURL?.(),details?.isMainFrame));
   if(smoke&&runtime.clientId==='platform')ownSession.webRequest.onBeforeRequest({urls:['http://*/*','https://*/*','ws://*/*','wss://*/*']},(details,callback)=>{smokeNetworkRequests.push(details.url);callback({cancel:true});});
   ownSession.webRequest.onHeadersReceived((details,callback)=>callback({responseHeaders:{...details.responseHeaders,'Content-Security-Policy':[details.url.startsWith('synk-desktop://platform/')?nativeContentSecurityPolicy():details.url.startsWith('synk-desktop://status/')?connectionContentSecurityPolicy():contentSecurityPolicy(details.resourceType)]}}));
   ownSession.removeAllListeners('will-download');
@@ -235,7 +237,7 @@ function createWindow(){
       if(smoke){const dir=smokeArtifacts;fs.mkdirSync(dir,{recursive:true});item.setSavePath(path.join(dir,runtime.clientId+'-synthetic-export.'+spec.extension));item.once('done',(_event,state)=>{smokeDownload={state,mime:item.getMimeType(),size:item.getReceivedBytes()};});return;}
       item.setSaveDialogOptions({title:'SYNK 기록 저장',defaultPath:path.join(app.getPath('downloads'),item.getFilename()),filters:[{name:spec.filterName,extensions:[spec.extension]}]});
     },
-    onDenied(reason){if(smoke||!window||window.isDestroyed())return;dialog.showMessageBox(window,{type:'info',title:'SYNK 기록 저장',message:reason==='session'?'회사 로그인을 확인한 뒤 다시 저장해 주세요.':'이 파일은 앱에서 저장할 수 없어요.',detail:runtime.clientId==='messenger'?'내 작업실의 AI 업무 연습 TXT 기록만 최대 64 KiB까지 저장할 수 있어요.':'연결된 JSON 기록만 최대 32 MiB까지 저장할 수 있어요. 더 큰 기록은 웹에서 내보내 주세요.'});},
+    onDenied(reason){if(smoke||!window||window.isDestroyed())return;dialog.showMessageBox(window,{type:'info',title:'SYNK 기록 저장',message:reason==='session'?'회사 계정으로 로그인한 뒤 다시 저장해 주세요.':'이 파일은 앱에서 저장할 수 없어요.',detail:runtime.clientId==='messenger'?'작업실의 AI 업무 연습 기록(TXT)만 64KB까지 저장할 수 있어요.':'JSON 기록은 32MB까지만 저장할 수 있어요. 더 큰 기록은 웹에서 내보내 주세요.'});},
   }));
   if(!protocolRegistered){const nativeContent=createNativeContent({appRoot:app.getAppPath()}),connectionContent=createConnectionContent({appRoot:app.getAppPath(),clientId:runtime.clientId,mode:runtime.mode,entry,messengerCloudPreview:runtime.messengerCloudPreview,worldCloudPreview:runtime.worldCloudPreview,productName:current.productName});ownSession.protocol.handle('synk-desktop',request=>request.url.startsWith('synk-desktop://platform/')&&runtime.clientId==='platform'?nativeContent(request):connectionContent(request));}
   protocolRegistered=true;
