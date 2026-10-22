@@ -1,7 +1,7 @@
 {
- "createdAt": "2026-10-22T04:39:14.970Z",
- "commit": "c1874f2787138ce73782d6a05e18f0579f59ece0",
- "run": 39722355100,
+ "createdAt": "2026-10-22T05:32:38.348Z",
+ "commit": "bb5126ed9897bb79018e171de4ee452c89dfd1b2",
+ "run": 39727331441,
  "env": {
   "chromium": "151.0.7922.34",
   "os": "ubuntu24"
@@ -80,15 +80,15 @@
   "/care/": {
    "desktop": {
     "file": "desktop/care.jpg",
-    "sha256": "4ff3913c3f5749a8be99232c31cef3ad4f5c08ae280a65b3c44852802bb3de84",
+    "sha256": "1718138dbfcc179ec428a0d83aacd82496c1935d316a95a4be4f8ef9faa9e97c",
     "cssHeight": 2247,
-    "run": 39700254781
+    "run": 39727331441
    },
    "mobile": {
     "file": "mobile/care.jpg",
-    "sha256": "a5d9bd47c8cafb4366d0c3decb9dc454a90e9b2d1e5f6a6b2e54adac22d84deb",
-    "cssHeight": 3319,
-    "run": 39700254781
+    "sha256": "51fe2bbf559b517c6c037ce4b2e5ea30e7511011125ba1cc10f487661a641355",
+    "cssHeight": 3243,
+    "run": 39727331441
    }
   },
   "/data-deletion/": {
@@ -206,15 +206,15 @@
   "/fortune/": {
    "desktop": {
     "file": "desktop/fortune.jpg",
-    "sha256": "dfe7918c6660e28a76447516f36d6c6cc1fce7a9fb6ee4f93b92399ddf30186f",
+    "sha256": "1ced1df7cf93f34898372440980a662650192086e4253d85c84d3160c637dd62",
     "cssHeight": 1386,
-    "run": 39700254781
+    "run": 39727331441
    },
    "mobile": {
     "file": "mobile/fortune.jpg",
-    "sha256": "876d8617a7186ef3e27c84cc4f16b84231273b98c186040cf8ea730deaca8368",
-    "cssHeight": 2271,
-    "run": 39700254781
+    "sha256": "924863cc6b829f103ae598f12f35fe20eb45d0afa937efa86e7c866e44ccef91",
+    "cssHeight": 2120,
+    "run": 39727331441
    }
   },
   "/founder/": {
@@ -444,29 +444,29 @@
   "/world/korean-rhythm/": {
    "desktop": {
     "file": "desktop/world~korean-rhythm.jpg",
-    "sha256": "99a6104457b03c52ea42f2a4919ad05837d407591fcf95bf749c55ba4c36a8d2",
+    "sha256": "fb273460f545034f559b1df766eeb6668682ef136dcf320551ee88d9b6b23dee",
     "cssHeight": 1121,
-    "run": 39700254781
+    "run": 39727331441
    },
    "mobile": {
     "file": "mobile/world~korean-rhythm.jpg",
-    "sha256": "aed471c2746d4a3bd2e60270c59a5ce5aff225d149d66691fe4f1d0536ee42f8",
+    "sha256": "dd84bae63cf198c71d8a5d6049c7ae969a5728d061fc2df82a5dfc937409677f",
     "cssHeight": 1667,
-    "run": 39700254781
+    "run": 39727331441
    }
   },
   "/world/korean-runner/": {
    "desktop": {
     "file": "desktop/world~korean-runner.jpg",
-    "sha256": "5fdef60ba8ba42785351dc07f2a9b5d62f8f599b58ef406b1b7b39207dc7fcf1",
+    "sha256": "f2f4c8bcd5923929f69d535fb13a0959b573c3f350fb33e88265d020176a200a",
     "cssHeight": 1037,
-    "run": 39700254781
+    "run": 39727331441
    },
    "mobile": {
     "file": "mobile/world~korean-runner.jpg",
-    "sha256": "e6c27889a00969a69dd5ca047121149e9c4408140c837a558b04a6f9bcd6c519",
+    "sha256": "d69a961e8d566c8adeb1fc8e388b5557548f2b88c52f3b4c538573ab55aa4e08",
     "cssHeight": 1599,
-    "run": 39700254781
+    "run": 39727331441
    }
   }
  }
