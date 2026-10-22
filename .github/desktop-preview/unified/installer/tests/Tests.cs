@@ -123,7 +123,7 @@ internal static class SignalInstallerTests
                 limited.Files.Add(new InstallFile { Path="update-only.txt",Bytes=0,SHA256=new string('0',64) });
                 var timed=new InstallerEngine(limited,delegate { return File.OpenRead(backend); });InstallFailure failure=null;
                 try { Task.Run(delegate { return timed.InstallWithDeadline(Progress,1500); }).GetAwaiter().GetResult(); }catch(InstallFailure error){failure=error;}
-                Assert(failure!=null&&failure.CanRetry&&failure.BackendStopped&&failure.Message.Contains("부분 설치"),"Fresh timeout state was not safely explained.");
+                Assert(failure!=null&&failure.CanRetry&&failure.BackendStopped&&failure.Message.Contains("덜 설치된"),"Fresh timeout state was not safely explained.");
                 Assert(!Directory.Exists(Spec.InstallDirectory),"Fresh partial installation remains.");
                 Assert(!File.Exists(StartMenuShortcut())&&!File.Exists(DesktopShortcut()),"Fresh partial shortcuts remain.");
                 using(var hive=RegistryKey.OpenBaseKey(RegistryHive.CurrentUser,RegistryView.Registry64))Assert(hive.OpenSubKey(UninstallKey())==null,"Fresh partial uninstall registration remains.");
@@ -197,7 +197,7 @@ internal static class SignalInstallerTests
                     try { Task.Run(delegate { return timed.InstallWithDeadline(Progress,1500); }).GetAwaiter().GetResult(); }
                     catch(InstallFailure error) { failure=error; }
                     Assert(failure!=null&&failure.CanRetry&&failure.BackendStopped,"Timed-out partial install was not safely retryable.");
-                    Assert(failure.Message.Contains("복구했습니다"),"Failure did not disclose rollback status.");
+                    Assert(failure.Message.Contains("되돌렸어요"),"Failure did not disclose rollback status.");
                     Assert(elapsed.ElapsedMilliseconds<20000,"Timeout did not return within the bounded stop grace.");
                     Assert(File.Exists(pulse),"Fixture descendant did not run.");
                     string prior=File.ReadAllText(pulse);Thread.Sleep(400);
@@ -219,7 +219,7 @@ internal static class SignalInstallerTests
                             bool relaunched=false;var blocked=Engine(ReadSpec());
                             var result=Task.Run(delegate { return blocked.InstallAutomaticUpdateCore(session,Progress,delegate(Action<string,string,int?> progress) { throw new InstallFailure("Synthetic stop confirmation failure",false,false); },delegate(string executable,string arguments){relaunched=true;}); }).GetAwaiter().GetResult();
                             Assert(!result.Restored&&!result.Updated&&!relaunched,"Unconfirmed stop attempted recovery or launch.");
-                            Assert(result.Message.Contains("일부 바뀐 상태")&&result.Message.Contains("복구 원본"),"Uncertain state not disclosed.");
+                            Assert(result.Message.Contains("일부 바뀌었을 수")&&result.Message.Contains("되돌릴 원본"),"Uncertain state not disclosed.");
                             InstallFailure failure=null;try { Engine(ReadSpec()).Preflight(); }catch(InstallFailure error){failure=error;}
                             Assert(failure!=null&&!failure.CanRetry,"New installer did not respect unresolved transaction barrier.");
                             failure=null;try { Engine(ReadSpec()).PrepareAutomaticUpdate(exited.Id,new string('a',64),new string('b',64)); }catch(InstallFailure error){failure=error;}
@@ -243,7 +243,7 @@ internal static class SignalInstallerTests
                         var session=new AutomaticUpdateSession { Parent=exited,Directory=Spec.InstallDirectory,Version=Spec.Version,ExecutableSHA256=Hash(Path.Combine(Spec.InstallDirectory,Spec.ExecutableName)),AsarSHA256=Hash(Path.Combine(Spec.InstallDirectory,"resources","app.asar")),Nonce=nonce,InstallerSHA256=new string('b',64) };
                         int launches=0;
                         var result=Task.Run(delegate { return timed.InstallAutomaticUpdateCore(session,Progress,delegate(Action<string,string,int?> progress){return timed.InstallPayload(progress,1500);},delegate(string executable,string arguments){engine.VerifyInstalled();VerifyRegistrationAndShortcuts();Assert(arguments=="--synk-update-recovery="+nonce,"Timeout recovery token differs");launches++;}); }).GetAwaiter().GetResult();
-                        Assert(result.Restored&&result.Relaunched&&!result.Updated&&launches==1,"Automatic timeout did not recover exactly once.");
+                        Assert(result.Restored&&result.Relaunched&&!result.Updated&&launches==1,"Automatic timeout did not recover exactly once: "+result.Message);
                         Assert(!File.Exists(Path.Combine(Spec.InstallDirectory,"update-only.txt")),"Automatic timeout left partial payload.");
                         Assert(Hash(sentinel)==sentinelHash,"Automatic timeout changed external account data.");
                         Assert(result.RecoveryFile.EndsWith(Spec.AppId+".json",StringComparison.Ordinal),"Fixture recovery file differs");File.Delete(result.RecoveryFile);
