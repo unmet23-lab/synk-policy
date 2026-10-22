@@ -128,6 +128,7 @@ SYNK PATH는 취향과 예산에 맞춘 여행 일정을 짜고, 한국 유학·
 - [SYNK PATH](https://synk.im/path/) · [English](https://synk.im/en/path/)
 - [Atlas](https://synk.im/atlas/) · [English](https://synk.im/en/atlas/)
 - [Founder](https://synk.im/founder/) · [English](https://synk.im/en/founder/)
+- [SYNK in Mongolian — SYNK-ийн танилцуулга — TOPIK бэлтгэл, солонгос хэлний сургалт](https://synk.im/mn/)
 - [Public company notes (Korean)](https://synk.im/knowledge.json) · [English](https://synk.im/en/knowledge.json)
 - [Privacy policy](https://synk.im/privacy/)
 - [Terms](https://synk.im/terms/)
