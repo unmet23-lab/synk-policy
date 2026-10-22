@@ -47,9 +47,9 @@ function seoulDateKey(now = Date.now()) {
   return `${parts.year}-${parts.month}-${parts.day}`;
 }
 function validateDateKey(date2) {
-  if (typeof date2 !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(date2)) throw new TypeError("날짜 형식이 올바르지 않습니다.");
+  if (typeof date2 !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(date2)) throw new TypeError("날짜 형식이 맞지 않아요. 날짜를 다시 골라 주세요.");
   const parsed = /* @__PURE__ */ new Date(`${date2}T00:00:00Z`);
-  if (!Number.isFinite(parsed.getTime()) || parsed.toISOString().slice(0, 10) !== date2) throw new TypeError("존재하지 않는 날짜입니다.");
+  if (!Number.isFinite(parsed.getTime()) || parsed.toISOString().slice(0, 10) !== date2) throw new TypeError("없는 날짜예요. 날짜를 다시 골라 주세요.");
   return date2;
 }
 function millisecondsUntilNextSeoulDay(now = Date.now()) {
@@ -11792,7 +11792,7 @@ function pillar(id, label, pair) {
   const [gan, zhi] = [...pair];
   const stemElement = elementByHanja[LunarUtil.WU_XING_GAN[gan]];
   const branchElement = elementByHanja[LunarUtil.WU_XING_ZHI[zhi]];
-  if (!stemElement || !branchElement) throw new Error("사주 간지를 계산하지 못했습니다.");
+  if (!stemElement || !branchElement) throw new Error("사주 간지를 계산하지 못했어요. 생년월일을 다시 골라 주세요.");
   const stem = { hanja: gan, hangul: stemNames[gan], element: stemElement.label };
   const branch = { hanja: zhi, hangul: branchNames[zhi], element: branchElement.label };
   return { id, label, known: true, hanja: pair, hangul: stem.hangul + branch.hangul, stem, branch };
@@ -12957,9 +12957,9 @@ function getMonthFlow({ mode: mode2, signId: signId2, saju, startDate = seoulDat
     const reason = date2 > SAJU_MAX_DATE || date2 < SAJU_MIN_DATE ? "계산 지원 범위 밖의 날짜예요." : null;
     if (reason) return { date: date2, weekday: weekdayOf(date2), available: false, overall: null, tag: null, tagLabel: null, label: reason };
     const card = index === 0 ? first : getDailyCard({ mode: mode2, signId: signId2, saju, date: date2 });
-    return { date: date2, weekday: weekdayOf(date2), available: true, overall: card.levels.overall, tag: card.tag, tagLabel: card.tagLabel, label: card.label };
+    return { date: date2, weekday: weekdayOf(date2), available: true, overall: card.levels.overall, tag: card.tag, tagLabel: card.tagLabel, label: card.label, headline: card.headline };
   });
-  const pick = (tag) => items.filter((item) => item.tag === tag).map(({ date: date2, weekday, overall, label, tagLabel }) => ({ date: date2, weekday, overall, label, tagLabel }));
+  const pick = (tag) => items.filter((item) => item.tag === tag).map(({ date: date2, weekday, overall, label, tagLabel, headline }) => ({ date: date2, weekday, overall, label, tagLabel, headline }));
   const goodDays = pick("good"), calmDays = pick("calm"), careDays = pick("care");
   const parts = [];
   if (goodDays.length) parts.push(`${TAGS.good}은 ${goodDays.length}일`);
@@ -13365,7 +13365,7 @@ function blockOrder(seed2, block) {
   return order;
 }
 function drawCard({ seed: seed2, date: date2 = seoulDateKey() } = {}) {
-  if (typeof seed2 !== "string" || !seed2.trim() || [...seed2].length > 200) throw new TypeError("카드를 뽑을 사람 정보를 확인해 주세요.");
+  if (typeof seed2 !== "string" || !seed2.trim() || [...seed2].length > 200) throw new TypeError("카드를 뽑을 정보가 없어요. 별자리나 생년월일을 먼저 골라 주세요.");
   assertSupportedDate(date2);
   const day = dayNumber(date2), block = Math.floor(day / BLOCK);
   const card = MAJOR_ARCANA[blockOrder(seed2, block)[mod(day, BLOCK)]];
@@ -13785,7 +13785,7 @@ async function createPKCE(cryptoAPI = globalThis.crypto) {
 }
 async function beginOAuth({ config, product, storage, now = Date.now(), cryptoAPI }) {
   const client = config.clients[product];
-  if (!config.configured || !client?.clientId || !client.redirectUri) throw new Error("이 제품의 SSO 연결 설정이 아직 준비되지 않았어요.");
+  if (!config.configured || !client?.clientId || !client.redirectUri) throw new Error("이 화면의 로그인 설정이 아직 없어요.");
   const pkce = await createPKCE(cryptoAPI), transaction = { ...pkce, product, clientId: client.clientId, redirectUri: client.redirectUri, createdAt: now };
   storage.setItem(`synk.oauth.pending.${product}`, JSON.stringify(transaction));
   const url = new URL("/auth/v1/oauth/authorize", config.supabaseUrl);
@@ -13806,11 +13806,11 @@ function consumeCallback({ config, product, url, storage, now = Date.now() }) {
   const pending = JSON.parse(raw), client = config.clients[product];
   if (!pending || pending.product !== product || pending.clientId !== client?.clientId || pending.redirectUri !== client?.redirectUri || params.get("state") !== pending.state || now - pending.createdAt > 6e5 || now < pending.createdAt) throw new Error("로그인 요청이 만료되었거나 상태가 달라졌어요. 다시 시작해 주세요.");
   const actual = new URL(url), expected = new URL(client.redirectUri);
-  if (!callbackMatches(actual, expected)) throw new Error("등록한 로그인 도착 주소와 달라요.");
+  if (!callbackMatches(actual, expected)) throw new Error("로그인 뒤 돌아온 주소가 달라요. 다시 로그인해 주세요.");
   storage.removeItem(key);
   if (params.has("error")) throw new Error(params.get("error") === "access_denied" ? "제품 연결을 취소했어요." : "로그인을 마치지 못했어요. 다시 시작해 주세요.");
   const code = params.get("code");
-  if (!code) throw new Error("로그인 코드가 없어요.");
+  if (!code) throw new Error("로그인 응답이 비어 있어요. 다시 로그인해 주세요.");
   return { grant_type: "authorization_code", client_id: client.clientId, redirect_uri: client.redirectUri, code, code_verifier: pending.verifier };
 }
 async function tokenRequest(config, fields, fetcher = fetch) {
@@ -13827,18 +13827,18 @@ async function tokenRequest(config, fields, fetcher = fetch) {
         cache: "no-store"
       });
     } catch {
-      throw Object.assign(new Error("로그인 서버에 연결하지 못했어요. 연결이 돌아오면 다시 확인해 주세요."), { code: "NETWORK", retryable: true });
+      throw Object.assign(new Error("인터넷 연결이 끊겨 로그인 서버에 닿지 못했어요. 연결되면 다시 시도해 주세요."), { code: "NETWORK", retryable: true });
     }
     let data;
     try {
       data = await response.json();
     } catch (error2) {
-      if (response.ok && error2?.name !== "SyntaxError") throw Object.assign(new Error("로그인 응답을 끝까지 받지 못했어요. 연결이 돌아오면 다시 확인해 주세요."), { code: "NETWORK", retryable: true });
+      if (response.ok && error2?.name !== "SyntaxError") throw Object.assign(new Error("로그인 응답을 끝까지 받지 못했어요. 연결되면 다시 시도해 주세요."), { code: "NETWORK", retryable: true });
       data = null;
     }
     if (!response.ok) {
       const retryable = response.status === 429 || response.status >= 500;
-      throw Object.assign(new Error(retryable ? "로그인 서버가 잠시 응답하지 않아요. 잠시 뒤 다시 확인해 주세요." : "로그인 연결을 마치지 못했어요. 다시 로그인해 주세요."), { code: retryable ? "AUTH_UNAVAILABLE" : "AUTH_REQUIRED", status: response.status, retryable });
+      throw Object.assign(new Error(retryable ? "로그인 서버가 잠시 응답하지 않아요. 잠시 뒤 다시 시도해 주세요." : "로그인 연결을 마치지 못했어요. 다시 로그인해 주세요."), { code: retryable ? "AUTH_UNAVAILABLE" : "AUTH_REQUIRED", status: response.status, retryable });
     }
     if (!data || typeof data.access_token !== "string" || !data.access_token) throw Object.assign(new Error("로그인 응답을 확인하지 못했어요. 다시 로그인해 주세요."), { code: "INVALID_RESPONSE" });
     return { access_token: data.access_token, refresh_token: data.refresh_token || null, expires_at: Date.now() + Number(data.expires_in || 3600) * 1e3 };
@@ -13867,7 +13867,7 @@ var personName = (value) => typeof value === "string" && value === value.trim() 
 var exact = (value, keys) => value && typeof value === "object" && !Array.isArray(value) && Object.keys(value).length === keys.length && keys.every((key) => Object.hasOwn(value, key));
 var bytes = (value) => new TextEncoder().encode(JSON.stringify(value)).length;
 var fail = () => {
-  throw new Error("저장할 운세 정보의 형식을 확인해 주세요.");
+  throw new Error("저장할 운세 정보가 형식에 맞지 않아요. 생년월일과 시간을 다시 골라 주세요.");
 };
 var full = () => {
   throw new Error("보관함 용량이 가득 찼어요. 내보낸 뒤 오래된 기록을 정리해 주세요.");
@@ -13980,7 +13980,7 @@ function setVerdict(state, entryId, verdict, { now = (/* @__PURE__ */ new Date()
   return validateState({ ...base, entries: base.entries.map((item, at) => at === index ? { ...item, verdict, updatedAt } : item) });
 }
 function savePerson(state, person, { id = crypto.randomUUID(), today = seoulDateKey() } = {}) {
-  if (!person || typeof person !== "object" || Array.isArray(person)) throw new TypeError("저장할 사람 정보를 확인해 주세요.");
+  if (!person || typeof person !== "object" || Array.isArray(person)) throw new TypeError("저장할 사람 정보가 비어 있어요. 이름과 생년월일을 적어 주세요.");
   const base = validateState(state, today);
   const name = typeof person.name === "string" ? person.name.trim() : person.name;
   if (!personName(name)) throw new TypeError("이름은 1~20자로 적어 주세요.");
@@ -14006,7 +14006,7 @@ function removePerson(state, personId, { today = seoulDateKey() } = {}) {
 var PARAM = "synk-platform-account";
 var CANCEL = "synk-platform-cancelled";
 var validId = (value) => typeof value === "string" && /^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/i.test(value);
-var mismatch = () => Object.assign(new Error("플랫폼에서 선택한 SYNK ID와 로그인 계정이 달라요. 플랫폼 계정을 확인한 뒤 다시 열어 주세요."), { code: "PLATFORM_ACCOUNT_MISMATCH" });
+var mismatch = () => Object.assign(new Error("플랫폼에서 로그인한 SYNK ID와 이 화면의 계정이 달라요. 같은 계정으로 로그인한 뒤 다시 열어 주세요."), { code: "PLATFORM_ACCOUNT_MISMATCH" });
 function createPlatformEntry({ clientKey, getUrl, replaceUrl }) {
   const key = `synk.platform.entry.${clientKey}`;
   let captured = false, restored = false, invalid = false, cancelled = false, intent = null, storage;
@@ -14027,7 +14027,7 @@ function createPlatformEntry({ clientKey, getUrl, replaceUrl }) {
       storage = typeof value === "function" ? value() : value;
       storage.setItem(key, JSON.stringify(next));
     } catch {
-      throw Object.assign(new Error("플랫폼의 계정 연결을 이 탭에 보관하지 못했어요. 브라우저 저장 설정을 확인한 뒤 다시 시도해 주세요."), { code: "PLATFORM_ENTRY_STORAGE", retryable: true });
+      throw Object.assign(new Error("브라우저가 저장을 막아 플랫폼의 로그인을 이어받지 못했어요. 사이트 데이터 저장을 허용한 뒤 다시 열어 주세요."), { code: "PLATFORM_ENTRY_STORAGE", retryable: true });
     }
     intent = next;
     invalid = next.invalid === true;
@@ -14118,22 +14118,22 @@ function createPlatformEntry({ clientKey, getUrl, replaceUrl }) {
       try {
         if (url.href !== getUrl()) replaceUrl(url.href);
       } catch {
-        throw Object.assign(new Error("화면의 로그인은 종료했지만 자동 연결 취소를 저장하지 못했어요. 이 창을 닫아 주세요."), { code: "PLATFORM_ENTRY_STORAGE", retryable: false });
+        throw Object.assign(new Error("로그아웃은 했지만 자동 로그인 끄기를 저장하지 못했어요. 이 창을 닫아 주세요."), { code: "PLATFORM_ENTRY_STORAGE", retryable: false });
       }
     }
   };
 }
-var PUBLIC = Object.freeze({ world: "https://synk.im/account/client.html?product=world&play=learning-hub", care: "https://synk.im/care/", fortune: "https://synk.im/fortune/", rehearsal: "https://synk.im/rehearsal/" });
+var PUBLIC = Object.freeze({ world: "https://synk.im/world/", care: "https://synk.im/care/", fortune: "https://synk.im/fortune/", rehearsal: "https://synk.im/rehearsal/" });
 
 // experiences/daily-fortune/account.mjs
 var changed = () => Object.assign(new Error("로그인 계정이 바뀌었어요. 다시 불러와 주세요."), { code: "ACCOUNT_CHANGED" });
-var networkFailure = () => Object.assign(new Error("계정 서버에 연결하지 못했어요. 연결이 돌아오면 다시 확인해 주세요."), { code: "NETWORK", retryable: true });
+var networkFailure = () => Object.assign(new Error("계정 서버에 연결하지 못했어요. 인터넷 연결을 확인한 뒤 다시 해 주세요."), { code: "NETWORK", retryable: true });
 var messages = {
   REVISION_CONFLICT: "다른 화면에서 저장한 변경이 있어요. 최신 기록을 다시 불러온 뒤 저장해 주세요.",
   AUTH_REQUIRED: "SYNK ID로 다시 로그인해 주세요.",
-  SESSION_REVOKED: "로그인이 종료됐어요. 다시 연결해 주세요.",
+  SESSION_REVOKED: "로그인이 끝났어요. SYNK ID로 다시 로그인해 주세요.",
   ACCOUNT_DELETION_PENDING: "삭제 요청 중인 계정에는 새 기록을 저장할 수 없어요.",
-  FORTUNE_UNAVAILABLE: "운세 계정 저장 서비스가 아직 준비되지 않았어요. 연결 후 다시 불러와 주세요."
+  FORTUNE_UNAVAILABLE: "운세 기록 저장은 아직 준비 중이에요. 운세 보기는 그대로 할 수 있어요."
 };
 function createFortuneAccount({
   native = globalThis.window?.synkFortuneAccount,
@@ -14147,7 +14147,7 @@ function createFortuneAccount({
   }
 } = {}) {
   let config, session, account, document2 = emptyState(), revision = null, epoch = 0, refreshPromise, unsubscribe, disposed = false, loading, nativeAuthenticated = false, nativeGeneration = -1, starting = null, pendingExchange = null;
-  let state = { status: "loading", configured: false, account: null, ready: false, retryable: false, message: "계정 연결을 확인하고 있어요." };
+  let state = { status: "loading", configured: false, account: null, ready: false, retryable: false, message: "로그인 상태를 확인하고 있어요." };
   const key = "synk.oauth.session.fortune";
   const platformEntry = native ? null : createPlatformEntry({ clientKey: "fortune", getUrl: () => location2.href, replaceUrl: replaceURL });
   let automaticNavigations = 0;
@@ -14167,7 +14167,7 @@ function createFortuneAccount({
     document2 = emptyState();
     onReset();
   };
-  function expire(message = "로그인 연결이 바뀌었어요. SYNK ID로 다시 연결해 주세요.") {
+  function expire(message = "로그인 상태가 바뀌었어요. SYNK ID로 다시 로그인해 주세요.") {
     nativeAuthenticated = false;
     session = null;
     pendingExchange = null;
@@ -14182,7 +14182,7 @@ function createFortuneAccount({
   }
   const errorFor = (data, status) => Object.assign(
     new Error(
-      data?.error?.code === "ACCOUNT_UNAVAILABLE" && status === 403 ? "이 계정 상태에서는 운세 정보를 이용할 수 없어요. SYNK 계정 화면에서 삭제 요청 등 계정 상태를 확인한 뒤 다시 불러와 주세요." : messages[data?.error?.code] || (status === 404 ? "운세 계정 저장 서비스가 아직 연결되지 않았어요." : "계정 저장을 완료하지 못했어요. 연결을 확인하고 다시 시도해 주세요.")
+      data?.error?.code === "ACCOUNT_UNAVAILABLE" && status === 403 ? "지금 계정 상태로는 운세 기록을 쓸 수 없어요. SYNK 계정 화면에서 삭제 요청이 있는지 본 뒤 다시 불러와 주세요." : messages[data?.error?.code] || (status === 404 ? "운세 기록 저장은 아직 준비 중이에요." : "계정에 저장하지 못했어요. 인터넷 연결을 확인한 뒤 다시 해 주세요.")
     ),
     { code: data?.error?.code || (status === 404 ? "SERVICE_UNAVAILABLE" : "ACCOUNT_UNAVAILABLE"), status, retryable: data?.error?.retryable === true || status === 429 || status >= 500 }
   );
@@ -14332,7 +14332,7 @@ function createFortuneAccount({
       sessionGeneration: nextGeneration,
       ready: revision !== null,
       retryable: false,
-      message: next.signedIn ? "SYNK 계정에 연결됐어요." : next.configured ? "로그인하면 내 정보와 보관함을 이어갈 수 있어요." : "계정 연결 설정 전이에요. 운세는 바로 볼 수 있어요."
+      message: next.signedIn ? "SYNK ID로 로그인했어요." : next.configured ? "로그인하면 내 정보와 담은 운세를 계정에 보관할 수 있어요." : "이 화면에서는 아직 로그인할 수 없어요. 운세는 바로 볼 수 있어요."
     });
     if (next.signedIn && (different || revision === null)) await load();
   }
@@ -14377,14 +14377,14 @@ function createFortuneAccount({
     const client = config.clients.platform;
     if (!config.configured || !client.clientId || !client.redirectUri) {
       pendingExchange = null;
-      emit({ status: "unconfigured", configured: false, retryable: false, message: "계정 연결 설정 전이에요. 운세는 바로 볼 수 있어요." });
+      emit({ status: "unconfigured", configured: false, retryable: false, message: "이 화면에서는 아직 로그인할 수 없어요. 운세는 바로 볼 수 있어요." });
       return snapshot();
     }
     try {
       storage ||= globalThis.sessionStorage;
       if (!storage) throw new Error();
     } catch {
-      throw new Error("브라우저의 로그인 저장을 사용할 수 없어요. 저장 권한을 확인해 주세요.");
+      throw new Error("이 브라우저에서 로그인 정보를 저장할 수 없어요. 사생활 보호 창이라면 일반 창에서 열어 주세요.");
     }
     const callback = new URL(client.redirectUri), here = new URL(location2.href);
     const directory = new URL("./", here).pathname;
@@ -14408,7 +14408,7 @@ function createFortuneAccount({
       }
     }
     if (pendingExchange) {
-      if (pendingExchange.binding !== binding()) throw Object.assign(new Error("계정 연결 설정이 바뀌었어요. 다시 로그인해 주세요."), { code: "AUTH_REQUIRED" });
+      if (pendingExchange.binding !== binding()) throw Object.assign(new Error("로그인 설정이 바뀌었어요. 다시 로그인해 주세요."), { code: "AUTH_REQUIRED" });
       const tokens = await tokenRequest(config, pendingExchange.fields, fetcher);
       guard(expected);
       pendingExchange = null;
@@ -14424,7 +14424,7 @@ function createFortuneAccount({
     if (!session?.access_token) {
       session = null;
       if (await automaticSignIn(expected)) return snapshot();
-      emit({ status: "signed-out", retryable: false, message: "로그인하면 내 정보와 보관함을 이어갈 수 있어요." });
+      emit({ status: "signed-out", retryable: false, message: "로그인하면 내 정보와 담은 운세를 계정에 보관할 수 있어요." });
       return snapshot();
     }
     try {
@@ -14444,7 +14444,7 @@ function createFortuneAccount({
   }
   async function automaticSignIn(expected) {
     if (!platformEntry.beginAttempt()) return false;
-    emit({ status: "signing-in", account: null, ready: false, retryable: false, message: "플랫폼의 SYNK ID로 연결하고 있어요." });
+    emit({ status: "signing-in", account: null, ready: false, retryable: false, message: "SYNK ID로 로그인하고 있어요." });
     const destination = await beginOAuth({ config, product: "platform", storage });
     guard(expected);
     automaticNavigations++;
@@ -14505,7 +14505,7 @@ function createFortuneAccount({
     emit({ status: "signed-out", account: null, ready: false, retryable: false, message: entryError?.message || "이 화면에서 로그아웃했어요." });
     if (native) {
       const result = await native.authSignOut();
-      if (!account && (result?.ok === false || result?.serverRevoked === false)) emit({ message: "이 화면에서 로그아웃했어요. 기기 저장과 서버의 로그인 종료는 다시 확인해 주세요." });
+      if (!account && (result?.ok === false || result?.serverRevoked === false)) emit({ message: "이 화면에서는 로그아웃했지만, 이 PC의 로그인 기록이나 서버 쪽 로그인 종료는 확인하지 못했어요. SYNK 앱의 계정 창에서 한 번 더 로그아웃해 주세요." });
       return result;
     }
     try {
@@ -14518,7 +14518,7 @@ function createFortuneAccount({
         const response = await fetcher(new URL("/auth/v1/logout?scope=local", config.supabaseUrl), { method: "POST", credentials: "omit", redirect: "error", signal: AbortSignal.timeout(12e3), headers: { apikey: config.supabasePublishableKey, Authorization: `Bearer ${previous.access_token}` } });
         if (!response.ok) throw new Error();
       } catch {
-        emit({ message: "이 화면에서 로그아웃했어요. 서버의 로그인 종료는 다시 확인해 주세요." });
+        emit({ message: "이 화면에서는 로그아웃했어요. 서버 쪽 로그인 종료는 확인하지 못했으니, 공용 기기라면 브라우저를 닫아 주세요." });
       }
     }
     if (entryError) {
@@ -14724,7 +14724,7 @@ var readingDate = date;
 var view = "today";
 var setupOpen = false;
 var vault = emptyState();
-var accountState = { configured: false, status: "loading", ready: false, message: "계정 연결을 확인하고 있어요." };
+var accountState = { configured: false, status: "loading", ready: false, message: "로그인 상태를 확인하고 있어요." };
 var accountBusy = false;
 var loadedIdentity = null;
 var screenVersion = 0;
@@ -14769,10 +14769,10 @@ var shortDate = (day) => {
 };
 function intro() {
   return `<section class="intro">
-    <div class="copy"><p class="kicker">SYNK FOR YOU · FORTUNE</p><h1 tabindex="-1">오늘의 좋은 기운,<br><span class="hl">내 방식으로.</span></h1>
-      <p class="lead">별자리나 한국 사주로 오늘의 기운을 가볍게 읽어요. 궁합과 올해의 흐름도 보고, 맞았는지 남겨 두면 다음에 더 재밌어져요.</p>
+    <div class="copy"><p class="kicker">SYNK FOR YOU · FORTUNE</p><h1 tabindex="-1">오늘 운세를<br><span class="hl">별자리나 사주로 봐요.</span></h1>
+      <p class="lead">오늘의 기운과 해 보면 좋은 일, 행운의 색을 알려 줘요. 이번 달 흐름과 궁합, 올해 운세도 볼 수 있어요.</p>
       <ul class="meta"><li><small>01</small>별자리·사주</li><li><small>02</small>오늘의 기운</li><li><small>03</small>궁합</li><li><small>04</small>내 보관함</li></ul>
-      <p class="small muted">무료 · 광고 없음 · 비회원도 바로 · 로그인하면 기록 보관</p><div class="actions"><a class="btn soft" href="#setup">별자리·사주 고르기 ${icon("arrow")}</a></div></div>
+      <p class="small muted">무료 · 광고 없음 · 로그인 없이 바로</p><div class="actions"><a class="btn soft" href="#setup">별자리·사주 고르기 ${icon("arrow")}</a></div></div>
     <div class="art">${poster({ word: "운세", label: "01 / FORTUNE", chip: dayLabel(date), art: "./assets/art/shooting.webp", alt: "꼬리를 달고 날아가는 노란 펠트 별똥별" })}</div>
   </section>`;
 }
@@ -14792,7 +14792,7 @@ function setup() {
 function profileStrip() {
   const me = birth ? getMeCard(birth) : null;
   return `<div class="profile-strip"><div class="who"><span class="eyebrow">${mode === "korean" ? "한국 사주" : "별자리"}</span><strong>${esc(profileLabel())}</strong></div>
-    ${me ? `<ul class="meta me" data-cols="3"><li><small class="ko">띠</small>${esc(me.animal?.label || me.animal || "")}</li><li><small class="ko">일간</small>${esc(me.dayMaster?.label || me.dayMaster || "확인 필요")}</li><li><small class="ko">별자리</small>${esc(me.zodiac?.label || me.zodiac || "")}</li></ul>` : ""}
+    ${me ? `<ul class="meta me" data-cols="3"><li><small class="ko">띠</small>${esc(me.animal?.label || me.animal || "")}</li><li><small class="ko">일간</small>${esc(me.dayMaster?.label || me.dayMaster || "알 수 없음")}</li><li><small class="ko">별자리</small>${esc(me.zodiac?.label || me.zodiac || "")}</li></ul>` : ""}
     <button class="btn small soft" type="button" data-action="change">바꾸기</button></div>`;
 }
 function todayView() {
@@ -14817,8 +14817,8 @@ function todayView() {
         <div class="card-top"><span class="eyebrow">오늘의 작은 실천</span>${saved ? `<span class="led-chip plain">보관함에 있어요${saved.verdict ? ` · ${VERDICT[saved.verdict]}` : ""}</span>` : ""}</div>
         <label class="check"><input type="checkbox" name="completed" ${completed ? "checked" : ""}><span>${keepDots(r.do)} <span class="small muted">해 봤어요</span></span></label>
         <div class="field"><label for="note">한 줄 메모 <span class="opt-note" data-note-count>${[...note].length} / 1000</span></label><textarea id="note" name="note" maxlength="1000" placeholder="오늘 있었던 일, 맞았던 것, 기억하고 싶은 것">${esc(note)}</textarea></div>
-        <div class="actions"><button class="btn primary" type="submit" ${accountBusy || !accountState.ready ? "disabled" : ""}>보관함에 담기</button><button class="btn soft" type="button" data-action="copy">${icon("copy")} 복사</button>${accountState.ready ? "" : '<button class="linkbtn" type="button" data-action="account">로그인하면 담을 수 있어요</button>'}</div>
-        ${accountState.ready ? '<p class="small muted">결과·실천 여부·메모를 내 SYNK 계정에 저장해요. 담기 전 수정은 이 화면에만 남아요.</p>' : ""}
+        <div class="actions"><button class="btn primary" type="submit" ${accountBusy || !accountState.ready ? "disabled" : ""}>보관함에 담기</button><button class="btn soft" type="button" data-action="copy">${icon("copy")} 복사</button>${accountState.ready ? "" : `<button class="linkbtn" type="button" data-action="account">${accountState.status === "signed-in" ? "보관함을 아직 열 수 없어요 · 까닭 보기" : "로그인하면 담을 수 있어요"}</button>`}</div>
+        ${accountState.ready ? '<p class="small muted">결과·실천 여부·메모를 내 SYNK ID에 저장해요. 담기 전 수정은 이 화면에만 남아요.</p>' : ""}
         <div class="manual-copy" hidden><label for="copy-text">아래 글을 직접 복사해 주세요</label><textarea id="copy-text" readonly></textarea></div>
       </form>
     </div>
@@ -14841,7 +14841,7 @@ function todayView() {
 function sajuBlock(saju) {
   if (!saju) return "";
   const guide = getSajuGuide(saju);
-  return `<div class="pillars">${saju.pillars.map((p) => `<div class="pillar${p.known ? "" : " unknown"}"><span class="eyebrow">${esc(p.label)}</span>${p.known ? `<span class="hanja">${esc(p.stem.hanja)}${esc(p.branch.hanja)}</span><span class="small">${esc(p.stem.hangul)}${esc(p.branch.hangul)} · ${esc(p.stem.element)}${esc(p.branch.element)}</span>` : '<span class="hanja">—</span><span class="small muted">시각 확인 필요</span>'}</div>`).join("")}</div>
+  return `<div class="pillars">${saju.pillars.map((p) => `<div class="pillar${p.known ? "" : " unknown"}"><span class="eyebrow">${esc(p.label)}</span>${p.known ? `<span class="hanja">${esc(p.stem.hanja)}${esc(p.branch.hanja)}</span><span class="small">${esc(p.stem.hangul)}${esc(p.branch.hangul)} · ${esc(p.stem.element)}${esc(p.branch.element)}</span>` : '<span class="hanja">—</span><span class="small muted">시간을 알면 나와요</span>'}</div>`).join("")}</div>
   <ul class="meta elements">${saju.elements.map((e) => `<li><small class="ko">${esc(e.label)} ${esc(e.hanja)}</small><span class="num">${e.count}</span></li>`).join("")}</ul>
   <details class="more"><summary>사주를 읽는 법</summary><p>${keepDots(guide.intro)}</p>${guide.pillars.map((item) => `<p><strong>${esc(item.label)} · ${esc(item.title)}</strong> ${esc(item.description)} ${esc(item.reading)}</p>`).join("")}<p><strong>${esc(guide.dayMaster.title)}</strong> ${esc(guide.dayMaster.description)}</p></details>
   ${saju.notes.length ? `<ul class="notes">${saju.notes.map((n) => `<li>${esc(n)}</li>`).join("")}</ul>` : ""}`;
@@ -14854,15 +14854,15 @@ function needProfile(title, word, art) {
   return `<div class="split"><div class="main"><p class="kicker">FORTUNE</p><h1 class="page-title" tabindex="-1">${title}</h1><p class="lead">먼저 오늘 탭에서 별자리나 생년월일을 골라 주세요.</p><button class="btn primary" type="button" data-view="today">별자리·사주 고르기</button></div><aside class="side">${poster({ word, size: "low", art, alt: "" })}</aside></div>`;
 }
 function monthView() {
-  if (!hasProfile()) return needProfile('한 달의 흐름을<br><span class="hl">미리 살펴봐요.</span>', "흐름", "./assets/art/calendar.webp");
+  if (!hasProfile()) return needProfile('앞으로 30일의<br><span class="hl">좋은 날을 찾아 줘요.</span>', "흐름", "./assets/art/calendar.webp");
   const flow = getMonthFlow({ mode, signId, saju: mode === "korean" ? sajuFor(date) : null, birth, startDate: date, days: 30 });
   const days = flow.days || flow.items || flow;
   const lead = (/* @__PURE__ */ new Date(`${days[0].date}T00:00:00Z`)).getUTCDay();
-  return `<div class="month-head"><div><p class="kicker">NEXT 30 DAYS · <b class="ko">${esc(profileLabel())}</b></p><h1 class="page-title" tabindex="-1">한 달의 흐름,<br><span class="hl">가볍게 미리.</span></h1><p class="lead">기운이 좋은 날과 천천히 가면 좋은 날을 모았어요. 날짜를 누르면 그날 운세를 열어요.</p></div>${poster({ word: "흐름", size: "low", label: "30 DAYS", art: "./assets/art/calendar.webp", alt: "펠트 달력" })}</div>
+  return `<div class="month-head"><div><p class="kicker">NEXT 30 DAYS · <b class="ko">${esc(profileLabel())}</b></p><h1 class="page-title" tabindex="-1">앞으로 30일 중<br><span class="hl">좋은 날과 천천히 갈 날</span></h1><p class="lead">기운이 좋은 날과 천천히 가면 좋은 날을 모았어요. 날짜를 누르면 그날 운세를 열어요.</p></div>${poster({ word: "흐름", size: "low", label: "30 DAYS", art: "./assets/art/calendar.webp", alt: "펠트 달력" })}</div>
   <div class="cal" role="grid" aria-label="30일 흐름">${WEEK2.map((w) => `<span class="wk" role="columnheader">${w}</span>`).join("")}${'<span class="blank"></span>'.repeat(lead)}${days.map((d) => `<button class="cell${d.tag ? ` ${d.tag}` : ""}${d.date === date ? " today" : ""}" type="button" role="gridcell" data-day="${d.date}" aria-label="${dayLabel(d.date)} 총운 ${d.overall}칸${d.tag ? ` · ${TAG[d.tag]}` : ""}"><span class="num">${Number(d.date.slice(8))}</span>${level2(d.overall, "")}${d.tag ? `<span class="tagdot" aria-hidden="true"></span>` : ""}</button>`).join("")}</div>
   <div class="legend"><span><i class="tagdot good"></i>좋은 날</span><span><i class="tagdot care"></i>천천히 가면 좋은 날</span></div>
-  <div class="grid two days-two"><div class="card"><span class="eyebrow">기운이 좋은 날</span><ul class="daylist">${(flow.goodDays || days.filter((d) => d.tag === "good")).slice(0, 6).map((d) => `<li><button class="linkbtn" type="button" data-day="${d.date}">${dayLabel(d.date)}</button><span class="small muted">${esc(d.label || "")}</span></li>`).join("") || '<li class="muted">이번 30일에는 따로 고른 날이 없어요.</li>'}</ul></div>
-  <div class="card"><span class="eyebrow">천천히 가면 좋은 날</span><ul class="daylist">${(flow.careDays || days.filter((d) => d.tag === "care")).slice(0, 6).map((d) => `<li><button class="linkbtn" type="button" data-day="${d.date}">${dayLabel(d.date)}</button><span class="small muted">${esc(d.label || "")}</span></li>`).join("") || '<li class="muted">특별히 천천히 갈 날이 없어요.</li>'}</ul></div></div>
+  <div class="grid two days-two"><div class="card"><span class="eyebrow">기운이 좋은 날</span><ul class="daylist">${(flow.goodDays || days.filter((d) => d.tag === "good")).slice(0, 6).map((d) => `<li><button class="linkbtn" type="button" data-day="${d.date}">${dayLabel(d.date)}</button><span class="small muted">${esc(d.headline || d.label || "")}</span></li>`).join("") || '<li class="muted">이번 30일에는 따로 고른 날이 없어요.</li>'}</ul></div>
+  <div class="card"><span class="eyebrow">천천히 가면 좋은 날</span><ul class="daylist">${(flow.careDays || days.filter((d) => d.tag === "care")).slice(0, 6).map((d) => `<li><button class="linkbtn" type="button" data-day="${d.date}">${dayLabel(d.date)}</button><span class="small muted">${esc(d.headline || d.label || "")}</span></li>`).join("") || '<li class="muted">특별히 천천히 갈 날이 없어요.</li>'}</ul></div></div>
   <p class="hint">재미로 보는 흐름이에요. 중요한 일정이나 결정을 이 표로 정하지 않아요.</p>`;
 }
 function matchView() {
@@ -14871,7 +14871,7 @@ function matchView() {
   const r = matchResult;
   return `<div class="split match">
     <div class="main">
-      <p class="kicker">COMPATIBILITY</p><h1 class="page-title" tabindex="-1">우리 둘은<br><span class="hl">어떤 결일까요?</span></h1>
+      <p class="kicker">COMPATIBILITY</p><h1 class="page-title" tabindex="-1">두 사람이<br><span class="hl">얼마나 잘 맞을까요?</span></h1>
       <p class="lead">두 사람의 생년월일로 대화·속도·배려 세 가지 결을 가볍게 읽어요. 같은 두 사람은 언제나 같은 결과예요.</p>
       <form id="match-form" class="card match-form">
         ${myBirth ? `<p class="small muted">나 · 양력 ${esc(dayLabel(myBirth, { weekday: false, today: "" }))}${birth?.birthTime ? ` · ${esc(birth.birthTime)}` : ""}</p>` : `<div class="field"><label for="my-birth">내 양력 생년월일</label><input id="my-birth" name="myBirth" type="date" min="1900-01-01" max="${date}" required value="${esc(myBirthForMatch)}"></div>`}
@@ -14893,7 +14893,7 @@ function matchView() {
 }
 function yearView() {
   const year = Number(date.slice(0, 4));
-  if (!hasProfile()) return needProfile(`${year}년,<br><span class="hl">나의 한 해.</span>`, String(year), "./assets/art/firework.webp");
+  if (!hasProfile()) return needProfile(`${year}년<br><span class="hl">한 해 운세</span>`, String(year), "./assets/art/firework.webp");
   const y = mode === "korean" ? getYearReading({ saju: sajuFor(date), year }) : getZodiacYear({ signId, year });
   const month = Number(date.slice(5, 7));
   return `<div class="month-head"><div><p class="kicker">${year} · <b class="ko">${esc(y.ganji ? `${y.ganji}년` : profileLabel())}</b></p><h1 class="page-title" tabindex="-1">${keepDots(y.headline)}</h1><p class="lead">${keepDots(y.message)}</p>${y.keywords?.length ? `<div class="chips">${y.keywords.map((k) => `<span class="chip tag">${esc(k)}</span>`).join("")}</div>` : ""}</div>${poster({ word: String(year), size: "low", label: "THIS YEAR", art: "./assets/art/firework.webp", alt: "알록달록한 펠트 폭죽" })}</div>
@@ -14901,7 +14901,8 @@ function yearView() {
   <p class="hint">신년 운세처럼 가볍게 읽는 한 해 이야기예요. 실제 사건이나 성패를 예측하지 않아요.</p>`;
 }
 function vaultView() {
-  if (!accountState.ready) return `<div class="split"><div class="main"><p class="kicker">MY FORTUNE</p><h1 class="page-title" tabindex="-1">맞았는지,<br><span class="hl">남겨 두면 재밌어요.</span></h1><p class="lead">SYNK ID로 로그인하면 오늘의 운세와 메모를 담고, 맞았는지 표시하고, 최근 7일을 돌아볼 수 있어요.</p><button class="btn primary" type="button" data-action="account">SYNK ID로 이어가기</button></div><aside class="side">${poster({ word: "보관함", size: "low", art: "./assets/art/star.webp", alt: "노란 펠트 별" })}</aside></div>`;
+  if (!accountState.ready && accountState.status === "signed-in") return `<div class="split"><div class="main"><p class="kicker">MY FORTUNE</p><h1 class="page-title" tabindex="-1">담아 둔 운세</h1><p class="lead">${esc(accountState.message || "계정의 최신 기록을 불러오고 있어요.")}</p></div><aside class="side">${poster({ word: "보관함", size: "low", art: "./assets/art/star.webp", alt: "노란 펠트 별" })}</aside></div>`;
+  if (!accountState.ready) return `<div class="split"><div class="main"><p class="kicker">MY FORTUNE</p><h1 class="page-title" tabindex="-1">담아 둔 운세가<br><span class="hl">맞았는지 표시해요.</span></h1><p class="lead">SYNK ID로 로그인하면 오늘의 운세와 메모를 보관하고 최근 7일을 돌아볼 수 있어요.</p><button class="btn primary" type="button" data-action="account">SYNK ID로 로그인</button></div><aside class="side">${poster({ word: "보관함", size: "low", art: "./assets/art/star.webp", alt: "노란 펠트 별" })}</aside></div>`;
   const entries = vault.entries.filter((e) => vaultFilter === "all" || (vaultFilter === "completed" ? e.completed : ["hit", "meh", "miss"].includes(vaultFilter) ? e.verdict === vaultFilter : e.mode === vaultFilter));
   const hits = vault.entries.filter((e) => e.verdict === "hit").length, judged = vault.entries.filter((e) => e.verdict).length;
   const recent = recentReflections(vault, date);
@@ -14919,12 +14920,12 @@ function vaultView() {
 }
 function accountBody() {
   const signedIn = accountState.status === "signed-in";
-  return `<div class="acct-status"><span class="led-chip ${accountState.ready ? "" : signedIn ? "check" : "plain"}">${accountState.ready ? "연결됨" : signedIn ? "확인 중" : accountState.status === "signing-in" ? "로그인 중" : "로그인 전"}</span><p>${esc(accountState.account?.display_name ? `${accountState.account.display_name}님 · ` : "")}${esc(accountState.message || "")}</p></div>
-  <div class="actions">${!signedIn && (accountState.configured || accountState.retryable) ? `<button class="btn primary" type="button" data-acct="login" ${accountBusy || accountState.status === "signing-in" ? "disabled" : ""}>${accountState.retryable ? "계정 연결 다시 확인" : "SYNK ID로 로그인"}</button>` : ""}${accountState.status === "signing-in" ? '<button class="btn soft" type="button" data-acct="cancel">취소</button>' : ""}${signedIn ? `<button class="btn soft" type="button" data-acct="reload" ${accountBusy ? "disabled" : ""}>${icon("refresh")} 다시 불러오기</button><button class="btn ghost" type="button" data-acct="logout">로그아웃</button>` : ""}</div>
+  return `<div class="acct-status"><span class="led-chip ${accountState.ready ? "" : signedIn ? "check" : "plain"}">${signedIn ? "로그인됨" : accountState.status === "signing-in" ? "로그인 중" : "로그인 전"}</span><p>${esc(accountState.account?.display_name ? `${accountState.account.display_name}님 · ` : "")}${esc(accountState.message || "")}</p></div>
+  <div class="actions">${!signedIn && (accountState.configured || accountState.retryable) ? `<button class="btn primary" type="button" data-acct="login" ${accountBusy || accountState.status === "signing-in" ? "disabled" : ""}>${accountState.retryable ? "로그인 다시 확인" : "SYNK ID로 로그인"}</button>` : ""}${accountState.status === "signing-in" ? '<button class="btn soft" type="button" data-acct="cancel">취소</button>' : ""}${signedIn ? `<button class="btn soft" type="button" data-acct="reload" ${accountBusy ? "disabled" : ""}>${icon("refresh")} 다시 불러오기</button><button class="btn ghost" type="button" data-acct="logout">로그아웃</button>` : ""}</div>
   ${accountState.ready ? `<section class="acct-sec"><h3>내 정보</h3><p class="small muted">${vault.profile ? `저장된 출생정보 · 양력 ${esc(vault.profile.birthDate)} · ${esc(vault.profile.birthTime ?? "시간 모름")} · 한국 표준시` : "저장된 출생정보가 없어요. 화면에서 고른 정보를 저장할 수 있어요."}</p><button class="btn small soft" type="button" data-acct="save-profile" ${accountBusy || !hasProfile() ? "disabled" : ""}>지금 고른 방식과 정보 저장</button></section>
   <section class="acct-sec"><h3>내 기록</h3><p class="small muted">출생정보·메모가 들어간 파일로 내보내거나, 이 계정의 운세 정보만 지울 수 있어요. SYNK 계정 자체는 지우지 않아요.</p><div class="actions"><button class="btn small soft" type="button" data-acct="export" ${accountBusy ? "disabled" : ""}>${icon("download")} 내보내기</button><button class="btn small ghost danger" type="button" data-acct="delete" ${accountBusy ? "disabled" : ""}>운세 정보 전체 삭제</button></div>
     ${deletePending ? `<div class="notice-box alert"><span class="lbl">확인</span><strong>저장한 출생정보·선호·보관함을 모두 지울까요?</strong><p>지운 뒤에는 되돌릴 수 없어요.</p><div class="actions"><button class="btn small primary" type="button" data-acct="confirm-delete" ${accountBusy ? "disabled" : ""}>모두 지우기</button><button class="btn small soft" type="button" data-acct="cancel-delete">취소</button></div></div>` : ""}</section>` : ""}
-  <p class="small muted">비회원 입력은 이 화면 메모리에만 있어요. 출생정보는 저장 단추를 누를 때만 계정으로 보내요.</p>`;
+  <p class="small muted">로그인하지 않고 입력한 정보는 이 화면에만 남아요. 저장 단추를 눌러야 SYNK ID에 보관해요.</p>`;
 }
 var VIEWS = { today: todayView, month: monthView, match: matchView, year: yearView, vault: vaultView };
 function render({ focus = true } = {}) {
@@ -14951,7 +14952,7 @@ function paintAccount() {
   const chip = document.querySelector('[data-action="account"].acct');
   if (chip) {
     chip.dataset.state = accountState.ready ? "ok" : ["loading", "signing-in"].includes(accountState.status) ? "busy" : accountState.status === "error" || accountState.retryable ? "alert" : "";
-    chip.querySelector("span").textContent = accountState.ready ? accountState.account?.display_name || "내 계정" : accountState.status === "signing-in" ? "로그인 중" : accountState.status === "signed-in" ? "확인 중" : "로그인";
+    chip.querySelector("span").textContent = accountState.ready ? accountState.account?.display_name || "내 계정" : accountState.status === "signing-in" ? "로그인 중" : accountState.status === "signed-in" ? accountState.account?.display_name || "내 계정" : "로그인";
   }
   const body = document.querySelector("#account-body");
   if (body && !sheet.open_) body.innerHTML = accountBody();
@@ -15083,7 +15084,7 @@ app.addEventListener("submit", (event) => {
       app.querySelector("#match-title")?.focus();
     }
   } catch (err) {
-    error(err.message || "입력을 확인해 주세요.");
+    error(err.message || "입력한 날짜나 시간을 읽지 못했어요. 다시 적어 주세요.");
   }
 });
 document.addEventListener("click", (event) => {
@@ -15271,7 +15272,7 @@ async function accountTask(action, success) {
     const message = await action();
     if (success) toast(typeof message === "string" ? message : success);
   } catch (err) {
-    if (err.code !== "ACCOUNT_CHANGED") toast(err.message || "계정 연결을 확인해 주세요.");
+    if (err.code !== "ACCOUNT_CHANGED") toast(err.message || "계정 요청을 처리하지 못했어요. 잠시 뒤 다시 해 주세요.");
   } finally {
     accountBusy = false;
     render({ focus: false });
