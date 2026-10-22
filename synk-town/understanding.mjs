@@ -114,7 +114,7 @@ const CORRECTIONS = {
   'town-sequence-class': [null, '손 씻기는 앞치마를 입기 전이에요. 질문은 입은 다음을 물어요.', '앞치마는 이미 입었어요. 앞치마를 입은 다음에는 재료를 받아요.'],
   'town-sequence-parcel': ['선물 넣기는 첫 번째예요. 마지막에는 받는 사람 이름을 써요.', null, '상자를 닫은 뒤 이름을 쓰는 일이 남아 있어요.'],
   'town-sequence-garden': ['물 주기는 씨앗을 심은 뒤예요. 심기 전에는 흙을 넣어요.', '씨앗 심기는 질문이 묻는 바로 그 일이에요. 씨앗을 심기 전에 흙을 넣어요.'],
-  'town-sequence-ticket': [null, '표는 안이 아니라 매표소에서 사요. 산 표는 입구에서 보여 주세요.', '표는 매표소가 아니라 입구에서 보여 줘요. 그다음 안으로 들어가요.'],
+  'town-sequence-ticket': [null, '표는 안이 아니라 매표소에서 사요. 산 표는 입구에서 보여 줘요.', '표는 매표소가 아니라 입구에서 보여 줘요. 그다음 안으로 들어가요.'],
 };
 export function readingFeedback(item, selected) {
   readingAnswer(item, selected);
