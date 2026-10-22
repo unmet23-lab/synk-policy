@@ -10,15 +10,15 @@
   "/": {
    "desktop": {
     "file": "desktop/home.jpg",
-    "sha256": "56564d52e02253603a3bda0bfe6dffb7dbf2edfc60074984c227aa93d23cf7f2",
-    "cssHeight": 9928,
-    "run": 39738723264
+    "sha256": "da703d98623597a5e20a1ce2c249df4400a4e8094ecfd3d14a5d53a144910552",
+    "cssHeight": 9355,
+    "run": 39759857503
    },
    "mobile": {
     "file": "mobile/home.jpg",
-    "sha256": "6abc08ed328c82a6c70367b949be9d23c8b5a237f5d7a77e9940a7e286fa085e",
-    "cssHeight": 13103,
-    "run": 39738723264
+    "sha256": "34ea46afeb71057f80fa0ab447847661577396cea11ff558e0af2bad327a996e",
+    "cssHeight": 12319,
+    "run": 39759857503
    }
   },
   "/atlas/": {
@@ -108,15 +108,15 @@
   "/en/": {
    "desktop": {
     "file": "desktop/en.jpg",
-    "sha256": "ac3b3a61a771e3c942a2cb088aeeba98e6cc5ce03cf7ca36373e7d8a3abdf9ee",
-    "cssHeight": 10146,
-    "run": 39738723264
+    "sha256": "c7cc546535d6d617267e2f09cd3f58bd390e9088163f12f03ddb9673087db5ab",
+    "cssHeight": 9564,
+    "run": 39759857503
    },
    "mobile": {
     "file": "mobile/en.jpg",
-    "sha256": "106ceab653f988d1d61aab6dc92efaa5dca1e18381059c19569f8bdbe60acc24",
-    "cssHeight": 14172,
-    "run": 39738723264
+    "sha256": "a170ea8cbeb4e7aa9d13f92e64ab0ef22337010efcdae691da5bbc2fff5f5184",
+    "cssHeight": 13273,
+    "run": 39759857503
    }
   },
   "/en/atlas/": {
