@@ -79,6 +79,7 @@
  "/fortune/|mobile": {},
  "/founder/|desktop": {},
  "/founder/|mobile": {},
+ "/lab/topik4/|desktop": {},
  "/lab/topik4/|mobile": {
   "region": {
    "impact": "moderate",
