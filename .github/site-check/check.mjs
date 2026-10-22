@@ -7,16 +7,21 @@
 // 3. 페이지 — 주요 페이지를 컴퓨터·휴대폰으로 열어 콘솔 오류·실패한 요청·가로 넘침이 없는지 본다.
 // 4. LAB 게임 — LAB 게임 카드(data-game)마다 /try/<게임>/을 열고 시작 단추가 풀리면 눌러 8초 뒤 오류가 없는지 본다. 카드 그림도 받아지는지 본다.
 // 5. 질문창 — LAB 질문창에 하나 물어 답이 나오는지 본다.
+// 6. 기준 이미지·접근성(2026-10-21) — 3단계의 쪽마다 컴퓨터·휴대폰 전체 화면을 기준 그림(baseline/)과 odiff로 견주고, axe 위반을 기준과 견준다.
+//    달라진 쪽은 보고만 하고(차이 그림은 visual/), 새로 생긴 치명 접근성 위반만 실패로 센다. 기준은 의도한 변경일 때만 따로 바꾼다(visual.mjs 머리글).
 // 정적 GET/HEAD의 502·503·504만 쓰기 없는 시나리오를 새 context에서 한 번 재검사한다.
 // 첫 실패 JSON·화면을 성공 여부와 무관하게 보존하며 복구는 별도 경고로 남긴다.
-// Usage: node .github/site-check/check.mjs   (환경: SITE_BASE=https://synk.im, PLAYWRIGHT_MODULE=플레이라이트 경로, CI=true)
+// Usage: node .github/site-check/check.mjs   (환경: SITE_BASE=https://synk.im, PLAYWRIGHT_MODULE=플레이라이트 경로, CI=true,
+//        손으로 돌릴 때 6단계는 ODIFF_MODULE=odiff-bin 폴더, AXE_SOURCE=axe.min.js — 없으면 건너뛰고 참고로 남긴다)
 import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
 import {execFileSync} from 'node:child_process';
+import {createRequire} from 'node:module';
 import {pathToFileURL} from 'node:url';
 import {createBrowserProbe} from './browser-probe.mjs';
 import {runScenarioCheck} from './scenario-recovery.mjs';
+import {runVisualCheck, summaryLines, IMPACT_NAME, deviceName} from './visual.mjs';
 
 const base = (process.env.SITE_BASE || 'https://synk.im').replace(/\/$/, '');
 const ci = process.env.CI === 'true';
@@ -242,12 +247,34 @@ console.log('5. 질문창');
   } catch (e) { fail('질문창', String(e).split('\n')[0].slice(0, 140)); }
   await s?.context.close();
 }
+
+// 6. 기준 이미지·접근성
+console.log('6. 기준 이미지·접근성');
+let visual = null, a11y = null;
+{
+  const require = createRequire(import.meta.url);
+  let odiff = null, axeSource = null;
+  try { odiff = require(process.env.ODIFF_MODULE || 'odiff-bin'); } catch { notes.push('odiff-bin을 못 불러 기준 이미지 견주기를 건너뜀'); }
+  try { axeSource = fs.readFileSync(process.env.AXE_SOURCE || require.resolve('axe-core/axe.min.js'), 'utf8'); } catch { notes.push('axe-core를 못 불러 접근성 검사를 건너뜀'); }
+  if (odiff) {
+    try {
+      ({visual, a11y} = await runVisualCheck({browser, base, routes, baselineDir: '.github/site-check/baseline', shotsDir: 'site-check-shots', diffDir: path.join(out, 'visual'),
+        odiff, axeSource, env: {chromium: browser.version(), os: process.env.ImageOS || process.platform}, commit: process.env.GITHUB_SHA || null,
+        run: process.env.GITHUB_RUN_ID ? Number(process.env.GITHUB_RUN_ID) : null, log: console.log,
+        onCritical: x => { const [route, device] = x.key.split('|'); fail('접근성', `${route} ${deviceName(device)}: 새 ${IMPACT_NAME.critical} 위반 ${x.id} ${x.was}→${x.count}곳 ${x.targets.slice(0, 2).join(' , ')}`); }}));
+      if (!axeSource) a11y = null;
+      for (const line of summaryLines(visual, a11y)) console.log('  ' + line);
+      if (ci && visual.changed.length) console.log(`::warning::기준 이미지와 달라진 쪽 ${visual.changed.length}개 — 점검 요약의 「기준 이미지·접근성」을 본다`);
+    } catch (e) { notes.push(`기준 이미지·접근성 단계가 못 돌았다: ${String(e).split('\n')[0].slice(0, 160)}`); }
+  }
+}
 await browser.close();
 
 const status = problems.length ? 'failed' : recoveredScenarios.length ? 'transient-recovered' : 'passed';
-fs.writeFileSync(path.join(out, 'result.json'), JSON.stringify({status, checkedAt: new Date().toISOString(), problems, notes, recoveredScenarios}, null, 2) + '\n');
+fs.writeFileSync(path.join(out, 'result.json'), JSON.stringify({status, checkedAt: new Date().toISOString(), problems, notes, recoveredScenarios, visual, a11y}, null, 2) + '\n');
 const summary = [`## synk.im 배포 점검 ${problems.length ? `— 문제 ${problems.length}개` : recoveredScenarios.length ? `— 일시 오류 ${recoveredScenarios.length}개 재검사로 복구` : '— 문제 없음'}`, '',
   ...(problems.length ? problems.map(p => `- ${p}`) : ['- 반영, 도구 이름, 페이지, LAB 게임, 질문창 모두 통과']),
+  ...(visual || a11y ? ['', '### 기준 이미지·접근성', ...summaryLines(visual, a11y)] : []),
   ...(notes.length ? ['', ...notes.map(n => `- 참고: ${n}`)] : [])].join('\n');
 if (process.env.GITHUB_STEP_SUMMARY) fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY, summary + '\n');
 console.log('\n' + summary);
