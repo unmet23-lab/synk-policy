@@ -540,10 +540,13 @@ export default {
  'response.longer':{ko:'앞으로 짧은 연습을 조금 길게 할게요. 다음 응답으로 바꿀 수 있어요.',en:'From now on, short practice will be a little longer. Your next response can change this.',mn:'Цаашид богино дасгалыг арай урт болгоно. Дараагийн хариултаараа өөрчилж болно.'},
  'response.failed':{ko:'지금은 응답을 남기지 못했어요.',en:'Couldn’t save your response right now.',mn:'Одоогоор хариултыг хадгалж чадсангүй.'},
  'response.mine':{ko:'내가 남긴 응답',en:'Responses you left',mn:'Миний үлдээсэн хариултууд'},
- 'response.note30':{ko:'30일이 지난 응답은 더 쓰이지 않고 기록 요약으로 접혀 목록에서 빠져요.',en:'Responses older than 30 days are no longer used. They fold into your record summary and leave this list.',mn:'30 хоног өнгөрсөн хариулт цаашид ашиглагдахгүй. Тэмдэглэлийн хураангуйд нэгтгэгдэж, жагсаалтаас гарна.'},
+ 'response.note30':{ko:'30일이 지난 응답은 더 쓰이지 않고 목록에서 빠져요.',en:'Responses older than 30 days are no longer used and leave this list.',mn:'30 хоног өнгөрсөн хариулт цаашид ашиглагдахгүй бөгөөд жагсаалтаас гарна.'},
  'response.remove':{ko:'빼기',en:'Remove',mn:'Хасах'},
  'response.removeLabel':{ko:'{kind} · {value} 응답 빼기',en:'Remove response: {kind} · {value}',mn:'Хариулт хасах: {kind} · {value}'},
  'response.removeNote':{ko:'뺀 응답은 목록과 쓰임에서 빠져요. 기록 파일에는 남고, 기록을 지우는 길은 계정 삭제예요.',en:'Removed responses leave this list and are no longer used. They stay in your records file; to erase records, delete your account.',mn:'Хассан хариулт жагсаалтад харагдахаа больж, цаашид ашиглагдахгүй. Тэмдэглэлийн файлд хадгалагдсан хэвээр үлдэнэ. Тэмдэглэлийг устгах бол бүртгэлээ устгах хүсэлт гаргана уу.'},
+ // 학습 기록 연결이 꺼진 학습자: 기록이 이 기기에만 있어 계정 삭제로 지워지지 않는다(처리방침 「저장을 끈 동안 기기에 쌓인 기록은 나중에 켜도 옮기지 않는다」·「사이트 데이터를 지우면 함께 지워진다」와 같은 뜻).
+ 'response.removeNoteDevice':{ko:'뺀 응답은 목록과 쓰임에서 빠져요. 기록은 이 기기에만 있어요. 브라우저의 사이트 데이터를 지우면 함께 지워지고, 나중에 저장을 켜도 계정으로 옮기지 않아요.',en:'Removed responses leave this list and are no longer used. Your records are only on this device: clearing the browser’s site data erases them, and turning on saving later won’t move them to your account.',mn:'Хассан хариулт жагсаалтад харагдахаа больж, цаашид ашиглагдахгүй. Тэмдэглэл зөвхөн энэ төхөөрөмж дээр байна. Хөтчийн сайтын өгөгдлийг устгавал хамт устах бөгөөд дараа нь хадгалахыг асаасан ч бүртгэл рүү шилжихгүй.'},
+ // 10-23 공개 판의 앱 셸이 removeNote 뒤에 붙이던 줄(기능 꺼짐이라 보인 적 없음) — 다음 공개 때 지운다.
  'response.deviceOnly':{ko:'이 기기에만 있어요.',en:'They are only on this device.',mn:'Зөвхөн энэ төхөөрөмж дээр хадгалагдсан.'},
  'response.removed':{ko:'응답을 뺐어요.',en:'Response removed.',mn:'Хариултыг хаслаа.'},
  'response.removeFailed':{ko:'응답을 빼지 못했어요. 잠시 뒤 다시 해 주세요.',en:'Couldn’t remove the response. Please try again shortly.',mn:'Хариултыг хасаж чадсангүй. Түр хүлээгээд дахин оролдоно уу.'},
@@ -877,7 +880,8 @@ export default {
  'account.kindTest':{ko:'로컬 테스트 계정',en:'Local test account',mn:'Дотоод туршилтын бүртгэл'},
  'account.learningRecords':{ko:'학습 기록 연결',en:'Learning records',mn:'Сургалтын мэдээллийн холболт'},
  'account.learningSave':{ko:'학습 기록을 SYNK 계정에 저장하기',en:'Save learning records to my SYNK account',mn:'Сургалтын мэдээллийг SYNK бүртгэлдээ хадгалах'},
- 'account.learningNote':{ko:'켠 뒤에 한 첫 문장 놀이 답만 저장해요. 반에 공유하는 것과 타운 활동 공유는 내 수업에서 따로 정해요.',en:'Only First Sentences answers given after you turn this on are saved. Sharing with your class and Town sharing are set separately in My classes.',mn:'Асаасны дараах «Анхны өгүүлбэр»-ийн хариултыг л хадгална. Ангитайгаа болон Таунтай хуваалцахыг «Миний хичээл» хэсэгт тусад нь тохируулна.'},
+ // 10-23(WORLD 학습자 응답 Fable 검수): 이 토글이 학습 호스트 연결(world-account.mjs connected)을 정해 연습·놀이 기록 전체와 연습 뒤 응답이 계정에 가는지를 가른다 — 처리방침 「학습 기록 저장을 켠 경우에만」과 같은 뜻.
+ 'account.learningNote':{ko:'켠 뒤에 한 연습·놀이 기록과 연습 뒤 남긴 응답을 SYNK 계정에 저장해요. 끈 동안의 기록은 이 기기에만 남아요. 반에 공유하는 것과 타운 활동 공유는 내 수업에서 따로 정해요.',en:'Practice and play records, and responses you leave after practice, are saved to your SYNK account from when you turn this on. While it is off, records stay on this device only. Sharing with your class and Town sharing are set separately in My classes.',mn:'Асаасны дараах дасгал, тоглоомын тэмдэглэл болон дасгалын дараа үлдээсэн хариултыг SYNK бүртгэлд хадгална. Унтраасан үеийн тэмдэглэл зөвхөн энэ төхөөрөмж дээр үлдэнэ. Ангитайгаа болон Таунтай хуваалцахыг «Миний хичээл» хэсэгт тусад нь тохируулна.'},
  'account.learningElsewhere':{ko:'학습 연결 설정은 내 수업의 계정 화면에서 볼 수 있어요.',en:'You can see learning connection settings on the account screen in My classes.',mn:'Сургалтын холболтын тохиргоог «Миний хичээл» хэсгийн бүртгэлийн дэлгэцээс харж болно.'},
  'account.classSettings':{ko:'수업·공유 설정 열기',en:'Open class and sharing settings',mn:'Хичээл, хуваалцах тохиргоог нээх'},
  'account.logout':{ko:'로그아웃하기',en:'Sign out',mn:'Гарах'},
