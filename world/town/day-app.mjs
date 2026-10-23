@@ -1,10 +1,12 @@
 import { createDayScene } from './day-scene.mjs';
 import { createWalkControls } from './walk-controls.mjs';
 import { movePoint, nearbyPlace, WALK_SPAWNS } from './walk.mjs';
+import { PLACE_BY_ID, PLAYER_PLACES, SPOT_BY_ID } from './town/places.mjs';
+import { placeAt, caption, doing, goalOf } from './town/village.mjs';
 
 const $ = id => document.getElementById(id);
 const surfaceId = crypto.randomUUID(), reduced = matchMedia('(prefers-reduced-motion: reduce)');
-const names = { home: '나의 집', cafe: '찻집', workshop: '공방', greenhouse: '온실' };
+const names = Object.fromEntries(PLAYER_PLACES.map(id => [id, PLACE_BY_ID[id].labels.map]));
 // 우리 동네 HUD(2026-10-14 3차): 가장 작은 지도 한 장 + 할 일 한 줄. 표시만 하고 이동·저장·권한 논리는 건드리지 않는다.
 const MAP_BOUNDS = { minX: -9, maxX: 9, minZ: -6.5, maxZ: 6 };
 const mapX = x => Math.max(4, Math.min(96, (x - MAP_BOUNDS.minX) / (MAP_BOUNDS.maxX - MAP_BOUNDS.minX) * 100));
@@ -36,6 +38,16 @@ let planSample = null, applied = new Set(), lastObservation = null, observedMs =
 let renderedRequest = 0, pendingVisual = null, executionSample = null;
 let contactId = null, contactMs = 0, contactLast = null, contactPending = false, raf = null;
 const signatures = new Map();
+// The living village (W3, §14-4): the window's estimate of the server's clock, the residents it draws
+// from the plan every frame, and the F11 heartbeat's reads and boundaries.
+const RESIDENT_IDS = ['cafe-owner', 'workshop-owner', 'researcher'], BOUNDARY_GAP_MS = 20000;
+let clockOffset = null, villageLive = { ids: new Set(), signature: '' };
+let reading = false, bounding = false, lastBoundary = 0, dueReadAt = 0;
+// A WORLD page opened before the town learned pulse·boundary keeps an older host that answers only presence — its
+// town client or its account bundle refuses the operation (either may still come from the 10-minute cache) — and
+// a PC app released before those routes says so by its code: this window then falls back to the old heartbeat
+// (a presence each second, the whole town each time).
+let legacyHost = false;
 const walkWanted = new URLSearchParams(location.search).get('controls') !== 'classic';
 let walkControls = null, walkPoint = null, walkPanel = false, walkHeading = 0, walkMoving = false, walkInputActive = false, walkFrameAt = null;
 let walkPending = [], walkPacket = null, walkFlushing = null, walkSentAt = 0, walkInputMode = matchMedia('(pointer: coarse)').matches ? 'touch' : 'keyboard';
@@ -139,6 +151,9 @@ function setBusy(value) {
   busy = value; $('day-app').setAttribute('aria-busy', String(value));
   for (const b of document.querySelectorAll('[data-command], [data-destination], [data-mode], #life-open, #life-contact-open, #life-resume')) b.disabled = value || !available() || b.dataset.unavailable === 'true';
 }
+// state and command answer with the whole town; pulse and boundary with a few fields (vertical slice §14-3, F11).
+// The old heartbeat (presence) answers the whole town like a read — without worldSeq on an account's town.
+const answered = (path, result) => ['state', 'command', 'presence'].includes(path) ? !!(result?.state && result.view && result.capabilities?.day) : Number.isSafeInteger(result?.worldSeq);
 async function request(path, body) {
   if (worldHostRequested) {
     if (!worldHost) throw new Error('홈의 계정 연결을 확인하고 있어요.');
@@ -146,12 +161,12 @@ async function request(path, body) {
       connected = false; pauseWalkInput(); location.reload(); throw new Error('계정 연결을 새로 확인하고 있어요.');
     }
     const result = await worldHost.request(path, body);
-    if (!result?.state || !result?.view || !result?.capabilities?.day) throw new Error(result?.message || '이 계정의 타운을 열 수 없어요.');
+    if (!answered(path, result)) throw new Error(result?.message || '이 계정의 타운을 열 수 없어요.');
     return result;
   }
   const response = await fetch(`/api/preview/${path}`, body ? { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body), cache: 'no-store' } : { cache: 'no-store' });
   const result = await response.json();
-  if (!response.ok || !result.state || !result.view || !result.capabilities?.day) throw new Error(result.message || '첫 하루를 열 수 없어요. 개발 체험 서버를 확인해 주세요.');
+  if (!response.ok || !answered(path, result)) throw Object.assign(new Error(result.message || '첫 하루를 열 수 없어요. 개발 체험 서버를 확인해 주세요.'), { status: response.status });
   return result;
 }
 function visible(element, whole = true) {
@@ -172,7 +187,21 @@ async function pulseNow() {
   // The host lease starts when the request is processed, not when a slow GPU
   // frame/network finally lets the browser consume the response.
   const requestedAt = performance.now();
-  const data = await request('presence', flags()); lastPulse = requestedAt; accept(data);
+  if (legacyHost) {
+    const data = await request('presence', flags()); lastPulse = requestedAt;
+    syncClock(data.serverNow, requestedAt, performance.now()); accept(data); return;
+  }
+  let data;
+  try { data = await request('pulse', flags()); }
+  catch (error) {
+    if (error?.code === 'TOWN_PULSE_UNSUPPORTED' || /Unknown town operation|Unsupported WORLD request/.test(error?.message || '')) { legacyHost = true; return pulseNow(); }
+    throw error;
+  }
+  lastPulse = requestedAt;
+  syncClock(data.serverNow, requestedAt, performance.now());
+  if (data.presence?.surfaceId === surfaceId) presence = data.presence;
+  // A pulse only keeps the lease (F11): the town is read again only when the world was written.
+  if (data.worldSeq !== snapshot?.state.writeSeq) read();
 }
 async function ensureFreshPresence() {
   if (presence?.owner && performance.now() - lastPulse <= 1200) return;
@@ -186,6 +215,62 @@ function pulse() {
   if (pulseQueued || !snapshot?.capabilities?.day || !connected) return;
   pulseQueued = true;
   queue(pulseNow).catch(e => showError(e.message)).finally(() => { pulseQueued = false; });
+}
+function read() {
+  if (reading || !connected) return;
+  reading = true;
+  queue(async () => accept(await request('state'))).catch(e => showError(e.message)).finally(() => { reading = false; });
+}
+/** The window holding the town says it is at a safe point, at most every 20 seconds (§14-3): the world
+ * settles there and may issue a contact. Another window holding the town is no error here. */
+function boundary() {
+  if (bounding || legacyHost || !presence?.owner) return;
+  bounding = true; lastBoundary = performance.now();
+  queue(async () => {
+    const data = await request('boundary', { surfaceId, fence: presence.fence });
+    if (data.issued || data.worldSeq !== snapshot?.state.writeSeq) accept(await request('state'));
+  }).catch(error => { if (error.status !== 409) showError(error.message); }).finally(() => { bounding = false; });
+}
+/** Whether the world runs a timer of its own now (a scene's stage, C1, a bazaar step, a guest's use):
+ * only then the screen reads every second. Otherwise the world moves when the window does something. */
+function timed() {
+  const v = snapshot?.view, e = v?.day?.episode, b = v?.bazaar?.episode;
+  return !!(e?.open && e.location === v.day.location && ['demonstration', 'rehearsal', 'executing', 'explaining'].includes(e.stage))
+    || v?.life?.interaction?.stage === 'executing' || !!v?.execution
+    || bazaarActive() && (['demonstration', 'rehearsal', 'preparing', 'serving', 'installing', 'looking'].includes(b.stage) || b.stage === 'result' && b.elapsedMs < 1200);
+}
+/** The next server time the town changes by the clock alone: a band ends, a resident wakes or goes to
+ * sleep (a scene may begin or not), a prepared job is ready. The screen reads then (W3). */
+function dueAt() {
+  // Judged at the time the view was drawn: what changes after it is due, however late the window looks.
+  const v = snapshot?.view.day?.scene?.village, times = [];
+  if (v) {
+    times.push(v.band.endMs);
+    // The place's line says what its own resident is doing (the cafe owner, the researcher): read when that turns.
+    const named = { cafe: 'cafe-owner', greenhouse: 'researcher' }[snapshot.view.day.location];
+    for (const seg of named ? v.segments.filter(s => s.npc === named) : []) for (const at of [seg.startMs, seg.arriveMs, seg.endMs]) if (at > v.nowMs) times.push(at);
+    for (const id of RESIDENT_IDS) {
+      const mine = v.segments.filter(s => s.npc === id), up = mine.some(s => s.startMs <= v.nowMs);
+      const next = up ? Math.max(...mine.map(s => s.endMs)) : Math.min(...mine.map(s => s.startMs));
+      if (Number.isFinite(next)) times.push(next);
+    }
+  }
+  const job = snapshot?.state.day?.job;
+  if (job?.status === 'preparing') times.push(job.readyAt);
+  return times.length ? Math.min(...times) : null;
+}
+/** The heartbeat (F11): a pulse each second keeps the lease and the server's clock; a timed world is read
+ * every second; a due time is read once (again after 2 seconds if the server had not reached it yet);
+ * a safe window offers a boundary every 20 seconds. */
+function tick() {
+  if (!snapshot?.capabilities?.day || !connected) return;
+  pulse();
+  // A hidden window keeps its lease and reads again when it is shown; an older host's presence brings the whole town.
+  if (document.hidden || legacyHost) return;
+  const now = performance.now(), t = serverNow(), due = dueAt();
+  if (timed()) read();
+  else if (due !== null && t !== null && t >= due && now >= dueReadAt) { dueReadAt = now + 2000; read(); }
+  if (now - lastBoundary >= BOUNDARY_GAP_MS && flags().safe) boundary();
 }
 async function command(type, payload = {}) {
   if (busy || !available()) return false;
@@ -242,8 +327,61 @@ function configurePlan() {
   if (activePlan?.id === raw.id && activePlan.revision === raw.revision) return;
   resetPlan(); activePlan = globalThis.LoomLife.createPlan(raw);
 }
+/** The server's clock as this window knows it: each pulse answer carries serverNow (null before the first). */
+function serverNow() { return clockOffset === null ? null : Math.round(performance.now() + clockOffset); }
+function syncClock(serverAt, sentAt, receivedAt) {
+  if (!Number.isSafeInteger(serverAt)) return;
+  const sample = serverAt - (sentAt + receivedAt) / 2;
+  // Smooth the network's jitter; a jump (a sleeping laptop, a changed clock) is taken at once.
+  clockOffset = clockOffset === null || Math.abs(sample - clockOffset) > 2000 ? sample : clockOffset + (sample - clockOffset) * .25;
+}
+/** Each resident at the server's time (§14-4 — the same placeAt the host runs): where the plan has it, or
+ * where a scene holds it once it has walked over (review P2-2). One the cafe's own scene draws (hidden) is
+ * left to that scene. Reduced motion shows where a walking resident is going, not each step. */
+function villageRows(v) {
+  const t = Math.min(v.band.endMs - 1, Math.max(v.nowMs, serverNow() ?? v.nowMs)), places = {}, rows = [], still = reduced.matches || fallback;
+  for (const id of RESIDENT_IDS) {
+    const at = placeAt(v.segments, id, t, v.startSpots), hold = v.holds?.[id];
+    places[id] = at;
+    if (v.hidden?.includes(id)) continue;
+    if (hold && !(at?.walking && at.archetype === 'reserved')) rows.push({ ...hold, id, held: true });
+    else if (!at) rows.push({ id, asleep: true });
+    else {
+      const point = at.walking && still ? SPOT_BY_ID[at.spot].at : at;
+      rows.push({ id, x: point.x, z: point.z, pose: at.walking && still ? 'standing' : at.pose, goal: goalOf(at), live: true, archetype: at.archetype, walking: at.walking });
+    }
+  }
+  // Two residents on one spot (a two-seat spot, or a plan spot under a scene's) stand apart; a walker passes through.
+  const placed = [];
+  for (const row of rows) {
+    if (row.asleep) continue;
+    if (row.live && !row.walking) for (let i = 0; i < 3 && placed.some(p => Math.hypot(p.x - row.x, p.z - row.z) < .35); i++) row.x += .55;
+    placed.push(row);
+  }
+  // Every resident's plan state is in it — one the cafe's own scene draws (hidden) still turns the captions.
+  const signature = RESIDENT_IDS.map(id => { const row = rows.find(r => r.id === id), at = places[id];
+    return `${id}:${!row ? 'hidden' : row.held ? 'held' : row.asleep ? 'asleep' : 'live'}:${at ? `${at.archetype}:${at.walking}` : 'asleep'}`; }).join('|');
+  return { t, rows, places, signature };
+}
+/** The cafe owner's line in the life panel: C1's own while it holds the owner, else the plan's now. */
+function ownerLine(places) {
+  const b = snapshot.view.life?.background; if (!b) return '';
+  if (b.phase !== 'free' || !places) return b.line || '';
+  const at = places['cafe-owner'];
+  return at ? `${roleNames['cafe-owner']}은 ${doing(at)[1]}.` : `${roleNames['cafe-owner']}은 지금 자고 있어요.`;
+}
 function currentScene() {
   const scene = { ...snapshot.view.day.scene, memories: (snapshot.state.day?.history || []).map(({ resultId, kind, role, choice, location }) => ({ resultId, kind, role, choice, location })) };
+  // Residents follow the plan at the server's time now; the server's npcs were drawn at its own moment.
+  const village = scene.village ? villageRows(scene.village) : null;
+  if (village) {
+    scene.npcs = [...(scene.npcs || []).filter(n => !RESIDENT_IDS.includes(n.id)), ...village.rows.filter(r => !r.asleep)];
+    if (snapshot.state.day?.job?.status !== 'preparing') scene.summary = caption(village.places);
+    // The cafe's own scene never draws an owner the plan has asleep (the night rule, §4-2 A) — unless a guest's
+    // use or reaction begun before bedtime is playing: a scene begun goes on.
+    scene.ownerAsleep = scene.village.sleeps === true && !village.places['cafe-owner'] && !executionSample && !planSample;
+    scene.villageSignature = village.signature; scene.ownerLine = ownerLine(village.places);
+  }
   if (walking() && walkPoint) { scene.player = { ...walkPoint, heading: walkHeading, pose: walkMoving ? 'walking' : 'standing' }; scene.freeWalk = true; }
   if (bazaarActive() && snapshot.view.bazaar.scene?.active) {
     const b = snapshot.view.bazaar.scene;
@@ -255,14 +393,24 @@ function currentScene() {
   if (snapshot.view.day.location === 'cafe' || walking()) {
     scene.legacy = { ...snapshot.view.scene, active: walking() || !!activePlan || !!executionSample || !dayActive() || !!snapshot.state.life?.episode?.open };
     if (executionSample || planSample) scene.legacyActors = (executionSample || planSample).actors;
-    else if (!scene.cafeReserved && snapshot.view.life?.canStart && snapshot.view.life?.background) scene.lifeRoutine = snapshot.view.life.background;
+    // C1 draws the owner (and its cup) only while its scene holds the owner (W3); otherwise the plan does.
+    else if (snapshot.view.life?.background?.owner) scene.lifeHold = snapshot.view.life.background;
   }
   return scene;
+}
+/** The residents the plan moves every frame in the scene just drawn: live rows another layer (FT10's
+ * guest use, C1, the bazaar) does not draw this frame. */
+function liveIds(scene) {
+  const ids = new Set((scene.npcs || []).filter(n => n.live).map(n => n.id));
+  if (scene.legacyActors?.owner || scene.lifeHold?.owner) ids.delete('cafe-owner');
+  return ids;
 }
 function renderScene() {
   if (!snapshot) return;
   const day = snapshot.view.day, scene = currentScene();
-  const background = lifeAvailable() ? snapshot.view.life.background?.line : null;
+  villageLive = { ids: liveIds(scene), signature: scene.villageSignature ?? '' };
+  if (scene.ownerLine !== undefined) text('life-background', scene.ownerLine);
+  const background = lifeAvailable() ? scene.ownerLine ?? snapshot.view.life.background?.line : null;
   const sample = executionSample || planSample;
   const description = activePlan || executionSample ? (sample?.visualComplete ? snapshot.view.line : stepLines[sample?.activeStepId] || '손님이 고른 자리를 사용해요.') : bazaarActive() ? snapshot.view.bazaar.line : dayActive() ? day.line : background || scene.summary || scene.line || day.line;
   $('scene').setAttribute('aria-label', `${names[day.location] || day.location}. ${description}`); text('scene-caption', description); if (!walking()) text('scene-badge', names[day.location] || day.location);
@@ -285,7 +433,7 @@ function contactHere(contact) { return !!contact && presence?.owner && contact.i
 function renderLife() {
   const life = snapshot.view.life, enabled = lifeAvailable(); $('life-panel').hidden = !enabled;
   $('life-open').dataset.unavailable = String(!enabled); $('life-resume').hidden = !life?.restGuard;
-  text('life-background', life?.background?.line || '');
+  if (!snapshot.view.day.scene.village) text('life-background', life?.background?.line || '');
   const contact = life?.contact, shown = enabled && contactHere(contact) && ['issued', 'delivered'].includes(contact.state) && !$('life-dialog').open;
   $('life-contact').hidden = !shown; text('life-contact-line', shown ? contact.label : '');
   const result = enabled && life?.interaction?.stage === 'result' ? life.interaction : null;
@@ -397,10 +545,20 @@ function observe(now) {
   if (visibleContact && contactLast !== null) contactMs += Math.min(100, Math.max(0, now - contactLast)); contactLast = visibleContact ? now : null;
   if (visibleContact && contactMs >= 300 && !contactPending) { contactPending = true; command('LIFE_ACK', { contactId, visible: true }).then(ok => { if (!ok) contactPending = false; }); }
 }
-function frame(now) { walkFrame(now); observe(now); raf = requestAnimationFrame(frame); }
+/** Each frame the plan's residents move to where they are at the server's time (W3); when one starts a
+ * new segment, wakes, sleeps or reaches a scene's hold, the whole scene (captions included) is drawn again. */
+function villageFrame() {
+  const v = snapshot?.view.day?.scene?.village;
+  if (!v || !connected) return;
+  const village = villageRows(v);
+  if (village.signature !== villageLive.signature) { renderScene(); return; }
+  if (renderer && villageLive.ids.size) renderer.setResidents?.(village.rows.filter(r => villageLive.ids.has(r.id)));
+}
+function frame(now) { walkFrame(now); observe(now); villageFrame(); raf = requestAnimationFrame(frame); }
 async function load() {
   setBusy(true);
-  try { await queue(async () => { walkPacket = null; walkPending = []; accept(await request('state')); clearError(); await pulseNow(); }); }
+  // The window's first pulse records a visit that ended while it was away; the second read shows the town after it.
+  try { await queue(async () => { walkPacket = null; walkPending = []; accept(await request('state')); clearError(); await pulseNow(); accept(await request('state')); }); }
   catch (error) { showError(error.message); }
   finally { setBusy(false); }
   // A failed first walk-enable has no saved walking state. Retry must finish
@@ -449,13 +607,13 @@ try { const note = JSON.parse(localStorage.getItem('synk-town-day-play-notes') |
 function notes() { return { kind: 'self-guided-developer-play-notes', recordedAt: new Date().toISOString(), participantStudy: false, ...Object.fromEntries(noteIds.map(id => [id, $(id).value])) }; }
 $('play-notes').addEventListener('submit', event => { event.preventDefault(); try { localStorage.setItem('synk-town-day-play-notes', JSON.stringify(notes())); text('notes-status', '이 기기에 저장했어요.'); } catch { text('notes-status', '메모 파일 받기로 보관해 주세요.'); } });
 $('notes-export').addEventListener('click', () => { const blob = new Blob([JSON.stringify(notes(), null, 2)], { type: 'application/json' }); const url = URL.createObjectURL(blob); const link = document.createElement('a'); link.href = url; link.download = 'synk-town-play-notes.json'; link.click(); setTimeout(() => URL.revokeObjectURL(url), 1000); });
-document.addEventListener('visibilitychange', () => { if (document.hidden) pauseWalkInput(); pulse(); }); window.addEventListener('online', () => { if (!connected) load(); });
+document.addEventListener('visibilitychange', () => { if (document.hidden) pauseWalkInput(); pulse(); if (!document.hidden) read(); }); window.addEventListener('online', () => { if (!connected) load(); });
 window.addEventListener('blur', () => { if (walking()) { pauseWalkInput(); pulse(); } }); window.addEventListener('focus', () => { if (walking()) pulse(); });
 window.addEventListener('pagehide', () => {
   if (raf !== null) cancelAnimationFrame(raf); walkControls?.dispose(); renderer?.dispose();
   const stopped = { surfaceId, surface: 'day', foreground: false, safe: false };
-  if (worldHostRequested) { worldHost?.request('presence', stopped).catch(() => {}); worldHost?.dispose(); }
-  else fetch('/api/preview/presence', { method: 'POST', headers: { 'Content-Type': 'application/json' }, keepalive: true, body: JSON.stringify(stopped) }).catch(() => {});
+  if (worldHostRequested) { worldHost?.request(legacyHost ? 'presence' : 'pulse', stopped).catch(() => {}); worldHost?.dispose(); }
+  else fetch('/api/preview/pulse', { method: 'POST', headers: { 'Content-Type': 'application/json' }, keepalive: true, body: JSON.stringify(stopped) }).catch(() => {});
 });
 window.addEventListener('pageshow', event => { if (event.persisted) location.reload(); });
 reduced.addEventListener('change', () => { resetPlan(); configurePlan(); renderScene(); });
@@ -490,12 +648,13 @@ try {
   walkControls = createWalkControls({ surface: $('scene'), joystick: $('walk-joystick'), thumb: $('walk-thumb'), canMove: () => walking() && connected && !busy,
     onInteract: interactWalk, onCancel: dismissWalkPanel, onMoveStart: dismissWalkPanel, onInputMode: mode => { walkInputMode = mode; } });
   renderScene(); applyWalkView(); if (walking()) $('scene').focus({ preventScroll: true });
-  raf = requestAnimationFrame(frame); setInterval(pulse, 1000);
+  raf = requestAnimationFrame(frame); setInterval(tick, 1000);
   setInterval(() => { if (renderer) text('scene-metrics', JSON.stringify(renderer.stats(), null, 2)); }, 3000);
 } catch (error) { showError(error.message); }
 
 // Read-only instrumentation for the isolated QA runner. It cannot mutate state or time.
 globalThis.SYNKTownDay = Object.freeze({ metrics: () => ({ ...(renderer?.stats() || { renderer: 'text-alternative' }), reducedMotion: reduced.matches, connected, fallback, worldLinked: worldHostRequested,
+  village: { serverNow: serverNow(), live: [...villageLive.ids], signature: villageLive.signature, due: dueAt(), timed: timed() },
   walk: { enabled: walking(), ...walkPoint, heading: walkHeading, moving: walkMoving, inputActive: walkInputActive, nearby: nearby(walkPoint), interactionOpen: walkPanel, input: walkInputMode,
     pending: walkPending.length, pendingMs: walkPending.reduce((n, s) => n + s.durationMs, 0), sending: !!walkFlushing, backpressured: walkBackpressured,
     correctionDistance: walkCorrectionDistance, maxCorrection: walkMaxCorrection } }), snapshot: () => structuredClone(snapshot) });

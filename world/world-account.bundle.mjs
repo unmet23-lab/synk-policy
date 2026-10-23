@@ -19290,7 +19290,7 @@ async function loadWorldConfig({ value = globalThis.__SYNK_WORLD_CONFIG__, base 
 var changed = () => Object.assign(Error("\uB85C\uADF8\uC778\uD55C \uACC4\uC815\uC774 \uBC14\uB00C\uC5C8\uC5B4\uC694."), { code: "ACCOUNT_CHANGED" });
 var authErrors = /* @__PURE__ */ new Set(["AUTH_REQUIRED", "AUTH_SESSION_MISSING", "SESSION_REVOKED", "UNAUTHORIZED", "ACCOUNT_UNAVAILABLE", "PRODUCT_FORBIDDEN", "PLATFORM_ACCOUNT_MISMATCH"]);
 var TOWN_ACCOUNT_ROUTES = /* @__PURE__ */ new Set(["town/entry", "town/check", "town/placement"]);
-var routes = /* @__PURE__ */ new Map([["bootstrap", "GET"], ["play/start", "POST"], ["play/complete", "POST"], ["avatar/outfit", "PUT"], ["wardrobe/looks", "PUT"], ["town/entry", "GET"], ["town/state", "GET"], ["town/sharing", "POST"], ["town/command", "POST"], ["town/presence", "POST"], ["town/check", "POST"], ["town/placement", "POST"], ["enrollment/preview", "POST"], ["enrollment/claim", "POST"], ["homework", "GET"], ["homework/submit", "POST"], ["homework/key", "POST"], ["writing", "POST"], ["speaking", "POST"]]);
+var routes = /* @__PURE__ */ new Map([["bootstrap", "GET"], ["play/start", "POST"], ["play/complete", "POST"], ["avatar/outfit", "PUT"], ["wardrobe/looks", "PUT"], ["town/entry", "GET"], ["town/state", "GET"], ["town/sharing", "POST"], ["town/command", "POST"], ["town/presence", "POST"], ["town/pulse", "POST"], ["town/boundary", "POST"], ["town/check", "POST"], ["town/placement", "POST"], ["enrollment/preview", "POST"], ["enrollment/claim", "POST"], ["homework", "GET"], ["homework/submit", "POST"], ["homework/key", "POST"], ["writing", "POST"], ["speaking", "POST"]]);
 function createWorldAccount({
   config: raw,
   storage = globalThis.sessionStorage,
@@ -19311,8 +19311,8 @@ function createWorldAccount({
   const config = readConfig(raw, getUrl()), key = "synk.oauth.session.world";
   const binding = [config.supabaseUrl, config.accountApiUrl, config.clients.world.clientId, config.clients.world.redirectUri].join("|");
   const entry = createPlatformEntry({ clientKey: "world", getUrl, replaceUrl });
-  let session = null, rawSession = null, owner = null, currentSessionId = null, currentAccount = null, epoch = 0, closed = false, refreshing = null, pendingExchange = null, townBinding = null, townStateRevision = -1, verifiedClient = null, gameHost = null, gameLaunch = 0, lifeHost = null, lifeLaunch = 0, verification = 0;
-  let nativeIdentity = null, nativeAccountId = null, nativeGeneration = -1, signedOutGeneration = -1, nativeEvents = 0, nativeReady = null, unsubscribe = null, nativeClassroom = false, nativeHomework = false, nativeTownCheck = false;
+  let session = null, rawSession = null, owner = null, currentSessionId = null, currentAccount = null, epoch = 0, closed = false, refreshing = null, pendingExchange = null, townBinding = null, townStateRevision = -1, townVerifiedAt = -Infinity, verifiedClient = null, gameHost = null, gameLaunch = 0, lifeHost = null, lifeLaunch = 0, verification = 0;
+  let nativeIdentity = null, nativeAccountId = null, nativeGeneration = -1, signedOutGeneration = -1, nativeEvents = 0, nativeReady = null, unsubscribe = null, nativeClassroom = false, nativeHomework = false, nativeTownCheck = false, nativeTownPulse = false;
   const controllers = /* @__PURE__ */ new Set();
   const guard = (expected) => {
     if (closed || expected !== epoch) throw changed();
@@ -19345,6 +19345,7 @@ function createWorldAccount({
     verifiedClient = null;
     townBinding = null;
     townStateRevision = -1;
+    townVerifiedAt = -Infinity;
     nativeIdentity = null;
     nativeAccountId = null;
     for (const c of controllers) c.abort();
@@ -19380,6 +19381,7 @@ function createWorldAccount({
       nativeClassroom = Array.isArray(environment.worldRoutes) && environment.worldRoutes.includes("classroom");
       nativeHomework = Array.isArray(environment.worldRoutes) && ["homework", "homework/submit"].every((route) => environment.worldRoutes.includes(route));
       nativeTownCheck = Array.isArray(environment.worldRoutes) && ["town/check", "town/placement"].every((route) => environment.worldRoutes.includes(route));
+      nativeTownPulse = Array.isArray(environment.worldRoutes) && ["town/pulse", "town/boundary"].every((route) => environment.worldRoutes.includes(route));
       unsubscribe = bridge.onAuthChanged((state) => {
         const before = nativeIdentity;
         nativeEvents++;
@@ -19665,13 +19667,18 @@ function createWorldAccount({
     const expected = epoch;
     guard(expected);
     if (!owner || !session) throw Object.assign(Error("SYNK ID\uB85C \uB85C\uADF8\uC778\uD574 \uC8FC\uC138\uC694."), { code: "AUTH_REQUIRED", status: 401 });
-    if (path === "town/state") await verify(expected);
+    if (path === "town/state" && now() - townVerifiedAt >= 6e4) {
+      await verify(expected);
+      townVerifiedAt = now();
+    }
     if (path === "town/entry") {
       townBinding = null;
       townStateRevision = -1;
+      townVerifiedAt = -Infinity;
     }
     if (path === "town/sharing" && !townBinding?.classId) throw Object.assign(Error("CLASSROOM_FORBIDDEN"), { code: "CLASSROOM_FORBIDDEN", status: 403 });
     if ((path === "town/check" || path === "town/placement") && native && !nativeTownCheck) throw Object.assign(Error("PC \uC571\uC5D0\uC11C\uB294 \uC544\uC9C1 \uB9C8\uC744 \uC900\uBE44 \uD655\uC778\uC744 \uC5F4 \uC218 \uC5C6\uC5B4\uC694."), { code: "TOWN_CHECK_UNSUPPORTED" });
+    if ((path === "town/pulse" || path === "town/boundary") && native && !nativeTownPulse) throw Object.assign(Error("PC \uC571\uC5D0\uC11C\uB294 \uC544\uC9C1 \uC774 \uB9C8\uC744 \uD654\uBA74\uC744 \uC5F4 \uC218 \uC5C6\uC5B4\uC694. \uBE0C\uB77C\uC6B0\uC800\uC758 SYNK WORLD\uC5D0\uC11C \uC5F4\uC5B4 \uC8FC\uC138\uC694."), { code: "TOWN_PULSE_UNSUPPORTED" });
     const accept = (data, ok, status) => {
       guard(expected);
       if (status === 401 || authErrors.has(data?.error?.code)) {
@@ -19930,6 +19937,9 @@ function createWorldAccount({
     },
     get supportsTownCheck() {
       return !native || nativeTownCheck;
+    },
+    get supportsTownPulse() {
+      return !native || nativeTownPulse;
     },
     identity: () => ({ accountId: owner, generation: epoch }),
     assertActive() {

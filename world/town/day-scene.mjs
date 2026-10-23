@@ -8,12 +8,15 @@ import { buildTownEnvironment } from './day-environment.mjs';
 import { applyTownMaterials, TOWN_BRAND } from './day-materials.mjs';
 import { createTownRendering } from './day-rendering.mjs';
 import { WALK_BOUNDS } from './walk.mjs';
+import { PLACE_BY_ID, PLAYER_PLACES, FT_SEATS, SIGN_SLOTS } from './town/places.mjs';
 
 // Local art/interaction study derived from synk-world-home/scene.mjs.
 // The player retains the approved Mongle silhouette; residents have their own casts.
 const TAU = Math.PI * 2;
-const LOCATIONS = Object.freeze({ home: [-6, 0], cafe: [0, 0], workshop: [6, 0], greenhouse: [0, -6] });
-const LABELS = { home: '우리 집', cafe: '찻집', workshop: '공방', greenhouse: '온실' };
+const LOCATIONS = Object.freeze(Object.fromEntries(PLAYER_PLACES.map(id => [id, [PLACE_BY_ID[id].center.x, PLACE_BY_ID[id].center.z]])));
+const LABELS = Object.fromEntries(PLAYER_PLACES.map(id => [id, PLACE_BY_ID[id].labels.scene]));
+// Old 2D cafe-screen seat → [2D x, 2D y, 3D x, 3D z], the anchor for FT10/FT51 legacy actors.
+const LEGACY_SLOTS = Object.fromEntries(Object.entries(FT_SEATS).map(([id, seat]) => [id, [seat.legacy2d.x, seat.legacy2d.y, seat.at.x, seat.at.z]]));
 const ROLE_LABELS = { player: '나', 'cafe-owner': '찻집 주인', 'workshop-owner': '공방 주인', researcher: '연구원', 'visitor-tea-reader': '손님', 'book-guest': '책 읽는 손님', companion: '동행 손님' };
 const VISITORS = new Set(['visitor-tea-reader', 'book-guest', 'companion']);
 const clamp = THREE.MathUtils.clamp;
@@ -394,6 +397,24 @@ export function createDayScene(canvas, { onDestination = () => {}, onError = () 
     if (cameraMode === 'follow' || freeWalk && cameraMode === 'close') followTarget();
     dirty = true; schedule();
   }
+  /** The residents the village plan moves (W3, §14-4): the screen gives each one's place at the server's
+   * clock every frame — { id, x, z, pose } or { id, asleep: true }. It moves actors only; a render request
+   * (and its serial, which a screen's acknowledgements wait on) is never made here. */
+  function setResidents(rows = []) {
+    if (disposed) return;
+    const now = performance.now(); let changed = false;
+    for (const row of rows) {
+      const a = actors.get(row.id); if (!a) continue;
+      if (row.asleep) { if (a.group.visible) { a.group.visible = false; changed = true; } continue; }
+      if (a.group.visible && a.group.userData.placed && a.target.x === row.x && a.target.z === row.z && a.pose === row.pose) continue;
+      const from = a.group.userData.placed && a.group.visible ? { x: a.target.x, z: a.target.z } : null;
+      setActor(row.id, row, now, true);
+      // A frame's step is shorter than setActor's turning threshold: face the way the plan walks.
+      if (from && Math.hypot(row.x - from.x, row.z - from.z) > .0005) a.facing = Math.atan2(row.x - from.x, row.z - from.z);
+      changed = true;
+    }
+    if (changed) { dirty = true; schedule(); }
+  }
   function setActor(id, value, now, immediate = false) {
     const a = actors.get(id); if (!a || !value) return; const walkingPlayer = id === 'player' && freeWalk;
     const x = clamp(finite(value.x), walkingPlayer ? WALK_BOUNDS.minX : -10, walkingPlayer ? WALK_BOUNDS.maxX : 10),
@@ -508,18 +529,19 @@ export function createDayScene(canvas, { onDestination = () => {}, onError = () 
   let cafeAnchor = { sourceX: 50, sourceY: 55, x: 0, z: 0 };
   function cafePoint(point) { return { x: cafeAnchor.x + (finite(point?.x, 50) - cafeAnchor.sourceX) * .045, z: cafeAnchor.z + (finite(point?.y, 55) - cafeAnchor.sourceY) * .045, pose: point?.pose }; }
   function updateLegacy(data, now) {
-    const active = !!data.legacy?.active; legacy.visible = active; actors.get('visitor-tea-reader').group.visible = active && (!!data.legacy?.guestSeated || !!data.legacyActors?.guest);
+    // A closed cafe at night (the owner asleep in the village plan, the night rule) shows no guest and no owner.
+    const active = !!data.legacy?.active; legacy.visible = active; actors.get('visitor-tea-reader').group.visible = active && !data.ownerAsleep && (!!data.legacy?.guestSeated || !!data.legacyActors?.guest);
     actors.get('cafe-owner').label.position.y = active && (data.legacy?.guestSeated || data.legacyActors?.guest) ? 1.84 : actors.get('cafe-owner').height + .26;
     if (!active) return;
-    const slots = { garden: [65, 64, -.7, 2], 'garden-right': [78, 68, 1.2, 2], 'eaves-left': [25, 54, -1.2, .4], 'eaves-right': [39, 54, .8, .4] }, slot = slots[data.legacy.placement] || [50, 55, 0, 0];
+    const slot = LEGACY_SLOTS[data.legacy.placement] || [50, 55, 0, 0];
     cafeAnchor = { sourceX: slot[0], sourceY: slot[1], x: slot[2], z: slot[3] }; const pos = cafePoint({ x: slot[0], y: slot[1] });
     legacyChair.position.set(pos.x, .14, pos.z); legacyChair.visible = !!data.legacy.placement; legacyCanopy.position.set(pos.x, .12, pos.z); legacyCanopy.visible = !!data.legacy.canopyPlaced; canopyMaterial.color.set(data.legacy.color === 'yellow' ? '#dcbd76' : '#7d9b84');
-    const sign = data.legacy.signPreview || data.legacy.sign, signPoint = cafePoint(sign?.slot === 'entrance-right' ? { x: 42, y: 82 } : { x: 15, y: 72 });
+    const sign = data.legacy.signPreview || data.legacy.sign, signPoint = cafePoint(SIGN_SLOTS[sign?.slot === 'entrance-right' ? 'entrance-right' : 'entrance-left'].legacy2d);
     legacySign.visible = !!sign?.slot; legacySign.position.set(signPoint.x, .12, signPoint.z); signChairIcon.visible = sign?.picture === 'chair'; signTeaIcon.visible = sign?.picture === 'tea';
     const source = data.legacyActors || {}, fallbackGuest = { x: slot[0], y: slot[1], pose: data.legacy.guestSeated ? 'sit' : 'stand' };
-    if (data.legacy.guestSeated || source.guest) setActor('visitor-tea-reader', cafePoint(source.guest || fallbackGuest), now, true);
+    if (!data.ownerAsleep && (data.legacy.guestSeated || source.guest)) setActor('visitor-tea-reader', cafePoint(source.guest || fallbackGuest), now, true);
     if (source.owner) setActor('cafe-owner', cafePoint(source.owner), now, true);
-    else if (!data.npcs?.some(n => n.id === 'cafe-owner') && !data.lifeRoutine?.owner) setActor('cafe-owner', cafePoint({ x: 42, y: 60, pose: 'standing' }), now, true);
+    else if (!data.npcs?.some(n => n.id === 'cafe-owner') && !data.lifeHold?.owner && !data.ownerAsleep) setActor('cafe-owner', cafePoint({ x: 42, y: 60, pose: 'standing' }), now, true);
     legacyCup.visible = !!data.legacy.teaPlaced || (!!source.tea && source.tea.pose !== 'hidden');
     const cup = source.tea ? cafePoint(source.tea) : pos; legacyCup.position.set(cup.x + .4, .62, cup.z + .18);
     if (legacyCup.visible) { const supportY = supportHeight(legacyCup.position.x, legacyCup.position.z), bounds = restOn(legacyCup, supportY); legacyContact = { id: 'legacy-cup', kind: 'legacy-cup', bottomY: bounds.min.y, supportY, gap: bounds.min.y - supportY }; }
@@ -536,13 +558,15 @@ export function createDayScene(canvas, { onDestination = () => {}, onError = () 
     quality = nextQuality; cameraMode = nextCamera; reducedMotion = !!options.reducedMotion; currentLocation = LOCATIONS[data.location] ? data.location : 'home';
     if (lastQuality !== quality) { lastQuality = quality; const size = canvas.clientWidth < 600 && quality !== 'experience' ? 1024 : 2048; light.shadow.mapSize.set(size, size); light.shadow.map?.dispose(); light.shadow.map = null; light.shadow.needsUpdate = true; cpuTimes = []; intervals = []; lastMetricsAt = 0; }
     if (!freeWalk || !playerControlled) setActor('player', data.player || { x: -6, z: 1.1 }, now);
-    const npcIds = new Set(); for (const npc of data.npcs || []) { if (npc.id === 'player' || npc.id === 'visitor-tea-reader') continue; npcIds.add(npc.id); setActor(npc.id, npc, now); }
+    // A live resident follows the village plan every frame (setResidents), so it is placed, not eased.
+    const npcIds = new Set(); for (const npc of data.npcs || []) { if (npc.id === 'player' || npc.id === 'visitor-tea-reader') continue; npcIds.add(npc.id); setActor(npc.id, npc, now, npc.live === true); }
     for (const id of ['cafe-owner', 'workshop-owner', 'researcher', 'book-guest', 'companion']) if (!npcIds.has(id)) actors.get(id).group.visible = false;
     actors.get('workshop-owner').label.position.set(bazaarActive ? 1.1 : 0, bazaarActive ? .8 : actors.get('workshop-owner').height + .26, 0);
     updateProps(data.legacy?.active ? data.props?.filter(p => p.id !== 'ft-seat') : data.props); updateMemories(data.memories); updateLegacy(data, now);
-    lifeCup.visible = !!data.lifeRoutine?.prop && data.lifeRoutine.prop.pose !== 'hidden';
-    if (data.lifeRoutine?.owner) setActor('cafe-owner', cafePoint(data.lifeRoutine.owner), now, true);
-    if (lifeCup.visible) { const p = cafePoint(data.lifeRoutine.prop); lifeCup.position.set(p.x, .53, p.z); const supportY = supportHeight(p.x, p.z), bounds = restOn(lifeCup, supportY); lifeContact = { id: 'life-cup', kind: 'life-cup', x: p.x, z: p.z, bottomY: bounds.min.y, supportY, gap: bounds.min.y - supportY }; }
+    // The owner and its cup are C1's only while the C1 scene holds the owner (W3); otherwise the plan draws it.
+    lifeCup.visible = !!data.lifeHold?.prop && data.lifeHold.prop.pose !== 'hidden';
+    if (data.lifeHold?.owner) setActor('cafe-owner', cafePoint(data.lifeHold.owner), now, true);
+    if (lifeCup.visible) { const p = cafePoint(data.lifeHold.prop); lifeCup.position.set(p.x, .53, p.z); const supportY = supportHeight(p.x, p.z), bounds = restOn(lifeCup, supportY); lifeContact = { id: 'life-cup', kind: 'life-cup', x: p.x, z: p.z, bottomY: bounds.min.y, supportY, gap: bounds.min.y - supportY }; }
     // A deliberate view change uses a cut rather than flying through buildings.
     if (layoutChanged) layoutCamera(cameraChanged); dirty = true; schedule(); return requestedSerial;
   }
@@ -644,7 +668,7 @@ export function createDayScene(canvas, { onDestination = () => {}, onError = () 
       }
     };
   }
-  function stats() { const player = actors.get('player'); const projected = player.group.position.clone().add(new THREE.Vector3(0, .55 + player.surfaceOffset, 0)).project(camera); const head = player.group.position.clone().add(new THREE.Vector3(0, .83 + player.surfaceOffset, 0)).project(camera); return { ready, ...cameraDiagnostics(), playerHeadScreen: {x:(head.x+1)*canvas.clientWidth/2,y:(1-head.y)*canvas.clientHeight/2,inFrustum:Math.abs(head.x)<1&&Math.abs(head.y)<1&&Math.abs(head.z)<1}, graphicsVersion: 20, ...(bakedDistrict ? { bakedDistrict: bakedDistrict.stats() } : {}), brandArt: { revision: 13, palette: TOWN_BRAND, materialVersion: surfaceArt.version, memoryMarkers: memoryMarkers.map(h => ({ ...h })) }, rendering: rendering.stats(), conversationHeads: framingActorIds.map(id=>{const a=actors.get(id), point=(a.resident?.head ? a.resident.head.getWorldPosition(new THREE.Vector3()) : a.group.position.clone().add(new THREE.Vector3(0,a.headHeight,0))).project(camera);return {id,x:(point.x+1)*canvas.clientWidth/2,y:(1-point.y)*canvas.clientHeight/2};}), residents: [...actors.entries()].filter(([,a])=>a.resident).map(([id,a])=>({id,visible:a.group.visible,identity:a.resident.identity,height:a.height,headHeight:a.headHeight,pose:a.pose})), assetsReady, assetFailures: [...assetFailures], environment: environmentArt.stats, surfaceAlignment: { revision: 20, floorY: player.floorY, surfaceOffset: player.surfaceOffset, footWorldY: player.group.position.y + player.body.position.y, nominalFootWorldY: player.group.position.y + player.surfaceOffset, bob: player.gaitBob, shadowWorldY: player.group.position.y + player.shadow.position.y, contactShadowVisible: player.shadow.visible, anchorY: player.group.position.y, gameplayYChanged: false }, propContacts: [...propContacts, ...(lifeCup.visible && lifeContact ? [lifeContact] : []), ...(legacy.visible && legacyCup.visible && legacyContact ? [legacyContact] : [])], occlusionReuse: { queries: occlusionQueries, reusedFrames: occlusionReused, fadedMeshCount: fadedMeshes.size, roofCutaways: [...fadedMeshes].filter(object => fadedMaterials.get(object)?.roof && !object.visible).length }, shadowFocus: shadowDiagnostics, playerAvatar: player.avatar?.metrics() || {avatarVersion:'town-role-v2',outfit:playerOutfit}, appearanceVerified, playerScreen: { x: (projected.x + 1) * canvas.clientWidth / 2, y: (1 - projected.y) * canvas.clientHeight / 2, inFrustum: Math.abs(projected.x) < 1 && Math.abs(projected.y) < 1 && Math.abs(projected.z) < 1 }, cameraNear: camera.near, cameraDistance: camera.position.distanceTo(player.group.position), requestedSerial, renderedSerial, renderer: `Three.js r${THREE.REVISION}`, webgl: renderer.capabilities.isWebGL2 ? 'WebGL2' : 'WebGL', contextLost, drawCalls: renderer.info.render.calls, triangles: renderer.info.render.triangles, geometries: renderer.info.memory.geometries, textures: renderer.info.memory.textures, dpr: renderer.getPixelRatio(), drawingBuffer: { width: canvas.width, height: canvas.height }, frameCount, samples: cpuTimes.length, cpuRenderMs: { p50: quantile(cpuTimes, .5), p95: quantile(cpuTimes, .95) }, frameIntervalMs: { p50: quantile(intervals, .5), p95: quantile(intervals, .95) }, frameCap: 60, quality, camera: cameraMode, location: currentLocation, freeWalk, locomotion: { revision: 6, requestedHeading: player.facing, displayedHeading: player.visualFacing, gaitBlend: player.gaitBlend, phase: player.walkPhase, bob: player.gaitBob, roll: player.body.rotation.z, positionResidual: player.group.position.distanceTo(player.target), headingResponse: 'shortest-angle-body-only', gaitClock: 'travel-distance' }, playerPose: { x: player.group.position.x, y: player.group.position.y, z: player.group.position.z, heading: player.body.rotation.y, moving: playerMoving }, cameraPosition: camera.position.toArray(), cameraTarget: cameraTarget.toArray(), obscuredBuildingCount: [...obscuredBuildings].filter(g => buildings.includes(g)).length, obscuredPropCount: [...obscuredBuildings].filter(g => !buildings.includes(g)).length, paused: disposed || !visible || document.hidden || contextLost, reducedMotion: reducedMotion || motionQuery.matches, actorCount: [...actors.values()].filter(a => a.group.visible).length, propCount, productionAsset: false, physicalDeviceVerified: false }; }
+  function stats() { const player = actors.get('player'); const projected = player.group.position.clone().add(new THREE.Vector3(0, .55 + player.surfaceOffset, 0)).project(camera); const head = player.group.position.clone().add(new THREE.Vector3(0, .83 + player.surfaceOffset, 0)).project(camera); return { ready, ...cameraDiagnostics(), playerHeadScreen: {x:(head.x+1)*canvas.clientWidth/2,y:(1-head.y)*canvas.clientHeight/2,inFrustum:Math.abs(head.x)<1&&Math.abs(head.y)<1&&Math.abs(head.z)<1}, graphicsVersion: 20, ...(bakedDistrict ? { bakedDistrict: bakedDistrict.stats() } : {}), brandArt: { revision: 13, palette: TOWN_BRAND, materialVersion: surfaceArt.version, memoryMarkers: memoryMarkers.map(h => ({ ...h })) }, rendering: rendering.stats(), conversationHeads: framingActorIds.map(id=>{const a=actors.get(id), point=(a.resident?.head ? a.resident.head.getWorldPosition(new THREE.Vector3()) : a.group.position.clone().add(new THREE.Vector3(0,a.headHeight,0))).project(camera);return {id,x:(point.x+1)*canvas.clientWidth/2,y:(1-point.y)*canvas.clientHeight/2};}), residents: [...actors.entries()].filter(([,a])=>a.resident).map(([id,a])=>({id,visible:a.group.visible,identity:a.resident.identity,height:a.height,headHeight:a.headHeight,pose:a.pose,x:a.group.position.x,z:a.group.position.z})), assetsReady, assetFailures: [...assetFailures], environment: environmentArt.stats, surfaceAlignment: { revision: 20, floorY: player.floorY, surfaceOffset: player.surfaceOffset, footWorldY: player.group.position.y + player.body.position.y, nominalFootWorldY: player.group.position.y + player.surfaceOffset, bob: player.gaitBob, shadowWorldY: player.group.position.y + player.shadow.position.y, contactShadowVisible: player.shadow.visible, anchorY: player.group.position.y, gameplayYChanged: false }, propContacts: [...propContacts, ...(lifeCup.visible && lifeContact ? [lifeContact] : []), ...(legacy.visible && legacyCup.visible && legacyContact ? [legacyContact] : [])], occlusionReuse: { queries: occlusionQueries, reusedFrames: occlusionReused, fadedMeshCount: fadedMeshes.size, roofCutaways: [...fadedMeshes].filter(object => fadedMaterials.get(object)?.roof && !object.visible).length }, shadowFocus: shadowDiagnostics, playerAvatar: player.avatar?.metrics() || {avatarVersion:'town-role-v2',outfit:playerOutfit}, appearanceVerified, playerScreen: { x: (projected.x + 1) * canvas.clientWidth / 2, y: (1 - projected.y) * canvas.clientHeight / 2, inFrustum: Math.abs(projected.x) < 1 && Math.abs(projected.y) < 1 && Math.abs(projected.z) < 1 }, cameraNear: camera.near, cameraDistance: camera.position.distanceTo(player.group.position), requestedSerial, renderedSerial, renderer: `Three.js r${THREE.REVISION}`, webgl: renderer.capabilities.isWebGL2 ? 'WebGL2' : 'WebGL', contextLost, drawCalls: renderer.info.render.calls, triangles: renderer.info.render.triangles, geometries: renderer.info.memory.geometries, textures: renderer.info.memory.textures, dpr: renderer.getPixelRatio(), drawingBuffer: { width: canvas.width, height: canvas.height }, frameCount, samples: cpuTimes.length, cpuRenderMs: { p50: quantile(cpuTimes, .5), p95: quantile(cpuTimes, .95) }, frameIntervalMs: { p50: quantile(intervals, .5), p95: quantile(intervals, .95) }, frameCap: 60, quality, camera: cameraMode, location: currentLocation, freeWalk, locomotion: { revision: 6, requestedHeading: player.facing, displayedHeading: player.visualFacing, gaitBlend: player.gaitBlend, phase: player.walkPhase, bob: player.gaitBob, roll: player.body.rotation.z, positionResidual: player.group.position.distanceTo(player.target), headingResponse: 'shortest-angle-body-only', gaitClock: 'travel-distance' }, playerPose: { x: player.group.position.x, y: player.group.position.y, z: player.group.position.z, heading: player.body.rotation.y, moving: playerMoving }, cameraPosition: camera.position.toArray(), cameraTarget: cameraTarget.toArray(), obscuredBuildingCount: [...obscuredBuildings].filter(g => buildings.includes(g)).length, obscuredPropCount: [...obscuredBuildings].filter(g => !buildings.includes(g)).length, paused: disposed || !visible || document.hidden || contextLost, reducedMotion: reducedMotion || motionQuery.matches, actorCount: [...actors.values()].filter(a => a.group.visible).length, propCount, productionAsset: false, physicalDeviceVerified: false }; }
   function dispose() {
     if (disposed) return; disposed = true; cancelAnimationFrame(raf); resizeObserver.disconnect(); intersection.disconnect(); document.removeEventListener('visibilitychange', visibilityChange); motionQuery.removeEventListener?.('change', motionChange);
     for (const [type, fn] of [['pointerdown', pointerDown], ['pointerup', pointerUp], ['pointercancel', pointerCancel], ['webglcontextlost', lost]]) canvas.removeEventListener(type, fn);
@@ -706,5 +730,5 @@ export function createDayScene(canvas, { onDestination = () => {}, onError = () 
     try { await Promise.race([initialAssets.catch(() => {}), new Promise(resolve => { timer = setTimeout(resolve, 5000); })]); }
     finally { clearTimeout(timer); }
   }
-  resize(); if (!deferInitialRender) render({ location: 'home' , player: { x: -6, z: 1.1 }, npcs: [] }); return { render, setPlayerPose, setAppearance, prepareInitialAssets, resize, stats, dispose };
+  resize(); if (!deferInitialRender) render({ location: 'home' , player: { x: -6, z: 1.1 }, npcs: [] }); return { render, setPlayerPose, setResidents, setAppearance, prepareInitialAssets, resize, stats, dispose };
 }
