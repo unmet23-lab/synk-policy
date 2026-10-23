@@ -1,6 +1,6 @@
 {
-  "version": "2026-09-15-selected-experiences-copy-9bfc4e4ce8-rhythm-20261001-copy-3910676d01-release-copy-3e4ed3be6d-en-002b14631325-bm-platform-20261007-a885b0d303-travel-20261007-ce148dd860-real-20261007-ab58ee7076-homepage-current-20261009-033c24b61f29-homepage-v10-20261010-151558f40b1a",
-  "updatedAt": "2026-10-22",
+  "version": "2026-09-15-selected-experiences-copy-9bfc4e4ce8-rhythm-20261001-copy-3910676d01-release-copy-3e4ed3be6d-en-002b14631325-bm-platform-20261007-a885b0d303-travel-20261007-ce148dd860-real-20261007-ab58ee7076-homepage-current-20261009-033c24b61f29-homepage-v10-20261010-d749adb76ff4",
+  "updatedAt": "2026-10-23",
   "docs": [
     {
       "id": "company",
@@ -473,9 +473,16 @@
         "Your day — the order of stops, arrival times, walking and time at each place, all in one view. Swap one stop, walk less or stay indoors, or see it on a map.",
         "Places — restaurants, tea houses, palaces and museums are included only after checking their official information. Places to stay are in the place list with their official pages too.",
         "After your trip — note what you liked or missed, and only the tastes you choose to keep carry into your next plan. Sign in with SYNK ID to continue on another device, or carry on with a trip file without signing in.",
-        "Check opening hours and prices before you visit. We do not take bookings or payments for travel or cultural experiences or give live directions; to ask about visiting Korea or a cultural experience, contact PATH. For now it plans days around Jongno, Bukchon and Seochon in Seoul only."
+        "Check opening hours and prices before you visit. We do not take bookings or payments for travel or cultural experiences or give live directions; to ask about visiting Korea or a cultural experience, contact PATH. For now it plans days around Jongno, Bukchon and Seochon in Seoul only.",
+        "Settle Together stays beside people who have just arrived in Korea, from the first day until they have settled in, and we are preparing a pilot for the first half of 2027. It does not stop at telling you what must be done in the first 30 days — registering as a foreign resident, opening a bank account, paying health insurance — but checks with each person that it is done. We are not taking applications yet.",
+        "The first 30 days — the app tells you what to do and by when, and you mark each task done yourself. If Korean is still hard for you, a manager goes with you.",
+        "Questions — an AI answers first in several languages, and anything a person needs to check is taken over by a manager who counsels in plain Korean. Visa, administrative and legal problems go straight to the existing counselling services, and anything involving life or safety starts with the emergency numbers.",
+        "Getting together — international students and Korean students and residents play a season league every other week on mixed teams, and there are cooking and language-exchange meetups. Teams are reshuffled every season.",
+        "Quarterly settlement indicators — every quarter we measure the share who finished the required paperwork of the first 30 days, how long it took to first answer a question, the share of people who lost touch and were found and helped, the share who came back to meetups, and how many Koreans took part. Partner institutions receive only totals in which no one can be identified.",
+        "Principles — you take part only with your consent, and we do not take foreign resident registration numbers or passport numbers. What you tell us is not used for enforcement, and participants pay nothing for the core support.",
+        "The pilot — from March to August 2027 (spring semester and summer break), a dedicated manager and senior international students will look after 30–50 people. App notifications and the AI first reply will be open to up to 200 people once the app is released (target: February). Existing institutions keep their counselling and education as they are; we add follow-through to the end and settlement indicators."
       ],
-      "updatedAt": "2026-10-19"
+      "updatedAt": "2026-10-23"
     }
   ],
   "records": [
@@ -4945,6 +4952,43 @@
         "href": "/en/shift/#service-3"
       },
       "reviewedAt": "2026-10-22"
+    },
+    {
+      "id": "path-companion",
+      "title": "What is PATH’s Settle Together?",
+      "brand": "path",
+      "keywords": [
+        "settle together",
+        "first 30 days",
+        "bank account",
+        "health insurance",
+        "alien registration",
+        "foreign resident registration",
+        "passport number",
+        "futsal",
+        "settlement indicators",
+        "season league"
+      ],
+      "questionExamples": [
+        "What is Settle Together?",
+        "What does Settle Together do?",
+        "How do you follow the first 30 days?",
+        "Will a manager come with me?",
+        "Can I join the Settle Together pilot?",
+        "When does Settle Together start?",
+        "Do you help with alien registration?",
+        "Do you need my passport number?",
+        "Is there a futsal league with Koreans?",
+        "What do I need to do in my first month in Korea?"
+      ],
+      "answer": "Settle Together stays beside people who have just arrived in Korea, from the first day until they have settled in, and we are preparing a pilot for the first half of 2027. It does not stop at telling you what must be done in the first 30 days — registering as a foreign resident, opening a bank account, paying health insurance — but checks with each person that it is done. We are not taking applications yet.\n\nThe first 30 days — the app tells you what to do and by when, and you mark each task done yourself. If Korean is still hard for you, a manager goes with you.\n\nQuestions — an AI answers first in several languages, and anything a person needs to check is taken over by a manager who counsels in plain Korean. Visa, administrative and legal problems go straight to the existing counselling services, and anything involving life or safety starts with the emergency numbers.\n\nGetting together — international students and Korean students and residents play a season league every other week on mixed teams, and there are cooking and language-exchange meetups. Teams are reshuffled every season.\n\nQuarterly settlement indicators — every quarter we measure the share who finished the required paperwork of the first 30 days, how long it took to first answer a question, the share of people who lost touch and were found and helped, the share who came back to meetups, and how many Koreans took part. Partner institutions receive only totals in which no one can be identified.\n\nPrinciples — you take part only with your consent, and we do not take foreign resident registration numbers or passport numbers. What you tell us is not used for enforcement, and participants pay nothing for the core support.\n\nThe pilot — from March to August 2027 (spring semester and summer break), a dedicated manager and senior international students will look after 30–50 people. App notifications and the AI first reply will be open to up to 200 people once the app is released (target: February). Existing institutions keep their counselling and education as they are; we add follow-through to the end and settlement indicators.",
+      "sourceId": "path",
+      "relatedIds": [
+        "path-settle",
+        "path-support",
+        "path-intro"
+      ],
+      "reviewedAt": "2026-10-23"
     }
   ],
   "visions": {
