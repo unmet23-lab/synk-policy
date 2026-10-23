@@ -8,13 +8,17 @@
 
 SYNK 플랫폼은 SYNK의 앱과 회원 혜택을 한곳에서 쓰는 입구입니다. 웹에서 바로 열거나 PC 앱으로 받아 쓰고, 로그인하면 진도 같은 기록이 SYNK ID에 남습니다.
 
-### SYNK WORLD · 웹 · PC 앱 — 우리 동네에서 배우는 한국어
+### SYNK WORLD · 웹 · PC 앱 — 한국어 게임과 TOPIK 연습
 
-함께할 튜터를 고르고 동네의 카페·편의점·버스 정류장을 누르면, 그곳에서 쓰는 한국어를 배웁니다. 우리 집에서는 내 방을 꾸미고, 놀이에서는 한국어 게임을 합니다.
+TOPIK 짧은 진단으로 내 위치를 보고, 듣기·읽기 연습과 TOPIK II 쓰기 연습을 합니다. 내 연습 기록에 맞춰 다음 연습을 골라 줍니다.
 
-- 장소마다 생활 표현 한 묶음 — 인사·주문·약속·길 찾기
-- 한국어 게임 여덟 가지가 한 학습 기록을 쓰고, 아틀라스가 그 기록으로 다음 연습을 고릅니다
-- SYNK ID로 로그인하면 진도와 꾸민 방이 계정에 남습니다
+- TOPIK I 짧은 진단으로 내 위치와 이번 주 연습 계획
+- TOPIK I·II 듣기·읽기 연습, TOPIK II 쓰기 51~54번 첨삭(로그인, 하루 세 번)
+- 말하기 시험 형식 연습과 카페 역할극 — 점수 없이
+- 우리 동네 장소마다 생활 한국어, 한국어 게임 여덟 가지
+- 화면은 한국어·영어·몽골어로, 배우는 내용은 한국어로
+
+급수를 환산하거나 합격을 약속하지 않습니다.
 
 [SYNK WORLD 열기](https://synk.im/world/)
 
@@ -34,11 +38,12 @@ Windows 64비트와 Mac(Apple Silicon·Intel, macOS 13 이상)용 Preview 0.4.43
 
 SYNK LAB은 한국어 교재와 학습 게임, 개인화 학습 앱을 만드는 에듀테크 회사입니다. TOPIK 4급을 목표로 한 정규 1년 과정을 준비하고 있고, 학습 게임은 SYNK ID로 로그인해 이용합니다.
 
-TOPIK 4급을 목표로 한 1년 과정과 교재, 학습 게임과 개인화 학습 앱을 만듭니다.
+TOPIK 4급을 목표로 한 정규 1년 과정과 교재 「시냅스」를 준비하고, SYNK WORLD에서 TOPIK 연습과 한국어 게임을 합니다.
 
-- TOPIK 4급 목표 정규 1년 과정
-- 시냅스 교재 8권 원고 완성
-- 개인화 학습 앱 개발 중
+- SYNK WORLD — TOPIK 연습과 한국어 게임(지금 이용 · 미리보기)
+- TOPIK 4급 8주 온라인 반(준비 중 · 관심 등록)
+- TOPIK 4급 목표 정규 1년 과정(준비 중 · 개원 준비)
+- 교재 「시냅스」 8권(준비 중 · 원고 완성)
 
 [SYNK LAB 보기](https://synk.im/lab/)
 
@@ -66,15 +71,16 @@ SYNK PULSE는 제품 광고, 브랜드필름, AI 모델 룩북, 사용법 영상
 
 [SYNK PULSE 보기](https://synk.im/pulse/)
 
-### SYNK PATH — 여행부터 한국 생활까지, 나에게 맞게 준비합니다
+### SYNK PATH — 한국에서 공부하고 일하며 사는 길을, 함께 준비합니다
 
-SYNK PATH는 취향과 예산에 맞춘 여행 일정을 짜고, 한국 유학·취업과 정착을 준비하도록 돕습니다.
+처음 짐을 꾸릴 때부터 한국 생활에 자리 잡을 때까지, 필요한 한국어와 조건, 면접과 생활을 순서대로 함께 짚어 가는 일을 준비하고 있습니다. 한국어는 SYNK LAB이 맡습니다 — 지금은 SYNK WORLD의 TOPIK 연습을 쓸 수 있고, 정규 과정은 개원을 준비하고 있습니다.
 
-서울 하루 일정은 지금 무료로 짜 볼 수 있고, 한국 유학·취업 준비와 VR 면접 연습, 주거·정착 지원을 준비하고 있습니다.
+서울 하루 일정과 요양보호사 면접 VR 연습은 지금 써 볼 수 있고, 유학 준비와 일자리 조건 알아보기, 한국 생활 정착을 준비하고 있습니다. 입학·비자·취업·체류를 보장하지 않습니다.
 
 - 서울 하루 일정 · 무료, 가입 없이
-- 유학 계획·지원 서류·면접 준비
-- VR 면접·생활 연습
+- 요양보호사 면접 VR 연습(60~90초)
+- 유학 준비와 일자리 조건 알아보기(준비 중)
+- 한국 생활 정착(준비 중)
 
 [SYNK PATH 보기](https://synk.im/path/)
 
@@ -83,7 +89,7 @@ SYNK PATH는 취향과 예산에 맞춘 여행 일정을 짜고, 한국 유학·
 아틀라스는 SYNK가 직접 만드는 개인화 엔진입니다. 여덟 엔진이 목표와 지금 상황을 이해하고, 배울 내용과 화면·말·소리를 한 사람에게 맞추고, 도움이 됐는지 확인합니다.
 
 - Core — 지금 무엇이 필요한지 판단. 무엇을 하려는지, 어디에서 막히는지 살펴 다음에 할 일과 필요한 도움을 정합니다. 권하는 것과 빼는 것의 이유도 함께 남깁니다.
-- Strata — 배울 내용과 순서의 지도. 문법·표현·어휘를 난이도와 먼저 배울 순서에 따라 잇습니다. 틀린 부분을 어떤 기초부터 다시 연습할지 정하는 기준입니다. (개발 중)
+- Strata — 배울 내용과 순서의 지도. 문법·표현·어휘를 난이도와 먼저 배울 순서에 따라 잇습니다. 틀린 부분을 어떤 기초부터 다시 연습할지 정하는 기준입니다. (준비 중)
 - Trail — 해 본 과정과 변화 기록. 어떤 과제를 했고 어디에서 도움을 받았는지 기록합니다. 이전의 답과 최근의 답을 비교해 달라진 점을 봅니다.
 - Loom — 손길에 반응하는 화면. 펠트 재질에 빛과 움직임을 더해 화면과 캐릭터를 표현합니다. 사용자의 행동에 자연스럽게 반응하는 장면을 만듭니다.
 - Vellum — 이해할 수 있는 설명. 지금 하는 과제와 본인의 답에 맞춰 설명과 힌트를 건넵니다. 왜 이 연습을 하는지, 막혔을 때 무엇을 볼지 알려 줍니다.
@@ -97,12 +103,9 @@ SYNK PATH는 취향과 예산에 맞춘 여행 일정을 짜고, 한국 유학·
 
 ## 일하는 방식
 
-- 나이로 짐작하지 않습니다 — 나이·성별·국적이 아니라 본인이 고른 설정과 실제로 해 본 결과로 맞춥니다. 목표가 바뀌면 다음 제안도 함께 바뀝니다.
-- 도움이 됐는지 따로 확인합니다 — 끝까지 했다는 것만으로 늘었다고 말하지 않습니다. 도움 없이 해내는 일이 늘었는지, 제안이 맞았는지를 따로 봅니다.
-- 본인의 답과 AI의 추정을 나눠 둡니다 — 직접 쓴 답과 실제로 한 행동을 원본으로 남깁니다. AI가 짐작한 내용은 따로 표시해 본인이 확인하고 고칠 수 있게 합니다.
-- 화면과 소리까지 직접 만듭니다 — 펠트로 만든 화면과 캐릭터, 음악과 목소리까지 한 팀이 만듭니다. 그래서 내용뿐 아니라 보고 듣는 방식까지 한 사람에게 맞출 수 있습니다.
-- 누구나 오래 쓸 수 있게 만듭니다 — 큰 글자, 짧은 설명, 소리 없이 쓰는 방법을 본인이 고르게 합니다. 무료 기능은 기기 안에서 계산해 많은 사람이 써도 오래 운영할 수 있게 합니다.
-- 준비 중인 것은 준비 중이라고 씁니다 — 지금 쓸 수 있는 것과 준비하고 있는 것을 나눠 적습니다. 아직 확인하지 않은 효과는 약속하지 않습니다.
+- 나이로 짐작하지 않습니다 — 나이·성별·국적이 아니라 본인이 고른 설정과 실제로 해 본 결과로 맞춥니다.
+- 본인의 답과 AI의 추정을 나눠 둡니다 — 직접 쓴 답과 실제로 한 행동을 원본으로 남기고, AI가 짐작한 것은 따로 표시해 본인이 고칠 수 있게 합니다.
+- 준비 중인 것은 준비 중이라고 씁니다 — 지금 쓸 수 있는 것과 준비하는 것을 나눠 적고, 확인하지 않은 효과는 약속하지 않습니다.
 
 ## 창업자
 
@@ -127,12 +130,12 @@ SYNK PATH는 취향과 예산에 맞춘 여행 일정을 짜고, 한국 유학·
 
 ## In English
 
-An engine that fits you better the more you use it. SYNK builds Atlas, a personalization engine. We started in Korean education. Today we are building the SYNK platform, where one SYNK ID carries you across SYNK apps, and we use the same engine for business services and video production.
+An engine that fits you better the more you use it. SYNK builds Atlas, a personalization engine. We started in Korean-language education. Today we are building the SYNK platform, where one SYNK ID carries you across SYNK apps, and we use the same engine for business services and advertising videos.
 
-- SYNK LAB — Learn Korean, and get ready for Korea. SYNK LAB makes Korean textbooks, learning games and a personalized learning app. We are preparing a full-time one-year course aimed at TOPIK Level 4, and our learning games are available when you sign in with SYNK ID. A one-year course aimed at TOPIK Level 4, textbooks, learning games and a personalized learning app.
-- SYNK SHIFT — AI lectures, plus work automation. SYNK SHIFT teaches the skills the AI era calls for at schools, companies and institutions, then automates repetitive work with AI for companies that took a lecture, to cut fixed costs. In schools we also give AI career lectures on how to steer a career in the AI era and what to prepare for it. We also run an instructor agency that finds instructors and assigns them to fit each request. AI career lectures for schools on the careers and skills the AI era calls for, and hands-on AI lectures for companies and institutions. We find and assign instructors who fit each request, and automate repetitive work with AI for companies that took a lecture.
+- SYNK LAB — Learn Korean, and get ready to study in Korea. SYNK LAB makes Korean textbooks, learning games and a personalized learning app. We are preparing a one-year course aimed at TOPIK Level 4, and our learning games are available when you sign in with SYNK ID. We are preparing the Synapse textbooks and a one-year course aimed at TOPIK Level 4, and SYNK WORLD offers TOPIK practice and Korean games.
+- SYNK SHIFT — AI lectures, plus work automation. SYNK SHIFT teaches the skills the AI era calls for at schools, companies and institutions, then automates repetitive work with AI for companies that took a lecture, to cut fixed costs. In schools we also give AI career lectures on how to steer a career in the AI era and what to prepare for it. We also run an instructor agency that finds instructors and assigns them to fit each request. AI career lectures for schools on the careers and skills the AI era calls for, and AI lectures for companies and institutions where staff practise on their own work. We find and assign instructors who fit each request, and automate repetitive work with AI for companies that took a lecture.
 - SYNK PULSE — Ads and model videos, plus our own music and characters. SYNK PULSE makes product ads, brand films, AI model lookbooks and how-to videos, from planning to the final cut. We also create the music and stories of Mongle, Kkamong and Marin, and look for partners to license them or make something together. Product ads, brand films, AI model lookbooks and how-to videos. We also make the music and stories of Mongle, Kkamong and Marin.
-- SYNK PATH — From travel to life in Korea, planned around you. SYNK PATH plans trips around your tastes and budget and helps you prepare to study, work and settle in Korea. Plan a day in Seoul for free now; support for studying and working in Korea, VR interview practice and housing is in preparation.
+- SYNK PATH — Studying, working and living in Korea, prepared with you. From packing your bags to settling into life in Korea, we are preparing to work through the Korean you need, the requirements, interviews and daily life with you, one step at a time. SYNK LAB takes care of the Korean — SYNK WORLD’s TOPIK practice is open now, and we are preparing to open the one-year course. The Seoul day planner and caregiver interview practice in VR are available now; help with preparing to study, finding out job requirements and settling into life in Korea is in preparation. We do not guarantee admission, visas, jobs or residence.
 
 Atlas: Atlas is the personalization engine SYNK builds. Eight engines understand a person’s goal and situation, fit the content, screens, words and sound to them, and check whether it helped.
 

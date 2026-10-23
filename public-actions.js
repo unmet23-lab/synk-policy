@@ -9,8 +9,6 @@ const externalLinks = new Set([
   'https://synk.im/name/',
   'https://synk.im/privacy/#website-questions',
   'https://synk.im/privacy/#ko',
-  'https://synk-field-notes.unmet23.chatgpt.site/자료실/index.html',
-  'https://synk-field-notes.unmet23.chatgpt.site/01-lab-youtube/index.html',
 ]);
 
 export function isPublicActionHref(href) {

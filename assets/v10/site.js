@@ -1,5 +1,5 @@
-import { ORB_GRID, LIGHT, grainSteps, measureSteps, inkPixels, paintPixels } from './orb-renderer-2c3b14ce8c61.js';
-// SYNK 홈페이지 v10 · 메뉴, 나타나기, 대화 구, 질문(자주 묻는 질문 + 직접 묻기), 게임 장면, 알림.
+// SYNK 홈페이지 v11 · 메뉴, 나타나기, 질문(자주 묻는 질문 + 직접 묻기), 다운로드 창, 서비스 목록, 알림.
+// v10의 대화 구(점묘 구 · 「대화 시작」)는 2026-10-23 v11에서 뺐다 — 질문 입력칸 하나로 묻는다.
 // 질문의 답은 공개 안내(knowledge.json) 안에서만 고른다. 대화는 저장하지 않는다.
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => [...r.querySelectorAll(s)];
@@ -19,8 +19,6 @@ const externalLinks = new Set([
   'https://synk.im/name/',
   'https://synk.im/privacy/#website-questions',
   'https://synk.im/privacy/#ko',
-  'https://synk-field-notes.unmet23.chatgpt.site/자료실/index.html',
-  'https://synk-field-notes.unmet23.chatgpt.site/01-lab-youtube/index.html',
 ]);
 
 function isPublicActionHref(href) {
@@ -44,16 +42,16 @@ toggle?.addEventListener('click', () => setMenu(!bar.classList.contains('open'))
 $('[data-bar-panel]')?.addEventListener('click', e => { if (e.target.closest('a')) setMenu(false); });
 document.addEventListener('keydown', e => { if (e.key === 'Escape' && bar?.classList.contains('open')) { setMenu(false); toggle?.focus(); } });
 matchMedia('(min-width: 901px)').addEventListener('change', () => setMenu(false));
-// 어두운 싱ㅋ 표지가 메뉴 뒤에 있는 동안만 어두운 유리로 둔다
-const cover = $('.cover');
-if (cover && bar) {
+// 어두운 처마 입구가 메뉴 뒤에 있는 동안만 어두운 유리로 둔다(v11 본문은 흰 바탕이라 입구를 지나면 밝은 유리)
+const gate = $('.gate');
+if (gate && bar) {
   if ('IntersectionObserver' in window) {
     // 관찰 결과의 좌표를 쓴다. 매 스크롤 프레임에 문서 전체 레이아웃을 강제로 읽지 않는다.
     new IntersectionObserver(entries => {
       bar.classList.toggle('on-dark', entries[0].boundingClientRect.bottom > 64);
-    }, { rootMargin: '-64px 0px 0px 0px' }).observe(cover);
+    }, { rootMargin: '-64px 0px 0px 0px' }).observe(gate);
   } else {
-    const tone = () => bar.classList.toggle('on-dark', cover.getBoundingClientRect().bottom > 64);
+    const tone = () => bar.classList.toggle('on-dark', gate.getBoundingClientRect().bottom > 64);
     addEventListener('scroll', tone, { passive: true });
     addEventListener('resize', tone); tone();
   }
@@ -62,171 +60,6 @@ if (cover && bar) {
 /* 부드러운 이동: 사람이 처음 누르거나 키를 친 뒤에 켠다. 주소(#…)로 들어온 첫 이동은 움직임 없이 바로 그 자리다 */
 const smooth = () => { document.documentElement.classList.add('smooth'); removeEventListener('pointerdown', smooth, true); removeEventListener('keydown', smooth, true); };
 addEventListener('pointerdown', smooth, true); addEventListener('keydown', smooth, true);
-
-/* 대화 구(2026-10-11 유호님 「예전에 SYNK 구체같은거 … 그거 추가해주고」): 9월 질문창의 구를 그대로 옮겨 왔다(공개본 orb-conversation.js).
-   빛 알갱이를 찍은 잉크 구. 빛은 왼쪽 위에 머물다가, 포인터가 구 위에서 움직일 때만 그쪽으로 돈다. 저절로 움직이지 않는다.
-   두 잉크는 CSS에서 온다(color = 어두운 알갱이, caret-color = 빛난 알갱이). 알갱이 순서는 아틀라스 지도와 같아 이 브라우저에 한 번만 계산해 둔다. */
-let grainJob = null;
-const whenIdle = window.requestIdleCallback ? cb => requestIdleCallback(cb, { timeout: 1000 }) : cb => setTimeout(() => cb(null), 16);
-function inSlices(steps, active = () => true) {
-  return new Promise(resolve => {
-    const run = deadline => {
-      if (!active()) { resolve(null); return; }
-      const stop = performance.now() + (deadline && !deadline.didTimeout ? Math.min(8, deadline.timeRemaining()) : 8);
-      for (;;) { const next = steps.next(); if (next.done) { resolve(next.value); return; } if (performance.now() >= stop) break; }
-      whenIdle(run);
-    };
-    whenIdle(run);
-  });
-}
-const GRAIN_KEY = 'synk-grain-order-v1';
-function storedGrain(count) {
-  try {
-    const text = localStorage.getItem(GRAIN_KEY); if (!text || text.length !== Math.ceil(count * 2 / 3) * 4) return null;
-    const bytes = Uint8Array.from(atob(text), c => c.charCodeAt(0)), steps = new Uint16Array(bytes.buffer, 0, count);
-    const seen = new Uint8Array(count), order = new Float32Array(count);
-    for (let place = 0; place < count; place++) { const step = steps[place]; if (step >= count || seen[step]) return null; seen[step] = 1; order[place] = (step + .5) / count; }
-    return order;
-  } catch { return null; }
-}
-function storeGrain(order) {
-  try {
-    const count = order.length, steps = new Uint16Array(count);
-    for (let place = 0; place < count; place++) steps[place] = Math.round(order[place] * count - .5);
-    const bytes = new Uint8Array(steps.buffer); let text = '';
-    for (let i = 0; i < bytes.length; i += 0x8000) text += String.fromCharCode.apply(null, bytes.subarray(i, i + 0x8000));
-    localStorage.setItem(GRAIN_KEY, btoa(text));
-  } catch {}
-}
-// 고른 순서: 다음 알갱이는 가장 빈 자리로(아틀라스 지도와 같은 씨앗)
-function grainOrder(active = () => true) {
-  if (grainJob) return grainJob;
-  const stored = storedGrain(ORB_GRID * ORB_GRID);
-  return grainJob = stored ? Promise.resolve(stored) : inSlices(grainSteps(), active).then(order => { if (order) storeGrain(order); else grainJob = null; return order; });
-}
-let probe = null;
-function rgba(value, fallback) {
-  // getComputedStyle의 sRGB 값은 직접 읽는다. 색 두 개 때문에 GPU 픽셀을 동기 회수하지 않는다.
-  const rgb = String(value || fallback).match(/^rgba?\(\s*([\d.]+)[,\s]+([\d.]+)[,\s]+([\d.]+)(?:\s*[,/]\s*([\d.]+))?\s*\)$/);
-  if (rgb) return [...rgb.slice(1, 4).map(Number), Math.round(Number(rgb[4] ?? 1) * 255)];
-  const hex = String(value || fallback).match(/^#([\da-f]{3}|[\da-f]{6})$/i);
-  if (hex) { const h = hex[1].length === 3 ? [...hex[1]].map(c => c + c).join('') : hex[1]; return [0, 2, 4].map(i => parseInt(h.slice(i, i + 2), 16)).concat(255); }
-  probe ??= Object.assign(document.createElement('canvas'), { width: 1, height: 1 }).getContext('2d', { willReadFrequently: true });
-  probe.clearRect(0, 0, 1, 1); probe.fillStyle = fallback; probe.fillStyle = value || fallback; probe.fillRect(0, 0, 1, 1);
-  return Array.from(probe.getImageData(0, 0, 1, 1).data);
-}
-function mountOrbFallback(holder) {
-  const canvas = $('canvas', holder), surface = $('.orb-surface', holder);
-  const ctx = canvas?.getContext('2d'); if (!ctx || !surface) return;
-  const fine = matchMedia('(hover: hover) and (pointer: fine)');
-  let angle = LIGHT.angle, lift = LIGHT.lift, frame = 0, drawn = '', shape = null, preparing = '';
-  let near = !('IntersectionObserver' in window), image = null, inkKey = '', dark = null, light = null;
-  const active = () => near && !document.hidden;
-  function prepare(size, dpr) {
-    const want = size + '|' + dpr; if (preparing === want) return; preparing = want;
-    grainOrder(active).then(grain => grain && inSlices(measureSteps(size, dpr, grain), () => active() && preparing === want)).then(next => { if (preparing !== want) return; preparing = ''; if (next) { shape = next; image = null; } request(); });
-  }
-  function paint() {
-    frame = 0; if (!active()) return;
-    const dpr = Math.min(Math.max(devicePixelRatio || 1, 1), 3), width = surface.getBoundingClientRect().width; if (!width) return;
-    const style = getComputedStyle(surface), inks = style.color + '/' + style.caretColor;
-    const size = Math.round(width * dpr), key = size + '|' + dpr + '|' + angle.toFixed(2) + '|' + lift.toFixed(2) + '|' + inks;
-    if (key === drawn) return;
-    if (!shape || shape.size !== size || shape.dpr !== dpr) { prepare(size, dpr); return; }
-    drawn = key;
-    if (canvas.width !== size) canvas.width = canvas.height = size;
-    const css = (size + .004) / dpr + 'px'; if (canvas.style.width !== css) canvas.style.width = canvas.style.height = css;
-    image ??= ctx.createImageData(size, size);
-    if (inkKey !== inks) { inkKey = inks; dark = inkPixels(rgba(style.color, '#0a0a0a')); light = inkPixels(rgba(style.caretColor, '#fff')); }
-    paintPixels(image, shape, angle, lift, dark, light);
-    ctx.putImageData(image, 0, 0);
-    surface.classList.add('orb-rendered');
-  }
-  const request = () => { if (active() && !frame) frame = requestAnimationFrame(paint); };
-  // 질문 구역에 가까워질 때만 준비한다. 최초 ResizeObserver 통지를 가시성으로 취급하지 않는다.
-  if (!near) new IntersectionObserver(entries => {
-    near = entries.some(e => e.isIntersecting);
-    if (near) request();
-    else if (frame) { cancelAnimationFrame(frame); frame = 0; }
-  }, { rootMargin: '800px 0px' }).observe(surface);
-  new ResizeObserver(request).observe(surface);
-  holder.addEventListener('pointermove', event => {
-    if (reduced.matches || !fine.matches || event.pointerType === 'touch') return;
-    const r = surface.getBoundingClientRect(), dx = (event.clientX - r.left) / r.width * 2 - 1, dy = (event.clientY - r.top) / r.height * 2 - 1, d = Math.min(1, Math.hypot(dx, dy));
-    angle = Math.round(Math.atan2(dx, -dy) * 60) / 60; lift = Math.round((.92 - .5 * d) * 50) / 50; request();
-  });
-  holder.addEventListener('pointerleave', () => { angle = LIGHT.angle; lift = LIGHT.lift; request(); });
-  addEventListener('pageshow', request);
-  document.addEventListener('visibilitychange', () => { if (document.hidden && frame) { cancelAnimationFrame(frame); frame = 0; } else request(); });
-  let density = null;
-  const watch = () => { density?.removeEventListener?.('change', changed); density = matchMedia('(resolution: ' + (devicePixelRatio || 1) + 'dppx)'); density.addEventListener?.('change', changed); };
-  const changed = () => { watch(); request(); };
-  watch(); request();
-}
-function mountOrb(holder) {
-  let canvas = $('canvas', holder);
-  if (typeof Worker === 'undefined' || !canvas?.transferControlToOffscreen) { mountOrbFallback(holder); return; }
-  const surface = $('.orb-surface', holder), fine = matchMedia('(hover: hover) and (pointer: fine)');
-  let worker = null, frame = 0, near = !('IntersectionObserver' in window), busy = false, sent = '', failed = false;
-  let angle = LIGHT.angle, lift = LIGHT.lift, density, width = 0;
-  const active = () => near && !document.hidden && !failed;
-  const fallback = () => {
-    if (failed) return; failed = true; worker?.terminate(); cancelAnimationFrame(frame);
-    intersection?.disconnect(); resize.disconnect(); density?.removeEventListener('change', densityChanged);
-    holder.removeEventListener('pointermove', move); holder.removeEventListener('pointerleave', leave);
-    document.removeEventListener('visibilitychange', visibility); removeEventListener('pageshow', request);
-    const fresh = canvas.cloneNode(false); canvas.replaceWith(fresh); canvas = fresh;
-    mountOrbFallback(holder);
-  };
-  const render = () => {
-    frame = 0; if (!active() || busy) return;
-    const dpr = Math.min(Math.max(devicePixelRatio || 1, 1), 3);
-    if (!width) return;
-    const size = Math.round(width * dpr), style = getComputedStyle(surface);
-    const key = [size, dpr, angle.toFixed(2), lift.toFixed(2), style.color, style.caretColor].join('|');
-    if (key === sent) return;
-    const css = (size + .004) / dpr + 'px';
-    if (canvas.style.width !== css) canvas.style.width = canvas.style.height = css;
-    try {
-      if (!worker) {
-        worker = new Worker(new URL('./orb-worker-c252814a8089.js', import.meta.url), { type: 'module' });
-        worker.onerror = event => { event.preventDefault(); fallback(); };
-        worker.onmessageerror = fallback;
-        worker.onmessage = ({ data }) => {
-          if (data.error) { fallback(); return; }
-          busy = false;
-          if (data.drawn) { surface.classList.add('orb-rendered'); canvas.dataset.renderSize = String(data.size); }
-          else sent = '';
-          request();
-        };
-        const offscreen = canvas.transferControlToOffscreen();
-        worker.postMessage({ canvas: offscreen }, [offscreen]);
-      }
-      sent = key; busy = true;
-      worker.postMessage({ render: { size, dpr, angle, lift, dark: rgba(style.color, '#23242b'), light: rgba(style.caretColor, '#f4f4f5') } });
-    } catch { fallback(); }
-  };
-  const request = () => { if (active() && !frame) frame = requestAnimationFrame(render); };
-  const pause = () => { cancelAnimationFrame(frame); frame = 0; worker?.postMessage({ pause: true }); };
-  const visibility = () => { if (document.hidden) pause(); else request(); };
-  const move = event => {
-    if (reduced.matches || !fine.matches || event.pointerType === 'touch') return;
-    const r = surface.getBoundingClientRect(), dx = (event.clientX - r.left) / r.width * 2 - 1, dy = (event.clientY - r.top) / r.height * 2 - 1;
-    angle = Math.round(Math.atan2(dx, -dy) * 60) / 60; lift = Math.round((.92 - .5 * Math.min(1, Math.hypot(dx, dy))) * 50) / 50; request();
-  };
-  const leave = () => { angle = LIGHT.angle; lift = LIGHT.lift; request(); };
-  const intersection = near ? null : new IntersectionObserver(entries => { near = entries.some(e => e.isIntersecting); if (near) request(); else pause(); }, { rootMargin: '300px 0px' });
-  intersection?.observe(surface);
-  const resize = new ResizeObserver(entries => { width = entries[0].contentRect.width; request(); }); resize.observe(surface);
-  const watchDensity = () => { density?.removeEventListener('change', densityChanged); density = matchMedia('(resolution: ' + (devicePixelRatio || 1) + 'dppx)'); density.addEventListener('change', densityChanged); };
-  const densityChanged = () => { watchDensity(); request(); }; watchDensity();
-  holder.addEventListener('pointermove', move); holder.addEventListener('pointerleave', leave);
-  document.addEventListener('visibilitychange', visibility); addEventListener('pageshow', request); request();
-}
-// 구나 「대화 시작」을 누르면 질문 입력창으로
-const goAsk = () => { const q = $('#question'); if (!q) return; q.scrollIntoView({ block: 'center', behavior: reduced.matches ? 'auto' : 'smooth' }); q.focus({ preventScroll: true }); };
-$$('[data-orb]').forEach(o => { mountOrb(o); o.addEventListener('click', goAsk); });
-$$('[data-ask-start]').forEach(b => b.addEventListener('click', goAsk));
 
 /* 나타나기 */
 // 옆으로 넘기는 띠(PATH 서울 여행 세 단계, 900px 아래): 넘칠 때만 탭으로 닿고 이름을 단다.
