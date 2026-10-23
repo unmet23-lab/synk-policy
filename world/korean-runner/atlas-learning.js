@@ -6541,6 +6541,7 @@ var SynkLearning = (() => {
             if (!validId(event.decisionId) || !validId(event.experienceId) || !validId(event.variant)) throw new TypeError("Atlas: invalid completion");
           } else if (event.type === "feedback.given") {
             if (!validId(event.completionId) || !["helpful", "too_much", "want_more", "not_fit"].includes(event.value)) throw new TypeError("Atlas: invalid feedback");
+            if (event.decisionId !== void 0 && !validId(event.decisionId)) throw new TypeError("Atlas: invalid feedback");
           } else if (event.type === "signal.observed") {
             if (!SIGNALS.includes(event.kind) || !validId(event.key) || !unit(event.strength) || !Number.isInteger(event.n) || event.n < 0 || !flag(event.assisted)) throw new TypeError("Atlas: invalid signal");
             if (event.until != null && ms(event.until) <= ms(event.at)) throw new TypeError("Atlas: invalid expiry");
@@ -6591,6 +6592,7 @@ var SynkLearning = (() => {
           if (event.type === "feedback.given") {
             const completion = find(event.completionId, "experience.completed");
             if (!completion || scopeKey(completion.scope) !== scopeKey(event.scope) || ms(completion.at) > ms(event.at)) throw new Error("Atlas: feedback requires a prior completion in the same scope");
+            if (event.decisionId !== void 0 && event.decisionId !== completion.decisionId) throw new Error("Atlas: feedback names another decision than its completion");
           }
           if (event.type === "experience.completed") {
             const decision = find(event.decisionId, "decision.made");
@@ -6982,7 +6984,7 @@ var SynkLearning = (() => {
               const existing = completions.get(decision.id);
               return existing ? copy(existing) : record({ type: "experience.completed", decisionId: decision.id, experienceId: decision.experienceId, variant: decision.selected.id });
             },
-            feedback: (completionId, value) => record({ type: "feedback.given", completionId, value }),
+            feedback: (completionId, value, decisionId) => record({ type: "feedback.given", completionId, value, ...decisionId !== void 0 ? { decisionId } : {} }),
             practice: (kind, fields) => {
               if (!fields || typeof fields !== "object" || Array.isArray(fields) || typeof kind !== "string") throw new TypeError("Atlas: invalid practice fields");
               return record({ ...fields, type: kind.startsWith("practice.") ? kind : `practice.${kind}` });
@@ -7470,6 +7472,7 @@ var SynkLearning = (() => {
         "decision.made",
         "experience.completed",
         "record.excluded",
+        "feedback.given",
         "practice.presented",
         "practice.helped",
         "practice.attempted",
@@ -7550,16 +7553,17 @@ var SynkLearning = (() => {
         if (local) ledger.local = true;
         return ledger;
       }
-      function plan(events, { keep, olderThan, unfinishedBefore = olderThan, open = [] }) {
+      function plan(events, { keep, olderThan, unfinishedBefore = olderThan, respondedBefore = -Infinity, open = [] }) {
         if (events.length <= keep) return null;
         const groupOf = /* @__PURE__ */ new Map(), groups = /* @__PURE__ */ new Map();
         const join = (id, event) => {
-          if (!groups.has(id)) groups.set(id, { id, events: [], max: -Infinity, open: false, done: false });
+          if (!groups.has(id)) groups.set(id, { id, events: [], max: -Infinity, open: false, done: false, responded: -Infinity });
           const g = groups.get(id);
           g.events.push(event);
           g.max = Math.max(g.max, Date.parse(event.at), Date.parse(event.recordedAt));
           groupOf.set(event.id, id);
           if (event.type === "experience.completed") g.done = true;
+          if (event.type === "feedback.given") g.responded = Math.max(g.responded, Date.parse(event.at));
         };
         const pinned = /* @__PURE__ */ new Set();
         for (const e of events) {
@@ -7584,7 +7588,7 @@ var SynkLearning = (() => {
         const folded2 = /* @__PURE__ */ new Set();
         for (const g of order) {
           if (remaining <= keep || g.max >= olderThan) break;
-          if (g.open || !g.done && g.max >= unfinishedBefore) continue;
+          if (g.open || !g.done && g.max >= unfinishedBefore || g.responded > -Infinity && g.responded >= respondedBefore) continue;
           for (const e of g.events) folded2.add(e.id);
           remaining -= g.events.length;
           cutoff = g.max;
@@ -7593,7 +7597,7 @@ var SynkLearning = (() => {
         return { cutoff, folded: events.filter((e) => folded2.has(e.id)), kept: events.filter((e) => !folded2.has(e.id)) };
       }
       var folded = (ledger, event) => !!ledger && ledger.cutoff !== null && FOLDABLE.includes(event.type) && Date.parse(event.at) <= ledger.cutoff;
-      var reference = (e) => e?.type === "decision.made" ? void 0 : e?.decisionId ?? e?.presentationId ?? e?.targetId;
+      var reference = (e) => e?.type === "decision.made" ? void 0 : e?.decisionId ?? e?.presentationId ?? e?.targetId ?? e?.completionId;
       var stray = (event, known) => {
         const ref = reference(event);
         return typeof ref === "string" && !known.has(ref);
@@ -7620,7 +7624,7 @@ var SynkLearning = (() => {
         }
         return next;
       }
-      module.exports = { VERSION, BITS, FOLDABLE, empty, validate, before, rows, cellOf, contentOf, fold, plan, folded, stray, compare, demote };
+      module.exports = { VERSION, BITS, FOLDABLE, empty, validate, before, rows, cellOf, contentOf, fold, plan, folded, stray, compare, demote, reference };
     }
   });
 
@@ -8180,8 +8184,9 @@ var SynkLearning = (() => {
         const collect = () => {
           if (typeof port.partial === "function" && port.partial()) throw failure("HISTORY_FOLDED", "Atlas sync: this log summarised entries no server received; it cannot be sent");
           const local = port.events(), localIds = new Set(local.map((event) => event.id));
-          if (state.pending.some((eventId) => !localIds.has(eventId))) throw failure("STORAGE_ERROR", "Atlas sync: queued history does not match its account log");
           const folded = new Set(typeof port.dropped === "function" ? port.dropped() : []);
+          state.pending = state.pending.filter((eventId) => localIds.has(eventId) || !folded.has(eventId));
+          if (state.pending.some((eventId) => !localIds.has(eventId))) throw failure("STORAGE_ERROR", "Atlas sync: queued history does not match its account log");
           const lost = state.acknowledged.filter((eventId) => !localIds.has(eventId) && !folded.has(eventId));
           if (lost.length) {
             if (lost.some((eventId) => !state.missing.includes(eventId))) state.recoveryCursor = 0;
@@ -9717,6 +9722,10 @@ var SynkLearning = (() => {
       var { createPages, THRESHOLD } = require_learning_pages();
       var { createFlowPort, createLive } = require_game_flow();
       var KEY = "synk.atlas.learning.v1";
+      var SET_KINDS = ["short", "diagnostic", "mock"];
+      var RESPONSES = ["helpful", "not_fit", "too_much", "want_more"];
+      var SET_OPEN_MS = 864e5;
+      var RESPONSE_MS = 30 * 864e5;
       var identifier = (value) => typeof value === "string" && /^[a-zA-Z0-9_.:-]{1,120}$/.test(value);
       var uid = () => `l${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 12)}`;
       function createGame({
@@ -9748,7 +9757,7 @@ var SynkLearning = (() => {
         const UNCHANGED = /* @__PURE__ */ Symbol("unchanged-history");
         let lastStoredRaw = /* @__PURE__ */ Symbol("unread-history");
         let lastTime = 0;
-        const active = /* @__PURE__ */ new Map();
+        const active = /* @__PURE__ */ new Map(), sets = /* @__PURE__ */ new Map();
         const listeners = /* @__PURE__ */ new Set();
         const notify = (kind, code) => {
           for (const listener of listeners) {
@@ -9830,6 +9839,7 @@ var SynkLearning = (() => {
             ledger = stored.ledger || null;
             session = newSession(stored.events);
             active.clear();
+            sets.clear();
             settled.clear();
             settledVersion += 1;
             settle(stored.settled || [], new Set(stored.events.map((e) => e.id)));
@@ -9838,9 +9848,10 @@ var SynkLearning = (() => {
           }
           const theirs = stored.ledger || null, order = Ledger.compare(ledger, theirs), mine = log();
           const storedIds = new Set(stored.events.map((e) => e.id)), mineIds = new Set(mine.map((e) => e.id));
-          const combined = mine.filter((e) => order >= 0 || storedIds.has(e.id) || !Ledger.folded(theirs, e)), known = new Map(combined.map((e) => [e.id, e]));
+          const kept = /* @__PURE__ */ new Set(), keeps = (e, ids) => ids.has(e.id) || ids.has(Ledger.reference(e)) || kept.has(Ledger.reference(e));
+          const combined = mine.filter((e) => (order >= 0 || keeps(e, storedIds) || !Ledger.folded(theirs, e)) && kept.add(e.id)), known = new Map(combined.map((e) => [e.id, e]));
           for (const e of stored.events) {
-            if (order > 0 && !mineIds.has(e.id) && Ledger.folded(ledger, e)) continue;
+            if (order > 0 && !keeps(e, mineIds) && Ledger.folded(ledger, e)) continue;
             if (known.has(e.id)) {
               if (!sameEvent(known.get(e.id), e)) {
                 readable = false;
@@ -9852,12 +9863,20 @@ var SynkLearning = (() => {
             } else {
               known.set(e.id, e);
               combined.push(e);
+              kept.add(e.id);
             }
           }
           if (order < 0) ledger = theirs;
+          const types = new Map([...mine, ...stored.events].map((e) => [e.id, e.type]));
+          for (const e of combined) if (e.type === "feedback.given" && !known.has(e.completionId) || e.type === "record.excluded" && !known.has(e.targetId) && types.get(e.targetId) === "feedback.given") known.delete(e.id);
           settle([...settled, ...stored.settled || []], known);
           takeDropped(stored.dropped || [], order > 0);
-          session = newSession(combined);
+          const gone = [...mine, ...combined].filter((e) => !known.has(e.id));
+          if (folding?.remote && gone.length) {
+            for (const e of gone) dropped.add(e.id);
+            droppedVersion += 1;
+          }
+          session = newSession(combined.filter((e) => known.has(e.id)));
           for (const pid of active.keys()) if (!known.has(pid)) active.delete(pid);
         }
         const serialised = /* @__PURE__ */ new WeakMap();
@@ -9886,6 +9905,8 @@ var SynkLearning = (() => {
           if (events.length <= folding.max) return;
           if (retryFold && retryFold.settled === settledVersion && now < retryFold.at) return;
           const open = [...active].filter(([, item]) => !item.results.length).map(([pid]) => pid);
+          for (const [id, at] of sets) if (now - at < SET_OPEN_MS) open.push(id);
+          else sets.delete(id);
           if (folding.remote) {
             for (const e of events) if (!settled.has(e.id)) open.push(e.id);
           }
@@ -9893,7 +9914,8 @@ var SynkLearning = (() => {
             keep: folding.keep,
             olderThan: now - folding.ageMs,
             open,
-            unfinishedBefore: folding.remote ? now - 30 * 864e5 : now - folding.ageMs
+            unfinishedBefore: folding.remote ? now - 30 * 864e5 : now - folding.ageMs,
+            respondedBefore: now - RESPONSE_MS - SET_OPEN_MS
           });
           const batch = Math.max(1, Math.floor((folding.max - folding.keep) / 2));
           if (!planned || planned.folded.length < batch && events.length < 2 * folding.max) {
@@ -10271,6 +10293,35 @@ var SynkLearning = (() => {
             persist();
             return event;
           },
+          // A practice set ended (short practice, quick check, exam-form practice): a `<gameId>.set` decision and completion, so a
+          // response is about the set, not its last item. One 5-minute candidate, so a short-time setting never blocks it.
+          finishSet({ kind } = {}) {
+            refresh();
+            if (!SET_KINDS.includes(kind)) throw new TypeError("Atlas: invalid practice set");
+            const decision = session.plan(`${gameId}.set`, [{ id: kind, minutes: 5, pace: "standard" }]);
+            if (decision.status !== "ready") throw new Error("Atlas: practice set could not be recorded");
+            const completion = session.complete(decision);
+            sets.set(decision.id, Date.parse(completion.at));
+            persist();
+            return { decisionId: decision.id, completionId: completion.id };
+          },
+          // A response to a finished set. It names the set's decision too, so a store folding by the older reference() keeps the
+          // set with it. The same value again adds nothing; another value replaces it.
+          feedback(set, value) {
+            refresh();
+            if (!RESPONSES.includes(value) || !identifier(set?.completionId) || !identifier(set?.decisionId)) throw new TypeError("Atlas: invalid set response");
+            const done = log().find((e) => e.id === set.completionId);
+            if (done?.type !== "experience.completed" || done.experienceId !== `${gameId}.set` || done.decisionId !== set.decisionId || Date.parse(monotonicClock()) - Date.parse(done.at) > SET_OPEN_MS) throw Object.assign(new Error("Atlas: this practice set no longer takes a response"), { code: "SET_UNAVAILABLE" });
+            if (session.state().feedback.find((f) => f.completionId === done.id)?.value === value) return null;
+            const event = session.feedback(done.id, value, done.decisionId);
+            persist();
+            return event;
+          },
+          // Responses to this game's sets that Core still reads (30 days, not excluded), oldest first.
+          setFeedback() {
+            refresh();
+            return session.state().feedback.filter((f) => f.experienceId === `${gameId}.set`).map((f) => ({ id: f.id, completionId: f.completionId, decisionId: f.decisionId ?? null, value: f.value, kind: f.variant, at: f.at }));
+          },
           events() {
             refresh();
             return session.events();
@@ -10291,6 +10342,7 @@ var SynkLearning = (() => {
             takeDropped([], false);
             session = newSession([]);
             active.clear();
+            sets.clear();
             readable = true;
             writable = !!storage;
             complete = historyComplete;
