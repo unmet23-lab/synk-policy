@@ -298,6 +298,8 @@
  },
  "/prompts/|desktop": {},
  "/prompts/|mobile": {},
+ "/pulse/casting/|desktop": {},
+ "/pulse/casting/|mobile": {},
  "/pulse/|desktop": {
   "aria-allowed-role": {
    "impact": "minor",

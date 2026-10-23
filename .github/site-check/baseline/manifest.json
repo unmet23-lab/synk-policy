@@ -1,7 +1,7 @@
 {
- "createdAt": "2026-10-23T03:29:00.602Z",
- "commit": "c3bd376a4c111018f4d53381cfbbe21ce474b809",
- "run": 39893919060,
+ "createdAt": "2026-10-23T07:45:42.391Z",
+ "commit": "71e9864f765a54ffa14c33687da548d5432c9d0e",
+ "run": 39917776419,
  "env": {
   "chromium": "151.0.7922.34",
   "os": "ubuntu24"
@@ -397,6 +397,20 @@
     "sha256": "9814075b62e0228c2e6fbb00046ad8611ab6b14303da74969ca2640769ee1107",
     "cssHeight": 13490,
     "run": 39759857503
+   }
+  },
+  "/pulse/casting/": {
+   "desktop": {
+    "file": "desktop/pulse~casting.jpg",
+    "sha256": "559f91b9e59ddeee0dd18d60599f8ce4aa791b4eff24fddb30b1843581bfc608",
+    "cssHeight": 2743,
+    "run": 39917776419
+   },
+   "mobile": {
+    "file": "mobile/pulse~casting.jpg",
+    "sha256": "a473d9fc33b01a28b7343fd2c20ba019abb390a8aa48b3e0a2b4cd6ded32a784",
+    "cssHeight": 3738,
+    "run": 39917776419
    }
   },
   "/rl/": {
