@@ -198,5 +198,8 @@
       }
     },
     "accountApiUrl": "https://qiwxeddwwnzkwalpsuty.supabase.co"
+  },
+  "features": {
+    "worldFeedback": true
   }
 }
