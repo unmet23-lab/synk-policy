@@ -1,5 +1,5 @@
 import {createKnowledgeEngine} from './knowledge-engine.js?v=cdd45dbfce10';
-import {appendPublicActions} from './public-actions.js?v=69e93bf9957e';
+import {appendPublicActions} from './public-actions.js?v=bf08f355cb8d';
 const $=s=>document.querySelector(s);
 const conversation=$('#questions'),form=$('#question-form'),input=$('#question'),send=$('#send'),messages=$('#messages'),dialog=$('#document-dialog');
 const initialContext=()=>({brand:['lab','shift','pulse','path'].includes(document.body.dataset.site)?document.body.dataset.site:'synk'});

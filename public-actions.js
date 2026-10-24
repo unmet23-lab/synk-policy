@@ -1,25 +1,7 @@
-// One policy for reviewed answer links. Local destinations are verified by QA;
-// external destinations remain explicit so public data cannot create open redirects.
-const externalLinks = new Set([
-  'https://www.youtube.com/@synkkorean/live',
-  'https://www.youtube.com/@synkkorean',
-  'https://www.instagram.com/synk.mn/',
-  'https://t.me/synkmn',
-  'mailto:hello@synk.im',
-  'https://synk.im/name/',
-  'https://synk.im/privacy/#website-questions',
-  'https://synk.im/privacy/#ko',
-]);
+// 답 링크 판정은 src/public-link-policy.js 하나다. 여기는 그 판정을 지난 링크로 답 버튼을 만든다.
+import {isPublicActionHref} from './public-link-policy.js?v=be75ce60dc88';
 
-export function isPublicActionHref(href) {
-  if (typeof href !== 'string' || !href || /[\s\\\u0000-\u001f\u007f]/u.test(href)) return false;
-  if (externalLinks.has(href)) return true;
-  if (/^#[A-Za-z][A-Za-z0-9_-]*$/.test(href)) return true;
-  // Exactly one leading slash, plain path segments and an optional named anchor.
-  // Percent escapes, credentials, query redirects and dot segments are excluded.
-  if (!/^\/(?:[A-Za-z0-9_-]+\/)*[A-Za-z0-9_.-]*(?:#[A-Za-z][A-Za-z0-9_-]*)?$/.test(href)) return false;
-  return !href.split(/[\/#]/).some(segment => segment === '.' || segment === '..');
-}
+export {isPublicActionHref};
 
 export function appendPublicActions(parent, records) {
   const document = parent.ownerDocument;
