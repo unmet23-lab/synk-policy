@@ -4,348 +4,44 @@
   "targetUrl": "https://synk.im/care/",
   "sourceFiles": [
     {
-      "file": "experiences/relationship-care/index.html",
-      "sha256": "c9031a07919738f958266ebcb7e55a67cc18be4cebf8a91e35fe3c05a50c1f74"
-    },
-    {
-      "file": "experiences/relationship-care/style.css",
-      "sha256": "048167ebf83ec027ef62cb6ff0bda5e0d8673bde5498f0a82fbe451a5f2ff826"
-    },
-    {
       "file": "experiences/relationship-care/app.mjs",
-      "sha256": "10c471c4b71f688e6723bcd6345a5ffaf01bccf313dbf530fa69ae0014dc4433"
+      "sha256": "6262056b2d06292cd8433b1dc2ebf86c978e16c8f31e7fbeae9c30e0544d8283"
     },
     {
-      "file": "experiences/relationship-care/model.mjs",
-      "sha256": "6ca9981d6daa5ac6174be36702608a0d8967fbf56e01d21bc65c15d36973e727"
-    },
-    {
-      "file": "experiences/relationship-care/lunar.mjs",
-      "sha256": "13e43b6c7058e2d2174e6ea7e5c7a45c55ec41c793a169ca278f78761bc19d13"
-    },
-    {
-      "file": "experiences/relationship-care/care-features.mjs",
-      "sha256": "f2706dd289f891fef957a9115996da11b067614aaa162aa2c4972936183ff0b7"
-    },
-    {
-      "file": "experiences/relationship-care/care-sync.mjs",
-      "sha256": "be3716e624f1736bfaabf10be4c8524380482fcf4ce99eab7071a78ccaf2274e"
-    },
-    {
-      "file": "experiences/relationship-care/account.mjs",
-      "sha256": "431f31c77db137cfb704da1c4ce2cdc7d2d024465a32521dd2be2ed04c3d8084"
-    },
-    {
-      "file": "experiences/relationship-care/care-account-view.mjs",
-      "sha256": "c5c5215988da086575a0cff5fc0207374af822278624dc6d38ad48445003af86"
-    },
-    {
-      "file": "experiences/relationship-care/care-focus.mjs",
-      "sha256": "e84aaefa3ea952febd00c7e6875400087e2dbb3484212efbcb8bd440d58c32c7"
-    },
-    {
-      "file": "experiences/relationship-care/care-context.mjs",
-      "sha256": "57e64777c0eb8a95fd1962e82c10bf694953be0abc1e37ca30e53a7e86a4fcd2"
-    },
-    {
-      "file": "experiences/relationship-care/care-push.mjs",
-      "sha256": "2addbd4a72b2506af20bf7457230536e88911dc5124824693854484d227a7c4f"
-    },
-    {
-      "file": "experiences/relationship-care/care-sw.js",
-      "sha256": "f1c9150c65e082ac04958229d5757238caec34d66863610296a6cd4ff102fe40"
-    },
-    {
-      "file": "experiences/relationship-care/manifest.webmanifest",
-      "sha256": "44f56419df7229929689f6799f5b8f65188f3bcda01ada6a226fb3a065efdee0"
-    },
-    {
-      "file": "experiences/relationship-care/care-planner.mjs",
-      "sha256": "3cad1b615b4ecdbef169f138a417bbd6575e16e81a9d14acb5789e7a84e8d385"
-    },
-    {
-      "file": "experiences/relationship-care/care-personalization.mjs",
-      "sha256": "0541293280369f4dceba0f0bc443945ab38930b6a1114e40ce4e9a0f0f4eb28c"
-    },
-    {
-      "file": "experiences/relationship-care/care-support.mjs",
-      "sha256": "aadb8c53f39ab6b718ec585abdf7c816c0980296ab447c13a922d7df9c747827"
-    },
-    {
-      "file": "experiences/relationship-care/care-followup.js",
-      "sha256": "08c9c10efb3915baa71f74519756f9af373a5914d811c5656dd286a43f4e3c41"
-    },
-    {
-      "file": "experiences/relationship-care/care-outcomes.mjs",
-      "sha256": "bca71af0b983436da57f59276d37a1b4e82a0d05fd4645db096cf0a65d57a52c"
-    },
-    {
-      "file": "experiences/relationship-care/memory-card.mjs",
-      "sha256": "1c4303f437a4adaea7c031afe80f8b4e052b5d055408f5a5d41ddd55e27ac599"
-    },
-    {
-      "file": "experiences/relationship-care/memory-theme.mjs",
-      "sha256": "655ca74bfe2cb6b0cef057c2565f19657fa5f301e089d4d804984b3a1978f815"
-    },
-    {
-      "file": "experiences/relationship-care/care-contact-import.mjs",
-      "sha256": "69904f0429c908822854e7ff05aff4f81c15364acca28007c46b80ec64a9450d"
-    },
-    {
-      "file": "experiences/relationship-care/care-signal-view.mjs",
-      "sha256": "69b0a2a38659d5760c1a017e300100708de855f3b652dee7c7baa30b961a9b11"
-    },
-    {
-      "file": "experiences/relationship-care/care-upcoming.mjs",
-      "sha256": "d1bff0831a3c432a11b515882bef48343e817ae84cc0b84791d2d238463b8539"
-    },
-    {
-      "file": "experiences/relationship-care/care-today.mjs",
-      "sha256": "34fa960e4490fb87659219ba5b07f91238072e7163d3240be95202c00741b61f"
-    },
-    {
-      "file": "experiences/relationship-care/care-ledger.mjs",
-      "sha256": "e2e3f53d7afd6ed57d739d3cc9f91bc8dd38ccbd66b9dc63a657a59ea55a4199"
-    },
-    {
-      "file": "experiences/relationship-care/care-amount.mjs",
-      "sha256": "d13829fdf0f48fdca49bba6fb4d7521495492ba9cdda170b4b54045b92eefc43"
-    },
-    {
-      "file": "experiences/relationship-care/care-memorial.mjs",
-      "sha256": "63350c6d0b145076a0bc0ab6160cf8e0cd28f16aad547ee2d142821f5f95f64c"
-    },
-    {
-      "file": "experiences/relationship-care/care-gift.mjs",
-      "sha256": "855c0ee097aee6837ffa3265013a2db053e668cc96772e7992e530c5004fcc71"
-    },
-    {
-      "file": "experiences/relationship-care/assets/icon192.png",
-      "sha256": "2f109a2b463ba8402d9c86aa1cc3f7c97c26ac214c39a80400b1710d1d74a2d2"
-    },
-    {
-      "file": "experiences/relationship-care/assets/icon512.png",
-      "sha256": "2b741257987f1a193fd616648084d83a8f4096c324670792a970aac37b382309"
-    },
-    {
-      "file": "experiences/relationship-care/assets/apple-touch-icon180.png",
-      "sha256": "798397a679c978d276fa976d0bb60be89eae5d744ec30ea1138dfaa203cfcac0"
-    },
-    {
-      "file": "experiences/relationship-care/assets/badge-check.webp",
-      "sha256": "9cf54368ec871bc8f1b645ca2dfda0ff88d6dd565c3d27b1dd9b98dc5e2bb645"
-    },
-    {
-      "file": "experiences/relationship-care/assets/badge-cream.webp",
-      "sha256": "5336c1eca815b403ad0348bfde1573dda2367fab4996ea099c2daf03015f15be"
-    },
-    {
-      "file": "experiences/relationship-care/assets/InterTight-Bold.ttf",
-      "sha256": "1ba0c5d0bfd19b5e1171fcbb4e83235331093fb5060bd556ceb1b10c74e4b4ca"
-    },
-    {
-      "file": "experiences/relationship-care/assets/InterTight-LICENSE.txt",
-      "sha256": "7bb9fbf670a56dcfbb1889314d248fa21c92acf2548ae42c08a67788ea50336c"
-    },
-    {
-      "file": "experiences/relationship-care/assets/slab-blush-long.webp",
-      "sha256": "8249fb7023fd51806045e8db93999c0ae24ae9ba09d2f57e9f6712d632b9a899"
-    },
-    {
-      "file": "experiences/relationship-care/assets/slab-coral-long.webp",
-      "sha256": "d58a4c8912eba6972ef1a38a7f701b7d841970a164524d41f267984949686849"
-    },
-    {
-      "file": "experiences/relationship-care/assets/slab-cream-long.webp",
-      "sha256": "84569abd7fed8e954281cd109f19def8288321c41c8bbbe3f8804208fe43f6ac"
-    },
-    {
-      "file": "experiences/relationship-care/assets/sticker-check.webp",
-      "sha256": "255e2696f9c008a1d6e220d0452b03b7fe5aaf649c78095ec0c6ef738f6620b0"
-    },
-    {
-      "file": "experiences/relationship-care/assets/sticker-envelope.webp",
-      "sha256": "e157638a16caacb08a98131c50c6aa7024192f1b2d058b64d10e7c252504cf7f"
-    },
-    {
-      "file": "experiences/relationship-care/assets/sticker-person.webp",
-      "sha256": "b26e20a40385723a37d61c9b6632f686a7fa6cc1f71dfcc2c3000b1255b9d2ae"
-    },
-    {
-      "file": "experiences/relationship-care/assets/sticker-time.webp",
-      "sha256": "c8b0931c96f1bf654e9f05136a768ea75b96687421e701f826625db3a9906c22"
-    },
-    {
-      "file": "experiences/relationship-care/assets/SUIT-LICENSE.txt",
-      "sha256": "6d13f474c0732e3e2269bd2cc66df5ce0cbaba0b0e8836b0acfaf85309af72e9"
-    },
-    {
-      "file": "experiences/relationship-care/assets/SUIT-Variable.woff2",
-      "sha256": "aa894a204d5a6fbae259dac6868d350cbd373a390caee0313f92946af741df23"
-    },
-    {
-      "file": "experiences/relationship-care/assets/synk-logo.svg",
-      "sha256": "66456831e788db171e0ee0df4df96e9b4a9efa6a313af246b799be08d8e56f36"
-    },
-    {
-      "file": "experiences/relationship-care/assets/thread-shift.webp",
-      "sha256": "123cc5ccf392346e5beffc2f195c3b0315fddcfb24881b33fefdba110061d483"
-    },
-    {
-      "file": "experiences/relationship-care/assets/art/letter.webp",
-      "sha256": "040c6fa8de4fde844477b91d4fc303b1514957165c18fd0d4635ad931958cc2e"
-    },
-    {
-      "file": "experiences/relationship-care/assets/art/calendar.webp",
-      "sha256": "1dedecdaf9091f4443dc4544b6ec86d1fad1f5404d3067c59a362315d20bf1d0"
-    },
-    {
-      "file": "experiences/relationship-care/assets/art/piggy.webp",
-      "sha256": "51bfa8db77b5d635a3a8024b9f63c72c0de66a4f148f24e2140f2c880c554076"
-    },
-    {
-      "file": "experiences/relationship-care/assets/art/person.webp",
-      "sha256": "aa3aa5e9e159cd64915d4fe0272cc50d117c056d7e355dc0b166d1f53c07e510"
-    },
-    {
-      "file": "experiences/relationship-care/assets/art/bell.webp",
-      "sha256": "31174d7fa753fe3d1f8f821a2d6d01458988c03691e2a9825e587a3dab3c96e6"
-    },
-    {
-      "file": "experiences/relationship-care/assets/art/flower.webp",
-      "sha256": "67d9a6abc842df050feac46ade6c4048181918309219d9b960ab119355447587"
-    },
-    {
-      "file": "experiences/relationship-care/assets/art/bubble.webp",
-      "sha256": "994ff57a257d35621001cd37b417539b84eaae95a00afebf7662bba48597cda5"
-    },
-    {
-      "file": "experiences/relationship-care/assets/art/ribbon.webp",
-      "sha256": "711d2a96b937c130d77dfa8755197c84772b85cff8073a798a7cd393206d8690"
-    },
-    {
-      "file": "experiences/relationship-care/assets/art/care-note.webp",
-      "sha256": "4f1f9e4f4798d246674ffd2ef3f65346e08140aeae2994783a0d670d06ab5c78"
-    },
-    {
-      "file": "atlas/domain.js",
-      "sha256": "950ae931d129fe5c4aebc4900aad20cf491012d4f997146e27626634fc8fe64f"
-    },
-    {
-      "file": "atlas/ask.js",
-      "sha256": "a0a3241fa6ddb219e371cc87c84dceff27bbf35222d9f3c96ccf35b5e27d6f93"
-    },
-    {
-      "file": "atlas/vellum-expression.js",
-      "sha256": "0481ef1aaf675f1d1b83eba161b165baad0072e6f926ee18d44a714fdbc77c2f"
-    },
-    {
-      "file": "atlas/temper-outcomes.js",
-      "sha256": "ad19fc96aeb68e4ebce6f4cdc39b3c3a68ef439c5c836804760c00ea9764c3e1"
-    },
-    {
-      "file": "experiences/synk-account/src/core.mjs",
-      "sha256": "9d54d4ebc6d9f9358427b388d330c561625431041afb3e72ccf21e9708d412ca"
-    },
-    {
-      "file": "experiences/synk-account/src/platform-entry.mjs",
-      "sha256": "923223943f0e79825c247792ad13a94527386ccbea0012fe0abc9e45ba6d88a7"
-    },
-    {
-      "file": "experiences/synk-account/src/product-account.mjs",
-      "sha256": "2cbf38993f83c233c922d37abec167b438b43cf53cafe56c62b36f20356efec5"
-    },
-    {
-      "file": "experiences/synk-account/src/document-sync.mjs",
-      "sha256": "29bae1988038364d391207098b278f8545f4c45a95f7c2a74d344c10d1f92389"
-    },
-    {
-      "file": "experiences/member-signal/signal.css",
-      "sha256": "8447909dd1433f42aaeded1f569457534af6a72db8a75d6aadc404115df496c6"
-    },
-    {
-      "file": "experiences/member-signal/theme.js",
-      "sha256": "1cc7dc09c7a27f8b95ebacb5bb079c4c3ec1976866fde518d7589fcf6d9f82ab"
-    },
-    {
-      "file": "experiences/member-signal/assets/SUIT-Variable.woff2",
-      "sha256": "aa894a204d5a6fbae259dac6868d350cbd373a390caee0313f92946af741df23"
-    },
-    {
-      "file": "experiences/member-signal/assets/InterTight-Regular.woff2",
-      "sha256": "141691dedbf7ae404140c4666a7f654c5c9dceb3d9e7f1a3ba5aef84a6b093d5"
-    },
-    {
-      "file": "experiences/member-signal/assets/InterTight-Medium.woff2",
-      "sha256": "3f79a810283d78922a31ce5167f2875d40ae19ba8f7688110de0e63cfe359494"
-    },
-    {
-      "file": "experiences/member-signal/assets/InterTight-700.woff2",
-      "sha256": "e50c43780f95750d53a434731f49ed14251fd1038a757deabdcb9982b566566e"
-    },
-    {
-      "file": "experiences/member-signal/assets/DMMono-Medium.woff2",
-      "sha256": "69108e2080a3ffb271187d6d913a51b6faa4faf895d8cf15fc64879f8906cd8e"
-    },
-    {
-      "file": "experiences/member-signal/assets/SYNKArrow.woff2",
-      "sha256": "ab06bd2346b2632f508ee1c3baac448565f09ef5dde13b711ba16844ae3ba256"
-    },
-    {
-      "file": "experiences/member-signal/assets/synk-logo.svg",
-      "sha256": "cd4950d57eab280fe14b26d58cb78f416eaf5c1ae1f0fa130986dde9567f61f6"
-    },
-    {
-      "file": "experiences/member-signal/assets/grain.svg",
-      "sha256": "8818b4a926e16a9501b0afb112caa2d4c3bfc36d1f953ac7f2b18e23d4a63dcb"
-    },
-    {
-      "file": "experiences/member-signal/assets/SUIT-OFL.txt",
-      "sha256": "30d101ee3c35ef629d622d933d261a27b2f60223e0a3b0f36791e569c2b9daa9"
-    },
-    {
-      "file": "experiences/member-signal/assets/InterTight-OFL.txt",
-      "sha256": "50240ab035cf1b6b3307940235481d515c4b6de3ab1fa843dbe59e7892cb9d58"
-    },
-    {
-      "file": "experiences/member-signal/assets/DMMono-OFL.txt",
-      "sha256": "febfd2b42308d5327ade2884aed777da3d2decd2c53d574c43e603443d70c5b2"
-    },
-    {
-      "file": "experiences/member-signal/signal.mjs",
-      "sha256": "90ea9ccc80a839e2583aba76bd7e4bf6606da0285b6fa486b94100b73b82be9a"
+      "file": "experiences/relationship-care/care-transient-session.mjs",
+      "sha256": "83ec1ef8abc07bcab04d8c1c3ac982b7daff786e09aeed627e6164e68bcdaf20"
     }
   ],
   "files": [
     {
       "name": "index.html",
-      "bytes": 57461,
-      "sha256": "1c84de4cdc7f20ac7889e3351e75e152e96fd8f6128f16bd85b40696925aa512"
+      "bytes": 56593,
+      "sha256": "8525560b1011aa5a28ebb6e9d3c3999788823f651e77b9bbec3d1a177dd24c60"
     },
     {
       "name": "style.css",
-      "bytes": 29399,
-      "sha256": "048167ebf83ec027ef62cb6ff0bda5e0d8673bde5498f0a82fbe451a5f2ff826"
+      "bytes": 29687,
+      "sha256": "84a1027a3203d01f6147ab03140d76e6ea45fdf4c5b3bdb2086948864b642e13"
     },
     {
       "name": "app.mjs",
-      "bytes": 164912,
-      "sha256": "8edaa4cb549ed2d4e89c5369bd5ffe7436ccb59b4750168835089162824a81af"
+      "bytes": 166164,
+      "sha256": "c50ce8c444242bbff2aa0f3a8e98eeb09c20257fc9535afa423b78884083e626"
     },
     {
       "name": "model.mjs",
-      "bytes": 74992,
-      "sha256": "6ca9981d6daa5ac6174be36702608a0d8967fbf56e01d21bc65c15d36973e727"
+      "bytes": 74526,
+      "sha256": "64ec1105baa6bcf7b30a2a5d6301e79c0032dfefe5b1d0d850893c7ffdb68b33"
     },
     {
       "name": "lunar.mjs",
-      "bytes": 9917,
-      "sha256": "13e43b6c7058e2d2174e6ea7e5c7a45c55ec41c793a169ca278f78761bc19d13"
+      "bytes": 9918,
+      "sha256": "901582dbf1de09c9003d6d73966c3d7ad017bcb6f569ac6369f38aa027fe8ba2"
     },
     {
       "name": "care-features.mjs",
-      "bytes": 13483,
-      "sha256": "f2706dd289f891fef957a9115996da11b067614aaa162aa2c4972936183ff0b7"
+      "bytes": 13433,
+      "sha256": "71fe8c6d249e2be43be307fb5e6580a075aa03d3b71ab4c70e8f08548ef56aa2"
     },
     {
       "name": "care-sync.mjs",
@@ -359,28 +55,28 @@
     },
     {
       "name": "care-account-view.mjs",
-      "bytes": 5889,
-      "sha256": "c5c5215988da086575a0cff5fc0207374af822278624dc6d38ad48445003af86"
+      "bytes": 5738,
+      "sha256": "703dbc8408be5a1de3a9994c397eab6976ce32118e7ab98d0833efbf53ea6fdf"
     },
     {
       "name": "care-focus.mjs",
-      "bytes": 9080,
-      "sha256": "546c388c7a787ea502351b77e0678931d7d2bb6b7f3019ba64ffc56e30bfb061"
+      "bytes": 8888,
+      "sha256": "90aa7e7ff0fc89f9b57eeebef90b6410bea6edb708a0d6b59245116d4ed3ab69"
     },
     {
       "name": "care-context.mjs",
-      "bytes": 8160,
-      "sha256": "57e64777c0eb8a95fd1962e82c10bf694953be0abc1e37ca30e53a7e86a4fcd2"
+      "bytes": 8100,
+      "sha256": "6686fd69244bbefc7bc67e0696a3f60777796384443ec8596f8175ca22b58cb4"
     },
     {
       "name": "care-push.mjs",
-      "bytes": 21091,
-      "sha256": "2addbd4a72b2506af20bf7457230536e88911dc5124824693854484d227a7c4f"
+      "bytes": 21094,
+      "sha256": "65c56c538c5f331983e8508686f0fedac454630b9d697dbd1850dd409a13d4e2"
     },
     {
       "name": "care-sw.js",
-      "bytes": 1380,
-      "sha256": "f1c9150c65e082ac04958229d5757238caec34d66863610296a6cd4ff102fe40"
+      "bytes": 1374,
+      "sha256": "545c6dcf565d1ea2beabfa10af5b97c2923b6c500a6d54159789028d43bfdd81"
     },
     {
       "name": "manifest.webmanifest",
@@ -389,18 +85,18 @@
     },
     {
       "name": "care-planner.mjs",
-      "bytes": 11919,
-      "sha256": "6abcbfac248a215fb4ae1e64f03b1571a0cd8b815c360fa04e7a3398f10012f5"
+      "bytes": 11456,
+      "sha256": "df63d79d3214737cb53ca1cbaa0e50d165d58bde18ae5655ad8ecacf5277c8f2"
     },
     {
       "name": "care-personalization.mjs",
-      "bytes": 3235,
-      "sha256": "0541293280369f4dceba0f0bc443945ab38930b6a1114e40ce4e9a0f0f4eb28c"
+      "bytes": 3155,
+      "sha256": "e89818afc40224f0a1138f385d2b41956b9188053de37f22942a7b1aa0d9a7ed"
     },
     {
       "name": "care-support.mjs",
-      "bytes": 14206,
-      "sha256": "a2592485368c4e45d043d6d1146805c542599e7b9292d4679f9e444a70146fa1"
+      "bytes": 13646,
+      "sha256": "f5db96d74d3d4d785139c3acc16801a05e3a7ba42c28f0d141998d96ba5fdcf0"
     },
     {
       "name": "care-followup.js",
@@ -414,8 +110,8 @@
     },
     {
       "name": "memory-card.mjs",
-      "bytes": 8033,
-      "sha256": "1c4303f437a4adaea7c031afe80f8b4e052b5d055408f5a5d41ddd55e27ac599"
+      "bytes": 7993,
+      "sha256": "bb49f5040ad923a8e779e3b4afbf8f8e0e663ab99b8d3206c53c4250bcd7133b"
     },
     {
       "name": "memory-theme.mjs",
@@ -424,43 +120,43 @@
     },
     {
       "name": "care-contact-import.mjs",
-      "bytes": 5726,
-      "sha256": "69904f0429c908822854e7ff05aff4f81c15364acca28007c46b80ec64a9450d"
+      "bytes": 5823,
+      "sha256": "abe5849951f85c8d56ddf6cd6760d0c1406274fc5d2b5a204bad2c7f0b68e893"
     },
     {
       "name": "care-signal-view.mjs",
-      "bytes": 24548,
-      "sha256": "69b0a2a38659d5760c1a017e300100708de855f3b652dee7c7baa30b961a9b11"
+      "bytes": 24547,
+      "sha256": "3b5bf5423edf47fc99104ca9fcec471e3ba94c27c7e98a85b6462dc21e1fc023"
     },
     {
       "name": "care-upcoming.mjs",
-      "bytes": 11541,
-      "sha256": "d1bff0831a3c432a11b515882bef48343e817ae84cc0b84791d2d238463b8539"
+      "bytes": 11531,
+      "sha256": "edd4f3749c058260245dd240e69b3434e4bcfb4c2cbb3f101a8c1902434ee110"
     },
     {
       "name": "care-today.mjs",
-      "bytes": 13242,
-      "sha256": "34fa960e4490fb87659219ba5b07f91238072e7163d3240be95202c00741b61f"
+      "bytes": 13239,
+      "sha256": "8f5fc9e02d4e858f2a0d2ec02c8dd693f5cd4ca8cc5161fbf7679dcb19eda702"
     },
     {
       "name": "care-ledger.mjs",
-      "bytes": 25022,
-      "sha256": "e2e3f53d7afd6ed57d739d3cc9f91bc8dd38ccbd66b9dc63a657a59ea55a4199"
+      "bytes": 25155,
+      "sha256": "635abcdf4044472a708edcc42bc832478537039055611e93d36651d05c64c1c3"
     },
     {
       "name": "care-amount.mjs",
-      "bytes": 9428,
-      "sha256": "d13829fdf0f48fdca49bba6fb4d7521495492ba9cdda170b4b54045b92eefc43"
+      "bytes": 9432,
+      "sha256": "da76ead5627f741bba0c45ecc74dbcb2ec9df871a501dc69f6985a4ef102f7a7"
     },
     {
       "name": "care-memorial.mjs",
-      "bytes": 12033,
-      "sha256": "63350c6d0b145076a0bc0ab6160cf8e0cd28f16aad547ee2d142821f5f95f64c"
+      "bytes": 12950,
+      "sha256": "9f3da195457a73306ef4046658f941cc9390d24c08f17c3d5adecf774400372f"
     },
     {
       "name": "care-gift.mjs",
-      "bytes": 8224,
-      "sha256": "855c0ee097aee6837ffa3265013a2db053e668cc96772e7992e530c5004fcc71"
+      "bytes": 8222,
+      "sha256": "023568e5c42357bc71645dc479c5bacc3e9b71379e5fae08ebafb1ec09824a47"
     },
     {
       "name": "assets/icon192.png",
@@ -619,23 +315,23 @@
     },
     {
       "name": "vendor/account/core.mjs",
-      "bytes": 11707,
-      "sha256": "9d54d4ebc6d9f9358427b388d330c561625431041afb3e72ccf21e9708d412ca"
+      "bytes": 11757,
+      "sha256": "d6b15c88872dcf80d48fb2303a35487c21be0ee4428aa469195ae088bfca20e2"
     },
     {
       "name": "vendor/account/platform-entry.mjs",
-      "bytes": 6208,
-      "sha256": "923223943f0e79825c247792ad13a94527386ccbea0012fe0abc9e45ba6d88a7"
+      "bytes": 6178,
+      "sha256": "9ff73f44f6b33f13ba393f324e4b97c3a335fec8a8347d46d2239f845eed5288"
     },
     {
       "name": "vendor/account/product-account.mjs",
-      "bytes": 31712,
-      "sha256": "2cbf38993f83c233c922d37abec167b438b43cf53cafe56c62b36f20356efec5"
+      "bytes": 31786,
+      "sha256": "0ea2f58d9c91a3cfbbc90c1ac6c4dd3f79c0f222fa2fd6762108b43768559602"
     },
     {
       "name": "vendor/account/document-sync.mjs",
-      "bytes": 28709,
-      "sha256": "29bae1988038364d391207098b278f8545f4c45a95f7c2a74d344c10d1f92389"
+      "bytes": 28731,
+      "sha256": "eaeb54219bac337e5d64ab81e724b973587c68a188156c8ad75024f32417b119"
     },
     {
       "name": "signal/signal.css",
@@ -711,11 +407,50 @@
       "name": "config.json",
       "bytes": 598,
       "sha256": "fe7beff798ad4b4d4c03d0c9c66b67c8d2bd9f173e209d3bd87d6c5a035a9ca8"
+    },
+    {
+      "name": "care-transient-session.mjs",
+      "bytes": 9212,
+      "sha256": "83ec1ef8abc07bcab04d8c1c3ac982b7daff786e09aeed627e6164e68bcdaf20"
     }
   ],
   "limitations": {
     "transcription": "PC local app only",
     "pushWhenClosed": "Requires deployed push service, account opt-in, browser permission and supported device",
     "realLoginVerified": false
+  },
+  "composition": {
+    "kind": "selective-public-overlay",
+    "base": {
+      "repository": "synk-policy",
+      "commit": "16a107568af698fd2adb3eed195d2a9efbe48856",
+      "prefix": "care/",
+      "inheritedManifestSha256": "9b89e8fd236e8e479c7be169bfe4bc1a11be9d0f47025f12f0fb37286e685212",
+      "sourceFilesInInheritedManifest": "Historical receipt only; not asserted as inputs to this composition."
+    },
+    "retainedPayloadFiles": 77,
+    "sourceOutputs": [
+      {
+        "source": "experiences/relationship-care/app.mjs",
+        "output": "app.mjs",
+        "transform": "Official prepare-care-public: '/member-signal/signal.mjs' to './signal/signal.mjs'."
+      },
+      {
+        "source": "experiences/relationship-care/care-transient-session.mjs",
+        "output": "care-transient-session.mjs",
+        "transform": "Byte-for-byte copy."
+      }
+    ],
+    "entry": {
+      "output": "index.html",
+      "transform": "Official versionPublicEntry on pinned HTML; original CSP and config retained.",
+      "versionFunctionSha256": "eacabc37e30d66fe45844485e953245d1c84545374b0022bfc930135bddb4479"
+    },
+    "builder": {
+      "path": "tools/prepare-care-public.mjs",
+      "sha256": "5211e4e358b42033e00d4b669b1a81826dc8e608e7b89fe9213f040f2b21b0d5"
+    },
+    "receiptSemantics": "files describes all 80 shipped payloads. sourceFiles describes only the two new authored inputs; the remaining payloads come from the exact pinned public artifact, not current canonical source.",
+    "recipeSha256": "df006d4212c50961bcab23cb9cbc843943c73f153928c0a1dca1794a75ebfda2"
   }
 }

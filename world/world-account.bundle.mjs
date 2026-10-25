@@ -7935,7 +7935,26 @@ var require_temper = __commonJS({
           significanceTested: false
         };
       }
-      return Object.freeze({ VERSION, MINIMUM_PER_CELL, measure, combine, compare, groups });
+      const FLIP_WINDOW = 2;
+      const COOL_DOWN = 2;
+      function check2({ spec, knob, from, to, step, phase = "response", history: history2 = [], frozen = false } = {}) {
+        if (frozen) return { ok: false, rail: "hold" };
+        const k = spec?.knobs?.find((x) => x.id === knob);
+        if (!k) return { ok: false, rail: "unknown-knob" };
+        if (!Number.isInteger(from) || !Number.isInteger(to) || Math.abs(to - from) !== 1) return { ok: false, rail: "one-step" };
+        if (to < 0 || to >= k.values.length) return { ok: false, rail: "bounds" };
+        if (k.follows === "declared") return { ok: false, rail: "declared-only" };
+        if (!["opening", "response", "accepted"].includes(phase) || !Number.isInteger(step) || !Array.isArray(history2)) return { ok: false, rail: "invalid" };
+        if (phase !== "opening") {
+          const live = history2.filter((c) => c.phase !== "opening");
+          if (live.some((c) => c.step === step)) return { ok: false, rail: "one-change-per-response" };
+          const recent = live.filter((c) => c.knob === knob && step - c.step <= FLIP_WINDOW).at(-1);
+          if (recent && to > from && recent.to < recent.from) return { ok: false, rail: "no-bounce" };
+          if (to > from && live.some((c) => c.direction > 0 && step - c.step <= COOL_DOWN)) return { ok: false, rail: "cool-down" };
+        }
+        return { ok: true, rail: null };
+      }
+      return Object.freeze({ VERSION, MINIMUM_PER_CELL, measure, combine, compare, groups, FLIP_WINDOW, COOL_DOWN, check: check2 });
     });
   }
 });
@@ -9178,30 +9197,26 @@ var require_memory_sync = __commonJS({
 var require_temper_flow = __commonJS({
   "atlas/temper-flow.js"(exports, module) {
     (function(root, factory) {
-      if (typeof module === "object" && module.exports) module.exports = factory(() => require_flow());
-      else root.SynkTemperFlow = factory(() => root.SynkFlow);
-    })(typeof globalThis !== "undefined" ? globalThis : exports, function(getFlow) {
-      "use strict";
-      const VERSION = "temper-flow-1";
-      const FLIP_WINDOW = 2;
-      const COOL_DOWN = 2;
-      function check2({ spec, knob, from, to, step, phase = "response", history: history2 = [], frozen = false } = {}) {
-        if (frozen) return { ok: false, rail: "hold" };
-        const k = spec?.knobs?.find((x) => x.id === knob);
-        if (!k) return { ok: false, rail: "unknown-knob" };
-        if (!Number.isInteger(from) || !Number.isInteger(to) || Math.abs(to - from) !== 1) return { ok: false, rail: "one-step" };
-        if (to < 0 || to >= k.values.length) return { ok: false, rail: "bounds" };
-        if (k.follows === "declared") return { ok: false, rail: "declared-only" };
-        if (!["opening", "response", "accepted"].includes(phase) || !Number.isInteger(step) || !Array.isArray(history2)) return { ok: false, rail: "invalid" };
-        if (phase !== "opening") {
-          const live = history2.filter((c) => c.phase !== "opening");
-          if (live.some((c) => c.step === step)) return { ok: false, rail: "one-change-per-response" };
-          const recent = live.filter((c) => c.knob === knob && step - c.step <= FLIP_WINDOW).at(-1);
-          if (recent && to > from && recent.to < recent.from) return { ok: false, rail: "no-bounce" };
-          if (to > from && live.some((c) => c.direction > 0 && step - c.step <= COOL_DOWN)) return { ok: false, rail: "cool-down" };
-        }
-        return { ok: true, rail: null };
+      if (typeof module === "object" && module.exports) {
+        const Flow = require_flow();
+        module.exports = factory(require_temper(), () => Flow);
+      } else {
+        let built = null;
+        const ready = () => built || (typeof root.SynkTemper?.check === "function" ? built = factory(root.SynkTemper, () => root.SynkFlow) : null);
+        const later = (name) => (...args) => {
+          if (!ready()) throw new Error("Temper: load temper.js (the guard) before using temper-flow.js");
+          return built[name](...args);
+        };
+        const calls = { check: later("check"), truth: later("truth"), simulate: later("simulate") };
+        const waiting = Object.freeze(Object.defineProperties({}, Object.fromEntries(["VERSION", "FLIP_WINDOW", "COOL_DOWN", "PERSONAS", "check", "truth", "simulate"].map((name) => [name, { enumerable: true, get: () => ready()?.[name] ?? calls[name] }]))));
+        const keep = (value) => Object.defineProperty(root, "SynkTemperFlow", { value, writable: true, enumerable: true, configurable: true });
+        Object.defineProperty(root, "SynkTemperFlow", { enumerable: true, configurable: true, set: keep, get: () => ready() ? keep(built).SynkTemperFlow : waiting });
       }
+    })(typeof globalThis !== "undefined" ? globalThis : exports, function(guard, getFlow) {
+      "use strict";
+      if (!guard || typeof guard.check !== "function") throw new Error("Temper: load temper.js (the guard) before using temper-flow.js");
+      const VERSION = "temper-flow-1";
+      const { FLIP_WINDOW, COOL_DOWN, check: check2 } = guard;
       const seeded = (seed) => {
         let h = 2166136261;
         for (let i = 0; i < seed.length; i += 1) {
@@ -9269,7 +9284,7 @@ var require_temper_flow = __commonJS({
           const outcome = timeout ? "timeout" : success ? "success" : "fail";
           const result = flow.observe({ outcome, assisted, pressure: chance.timed ? Math.min(1, duration) : null, latencyMs: Math.round(duration * 1e4) });
           let change = result.change;
-          if (adaptive && !change && flow.quietStreak() >= 3 && step - offered >= 10) {
+          if (adaptive && !change && flow.quietStreak() >= 3 && step - offered >= 10 && flow.lessHelpAllowed()) {
             offered = step;
             if (rng() < (self.accepts ?? 0.6)) change = flow.acceptLessHelp();
           }
@@ -9364,8 +9379,10 @@ var require_temper_flow = __commonJS({
 var require_flow = __commonJS({
   "atlas/flow.js"(exports, module) {
     (function(root, factory) {
-      if (typeof module === "object" && module.exports) module.exports = factory(() => require_temper_flow());
-      else root.SynkFlow = factory(() => root.SynkTemperFlow);
+      if (typeof module === "object" && module.exports) {
+        const guard = require_temper();
+        module.exports = factory(() => guard);
+      } else root.SynkFlow = factory(() => root.SynkTemper);
     })(typeof globalThis !== "undefined" ? globalThis : exports, function(getGuard) {
       "use strict";
       const VERSION = "flow-1";
@@ -9507,6 +9524,7 @@ var require_flow = __commonJS({
         let overall = spec.target + (mode === "easier" ? 0.1 : mode === "harder" ? -0.1 : 0) + (condition === "tired" ? 0.08 : 0);
         overall = clamp(overall, 0.55, 0.92);
         const aim = targets(spec, overall);
+        const ordinary = targets(spec, spec.target);
         const base = defaults(spec);
         const fresh = (dimension) => ({ theta: challenge(spec, base, dimension) + logit(targets(spec, spec.target)[dimension]), n: 0, reversals: 0, streak: 0, sign: 0 });
         const estimates = { content: fresh("content"), pace: fresh("pace") };
@@ -9532,17 +9550,16 @@ var require_flow = __commonJS({
         const latencies = remembered ? remembered.latencies : [];
         const changes = [], trace = [];
         let step = 0, responses = 0, quiet = 0, steady = 0, last = null;
-        const TODAY_ONLY = ["tired", "declared-easier", "declared-harder"];
         const todayOnly = {};
-        const gap = (dimension) => (estimates[dimension].theta - logit(aim[dimension]) - challenge(spec, indices, dimension)) / spec.scale;
+        const gap = (dimension, goal = aim, theta = estimates[dimension].theta) => (theta - logit(goal[dimension]) - challenge(spec, indices, dimension)) / spec.scale;
         const chance = (dimension, at = indices) => sigmoid(estimates[dimension].theta - challenge(spec, at, dimension));
         const expected = (at = indices) => (has(spec, "content") ? chance("content", at) : 1) * (has(spec, "pace") ? chance("pace", at) : 1);
-        const span = (dimension) => {
+        const span = (dimension, goal = aim) => {
           const knobs = spec.knobs.filter((knob) => dimensionOf(knob) === dimension);
           const fixed = (knob) => knob.follows === "declared" ? indices[knob.id] : null;
           const low = spec.scale * knobs.reduce((sum, k) => sum + k.weight * (fixed(k) ?? 0), 0);
           const high = spec.scale * knobs.reduce((sum, k) => sum + k.weight * (fixed(k) ?? k.values.length - 1), 0);
-          return [low + logit(aim[dimension]) - 2 * spec.scale, high + logit(aim[dimension]) + 2 * spec.scale];
+          return [low + logit(goal[dimension]) - 2 * spec.scale, high + logit(goal[dimension]) + 2 * spec.scale];
         };
         const bound = (dimension) => {
           const [low, high] = span(dimension);
@@ -9589,6 +9606,7 @@ var require_flow = __commonJS({
           }
           return null;
         }
+        const ordinaryTheta = Object.fromEntries(DIMENSIONS.map((d) => [d, clamp(estimates[d].theta, ...span(d, ordinary))]));
         for (const dimension of DIMENSIONS) bound(dimension);
         const opening = [];
         if (adaptive && returning) {
@@ -9602,16 +9620,34 @@ var require_flow = __commonJS({
           for (const dimension of DIMENSIONS) estimates[dimension].theta = Math.min(estimates[dimension].theta, logit(aim[dimension]) + challenge(spec, indices, dimension));
         } else if (adaptive) {
           const limit = basis === "memory" ? 2 : 12, easeOnly = basis === "memory" || calm;
-          for (let moves = 0; moves < limit; moves += 1) {
-            const dimension = DIMENSIONS.filter((d) => Math.abs(gap(d)) >= DEADBAND && (!easeOnly || gap(d) < 0)).sort((a, b) => Math.abs(gap(b)) - Math.abs(gap(a)))[0];
-            if (!dimension) break;
-            const direction = Math.sign(gap(dimension));
-            const reason = direction > 0 ? mode === "harder" ? "declared-harder" : "prior" : condition === "tired" ? "tired" : mode === "easier" ? "declared-easier" : "prior";
-            const change = settle(dimension, direction, null, reason, "opening");
-            if (!change) break;
-            opening.push(change);
-            if (TODAY_ONLY.includes(change.because)) todayOnly[change.knob] = (todayOnly[change.knob] || 0) + change.direction;
+          const why = basis === "memory" ? "memory" : "prior";
+          const open = (goal, theta, ease) => {
+            const moves = [];
+            for (let n = 0; n < limit; n += 1) {
+              const off = (d) => gap(d, goal, theta[d]);
+              const dimension = DIMENSIONS.filter((d) => Math.abs(off(d)) >= DEADBAND && (!ease || off(d) < 0)).sort((a, b) => Math.abs(off(b)) - Math.abs(off(a)))[0];
+              if (!dimension) break;
+              const change = settle(dimension, Math.sign(off(dimension)), null, why, "opening");
+              if (!change) break;
+              moves.push(change);
+            }
+            return moves;
+          };
+          let home = null;
+          if (mode !== "auto" || calm) {
+            const from = { ...indices };
+            open(ordinary, ordinaryTheta, basis === "memory");
+            home = indices;
+            indices = from;
+            changes.length = 0;
           }
+          for (const change of open(aim, Object.fromEntries(DIMENSIONS.map((d) => [d, estimates[d].theta])), easeOnly)) {
+            if (home && (home[change.knob] - change.from) * change.direction <= 0) {
+              change.because = change.direction > 0 ? mode === "harder" ? "declared-harder" : why : calm ? "tired" : mode === "easier" ? "declared-easier" : why;
+            }
+            opening.push(change);
+          }
+          if (home) for (const knob of spec.knobs) todayOnly[knob.id] = indices[knob.id] - home[knob.id];
         }
         const intro = !adaptive ? arm === "baseline" ? "baseline" : "fixed" : returning ? "returning" : condition === "tired" ? "tired" : basis;
         const settings = () => ({
@@ -10092,7 +10128,7 @@ var require_game_flow = __commonJS({
         const run = Flow.start({ spec, memory, prior, declared, condition: condition === void 0 ? port.today() : condition, arm, now: clock2() });
         const say = (event) => VellumFlow.line(event, { level, words });
         const save = () => port.save(spec.id, run.memory(clock2()), since);
-        const shown = /* @__PURE__ */ new Map();
+        const shown = /* @__PURE__ */ new Map(), owed = /* @__PURE__ */ new Set();
         const snapshot = () => {
           const s = run.settings();
           return { content: s.content, policy: s.policy, arm: s.arm, mode: s.mode, values: s.values, level: s.level };
@@ -10131,11 +10167,17 @@ var require_game_flow = __commonJS({
           },
           /* Learning evidence to Trail first; then the same response moves the challenge. `flow` may
            * name the outcome for the challenge (a missed order is a 'timeout' there, yet not a language
-           * error) and pass the share of time used as `pressure`. Trail decides assisted and repeat. */
+           * error) and pass the share of time used as `pressure`. Otherwise the outcome is the verdict
+           * Trail recorded, so an answer it could not assess moves nothing. Trail decides assisted and repeat. */
           answer(pid, response, flow = {}) {
+            const known = typeof coach.events === "function" ? coach.events() : null;
             const recorded = coach.answer(pid, response);
-            const outcome = flow.outcome ?? (response.correct === true ? "success" : response.correct === false ? "fail" : "void");
+            const eventId = object3(recorded) && recorded.accepted !== false && typeof recorded.eventId === "string" && recorded.eventId ? recorded.eventId : null;
+            const fresh = !!eventId && Array.isArray(known) && (owed.has(eventId) || !known.some((event) => event.id === eventId));
+            if (!fresh) return { recorded, change: null, settings: run.settings(), evidence: false, line: null };
+            const outcome = flow.outcome ?? (recorded.verdict === "correct" ? "success" : recorded.verdict === "incorrect" ? "fail" : "void");
             const level2 = spec.items && spec.items.levels.includes(shown.get(pid)) ? shown.get(pid) : null;
+            owed.add(eventId);
             const observed = run.observe({
               outcome,
               assisted: flow.assisted ?? recorded.assisted === true,
@@ -10144,6 +10186,7 @@ var require_game_flow = __commonJS({
               latencyMs: flow.latencyMs ?? null,
               level: level2
             });
+            owed.delete(eventId);
             save();
             return { recorded, ...result(observed) };
           },
@@ -10210,36 +10253,17 @@ var require_game_learning = __commonJS({
     var RESPONSE_MS = 30 * 864e5;
     var identifier = (value) => typeof value === "string" && /^[a-zA-Z0-9_.:-]{1,120}$/.test(value);
     var uid = () => `l${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 12)}`;
-    function createGame({
-      gameId,
-      map,
-      storage = null,
-      learnerKey = "device",
-      clock: clock2 = () => (/* @__PURE__ */ new Date()).toISOString(),
-      historyComplete = true,
-      storageScope = "device",
-      accountKey = null,
-      fold = null,
-      memoryOwner = null
-    } = {}) {
-      if (!identifier(gameId) || !identifier(learnerKey) || typeof map?.allNodes !== "function") throw new TypeError("Atlas: game, local scope and Strata map required");
-      if (!["device", "account"].includes(storageScope) || storageScope === "account" && (!identifier(accountKey) || learnerKey !== "device")) throw new TypeError("Atlas: account identity and isolated host storage required");
-      if (memoryOwner != null && (storageScope !== "account" || memoryOwner.scope !== "account" || !identifier(memoryOwner.accountKey) || !memoryOwner.flow || ["today", "setToday", "presentation", "setPresentation", "epoch", "memories", "save", "decline", "state", "merge", "subscribe"].some((name) => typeof memoryOwner.flow[name] !== "function"))) throw new TypeError("Atlas: a verified personal memory owner is required");
-      const scope = { domain: "LAB", workspace: "learning", subject: learnerKey };
-      const key = `${KEY}.${learnerKey}`;
+    var AHEAD_MS = 5 * 6e4;
+    function openHistory({ storage, key, scope, storageScope, accountKey, historyComplete, fold, clock: clock2, held, release }) {
       const pages = storageScope === "account" && storage ? createPages(storage, key, ["events", "settled", "dropped"]) : null;
-      let paged = false;
-      let flowPort = null;
-      let epoch = null, session, readable = true, writable = !!storage, complete = historyComplete, warning = null, ledger = null;
+      let paged = false, epoch = null, session, readable = true, writable = !!storage, complete = historyComplete, warning = null, ledger = null;
       const folding = fold === false || fold == null && storageScope !== "device" ? null : { max: 600, keep: 400, ageMs: fold?.remote ? 864e5 : 6e5, remote: false, ...fold && typeof fold === "object" ? fold : {} };
       const settled = /* @__PURE__ */ new Set();
       let settledVersion = 0;
       const dropped = /* @__PURE__ */ new Set();
       let droppedVersion = 0;
       const UNCHANGED = /* @__PURE__ */ Symbol("unchanged-history");
-      let lastStoredRaw = /* @__PURE__ */ Symbol("unread-history");
-      let lastTime = 0;
-      const active = /* @__PURE__ */ new Map(), sets = /* @__PURE__ */ new Map();
+      let lastStoredRaw = /* @__PURE__ */ Symbol("unread-history"), lastTime = 0;
       const listeners = /* @__PURE__ */ new Set();
       const notify = (kind, code) => {
         for (const listener of listeners) {
@@ -10255,7 +10279,6 @@ var require_game_learning = __commonJS({
         lastTime = Math.max(value, lastTime);
         return new Date(lastTime).toISOString();
       };
-      const AHEAD_MS = 5 * 6e4;
       const newSession = (events) => {
         const own2 = Date.parse(clock2());
         for (const e of events) {
@@ -10264,7 +10287,7 @@ var require_game_learning = __commonJS({
         }
         return Atlas.createSession({ scope, events, clock: monotonicClock });
       };
-      const log = () => session.snapshot ? session.snapshot() : session.events();
+      const log = (of = session) => of.snapshot ? of.snapshot() : of.events();
       const decode = (raw) => {
         if (raw == null) return null;
         const value = pages ? pages.decode(raw) : JSON.parse(raw);
@@ -10320,8 +10343,7 @@ var require_game_learning = __commonJS({
           epoch = stored.epoch;
           ledger = stored.ledger || null;
           session = newSession(stored.events);
-          active.clear();
-          sets.clear();
+          release(null);
           settled.clear();
           settledVersion += 1;
           settle(stored.settled || [], new Set(stored.events.map((e) => e.id)));
@@ -10359,7 +10381,7 @@ var require_game_learning = __commonJS({
           droppedVersion += 1;
         }
         session = newSession(combined.filter((e) => known.has(e.id)));
-        for (const pid of active.keys()) if (!known.has(pid)) active.delete(pid);
+        release((id) => !known.has(id));
       }
       const serialised = /* @__PURE__ */ new WeakMap();
       const entryJson = (e) => {
@@ -10370,7 +10392,7 @@ var require_game_learning = __commonJS({
         }
         return json;
       };
-      let body = null;
+      let body = null, ledgerJson = null, settledJson = null, droppedJson = null, retryFold = null;
       const snapshot = (events) => {
         if (!(body && body.session === session && body.count <= events.length && (body.count === 0 || events[body.count - 1] === body.last))) body = { session, count: 0, last: null, text: "" };
         for (; body.count < events.length; body.count += 1) body.text += (body.count ? "," : "") + entryJson(events[body.count]);
@@ -10380,15 +10402,12 @@ var require_game_learning = __commonJS({
         if (droppedJson?.version !== droppedVersion) droppedJson = { version: droppedVersion, text: dropped.size ? `,"dropped":${JSON.stringify([...dropped])}` : "" };
         return `{"version":1,"epoch":${JSON.stringify(epoch)},"events":[${body.text}]${ledgerJson.text}${settledJson.text}${droppedJson.text}${storageScope === "account" ? `,"owner":${JSON.stringify(accountKey)}` : ""}}`;
       };
-      let ledgerJson = null, settledJson = null, droppedJson = null, retryFold = null;
       function compact() {
         if (!folding || paged) return;
         const events = log(), now = Date.parse(monotonicClock());
         if (events.length <= folding.max) return;
         if (retryFold && retryFold.settled === settledVersion && now < retryFold.at) return;
-        const open = [...active].filter(([, item]) => !item.results.length).map(([pid]) => pid);
-        for (const [id, at] of sets) if (now - at < SET_OPEN_MS) open.push(id);
-        else sets.delete(id);
+        const open = held(now);
         if (folding.remote) {
           for (const e of events) if (!settled.has(e.id)) open.push(e.id);
         }
@@ -10407,11 +10426,9 @@ var require_game_learning = __commonJS({
         retryFold = null;
         ledger = Ledger.fold(ledger, planned.folded, { scope, log: events, local: !folding.remote });
         session = newSession(planned.kept);
-        for (const e of planned.folded) {
-          if (e.type === "practice.presented") active.delete(e.id);
-          settled.delete(e.id);
-        }
+        for (const e of planned.folded) settled.delete(e.id);
         settledVersion += 1;
+        release((id) => planned.folded.some((e) => e.id === id));
         if (folding.remote) {
           for (const e of planned.folded) dropped.add(e.id);
           droppedVersion += 1;
@@ -10458,28 +10475,192 @@ var require_game_learning = __commonJS({
         }
       }
       if (!initial && readable && storage) persist();
-      const practiceSession = { practice: (...args) => session.practice(...args) };
+      const requireDurable = () => {
+        refresh();
+        if (!readable || !writable) throw Object.assign(new Error("Atlas: local history is not durable"), { code: "STORAGE_ERROR" });
+      };
+      const port = Object.freeze({
+        scope: storageScope,
+        accountKey,
+        // The kept entries. A synchronised store's folded entries are on the server; whether this
+        // history can be sent at all is partial().
+        events() {
+          requireDurable();
+          return session.events();
+        },
+        // The kept entries' ids, without copying the entries: a WORLD host compares them around a
+        // game call to find what the call added (account/world-learning-host.js).
+        ids() {
+          requireDurable();
+          return log().map((e) => e.id);
+        },
+        // True when this store folded entries no server has received (it was not synchronised then):
+        // its history can never be sent whole, so a synchroniser must not send it.
+        partial() {
+          refresh();
+          return !!ledger?.local;
+        },
+        // The sync calls this after a complete pull with every entry id the server has sent:
+        // those entries may fold here. Saved quietly (it is not a new learning entry).
+        settle(ids) {
+          if (!folding?.remote || !Array.isArray(ids)) return false;
+          refresh();
+          if (!readable) return false;
+          const version = settledVersion;
+          settle([...settled, ...ids], new Set(log().map((e) => e.id)));
+          return settledVersion === version || persist("settle", { quiet: true });
+        },
+        // Ids this store folded away since the synchroniser last took them (always on the server).
+        dropped() {
+          refresh();
+          return [...dropped];
+        },
+        // The synchroniser has taken these (saved in its own outbox first).
+        forget(ids) {
+          refresh();
+          if (!readable || !Array.isArray(ids)) return false;
+          const version = droppedVersion;
+          for (const id of ids) if (dropped.delete(id)) droppedVersion = version + 1;
+          return droppedVersion === version || persist("forget", { quiet: true });
+        },
+        subscribe(listener) {
+          if (typeof listener !== "function") throw new TypeError("Atlas: listener required");
+          listeners.add(listener);
+          return () => listeners.delete(listener);
+        },
+        markComplete(value) {
+          complete = value === true;
+        },
+        importEvents(incoming) {
+          refresh();
+          if (!readable) throw Object.assign(new Error("Atlas: local history is unreadable"), { code: "STORAGE_ERROR" });
+          if (ledger?.local) throw Object.assign(new Error("Atlas: a folded history is kept on this device only"), { code: "HISTORY_FOLDED" });
+          if (!Array.isArray(incoming)) throw new TypeError("Atlas: imported events must be an array");
+          const combined = log().slice(), previousLength = combined.length, known = new Map(combined.map((event) => [event.id, event])), late = [], gone = [], skipped = [];
+          for (const event of incoming) {
+            if (known.has(event?.id)) {
+              if (!sameEvent(known.get(event.id), event)) throw Object.assign(new Error("Atlas: conflicting imported event"), { code: "EVENT_CONFLICT" });
+            } else if (ledger && Ledger.stray(event, known)) {
+              skipped.push(event.id);
+              if (event.type === "record.excluded") gone.push(event.targetId);
+              continue;
+            } else {
+              known.set(event?.id, event);
+              combined.push(event);
+              if (Ledger.folded(ledger, event)) late.push(event);
+            }
+          }
+          if (combined.length === previousLength && !skipped.length && writable && (paged || snapshot(combined) === lastStoredRaw)) return { added: 0, skipped };
+          const imported = newSession(combined);
+          session = imported;
+          if (late.length || skipped.length) ledger = Ledger.demote(ledger, { late, excluded: gone, strays: skipped.length }, (id) => known.get(id));
+          if (!persist("import")) throw Object.assign(new Error("Atlas: imported history could not be saved"), { code: "STORAGE_ERROR" });
+          return { added: combined.length - previousLength, skipped };
+        }
+      });
+      return Object.freeze({
+        port,
+        refresh,
+        clock: monotonicClock,
+        // What is saved now. `session` is the log the game appends to (only this owner replaces it);
+        // `available`: it can be read and written; `durable`: also complete, so only then is an answer independent.
+        state() {
+          const of = session;
+          return Object.freeze({ epoch, session: of, get log() {
+            return log(of);
+          }, ledger, available: readable && writable, durable: complete && readable && writable, warning });
+        },
+        persist: () => persist(),
+        // Before a tab closes or hides: another tab may have written an older history over this
+        // one's entries in the meantime (tabs see each other's writes late), so join and write again.
+        flush() {
+          refresh();
+          return !!storage && readable && writable && (snapshot(log()) === lastStoredRaw || persist("flush", { quiet: true }));
+        },
+        reset() {
+          epoch = uid();
+          ledger = null;
+          settled.clear();
+          settledVersion += 1;
+          takeDropped([], false);
+          session = newSession([]);
+          release(null);
+          readable = true;
+          writable = !!storage;
+          complete = historyComplete;
+          warning = null;
+          persist();
+        }
+      });
+    }
+    function createGame({
+      gameId,
+      map,
+      storage = null,
+      learnerKey = "device",
+      clock: clock2 = () => (/* @__PURE__ */ new Date()).toISOString(),
+      historyComplete = true,
+      storageScope = "device",
+      accountKey = null,
+      fold = null,
+      memoryOwner = null
+    } = {}) {
+      if (!identifier(gameId) || !identifier(learnerKey) || typeof map?.allNodes !== "function") throw new TypeError("Atlas: game, local scope and Strata map required");
+      if (!["device", "account"].includes(storageScope) || storageScope === "account" && (!identifier(accountKey) || learnerKey !== "device")) throw new TypeError("Atlas: account identity and isolated host storage required");
+      if (memoryOwner != null && (storageScope !== "account" || memoryOwner.scope !== "account" || !identifier(memoryOwner.accountKey) || !memoryOwner.flow || ["today", "setToday", "presentation", "setPresentation", "epoch", "memories", "save", "decline", "state", "merge", "subscribe"].some((name) => typeof memoryOwner.flow[name] !== "function"))) throw new TypeError("Atlas: a verified personal memory owner is required");
+      const scope = { domain: "LAB", workspace: "learning", subject: learnerKey };
+      const key = `${KEY}.${learnerKey}`;
+      let flowPort = null;
+      const active = /* @__PURE__ */ new Map(), sets = /* @__PURE__ */ new Map();
+      const history2 = openHistory({
+        storage,
+        key,
+        scope,
+        storageScope,
+        accountKey,
+        historyComplete,
+        fold,
+        clock: clock2,
+        held: (now) => {
+          const open = [...active].filter(([, item]) => !item.results.length).map(([pid]) => pid);
+          for (const [id, at] of sets) if (now - at < SET_OPEN_MS) open.push(id);
+          else sets.delete(id);
+          return open;
+        },
+        release: (gone) => {
+          if (!gone) {
+            active.clear();
+            sets.clear();
+          } else for (const pid of active.keys()) if (gone(pid)) active.delete(pid);
+        }
+      });
+      const monotonicClock = history2.clock;
+      const current = () => {
+        history2.refresh();
+        return history2.state();
+      };
+      const practiceSession = { practice: (...args) => history2.state().session.practice(...args) };
       const VIEW_MS = 6e4;
       let cached2 = null, met = null;
-      function view() {
-        const events = log(), asOf = monotonicClock(), now = Date.parse(asOf);
+      function view(saved) {
+        const events = saved.log, asOf = monotonicClock(), now = Date.parse(asOf);
         if (cached2?.events === events && now - cached2.now < VIEW_MS) return cached2.summary;
-        cached2 = { events, now, summary: Trail2.summarize(events, { scope, asOf, prior: ledger }), profiles: /* @__PURE__ */ new Map(), counts: null };
+        cached2 = { events, now, summary: Trail2.summarize(events, { scope, asOf, prior: saved.ledger }), profiles: /* @__PURE__ */ new Map(), counts: null };
         return cached2.summary;
       }
-      function profileOf(observed) {
-        const ok = complete && readable && writable, flag = String(ok);
+      function profileOf(observed, { durable, ledger }) {
+        const flag = String(durable);
         if (cached2?.summary === observed && cached2.profiles.has(flag)) return cached2.profiles.get(flag);
         const profile = {
-          ...Learning.summarizeLearning({ summary: observed, map, complete: ok, prior: ledger }),
-          concepts: Learning.summarizeConcepts({ summary: observed, map, complete: ok, prior: ledger })
+          ...Learning.summarizeLearning({ summary: observed, map, complete: durable, prior: ledger }),
+          concepts: Learning.summarizeConcepts({ summary: observed, map, complete: durable, prior: ledger })
         };
         if (cached2?.summary === observed) cached2.profiles.set(flag, profile);
         return profile;
       }
-      function provenance() {
-        const events = log();
-        if (!met || met.session !== session) met = { session, done: 0, index: Trail2.createIndex({ scope, prior: ledger }), buckets: /* @__PURE__ */ new Map() };
+      function provenance(saved) {
+        const events = saved.log;
+        if (!met || met.session !== saved.session) met = { session: saved.session, done: 0, index: Trail2.createIndex({ scope, prior: saved.ledger }), buckets: /* @__PURE__ */ new Map() };
         for (; met.done < events.length; met.done += 1) {
           const row = met.index.add(events[met.done]);
           if (!row?.measure) continue;
@@ -10489,140 +10670,57 @@ var require_game_learning = __commonJS({
         }
         return met;
       }
-      function basisOf(measure) {
-        const known = provenance();
-        if (!known.index.exact) return profileOf(view()).skills.find((s) => s.id === measure.skillId).levels[measure.difficulty].formats[measure.responseFormat];
-        const key2 = `${measure.skillId}|${measure.difficulty}|${measure.responseFormat}`, cell = Ledger.cellOf(ledger, key2);
+      function basisOf(measure, saved) {
+        const known = provenance(saved);
+        if (!known.index.exact) return profileOf(view(saved), saved).skills.find((s) => s.id === measure.skillId).levels[measure.difficulty].formats[measure.responseFormat];
+        const key2 = `${measure.skillId}|${measure.difficulty}|${measure.responseFormat}`, cell = Ledger.cellOf(saved.ledger, key2);
         const rows2 = (known.buckets.get(key2) || []).filter((row) => !row.omitted);
         return Learning.formatEvidence(rows2, {
           now: Date.parse(monotonicClock()),
-          complete: complete && readable && writable,
+          complete: saved.durable,
           difficulty: measure.difficulty,
           responseFormat: measure.responseFormat,
           base: cell ? Ledger.rows(cell) : null
         });
       }
-      function summary() {
-        refresh();
-        const observed = view();
+      function report(saved) {
+        const observed = view(saved), { ledger } = saved;
         const measured = () => Temper.combine(ledger?.counts || null, Temper.measure(observed));
         if (cached2?.summary === observed && !cached2.counts) cached2.counts = measured();
         return {
-          ...profileOf(observed),
+          ...profileOf(observed, saved),
           storage: {
-            available: readable && writable,
+            available: saved.available,
             scope: storageScope,
-            warning,
+            warning: saved.warning,
             ...ledger ? { folded: ledger.folded, adjusted: ledger.adjusted || 0 } : {}
           },
           counts: cached2?.summary === observed ? cached2.counts : measured()
         };
       }
       function requireActive(pid) {
-        refresh();
-        const item = active.get(pid);
+        const saved = current(), item = active.get(pid);
         if (!item) throw new Error("Atlas: presentation ended or local record reset");
-        return item;
+        return [item, saved];
       }
       const api = {
-        syncPort: Object.freeze({
-          scope: storageScope,
-          accountKey,
-          // The kept entries. A synchronised store's folded entries are on the server; whether this
-          // history can be sent at all is partial().
-          events() {
-            refresh();
-            if (!readable || !writable) throw Object.assign(new Error("Atlas: local history is not durable"), { code: "STORAGE_ERROR" });
-            return session.events();
-          },
-          // The kept entries' ids, without copying the entries: a WORLD host compares them around a
-          // game call to find what the call added (account/world-learning-host.js).
-          ids() {
-            refresh();
-            if (!readable || !writable) throw Object.assign(new Error("Atlas: local history is not durable"), { code: "STORAGE_ERROR" });
-            return log().map((e) => e.id);
-          },
-          // True when this store folded entries no server has received (it was not synchronised then):
-          // its history can never be sent whole, so a synchroniser must not send it.
-          partial() {
-            refresh();
-            return !!ledger?.local;
-          },
-          // The sync calls this after a complete pull with every entry id the server has sent:
-          // those entries may fold here. Saved quietly (it is not a new learning entry).
-          settle(ids) {
-            if (!folding?.remote || !Array.isArray(ids)) return false;
-            refresh();
-            if (!readable) return false;
-            const version = settledVersion;
-            settle([...settled, ...ids], new Set(log().map((e) => e.id)));
-            return settledVersion === version || persist("settle", { quiet: true });
-          },
-          // Ids this store folded away since the synchroniser last took them (always on the server).
-          dropped() {
-            refresh();
-            return [...dropped];
-          },
-          // The synchroniser has taken these (saved in its own outbox first).
-          forget(ids) {
-            refresh();
-            if (!readable || !Array.isArray(ids)) return false;
-            const version = droppedVersion;
-            for (const id of ids) if (dropped.delete(id)) droppedVersion = version + 1;
-            return droppedVersion === version || persist("forget", { quiet: true });
-          },
-          subscribe(listener) {
-            if (typeof listener !== "function") throw new TypeError("Atlas: listener required");
-            listeners.add(listener);
-            return () => listeners.delete(listener);
-          },
-          markComplete(value) {
-            complete = value === true;
-          },
-          importEvents(incoming) {
-            refresh();
-            if (!readable) throw Object.assign(new Error("Atlas: local history is unreadable"), { code: "STORAGE_ERROR" });
-            if (ledger?.local) throw Object.assign(new Error("Atlas: a folded history is kept on this device only"), { code: "HISTORY_FOLDED" });
-            if (!Array.isArray(incoming)) throw new TypeError("Atlas: imported events must be an array");
-            const combined = log().slice(), previousLength = combined.length, known = new Map(combined.map((event) => [event.id, event])), late = [], gone = [], skipped = [];
-            for (const event of incoming) {
-              if (known.has(event?.id)) {
-                if (!sameEvent(known.get(event.id), event)) throw Object.assign(new Error("Atlas: conflicting imported event"), { code: "EVENT_CONFLICT" });
-              } else if (ledger && Ledger.stray(event, known)) {
-                skipped.push(event.id);
-                if (event.type === "record.excluded") gone.push(event.targetId);
-                continue;
-              } else {
-                known.set(event?.id, event);
-                combined.push(event);
-                if (Ledger.folded(ledger, event)) late.push(event);
-              }
-            }
-            if (combined.length === previousLength && !skipped.length && writable && (paged || snapshot(combined) === lastStoredRaw)) return { added: 0, skipped };
-            const imported = newSession(combined);
-            session = imported;
-            if (late.length || skipped.length) ledger = Ledger.demote(ledger, { late, excluded: gone, strays: skipped.length }, (id) => known.get(id));
-            if (!persist("import")) throw Object.assign(new Error("Atlas: imported history could not be saved"), { code: "STORAGE_ERROR" });
-            return { added: combined.length - previousLength, skipped };
-          }
-        }),
-        summary,
+        syncPort: history2.port,
+        summary: () => report(current()),
         recommend(candidates, options = {}) {
-          const profile = summary();
-          return { ...Learning.recommend({ profile, candidates, presentations: view().presentations, prior: ledger, ...options }), storage: profile.storage };
+          const saved = current(), profile = report(saved);
+          return { ...Learning.recommend({ profile, candidates, presentations: view(saved).presentations, prior: saved.ledger, ...options }), storage: profile.storage };
         },
         recommendActivities(candidates, options = {}) {
-          const profile = summary();
-          return { ...Learning.recommendActivities({ ...options, profile, candidates, presentations: view().presentations, prior: ledger }), storage: profile.storage };
+          const saved = current(), profile = report(saved);
+          return { ...Learning.recommendActivities({ ...options, profile, candidates, presentations: view(saved).presentations, prior: saved.ledger }), storage: profile.storage };
         },
         // Display exposure is stricter than independent-attempt qualification: an item
         // shown without an answer is still not a never-shown item. Both include folded history.
         exposure(item) {
           if (!identifier(item?.itemKey) || !identifier(item.familyKey || item.itemKey)) throw new TypeError("Atlas: invalid exposure item");
-          refresh();
-          const family = item.familyKey || item.itemKey;
-          const shown = log().some((e) => e.type === "practice.presented" && (e.itemKey === item.itemKey || (e.measure?.familyKey || e.itemKey) === family)) || (ledger?.presented || []).some(([_task, priorItem, priorFamily]) => priorItem === item.itemKey || priorFamily === family);
-          return { seen: shown || provenance().index.met(item.itemKey, family) ? true : complete && readable && writable ? false : null };
+          const saved = current(), family = item.familyKey || item.itemKey;
+          const shown = saved.log.some((e) => e.type === "practice.presented" && (e.itemKey === item.itemKey || (e.measure?.familyKey || e.itemKey) === family)) || (saved.ledger?.presented || []).some(([_task, priorItem, priorFamily]) => priorItem === item.itemKey || priorFamily === family);
+          return { seen: shown || provenance(saved).index.met(item.itemKey, family) ? true : saved.durable ? false : null };
         },
         // A consumer supplies the two attempts it deliberately joined in this round.
         // This reads recent full events only: no durable lineage, profile update or causal claim.
@@ -10630,13 +10728,14 @@ var require_game_learning = __commonJS({
           if (![sourceAttemptId, targetAttemptId].every(identifier)) throw new TypeError("Atlas: invalid recheck attempt IDs");
           const result = { sourceAttemptId, targetAttemptId, correctionObserved: false, correctionEventIds: [], learningEffectClaim: false };
           const unavailable = (reason) => ({ ...result, status: "unavailable", line: "\uC0C8 \uBB38\uD56D \uD655\uC778 \uACB0\uACFC\uB97C \uD310\uB2E8\uD560 \uAE30\uB85D\uC774 \uCDA9\uBD84\uD558\uC9C0 \uC54A\uC544\uC694.", reason });
+          let saved;
           try {
-            refresh();
+            saved = current();
           } catch {
             return unavailable("incomplete-history");
           }
-          if (!complete || !readable || !writable || ledger?.adjusted) return unavailable("incomplete-history");
-          const events = log(), positions = new Map(events.map((event, index) => [event.id, index]));
+          if (!saved.durable || saved.ledger?.adjusted) return unavailable("incomplete-history");
+          const events = saved.log, positions = new Map(events.map((event, index) => [event.id, index]));
           const byId = new Map(events.map((event) => [event.id, event]));
           const sourceEvent = byId.get(sourceAttemptId), targetEvent = byId.get(targetAttemptId);
           if (sourceEvent?.type !== "practice.attempted" || targetEvent?.type !== "practice.attempted") return unavailable("missing-attempt");
@@ -10660,8 +10759,8 @@ var require_game_learning = __commonJS({
           if (!a || !b || !Learning.RESPONSE_FORMATS.includes(a.responseFormat) || a.responseFormat === "unknown" || ["skillId", "difficulty", "responseFormat", "modality", "audioRequired"].some((key2) => a[key2] !== b[key2]) || sourcePresentation.taskVersion !== targetPresentation.taskVersion) return unavailable("different-measurement");
           if (sourcePresentation.itemKey === targetPresentation.itemKey || a.familyKey === b.familyKey) return unavailable("same-family");
           const priorPresentation = events.some((event) => event.type === "practice.presented" && event.id !== targetPresentation.id && (positions.get(event.id) < positions.get(targetPresentation.id) || Date.parse(event.at) < Date.parse(targetPresentation.at)) && (event.itemKey === targetPresentation.itemKey || (event.measure?.familyKey || event.itemKey) === b.familyKey));
-          if (priorPresentation || (ledger?.presented || []).some(([_task, item, family]) => item === targetPresentation.itemKey || family === b.familyKey)) return unavailable("previously-presented");
-          const observed = view(), source = observed.attempts.find((row) => row.eventId === sourceAttemptId), target = observed.attempts.find((row) => row.eventId === targetAttemptId);
+          if (priorPresentation || (saved.ledger?.presented || []).some(([_task, item, family]) => item === targetPresentation.itemKey || family === b.familyKey)) return unavailable("previously-presented");
+          const observed = view(saved), source = observed.attempts.find((row) => row.eventId === sourceAttemptId), target = observed.attempts.find((row) => row.eventId === targetAttemptId);
           if (!source || !target || source.exclusionReason || target.exclusionReason || !["correct", "incorrect"].includes(source.verdict) || !["correct", "incorrect"].includes(target.verdict)) return unavailable("unassessable");
           if (source.verdict === "correct" && source.assisted !== true) return unavailable("source-not-recheck");
           if (targetPresentation.firstExposure !== true || target.exposure !== "new" || ![true, false].includes(target.assisted) || target.assisted === false && !target.independent) return unavailable("unknown-provenance");
@@ -10684,7 +10783,7 @@ var require_game_learning = __commonJS({
           };
         },
         present(item, context = {}) {
-          refresh();
+          const saved = current();
           if (!context || typeof context !== "object" || Object.keys(context).some((k) => k !== "flow") || context.flow != null && (typeof context.flow !== "object" || Array.isArray(context.flow))) throw new TypeError("Atlas: invalid presentation context");
           const node = map.getNode(item?.skillId);
           if (!node || node.domain !== item.modality || !identifier(item.id) || !identifier(item.itemKey) || !identifier(item.familyKey || item.itemKey) || ![1, 2, 3].includes(item.difficulty) || !Learning.RESPONSE_FORMATS.includes(item.responseFormat ?? "unknown")) throw new TypeError("Atlas: invalid measured item");
@@ -10697,9 +10796,9 @@ var require_game_learning = __commonJS({
             audioRequired: item.audioRequired ?? item.modality === "listening",
             confounded: !!item.confounded
           };
-          const seen = provenance().index.met(item.itemKey, measure.familyKey);
-          const basis = basisOf(measure);
-          const decision = session.plan(gameId, [{
+          const seen = provenance(saved).index.met(item.itemKey, measure.familyKey);
+          const basis = basisOf(measure, saved);
+          const decision = saved.session.plan(gameId, [{
             id: item.id,
             minutes: 3,
             pace: "standard",
@@ -10722,46 +10821,46 @@ var require_game_learning = __commonJS({
             map,
             task,
             assess: (result) => ({ verdict: result.assessable === false ? "unassessed" : result.correct == null ? "skipped" : result.correct ? "correct" : "incorrect", errorTags: [] }),
-            firstExposure: seen ? false : complete && readable && writable ? true : null
+            firstExposure: seen ? false : saved.durable ? true : null
           });
           active.set(practice.presentation.id, { practice, measure, decision, audio: "pending", results: [] });
-          persist();
+          history2.persist();
           return practice.presentation.id;
         },
         help(pid, kind) {
-          const p = requireActive(pid);
+          const [p] = requireActive(pid);
           if (!["text", "hint", "answer", "replay"].includes(kind)) throw new TypeError("Atlas: invalid help kind");
           const result = p.practice.delivered({ id: kind, level: kind === "answer" ? "answer" : "cue", contentRef: `${gameId}.${kind}` });
-          persist();
+          history2.persist();
           return result;
         },
         delivery(pid, { audio }) {
-          const p = requireActive(pid);
+          const [p, saved] = requireActive(pid);
           p.audio = audio;
-          const result = session.practice("delivery", { presentationId: pid, audio });
-          persist();
+          const result = saved.session.practice("delivery", { presentationId: pid, audio });
+          history2.persist();
           return result;
         },
         answer(pid, result) {
-          const p = requireActive(pid);
+          const [p, saved] = requireActive(pid);
           if (!result || ![true, false, null].includes(result.correct) || typeof result.assessable !== "boolean") throw new TypeError("Atlas: answer must identify assessability");
           const choice = Object.hasOwn(result, "choice") ? Trail2.choiceRecord(result.choice) : null;
           const attemptNo = result.attemptNo ?? 1;
           if (!Number.isInteger(attemptNo) || attemptNo < 1 || attemptNo > p.results.length + 1) throw new TypeError("Atlas: attempts must be consecutive");
           if (p.results[attemptNo - 1]) {
-            const saved = p.results[attemptNo - 1];
-            return { ...saved, ...saved.choice ? { choice: { ...saved.choice } } : {} };
+            const earlier = p.results[attemptNo - 1];
+            return { ...earlier, ...earlier.choice ? { choice: { ...earlier.choice } } : {} };
           }
-          const reason = p.measure.confounded ? result.reason || "visual" : p.measure.audioRequired && p.audio !== "completed" ? "audio" : !readable || !writable ? "storage" : result.reason;
-          const assessable = result.assessable && !p.measure.confounded && (!p.measure.audioRequired || p.audio === "completed") && readable && writable;
+          const reason = p.measure.confounded ? result.reason || "visual" : p.measure.audioRequired && p.audio !== "completed" ? "audio" : !saved.available ? "storage" : result.reason;
+          const assessable = result.assessable && !p.measure.confounded && (!p.measure.audioRequired || p.audio === "completed") && saved.available;
           const attempt = p.practice.submit({ ...result, assessable }, { reason: reason || null, ...choice ? { choice } : {} });
-          session.complete(p.decision);
-          persist();
-          const known = provenance(), row = known.index.attempt(attempt.eventId);
-          const actual = known.index.exact ? row && !row.omitted ? row : void 0 : view().attempts.find((a) => a.eventId === attempt.eventId);
+          saved.session.complete(p.decision);
+          history2.persist();
+          const after = history2.state(), known = provenance(after), row = known.index.attempt(attempt.eventId);
+          const actual = known.index.exact ? row && !row.omitted ? row : void 0 : view(after).attempts.find((a) => a.eventId === attempt.eventId);
           const recorded = {
             ...attempt,
-            independent: !!actual?.independent && complete && writable,
+            independent: !!actual?.independent && after.durable,
             reason: reason || null,
             assisted: actual?.assisted ?? null,
             exposure: actual?.exposure ?? null
@@ -10770,76 +10869,56 @@ var require_game_learning = __commonJS({
           return { ...recorded, ...recorded.choice ? { choice: { ...recorded.choice } } : {} };
         },
         exclude(eventId) {
-          refresh();
-          const event = session.exclude(eventId);
-          persist();
+          const event = current().session.exclude(eventId);
+          history2.persist();
           return event;
         },
         // A practice set ended (short practice, quick check, exam-form practice): a `<gameId>.set` decision and completion, so a
         // response is about the set, not its last item. One 5-minute candidate, so a short-time setting never blocks it.
+        // Both entries are written together, once.
         finishSet({ kind } = {}) {
-          refresh();
+          const { session } = current();
           if (!SET_KINDS.includes(kind)) throw new TypeError("Atlas: invalid practice set");
           const decision = session.plan(`${gameId}.set`, [{ id: kind, minutes: 5, pace: "standard" }]);
           if (decision.status !== "ready") throw new Error("Atlas: practice set could not be recorded");
           const completion = session.complete(decision);
           sets.set(decision.id, Date.parse(completion.at));
-          persist();
+          history2.persist();
           return { decisionId: decision.id, completionId: completion.id };
         },
         // A response to a finished set. It names the set's decision too, so a store folding by the older reference() keeps the
         // set with it. The same value again adds nothing; another value replaces it.
         feedback(set, value) {
-          refresh();
+          const saved = current();
           if (!RESPONSES.includes(value) || !identifier(set?.completionId) || !identifier(set?.decisionId)) throw new TypeError("Atlas: invalid set response");
-          const done = log().find((e) => e.id === set.completionId);
+          const done = saved.log.find((e) => e.id === set.completionId);
           if (done?.type !== "experience.completed" || done.experienceId !== `${gameId}.set` || done.decisionId !== set.decisionId || Date.parse(monotonicClock()) - Date.parse(done.at) > SET_OPEN_MS) throw Object.assign(new Error("Atlas: this practice set no longer takes a response"), { code: "SET_UNAVAILABLE" });
-          if (session.state().feedback.find((f) => f.completionId === done.id)?.value === value) return null;
-          const event = session.feedback(done.id, value, done.decisionId);
-          persist();
+          if (saved.session.state().feedback.find((f) => f.completionId === done.id)?.value === value) return null;
+          const event = saved.session.feedback(done.id, value, done.decisionId);
+          history2.persist();
           return event;
         },
         // Responses to this game's sets that Core still reads (30 days, not excluded), oldest first.
         setFeedback() {
-          refresh();
-          return session.state().feedback.filter((f) => f.experienceId === `${gameId}.set`).map((f) => ({ id: f.id, completionId: f.completionId, decisionId: f.decisionId ?? null, value: f.value, kind: f.variant, at: f.at }));
+          return current().session.state().feedback.filter((f) => f.experienceId === `${gameId}.set`).map((f) => ({ id: f.id, completionId: f.completionId, decisionId: f.decisionId ?? null, value: f.value, kind: f.variant, at: f.at }));
         },
         events() {
-          refresh();
-          return session.events();
+          return current().session.events();
         },
-        // Before a tab closes or hides: another tab may have written an older history over this
-        // one's entries in the meantime (tabs see each other's writes late), so join and write again.
-        flush() {
-          refresh();
-          if (!storage || !readable || !writable) return false;
-          return snapshot(log()) === lastStoredRaw || persist("flush", { quiet: true });
-        },
+        flush: () => history2.flush(),
         reset() {
           if (storageScope === "account") throw Object.assign(new Error("Atlas: account deletion requires the host consent/reset API; local reset cannot delete server records"), { code: "ACCOUNT_RESET_REQUIRED" });
-          epoch = uid();
-          ledger = null;
-          settled.clear();
-          settledVersion += 1;
-          takeDropped([], false);
-          session = newSession([]);
-          active.clear();
-          sets.clear();
-          readable = true;
-          writable = !!storage;
-          complete = historyComplete;
-          warning = null;
-          persist();
+          history2.reset();
           flowPort.clear();
-          return summary();
+          return api.summary();
         }
       };
       flowPort = memoryOwner?.flow || createFlowPort({ storage, key, clock: monotonicClock, epoch: () => {
         try {
-          refresh();
+          history2.refresh();
         } catch {
         }
-        return epoch;
+        return history2.state().epoch;
       } });
       api.today = flowPort.today;
       api.setToday = flowPort.setToday;
@@ -13881,7 +13960,7 @@ var PACKS = [
       ], [
         question("plans-apply-time", "plans-time-reading", "plans-time", "\uC5B8\uC81C \uAC00\uC57C \uD574\uC694?", "\uCE5C\uAD6C\uC758 \uBA54\uC2DC\uC9C0: \u201C\uB0B4\uC77C \uC624\uD6C4 \uB450 \uC2DC\uC5D0 \uD559\uAD50 \uC55E\uC5D0\uC11C \uB9CC\uB098\uC694.\u201D", ["\uB0B4\uC77C \uC624\uD6C4 \uB450 \uC2DC", "\uC624\uB298 \uC624\uD6C4 \uB450 \uC2DC", "\uB0B4\uC77C \uC624\uC804 \uB450 \uC2DC"], "a", "\uB0A0\uC9DC\uB294 \uB0B4\uC77C, \uC2DC\uAC04\uC740 \uC624\uD6C4 \uB450 \uC2DC\uC608\uC694.", transfer("\uC5B8\uC81C \uAC00\uC57C \uD574\uC694?", "\uCE5C\uAD6C\uC758 \uBA54\uC2DC\uC9C0: \u201C\uC624\uB298 \uC624\uD6C4 \uB2E4\uC12F \uC2DC\uC5D0 \uCE74\uD398 \uC55E\uC5D0\uC11C \uB9CC\uB098\uC694.\u201D", ["\uB0B4\uC77C \uC624\uD6C4 \uB2E4\uC12F \uC2DC", "\uC624\uB298 \uC624\uC804 \uB2E4\uC12F \uC2DC", "\uC624\uB298 \uC624\uD6C4 \uB2E4\uC12F \uC2DC"], "c", "\uC0C8 \uC57D\uC18D\uC740 \uC624\uB298 \uC624\uD6C4 \uB2E4\uC12F \uC2DC\uC608\uC694. \uC7A5\uC18C\uC640 \uC2DC\uAC04\uC744 \uB098\uB204\uC5B4 \uC77D\uC5B4\uC694.")),
         question("plans-apply-place", "plans-location", "plans-place", "\uC5B4\uB514\uC5D0\uC11C \uAE30\uB2E4\uB9B4\uAE4C\uC694?", "\u201C\uC5ED \uC548\uC774 \uC544\uB2C8\uB77C \uC5ED \uC55E\uC5D0\uC11C \uB9CC\uB098\uC694.\u201D", ["\uC5ED \uC548", "\uC5ED \uB4A4", "\uC5ED \uC55E"], "c", "\uBA54\uC2DC\uC9C0\uB294 \u2018\uC5ED \uC548\u2019\uC774 \uC544\uB2C8\uB77C \u2018\uC5ED \uC55E\u2019\uC774\uB77C\uACE0 \uD655\uC778\uD574 \uC918\uC694.", transfer("\uC5B4\uB514\uC5D0\uC11C \uAE30\uB2E4\uB9B4\uAE4C\uC694?", "\u201C\uD559\uAD50 \uC548\uC774 \uC544\uB2C8\uB77C \uD559\uAD50 \uC55E\uC5D0\uC11C \uB9CC\uB098\uC694.\u201D", ["\uD559\uAD50 \uC548", "\uD559\uAD50 \uC55E", "\uD559\uAD50 \uB4A4"], "b", "\u2018\uD559\uAD50 \uC548\u2019\uC740 \uC81C\uC678\uD558\uACE0 \u2018\uD559\uAD50 \uC55E\u2019\uC5D0\uC11C \uB9CC\uB098\uC694.")),
-        question("plans-apply-delay", "plans-delay-message", "plans-delay", "\uCE5C\uAD6C\uC5D0\uAC8C \uBCF4\uB0BC \uC5F0\uB77D\uC744 \uACE8\uB77C\uC694.", "\uC57D\uC18D \uC7A5\uC18C\uC5D0 \uAC00\uB294 \uBC84\uC2A4\uB97C \uB193\uCCE4\uC5B4\uC694. \uC57D\uC18D \uC2DC\uAC04\uBCF4\uB2E4 \uB2A6\uAC8C \uB3C4\uCC29\uD560 \uAC83 \uAC19\uC544\uC694.", ["\uBC8C\uC368 \uB3C4\uCC29\uD588\uC5B4\uC694.", "\uC870\uAE08 \uB2A6\uC744 \uAC83 \uAC19\uC544\uC694.", "\uC77C\uCC0D \uB3C4\uCC29\uD588\uC5B4\uC694."], "b", "\uC544\uC9C1 \uB3C4\uCC29\uD558\uC9C0 \uC54A\uC558\uACE0 \uB2A6\uC744 \uAC83 \uAC19\uC73C\uBBC0\uB85C \uBBF8\uB9AC \uC5F0\uB77D\uD574\uC694.", transfer("\uCE5C\uAD6C\uC5D0\uAC8C \uBCF4\uB0BC \uC5F0\uB77D\uC744 \uACE8\uB77C\uC694.", "\uAE38\uC774 \uB9C9\uD600 \uC57D\uC18D \uC2DC\uAC04\uBCF4\uB2E4 \uC2ED \uBD84 \uB2A6\uAC8C \uB3C4\uCC29\uD560 \uAC83 \uAC19\uC544\uC694.", ["\uC2ED \uBD84 \uB2A6\uC744 \uAC83 \uAC19\uC544\uC694.", "\uC2ED \uBD84 \uC77C\uCC0D \uC654\uC5B4\uC694.", "\uC9C0\uAE08 \uB3C4\uCC29\uD588\uC5B4\uC694."], "a", "\uB2A6\uC744 \uC608\uC0C1 \uC2DC\uAC04\uC744 \uD568\uAED8 \uC54C\uB824 \uC8FC\uBA74 \uCE5C\uAD6C\uAC00 \uAE30\uB2E4\uB9AC\uB294 \uB370 \uB3C4\uC6C0\uC774 \uB3FC\uC694."))
+        question("plans-apply-delay", "plans-delay-message", "plans-delay", "\uCE5C\uAD6C\uC5D0\uAC8C \uBCF4\uB0BC \uC5F0\uB77D\uC744 \uACE8\uB77C\uC694.", "\uC57D\uC18D \uC7A5\uC18C\uC5D0 \uAC00\uB294 \uBC84\uC2A4\uB97C \uB193\uCCE4\uC5B4\uC694. \uC57D\uC18D \uC2DC\uAC04\uBCF4\uB2E4 \uB2A6\uAC8C \uB3C4\uCC29\uD560 \uAC83 \uAC19\uC544\uC694.", ["\uBC8C\uC368 \uB3C4\uCC29\uD588\uC5B4\uC694.", "\uC870\uAE08 \uB2A6\uC744 \uAC83 \uAC19\uC544\uC694.", "\uC77C\uCC0D \uB3C4\uCC29\uD588\uC5B4\uC694."], "b", "\uC544\uC9C1 \uB3C4\uCC29\uD558\uC9C0 \uC54A\uC558\uACE0 \uB2A6\uC744 \uAC83 \uAC19\uC73C\uBBC0\uB85C \uBBF8\uB9AC \uC5F0\uB77D\uD574\uC694.", transfer("\uCE5C\uAD6C\uC5D0\uAC8C \uBCF4\uB0BC \uC5F0\uB77D\uC744 \uACE8\uB77C\uC694.", "\uAE38\uC774 \uB9C9\uD600 \uC57D\uC18D \uC2DC\uAC04\uBCF4\uB2E4 \uC2ED \uBD84 \uB2A6\uAC8C \uB3C4\uCC29\uD560 \uAC83 \uAC19\uC544\uC694.", ["\uC2ED \uBD84 \uB2A6\uC744 \uAC83 \uAC19\uC544\uC694.", "\uC2ED \uBD84 \uC77C\uCC0D \uC654\uC5B4\uC694.", "\uC9C0\uAE08 \uB3C4\uCC29\uD588\uC5B4\uC694."], "a", "\uC5BC\uB9C8\uB098 \uB2A6\uC744\uC9C0 \uD568\uAED8 \uC54C\uB824 \uC8FC\uBA74 \uCE5C\uAD6C\uAC00 \uAE30\uB2E4\uB9AC\uB294 \uB370 \uB3C4\uC6C0\uC774 \uB3FC\uC694."))
       ])
     ]
   }
@@ -18189,7 +18268,7 @@ function createPositionView({ t, has = () => true, formatDate = null, lang = () 
     const answered = results.filter((row) => !row.skipped).length, skipped = results.length - answered;
     const rows2 = doneRows({ map, results, items, practice });
     const wrong = results.some((row) => !row.skipped && row.verdict === "incorrect");
-    return `<div class="wpos life-heading" data-position-done tabindex="-1">${poster(t("position.diagnostic.doneTitle"), t("position.diagnostic.doneSummary", { answered, skipped }))}${rows2 ? `<ul class="wpos-done-list">${rows2}</ul>` : ""}${wrong ? `<p class="wpos-note">${posEscape(t("position.diagnostic.wrongNote"))}</p>` : ""}<p class="wpos-intro">${posEscape(t("position.diagnostic.doneNote"))}</p><p class="wpos-summary-line">${posEscape(t("position.summary", { ...map.counts, total: map.total }))}</p><button class="felt-button" type="button" data-position-back>${posEscape(t("position.diagnostic.back"))} <span aria-hidden="true">\u2192</span></button>${renderSetResponse(response)}</div>`;
+    return `<div class="wpos life-heading" data-position-done tabindex="-1">${poster(t("position.diagnostic.doneTitle"), t("position.diagnostic.doneSummary", { answered, skipped }))}${rows2 ? `<ul class="wpos-done-list">${rows2}</ul>` : ""}${wrong ? `<p class="wpos-note">${posEscape(t("position.diagnostic.wrongNote"))}</p>` : ""}<p class="wpos-intro">${posEscape(t("position.diagnostic.doneNote"))}</p><p class="wpos-summary-line">${posEscape(t(map.exam === "topik2" ? "position.summary.topik2" : "position.summary", { ...map.counts, total: map.total }))}</p><button class="felt-button" type="button" data-position-back>${posEscape(t("position.diagnostic.back"))} <span aria-hidden="true">\u2192</span></button>${renderSetResponse(response)}</div>`;
   }
   const TOWN_POSTER = { print: "position", label: "TOWN CHECK" };
   function renderTownCheckWait({ after = false } = {}) {
