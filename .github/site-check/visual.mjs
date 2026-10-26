@@ -4,7 +4,7 @@
 // 이 점검이 남긴 그 회차 캡처(아티팩트 site-check-shots)를 골라 기준으로 올린다.
 // 그림: 컴퓨터 0.5배(720px 폭)·휴대폰 1배(390px 폭) JPEG, 높이 12000px까지 — 33쪽 × 2기기 한 벌이 14MB 안팎(10-21 실측).
 // 한 번에 찍는 높이는 장치 화소 8192까지다(10-26) — CI 실행기의 소프트웨어 GPU(SwiftShader)는 그보다 긴 전체 화면을 8192행부터
-// 쪽 머리로 되풀이해 찍는다. 그보다 긴 그림(휴대폰의 긴 쪽)은 고르게 나눠 PNG로 찍고 빈 쪽의 캔버스에서 이어 JPEG 한 장으로 만든다.
+// 쪽 머리로 되풀이해 찍는다. 그보다 긴 그림(휴대폰의 긴 쪽)은 고르게 나눠 PNG로 찍고 그 쪽에서 떼어 둔 캔버스로 이어 JPEG 한 장으로 만든다.
 // 흔들림: 두 번 잇달아 같은 그림이 나올 때까지(최대 6번) 찍고, 끝내 같지 않으면 견주지 않고 「흔들림」으로 남긴다
 // (10-21 두 회차 견줌에서 /world/는 한 번은 검은 화면, 한 번은 첫 그림이었다). 동영상·캔버스·iframe은 분홍 상자로 가린다.
 // 새로 생긴 치명(critical) 접근성 위반만 점검을 실패시키고, 그림 차이와 나머지 위반은 보고만 한다.
@@ -67,23 +67,36 @@ export async function stableShot(page, shoot, {tries = 6, gap = 500} = {}) {
   return {image: last, unstable: true, shots: tries};
 }
 
-/** 나눠 찍은 PNG 조각을 새 context 빈 쪽의 캔버스에서 위아래로 잇고 JPEG로 굽는다. */
-export async function stitchJpeg(browser, tiles, quality = JPEG_QUALITY) {
-  const page = await browser.newPage();
-  try {
-    const data = await page.evaluate(async ({tiles, quality}) => {
-      const images = await Promise.all(tiles.map(b64 => createImageBitmap(new Blob([Uint8Array.from(atob(b64), c => c.charCodeAt(0))], {type: 'image/png'}),
-        {colorSpaceConversion: 'none', premultiplyAlpha: 'none'})));
-      const canvas = document.createElement('canvas');
-      canvas.width = images[0].width;
-      canvas.height = images.reduce((sum, image) => sum + image.height, 0);
-      const g = canvas.getContext('2d');
-      let y = 0;
-      for (const image of images) { g.drawImage(image, 0, y); y += image.height; }
-      return canvas.toDataURL('image/jpeg', quality / 100).split(',')[1];
-    }, {tiles: tiles.map(b => b.toString('base64')), quality});
-    return Buffer.from(data, 'base64');
-  } finally { await page.context().close(); }
+/**
+ * 나눠 찍은 쪽의 resize 흔적을 지운다. 실행기 브라우저는 조각을 찍거나 같은 브라우저에 새 쪽을 열 때 가끔 쪽을 4×4로 resize했다가
+ * 되돌리는데, 되돌리는 resize 때 배치가 아직 낡아 resize마다 넘침을 재는 쪽 스크립트가 엉뚱하게 판정한다(10-27 진단 —
+ * /path/ 휴대폰 가로 칸의 tabindex가 빠져 axe scrollable-region-focusable). 배치가 자리 잡은 뒤 지금 크기로 resize를 한 번 더 보낸다.
+ */
+export async function replayResize(page) {
+  await page.evaluate(() => new Promise(done => {
+    const timer = setTimeout(done, 1500);
+    const frame = f => requestAnimationFrame(() => requestAnimationFrame(f));
+    frame(() => { dispatchEvent(new Event('resize')); frame(() => { clearTimeout(timer); done(); }); });
+  })).catch(() => {});
+}
+
+/**
+ * 나눠 찍은 PNG 조각을 찍은 그 쪽에서, 문서에 붙이지 않은 캔버스에 위아래로 잇고 JPEG로 굽는다(쪽의 화면은 건드리지 않는다).
+ * 같은 브라우저에 새 쪽을 열지 않는다 — 열면 위의 4×4 resize가 더 잦다(10-27 진단).
+ */
+export async function stitchJpeg(page, tiles, quality = JPEG_QUALITY) {
+  const data = await page.evaluate(async ({tiles, quality}) => {
+    const images = await Promise.all(tiles.map(b64 => createImageBitmap(new Blob([Uint8Array.from(atob(b64), c => c.charCodeAt(0))], {type: 'image/png'}),
+      {colorSpaceConversion: 'none', premultiplyAlpha: 'none'})));
+    const canvas = document.createElement('canvas');
+    canvas.width = images[0].width;
+    canvas.height = images.reduce((sum, image) => sum + image.height, 0);
+    const g = canvas.getContext('2d');
+    let y = 0;
+    for (const image of images) { g.drawImage(image, 0, y); y += image.height; image.close(); }
+    return canvas.toDataURL('image/jpeg', quality / 100).split(',')[1];
+  }, {tiles: tiles.map(b => b.toString('base64')), quality});
+  return Buffer.from(data, 'base64');
 }
 
 /** axe 위반: CSP가 인라인 스크립트를 막는 쪽(/care/·/fortune/)이 있어 script 태그가 아니라 evaluate로 넣는다(10-21). */
@@ -110,11 +123,11 @@ export async function capturePage({browser, base, route, device, shotsDir, axeSo
       ? () => page.screenshot({type: 'jpeg', quality: JPEG_QUALITY, ...common, clip: {x: 0, y: 0, width, height: clipHeight}})
       : async () => { const parts = []; for (const t of tiles) parts.push(await page.screenshot({type: 'png', ...common, clip: {x: 0, y: t.y, width, height: t.height}})); return parts; };
     let {image, unstable, shots} = await stableShot(page, shoot);
+    if (tiles.length > 1) await replayResize(page);
     let axe = null, axeError = null;
     if (axeSource) { try { axe = await runAxe(page, axeSource); } catch (error) { axeError = String(error).split('\n')[0].slice(0, 200); } }
-    // 잇기는 새 쪽을 열므로 axe 뒤에 한다 — 앞에 두었더니 CI에서 /path/ 휴대폰의 가로 칸(resize 때 넘침을 재어 tabindex를 붙이는 칸) 둘이
-    // tabindex 없이 재였다(10-26·27 두 회차, 이 PC에서는 재현 안 됨). axe는 옛 흐름처럼 마지막 찍기 바로 뒤에 돈다.
-    if (tiles.length > 1) image = await stitchJpeg(browser, image);
+    // 잇기는 쪽 화면을 건드리지 않지만 재는 일(axe)을 먼저 둔다.
+    if (tiles.length > 1) image = await stitchJpeg(page, image);
     const file = shotFile(route, device.key);
     fs.mkdirSync(path.dirname(path.join(shotsDir, file)), {recursive: true});
     fs.writeFileSync(path.join(shotsDir, file), image);

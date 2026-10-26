@@ -6,7 +6,7 @@ import path from 'node:path';
 import {createRequire} from 'node:module';
 import {after, before, test} from 'node:test';
 import {pathToFileURL} from 'node:url';
-import {classify, compareAxe, axeTable, shotsManifest, summaryLines, slugOf, shotFile, runVisualCheck, capturePage, tilesOf, CHANGE_PERCENT, TILE_LIMIT, VISUAL_DEVICES} from './visual.mjs';
+import {classify, compareAxe, axeTable, shotsManifest, summaryLines, slugOf, shotFile, runVisualCheck, capturePage, replayResize, tilesOf, CHANGE_PERCENT, TILE_LIMIT, VISUAL_DEVICES} from './visual.mjs';
 
 const require = createRequire(import.meta.url);
 
@@ -156,4 +156,18 @@ test('긴 휴대폰 쪽: 8192px 아래도 그 자리의 화면이 찍히고, 조
   }));
   const off = rows.map((band, i) => Math.max(...band.flatMap(c => c.map((v, k) => Math.abs(v - want[i][k])))));
   assert.ok(off.every(d => d <= 12), `띠 색 차이(위에서 띠마다): ${off.join(' ')}`);
+});
+
+test('resize 바로잡기: 낡은 배치에서 뗀 tabindex를 쪽의 resize 처리기가 지금 배치로 다시 붙인다', async t => {
+  if (!browser) return t.skip('플레이라이트가 없다');
+  const page = await browser.newPage({viewport: {width: 390, height: 844}});
+  t.after(() => page.context().close());
+  // synk.im 가로 칸(site.js [data-scroll-x])과 같은 처리기: 넘치면 tabindex를 붙이고 아니면 뗀다.
+  await page.setContent(`<div id="x" style="overflow-x:auto;width:300px"><div style="width:900px;height:20px"></div></div>
+    <script>const x = document.getElementById('x'); const sync = () => x.scrollWidth > x.clientWidth + 1 ? x.tabIndex = 0 : x.removeAttribute('tabindex');
+    sync(); addEventListener('resize', sync);</script>`);
+  // 4×4에서 돌아오는 resize가 낡은 배치로 tabindex를 뗀 때와 같은 상태
+  await page.evaluate(() => document.getElementById('x').removeAttribute('tabindex'));
+  await replayResize(page);
+  assert.equal(await page.evaluate(() => document.getElementById('x').getAttribute('tabindex')), '0');
 });
