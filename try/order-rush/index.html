@@ -12,7 +12,7 @@
 <link rel="preload" href="kit/fonts/SUIT-Variable.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="kit/lab.css">
 <link rel="stylesheet" href="style.css">
-<script src="./atlas-learning.js?v=71841b0d3cba"></script>
+<script src="./atlas-learning.js?v=57d236e30d1f"></script>
 <script type="module" src="./app.js"></script>
 </head>
 <body>
@@ -195,9 +195,9 @@
   </section>
 </main>
 
-<dialog id="pause-dialog" class="paper lab-dialog">
+<dialog id="pause-dialog" class="paper lab-dialog" aria-labelledby="pause-title">
   <span class="kicker" id="pause-kicker">PAUSED</span>
-  <h2>카페도 잠깐 쉬어요</h2>
+  <h2 id="pause-title">카페도 잠깐 쉬어요</h2>
   <p>주문과 영업 시간이 함께 멈췄어요. 이어서 하거나 처음으로 돌아갈 수 있어요.</p>
   <p id="game-learning" class="fine pause-why"></p>
   <div class="dialog-actions">
