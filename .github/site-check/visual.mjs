@@ -3,6 +3,8 @@
 // 기준은 이 점검이 바꾸지 않는다. 의도한 변경일 때만 SYNK-appsscript의 `node tools/공개.js 기준 …`이
 // 이 점검이 남긴 그 회차 캡처(아티팩트 site-check-shots)를 골라 기준으로 올린다.
 // 그림: 컴퓨터 0.5배(720px 폭)·휴대폰 1배(390px 폭) JPEG, 높이 12000px까지 — 33쪽 × 2기기 한 벌이 14MB 안팎(10-21 실측).
+// 한 번에 찍는 높이는 장치 화소 8192까지다(10-26) — CI 실행기의 소프트웨어 GPU(SwiftShader)는 그보다 긴 전체 화면을 8192행부터
+// 쪽 머리로 되풀이해 찍는다. 그보다 긴 그림(휴대폰의 긴 쪽)은 고르게 나눠 PNG로 찍고 빈 쪽의 캔버스에서 이어 JPEG 한 장으로 만든다.
 // 흔들림: 두 번 잇달아 같은 그림이 나올 때까지(최대 6번) 찍고, 끝내 같지 않으면 견주지 않고 「흔들림」으로 남긴다
 // (10-21 두 회차 견줌에서 /world/는 한 번은 검은 화면, 한 번은 첫 그림이었다). 동영상·캔버스·iframe은 분홍 상자로 가린다.
 // 새로 생긴 치명(critical) 접근성 위반만 점검을 실패시키고, 그림 차이와 나머지 위반은 보고만 한다.
@@ -16,6 +18,7 @@ export const VISUAL_DEVICES = [
 ];
 export const FIXED_TIME = '2026-10-01T10:00:00+09:00';
 export const MAX_HEIGHT = 12000;
+export const TILE_LIMIT = 8192;
 export const JPEG_QUALITY = 70;
 // 이보다 작은 차이는 같은 것으로 본다 — 10-21 두 회차 견줌에서 흔들리지 않은 쪽의 차이는 모두 0.01% 아래(글자 가장자리 몇십 화소)였다.
 export const CHANGE_PERCENT = 0.05;
@@ -41,16 +44,46 @@ export async function settle(page) {
   await page.waitForLoadState('networkidle', {timeout: 5000}).catch(() => {});
 }
 
-/** 두 번 잇달아 같은 그림이 나올 때까지 찍는다. 끝내 같지 않으면 unstable. */
-export async function stableShot(page, options, {tries = 6, gap = 500} = {}) {
-  let last = await page.screenshot(options);
+/** 위에서 height(CSS px)까지를 scale배로 찍을 조각: 조각마다 장치 화소 limit 아래가 되게 고르게 나눈다(짧으면 한 조각). */
+export function tilesOf(height, scale, limit = TILE_LIMIT) {
+  const count = Math.max(1, Math.ceil(height * scale / limit));
+  const step = Math.ceil(height / count);
+  const tiles = [];
+  for (let y = 0; y < height; y += step) tiles.push({y, height: Math.min(step, height - y)});
+  return tiles;
+}
+
+/** 두 번 잇달아 같은 그림이 나올 때까지 찍는다. 끝내 같지 않으면 unstable. shoot은 Buffer나 Buffer 배열(나눠 찍은 조각)을 낸다. */
+export async function stableShot(page, shoot, {tries = 6, gap = 500} = {}) {
+  const parts = x => Array.isArray(x) ? x : [x];
+  const same = (a, b) => parts(a).length === parts(b).length && parts(a).every((x, i) => x.equals(parts(b)[i]));
+  let last = await shoot();
   for (let i = 1; i < tries; i++) {
     await page.waitForTimeout(gap);
-    const next = await page.screenshot(options);
-    if (next.equals(last)) return {image: next, unstable: false, shots: i + 1};
+    const next = await shoot();
+    if (same(next, last)) return {image: next, unstable: false, shots: i + 1};
     last = next;
   }
   return {image: last, unstable: true, shots: tries};
+}
+
+/** 나눠 찍은 PNG 조각을 새 context 빈 쪽의 캔버스에서 위아래로 잇고 JPEG로 굽는다. */
+export async function stitchJpeg(browser, tiles, quality = JPEG_QUALITY) {
+  const page = await browser.newPage();
+  try {
+    const data = await page.evaluate(async ({tiles, quality}) => {
+      const images = await Promise.all(tiles.map(b64 => createImageBitmap(new Blob([Uint8Array.from(atob(b64), c => c.charCodeAt(0))], {type: 'image/png'}),
+        {colorSpaceConversion: 'none', premultiplyAlpha: 'none'})));
+      const canvas = document.createElement('canvas');
+      canvas.width = images[0].width;
+      canvas.height = images.reduce((sum, image) => sum + image.height, 0);
+      const g = canvas.getContext('2d');
+      let y = 0;
+      for (const image of images) { g.drawImage(image, 0, y); y += image.height; }
+      return canvas.toDataURL('image/jpeg', quality / 100).split(',')[1];
+    }, {tiles: tiles.map(b => b.toString('base64')), quality});
+    return Buffer.from(data, 'base64');
+  } finally { await page.context().close(); }
 }
 
 /** axe 위반: CSP가 인라인 스크립트를 막는 쪽(/care/·/fortune/)이 있어 script 태그가 아니라 evaluate로 넣는다(10-21). */
@@ -70,14 +103,20 @@ export async function capturePage({browser, base, route, device, shotsDir, axeSo
     await settle(page);
     const height = await page.evaluate(() => Math.max(document.documentElement.scrollHeight, document.body?.scrollHeight || 0));
     const clipHeight = Math.min(height, MAX_HEIGHT);
-    const {image, unstable, shots} = await stableShot(page, {type: 'jpeg', quality: JPEG_QUALITY, fullPage: true, animations: 'disabled', caret: 'hide',
-      clip: {x: 0, y: 0, width: device.options.viewport.width, height: clipHeight}, mask: [page.locator('video, canvas, iframe')], maskColor: '#FF00FF'});
+    const width = device.options.viewport.width;
+    const common = {fullPage: true, animations: 'disabled', caret: 'hide', mask: [page.locator('video, canvas, iframe')], maskColor: '#FF00FF'};
+    const tiles = tilesOf(clipHeight, device.options.deviceScaleFactor);
+    const shoot = tiles.length === 1
+      ? () => page.screenshot({type: 'jpeg', quality: JPEG_QUALITY, ...common, clip: {x: 0, y: 0, width, height: clipHeight}})
+      : async () => { const parts = []; for (const t of tiles) parts.push(await page.screenshot({type: 'png', ...common, clip: {x: 0, y: t.y, width, height: t.height}})); return parts; };
+    let {image, unstable, shots} = await stableShot(page, shoot);
+    if (tiles.length > 1) image = await stitchJpeg(browser, image);
     const file = shotFile(route, device.key);
     fs.mkdirSync(path.dirname(path.join(shotsDir, file)), {recursive: true});
     fs.writeFileSync(path.join(shotsDir, file), image);
     let axe = null, axeError = null;
     if (axeSource) { try { axe = await runAxe(page, axeSource); } catch (error) { axeError = String(error).split('\n')[0].slice(0, 200); } }
-    return {route, device: device.key, shot: {file, sha256: sha(image), bytes: image.length, cssHeight: height, clipped: height > MAX_HEIGHT}, unstable, shots, axe, axeError};
+    return {route, device: device.key, shot: {file, sha256: sha(image), bytes: image.length, cssHeight: height, clipped: height > MAX_HEIGHT, tiles: tiles.length}, unstable, shots, axe, axeError};
   } finally { await context.close(); }
 }
 
