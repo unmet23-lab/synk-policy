@@ -1,7 +1,7 @@
 {
- "createdAt": "2026-10-25T05:48:30.431Z",
- "commit": "545b1cb2d10c930410363693681822ae95a76b39",
- "run": 40166010135,
+ "createdAt": "2026-10-26T13:34:18.437Z",
+ "commit": "d269713bbe29c6126d6e97e686a931927f309d63",
+ "run": 40329802608,
  "env": {
   "chromium": "151.0.7922.34",
   "os": "ubuntu24"
@@ -178,15 +178,15 @@
   "/en/pulse/": {
    "desktop": {
     "file": "desktop/en~pulse.jpg",
-    "sha256": "e0e8f001967c8c4193cfb5fd3d52dc7d4413dced11631627825e50b1dabf8601",
-    "cssHeight": 7563,
-    "run": 40083355200
+    "sha256": "314305e35884abc256ea3c742b0a5c9569131e81996227ab52caeea9f60a5922",
+    "cssHeight": 7989,
+    "run": 40329802608
    },
    "mobile": {
     "file": "mobile/en~pulse.jpg",
-    "sha256": "ce72431f1fb07753e2558aa889616ca45db67bab765622d4b1f6e3141893cba9",
-    "cssHeight": 14386,
-    "run": 40083355200
+    "sha256": "e390a54011994c3227e42eba2fdfc0ae90d9ac78a4f71802b17534e0c32308a4",
+    "cssHeight": 14984,
+    "run": 40329802608
    }
   },
   "/en/shift/": {
@@ -388,29 +388,29 @@
   "/pulse/": {
    "desktop": {
     "file": "desktop/pulse.jpg",
-    "sha256": "add2a1edaeb4355312ed8ff7b325b3706ee476f564a023132536f897a3ba1975",
-    "cssHeight": 7450,
-    "run": 40083355200
+    "sha256": "02353d46b8d7bdf7ff579afb6a8e14f146330210cdb760f149c80381c6d713a2",
+    "cssHeight": 7855,
+    "run": 40329802608
    },
    "mobile": {
     "file": "mobile/pulse.jpg",
-    "sha256": "d08733ade37a9adeb2f08128f01da4eb291b1b03e1089a5196ac97b456db8e16",
-    "cssHeight": 13037,
-    "run": 40083355200
+    "sha256": "e60156922d334f3d845224b414dff3f424a79ec9449bd984dba863952d4d21ed",
+    "cssHeight": 13528,
+    "run": 40329802608
    }
   },
   "/pulse/casting/": {
    "desktop": {
     "file": "desktop/pulse~casting.jpg",
-    "sha256": "10101065bdaff3d29ba17a6213c37344e6ea27c14be4cc0536673d08a95cc0d1",
+    "sha256": "e7824c7f061a13345f95f8a400ed2d565e7ae571c0de310ec19ee2abea9fae45",
     "cssHeight": 3150,
-    "run": 40053255313
+    "run": 40329802608
    },
    "mobile": {
     "file": "mobile/pulse~casting.jpg",
-    "sha256": "b847a5f8b2e1fe771b50e68320173f8967b0d9553f2115e69e7daba1c2a681a4",
+    "sha256": "fc219044e2512eac4a682931d6f9e4a7ad930c65a5f963c3fae03367435d1abb",
     "cssHeight": 3872,
-    "run": 40053255313
+    "run": 40329802608
    }
   },
   "/rl/": {
