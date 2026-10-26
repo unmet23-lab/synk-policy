@@ -110,12 +110,14 @@ export async function capturePage({browser, base, route, device, shotsDir, axeSo
       ? () => page.screenshot({type: 'jpeg', quality: JPEG_QUALITY, ...common, clip: {x: 0, y: 0, width, height: clipHeight}})
       : async () => { const parts = []; for (const t of tiles) parts.push(await page.screenshot({type: 'png', ...common, clip: {x: 0, y: t.y, width, height: t.height}})); return parts; };
     let {image, unstable, shots} = await stableShot(page, shoot);
+    let axe = null, axeError = null;
+    if (axeSource) { try { axe = await runAxe(page, axeSource); } catch (error) { axeError = String(error).split('\n')[0].slice(0, 200); } }
+    // 잇기는 새 쪽을 열므로 axe 뒤에 한다 — 앞에 두었더니 CI에서 /path/ 휴대폰의 가로 칸(resize 때 넘침을 재어 tabindex를 붙이는 칸) 둘이
+    // tabindex 없이 재였다(10-26·27 두 회차, 이 PC에서는 재현 안 됨). axe는 옛 흐름처럼 마지막 찍기 바로 뒤에 돈다.
     if (tiles.length > 1) image = await stitchJpeg(browser, image);
     const file = shotFile(route, device.key);
     fs.mkdirSync(path.dirname(path.join(shotsDir, file)), {recursive: true});
     fs.writeFileSync(path.join(shotsDir, file), image);
-    let axe = null, axeError = null;
-    if (axeSource) { try { axe = await runAxe(page, axeSource); } catch (error) { axeError = String(error).split('\n')[0].slice(0, 200); } }
     return {route, device: device.key, shot: {file, sha256: sha(image), bytes: image.length, cssHeight: height, clipped: height > MAX_HEIGHT, tiles: tiles.length}, unstable, shots, axe, axeError};
   } finally { await context.close(); }
 }
