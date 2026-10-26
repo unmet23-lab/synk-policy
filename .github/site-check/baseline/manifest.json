@@ -1,7 +1,7 @@
 {
- "createdAt": "2026-10-26T16:18:38.248Z",
- "commit": "b9313a5f5faf7f31c1cc30f39e69690a88b88c25",
- "run": 40352819445,
+ "createdAt": "2026-10-26T18:12:38.859Z",
+ "commit": "dfd0fa1c2f2ae116138d46430377d779dcb9f51d",
+ "run": 40373607217,
  "env": {
   "chromium": "151.0.7922.34",
   "os": "ubuntu24"
@@ -453,6 +453,20 @@
     "sha256": "02b3b3b8db1ec7db28f901fe004be9dd2e964a303610f398cc43babfc8bf7340",
     "cssHeight": 4579,
     "run": 39700254781
+   }
+  },
+  "/ub/": {
+   "desktop": {
+    "file": "desktop/ub.jpg",
+    "sha256": "3a85dc9f055fe84681c5739f1e1a978014bbcc49af327641d016484e32346edd",
+    "cssHeight": 2653,
+    "run": 40373607217
+   },
+   "mobile": {
+    "file": "mobile/ub.jpg",
+    "sha256": "ce16c9132a60b1151df9601fa494938ad026764758486345a31a7e287764ff05",
+    "cssHeight": 5562,
+    "run": 40373607217
    }
   },
   "/world/": {

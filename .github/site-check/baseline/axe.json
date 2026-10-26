@@ -259,6 +259,8 @@
  "/shift/|mobile": {},
  "/terms/|desktop": {},
  "/terms/|mobile": {},
+ "/ub/|desktop": {},
+ "/ub/|mobile": {},
  "/world/hangul-stage/|desktop": {
   "aria-prohibited-attr": {
    "impact": "serious",
