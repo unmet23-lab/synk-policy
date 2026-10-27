@@ -8,13 +8,14 @@ import { placeAt, caption, doing, goalOf } from './town/village.mjs';
 import { lightAt } from './town/light.mjs';
 import { validOffset } from './town/clock.mjs';
 import { createMoodLines, moodAt } from './day-mood.mjs';
-import { createOffer, offerModel, placeModel, takeModel, sceneLine, pairSteps, lineText, iconSvg, FEEDBACK, NAMES as CARD_NAMES } from './day-cards.mjs';
+import { createOffer, offerModel, placeModel, takeModel, sceneLine, pairSteps, lineText, iconSvg, FEEDBACK, NAMES as CARD_NAMES, CARD_BY_ID } from './day-cards.mjs';
 import { createNotebook } from './day-notebook.mjs';
 import { createStay } from './day-stay.mjs';
 import { createAsk, tutorOnDevice } from './day-ask.mjs';
 import { createMeanwhile } from './day-meanwhile.mjs';
 import { createTownSound } from './day-sound.mjs';
 import { QUIET } from './town/stay.mjs';
+import { createTeaBoard, teaGuests } from './day-tea.mjs';
 
 const $ = id => document.getElementById(id);
 const surfaceId = crypto.randomUUID(), reduced = matchMedia('(prefers-reduced-motion: reduce)');
@@ -22,6 +23,8 @@ const surfaceId = crypto.randomUUID(), reduced = matchMedia('(prefers-reduced-mo
 const sound = createTownSound({ surfaceId });
 // walkWarm is false between standing up and the zero step's receipt: steps wait for the walk clock to stand again.
 let stay = null, stayPoint = null, villageWalking = false, appTimer = 0, lightPaintedAt = 0, seatedRetry = 0, walkWarm = true;
+// The tea order's board (W8): guests' words, the hand's board and the cup in hand — day-tea.mjs.
+let tea = null;
 const unlockSound = () => sound.unlock();
 addEventListener('pointerdown', unlockSound, { capture: true, passive: true }); addEventListener('keydown', unlockSound, true);
 // A touch's pointerdown is no user activation: phones (iPhones above all) let the sound start only in touchend or click.
@@ -126,6 +129,16 @@ function soundFrame() {
   sound.update({ light: lightShown, ms: at, listener, awake: v ? { 'cafe-owner': !!placeAt(v.segments, 'cafe-owner', t, v.startSpots) } : {}, staying: !!seat,
     dialog: !!document.querySelector('dialog[open]') || walkPanel, hidden: document.hidden });
 }
+/** What the tea board needs (W8): the place the player stands by, whether the cafe can take an order now (the owner up, no
+ * other scene there), where the one-cup board's guest is, and the card take with its feedback. */
+function teaContext() {
+  const v = snapshot?.view.day?.scene?.village, o = snapshot?.view.tea?.open, at = serverNow() ?? v?.nowMs ?? null;
+  const card = o?.card ? CARD_BY_ID.get(o.card.id) : null, spot = card?.paths?.player?.spot || card?.spot || '';
+  const ownerAwake = !!(v && Number.isSafeInteger(at) && placeAt(v.segments, 'cafe-owner', Math.min(v.band.endMs - 1, Math.max(v.nowMs, at)), v.startSpots));
+  return { walking: walking(), panel: walkPanel, location: walking() ? nearby(walk.point) : snapshot?.view.day?.location ?? null, point: walk.point, connected, busy, inputMode: walkInputMode,
+    seated: !!stay?.active(), ownerAwake, cafeBusy: bazaarActive() || dayActive() || !!snapshot?.state.life?.episode?.open || v?.take?.status === 'with',
+    ownerPlace: spot.split('.')[0] || null, take: v?.take ?? null, feedback: snapshot?.state.prefs?.feedback || [] };
+}
 function reconcileWalk() {
   if (!walking()) return;
   walk.reconcile(snapshot.state.day.walk);
@@ -146,6 +159,8 @@ async function flushWalk(force = false) {
 }
 async function interactWalk() {
   if (!walking() || busy || !connected) return;
+  // E · A at the tea board: serve the guest the player stands by, or 「다 됐어요」 (review F7) — else the walk's talk.
+  if (tea?.interact()) return;
   if (walkPanel) { const action = $('nearby-panel').querySelector('button[data-command]:not(:disabled)'); if (action) action.click(); return; }
   walkControls?.stop(); await flushWalk(true); const place = nearby(walk.point); if (!place) return;
   if (await command('DAY_INTERACT', { location: place })) { walkPanel = true; placeOpens++; applyWalkView(); renderCards(); }
@@ -155,7 +170,7 @@ function walkFrame(now) {
   const due = walk.step(now, walkControls.read(), walkWarm);
   renderer?.setPlayerPose?.(walk.pose()); paintMap(nearby(walk.point));
   if (due) flushWalk();
-  applyWalkView(); stay?.update(stayContext());
+  applyWalkView(); stay?.update(stayContext()); tea?.update(snapshot.view.tea, teaContext());
 }
 
 function text(id, value = '') { if ($(id).textContent !== value) $(id).textContent = value; }
@@ -170,7 +185,7 @@ function available() { return connected && snapshot?.capabilities?.day === true;
 function setBusy(value) {
   busy = value; $('day-app').setAttribute('aria-busy', String(value));
   for (const b of document.querySelectorAll('[data-command], [data-destination], [data-mode], #life-open, #life-contact-open, #life-resume')) b.disabled = value || !available() || b.dataset.unavailable === 'true';
-  stay?.update(stayContext());
+  stay?.update(stayContext()); if (snapshot) tea?.update(snapshot.view.tea, teaContext());
 }
 // state and command answer with the whole town; pulse and boundary with a few fields (vertical slice §14-3, F11).
 // The old heartbeat (presence) answers the whole town like a read — without worldSeq on an account's town.
@@ -259,7 +274,8 @@ function boundary() {
   // A screen that draws the cards says so (W5b, review F6) — not while seated (no offer reaches a quiet seat) — and
   // carries what it showed (§20-2, up to a request's worth). It draws the mascot's question too (W6b) and says which
   // question it drew beside the boundary (asked — never a command, so no command revision moves).
-  const caps = capsOk && !stay?.active() ? (asksOk ? ['cards', 'asks'] : ['cards']) : null, seen = [...seenQueue].slice(0, SEEN_PER_REQUEST);
+  // W8: and one that draws the tea board says 'tea' — the life cards (C5·R6) are offered only to it (review F13).
+  const caps = capsOk && !stay?.active() ? ['cards', ...(asksOk ? ['asks'] : []), ...(tea ? [tea.caps] : [])] : null, seen = [...seenQueue].slice(0, SEEN_PER_REQUEST);
   const asked = asksOk ? askReport : null;
   queue(async () => {
     const data = await request('boundary', { surfaceId, fence: presence.fence, ...(caps ? { caps } : {}), ...(seen.length ? { seen } : {}), ...(asked ? { asked } : {}) });
@@ -325,7 +341,7 @@ async function command(type, payload = {}) {
   setBusy(true);
   try {
     await queue(async () => {
-      if (/^(DAY_|LIFE_|BAZAAR_|SUPPORT_|CARD_|GREET$)/.test(type)) {
+      if (/^(DAY_|LIFE_|BAZAAR_|SUPPORT_|CARD_|TEA_|GREET$)/.test(type)) {
         await ensureFreshPresence();
         payload = { ...payload, surfaceId, fence: presence.fence };
       }
@@ -433,6 +449,8 @@ function ownerLine(places) {
 }
 function currentScene() {
   const scene = { ...snapshot.view.day.scene, memories: (snapshot.state.day?.history || []).map(({ resultId, kind, role, choice, location }) => ({ resultId, kind, role, choice, location })) };
+  // The tea order's guests (W8): the waiting two at their stand points, the seated ones at their seats (day-tea.mjs).
+  scene.teaGuests = teaGuests(snapshot.view.tea);
   // Residents follow the plan at the server's time now; the server's npcs were drawn at its own moment.
   const village = scene.village ? villageRows(scene.village) : null;
   if (village) {
@@ -592,6 +610,8 @@ let cardFeedbackOpen = false, cardClosing = false, cardOpenedHere = null;
 function renderCardDialog() {
   const dialog = $('card-dialog'), m = takeModel(snapshot.view.day?.scene?.village?.take);
   if (!m) { if (dialog.open) dialog.close(); cardFeedbackOpen = false; cardOpenedHere = null; return; }
+  // A card whose 「나와 함께」 is a life activity (W8: C5 the order, R6 the one-cup board) is done on that board, not here.
+  if (CARD_BY_ID.get(m.card)?.paths?.player?.activity) { if (dialog.open) dialog.close(); return; }
   // A take still open (a reload, another window's answer) brings its panel back — not while this window is closing it, and
   // only in the window holding the town (review F5): a second window does not pop the panel over its own view.
   if (!dialog.open) { if (cardClosing || stay?.active() || !presence?.owner && cardOpenedHere !== m.card) return; cardFeedbackOpen = false; dialog.showModal(); }
@@ -671,7 +691,7 @@ function accept(data) {
   reconcileWalk(); applyWalkView();
   // Another window moved the player from where it sat down (or left home in the classic view): stand up quietly (W7b).
   if (stay?.active() && (walking() ? !walk.point || !stayPoint || Math.hypot(walk.point.x - stayPoint.x, walk.point.z - stayPoint.z) > stay.seat().reach : day.location !== 'home')) stay.leave('moved');
-  clearTimeout(seatedRetry); stay?.update(stayContext()); soundFrame();
+  clearTimeout(seatedRetry); stay?.update(stayContext()); soundFrame(); tea?.update(data.view.tea, teaContext());
 }
 function currentObservation() {
   if (!bazaarActive()) return snapshot?.view.day?.observation;
@@ -808,10 +828,10 @@ function offerFrame(v, blocked, labelAt) {
   }
 }
 /** The notices over the scene (W6b): 「그동안 달라진 것」 once a visit, then the mascot's question — never over the place's
- * panel, a dialog or the seat. The question waits while the board is up; once drawn, its key waits for the next boundary. */
+ * panel, a dialog, the seat or the tea board (W8). The question waits while the board is up; once drawn, its key waits for the next boundary. */
 function noticesFrame(now) {
   if (!meanwhileUi || !askUi) return;
-  const blocked = !snapshot || !connected || walkPanel || !!document.querySelector('dialog[open]') || !!stay?.active();
+  const blocked = !snapshot || !connected || walkPanel || !!document.querySelector('dialog[open]') || !!stay?.active() || !!tea?.active?.();
   const board = meanwhileUi.update({ meanwhile: snapshot?.view.day?.scene?.village?.meanwhile, firstPulseAt, blocked, now });
   const ask = askUi.update({ ask: snapshot?.view.ask, blocked: blocked || board.shown, now });
   if (ask.drawn) askReport = ask.drawn;
@@ -845,7 +865,7 @@ function frame(now) {
     appTimer = setTimeout(() => { appTimer = 0; raf = requestAnimationFrame(frame); }, 1000 / (villageWalking || padded ? QUIET.appHz : QUIET.idleHz));
     return;
   }
-  walkFrame(now); observe(now); villageFrame(); cardsFrame(now); noticesFrame(now); stay?.frame(); raf = requestAnimationFrame(frame);
+  walkFrame(now); observe(now); villageFrame(); cardsFrame(now); noticesFrame(now); stay?.frame(); tea?.frame(); raf = requestAnimationFrame(frame);
 }
 async function load() {
   setBusy(true);
@@ -949,7 +969,8 @@ try {
     else if (snapshot?.state.day.walk?.enabled) await command('DAY_WALK_DISABLE');
   }
   walkControls = createWalkControls({ surface: $('scene'), joystick: $('walk-joystick'), thumb: $('walk-thumb'), canMove: () => walking() && connected && !busy && !stay?.active(),
-    onInteract: interactWalk, onCancel: dismissWalkPanel, onMoveStart: dismissWalkPanel, onInputMode: mode => { walkInputMode = mode; } });
+    // Esc · B fold the tea board first when it is up (review F7), then close the place's panel.
+    onInteract: interactWalk, onCancel: () => { if (!tea?.cancel()) dismissWalkPanel(); }, onMoveStart: dismissWalkPanel, onInputMode: mode => { walkInputMode = mode; } });
   // Staying (W7b): the seats, their quiet view and the sound switches. Sitting sends the steps taken so far; standing
   // up starts the walk clock again with a zero step, so the first real step is never pulled back.
   stay = createStay({ scene: $('scene'), hud: $('walk-hud'), nearby: $('nearby-panel'), settings: $('settings-dialog'), sound, renderer: () => renderer,
@@ -962,6 +983,11 @@ try {
       paintLight(true); renderScene();
     } });
   sound.onPrefs(() => stay?.paint());
+  // The tea order (W8): its commands go through the window's fence once the walk is sent; a guest's head anchors its words.
+  tea = createTeaBoard({ scene: $('scene'), hud: $('walk-hud'), nearby: $('nearby-panel'), settings: $('settings-dialog'), command: (type, payload) => freeCommand(type, payload),
+    beforeCommand: async () => { if (walking()) await flushWalk(true); }, noteSeen, onInputMode: mode => { walkInputMode = mode; },
+    labelAt: id => { const p = renderer?.labelScreen?.(id); if (!p) return null; const c = $('day-canvas').getBoundingClientRect(), s = $('scene').getBoundingClientRect(); return { x: p.x + c.left - s.left, y: p.y + c.top - s.top }; } });
+  if (snapshot) tea?.update(snapshot.view.tea, teaContext());
   // The returning visit's board and the mascot's question (W6b), stacked over the scene in that order.
   notices = Object.assign(document.createElement('div'), { className: 'town-notices' }); $('scene').append(notices);
   meanwhileUi = createMeanwhile(notices, { live: $('mood-live'), onSeen: noteSeen });
@@ -975,7 +1001,7 @@ try {
 // Read-only instrumentation for the isolated QA runner. It cannot mutate state or time.
 globalThis.SYNKTownDay = Object.freeze({ metrics: () => ({ ...(renderer?.stats() || { renderer: 'text-alternative' }), reducedMotion: reduced.matches, connected, fallback, worldLinked: worldHostRequested,
   village: { serverNow: serverNow(), live: [...villageLive.ids], signature: villageLive.signature, due: dueAt(), timed: timed() },
-  stay: stay?.metrics() ?? null, sound: { ...sound.stats(), level: sound.level() }, foreground: flags().foreground,
+  stay: stay?.metrics() ?? null, sound: { ...sound.stats(), level: sound.level() }, foreground: flags().foreground, tea: tea?.metrics() ?? null,
   // W5b: what this window draws of the cards — the offer, the residents' lines, the place's panel — and its seen keys still to send.
   cards: { capsOk, safe: flags().safe, seenPending: [...seenQueue], gesture: offerGesture, take: snapshot?.view.day?.scene?.village?.take?.status ?? null,
     offer: (el => el ? { text: el.querySelector('.offer-text')?.textContent ?? '', docked: el.classList.contains('is-docked'), rect: el.getBoundingClientRect().toJSON() } : null)(document.querySelector('#card-offers .offer-card:not([hidden])')),
