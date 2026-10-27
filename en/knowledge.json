@@ -1,6 +1,6 @@
 {
-  "version": "2026-09-15-selected-experiences-copy-9bfc4e4ce8-rhythm-20261001-copy-3910676d01-release-copy-3e4ed3be6d-en-002b14631325-bm-platform-20261007-a885b0d303-travel-20261007-ce148dd860-real-20261007-ab58ee7076-homepage-current-20261009-033c24b61f29-homepage-v10-20261010-19835d88cd09",
-  "updatedAt": "2026-10-24",
+  "version": "2026-09-15-selected-experiences-copy-9bfc4e4ce8-rhythm-20261001-copy-3910676d01-release-copy-3e4ed3be6d-en-002b14631325-bm-platform-20261007-a885b0d303-travel-20261007-ce148dd860-real-20261007-ab58ee7076-homepage-current-20261009-033c24b61f29-homepage-v10-20261010-2fccdfe2eb32",
+  "updatedAt": "2026-10-27",
   "docs": [
     {
       "id": "company",
@@ -299,9 +299,10 @@
         "Schedule and cost are agreed with each school. The lecture does not decide a student’s career for them.",
         "Yes. We hear the goal and the audience of the request, then find an AI or AI-career instructor who fits and assign them. First we show an evidence card for each instructor: who they teach and for what kind of work, what they have made themselves, samples they can share, and what stays after the class.",
         "You know exactly which instructor is coming before you sign. Running the day, a substitute if the instructor cannot come, cancellation and questions after the lecture are written into the contract only as far as we can really promise.",
-        "We do not lead with a headcount or a roster; for each request we find an instructor who fits and show you their evidence card. We have not posted for instructors yet. If you would like to teach with us, tell us your field and what you have made yourself at hello@synk.im. Selection criteria, payment and rights to teaching material will be shared once they are set."
+        "We do not lead with a headcount or a roster; for each request we find an instructor who fits and show you their evidence card. We have not posted for instructors yet. If you would like to teach with us, tell us your field and what you have made yourself at hello@synk.im. Selection criteria, payment and rights to teaching material will be shared once they are set.",
+        "You can see the instructor profile and lectures open for inquiry now under Lectures and instructors on the SHIFT page, and ask about your pick. You can also leave the instructor undecided or let SYNK recommend one."
       ],
-      "updatedAt": "2026-10-23"
+      "updatedAt": "2026-10-27"
     },
     {
       "id": "pulse",
@@ -4942,7 +4943,7 @@
         "How many instructors do you have?",
         "Who are the instructors?"
       ],
-      "answer": "Yes. We hear the goal and the audience of the request, then find an AI or AI-career instructor who fits and assign them. First we show an evidence card for each instructor: who they teach and for what kind of work, what they have made themselves, samples they can share, and what stays after the class.\n\nYou know exactly which instructor is coming before you sign. Running the day, a substitute if the instructor cannot come, cancellation and questions after the lecture are written into the contract only as far as we can really promise.\n\nWe do not lead with a headcount or a roster; for each request we find an instructor who fits and show you their evidence card. We have not posted for instructors yet. If you would like to teach with us, tell us your field and what you have made yourself at hello@synk.im. Selection criteria, payment and rights to teaching material will be shared once they are set.",
+      "answer": "Yes. We hear the goal and the audience of the request, then find an AI or AI-career instructor who fits and assign them. First we show an evidence card for each instructor: who they teach and for what kind of work, what they have made themselves, samples they can share, and what stays after the class.\n\nYou know exactly which instructor is coming before you sign. Running the day, a substitute if the instructor cannot come, cancellation and questions after the lecture are written into the contract only as far as we can really promise.\n\nWe do not lead with a headcount or a roster; for each request we find an instructor who fits and show you their evidence card. We have not posted for instructors yet. If you would like to teach with us, tell us your field and what you have made yourself at hello@synk.im. Selection criteria, payment and rights to teaching material will be shared once they are set.\n\nYou can see the instructor profile and lectures open for inquiry now under Lectures and instructors on the SHIFT page, and ask about your pick. You can also leave the instructor undecided or let SYNK recommend one.",
       "sourceId": "shift",
       "relatedIds": [
         "shift-education",
@@ -4950,10 +4951,10 @@
         "shift-contract"
       ],
       "action": {
-        "label": "See the instructor agency",
-        "href": "/en/shift/#service-3"
+        "label": "See lectures and instructors",
+        "href": "/en/shift/#lectures"
       },
-      "reviewedAt": "2026-10-23"
+      "reviewedAt": "2026-10-27"
     },
     {
       "id": "path-companion",
