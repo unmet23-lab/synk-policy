@@ -51,10 +51,10 @@ TOPIK 4급을 목표로 한 정규 1년 과정과 교재 「시냅스」를 준�
 
 SYNK SHIFT는 학교·기업·기관에서 AI 시대에 필요한 역량을 강의하고, 강의를 들은 기업의 반복 업무를 AI로 자동화해 고정비를 줄입니다. 학교에서는 AI 시대에 진로를 어떻게 맞춰 가고 어떤 소양을 준비할지 다루는 AI 진로 강의도 합니다. 강사를 찾아 의뢰에 맞게 배정하는 강사 에이전시도 함께 맡습니다.
 
-학교에는 AI 시대의 진로와 준비할 소양을 다루는 AI 진로 강의를, 기업·기관에는 자기 업무로 실습하는 AI 강의를 합니다. 의뢰에 맞는 강사를 찾아 배정하고, 강의를 들은 회사의 반복 업무는 AI로 자동화합니다.
+기업·기관에는 자기 업무로 실습하는 AI 특강을, 학교에는 AI 시대의 진로와 준비할 소양을 다루는 AI 진로 강의를 합니다. 의뢰에 맞는 강사를 찾아 배정하고, 강의를 들은 회사의 반복 업무는 AI로 자동화합니다.
 
+- AI 특강과 강사 배정
 - 학교 AI 진로 강의
-- 기업·기관 AI 강의와 강사 배정
 - 반나절 진단부터 시작하는 업무 자동화
 
 [SYNK SHIFT 보기](https://synk.im/shift/)
@@ -133,7 +133,7 @@ SYNK PULSE는 제품 광고, 브랜드필름, AI 모델 룩북, 사용법 영상
 An engine that fits you better the more you use it. SYNK builds Atlas, a personalization engine. We started in Korean-language education. Today we are building the SYNK platform, where one SYNK ID carries you across SYNK apps, and we use the same engine for business services and advertising videos.
 
 - SYNK LAB — Learn Korean, and get ready to study in Korea. SYNK LAB makes Korean textbooks, learning games and a personalized learning app. We are preparing a one-year course aimed at TOPIK Level 4, and our learning games are available when you sign in with SYNK ID. We are preparing the Synapse textbooks and a one-year course aimed at TOPIK Level 4, and SYNK WORLD offers TOPIK practice and Korean games.
-- SYNK SHIFT — AI lectures, plus work automation. SYNK SHIFT teaches the skills the AI era calls for at schools, companies and institutions, then automates repetitive work with AI for companies that took a lecture, to cut fixed costs. In schools we also give AI career lectures on how to steer a career in the AI era and what to prepare for it. We also run an instructor agency that finds instructors and assigns them to fit each request. AI career lectures for schools on the careers and skills the AI era calls for, and AI lectures for companies and institutions where staff practise on their own work. We find and assign instructors who fit each request, and automate repetitive work with AI for companies that took a lecture.
+- SYNK SHIFT — AI lectures, plus work automation. SYNK SHIFT teaches the skills the AI era calls for at schools, companies and institutions, then automates repetitive work with AI for companies that took a lecture, to cut fixed costs. In schools we also give AI career lectures on how to steer a career in the AI era and what to prepare for it. We also run an instructor agency that finds instructors and assigns them to fit each request. Hands-on AI lectures for companies and institutions, where staff practise on their own work, and AI career lectures for schools on the careers and skills the AI era calls for. We find and assign instructors who fit each request, and automate repetitive work with AI for companies that took a lecture.
 - SYNK PULSE — Ads and model videos, plus our own music and characters. SYNK PULSE makes product ads, brand films, AI model lookbooks and how-to videos, from planning to the final cut. We also create the music and stories of Mongle, Kkamong and Marin, and look for partners to license them or make something together. Product ads, brand films, AI model lookbooks and how-to videos. We also make the music and stories of Mongle, Kkamong and Marin.
 - SYNK PATH — Studying, working and living in Korea, prepared with you. From packing your bags to settling into life in Korea, we are preparing to work through the Korean you need, the requirements, interviews and daily life with you, one step at a time. SYNK LAB takes care of the Korean — SYNK WORLD’s TOPIK practice is open now, and we are preparing to open the one-year course. The Seoul day planner and caregiver interview practice in VR are available now; help with preparing to study, finding out job requirements and settling into life in Korea is in preparation. We do not guarantee admission, visas, jobs or residence.
 
