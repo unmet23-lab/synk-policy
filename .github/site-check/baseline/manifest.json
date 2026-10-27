@@ -1,7 +1,7 @@
 {
- "createdAt": "2026-10-27T10:59:10.971Z",
- "commit": "c536a90790b59e0f32d4b5c3834ecfd870bc3b13",
- "run": 40489483133,
+ "createdAt": "2026-10-27T11:42:19.366Z",
+ "commit": "1d5e88b70ca0ca49066cf9b03374cbbaedf451de",
+ "run": 40496197492,
  "env": {
   "chromium": "151.0.7922.34",
   "os": "ubuntu24"
@@ -360,15 +360,15 @@
   "/privacy/": {
    "desktop": {
     "file": "desktop/privacy.jpg",
-    "sha256": "792f041a069521314f8a4077672c84c45a1b6a1873efc7d117a090464977f502",
-    "cssHeight": 16328,
-    "run": 40461875380
+    "sha256": "7951f3404962f60ab0e29cf47602a9862d85a78c81828bbede89ddca765afa89",
+    "cssHeight": 16594,
+    "run": 40496197492
    },
    "mobile": {
     "file": "mobile/privacy.jpg",
-    "sha256": "f665d6bd9745edf3b72462ba95c27a9c968158a10fd4aa3ac5b0d8692bcc7ccb",
-    "cssHeight": 24366,
-    "run": 40461875380
+    "sha256": "90c0059390c81366565e7f7bfc0eae2bf4adc6c7663dbfaad7702cc935341ae2",
+    "cssHeight": 24868,
+    "run": 40496197492
    }
   },
   "/prompts/": {
