@@ -1,7 +1,7 @@
 {
- "createdAt": "2026-10-27T11:42:19.366Z",
- "commit": "1d5e88b70ca0ca49066cf9b03374cbbaedf451de",
- "run": 40496197492,
+ "createdAt": "2026-10-27T12:32:33.966Z",
+ "commit": "9c139e780c352f561343c98315ed9e39b73120c1",
+ "run": 40502464746,
  "env": {
   "chromium": "151.0.7922.34",
   "os": "ubuntu24"
@@ -10,15 +10,15 @@
   "/": {
    "desktop": {
     "file": "desktop/home.jpg",
-    "sha256": "7608446f5b251b645c98f480086c5b87f546f13f49dcc088c63a69474667a836",
+    "sha256": "c305b3bd0a1238198743b9718480059372dc25119279a284af913207c36813c8",
     "cssHeight": 11683,
-    "run": 40342436446
+    "run": 40502464746
    },
    "mobile": {
     "file": "mobile/home.jpg",
-    "sha256": "764cf3998d52c483680041b66ade28ea0e436ca5ef77622a36a7a777632145f5",
-    "cssHeight": 15100,
-    "run": 40342436446
+    "sha256": "a864230c36e7153b3619a14df25dde49ac093e5c872bcbfff5fbce74f0e0d4db",
+    "cssHeight": 15129,
+    "run": 40502464746
    }
   },
   "/atlas/": {
@@ -108,15 +108,15 @@
   "/en/": {
    "desktop": {
     "file": "desktop/en.jpg",
-    "sha256": "98734a57db8de8a15b32b57779b2301b1663e3d3b402d70cfad00b1fbfabf25c",
-    "cssHeight": 11985,
-    "run": 40342436446
+    "sha256": "572fa4078c22673820b331e331e257e69cbb6ca999fdd6b891a119965c90f543",
+    "cssHeight": 11965,
+    "run": 40502464746
    },
    "mobile": {
     "file": "mobile/en.jpg",
-    "sha256": "a80b9abb60aa7e9dcac2835a67c61bc0178b57c93f30291a81eee635b261620e",
-    "cssHeight": 16775,
-    "run": 40342436446
+    "sha256": "2e4a95d8c13b791be9e593d68ede4c2efe6429efcbfc8b1f501f0d8f9c0730d3",
+    "cssHeight": 16751,
+    "run": 40502464746
    }
   },
   "/en/atlas/": {
@@ -192,15 +192,15 @@
   "/en/shift/": {
    "desktop": {
     "file": "desktop/en~shift.jpg",
-    "sha256": "189090acd882d4a1f696a60fc1364262753cc70e47f279079d924d04cd940bfd",
+    "sha256": "e45841c9cf51066d352dec8e19c762745c08e6c4a084ec0cffd90fda74f987fc",
     "cssHeight": 7915,
-    "run": 40489483133
+    "run": 40502464746
    },
    "mobile": {
     "file": "mobile/en~shift.jpg",
     "sha256": "b418a65aa1ece536d3b52c6b6ae0bc33bc801fc45890f27493ec83bba94d754a",
     "cssHeight": 14825,
-    "run": 40489483133
+    "run": 40502464746
    }
   },
   "/fortune/": {
@@ -346,15 +346,15 @@
   "/practice/": {
    "desktop": {
     "file": "desktop/practice.jpg",
-    "sha256": "423da9d95da4e5d0634ec5ed5e8f1e3a478a3e1b5bcf6969dec1fbb7591f51b1",
+    "sha256": "0af4c0ea27995be99ef661c075d34c862427f9d7afa20f9f09a876d7f7e3929b",
     "cssHeight": 7594,
-    "run": 40489483133
+    "run": 40502464746
    },
    "mobile": {
     "file": "mobile/practice.jpg",
-    "sha256": "6a64a9e6ed519897d3f7832fafdfb8be075ee566e3400672a1aedbda8eeef27f",
+    "sha256": "cdc05d4f3ed76f4b15dc851e94fd80bd7beee58ec13bedc8e41c32f3648510f9",
     "cssHeight": 13304,
-    "run": 40489483133
+    "run": 40502464746
    }
   },
   "/privacy/": {
@@ -436,9 +436,9 @@
    },
    "mobile": {
     "file": "mobile/shift.jpg",
-    "sha256": "6a64a9e6ed519897d3f7832fafdfb8be075ee566e3400672a1aedbda8eeef27f",
+    "sha256": "cdc05d4f3ed76f4b15dc851e94fd80bd7beee58ec13bedc8e41c32f3648510f9",
     "cssHeight": 13304,
-    "run": 40489483133
+    "run": 40502464746
    }
   },
   "/terms/": {
