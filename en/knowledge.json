@@ -1,5 +1,5 @@
 {
-  "version": "2026-09-15-selected-experiences-copy-9bfc4e4ce8-rhythm-20261001-copy-3910676d01-release-copy-3e4ed3be6d-en-002b14631325-bm-platform-20261007-a885b0d303-travel-20261007-ce148dd860-real-20261007-ab58ee7076-homepage-current-20261009-033c24b61f29-homepage-v10-20261010-2fccdfe2eb32",
+  "version": "2026-09-15-selected-experiences-copy-9bfc4e4ce8-rhythm-20261001-copy-3910676d01-release-copy-3e4ed3be6d-en-002b14631325-bm-platform-20261007-a885b0d303-travel-20261007-ce148dd860-real-20261007-ab58ee7076-homepage-current-20261009-033c24b61f29-homepage-v10-20261010-ed917aab0943",
   "updatedAt": "2026-10-27",
   "docs": [
     {
@@ -265,8 +265,8 @@
         "For work we can show publicly, we present the fixes as well as the finished result: where we got stuck and why we changed the method, based on the actual work.",
         "There is no collection of the exact prompts we sent to AI tools. The cases do explain what we asked for and what came back. Students’ and clients’ material and private operational documents are not published.",
         "SHIFT gives AI lectures at schools, companies and institutions, runs an instructor agency, and automates work. Lectures come first; when a company that took a lecture wants it, we move on to automation.",
+        "Hands-on AI lecture — staff at companies, public bodies and schools practise on their own work and leave with one piece of work and a request–check–fix routine they can reuse.",
         "AI career lectures for schools — not a general careers talk, but how to steer a career in the AI era and which skills to build. Each student leaves with a one-page plan for their own career.",
-        "AI lectures for organizations — staff practise on their own work and leave with one piece of work and a request–check–fix routine they can reuse.",
         "Instructor agency — we find AI and AI-career instructors who fit the goal and audience of each request and assign them. You know exactly which instructor is coming before you sign.",
         "AI work automation — we pick one repetitive task and automate it to help cut fixed costs, in the order half-day review, build one task, monthly care.",
         "Consulting, branding, market research and product testing come with lectures and automation where they need them.",
@@ -300,7 +300,7 @@
         "Yes. We hear the goal and the audience of the request, then find an AI or AI-career instructor who fits and assign them. First we show an evidence card for each instructor: who they teach and for what kind of work, what they have made themselves, samples they can share, and what stays after the class.",
         "You know exactly which instructor is coming before you sign. Running the day, a substitute if the instructor cannot come, cancellation and questions after the lecture are written into the contract only as far as we can really promise.",
         "We do not lead with a headcount or a roster; for each request we find an instructor who fits and show you their evidence card. We have not posted for instructors yet. If you would like to teach with us, tell us your field and what you have made yourself at hello@synk.im. Selection criteria, payment and rights to teaching material will be shared once they are set.",
-        "You can see the instructor profile and lectures open for inquiry now under Lectures and instructors on the SHIFT page, and ask about your pick. You can also leave the instructor undecided or let SYNK recommend one."
+        "You can see the instructor profile and lectures open for inquiry now under Lectures on the SHIFT page. Each lecture card has an “Ask about this lecture” button, and “Ask for an instructor” lets SYNK recommend someone else."
       ],
       "updatedAt": "2026-10-27"
     },
@@ -2948,7 +2948,7 @@
       "brand": "shift",
       "category": "service",
       "title": "What services does SHIFT offer?",
-      "answer": "SHIFT gives AI lectures at schools, companies and institutions, runs an instructor agency, and automates work. Lectures come first; when a company that took a lecture wants it, we move on to automation.\n\nAI career lectures for schools — not a general careers talk, but how to steer a career in the AI era and which skills to build. Each student leaves with a one-page plan for their own career.\n\nAI lectures for organizations — staff practise on their own work and leave with one piece of work and a request–check–fix routine they can reuse.\n\nInstructor agency — we find AI and AI-career instructors who fit the goal and audience of each request and assign them. You know exactly which instructor is coming before you sign.\n\nAI work automation — we pick one repetitive task and automate it to help cut fixed costs, in the order half-day review, build one task, monthly care.\n\nConsulting, branding, market research and product testing come with lectures and automation where they need them.\n\nPrices for lectures and automation and the terms for assigning instructors are not set yet and are agreed per request. We do not promise learning results or savings in advance; we check them with you afterwards.",
+      "answer": "SHIFT gives AI lectures at schools, companies and institutions, runs an instructor agency, and automates work. Lectures come first; when a company that took a lecture wants it, we move on to automation.\n\nHands-on AI lecture — staff at companies, public bodies and schools practise on their own work and leave with one piece of work and a request–check–fix routine they can reuse.\n\nAI career lectures for schools — not a general careers talk, but how to steer a career in the AI era and which skills to build. Each student leaves with a one-page plan for their own career.\n\nInstructor agency — we find AI and AI-career instructors who fit the goal and audience of each request and assign them. You know exactly which instructor is coming before you sign.\n\nAI work automation — we pick one repetitive task and automate it to help cut fixed costs, in the order half-day review, build one task, monthly care.\n\nConsulting, branding, market research and product testing come with lectures and automation where they need them.\n\nPrices for lectures and automation and the terms for assigning instructors are not set yet and are agreed per request. We do not promise learning results or savings in advance; we check them with you afterwards.",
       "questionExamples": [
         "What services does SHIFT offer?",
         "Do you offer both corporate AI training and branding?",
@@ -4912,7 +4912,7 @@
       ],
       "action": {
         "label": "AI career lectures for schools",
-        "href": "/en/shift/#service-1"
+        "href": "/en/shift/#service-2"
       },
       "reviewedAt": "2026-10-23"
     },
@@ -4943,7 +4943,7 @@
         "How many instructors do you have?",
         "Who are the instructors?"
       ],
-      "answer": "Yes. We hear the goal and the audience of the request, then find an AI or AI-career instructor who fits and assign them. First we show an evidence card for each instructor: who they teach and for what kind of work, what they have made themselves, samples they can share, and what stays after the class.\n\nYou know exactly which instructor is coming before you sign. Running the day, a substitute if the instructor cannot come, cancellation and questions after the lecture are written into the contract only as far as we can really promise.\n\nWe do not lead with a headcount or a roster; for each request we find an instructor who fits and show you their evidence card. We have not posted for instructors yet. If you would like to teach with us, tell us your field and what you have made yourself at hello@synk.im. Selection criteria, payment and rights to teaching material will be shared once they are set.\n\nYou can see the instructor profile and lectures open for inquiry now under Lectures and instructors on the SHIFT page, and ask about your pick. You can also leave the instructor undecided or let SYNK recommend one.",
+      "answer": "Yes. We hear the goal and the audience of the request, then find an AI or AI-career instructor who fits and assign them. First we show an evidence card for each instructor: who they teach and for what kind of work, what they have made themselves, samples they can share, and what stays after the class.\n\nYou know exactly which instructor is coming before you sign. Running the day, a substitute if the instructor cannot come, cancellation and questions after the lecture are written into the contract only as far as we can really promise.\n\nWe do not lead with a headcount or a roster; for each request we find an instructor who fits and show you their evidence card. We have not posted for instructors yet. If you would like to teach with us, tell us your field and what you have made yourself at hello@synk.im. Selection criteria, payment and rights to teaching material will be shared once they are set.\n\nYou can see the instructor profile and lectures open for inquiry now under Lectures on the SHIFT page. Each lecture card has an “Ask about this lecture” button, and “Ask for an instructor” lets SYNK recommend someone else.",
       "sourceId": "shift",
       "relatedIds": [
         "shift-education",
@@ -4951,7 +4951,7 @@
         "shift-contract"
       ],
       "action": {
-        "label": "See lectures and instructors",
+        "label": "See lectures",
         "href": "/en/shift/#lectures"
       },
       "reviewedAt": "2026-10-27"
