@@ -1,7 +1,7 @@
 {
- "createdAt": "2026-10-26T23:28:03.699Z",
- "commit": "360984ea0a17c630b5ff1eb7383804b75a5bb493",
- "run": 40418248554,
+ "createdAt": "2026-10-27T06:47:41.152Z",
+ "commit": "c55d5a78fc97626e5085916b5445461493c5672e",
+ "run": 40461875380,
  "env": {
   "chromium": "151.0.7922.34",
   "os": "ubuntu24"
@@ -250,13 +250,13 @@
     "file": "desktop/lab~topik4.jpg",
     "sha256": "511e05eaa3c2a7fc18499b3c995687fbcdf4abf3973dd13ba68e15c47fc17faa",
     "cssHeight": 4823,
-    "run": 40075364201
+    "run": 40461875380
    },
    "mobile": {
     "file": "mobile/lab~topik4.jpg",
     "sha256": "bbd3efb59a8755f24fbd0add128241de6b4d12626faf4db5e7613a353fc7cfc2",
     "cssHeight": 7840,
-    "run": 40075364201
+    "run": 40461875380
    }
   },
   "/listen/": {
@@ -290,43 +290,43 @@
   "/name/": {
    "desktop": {
     "file": "desktop/name.jpg",
-    "sha256": "1c66f3e8dd06c3dd0a81d01f0578c382a44147365d8d448e91e0f1c67799a18b",
+    "sha256": "e77d16bf9eb4358f60b32764f3849956580586a2c011399fcdbcb61cbaa03468",
     "cssHeight": 1836,
-    "run": 39700254781
+    "run": 40461875380
    },
    "mobile": {
     "file": "mobile/name.jpg",
-    "sha256": "2e98d5637c400aa4ec532a786e6fa4f14d9b725145322442334d5d771775dbf2",
+    "sha256": "a92189d60340bed29ee128a659e9b86dc816ee53a8ba9832c2497eaea0e12a9e",
     "cssHeight": 2284,
-    "run": 39700254781
+    "run": 40461875380
    }
   },
   "/name/family/": {
    "desktop": {
     "file": "desktop/name~family.jpg",
-    "sha256": "56077c3f9baa0e984fd40b891f559b26780804596e2de340cfa027e1e9b76514",
+    "sha256": "8fe3defb42312bc7d425e30196c5efc757c31f6d7006ecff023b46bd21763f73",
     "cssHeight": 1723,
-    "run": 39700254781
+    "run": 40461875380
    },
    "mobile": {
     "file": "mobile/name~family.jpg",
-    "sha256": "3701afca1d8bf0c2416a3ff81d6551adf6047cd1b1a0121846476ef5037e73f4",
+    "sha256": "862978dc2cc1667f5609cf19d7e4f83cd340e09e4436dd1e280ad459d002ef9e",
     "cssHeight": 1985,
-    "run": 39700254781
+    "run": 40461875380
    }
   },
   "/nombre/": {
    "desktop": {
     "file": "desktop/nombre.jpg",
-    "sha256": "f94333db23841ff008a43dd9370f2fbda5b9f29737f56d30f306d65d7728ca2f",
+    "sha256": "f4e124fe003428205fd13cf469afa67e03ad3ffb4f43dcb6c2ded7625f64d48d",
     "cssHeight": 1326,
-    "run": 39700254781
+    "run": 40461875380
    },
    "mobile": {
     "file": "mobile/nombre.jpg",
-    "sha256": "91c6a9f3674cb5d56f44774ea0497e574e97b1e2b607854d87277144acefef9b",
+    "sha256": "f825689a85d53141c8d05a10130de92e67e58cefd521f5b5624757632ef9722a",
     "cssHeight": 1536,
-    "run": 39700254781
+    "run": 40461875380
    }
   },
   "/path/": {
@@ -362,13 +362,13 @@
     "file": "desktop/privacy.jpg",
     "sha256": "792f041a069521314f8a4077672c84c45a1b6a1873efc7d117a090464977f502",
     "cssHeight": 16328,
-    "run": 40342436446
+    "run": 40461875380
    },
    "mobile": {
     "file": "mobile/privacy.jpg",
     "sha256": "f665d6bd9745edf3b72462ba95c27a9c968158a10fd4aa3ac5b0d8692bcc7ccb",
     "cssHeight": 24366,
-    "run": 40342436446
+    "run": 40461875380
    }
   },
   "/prompts/": {
@@ -416,15 +416,15 @@
   "/rl/": {
    "desktop": {
     "file": "desktop/rl.jpg",
-    "sha256": "370d52ac66734e5ba157911b5d2a9620f1269e9948693f0e11cd00ec25eab24a",
+    "sha256": "a6543a01aee447b5e8544a1ae78d0ab6b3d89455211de59b81933dd22160deef",
     "cssHeight": 1936,
-    "run": 39700254781
+    "run": 40461875380
    },
    "mobile": {
     "file": "mobile/rl.jpg",
-    "sha256": "a173e47088beccf507b3e4a998618359c8a8b0b9963c4d07a06e957facbbdf8b",
+    "sha256": "dacd42a433276d26311fe859a5d474563d71779499cccffe03168a75df264af3",
     "cssHeight": 2271,
-    "run": 39700254781
+    "run": 40461875380
    }
   },
   "/shift/": {
@@ -486,15 +486,15 @@
   "/world/hangul-stage/": {
    "desktop": {
     "file": "desktop/world~hangul-stage.jpg",
-    "sha256": "a5aea13ee78a9108f07cfc25c4724b4e34ecb8954258273072d3483a09b4cea1",
+    "sha256": "b70b44df9b72912dd404df12cac4cc950df8059661d0258603bdf7d6a50c0e60",
     "cssHeight": 2324,
-    "run": 39700254781
+    "run": 40461875380
    },
    "mobile": {
     "file": "mobile/world~hangul-stage.jpg",
-    "sha256": "a20ad86a9e093660591675f8ba09d0abbb843524ba82e669cc7d94d91a39f598",
+    "sha256": "f81cf3aeced29a8852a0d111ff74405d123a604c1e7e6b918c74801eae7170d0",
     "cssHeight": 2881,
-    "run": 39700254781
+    "run": 40461875380
    }
   },
   "/world/korean-rhythm/": {

@@ -30,275 +30,41 @@
  "/founder/|desktop": {},
  "/founder/|mobile": {},
  "/lab/topik4/|desktop": {},
- "/lab/topik4/|mobile": {
-  "region": {
-   "impact": "moderate",
-   "count": 1,
-   "targets": [
-    ".t4-dock > span[data-t=\"cta\"]"
-   ]
-  }
- },
+ "/lab/topik4/|mobile": {},
  "/lab/|desktop": {},
  "/lab/|mobile": {},
  "/listen/|desktop": {},
  "/listen/|mobile": {},
  "/mn/|desktop": {},
  "/mn/|mobile": {},
- "/name/family/|desktop": {
-  "color-contrast": {
-   "impact": "serious",
-   "count": 7,
-   "targets": [
-    "button[data-set=\"mn\"]",
-    ".caption > .mn",
-    ".label"
-   ]
-  },
-  "landmark-one-main": {
-   "impact": "moderate",
-   "count": 1,
-   "targets": [
-    "html"
-   ]
-  },
-  "region": {
-   "impact": "moderate",
-   "count": 17,
-   "targets": [
-    ".home",
-    "h1 > .mn",
-    ".lead > .mn"
-   ]
-  }
- },
- "/name/family/|mobile": {
-  "color-contrast": {
-   "impact": "serious",
-   "count": 7,
-   "targets": [
-    "button[data-set=\"mn\"]",
-    ".caption > .mn",
-    ".label"
-   ]
-  },
-  "landmark-one-main": {
-   "impact": "moderate",
-   "count": 1,
-   "targets": [
-    "html"
-   ]
-  },
-  "region": {
-   "impact": "moderate",
-   "count": 17,
-   "targets": [
-    ".home",
-    "h1 > .mn",
-    ".lead > .mn"
-   ]
-  }
- },
- "/name/|desktop": {
-  "color-contrast": {
-   "impact": "serious",
-   "count": 6,
-   "targets": [
-    "button[data-set=\"mn\"]",
-    "th:nth-child(1) > .mn",
-    "th:nth-child(2) > .mn"
-   ]
-  },
-  "landmark-one-main": {
-   "impact": "moderate",
-   "count": 1,
-   "targets": [
-    "html"
-   ]
-  },
-  "region": {
-   "impact": "moderate",
-   "count": 19,
-   "targets": [
-    ".home",
-    "h1 > .mn",
-    ".lead > .mn"
-   ]
-  }
- },
- "/name/|mobile": {
-  "color-contrast": {
-   "impact": "serious",
-   "count": 6,
-   "targets": [
-    "button[data-set=\"mn\"]",
-    "th:nth-child(1) > .mn",
-    "th:nth-child(2) > .mn"
-   ]
-  },
-  "landmark-one-main": {
-   "impact": "moderate",
-   "count": 1,
-   "targets": [
-    "html"
-   ]
-  },
-  "region": {
-   "impact": "moderate",
-   "count": 19,
-   "targets": [
-    ".home",
-    "h1 > .mn",
-    ".lead > .mn"
-   ]
-  }
- },
- "/nombre/|desktop": {
-  "color-contrast": {
-   "impact": "serious",
-   "count": 15,
-   "targets": [
-    ".home > b",
-    ".langbtn[data-ui=\"es\"]",
-    "p[data-t=\"privacy\"]"
-   ]
-  },
-  "region": {
-   "impact": "moderate",
-   "count": 1,
-   "targets": [
-    ".bar"
-   ]
-  }
- },
- "/nombre/|mobile": {
-  "color-contrast": {
-   "impact": "serious",
-   "count": 15,
-   "targets": [
-    ".home > b",
-    ".langbtn[data-ui=\"es\"]",
-    "p[data-t=\"privacy\"]"
-   ]
-  },
-  "region": {
-   "impact": "moderate",
-   "count": 1,
-   "targets": [
-    ".bar"
-   ]
-  }
- },
+ "/name/family/|desktop": {},
+ "/name/family/|mobile": {},
+ "/name/|desktop": {},
+ "/name/|mobile": {},
+ "/nombre/|desktop": {},
+ "/nombre/|mobile": {},
  "/path/|desktop": {},
  "/path/|mobile": {},
  "/practice/|desktop": {},
  "/practice/|mobile": {},
- "/privacy/|desktop": {
-  "landmark-unique": {
-   "impact": "moderate",
-   "count": 2,
-   "targets": [
-    ".tbl-scroll[aria-label=\"개인정보 안내 표\"][role=\"region\"]:nth-child(24)",
-    ".tbl-scroll[aria-label=\"Privacy information table\"][role=\"region\"]:nth-child(12)"
-   ]
-  }
- },
- "/privacy/|mobile": {
-  "landmark-unique": {
-   "impact": "moderate",
-   "count": 2,
-   "targets": [
-    ".tbl-scroll[aria-label=\"개인정보 안내 표\"][role=\"region\"]:nth-child(24)",
-    ".tbl-scroll[aria-label=\"Privacy information table\"][role=\"region\"]:nth-child(12)"
-   ]
-  }
- },
+ "/privacy/|desktop": {},
+ "/privacy/|mobile": {},
  "/prompts/|desktop": {},
  "/prompts/|mobile": {},
  "/pulse/casting/|desktop": {},
  "/pulse/casting/|mobile": {},
  "/pulse/|desktop": {},
  "/pulse/|mobile": {},
- "/rl/|desktop": {
-  "color-contrast": {
-   "impact": "serious",
-   "count": 20,
-   "targets": [
-    ".home > b",
-    ".tag",
-    ".primary"
-   ]
-  },
-  "region": {
-   "impact": "moderate",
-   "count": 1,
-   "targets": [
-    ".bar"
-   ]
-  }
- },
- "/rl/|mobile": {
-  "color-contrast": {
-   "impact": "serious",
-   "count": 20,
-   "targets": [
-    ".home > b",
-    ".tag",
-    ".primary"
-   ]
-  },
-  "region": {
-   "impact": "moderate",
-   "count": 1,
-   "targets": [
-    ".bar"
-   ]
-  }
- },
+ "/rl/|desktop": {},
+ "/rl/|mobile": {},
  "/shift/|desktop": {},
  "/shift/|mobile": {},
  "/terms/|desktop": {},
  "/terms/|mobile": {},
  "/ub/|desktop": {},
  "/ub/|mobile": {},
- "/world/hangul-stage/|desktop": {
-  "aria-prohibited-attr": {
-   "impact": "serious",
-   "count": 3,
-   "targets": [
-    "div[aria-label=\"한\"]",
-    "div[aria-label=\"국\"]",
-    "div[aria-label=\"어\"]"
-   ]
-  },
-  "color-contrast": {
-   "impact": "serious",
-   "count": 2,
-   "targets": [
-    ".later > .stop[aria-hidden=\"true\"]",
-    ".later > .glyphs[aria-hidden=\"true\"]"
-   ]
-  }
- },
- "/world/hangul-stage/|mobile": {
-  "aria-prohibited-attr": {
-   "impact": "serious",
-   "count": 3,
-   "targets": [
-    "div[aria-label=\"한\"]",
-    "div[aria-label=\"국\"]",
-    "div[aria-label=\"어\"]"
-   ]
-  },
-  "color-contrast": {
-   "impact": "serious",
-   "count": 2,
-   "targets": [
-    ".later > .stop[aria-hidden=\"true\"]",
-    ".later > .glyphs[aria-hidden=\"true\"]"
-   ]
-  }
- },
+ "/world/hangul-stage/|desktop": {},
+ "/world/hangul-stage/|mobile": {},
  "/world/korean-rhythm/|desktop": {},
  "/world/korean-rhythm/|mobile": {},
  "/world/korean-runner/|desktop": {},
