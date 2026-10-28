@@ -8,6 +8,11 @@ const {verifyArchive}=require('./archive-verification.cjs');
 const assert=(value,message)=>{if(!value)throw Error(message);};
 const json=(file,value)=>{fs.mkdirSync(path.dirname(file),{recursive:true});fs.writeFileSync(file,JSON.stringify(value,null,2)+'\n');};
 const PRODUCTS={world:{name:'SYNK WORLD Preview',executable:'SYNKWorldPreview',stem:'SYNK-WORLD',category:'public.app-category.education'},messenger:{name:'SYNK Workspace Preview',executable:'SYNKMessengerPreview',stem:'SYNK-Workspace',category:'public.app-category.productivity'}};
+function readChildLocationHelperPin(asar,archive){
+  const helper='src/mac-application-location.cjs';
+  const exists=asar.listPackage(archive).some(name=>name.replaceAll('\\','/').replace(/^\/+/, '')===helper);
+  return exists?crypto.createHash('sha256').update(asar.extractFile(archive,helper)).digest('hex'):null;
+}
 // A refreshed, hash-verified baseline may already contain the location gate.
 // Accept only the exact existing transform and helper bytes pinned in that ASAR.
 function prepareChildLocation(stage,commonSource,baselineHelperSHA256=null){
@@ -41,7 +46,7 @@ async function buildChild({child,baseline,root,out,builder,platform,arch,version
     command(await deps('app-builder-lib/out/toolsets/7zip').getPath7za(),['x',backend,'-o'+unpack,'-y','resources/app.asar']);resources=path.join(unpack,'resources');
   }else{command('hdiutil',['attach','-readonly','-nobrowse','-noautoopen','-mountpoint',unpack,baseline]);mounted=true;resources=path.join(unpack,product.executable+'.app/Contents/Resources');}
   try{const archive=path.join(resources,'app.asar');assert(sha(archive)===child.asarSHA256,'Child baseline archive differs');
-    if(asar.listPackage(archive).includes('/src/mac-application-location.cjs'))baselineHelperSHA256=crypto.createHash('sha256').update(asar.extractFile(archive,'src/mac-application-location.cjs')).digest('hex');
+    baselineHelperSHA256=readChildLocationHelperPin(asar,archive);
     asar.extractAll(archive,stage);
   }finally{if(mounted)command('hdiutil',['detach',unpack]);}
   const before=inventory(stage),runtime=JSON.parse(fs.readFileSync(path.join(stage,'runtime.json')));
@@ -82,4 +87,4 @@ async function buildChild({child,baseline,root,out,builder,platform,arch,version
   const report={ok:true,client:child.id,version,metadata,baseline:child,overlay,sourceFiles:after,changed:after.filter(row=>before.find(old=>old.path===row.path)?.sha256!==row.sha256).map(row=>row.path),release,artifactFile:artifact,appPath:app,executable:{sha256:release.executableSHA256},asar:{sha256:release.asarSHA256},installer:{path:path.relative(builder,artifact).split(path.sep).join('/'),bytes:release.installer.bytes,sha256:release.installer.sha256},installedStateTouched:false};
   json(path.join(out,'build-report.json'),report);return report;
 }
-module.exports={buildChild,PRODUCTS,prepareChildLocation};
+module.exports={buildChild,PRODUCTS,prepareChildLocation,readChildLocationHelperPin};
