@@ -8,6 +8,7 @@ import { MusicPlayer } from './audio.js';
 import { Stage } from './stage.js';
 import { rhythmItem, FLOW_RHYTHM, timingObservation, timingSummary, assignmentTracks, assignmentTrack, rhythmTargetLabel, nextTrackLine } from './personalization.js';
 import {rhythmSupport} from './shared/brand-opening/game-tutor-support.js';
+import {createSupplementalPanel} from './supplemental-player.js';
 
 let gameTutor=null;
 const tutorEvent=(kind,detail)=>gameTutor?.emit(kind,detail);
@@ -27,13 +28,16 @@ function announce(text) { const n = $('sr-live'); n.textContent = ''; setTimeout
 // ── WORLD 안(2026-10-14 3차): world-host.js가 붙인 data-host=world일 때만 쓰는 무대·문구·소리·박자 맞추기·결과 한 장.
 // LAB 단독 화면은 이 분기를 하나도 타지 않는다(r2/games/standalone-proof.cjs로 계산 스타일·DOM·캔버스 픽셀 차이 0 확인).
 const WORLD = globalThis.document?.documentElement?.dataset?.host === 'world';
+const TRIAL = WORLD && globalThis.SynkPlayAccount?.status?.().trial === true;
 const wt = (lab, world) => (WORLD ? world : lab);   // 보이는 글: LAB 그대로 · WORLD 새 문구
 let worldSound = null;   // 공통 소리·진동·연출 스위치 — WORLD 안에서만 불러오고, 못 불러오면 조용히 넘어간다
-if (WORLD) import('../brand-opening/world-sound.js').then((m) => { worldSound = m; m.bindTaps(document); }).catch(() => {});
+if (WORLD) import('/world/brand-opening/world-sound.mjs').then((m) => { worldSound = m; m.bindTaps(document); }).catch(() => {});
 
 /* ── 공통 학습 기록(Atlas) ── */
 let coach = null, learningAvailable = true;
-try { coach = globalThis.SynkLearning?.createGame({ gameId: 'korean-rhythm', storage: localStorage }) || null; } catch { learningAvailable = false; }
+try { coach = globalThis.SynkLearning?.createGame({ gameId: 'korean-rhythm', storage: localStorage, followups:true }) || null; } catch { learningAvailable = false; }
+const supplementalPanel=createSupplementalPanel({host:$('supplemental-practice'),getCoach:()=>learningAvailable?coach:null});
+const supplementalLobby=createSupplementalPanel({host:$('supplemental-ready'),getCoach:()=>learningAvailable?coach:null});
 function learn(action, fallback = null) { try { return coach ? action(coach) : fallback; } catch { learningAvailable = false; return fallback; } }
 const assignment = () => learn((c) => c.assignment?.());
 // SYNK WORLD 안에서는 기록이 계정의 것이다: 지우기도 거기서 한다.
@@ -142,6 +146,8 @@ function nudgeOffset(ms) { state.offset = Math.max(-OFFSET_MAX, Math.min(OFFSET_
 
 /* ── 화면 ── */
 function show(name) {
+  if(name!=='results')supplementalPanel.close();
+  if(name!=='lobby')supplementalLobby.close();else if(!TRIAL)supplementalLobby.show();
   for (const s of ['lobby', 'game', 'results']) $(s).hidden = s !== name;
   state.screen = name;
   if(name==='lobby')tutorEvent('lobby');
@@ -452,6 +458,7 @@ function finish() {
   $('r-note').textContent = `들은 문장 ${correct}개를 맞혔어요.${texted ? ` 글로 본 문장 ${texted}개는 도움을 받은 답으로 남겨요.` : ''}`;
   renderLog(r);
   renderSkills(r);
+  if(!TRIAL)supplementalPanel.show();
   // 공통 코인(play-common): 곡을 끝까지 마쳤을 때만. 완주 15 + 정답 비율 × 10.
   const coins = $('r-coins');
   coins.textContent = '공통 코인을 계산하고 있어요.';
@@ -731,6 +738,7 @@ $('reset-learning').addEventListener('click', () => {
 if (!globalThis.SynkPlayCollection) for (const n of document.querySelectorAll('.synk-collection-line')) n.hidden = true;
 
 renderTracks(); renderRecommendation(true); syncSettings();
+if(!TRIAL)supplementalLobby.show();
 
 // 확인용 읽기 창(예전 확인 도구와 같은 모양). 입력은 실제 키·단추로만 한다.
 window.synkRhythm = {
@@ -782,7 +790,7 @@ if (QA) {
 }
 
 // 도우미 연결은 WORLD 틀 안에서만 부른다 — 계정 페이지의 일반 틀(/try/)에는 그 파일이 없다(10-17).
-if(WORLD&&globalThis.parent&&globalThis.parent!==globalThis)void import('../brand-opening/game-tutor-channel.js').then(({connectGameTutor})=>{
+if(WORLD&&globalThis.parent&&globalThis.parent!==globalThis)void import('/world/brand-opening/game-tutor-channel.mjs').then(({connectGameTutor})=>{
  gameTutor=connectGameTutor('rhythm',{onHelp:()=>pause(),onPracticeComplete:()=>{if(state.screen==='game'&&state.round)void resume();else void start();},onResumeAfterHelp:()=>{if(state.screen==='game'&&state.round)void resume();}});
  tutorEvent(state.screen==='game'?(state.paused?'paused':'playing'):state.screen==='results'?'finish':'lobby');
 }).catch(()=>{});

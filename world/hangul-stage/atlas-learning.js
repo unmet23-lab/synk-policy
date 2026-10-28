@@ -16,7 +16,7 @@ var SynkLearning = (() => {
       "use strict";
       var CONFIDENCE = ["authored", "measured", "ai_draft"];
       var KINDS = ["skill", "grammar_point", "expression", "situation", "letter", "syllable", "concept", "topic", "task", "word"];
-      var TYPES = ["part_of", "prerequisite", "contrasts_with"];
+      var TYPES = ["part_of", "prerequisite", "recommended_before", "contrasts_with"];
       var copy = (value) => JSON.parse(JSON.stringify(value));
       var fail = (message) => {
         throw new TypeError(`Strata: ${message}`);
@@ -61,6 +61,10 @@ var SynkLearning = (() => {
           if (uniqueEdges.has(key)) fail("duplicate edge");
           uniqueEdges.add(key);
           if (edge.type === "part_of" && (ids.get(edge.from).kind !== "grammar_point" || ids.get(edge.to).kind !== "skill")) fail("invalid grammar membership");
+          if (edge.type === "recommended_before") {
+            if (edge.blocking !== false || !text(edge.basis?.official_scope) || !text(edge.basis?.interpretation) || !text(edge.basis?.source_url) || !text(edge.reason_ko)) fail("recommendation needs nonblocking interpretation and source");
+            if (edge.reviewed && (!text(edge.review?.task) || !text(edge.review?.reviewer) || !text(edge.review?.evidence))) fail("reviewed recommendation needs review evidence");
+          }
           if (edge.type === "prerequisite") {
             const before = ids.get(edge.from).level?.intro, after = ids.get(edge.to).level?.intro;
             if (before != null && after != null && before > after) fail("prerequisite level inversion");
@@ -141,6 +145,20 @@ var SynkLearning = (() => {
             source_refs: edge.source_refs
           })));
         }
+        function recommendedBefore(id) {
+          if (!nodes.has(id)) return [];
+          return freeze(data.edges.filter((edge) => edge.type === "recommended_before" && edge.to === id && edge.reviewed).sort((a, b) => compare(a.from, b.from)).map((edge) => ({
+            node: getNode(edge.from),
+            target: id,
+            confidence: edge.confidence,
+            reviewed: true,
+            blocking: false,
+            reason_ko: edge.reason_ko,
+            basis: edge.basis,
+            source_refs: edge.source_refs,
+            review: edge.review
+          })));
+        }
         function candidates(state = { lines: [] }, { limit = 10 } = {}) {
           if (!Array.isArray(state.lines) || !Number.isInteger(limit) || limit < 0 || limit > 100) fail("invalid candidate input");
           if (state.mastered != null && (!Array.isArray(state.mastered) || state.mastered.some((id) => !text(id)))) fail("invalid mastered nodes");
@@ -161,7 +179,7 @@ var SynkLearning = (() => {
             targets: result.targets.sort(compare),
             reasons: result.reasons.sort(compare),
             blocked_by: result.prerequisites.filter((item) => item.blocking && !mastered.has(item.node.id)).map((item) => item.node.id),
-            advisory: result.prerequisites.filter((item) => !item.blocking && !mastered.has(item.node.id)).map((item) => item.node.id)
+            advisory: [...new Set([...result.prerequisites.filter((item) => !item.blocking), ...recommendedBefore(result.id)].filter((item) => !mastered.has(item.node.id)).map((item) => item.node.id))]
           })).slice(0, limit));
         }
         return Object.freeze({
@@ -171,6 +189,7 @@ var SynkLearning = (() => {
           forSkill,
           forGoal,
           prerequisites,
+          recommendedBefore,
           candidates,
           allNodes: () => Object.freeze([...nodes.values()])
         });
@@ -762,6 +781,49 @@ var SynkLearning = (() => {
         function append(events, event) {
           return admit(events, event) ? [...copy(events), copy(event)] : copy(events);
         }
+        function validationNeeds(events) {
+          if (!Array.isArray(events)) throw new TypeError("Atlas: invalid events");
+          const ids = /* @__PURE__ */ new Set(), presentations = /* @__PURE__ */ new Set();
+          for (const event of events) {
+            validate(event);
+            ids.add(event.id);
+            if (isPractice(event)) {
+              ids.add(event.type === "practice.presented" ? event.decisionId : event.presentationId);
+              if (event.type === "practice.attempted") presentations.add(event.presentationId);
+            }
+            if (event.type === "experience.completed" || event.type === "outcome.observed") ids.add(event.decisionId);
+            if (event.type === "outcome.observed" && event.attemptId != null) ids.add(event.attemptId);
+            if (event.type === "feedback.given") ids.add(event.completionId);
+            if (event.type === "record.excluded") ids.add(event.targetId);
+          }
+          return { ids: [...ids], presentations: [...presentations] };
+        }
+        function validateIncrement({ events, scope, references = [], attempts = [] }) {
+          const key = scopeKey(scope), needs = validationNeeds(events);
+          const wanted = new Set(needs.ids), parents = /* @__PURE__ */ new Map(), stats = /* @__PURE__ */ new Map();
+          for (const event of references) {
+            validate(event);
+            if (!wanted.has(event.id) || parents.has(event.id)) throw new TypeError("Atlas: invalid reference lookup");
+            parents.set(event.id, event);
+          }
+          for (const event of attempts) {
+            validate(event);
+            if (event.type !== "practice.attempted" || !needs.presentations.includes(event.presentationId) || stats.has(event.presentationId) || scopeKey(event.scope) !== key) throw new TypeError("Atlas: invalid attempt lookup");
+            stats.set(event.presentationId, { count: event.attemptNo, latest: ms(event.at) });
+          }
+          if (typeof trail().link !== "function") throw new Error("Atlas: indexed Trail validation unavailable");
+          const fresh = /* @__PURE__ */ new Map(), lookup = {
+            byId: (id) => fresh.get(id) || parents.get(id),
+            attempts: (id) => stats.get(id) || { count: 0, latest: -Infinity }
+          };
+          for (const event of events) {
+            if (scopeKey(event.scope) !== key) throw new TypeError("Atlas: event outside session scope");
+            if (!admitWith(lookup, event)) continue;
+            fresh.set(event.id, event);
+            if (event.type === "practice.attempted") stats.set(event.presentationId, { count: event.attemptNo, latest: ms(event.at) });
+          }
+          return [...fresh.values()];
+        }
         function read(events, scope, asOf, recordedAsOf = asOf) {
           const key = scopeKey(scope), cutoff = ms(asOf), recordedCutoff = ms(recordedAsOf);
           const rows = [];
@@ -1158,7 +1220,7 @@ var SynkLearning = (() => {
             lines: () => understand(log, scope, clock()).lines
           };
         }
-        return Object.freeze({ VERSION, POLICIES, CONTEXT, validate, append, understand, decide, choice, createSession });
+        return Object.freeze({ VERSION, POLICIES, CONTEXT, validate, append, validationNeeds, validateIncrement, understand, decide, choice, createSession });
       });
     }
   });
@@ -1319,7 +1381,81 @@ var SynkLearning = (() => {
         if (reasons.includes("history.incomplete")) return "기록을 모두 확인하기 전이라 기본 활동으로 시작해요.";
         return "아직 연습 기록이 적어요. 짧게 해 보며 맞춰 갈게요.";
       }
-      module.exports = { SUPPORTS, STUCK, reviewOpen, offerCue, learningReason, situationLine, activityReason };
+      function memberActivityReason({ kind, action = false } = {}) {
+        if (!["favorite", "opened"].includes(kind)) throw new TypeError("Vellum: invalid member activity basis");
+        if (kind === "favorite") return action ? "직접 즐겨찾기에 고른 앱에서 이어서 시작해요." : "직접 즐겨찾기에 고른 앱이에요. 이용 횟수와는 별개의 선택이에요.";
+        return action ? "최근 60일에 열어 본 앱에서 이어서 시작해요." : "연결을 허용한 뒤 최근 60일에 앱을 연 기록이에요. 실제 활동 완료나 좋아하는 정도를 뜻하지 않아요.";
+      }
+      function periodComparisonReason({ source, state } = {}) {
+        if (!["activity", "practice"].includes(source) || !["ready", "empty", "partial", "disabled"].includes(state)) throw new TypeError("Vellum: invalid period comparison");
+        if (state === "disabled") return "앱 이용 기록 연결이 꺼져 있어요. 연결을 허용한 뒤의 기록부터 모아요.";
+        if (state === "partial") return "연결 시작 시점이나 보관 범위 때문에 두 기간의 기록을 모두 확인할 수 없어요. 있는 기록만 보여드리고 차이는 계산하지 않아요.";
+        if (state === "empty") return "두 기간 모두에 기록이 있어야 차이를 비교해요. 기록이 없는 기간을 성향이나 실력의 변화로 판단하지 않아요.";
+        return source === "activity" ? "같은 길이의 두 기간에 앱을 연 횟수와 날짜를 비교해요. 활동 완료나 관심의 강도를 뜻하지 않아요." : "같은 길이의 두 기간에 답한 횟수를 비교해요. 혼자 응답에는 오답도 포함하며, 실력 성장이나 학습 효과를 뜻하지 않아요.";
+      }
+      var memberDate = (value) => {
+        const time = typeof value === "string" ? Date.parse(value) : NaN;
+        if (!Number.isFinite(time)) throw new TypeError("Vellum: invalid member evidence date");
+        const [year, month, day] = new Date(time + 9 * 36e5).toISOString().slice(0, 10).split("-").map(Number);
+        return `${year}년 ${month}월 ${day}일`;
+      };
+      function memberUnderstandingLine({ kind, label, count = 0, activeDays = 0, state = "observed", selection = null, periodEnd = null } = {}) {
+        if (typeof label !== "string" || !["observed", "agreed", "contextual", "disagreed", "declared", "empty", "disabled"].includes(state)) throw new TypeError("Vellum: invalid member understanding");
+        if (state === "disabled") return "이 자료의 연결이 꺼져 있어 관찰과 그에 대한 확인을 요약에 사용하지 않아요.";
+        if (state === "empty") return "아직 여러 날의 기록이 충분하지 않아요. 지금 선호하는 방식을 직접 고를 수 있어요.";
+        if (state === "declared") {
+          if (kind === "learning-topic") {
+            if (selection === "interested") return `${label}에 관심이 있다고 직접 알려 줬어요. 다음 설명에서도 이 선택을 먼저 참고해요.`;
+            if (selection === "practice-only") return `${label}${particle(label, "은", "는")} 연습에서 다룬 내용일 뿐이라고 직접 알려 줬어요.`;
+            if (selection === "not-now") return `${label}${particle(label, "은", "는")} 지금 관심 있는 내용이 아니라고 직접 알려 줬어요.`;
+            throw new TypeError("Vellum: invalid member topic selection");
+          }
+          return `직접 고른 내용: ${label}. 다음 설명에서도 이 선택을 먼저 참고해요.`;
+        }
+        if (!Number.isSafeInteger(count) || !Number.isSafeInteger(activeDays)) throw new TypeError("Vellum: invalid member observation count");
+        const period = periodEnd ? `${memberDate(periodEnd)} 기준 최근 30일` : "최근 30일";
+        const fact = kind === "usage-repeat" ? `${period}의 연결된 기록에서 ${label}${particle(label, "을", "를")} ${activeDays}일에 걸쳐 ${count}번 열었어요.` : kind === "learning-topic" ? `${period}의 학습 기록에서 ${label}${particle(label, "을", "를")} 다룬 응답이 ${activeDays}일에 걸쳐 ${count}건 있어요.` : `${period}의 학습 기록에서 ${label} 방식의 응답이 ${activeDays}일에 걸쳐 ${count}건 있어요.`;
+        if (state === "agreed") return `${fact} ${kind === "learning-topic" ? "관심 있는 내용이라고 직접 확인했어요." : "자신에게 맞는 이용 방식이라고 직접 확인했어요."}`;
+        if (state === "contextual") return `${fact} 다만 상황에 따라 달라지는 내용이라고 직접 알려 줬어요.`;
+        if (state === "disagreed") return `${fact} 이 기록을 자신의 관심이나 선호로 해석하지 않기로 했어요.`;
+        return `${fact} ${kind === "learning-topic" ? "다뤘다는 사실만으로 관심이라고 정하지 않아요." : "기록된 방식이며 선호나 효과를 뜻하지는 않아요."}`;
+      }
+      function memberUnderstandingSummary({ hasDeclaration, hasFeedback, practice = null, learning, usage, learningAt = null, usageAt = null }) {
+        if (typeof hasDeclaration !== "boolean" || typeof hasFeedback !== "boolean" || !["ready", "disabled", "unavailable"].includes(learning) || !["ready", "disabled", "unavailable"].includes(usage)) throw new TypeError("Vellum: invalid member summary");
+        let observation = "";
+        if (learning === "ready" && practice) {
+          const { answered, independent, assisted, activeDays, to } = practice;
+          if (![answered, independent, assisted, activeDays].every((n) => Number.isSafeInteger(n) && n >= 0) || independent + assisted > answered || activeDays > Math.min(answered, 31)) throw new TypeError("Vellum: invalid member practice summary");
+          const period = `${memberDate(to)} 기준 최근 30일`;
+          observation = answered ? `학습 기록은 ${period} 중 ${activeDays}일, 응답 ${answered}건이에요. 그중 도움 없이 답한 응답은 ${independent}건, 도움을 받은 응답은 ${assisted}건이에요. ${activeDays === 1 ? "하루의 기록만으로 반복되는 경향이나 선호를 정하지 않아요." : "연습에서 사용한 방식과 본인이 원하는 방식은 다를 수 있어요."}` : `${period}에는 학습 응답 기록이 없어요. 기록이 없다는 사실을 관심이나 실력이 없다는 뜻으로 보지 않아요.`;
+        }
+        const scope = [];
+        if (learning === "disabled") scope.push("학습 기록 연결이 꺼져 있어 이번 설명에 사용하지 않았어요.");
+        else if (learning === "unavailable") scope.push("학습 기록은 이번 설명에 연결되지 않았어요.");
+        else if (!practice) scope.push(learningAt ? `학습 자료는 ${memberDate(learningAt)} 기준이며, 기간별 응답 수를 함께 확인할 수 없어 요약하지 않았어요.` : "기간별 학습 응답 수를 확인할 수 없어 요약하지 않았어요.");
+        else if (hasDeclaration) scope.push(`학습 기록은 ${memberDate(practice.to)} 기준 최근 30일의 자료예요. 직접 알려준 선호와 연습에서 관찰한 사실을 구분해요.`);
+        if (usage === "disabled") scope.push("앱 이용 기록 연결이 꺼져 있어 이번 설명에 사용하지 않았어요.");
+        else if (usage === "unavailable") scope.push("앱 이용 기록은 이번 설명에 연결되지 않았어요.");
+        else if (usageAt) scope.push(`앱 이용 기록은 ${memberDate(usageAt)} 기준으로 확인했어요. 앱을 연 사실만으로 구체적인 관심을 정하지 않아요.`);
+        return {
+          headline: hasDeclaration ? "내가 확인한 선호와 지금의 기록" : "아직 나의 선호를 알아가는 중이에요",
+          opening: hasDeclaration ? "" : hasFeedback ? "기록에 대한 본인의 확인을 먼저 반영했어요. 아직 확인하지 않은 관심이나 편한 방식은 추측하지 않아요." : "아직 관심사와 편한 방식을 정리할 만큼 직접 확인한 내용이 없어요. 원하는 방식을 직접 알려 주면 다음 설명에 먼저 반영해요.",
+          observation,
+          scope: scope.join(" ")
+        };
+      }
+      function memberUnderstandingNote({ line, note }) {
+        if (typeof line !== "string" || typeof note !== "string" || [...note].length > 200 || /[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f]|[\uD800-\uDFFF]/u.test(note)) throw new TypeError("Vellum: invalid member note");
+        return note.trim() ? `${line} 직접 남긴 설명: “${note}”` : line;
+      }
+      function memberUnderstandingActivityReason({ kind, labels }) {
+        if (!["topic", "learning", "app"].includes(kind) || !Array.isArray(labels) || !labels.length || labels.some((label) => typeof label !== "string")) throw new TypeError("Vellum: invalid member activity link");
+        const named = labels.join(" · ");
+        if (kind === "learning") return `관심 있다고 직접 확인한 '${named}'에서 이어서 학습을 골라 볼 수 있어요.`;
+        if (kind === "app") return `이어서 이용할 앱으로 ${named}${particle(named, "을", "를")} 직접 골랐어요.`;
+        return `직접 고른 '${named}' 관심과 연결되는 앱이에요.`;
+      }
+      module.exports = { SUPPORTS, STUCK, reviewOpen, offerCue, learningReason, situationLine, activityReason, memberActivityReason, periodComparisonReason, memberUnderstandingLine, memberUnderstandingSummary, memberUnderstandingNote, memberUnderstandingActivityReason };
     }
   });
 
@@ -1526,6 +1662,123 @@ var SynkLearning = (() => {
             significanceTested: false
           };
         }
+        const FOLLOWUP = Object.freeze({
+          version: "temper-followup-1",
+          maxAnchors: 24,
+          keepDays: 45,
+          windows: Object.freeze([["d1", 1, 3], ["d7", 7, 10], ["d30", 30, 37]].map(Object.freeze))
+        });
+        function followups({ events, summary, original = summary, prior = null, complete = true, asOf = summary?.asOf } = {}) {
+          summaries(summary);
+          summaries(original);
+          const now = Date.parse(asOf), day = 864e5, own = scopeKey(summary.scope);
+          if (!Array.isArray(events) || !Number.isFinite(now) || scopeKey(original.scope) !== own) throw new TypeError("Temper: invalid follow-up evidence");
+          const visible = events.filter((e) => scopeKey(e.scope) === own && Date.parse(e.at) <= now && Date.parse(e.recordedAt) <= now);
+          const byId = new Map(visible.map((e) => [e.id, e])), position = new Map(visible.map((e, i) => [e.id, i]));
+          const excluded = new Set(visible.filter((e) => e.type === "record.excluded").map((e) => e.targetId));
+          const completion = new Map(visible.filter((e) => e.type === "experience.completed").map((e) => [e.decisionId, e]));
+          const current = new Map(summary.attempts.map((a) => [a.eventId, a]));
+          const stamp = (a) => Date.parse(a.at), before = (a, b) => position.get(a.eventId ?? a.id) < position.get(b.eventId ?? b.id) && stamp(a) <= stamp(b) && Date.parse(a.recordedAt) <= Date.parse(b.recordedAt);
+          const game = (a) => byId.get(a.decisionId)?.experienceId;
+          const tuple = (a) => JSON.stringify([
+            game(a),
+            a.taskVersion,
+            a.measure?.skillId,
+            a.measure?.difficulty,
+            a.measure?.responseFormat,
+            a.measure?.modality,
+            a.measure?.audioRequired
+          ]);
+          const framed = (a) => {
+            const p = byId.get(a.presentationId), d = byId.get(a.decisionId), done = completion.get(a.decisionId);
+            return p?.type === "practice.presented" && d?.type === "decision.made" && done && before(d, p) && before(p, a) && before(a, done);
+          };
+          const qualified = (a) => a?.attemptNo === 1 && a.measure && a.measure.responseFormat !== "unknown" && !a.exclusionReason && [true, false].includes(a.assisted) && ["correct", "incorrect"].includes(a.verdict) && framed(a);
+          const invalidated = (a) => [a.eventId, a.presentationId, a.decisionId, completion.get(a.decisionId)?.id].some((id) => excluded.has(id)) || visible.some((e) => excluded.has(e.id) && ["practice.helped", "practice.delivery"].includes(e.type) && e.presentationId === a.presentationId && before(e, a));
+          const shown = /* @__PURE__ */ new Map(), foldedShown = /* @__PURE__ */ new Set();
+          const trace = (p) => [`item:${p.itemKey}`, `family:${p.measure?.familyKey || p.itemKey}`];
+          for (const p of visible.filter((e) => e.type === "practice.presented")) for (const key of trace(p)) {
+            if (!shown.has(key) || before(p, shown.get(key))) shown.set(key, p);
+          }
+          for (const [, item, family] of prior?.presented || []) {
+            foldedShown.add(`item:${item}`);
+            foldedShown.add(`family:${family}`);
+          }
+          const fresh = (a) => trace(byId.get(a.presentationId)).every((key) => !foldedShown.has(key) && shown.get(key)?.id === a.presentationId);
+          const ordered = [...original.attempts].sort((a, b) => stamp(a) - stamp(b) || position.get(a.eventId) - position.get(b.eventId));
+          const anchors = /* @__PURE__ */ new Map();
+          for (const a of ordered) if (qualified(a) && now - stamp(a) <= FOLLOWUP.keepDays * day && !anchors.has(tuple(a))) anchors.set(tuple(a), a);
+          const all = [...anchors.values()], selected = all.slice(0, FOLLOWUP.maxAnchors), retain = /* @__PURE__ */ new Set(), items = [];
+          const adjusted = prior?.adjusted || 0, usable = complete === true && !adjusted;
+          for (const source of selected) {
+            retain.add(source.decisionId);
+            const measure2 = { ...source.measure, taskVersion: source.taskVersion };
+            delete measure2.familyKey;
+            delete measure2.confounded;
+            const targets = ordered.filter((a) => a.eventId !== source.eventId && a.attemptNo === 1 && tuple(a) === tuple(source) && framed(a) && before(source, byId.get(a.presentationId)) && a.measure.familyKey !== source.measure.familyKey && a.itemKey !== source.itemKey && fresh(a));
+            for (const [window2, start, end] of FOLLOWUP.windows) {
+              const due = stamp(source) + start * day, expires = stamp(source) + end * day;
+              const target = targets.find((a) => stamp(a) >= due && stamp(a) < expires);
+              if (target) retain.add(target.decisionId);
+              const actualSource = current.get(source.eventId), actualTarget = target && current.get(target.eventId);
+              let status = now < due ? "not_due" : now < expires ? "due" : "missed", outcome = null, reason = null;
+              if (!usable) {
+                status = "unavailable";
+                reason = adjusted ? "adjusted-history" : "incomplete-history";
+              } else if (invalidated(source) || !actualSource || !qualified(actualSource)) {
+                status = "invalidated";
+                reason = "source-withdrawn";
+              } else if (target && (invalidated(target) || !actualTarget)) {
+                status = "invalidated";
+                reason = "target-withdrawn";
+              } else if (target) {
+                if (!qualified(actualTarget) || actualTarget.exposure !== "new" || actualTarget.assisted === false && !counted(actualTarget)) {
+                  status = "unavailable";
+                  reason = actualTarget.exclusionReason || "unassessable-target";
+                } else {
+                  status = "observed";
+                  outcome = `${actualTarget.assisted ? "assisted" : "independent"}-${actualTarget.verdict}`;
+                }
+              }
+              const correctionEventIds = summary.help.filter((h) => h.presentationId === source.presentationId && ["answer", "explanation"].includes(h.level) && before(source, h) && (!target || before(h, byId.get(target.presentationId)))).map((h) => h.eventId);
+              items.push({
+                id: `${source.eventId}:${window2}`,
+                sourceAttemptId: source.eventId,
+                sourceAt: source.at,
+                gameId: game(source),
+                measure: measure2,
+                kind: counted(source) && source.verdict === "correct" ? "retention" : "recovery",
+                window: window2,
+                dueAt: new Date(due).toISOString(),
+                expiresAt: new Date(expires).toISOString(),
+                status,
+                reason,
+                targetAttemptId: target?.eventId || null,
+                targetAt: target?.at || null,
+                outcome,
+                correctionEventIds
+              });
+            }
+          }
+          return {
+            policy: FOLLOWUP.version,
+            asOf,
+            observationOpportunities: true,
+            evidenceComplete: usable,
+            coverage: {
+              folded: prior?.folded || 0,
+              adjusted,
+              limited: all.length > selected.length,
+              excludedAnchors: all.length - selected.length,
+              reason: !usable ? adjusted ? "adjusted-history" : "incomplete-history" : prior?.folded ? "older-source-unavailable" : null
+            },
+            items,
+            retainDecisionIds: [...retain],
+            learningEffectClaim: false,
+            causalClaim: false,
+            policyPromotion: false
+          };
+        }
         const FLIP_WINDOW = 2;
         const COOL_DOWN = 2;
         function check({ spec, knob, from, to, step, phase = "response", history = [], frozen = false } = {}) {
@@ -1545,7 +1798,7 @@ var SynkLearning = (() => {
           }
           return { ok: true, rail: null };
         }
-        return Object.freeze({ VERSION, MINIMUM_PER_CELL, measure, combine, compare, groups, FLIP_WINDOW, COOL_DOWN, check });
+        return Object.freeze({ VERSION, MINIMUM_PER_CELL, measure, combine, compare, groups, FOLLOWUP, followups, FLIP_WINDOW, COOL_DOWN, check });
       });
     }
   });
@@ -1578,7 +1831,7 @@ var SynkLearning = (() => {
       }
       function validate(ledger) {
         const cellOk = (cell) => plain(cell) && Array.isArray(cell.ind) && cell.ind.length <= KEEP && cell.ind.every((r) => Array.isArray(r) && (r.length === 4 || r.length === 5 && typeof r[4] === "string") && typeof r[0] === "string" && Number.isFinite(r[1]) && ["correct", "incorrect"].includes(r[2]) && typeof r[3] === "string") && Array.isArray(cell.helped) && cell.helped.length <= MAX_ENTRIES && cell.helped.every((h) => Number.isFinite(h) || Array.isArray(h) && h.length === 2 && typeof h[0] === "string" && Number.isFinite(h[1])) && Number.isInteger(cell.unassessed) && cell.unassessed >= 0;
-        if (!plain(ledger) || ledger.version !== VERSION || !Number.isInteger(ledger.folded) || ledger.folded < 0 || !(ledger.cutoff === null || Number.isFinite(ledger.cutoff)) || !plain(ledger.keys) || Object.keys(ledger.keys).length > MAX_ENTRIES || Object.values(ledger.keys).some((v) => !Number.isInteger(v) || v < 1 || v > 7) || !Array.isArray(ledger.presented) || ledger.presented.length > MAX_ENTRIES || ledger.presented.some((r) => !Array.isArray(r) || r.length !== 4 || r.slice(0, 3).some((v) => typeof v !== "string") || !Number.isInteger(r[3]) || r[3] < 1) || !plain(ledger.cells) || !Object.values(ledger.cells).every(cellOk) || !plain(ledger.content) || !Object.values(ledger.content).every(cellOk) || !(ledger.counts === null || plain(ledger.counts)) || !(ledger.adjusted === void 0 || Number.isInteger(ledger.adjusted) && ledger.adjusted >= 0) || !(ledger.local === void 0 || ledger.local === true)) throw new TypeError("Ledger: unreadable");
+        if (!plain(ledger) || ledger.version !== VERSION || !Number.isInteger(ledger.folded) || ledger.folded < 0 || !(ledger.cutoff === null || Number.isFinite(ledger.cutoff)) || !plain(ledger.keys) || Object.keys(ledger.keys).length > MAX_ENTRIES || Object.values(ledger.keys).some((v) => !Number.isInteger(v) || v < 1 || v > 7) || !Array.isArray(ledger.presented) || ledger.presented.length > MAX_ENTRIES || ledger.presented.some((r) => !Array.isArray(r) || r.length !== 4 || r.slice(0, 3).some((v) => typeof v !== "string") || !Number.isInteger(r[3]) || r[3] < 1) || !plain(ledger.cells) || !Object.values(ledger.cells).every(cellOk) || !plain(ledger.content) || !Object.values(ledger.content).every(cellOk) || !(ledger.counts === null || plain(ledger.counts)) || !(ledger.adjusted === void 0 || Number.isInteger(ledger.adjusted) && ledger.adjusted >= 0) || !(ledger.followupsLost === void 0 || plain(ledger.followupsLost) && Number.isInteger(ledger.followupsLost.anchors) && ledger.followupsLost.anchors > 0 && ledger.followupsLost.anchors <= 24 && Number.isFinite(ledger.followupsLost.at)) || !(ledger.followupsPreserved === void 0 || typeof ledger.followupsPreserved === "boolean") || !(ledger.local === void 0 || ledger.local === true)) throw new TypeError("Ledger: unreadable");
         return ledger;
       }
       var before = (ledger, traceKey, kinds) => {
@@ -1690,6 +1943,40 @@ var SynkLearning = (() => {
       }
       var folded = (ledger, event) => !!ledger && ledger.cutoff !== null && FOLDABLE.includes(event.type) && Date.parse(event.at) <= ledger.cutoff;
       var reference = (e) => e?.type === "decision.made" ? void 0 : e?.decisionId ?? e?.presentationId ?? e?.targetId ?? e?.completionId;
+      function retention(events, decisions, { maxEvents = 2400, maxBytes = 1024 * 1024 } = {}) {
+        const groups = /* @__PURE__ */ new Map(), parent = /* @__PURE__ */ new Map();
+        for (const e of events) {
+          const group = e.type === "decision.made" ? e.id : parent.get(reference(e));
+          if (!group) continue;
+          parent.set(e.id, group);
+          if (!groups.has(group)) groups.set(group, []);
+          groups.get(group).push(e);
+        }
+        const selected = new Set(decisions.filter((id) => groups.has(id)));
+        const position = new Map(events.map((e, index) => [e.id, index]));
+        const first = Math.min(...[...selected].map((id) => Math.min(...groups.get(id).map((e) => position.get(e.id)))));
+        const presentations = events.filter((e) => e.type === "practice.presented"), keys = /* @__PURE__ */ new Set();
+        let changed = true;
+        while (changed) {
+          changed = false;
+          for (const p of presentations) {
+            const group = parent.get(p.id), traces = Trail.traceKeys(p);
+            if (!selected.has(group) && traces.some((key) => keys.has(key)) && groups.get(group).some((e) => position.get(e.id) >= first)) {
+              selected.add(group);
+              changed = true;
+            }
+            if (selected.has(group)) {
+              for (const key of traces) if (!keys.has(key)) {
+                keys.add(key);
+                changed = true;
+              }
+            }
+          }
+        }
+        const kept = events.filter((e) => selected.has(parent.get(e.id))), bytes = new TextEncoder().encode(JSON.stringify(kept)).length;
+        const limited = kept.length > maxEvents || bytes > maxBytes;
+        return { decisions: limited ? [] : [...selected], events: kept.length, bytes, limited, maxEvents, maxBytes };
+      }
       var stray = (event, known) => {
         const ref = reference(event);
         return typeof ref === "string" && !known.has(ref);
@@ -1716,7 +2003,7 @@ var SynkLearning = (() => {
         }
         return next;
       }
-      module.exports = { VERSION, BITS, FOLDABLE, empty, validate, before, rows, cellOf, contentOf, fold, plan, folded, stray, compare, demote, reference };
+      module.exports = { VERSION, BITS, FOLDABLE, empty, validate, before, rows, cellOf, contentOf, fold, plan, folded, stray, compare, demote, reference, retention };
     }
   });
 
@@ -1724,7 +2011,7 @@ var SynkLearning = (() => {
   var require_learning = __commonJS({
     "atlas/learning.js"(exports, module) {
       "use strict";
-      var POLICY = Object.freeze({ version: "learning-priority-3", recentDays: 30, reviewDays: 7, sample: 4, stableRatio: 0.8 });
+      var POLICY = Object.freeze({ version: "learning-priority-4", recentDays: 30, reviewDays: 7, sample: 4, stableRatio: 0.8 });
       var RESPONSE_FORMATS = Object.freeze(["binary-choice", "single-choice", "cup-compose", "action", "unknown"]);
       var { learningReason, activityReason, SUPPORTS } = require_vellum();
       var Ledger = require_learning_ledger();
@@ -1739,10 +2026,7 @@ var SynkLearning = (() => {
         const lastAt = valid.at(-1)?.at || null;
         const helped = rows.filter((a) => !a.exclusionReason && a.assisted === true && a.verdict === "correct" && Date.parse(a.at) <= now && now - Date.parse(a.at) <= POLICY.recentDays * DAY);
         let status = "unseen", priority = 0.65;
-        if (lastAt && now - Date.parse(lastAt) > POLICY.reviewDays * DAY) {
-          status = "review";
-          priority = 0.8;
-        } else if (n >= POLICY.sample && correct / n >= POLICY.stableRatio) {
+        if (n >= POLICY.sample && correct / n >= POLICY.stableRatio) {
           status = "recent-independent";
           priority = 0.15;
         } else if (n >= 3 && incorrect >= 2) {
@@ -1754,6 +2038,10 @@ var SynkLearning = (() => {
         } else if (helped.length) {
           status = "supported";
           priority = 0.9;
+        }
+        if (lastAt && now - Date.parse(lastAt) > POLICY.reviewDays * DAY && priority < 0.8) {
+          status = "review";
+          priority = 0.8;
         }
         const reasonEvidence = status === "supported" ? helped.slice(-12) : status === "review" && !recent.length ? valid.slice(-1) : recent;
         return {
@@ -2902,9 +3190,9 @@ var SynkLearning = (() => {
           }
           return { estimates: copy(memory.estimates), at: memory.at, indices, latencies: [...memory.latencies] };
         }
-        function priorFromSummary(input, summary, skillIds = []) {
+        function priorFromSummary(input, summary, skillIds = [], { responseFormat } = {}) {
           const spec = defineContent(input);
-          if (!spec.items || !summary || !Array.isArray(summary.skills) || !Array.isArray(skillIds) || !skillIds.length) return null;
+          if (!spec.items || summary?.evidenceComplete !== true || !Array.isArray(summary.skills) || !Array.isArray(skillIds) || !skillIds.length || typeof responseFormat !== "string" || !responseFormat || responseFormat === "unknown") return null;
           const skills = skillIds.map((skill) => summary.skills.find((s) => s.id === skill));
           if (skills.some((skill) => !skill)) return null;
           let level = spec.items.start;
@@ -2912,7 +3200,7 @@ var SynkLearning = (() => {
             const authored = spec.items.levels[index];
             const steady = skills.every((skill) => {
               const formats = skill.levels?.[authored]?.formats;
-              return !!formats && Object.values(formats).some((f) => f.status === "recent-independent");
+              return !!formats && Object.hasOwn(formats, responseFormat) && formats[responseFormat].status === "recent-independent";
             });
             if (!steady) break;
             level = index + 1;
@@ -3550,7 +3838,7 @@ var SynkLearning = (() => {
         });
       }
       function createLive({ coach, port, clock }) {
-        return function live(input, { declared = {}, presentation, skillIds = [], arm = "adapted", condition, level = "standard", words = {} } = {}) {
+        return function live(input, { declared = {}, presentation, skillIds = [], responseFormat, arm = "adapted", condition, level = "standard", words = {} } = {}) {
           const spec = Flow.defineContent(input);
           if (presentation === void 0) presentation = typeof port.presentation === "function" ? port.presentation() : null;
           if (presentation != null) {
@@ -3562,7 +3850,7 @@ var SynkLearning = (() => {
           let prior = null;
           if (!memory && skillIds.length) {
             try {
-              prior = Flow.priorFromSummary(spec, coach.summary(), skillIds);
+              prior = Flow.priorFromSummary(spec, coach.summary(), skillIds, { responseFormat });
             } catch {
               prior = null;
             }
@@ -3695,8 +3983,61 @@ var SynkLearning = (() => {
       var RESPONSE_MS = 30 * 864e5;
       var identifier = (value) => typeof value === "string" && /^[a-zA-Z0-9_.:-]{1,120}$/.test(value);
       var uid = () => `l${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 12)}`;
+      function readFollowups(events, { scope, asOf, prior = null, complete = true, retain = false }) {
+        const options = { scope, asOf, prior };
+        const report = Temper.followups({
+          events,
+          summary: Trail.summarize(events, options),
+          original: Trail.summarize(events.filter((e) => e.type !== "record.excluded"), options),
+          prior,
+          complete,
+          asOf
+        });
+        if (prior?.followupsLost) {
+          report.items = [];
+          report.retainDecisionIds = [];
+          report.evidenceComplete = false;
+          Object.assign(report.coverage, {
+            limited: true,
+            reason: "retention-capacity",
+            retentionEnabled: retain,
+            retentionLimited: true,
+            unretainedAnchors: prior.followupsLost.anchors,
+            lostAt: new Date(prior.followupsLost.at).toISOString()
+          });
+          return report;
+        }
+        if (prior?.folded && prior.followupsPreserved !== true) {
+          report.items = [];
+          report.retainDecisionIds = [];
+          report.evidenceComplete = false;
+          Object.assign(report.coverage, { limited: true, reason: "older-source-unavailable", retentionEnabled: retain });
+          return report;
+        }
+        const retention = retain ? Ledger.retention(events, report.retainDecisionIds) : null;
+        report.coverage.retentionEnabled = retain;
+        if (retention) {
+          Object.assign(report.coverage, {
+            retentionLimited: retention.limited,
+            retainedEvents: retention.limited ? 0 : retention.events,
+            retainedBytes: retention.limited ? 0 : retention.bytes
+          });
+          report.retainDecisionIds = retention.decisions;
+          if (retention.limited) {
+            report.coverage.limited = true;
+            report.coverage.reason = "retention-capacity";
+            report.coverage.unretainedAnchors = report.items.length / Temper.FOLLOWUP.windows.length;
+            for (const item of report.items) {
+              item.status = "unavailable";
+              item.reason = "retention-capacity";
+              item.outcome = null;
+            }
+          }
+        }
+        return report;
+      }
       var AHEAD_MS = 5 * 6e4;
-      function openHistory({ storage, key, scope, storageScope, accountKey, historyComplete, fold, clock, held, release }) {
+      function openHistory({ storage, key, scope, storageScope, accountKey, historyComplete, fold, followups, clock, held, release }) {
         const pages = storageScope === "account" && storage ? createPages(storage, key, ["events", "settled", "dropped"]) : null;
         let paged = false, epoch = null, session, readable = true, writable = !!storage, complete = historyComplete, warning = null, ledger = null;
         const folding = fold === false || fold == null && storageScope !== "device" ? null : { max: 600, keep: 400, ageMs: fold?.remote ? 864e5 : 6e5, remote: false, ...fold && typeof fold === "object" ? fold : {} };
@@ -3850,6 +4191,8 @@ var SynkLearning = (() => {
           if (events.length <= folding.max) return;
           if (retryFold && retryFold.settled === settledVersion && now < retryFold.at) return;
           const open = held(now);
+          const retained = followups ? readFollowups(events, { scope, asOf: new Date(now).toISOString(), prior: ledger, retain: true }) : null;
+          if (retained) open.push(...retained.retainDecisionIds);
           if (folding.remote) {
             for (const e of events) if (!settled.has(e.id)) open.push(e.id);
           }
@@ -3866,7 +4209,12 @@ var SynkLearning = (() => {
             return;
           }
           retryFold = null;
+          const preserved = followups && (!ledger?.folded || ledger.followupsPreserved === true);
           ledger = Ledger.fold(ledger, planned.folded, { scope, log: events, local: !folding.remote });
+          ledger.followupsPreserved = preserved;
+          if (retained?.coverage.retentionLimited && !ledger.followupsLost) {
+            ledger.followupsLost = { anchors: retained.coverage.unretainedAnchors, at: now };
+          }
           session = newSession(planned.kept);
           for (const e of planned.folded) settled.delete(e.id);
           settledVersion += 1;
@@ -4047,9 +4395,11 @@ var SynkLearning = (() => {
         storageScope = "device",
         accountKey = null,
         fold = null,
+        followups = false,
         memoryOwner = null
       } = {}) {
         if (!identifier(gameId) || !identifier(learnerKey) || typeof map?.allNodes !== "function") throw new TypeError("Atlas: game, local scope and Strata map required");
+        if (typeof followups !== "boolean") throw new TypeError("Atlas: follow-up retention must be explicit");
         if (!["device", "account"].includes(storageScope) || storageScope === "account" && (!identifier(accountKey) || learnerKey !== "device")) throw new TypeError("Atlas: account identity and isolated host storage required");
         if (memoryOwner != null && (storageScope !== "account" || memoryOwner.scope !== "account" || !identifier(memoryOwner.accountKey) || !memoryOwner.flow || ["today", "setToday", "presentation", "setPresentation", "epoch", "memories", "save", "decline", "state", "merge", "subscribe"].some((name) => typeof memoryOwner.flow[name] !== "function"))) throw new TypeError("Atlas: a verified personal memory owner is required");
         const scope = { domain: "LAB", workspace: "learning", subject: learnerKey };
@@ -4064,6 +4414,7 @@ var SynkLearning = (() => {
           accountKey,
           historyComplete,
           fold,
+          followups,
           clock,
           held: (now) => {
             const open = [...active].filter(([, item]) => !item.results.length).map(([pid]) => pid);
@@ -4148,8 +4499,13 @@ var SynkLearning = (() => {
           return [item, saved];
         }
         const api = {
+          mapVersion: map.map_ver,
           syncPort: history.port,
           summary: () => report(current()),
+          followups() {
+            const saved = current();
+            return readFollowups(saved.log, { scope, asOf: monotonicClock(), prior: saved.ledger, complete: saved.durable, retain: followups });
+          },
           recommend(candidates, options = {}) {
             const saved = current(), profile = report(saved);
             return { ...Learning.recommend({ profile, candidates, presentations: view(saved).presentations, prior: saved.ledger, ...options }), storage: profile.storage };
@@ -4273,8 +4629,8 @@ var SynkLearning = (() => {
           },
           help(pid, kind) {
             const [p] = requireActive(pid);
-            if (!["text", "hint", "answer", "replay"].includes(kind)) throw new TypeError("Atlas: invalid help kind");
-            const result = p.practice.delivered({ id: kind, level: kind === "answer" ? "answer" : "cue", contentRef: `${gameId}.${kind}` });
+            if (!["text", "hint", "answer", "replay", "explanation"].includes(kind)) throw new TypeError("Atlas: invalid help kind");
+            const result = p.practice.delivered({ id: kind, level: ["answer", "explanation"].includes(kind) ? kind : "cue", contentRef: `${gameId}.${kind}` });
             history.persist();
             return result;
           },
