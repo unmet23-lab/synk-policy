@@ -62,3 +62,6 @@ export class CafeSession{
  finish(){if(this.done)return;for(const t of this.queue)this.records.push({...t,outcome:'unanswered'});this.queue=[];this.done=true;}
  stats(){const answered=this.records.filter(r=>r.first!==null);return {served:this.records.filter(r=>r.outcome==='served').length,answered:answered.length,firstCorrect:answered.filter(r=>r.first).length,help:answered.filter(r=>r.help).length,unanswered:this.records.filter(r=>r.first===null).length};}
 }
+
+// Compatible export before the delayed-practice screen is released.
+export const DELAYED_ORDERS = Object.freeze([]);
