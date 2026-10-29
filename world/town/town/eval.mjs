@@ -49,8 +49,18 @@ const tallyOf = keys => keys.reduce((out, key) => add(out, SEEN_PREFIX(key)), un
  * for its first), before and after the world around the request, command the command (null for a boundary), added the
  * seen keys this request added and seen the seen ledger now. Returns the fields, or null when the visit has no version
  * or band yet. What each command counts: a card done with the player (did card.<ID>), one closed before it was done
- * (stoppedScenes), a response (feedback by value), "less often" set (lessOften), "something else today" (todayOther).
- * The help counts and the ladder's offer come with the conversation scene (W9). */
+ * (stoppedScenes), a response (feedback by value), "less often" set (lessOften), "something else today" (todayOther),
+ * the asks pressed in a scene by kind (help — the consent's 다시 · 천천히 · 무슨 뜻이에요; reopening a folded note is not
+ * one) and the widening offer (ladderOffer — none once the mascot's widening question is drawn, then the answer) (W9). The
+ * question is drawn when the screen reports it beside a boundary, or when it is closed unanswered (ASK_CLOSE counts it
+ * drawn first); an answer before the report goes straight to its value (W9 design review 5). */
+const HELP_KINDS = Object.freeze(['repeat', 'slower', 'meaning']);
+function widenDrawn(before, after, command) {
+  const was = before?.asks?.open;
+  if (was?.kind !== 'widen' || was.delivered) return false;
+  const now = after?.asks?.open;
+  return now?.key === was.key && now.delivered === true || command?.type === 'ASK_CLOSE' && command.payload?.key === was.key;
+}
 export function visitSummary(previous, { before, after, command = null, added = [], seen = {} }) {
   const visit = after?.townVisit, policy = after?.policy;
   if (!visit || visit.lifeDay === undefined || !policy || !after.life) return null;
@@ -64,10 +74,17 @@ export function visitSummary(previous, { before, after, command = null, added = 
   if (command?.type === 'FEEDBACK_GIVE') feedback = add(feedback, command.payload.value);
   if (command?.type === 'PREF_LESS_OFTEN' && command.payload.on === true) lessOften += 1;
   if (command?.type === 'PREF_TODAY_OTHER') todayOther += 1;
+  // A scene's asks: one a press (C4 · the tea order), or — from a tea screen before W9 — the increments its next command carries.
+  let help = same?.help, ladderOffer = same?.ladderOffer;
+  if (['CARD_HELP', 'TEA_HELP'].includes(command?.type) && HELP_KINDS.includes(command.payload?.kind)) help = add(help, command.payload.kind);
+  if (/^TEA_(SERVE|OWNER|CLOSE)$/.test(command?.type || '') && command.payload?.asks)
+    for (const kind of HELP_KINDS) help = add(help, kind, Number.isSafeInteger(command.payload.asks[kind]) ? command.payload.asks[kind] : 0);
+  if (command?.type === 'LANGUAGE_ANSWER' && ['accepted', 'declined'].includes(command.payload?.choice)) ladderOffer = command.payload.choice;
+  else if (widenDrawn(before, after, command)) ladderOffer = 'none';
   const fresh = tallyOf(added), newSeenBy = Object.entries(fresh || {}).reduce((out, [key, n]) => add(out, key, n), same?.newSeenBy);
   const seenTotalBy = Object.entries(seen).reduce((out, [key, n]) => add(out, SEEN_PREFIX(key), n), undefined);
   return { ...fields, ...(did ? { did } : {}), ...(newSeenBy ? { newSeenBy } : {}), ...(seenTotalBy ? { seenTotalBy } : {}),
-    ...(feedback ? { feedback } : {}), lessOften, todayOther, stoppedScenes: stopped };
+    ...(feedback ? { feedback } : {}), lessOften, todayOther, stoppedScenes: stopped, ...(help ? { help } : {}), ...(ladderOffer ? { ladderOffer } : {}) };
 }
 /** Write (overwrite by visit id) only under consent; otherwise nothing is kept. */
 export const writeVisit = (lines, consents, fields) => mayWrite(consents) ? [...lines.filter(line => line.id !== fields.id), visitLine(fields)] : lines;
