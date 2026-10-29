@@ -2,35 +2,35 @@
   "schemaVersion": 1,
   "product": "platform",
   "channel": "preview",
-  "version": "0.4.52",
-  "releaseId": "platform-preview-0.4.52",
-  "buildId": "20261029.1",
+  "version": "0.4.53",
+  "releaseId": "platform-preview-0.4.53",
+  "buildId": "20261029.2",
   "manifestUrl": "https://synk.im/desktop/releases/preview.json",
   "baselines": [
     {
       "platform": "win32",
       "arch": "x64",
-      "url": "https://github.com/unmet23-lab/synk-policy/releases/download/platform-preview-0.4.51/SYNK-Platform-Preview-0.4.51-Signal-win-x64.exe",
-      "bytes": 406853632,
-      "sha256": "7684d4014ee3368dbfe1486ab2ada9a04524f48a06685acbf660cf517b0b23ef",
-      "asarSHA256": "cc4d776b1d45071b409bf245d4c939e3ddf6a8abbd7b1f6862f626f043dd6571",
-      "backendSHA256": "0b2ac97d996619113a6553ada7718fd9167429b5770a5be3d73700fc4ebac022"
+      "url": "https://github.com/unmet23-lab/synk-policy/releases/download/platform-preview-0.4.52/SYNK-Platform-Preview-0.4.52-Signal-win-x64.exe",
+      "bytes": 406858240,
+      "sha256": "68443ef1d20b4cada26c6432c6013fe9060c6d54d41f31e73418e9ba40871e35",
+      "asarSHA256": "cf532af34f06a3497f8bc9d79c8bf8a3667c8d9bb06894848db64c6be5c1e2d1",
+      "backendSHA256": "824855db4c15830e382dc15660a3255d7d437b19aa8777319e71cce96c509643"
     },
     {
       "platform": "darwin",
       "arch": "arm64",
-      "url": "https://github.com/unmet23-lab/synk-policy/releases/download/platform-preview-0.4.51/SYNK-Platform-Preview-0.4.51-Signal-mac-arm64.dmg",
-      "bytes": 461086100,
-      "sha256": "cf3a395d5c3d7cd46219461085bc7e8d35c790a73ed262641118ac3799fe8ec0",
-      "asarSHA256": "fc7c35278cb0ba4bf85709898d793ec0672fb0b11418173089c4c322a1e8222e"
+      "url": "https://github.com/unmet23-lab/synk-policy/releases/download/platform-preview-0.4.52/SYNK-Platform-Preview-0.4.52-Signal-mac-arm64.dmg",
+      "bytes": 461075879,
+      "sha256": "8164f81c7bbe7429b503d2f34a25a6d73a716caa62a5d6e066c9eae3c5d9d80b",
+      "asarSHA256": "0e1c60839ce7d488bb461129c836afb1c8b3f34aa4df9649b7ab774c1b2fe3d0"
     },
     {
       "platform": "darwin",
       "arch": "x64",
-      "url": "https://github.com/unmet23-lab/synk-policy/releases/download/platform-preview-0.4.51/SYNK-Platform-Preview-0.4.51-Signal-mac-x64.dmg",
-      "bytes": 477633111,
-      "sha256": "c82539b924b6dd655ea7b041abc097f8f44460778e9754552adacc700375f6a0",
-      "asarSHA256": "e8ffd42a6d1f3528b4b38bcef8eb84ad85708cd7c4adaf85fe5251712c086fb6"
+      "url": "https://github.com/unmet23-lab/synk-policy/releases/download/platform-preview-0.4.52/SYNK-Platform-Preview-0.4.52-Signal-mac-x64.dmg",
+      "bytes": 477638422,
+      "sha256": "7cedf1a206d91fc9b089da950693468837f7a11eba3360cf5ec13f4e0d383e3a",
+      "asarSHA256": "37be43203d94f09ec16a0bfe6ceaaec882c14f005e50677de84d55ea66d58801"
     }
   ],
   "additionalLegacyPins": [
@@ -63,7 +63,7 @@
     }
   ],
   "electronVersion": "44.10.0",
-  "sourceHash": "57aebc794229ebdb66b082c3955473a13e50076635866a20a7f6765160b24508",
+  "sourceHash": "44407d8e217a43dcd312c723af942b2489bbb6901ca1849a1523d2b50787d7da",
   "sourceFiles": [
     {
       "path": "assets/launcher/benefit-care.webp",
@@ -612,8 +612,8 @@
     },
     {
       "path": "src/auth-service.cjs",
-      "bytes": 25726,
-      "sha256": "90b86e24ebf5dd7558fdd3e6049158dbd4c5f100f130a0909c13f3b7f86c5d24"
+      "bytes": 26000,
+      "sha256": "3c83513c1adaad240a303bdaaad126b7bcbed91c7f844fc77f3ecf40cfa3f41c"
     },
     {
       "path": "src/auth-store.cjs",
@@ -732,13 +732,13 @@
     },
     {
       "path": "src/main.cjs",
-      "bytes": 42912,
-      "sha256": "9c3a3cb2d644c99dd04d62b98c6492c85ca6db52a3f20689996064124be5c9df"
+      "bytes": 43237,
+      "sha256": "4886a250228b874c504a4f555bdc66e5bd78d48d0d9a299e2a87f28f05c838ab"
     },
     {
       "path": "src/messenger-teacher.cjs",
-      "bytes": 3439,
-      "sha256": "6b948746784fa8b7b88844ee3723e643d899671e7799afe19ea6e5ad215746f6"
+      "bytes": 3458,
+      "sha256": "c4cb224f4185f62ece125ed200642de57c7021f3b295995153087b25276696f8"
     },
     {
       "path": "src/native-content.cjs",
@@ -907,8 +907,8 @@
     },
     {
       "path": "src/suite-session.cjs",
-      "bytes": 11611,
-      "sha256": "96dfaf6dd6e613432efe77cf088f805f867b0253a970f46dd3397dcb3ea97e26"
+      "bytes": 13484,
+      "sha256": "aff51c246cd78ec3da4fd5708e29dcf2deb7c0e58192e1f3f46ab4fb4e4ea5ca"
     },
     {
       "path": "src/teacher-account.cjs",
