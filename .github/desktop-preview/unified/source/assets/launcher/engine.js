@@ -40,6 +40,7 @@
   const ARMS = ['adapted', 'baseline'];
   const DAY = 86400000, RECENT = 30 * DAY;
   const copy = value => JSON.parse(JSON.stringify(value));
+  const setOwn = (table, key, value) => Object.defineProperty(table, key, { value, enumerable: true, writable: true, configurable: true });
   const canonical = value => JSON.stringify(value, (_key, entry) => entry && typeof entry === 'object' && !Array.isArray(entry)
     ? Object.fromEntries(Object.keys(entry).sort().map(key => [key, entry[key]])) : entry);
   const freeze = value => {
@@ -209,7 +210,7 @@
   function read(events, scope, asOf, recordedAsOf = asOf) {
     const key = scopeKey(scope), cutoff = ms(asOf), recordedCutoff = ms(recordedAsOf);
     // A session's own entries were validated when admitted; anything else is checked in full.
-    const rows = [];
+    const rows = [], positions = new Map();
     let sorted = true, last = null;
     for (const e of events) {
       const known = admitted.get(e);
@@ -217,6 +218,7 @@
       const row = known || { key: scopeKey(e.scope), at: ms(e.at), recordedAt: ms(e.recordedAt) };
       if (row.key !== key || row.at > cutoff || row.recordedAt > recordedCutoff) continue;
       if (last && (row.at < last.at || (row.at === last.at && row.recordedAt < last.recordedAt))) sorted = false;
+      if (!positions.has(e.id)) positions.set(e.id, rows.length);
       rows.push({ e, at: row.at, recordedAt: row.recordedAt }); last = row;
     }
     // Stable sort preserves the append order when both clocks have the same
@@ -243,10 +245,14 @@
       if (excluded.has(event.id)) continue;
       const until = event.until || new Date(ms(event.at) + RECENT).toISOString();
       if (ms(until) <= cutoff) { expired.push(line); continue; }
-      const answer = latestAnswer[line] && !excluded.has(latestAnswer[line].id) ? latestAnswer[line] : null;
-      // "No" to a guess about the person stays until they answer again. "No" to a need or a
-      // due review only covers what had been observed by then; later evidence opens a new line.
-      const denied = answer?.value === 'no' && (event.kind === 'trait' || ms(answer.at) >= ms(event.at));
+      const response = latestAnswer[line];
+      // A confirmation covers only the source available then, even when both clocks tie.
+      // A declined trait guess stays declined; newer needs/due reviews may reopen.
+      const answeredAt = response && ms(response.at), sourceRecordedAt = ms(event.recordedAt);
+      const covers = response && (answeredAt > sourceRecordedAt || answeredAt === sourceRecordedAt
+        && ms(response.recordedAt) === sourceRecordedAt && positions.get(response.id) > positions.get(event.id));
+      const answer = response && !excluded.has(response.id) && (covers || event.kind === 'trait' && response.value === 'no') ? response : null;
+      const denied = answer?.value === 'no';
       const status = denied ? 'denied' : answer?.value === 'yes' ? 'confirmed' : 'unconfirmed';
       const sufficiency = event.n >= 8 ? 'solid' : event.n >= 3 ? 'fair' : 'thin';
       lines.push({ key: line, kind: event.kind, source: 'observed', strength: event.strength, n: event.n, sufficiency, assisted: event.assisted ?? null, at: event.at, until,
@@ -255,14 +261,16 @@
     const decisions = new Map(ordered.filter(e => e.type === 'decision.made' && !excluded.has(e.id)).map(e => [e.id, e]));
     // An excluded decision invalidates its analytical descendants as well.
     // The original completion still counts as history in `rounds` below.
-    const completed = new Map(ordered.filter(e => e.type === 'experience.completed' && !excluded.has(e.id) && decisions.has(e.decisionId)).map(e => [e.id, e]));
+    const completedRaw = new Map(ordered.filter(e => e.type === 'experience.completed' && decisions.has(e.decisionId)).map(e => [e.id, e]));
+    const byDecision = new Map();
+    for (const done of completedRaw.values()) if (!excluded.has(done.id) && !byDecision.has(done.decisionId)) byDecision.set(done.decisionId, done);
     const responses = new Map();
     if (personal) for (const event of ordered) {
-      if (event.type !== 'feedback.given' || !completed.has(event.completionId)) continue;
+      if (event.type !== 'feedback.given' || !completedRaw.has(event.completionId)) continue;
       if (cutoff - ms(event.at) > RECENT) continue;
-      const completion = completed.get(event.completionId);
+      const completion = completedRaw.get(event.completionId);
       // A changed answer moves to the end, so the list stays in order of the latest response.
-      if (ms(completion.at) <= ms(event.at)) { responses.delete(event.completionId); responses.set(event.completionId, copy({ ...event, experienceId: completion.experienceId, variant: completion.variant })); }
+      if (ms(completion.at) <= ms(event.at)) { responses.delete(completion.decisionId); responses.set(completion.decisionId, copy({ ...event, experienceId: completion.experienceId, variant: completion.variant })); if (!excluded.has(completion.id)) byDecision.set(completion.decisionId, completion); }
     }
     const latestOutcome = new Map();
     // The newest report per decision, measure, window and target line: a proof for one
@@ -272,11 +280,12 @@
     if (personal) for (const event of ordered) {
       if (event.type === 'outcome.observed' && decisions.has(event.decisionId)) latestOutcome.set(`${event.decisionId}|${event.measure}|${event.window}|${event.targetLine ?? ''}`, event);
     }
-    // A round is one finished experience. Excluding a completion removes it as evidence, not as history.
-    const rounds = {};
-    for (const event of ordered) if (event.type === 'experience.completed') rounds[event.experienceId] = (rounds[event.experienceId] || 0) + 1;
+    // Concurrent devices can finish the same decision. Keep both records, one round and one latest vote.
+    // Excluding a completion removes its evidence, not the historical round.
+    const rounds = {}, finished = new Set(), completed = new Map([...byDecision.values()].map(e => [e.id, e]));
+    for (const event of ordered) if (event.type === 'experience.completed' && !finished.has(event.decisionId)) { finished.add(event.decisionId); setOwn(rounds, event.experienceId, (Object.hasOwn(rounds, event.experienceId) ? rounds[event.experienceId] : 0) + 1); }
     const state = { version: VERSION, scope: copy(scope), asOf, recordedAsOf, context, evidence, expired,
-      feedback: [...responses.values()].filter(e => !excluded.has(e.id)), excluded: [...excluded], lines, outcomes: [...latestOutcome.values()].filter(e => !excluded.has(e.id)).map(copy), rounds };
+      feedback: [...responses.values()].filter(e => !excluded.has(e.id) && !excluded.has(e.completionId)), excluded: [...excluded], lines, outcomes: [...latestOutcome.values()].filter(e => !excluded.has(e.id)).map(copy), rounds };
     return { state, cutoff, personal, decisions, completed };
   }
   function understand(events, scope, asOf, recordedAsOf = asOf) { return read(events, scope, asOf, recordedAsOf).state; }
@@ -296,7 +305,7 @@
     if (!Array.isArray(levers) || typeof explore !== 'number' || !(explore >= 0 && explore <= 0.5)) throw new TypeError('Atlas: invalid decision input');
     const seen = new Set(); for (const lever of levers) checkLever(lever, seen);
     const view = read(events, scope, at, recordedAt), state = view.state, c = state.context;
-    const round = state.rounds[experienceId] || 0, seed = `${scopeKey(scope)}|${experienceId}|${round}`;
+    const round = Object.hasOwn(state.rounds, experienceId) ? state.rounds[experienceId] : 0, seed = `${scopeKey(scope)}|${experienceId}|${round}`;
     // Every replan inside one round lands in the same arm. The baseline arm ignores observed lines,
     // responses and learned weights so the two arms can be compared later; declared settings always hold.
     const share = view.personal ? explore : 0, arm = random(seed)() < share ? 'baseline' : 'adapted', adapted = arm === 'adapted';
@@ -357,10 +366,10 @@
     // whose latest answer was "not for me" stays out while a feasible alternative remains;
     // if all were refused, at least the one just refused is not offered straight back.
     const latest = new Map(feedback.map(f => [f.variant, f.value]));
-    const another = recent?.value === 'not_fit' ? eligible.filter(item => latest.get(item.id) !== 'not_fit') : [];
+    const another = eligible.filter(item => latest.get(item.id) !== 'not_fit');
     const fallback = recent?.value === 'not_fit' && !another.length ? eligible.filter(item => item.id !== recent.variant) : [];
     const selectable = another.length ? another : fallback.length ? fallback : eligible;
-    if (recent?.value === 'not_fit') reasons.push(another.length || fallback.length ? 'feedback.alternative' : 'feedback.no_alternative');
+    if (another.length < eligible.length) reasons.push(another.length || fallback.length ? 'feedback.alternative' : 'feedback.no_alternative');
     const scored = selectable.map(item => {
       const notes = [], proof = [];
       let score = item.pace === targetPace ? 4 : 0;
@@ -388,13 +397,13 @@
     };
     for (const lever of [...levers].sort((a, b) => a.id.localeCompare(b.id))) {
       const options = lever.options.filter(feasible), content = lever.class === 'content';
-      if (!options.length) { bundle[lever.id] = { option: null, basis: 'unavailable', reasons: ['no.feasible.option'], evidence: [] }; continue; }
+      if (!options.length) { setOwn(bundle, lever.id, { option: null, basis: 'unavailable', reasons: ['no.feasible.option'], evidence: [] }); continue; }
       const declared = lever.follows && c[lever.follows] != null ? options.find(option => option.id === c[lever.follows]) : null;
-      if (declared) { bundle[lever.id] = { option: declared.id, basis: 'declared', reasons: [`declared.${lever.follows}`], evidence: [state.evidence[lever.follows]] }; continue; }
+      if (declared) { setOwn(bundle, lever.id, { option: declared.id, basis: 'declared', reasons: [`declared.${lever.follows}`], evidence: [state.evidence[lever.follows]] }); continue; }
       const turn = index => (index - round % options.length + options.length) % options.length;
       if (!adapted) {
         const option = content ? options.find((_, index) => turn(index) === 0) : options.find(item => item.id === lever.default) || options[0];
-        bundle[lever.id] = { option: option.id, basis: 'baseline', reasons: ['arm.baseline'], evidence: [] }; continue;
+        setOwn(bundle, lever.id, { option: option.id, basis: 'baseline', reasons: ['arm.baseline'], evidence: [] }); continue;
       }
       const before = last ? picked(last, lever.id) : undefined;
       const tallies = new Map(lever.learn ? options.map(option => [option.id, tally(lever.id, option.id)]) : []);
@@ -422,7 +431,7 @@
         best.basis = 'learned'; best.notes.push('learned', tallies.get(best.option.id).helped ? 'learned.works' : away ? 'learned.switch' : 'learned.keep');
         for (const t of answered) best.proof.push(...t.proof);
       }
-      bundle[lever.id] = { option: best.option.id, basis: best.basis || (content ? 'rotation' : 'default'), reasons: best.notes.length ? best.notes : [content ? 'rotation' : 'default'], evidence: [...new Set(best.proof)] };
+      setOwn(bundle, lever.id, { option: best.option.id, basis: best.basis || (content ? 'rotation' : 'default'), reasons: best.notes.length ? best.notes : [content ? 'rotation' : 'default'], evidence: [...new Set(best.proof)] });
       evidence.push(...best.proof);
     }
     const following = levers.find(lever => lever.follows === 'support');
