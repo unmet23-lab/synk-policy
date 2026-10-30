@@ -1,6 +1,6 @@
 {
   "version": "2026-09-15-selected-experiences-copy-9bfc4e4ce8-rhythm-20261001-copy-3910676d01-release-copy-3e4ed3be6d-en-002b14631325-bm-platform-20261007-a885b0d303-travel-20261007-ce148dd860-real-20261007-ab58ee7076-homepage-current-20261009-033c24b61f29-homepage-v10-20261010-f228cd8d4fab",
-  "updatedAt": "2026-10-27",
+  "updatedAt": "2026-10-30",
   "docs": [
     {
       "id": "company",
@@ -42,7 +42,7 @@
         "Awards — 2019 Fine Art Photography Awards (Open Theme · Winner), 2017 MK Challenge · Maeil Business Newspaper (project leader · runner-up)",
         "Education — Chung-Ang University, Psychology",
         "Architecture taught him to see structure, psychology gave him an interest in how people think and act, and the stage taught him to make something with many people in step. He now uses all of it to build SYNK.",
-        "Without signing up you can use SYNK WORLD and two member benefits, Pleasure and the free horoscope. My learning profile and the AI subscription board (PC app) are free once you sign in with SYNK ID, and so are the Korean games. Most of them are in Korean.",
+        "Without signing up you can use SYNK WORLD and one member benefit, Pleasure. My learning profile and the AI subscription board (PC app) are free once you sign in with SYNK ID, and so are the Korean games. Most of them are in Korean.",
         "Korean games — three beginner games you can start without knowing Hangul, and eight games where you do what you hear and read. In SYNK WORLD you practise for TOPIK and hang out with Mongle as you pick up Korean, and the mini-games open once you sign in.",
         "Sign in with SYNK ID to see supported game progress and member benefits in My home. Each program stores progress differently, and anything done before signing up does not move to your account.",
         "Atlas is the personalization engine SYNK builds, and eight engines share the work. They understand the goal and situation (Core, Strata, Trail), fit the content, screens, words and sound to the person (Loom, Vellum, Reed), and check whether it helped (Prism, Temper).",
@@ -66,15 +66,14 @@
         "Strata is still in development.",
         "It is where you use SYNK apps and member benefits in one place with a single SYNK ID. From the platform section on our home page, you can download Preview 0.4.55 for 64-bit Windows or Mac, or open the web preview. Separate Apple Silicon and Intel downloads are available for macOS 13 or later. Check the chip or processor in About This Mac to choose your download.",
         "SYNK WORLD — Korean games and TOPIK practice. A short TOPIK diagnostic shows where you stand, then you practise listening, reading and TOPIK II writing (questions 51–54); signed in with SYNK ID, you get writing feedback up to three times a day. Exam-style speaking practice is there too, without scores. Tap places in Our Town, such as the café, the convenience store or the bus stop, to learn the Korean used there; eight Korean games share one learning record, and Atlas picks your next practice from it. It opens on the web (synk.im/world) and in the PC app.",
-        "Member benefits — My learning profile, the AI subscription board (PC app), Pleasure and a free horoscope, all free for SYNK ID members. The benefits are in Korean.",
+        "Member benefits — My learning profile, the AI subscription board (PC app) and Pleasure, all free for SYNK ID members. The benefits are in Korean.",
         "One SYNK ID — no separate sign-up for each app, and once you sign in your supported records follow the same account. Keep the apps you open often in My library, and turn on the account library to carry them to your other devices.",
         "What we are building — showing only the apps that match your organization and access, and carrying the interests you choose and the moments you found hard in practice into what comes next. You choose, check and correct what is remembered.",
         "These preview builds do not yet have a verified publisher signature or Apple notarization, so you may see a security notice. On Mac, drag the app from the DMG into Applications. The home page includes instructions for the first launch.",
-        "The SYNK platform has four member benefits, all free: My learning profile, the AI subscription board, Pleasure and a free horoscope. Pleasure and the horoscope need no account, and all four are in Korean.",
+        "The SYNK platform has three member benefits, all free: My learning profile, the AI subscription board and Pleasure. Pleasure needs no account, and all three are in Korean. The free horoscope is paused while we rework it, and any horoscope records you saved have not been deleted.",
         "My learning profile — shows what you chose apart from what your practice records show, and lets you open the evidence behind each. Sign in with SYNK ID to see it.",
         "AI subscription board — puts this week’s usage, reset times and billing dates for your AI subscriptions on one screen and recommends the account to use first today. It runs in the PC app, reads only the numbers each service officially reports, and keeps its records on that PC.",
         "Pleasure — who to get in touch with today, birthdays and anniversaries on lunar dates too, and the wedding and funeral gifts you have given and received, kept in one place. Start on the web and sign in to keep it on your account.",
-        "Free horoscope — your day by star sign and Korean saju, plus compatibility, the month and the year. No ads and nothing locked; the readings are for light fun.",
         "They fall into three groups: engines that understand (Core, Strata, Trail), engines that fit the experience (Loom, Vellum, Reed) and engines that check (Prism, Temper). Each service uses the ones it needs.",
         "Core decides what is needed now and records why something was recommended or left out. Strata maps what to learn and in what order (in development). Trail records the process and what changed.",
         "Loom brings felt textures to life with light and motion for screens that respond to touch. Vellum gives explanations and hints that fit the task and the answer. Reed handles music and sound, and turns it down when focus matters.",
@@ -4250,7 +4249,7 @@
         "What can I try for free?",
         "Is there anything I can use right now?"
       ],
-      "answer": "Without signing up you can use SYNK WORLD and two member benefits, Pleasure and the free horoscope. My learning profile and the AI subscription board (PC app) are free once you sign in with SYNK ID, and so are the Korean games. Most of them are in Korean.\n\nKorean games — three beginner games you can start without knowing Hangul, and eight games where you do what you hear and read. In SYNK WORLD you practise for TOPIK and hang out with Mongle as you pick up Korean, and the mini-games open once you sign in.\n\nSign in with SYNK ID to see supported game progress and member benefits in My home. Each program stores progress differently, and anything done before signing up does not move to your account.",
+      "answer": "Without signing up you can use SYNK WORLD and one member benefit, Pleasure. My learning profile and the AI subscription board (PC app) are free once you sign in with SYNK ID, and so are the Korean games. Most of them are in Korean.\n\nKorean games — three beginner games you can start without knowing Hangul, and eight games where you do what you hear and read. In SYNK WORLD you practise for TOPIK and hang out with Mongle as you pick up Korean, and the mini-games open once you sign in.\n\nSign in with SYNK ID to see supported game progress and member benefits in My home. Each program stores progress differently, and anything done before signing up does not move to your account.",
       "relatedIds": [
         "synk-stage",
         "guide-contact"
@@ -4259,7 +4258,7 @@
         "label": "See the SYNK platform",
         "href": "/en/#platform"
       },
-      "reviewedAt": "2026-10-19",
+      "reviewedAt": "2026-10-30",
       "aliases": [
         "SYNK 플랫폼에서는 무엇을 무료로 체험하나요?",
         "What can I try for free on the SYNK platform?"
@@ -4774,7 +4773,7 @@
         "What is SYNK WORLD?",
         "Where do I get the PC app?"
       ],
-      "answer": "It is where you use SYNK apps and member benefits in one place with a single SYNK ID. From the platform section on our home page, you can download Preview 0.4.55 for 64-bit Windows or Mac, or open the web preview. Separate Apple Silicon and Intel downloads are available for macOS 13 or later. Check the chip or processor in About This Mac to choose your download.\n\nSYNK WORLD — Korean games and TOPIK practice. A short TOPIK diagnostic shows where you stand, then you practise listening, reading and TOPIK II writing (questions 51–54); signed in with SYNK ID, you get writing feedback up to three times a day. Exam-style speaking practice is there too, without scores. Tap places in Our Town, such as the café, the convenience store or the bus stop, to learn the Korean used there; eight Korean games share one learning record, and Atlas picks your next practice from it. It opens on the web (synk.im/world) and in the PC app.\n\nMember benefits — My learning profile, the AI subscription board (PC app), Pleasure and a free horoscope, all free for SYNK ID members. The benefits are in Korean.\n\nOne SYNK ID — no separate sign-up for each app, and once you sign in your supported records follow the same account. Keep the apps you open often in My library, and turn on the account library to carry them to your other devices.\n\nWhat we are building — showing only the apps that match your organization and access, and carrying the interests you choose and the moments you found hard in practice into what comes next. You choose, check and correct what is remembered.\n\nThese preview builds do not yet have a verified publisher signature or Apple notarization, so you may see a security notice. On Mac, drag the app from the DMG into Applications. The home page includes instructions for the first launch.",
+      "answer": "It is where you use SYNK apps and member benefits in one place with a single SYNK ID. From the platform section on our home page, you can download Preview 0.4.55 for 64-bit Windows or Mac, or open the web preview. Separate Apple Silicon and Intel downloads are available for macOS 13 or later. Check the chip or processor in About This Mac to choose your download.\n\nSYNK WORLD — Korean games and TOPIK practice. A short TOPIK diagnostic shows where you stand, then you practise listening, reading and TOPIK II writing (questions 51–54); signed in with SYNK ID, you get writing feedback up to three times a day. Exam-style speaking practice is there too, without scores. Tap places in Our Town, such as the café, the convenience store or the bus stop, to learn the Korean used there; eight Korean games share one learning record, and Atlas picks your next practice from it. It opens on the web (synk.im/world) and in the PC app.\n\nMember benefits — My learning profile, the AI subscription board (PC app) and Pleasure, all free for SYNK ID members. The benefits are in Korean.\n\nOne SYNK ID — no separate sign-up for each app, and once you sign in your supported records follow the same account. Keep the apps you open often in My library, and turn on the account library to carry them to your other devices.\n\nWhat we are building — showing only the apps that match your organization and access, and carrying the interests you choose and the moments you found hard in practice into what comes next. You choose, check and correct what is remembered.\n\nThese preview builds do not yet have a verified publisher signature or Apple notarization, so you may see a security notice. On Mac, drag the app from the DMG into Applications. The home page includes instructions for the first launch.",
       "sourceId": "company",
       "relatedIds": [
         "synk-intro",
@@ -4785,7 +4784,7 @@
         "label": "Download or open the web preview",
         "href": "/en/#platform"
       },
-      "reviewedAt": "2026-10-24"
+      "reviewedAt": "2026-10-30"
     },
     {
       "id": "synk-benefits",
@@ -4808,7 +4807,7 @@
         "What is Pleasure?",
         "Where can I read the free horoscope?"
       ],
-      "answer": "The SYNK platform has four member benefits, all free: My learning profile, the AI subscription board, Pleasure and a free horoscope. Pleasure and the horoscope need no account, and all four are in Korean.\n\nMy learning profile — shows what you chose apart from what your practice records show, and lets you open the evidence behind each. Sign in with SYNK ID to see it.\n\nAI subscription board — puts this week’s usage, reset times and billing dates for your AI subscriptions on one screen and recommends the account to use first today. It runs in the PC app, reads only the numbers each service officially reports, and keeps its records on that PC.\n\nPleasure — who to get in touch with today, birthdays and anniversaries on lunar dates too, and the wedding and funeral gifts you have given and received, kept in one place. Start on the web and sign in to keep it on your account.\n\nFree horoscope — your day by star sign and Korean saju, plus compatibility, the month and the year. No ads and nothing locked; the readings are for light fun.",
+      "answer": "The SYNK platform has three member benefits, all free: My learning profile, the AI subscription board and Pleasure. Pleasure needs no account, and all three are in Korean. The free horoscope is paused while we rework it, and any horoscope records you saved have not been deleted.\n\nMy learning profile — shows what you chose apart from what your practice records show, and lets you open the evidence behind each. Sign in with SYNK ID to see it.\n\nAI subscription board — puts this week’s usage, reset times and billing dates for your AI subscriptions on one screen and recommends the account to use first today. It runs in the PC app, reads only the numbers each service officially reports, and keeps its records on that PC.\n\nPleasure — who to get in touch with today, birthdays and anniversaries on lunar dates too, and the wedding and funeral gifts you have given and received, kept in one place. Start on the web and sign in to keep it on your account.",
       "sourceId": "company",
       "relatedIds": [
         "synk-platform",
@@ -4819,7 +4818,7 @@
         "label": "See the member benefits",
         "href": "/account/platform.html#benefits"
       },
-      "reviewedAt": "2026-10-22"
+      "reviewedAt": "2026-10-30"
     },
     {
       "id": "atlas-engines",
