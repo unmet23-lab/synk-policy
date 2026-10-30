@@ -1,6 +1,6 @@
 # SYNK
 
-> 쓸수록 나에게 맞춰지는 엔진을 만듭니다. SYNK는 개인화 엔진 아틀라스를 만드는 회사입니다. 한국어 교육에서 시작해, 지금은 SYNK ID 하나로 SYNK의 앱을 이어 쓰는 SYNK 플랫폼을 만들고, 같은 엔진을 기업 서비스와 광고 영상에도 씁니다.
+> 쓸수록 나를 아는 AI를 만듭니다. SYNK는 한 사람의 목표와 실제로 해 본 결과를 읽고 다음 연습을 그 사람에게 맞추는 개인화 엔진, 아틀라스를 만듭니다. 이 엔진으로 한국어 교육, AI 강의와 업무 자동화, 광고 영상, 한국 유학 준비까지 네 가지 일을 합니다.
 
 지금 쓸 수 있는 것과 준비 중인 것을 나눠 적었습니다. 홈페이지의 질문창은 공개한 안내 안에서 답을 찾아 보여 주며, 문의 접수·결제·계약 확정이나 성과 보장을 하지 않습니다.
 
@@ -34,12 +34,13 @@ Windows 64비트와 Mac(Apple Silicon·Intel, macOS 13 이상)용 Preview 0.4.55
 
 ## 네 사업
 
-### SYNK LAB — 한국어를 배우고, 한국에서 공부할 준비까지
+### SYNK LAB — K드라마 속 배역이 되어, 한국어로 말합니다
 
-SYNK LAB은 한국어 교재와 학습 게임, 개인화 학습 앱을 만드는 에듀테크 회사입니다. TOPIK 4급을 목표로 한 정규 1년 과정을 준비하고 있고, 학습 게임은 SYNK ID로 로그인해 이용합니다.
+SYNK LAB은 직접 말하며 배우는 한국어를 만듭니다. K드라마 상황극에서 배역을 맡아 대사를 소리 내어 말하면, AI 감독이 고칠 점이 있을 때 하나만 짚고 테이크 2로 다시 갑니다. 1화 장면은 지금 바로 해 볼 수 있고, AI 감독 시범판과 TOPIK 4급 과정은 준비하고 있습니다. 매일의 연습은 SYNK WORLD에서 합니다.
 
-TOPIK 4급을 목표로 한 정규 1년 과정과 교재 「시냅스」를 준비하고, SYNK WORLD에서 TOPIK 연습과 한국어 게임을 합니다.
+K드라마 속 배역이 되어 말하는 한국어 상황극과 매일 연습하는 SYNK WORLD를 만들고, TOPIK 4급 반과 교재 「시냅스」를 준비합니다.
 
+- K드라마 상황극 — AI 감독이 디렉팅하는 말하기(준비 중 · 시범판)
 - SYNK WORLD — TOPIK 연습과 한국어 게임(지금 이용 · 미리보기)
 - TOPIK 4급 8주 온라인 반(준비 중 · 관심 등록)
 - TOPIK 4급 목표 정규 1년 과정(준비 중 · 개원 준비)
@@ -130,9 +131,9 @@ SYNK PULSE는 제품 광고, 브랜드필름, AI 모델 룩북, 사용법 영상
 
 ## In English
 
-An engine that fits you better the more you use it. SYNK builds Atlas, a personalization engine. We started in Korean-language education. Today we are building the SYNK platform, where one SYNK ID carries you across SYNK apps, and we use the same engine for business services and advertising videos.
+AI that gets to know you the more you use it. SYNK builds Atlas, a personalization engine that reads a person’s goals and what they have actually done, then fits the next practice to them. With it we run four businesses: Korean education, AI lectures and work automation, ad videos, and preparing to study in Korea.
 
-- SYNK LAB — Learn Korean, and get ready to study in Korea. SYNK LAB makes Korean textbooks, learning games and a personalized learning app. We are preparing a one-year course aimed at TOPIK Level 4, and our learning games are available when you sign in with SYNK ID. We are preparing the Synapse textbooks and a one-year course aimed at TOPIK Level 4, and SYNK WORLD offers TOPIK practice and Korean games.
+- SYNK LAB — Join the cast of a K-drama, and speak Korean. SYNK LAB makes Korean you actually speak. In our K-drama role-play you take a role and say your lines out loud; if there is something to fix, an AI director points out just one thing, then it’s take two. You can play an Episode 1 scene right now; the AI director pilot and the TOPIK Level 4 courses are in preparation. Daily practice happens in SYNK WORLD. We are making a Korean role-play where you speak as one of the cast of a K-drama, and SYNK WORLD for your daily practice; the TOPIK Level 4 class and the Synapse textbooks are in preparation.
 - SYNK SHIFT — AI lectures, plus work automation. SYNK SHIFT teaches the skills the AI era calls for at schools, companies and institutions, then automates repetitive work with AI for companies that took a lecture, to cut fixed costs. In schools we also give AI career lectures on how to steer a career in the AI era and what to prepare for it. We also run an instructor agency that finds instructors and assigns them to fit each request. Hands-on AI lectures for companies and institutions, where staff practise on their own work, and AI career lectures for schools on the careers and skills the AI era calls for. We find and assign instructors who fit each request, and automate repetitive work with AI for companies that took a lecture.
 - SYNK PULSE — Ads and model videos, plus our own music and characters. SYNK PULSE makes product ads, brand films, AI model lookbooks and how-to videos, from planning to the final cut. We also create the music and stories of Mongle, Kkamong and Marin, and look for partners to license them or make something together. Product ads, brand films, AI model lookbooks and how-to videos. We also make the music and stories of Mongle, Kkamong and Marin.
 - SYNK PATH — Studying, working and living in Korea, prepared with you. From packing your bags to settling into life in Korea, we are preparing to work through the Korean you need, the requirements, interviews and daily life with you, one step at a time. SYNK LAB takes care of the Korean — SYNK WORLD’s TOPIK practice is open now, and we are preparing to open the one-year course. The Seoul day planner and caregiver interview practice in VR are available now; help with preparing to study, finding out job requirements and settling into life in Korea is in preparation. We do not guarantee admission, visas, jobs or residence.
