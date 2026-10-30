@@ -1,0 +1,49 @@
+/* ---------- 입구 · 방문 목적(2026-10-30) ----------
+   홈 두 쪽(/ · /en/)만 싣는다. 처마 입구의 위쪽(하늘 · 처마 밑 싱ㅋ · 견본선 · 위 정보 줄)은 site.css 그대로이고(qa/v11-site.test.mjs의 sha256 잠금),
+   이 파일은 그 아래쪽 문 묶음(.gate-doors)만 맡는다 — 두 입구(아틀라스 · 회사 소개)와 SYNK 플랫폼 단추 자리를 「어떤 일로 오셨어요?」와
+   하러 온 일 넷, 작은 줄 둘로 바꾼다. 싱ㅋ 크기(--mark-w · --mark-top)와 처마 맞춤 식은 덮어쓰지 않는다.
+   넓은 화면: 회사 한 줄 / 질문 · 익명 안내 ……… 작은 줄 / 큰 칸 넷(한 줄). 높이는 두 입구 때(121px)보다 약 40px 크다 —
+   1280×720 · 1366×768에서도 싱ㅋ 아래끝과 15px 넘게 떨어진다(잰 값은 site-v10/README.md 「방문 목적 입구」).
+   좁은 · 세로 화면: 질문 → 큰 칸 넷(한 줄 48px) → 작은 줄 → 안내. 높이 700px 이하 휴대폰은 회사 한 줄을 접어 360×640에서도 네 칸이 첫 화면에 든다. */
+.gate-doors.visit{display:grid;grid-template-columns:auto minmax(0,1fr) auto;grid-template-areas:"kick kick kick" "q note more" "doors doors doors";column-gap:16px;align-items:baseline}
+.visit .gate-kicker{grid-area:kick;margin:0 0 10px}
+.visit-q{grid-area:q;margin:0 0 14px;font-size:clamp(22px,1.9vw,28px);font-weight:740;letter-spacing:-.025em;line-height:1.2;color:var(--g-ink)}
+.visit-note{grid-area:note;margin:0;font-size:13px;font-weight:500;line-height:1.4;color:var(--g-ink-2)}
+.visit-note a{color:inherit;text-underline-offset:3px}
+.visit-note a:hover{color:var(--g-ink)}
+.visit-doors{grid-area:doors;list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));column-gap:clamp(16px,2.2vw,32px)}
+.visit-door{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:end;gap:8px 12px;padding:14px 0 6px;border-top:1px solid var(--g-line);text-decoration:none;color:var(--g-ink)}
+.visit-door small{grid-column:1/-1;display:flex;align-items:center;gap:8px;font:400 12.5px/1 var(--mono);letter-spacing:.08em;color:var(--g-ink-2)}
+.visit-door strong{font-size:clamp(22px,2.1vw,32px);font-weight:760;letter-spacing:-.035em;line-height:1.15}
+/* 영어 칸 이름은 한국어보다 길다(「AI lectures & automation」) — 1366×768에서 두 줄로 접혀 싱ㅋ에 닿던 것을 한 줄로 */
+html[lang="en"] .visit-door strong{font-size:clamp(20px,1.65vw,28px)}
+.visit-door .arr{font:400 18px/1 var(--mono);color:var(--g-ink-2);padding-bottom:7px;transition:transform .2s var(--ease)}
+.visit-door:hover small,.visit-door:hover .arr{color:var(--g-ink)}
+.visit-door:hover .arr{transform:translateX(3px)}
+.visit-more{grid-area:more;display:flex;flex-wrap:wrap;justify-content:flex-end;gap:0 20px}
+.visit-more a{display:inline-flex;align-items:center;gap:6px;min-height:44px;color:var(--g-ink-2);font-size:14.5px;font-weight:650;text-decoration:none;white-space:nowrap}
+.visit-more a:hover{color:var(--g-ink)}
+.visit-more .arr{font-family:var(--mono)}
+/* 위 정보 줄 오른쪽 사업 이름 넷은 네 칸과 같은 말이라 홈에서 숨긴다. 막대의 사업 알약은 입구가 보이는 동안(막대가 어두운 유리일 때)만 숨긴다 —
+   입구를 지나면 네 사업으로 가는 길이 막대에 다시 생긴다(같은 꼴의 선례 build.mjs PATH_EN_CSS). */
+body[data-page="home"] .gate-top .brands,body[data-page="home"] .bar.on-dark .bar-brands,body[data-page="home"] .bar.on-dark .bar-brands+.bar-sep{display:none}
+@media (prefers-reduced-motion:reduce){.visit-door .arr{transition:none}}
+/* 1100px 이하 가로 창: 질문 · 안내 · 작은 줄 셋이 한 줄에 들면 가운데 안내 칸이 눌려 작은 줄과 겹친다 — 안내를 질문 아래 줄로 */
+@media (max-width:1100px){
+  .gate-doors.visit{grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"kick kick" "q more" "note note" "doors doors"}
+  .visit-q{margin-bottom:4px}
+  .visit-note{margin:0 0 12px}
+}
+@media (max-width:700px),(max-aspect-ratio:4/5){
+  .gate-doors.visit{grid-template-columns:minmax(0,1fr);grid-template-areas:"kick" "q" "doors" "more" "note";align-items:start}
+  .visit-q{font-size:24px;margin-bottom:12px}
+  .visit-doors{grid-template-columns:minmax(0,1fr)}
+  .visit-doors li:last-child .visit-door{border-bottom:1px solid var(--g-line)}
+  .visit-door{grid-template-columns:64px minmax(0,1fr) auto;align-items:center;gap:0 10px;padding:0;min-height:48px}
+  .visit-door small{grid-column:auto}
+  .visit-door strong,html[lang="en"] .visit-door strong{font-size:20px}
+  .visit-door .arr{padding-bottom:0}
+  .visit-more{justify-content:flex-start;gap:0 18px;margin-top:6px}
+  .visit-note{margin-top:2px}
+}
+@media (max-width:700px) and (max-height:700px){.visit .gate-kicker{display:none}}
