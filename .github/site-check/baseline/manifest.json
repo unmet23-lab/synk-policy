@@ -1,7 +1,7 @@
 {
- "createdAt": "2026-10-29T17:55:08.791Z",
- "commit": "354e618ccfc2db4546fef43feaa94f4f5a78cc3f",
- "run": 40923376527,
+ "createdAt": "2026-10-30T09:20:24.968Z",
+ "commit": "a07ae1240c909b1cd8eeef94687914790029f32a",
+ "run": 41030815791,
  "env": {
   "chromium": "151.0.7922.34",
   "os": "ubuntu24"
@@ -206,15 +206,15 @@
   "/fortune/": {
    "desktop": {
     "file": "desktop/fortune.jpg",
-    "sha256": "1ced1df7cf93f34898372440980a662650192086e4253d85c84d3160c637dd62",
-    "cssHeight": 1386,
-    "run": 39727331441
+    "sha256": "bf940d3c6a82f8f2e4845f6403c19c4b1d77ab2f3ffa6e60a3e2ea002edca273",
+    "cssHeight": 954,
+    "run": 41030815791
    },
    "mobile": {
     "file": "mobile/fortune.jpg",
-    "sha256": "924863cc6b829f103ae598f12f35fe20eb45d0afa937efa86e7c866e44ccef91",
-    "cssHeight": 2120,
-    "run": 39727331441
+    "sha256": "b54bc6f14b8e1693ab89399ccdef4b511979dc7834247532796168e5911cd2f3",
+    "cssHeight": 1153,
+    "run": 41030815791
    }
   },
   "/founder/": {
