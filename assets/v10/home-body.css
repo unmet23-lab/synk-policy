@@ -59,8 +59,9 @@ html[lang="en"] .duo-col .h2{font-size:clamp(27px,2.8vw,40px)}
 .duo-now .news-what{grid-column:2;grid-row:2}
 .duo-now .news-go{grid-column:3;grid-row:1/3}
 .duo-now .news-title{font-size:clamp(16px,1.3vw,18px)}
-.news-more{margin-top:0;border-top:0}
-.news-more>summary{padding:16px 0;font-size:15.5px}
+/* site.css의 details.more(특이성 0,1,1 · 위 선과 여백 28px)를 이기려고 details.를 붙인다 — 이 파일이 site.css 뒤에 실려 같은 특이성에서 이긴다(2026-10-31 화면 검수). */
+details.news-more{margin-top:0;border-top:0}
+details.news-more>summary{padding:16px 0;font-size:15.5px}
 .news-more-n{margin-left:2px;font-family:'SYNK Latin',var(--sans);font-weight:500;color:var(--ink-3);font-variant-numeric:tabular-nums}
 .news-more .news{border-top:1px solid var(--line)}
 .news-more .news li:last-child{border-bottom:0}
