@@ -71,11 +71,14 @@
       return false;
     };
     const permitted = (npcId, factId, visited = new Set()) => {
-      const grant = knowledge.get(npcId)?.get(factId);
-      if (!active(factId) || grant?.allowed !== true || visited.has(factId)) return false;
-      if (grant.viaId === null) return true;
-      if (grant.viaId === factId) return facts.get(factId).event.knownBy.includes(npcId);
-      return permitted(npcId, grant.viaId, new Set([...visited, factId]));
+      while (!visited.has(factId)) {
+        const grant = knowledge.get(npcId)?.get(factId);
+        if (!active(factId) || grant?.allowed !== true) return false;
+        if (grant.viaId === null) return true;
+        if (grant.viaId === factId) return facts.get(factId).event.knownBy.includes(npcId);
+        visited.add(factId); factId = grant.viaId;
+      }
+      return false;
     };
     for (const event of events) {
       validate(event);
@@ -102,7 +105,8 @@
         }
         // Seeing it directly is the strongest source; a relayed grant cannot replace it.
         const own = knowledge.get(event.npcId)?.get(event.factId);
-        if (!(event.allowed && own?.allowed === true && own.viaId === null)) know(event.npcId, event.factId, { allowed: event.allowed, viaId: event.viaId });
+        const witnessed = facts.get(event.factId).event.knownBy.includes(event.npcId);
+        if (!(event.allowed && own?.allowed === true && (own.viaId === null || own.viaId === event.factId && witnessed || event.viaId === event.factId && !witnessed))) know(event.npcId, event.factId, { allowed: event.allowed, viaId: event.viaId });
       } else {
         if (event.sourceIds.some(source => !permitted(event.npcId, source))) throw new Error('Trail Life: delivery requires permitted facts');
         if (deliveries.has(event.deliveryId)) throw new Error('Trail Life: duplicate delivery id');

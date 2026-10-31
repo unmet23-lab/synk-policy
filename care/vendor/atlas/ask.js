@@ -1,11 +1,8 @@
 /* SYNK Core: "오늘 물어볼 한 가지" (Atlas design §5-1, implementation spec §4-4).
  * Canonical source: SYNK-appsscript/atlas/ask.js. Owned by Core; not a ninth engine.
- * Works for any decision a content makes: a practice plan, a game's settings, the
- * recommendation of a consultation or a personalised tool. A question is worth asking only
- * if one of its answers changes what is decided. By default the most change is asked;
- * a host may instead declare decision utility/loss and the cost of asking.
- * Questions whose answers change nothing for this person are skipped, so a consultation
- * gets shorter and sharper the more it already knows.
+ * Content supplies its decision rule: a practice plan, settings or a recommendation.
+ * Ask skips questions that change nothing and ranks actual decision changes;
+ * a host may instead declare utility/loss and the cost of asking.
  * Pure: the decision function belongs to the content (Core.decide, a recommendation rule...).
  * No clock, storage, model call or identity. Answers never become a test or a score.
  */
@@ -14,7 +11,7 @@
   else root.SynkAsk = factory();
 })(typeof globalThis !== 'undefined' ? globalThis : this, function () {
   'use strict';
-  const VERSION = 'ask-1.1';
+  const VERSION = 'ask-1.2';
   // A six-choice multi-select can have 63 nonempty answer scenarios. Products
   // still show the six choices; this bound is for the host's decision analysis.
   const MAX_OPTIONS = 64;
@@ -86,15 +83,17 @@
     validate(questions);
     if (typeof decide !== 'function' || !answers || typeof answers !== 'object' || !Array.isArray(denied) || !asked || typeof asked !== 'object') throw new TypeError('Ask: invalid input');
     if (evaluate !== undefined && typeof evaluate !== 'function') throw new TypeError('Ask: evaluate must be a function');
+    if (!finite(quietDays) || quietDays < 0 || quietDays > 36500) throw new TypeError('Ask: invalid question cooldown');
+    const currentTime = now === null ? null : time(now);
     const valued = typeof evaluate === 'function';
     if (!valued && questions.some(q => owns(q, 'cost') || owns(q, 'responseProbability'))) throw new TypeError('Ask: question cost and response probability require evaluate');
     const current = decide({ ...answers });
-    const result = [];
+    const result = [], rawImpact = new Map();
     for (const q of questions) {
       const about = q.about ?? q.id;
-      if (Object.hasOwn(answers, about)) continue;
+      if (Object.hasOwn(answers, about) && (q.kind !== 'refresh' || currentTime === null)) continue;
       if (denied.includes(q.id)) { result.push({ id: q.id, kind: q.kind ?? 'setting', about, impact: 0, skippable: true, reason: 'denied' }); continue; }
-      if (Object.hasOwn(asked, q.id) && now !== null && time(now) - time(asked[q.id]) < quietDays * DAY) {
+      if (Object.hasOwn(asked, q.id) && currentTime !== null && currentTime - time(asked[q.id]) < quietDays * DAY) {
         result.push({ id: q.id, kind: q.kind ?? 'setting', about, impact: 0, skippable: true, reason: 'asked-recently' }); continue;
       }
       const chances = probabilities(q);
@@ -117,13 +116,20 @@
       const cost = q.cost ?? 0, responseProbability = q.responseProbability ?? 1, value = responseProbability * expectedGain - cost;
       if (valued && (!finite(expectedGain) || !finite(value))) throw new TypeError('Ask: nonfinite expected decision value');
       const skippable = impact === 0 || (valued && value <= 0);
+      rawImpact.set(q.id, impact);
       result.push({ id: q.id, kind: q.kind ?? 'setting', about, impact: Math.round(impact * 1000) / 1000, distinct,
         skippable, reason: impact === 0 ? 'no-change' : valued ? (value > 0 ? 'positive-decision-value' : 'no-positive-decision-value') : 'changes-decision', outcomes,
         ...(valued ? { basis: 'declared-decision-value', expectedGain, responseProbability, cost, value } : {}) });
     }
     // Most valuable (or most decisive) first; ties keep the content's own order.
-    const score = entry => valued ? entry.value ?? 0 : entry.impact;
-    return result.map((entry, order) => ({ ...entry, order })).sort((a, b) => score(b) - score(a) || a.order - b.order).map(({ order, ...entry }) => entry);
+    const score = entry => valued ? entry.value ?? 0 : rawImpact.get(entry.id) ?? 0;
+    // Anchor each tie group at its highest score; pairwise tolerances are not transitive.
+    const sorted = result.map((entry, order) => ({ ...entry, order })).sort((a, b) => score(b) - score(a) || a.order - b.order), groups = [];
+    for (const entry of sorted) {
+      const group = groups.at(-1), high = group && score(group[0]), low = score(entry);
+      if (!group || Math.abs(high - low) > Number.EPSILON * MAX_OPTIONS * Math.max(Math.abs(high), Math.abs(low))) groups.push([entry]); else group.push(entry);
+    }
+    return groups.flatMap(group => group.sort((a, b) => a.order - b.order)).map(({ order, ...entry }) => entry);
   }
   // The one question to ask now, or none. A daily budget of one is the default (design §5-1).
   function choose({ budget = 1, usedToday = 0, ...input } = {}) {
@@ -131,7 +137,7 @@
     const ranked = rank(input);
     if (usedToday >= budget) return { version: VERSION, status: 'none', reason: 'budget', ranked };
     const valued = typeof input.evaluate === 'function';
-    const best = ranked.find(entry => !entry.skippable && (valued ? entry.value > 0 : entry.impact > 0));
+    const best = ranked.find(entry => !entry.skippable);
     if (!best) return { version: VERSION, status: 'none', reason: valued ? 'no-question-has-positive-decision-value' : 'no-question-changes-the-decision', ranked };
     return { version: VERSION, status: 'ask', question: input.questions.find(q => q.id === best.id), impact: best.impact, reason: best.reason, ranked,
       ...(valued ? { value: best.value, basis: best.basis } : {}) };
@@ -143,7 +149,12 @@
   function fromAtlas({ engine, events = [], scope, at, experienceId, candidates, levers = [], questions, ...rest } = {}) {
     if (!engine || typeof engine.decide !== 'function') throw new TypeError('Ask: Core engine required');
     validate(questions);
-    const byAbout = new Map(questions.map(q => [q.about ?? q.id, q]));
+    const byAbout = new Map();
+    for (const q of questions) {
+      const about = q.about ?? q.id, prior = byAbout.get(about);
+      if (prior && ((prior.kind ?? 'setting') !== (q.kind ?? 'setting') || (q.kind === 'confirm' ? prior.line !== q.line : (prior.field ?? about) !== (q.field ?? about)))) throw new TypeError(`Ask: ambiguous Atlas question binding ${about}`);
+      byAbout.set(about, q);
+    }
     const decide = answers => {
       const extra = [];
       for (const [about, value] of Object.entries(answers)) {
