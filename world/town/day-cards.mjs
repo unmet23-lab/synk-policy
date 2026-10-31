@@ -102,6 +102,9 @@ export function sceneLine(segments, npc, t, { steps = {}, waiting = [], season =
   // player could not answer it there (screen review F2).
   const at = seg && arrived(seg, t) ? SPOT_BY_ID[seg.spot]?.place ?? null : null;
   const need = waiting.find(c => c.owner === npc && c.status === 'triggered' && (!TALK_AT[c.card] || TALK_AT[c.card] === at));
+  // Lingering by the menu board over it once a day (§8-4 ③), she says why in her mood line — the card's own reason (§7-3 new-menu,
+  // the view's segment carries its mood line only) — and the need waits.
+  if (need && TALK_AT[need.card] && seg?.mood && seg.mood.startsWith(`${npc}.mood.${CARD_MOOD[npc]?.[need.card] ?? '-'}.`)) return null;
   if (need) { const id = cardLine(npc, need.card, 'trigger', season); if (LINES.has(id)) return { id, icon: CARD_ICONS[need.card] || 'sparkle', seen: [`line:${id}`], occurrence: `${need.card}:${need.key}:trigger` }; }
   return null;
 }
@@ -125,6 +128,8 @@ export function greetLine(npc, { band = null, weather = null, minute = null, arc
   return LINES.has(id) ? id : null;
 }
 const OFF_WEEKDAY = Object.fromEntries((generated.RESIDENTS || []).map(r => [r.id, r.offWeekday ?? null]));
+/** Each resident's mood reason that is a card's own (§7-3 — C4 → new-menu): npc → { card: tag }. */
+const CARD_MOOD = Object.fromEntries((generated.RESIDENTS || []).map(r => [r.id, Object.fromEntries((r.moods || []).filter(m => /^[CWR][1-6]$/.test(m.factor)).map(m => [m.factor, m.tag]))]));
 /** What a resident is doing, in one line of its own (W10, §16 일과): its pair scene's while both are at it, the workshop
  * owner's waking on its day off in the morning, else its archetype's. now: { segments, t, band, lifeDay }. */
 export function routineLine(npc, { segments = [], t = null, band = null, lifeDay = null } = {}) {
@@ -154,10 +159,30 @@ export const takeable = c => !!c && ['triggered', 'paused'].includes(c.status) &
 export const TALK_AT = Object.freeze({ C4: 'cafe' });
 /** Where such a card is taken up, as the notebook and the card's note say it (「찻집에서 」), or ''. */
 export const talkWhere = card => (TALK_AT[card] === 'cafe' ? '찻집에서 ' : '');
+/** The town's refusals of a card's answer (409) in its own words (core.mjs commandCard · life.mjs cardContactFor). Through
+ * a WORLD account the error keeps only its code — the town's answer nests the words under error, as the gathering board
+ * found — so the screen says these then; a code with no words here says nothing (the town is read again). */
+const REFUSAL_WORDS = Object.freeze({ 'card-not-waiting': '그 일은 지금 함께할 수 없어요. 주인이 하는 일을 지켜봐 주세요.',
+  'card-busy': '하던 생활을 먼저 닫아 주세요.', 'card-not-open': '함께하던 생활을 다시 열어 주세요.', 'card-choice-first': '먼저 하나 골라 주세요.',
+  'stale-life-contact': '이 제안은 현재 화면에서 다시 확인해 주세요. 주인에게 직접 말을 걸면 언제든 열 수 있어요.',
+  'conflicting-command': '같은 요청의 내용이 달라요.' });
+/** A refusal's words: the town's own when they came, else these — naming whom the server names, as the screen has the
+ * residents (places: where each is now, none asleep; holds: who a scene holds) and the player (location). */
+export function refusalWords(code, message, { card = null, places = {}, holds = {}, location = null } = {}) {
+  if (message && message !== code) return message;
+  const c = CARD_BY_ID.get(card), owner = c?.owner, all = owner ? [owner, ...(c.paths?.player?.with || [])] : [];
+  if (owner && code === 'resident-asleep') return `${NAMES[all.find(npc => !places[npc]) || owner]}은 지금 자고 있어요. 아침에 다시 만나요.`;
+  if (owner && code === 'card-owner-busy') return `${NAMES[all.find(npc => holds[npc]) || owner]}이 하던 장면을 마친 뒤 함께할 수 있어요.`;
+  // Beside her somewhere else, a card talked about at its own place is turned down for that place; else for being far.
+  if (owner && code === 'card-too-far') return places[owner]?.to === location && TALK_AT[card] && TALK_AT[card] !== location
+    ? `${NAMES[owner]}에게는 찻집에서 말을 걸어 주세요.` : `${NAMES[owner]} 가까이 가서 말을 걸어 주세요.`;
+  return REFUSAL_WORDS[code] ?? null;
+}
 
 /** What the place's panel shows of the cards and the residents here (§8-3·§9-4): the resident who greets the player
  * with what it heard (one, once — the newest it may tell), the cards whose owner is here (its need, and 「같이 해요」 or
- * the paused one to go on with), and at home the news note (the newest three, never their days).
+ * the paused one to go on with — or, a card talked about at another place, away: its owner's line saying where), and at
+ * home the news note (the newest three, never their days).
  * W10: season is today's (a need with seasons speaks in it); with nothing heard to tell, own(npc) names the line a resident
  * here says of itself (its greeting, or what it is doing — the app's choice) and the first one with words is own. */
 export function placeModel({ location, residentsHere = [], hearsay = {}, cards = [], news = [], take = null, level = LEVEL, season = null, own = null }) {
@@ -166,10 +191,14 @@ export function placeModel({ location, residentsHere = [], hearsay = {}, cards =
   const needs = open ? [] : cards.filter(c => takeable(c) && residentsHere.includes(c.owner) && (!TALK_AT[c.card] || TALK_AT[c.card] === location))
     .map(c => ({ card: c.card, key: c.key, owner: c.owner, paused: c.status === 'paused',
     title: CARD_BY_ID.get(c.card).title, line: lineText(cardLine(c.owner, c.card, c.status === 'paused' ? 'offer' : 'trigger', season), level) }));
+  // Its owner here but the card opened only at its own place (C4 at the cafe's menu board): one line of hers says so, no
+  // button — the server takes it up only there (screen review F3).
+  const away = open ? [] : cards.filter(c => takeable(c) && residentsHere.includes(c.owner) && TALK_AT[c.card] && TALK_AT[c.card] !== location)
+    .map(c => ({ card: c.card, key: c.key, owner: c.owner, line: lineText(cardLine(c.owner, c.card, 'away'), level) })).filter(a => a.line);
   const note = location === 'home' ? news.slice(0, 3).map(n => ({ ref: n.ref, card: n.card, lineId: newsLine(n.card, n.ref), text: lineText(newsLine(n.card, n.ref), level) })).filter(n => n.text) : [];
   const mine = !greet && typeof own === 'function' ? residentsHere.map(npc => ({ npc, id: own(npc) })).find(o => o.id && lineText(o.id, level)) ?? null : null;
   return { greet: greet && { npc: greet.npc, ref: hearsay[greet.npc].ref, ...greet.line },
-    own: mine && { npc: mine.npc, id: mine.id, kind: LINES.get(mine.id).kind, text: lineText(mine.id, level), icon: 'quiet', seen: [`line:${mine.id}`] }, needs, note, open };
+    own: mine && { npc: mine.npc, id: mine.id, kind: LINES.get(mine.id).kind, text: lineText(mine.id, level), icon: 'quiet', seen: [`line:${mine.id}`] }, needs, away, note, open };
 }
 
 /** The offer standing for this window (§8-3): a card's contact issued here that the screen may still show — the owner's
