@@ -1,5 +1,5 @@
 {
-  "version": "2026-09-15-selected-experiences-copy-9bfc4e4ce8-rhythm-20261001-copy-3910676d01-release-copy-3e4ed3be6d-en-002b14631325-bm-platform-20261007-a885b0d303-travel-20261007-ce148dd860-real-20261007-ab58ee7076-homepage-current-20261009-033c24b61f29-homepage-v10-20261010-a91a16bad3f6",
+  "version": "2026-09-15-selected-experiences-copy-9bfc4e4ce8-rhythm-20261001-copy-3910676d01-release-copy-3e4ed3be6d-en-002b14631325-bm-platform-20261007-a885b0d303-travel-20261007-ce148dd860-real-20261007-ab58ee7076-homepage-current-20261009-033c24b61f29-homepage-v10-20261010-88d31ec82c05",
   "updatedAt": "2026-10-31",
   "docs": [
     {
@@ -330,7 +330,7 @@
         "Public examples do not confirm acceptance of a project or a delivery schedule. Advertising work owned by a client is not treated as SYNK-owned creative work.",
         "A public listening or viewing link does not grant permission to redistribute a work, put it in a video, play it in a shop, or use it in advertising or commercially. Please confirm availability and rights first.",
         "To start an inquiry, email hello@synk.im with the work title, media, location, duration, and intended use. This question panel does not grant permission or make a final copyright determination.",
-        "We are not featuring a radio on this website right now. The music and character stories PULSE makes are in the works section of the PULSE page.",
+        "We are not featuring a radio on this website right now. The music and character stories PULSE makes are introduced on the PULSE page, under the two pieces in Works.",
         "To use or make music with us, ask PULSE.",
         "Client videos are made for where they will run; our own works are made to be watched again.",
         "For client videos we start with where they will be used and who will see them. The product, people and style rules set at the start carry into every later video so that many videos still look like one brand, using two Atlas engines: Loom for the picture and Reed for sound.",
@@ -366,7 +366,7 @@
         "We only use photos of you, or of an adult who has agreed to the work. The plan is to deliver a finished version you can show right away plus an editable template where you can swap photos and text. Photography is not included.",
         "The number of photos, the number of slides, the revision scope, schedule and price will be set before sale. If you would like to talk it through early, ask PULSE."
       ],
-      "updatedAt": "2026-10-24"
+      "updatedAt": "2026-10-31"
     },
     {
       "id": "philosophy",
@@ -1483,10 +1483,10 @@
         "pulse-intro"
       ],
       "action": {
-        "label": "See works and IP",
-        "href": "/en/pulse/#works"
+        "label": "About our music and characters",
+        "href": "/en/pulse/#works-music"
       },
-      "reviewedAt": "2026-10-23",
+      "reviewedAt": "2026-10-31",
       "aliases": [
         "어떤 감상 경험을 만드나요?",
         "소리와 장면은 어떻게 연결하나요?",
@@ -2686,7 +2686,7 @@
       "sourceId": "pulse",
       "brand": "pulse",
       "title": "Where can I listen to the radio?",
-      "answer": "We are not featuring a radio on this website right now. The music and character stories PULSE makes are in the works section of the PULSE page.\n\nTo use or make music with us, ask PULSE.",
+      "answer": "We are not featuring a radio on this website right now. The music and character stories PULSE makes are introduced on the PULSE page, under the two pieces in Works.\n\nTo use or make music with us, ask PULSE.",
       "questionExamples": [
         "Where can I listen to the radio?",
         "Is there a 24-hour radio stream?",
@@ -2704,10 +2704,10 @@
         "pulse-listening",
         "pulse-rights"
       ],
-      "reviewedAt": "2026-10-10",
+      "reviewedAt": "2026-10-31",
       "action": {
-        "label": "See PULSE works",
-        "href": "/en/pulse/#works"
+        "label": "About our music and characters",
+        "href": "/en/pulse/#works-music"
       },
       "aliases": [
         "라디오는 어디서 들을 수 있나요?",
@@ -3413,10 +3413,10 @@
         "pulse-philosophy"
       ],
       "action": {
-        "label": "See works and IP",
-        "href": "/en/pulse/#works"
+        "label": "About our music and characters",
+        "href": "/en/pulse/#works-music"
       },
-      "reviewedAt": "2026-10-23",
+      "reviewedAt": "2026-10-31",
       "aliases": [
         "PULSE의 온라인 콘텐츠는 무엇인가요?"
       ]
@@ -3446,10 +3446,10 @@
         "pulse-philosophy"
       ],
       "action": {
-        "label": "See works and IP",
-        "href": "/en/pulse/#works"
+        "label": "About licensing our work",
+        "href": "/en/pulse/#works-music"
       },
-      "reviewedAt": "2026-10-10",
+      "reviewedAt": "2026-10-31",
       "aliases": [
         "PULSE의 IP 사업은 무엇인가요?",
         "PULSE는 캐릭터 사업도 하나요?",
@@ -3478,10 +3478,10 @@
         "pulse-philosophy"
       ],
       "action": {
-        "label": "See works and IP",
-        "href": "/en/pulse/#works"
+        "label": "About ads with our characters",
+        "href": "/en/pulse/#works-music"
       },
-      "reviewedAt": "2026-10-10",
+      "reviewedAt": "2026-10-31",
       "aliases": [
         "PULSE의 광고 사업은 무엇인가요?"
       ]

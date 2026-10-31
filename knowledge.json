@@ -1,5 +1,5 @@
 {
-  "version": "2026-09-15-selected-experiences-copy-9bfc4e4ce8-rhythm-20261001-copy-3910676d01-release-copy-3e4ed3be6d-bm-platform-20261007-aeb1f10aeb-travel-20261007-0d37d456af-real-20261007-05098f38f2-homepage-current-20261009-0ee91e08458f-homepage-v10-20261010-dab3357ad305",
+  "version": "2026-09-15-selected-experiences-copy-9bfc4e4ce8-rhythm-20261001-copy-3910676d01-release-copy-3e4ed3be6d-bm-platform-20261007-aeb1f10aeb-travel-20261007-0d37d456af-real-20261007-05098f38f2-homepage-current-20261009-0ee91e08458f-homepage-v10-20261010-52c115e230ea",
   "updatedAt": "2026-10-31",
   "docs": [
     {
@@ -329,7 +329,7 @@
         "공개된 예시만으로 제작 수락이나 납품 일정이 확정되지는 않습니다. 고객 소유의 광고 결과물을 SYNK 자체 작품으로 취급하지 않습니다.",
         "감상 링크를 공개했다고 해서 재배포나 영상 삽입, 매장 재생, 광고·상업 이용까지 허락한 것은 아닙니다. 쓸 수 있는지와 권리 조건을 먼저 확인해 주세요.",
         "작품명과 사용할 매체·장소·기간·용도를 hello@synk.im으로 보내 주시면 문의를 시작할 수 있습니다. 이 질문창에서 이용 허락이나 저작권 판단을 확정하지 않습니다.",
-        "지금은 홈페이지에서 라디오를 따로 안내하지 않습니다. PULSE가 만드는 음악과 캐릭터 이야기는 PULSE 페이지의 작품 소개에서 볼 수 있습니다.",
+        "지금은 홈페이지에서 라디오를 따로 안내하지 않습니다. PULSE가 만드는 음악과 캐릭터 이야기는 PULSE 페이지 「작품과 IP」의 두 작품 아래에서 소개합니다.",
         "음악을 함께 쓰거나 만들고 싶으시면 PULSE에 문의해 주세요.",
         "맡은 영상은 쓸 곳에 맞게, 우리 작품은 다시 보고 싶게 만듭니다.",
         "브랜드가 맡긴 영상은 어디에 쓸지와 누구에게 보여 줄지부터 정합니다. 처음에 정한 제품과 인물, 표현 기준을 다음 영상에도 그대로 써서 여러 편을 만들어도 한 브랜드로 보이게 합니다. 이때 아틀라스 가운데 화면을 짜는 Loom과 소리를 다루는 Reed를 씁니다.",
@@ -365,7 +365,7 @@
         "본인 또는 제작에 동의한 성인의 사진만 씁니다. 바로 보여 줄 완성본과, 사진과 글을 바꿔 계속 쓸 수 있는 편집용 양식을 함께 드릴 계획입니다. 실제 촬영은 포함하지 않습니다.",
         "사진 수량과 PPT 장수, 수정 범위, 일정과 가격은 판매 전에 정합니다. 미리 상의하고 싶으시면 PULSE에 문의해 주세요."
       ],
-      "updatedAt": "2026-10-24"
+      "updatedAt": "2026-10-31"
     },
     {
       "id": "philosophy",
@@ -1334,10 +1334,10 @@
         "pulse-intro"
       ],
       "action": {
-        "label": "작품과 IP 보기",
-        "href": "/pulse/#works"
+        "label": "음악과 캐릭터 안내 보기",
+        "href": "/pulse/#works-music"
       },
-      "reviewedAt": "2026-10-10"
+      "reviewedAt": "2026-10-31"
     },
     {
       "id": "pulse-not-study",
@@ -2350,7 +2350,7 @@
       "sourceId": "pulse",
       "brand": "pulse",
       "title": "라디오는 어디서 들을 수 있나요?",
-      "answer": "지금은 홈페이지에서 라디오를 따로 안내하지 않습니다. PULSE가 만드는 음악과 캐릭터 이야기는 PULSE 페이지의 작품 소개에서 볼 수 있습니다.\n\n음악을 함께 쓰거나 만들고 싶으시면 PULSE에 문의해 주세요.",
+      "answer": "지금은 홈페이지에서 라디오를 따로 안내하지 않습니다. PULSE가 만드는 음악과 캐릭터 이야기는 PULSE 페이지 「작품과 IP」의 두 작품 아래에서 소개합니다.\n\n음악을 함께 쓰거나 만들고 싶으시면 PULSE에 문의해 주세요.",
       "questionExamples": [
         "라디오는 어디서 들을 수 있나요?",
         "라디오 24시간 방송 있나요?",
@@ -2368,10 +2368,10 @@
         "pulse-listening",
         "pulse-rights"
       ],
-      "reviewedAt": "2026-10-10",
+      "reviewedAt": "2026-10-31",
       "action": {
-        "label": "PULSE 작품 보기",
-        "href": "/pulse/#works"
+        "label": "음악과 캐릭터 안내 보기",
+        "href": "/pulse/#works-music"
       }
     },
     {
@@ -2986,10 +2986,10 @@
         "pulse-philosophy"
       ],
       "action": {
-        "label": "작품과 IP 보기",
-        "href": "/pulse/#works"
+        "label": "음악과 캐릭터 안내 보기",
+        "href": "/pulse/#works-music"
       },
-      "reviewedAt": "2026-10-10"
+      "reviewedAt": "2026-10-31"
     },
     {
       "id": "pulse-ip",
@@ -3016,10 +3016,10 @@
         "pulse-philosophy"
       ],
       "action": {
-        "label": "작품과 IP 보기",
-        "href": "/pulse/#works"
+        "label": "작품 이용 안내 보기",
+        "href": "/pulse/#works-music"
       },
-      "reviewedAt": "2026-10-10"
+      "reviewedAt": "2026-10-31"
     },
     {
       "id": "pulse-advertising",
@@ -3043,10 +3043,10 @@
         "pulse-philosophy"
       ],
       "action": {
-        "label": "작품과 IP 보기",
-        "href": "/pulse/#works"
+        "label": "음악·캐릭터 광고 안내 보기",
+        "href": "/pulse/#works-music"
       },
-      "reviewedAt": "2026-10-10"
+      "reviewedAt": "2026-10-31"
     },
     {
       "id": "path-personal",
