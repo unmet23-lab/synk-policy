@@ -47,3 +47,9 @@ body[data-page="home"] .gate-top .brands,body[data-page="home"] .bar.on-dark .ba
   .visit-note{margin-top:2px}
 }
 @media (max-width:700px) and (max-height:700px){.visit .gate-kicker{display:none}}
+/* 작은 노트북(1366×768 · 1280×720): 문 묶음을 16px 줄여 싱ㅋ 아래끝과의 틈을 넓힌다. 회사 한 줄은 첫 화면의 유일한 회사 설명이라 숨기지 않는다 */
+@media (min-width:1101px) and (max-height:820px){
+  .visit .gate-kicker{margin-bottom:4px}
+  .visit-q{margin-bottom:8px}
+  .visit-door{padding-top:10px}
+}

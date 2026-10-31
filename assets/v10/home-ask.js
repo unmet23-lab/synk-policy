@@ -1,6 +1,7 @@
 // 홈 첫 화면 「어떤 일로 오셨어요?」 — 방문자가 고른 칸을 익명으로 센다(2026-10-30, 유호님 「방문자가 왜 왔는지 통계조사도」).
 // 받는 곳: SYNK 운영 계정의 구글 폼 「synk.im 방문 목적(익명)」. 폼의 응답 탭 요약이 곧 통계다(질문마다 원그래프).
-// 한 탭에서 한 번만 센다 — 처음 누른 칸(고름) 또는 고르지 않고 입구를 지나 내려간 것(지나침) 가운데 먼저 일어난 하나. 분모 = 고름 + 지나침.
+// 한 탭에서 고름 · 지나침을 한 번씩만 센다. 고르지 않고 입구를 지나 내려가면 바로 지나침을 보내고(앱 안 브라우저는 창을 닫을 때 신호가 없을 수 있어 떠날 때로 미루지 않는다),
+//   그 뒤 돌아와 칸을 고르면 「내려갔다가 칸을 고름」을 한 줄 더 보낸다. 읽는 법: 고른 사람 = 칸을 고름 + 내려갔다가 칸을 고름 · 끝내 안 고른 사람 = 고르지 않고 내려감 − 내려갔다가 칸을 고름.
 //   (보기만 하고 떠난 것은 세지 않는다 — 사람이 보지 않는 미리 불러오기 · 검색 로봇과 가려낼 수 없어서다.)
 // 보내는 것: 고름/지나침 · 고른 칸 · 쪽 언어(한국어 쪽/영어 쪽) · 들어온 곳(분류 이름만) · 기기(화면 넓이로 둘 중 하나) · 링크 꼬리표(?from=) · 판.
 //   구글 폼이 받은 시각을 더한다. 이 목록은 처리방침 「홈페이지 방문 통계」 절과 같아야 한다.
@@ -17,15 +18,15 @@ export const FORM = {
 export const VERSION = 'gate-v1';
 
 // 폼 보기 글(한국어 — 통계를 읽는 사람은 유호님이다). 영어 쪽도 같은 글로 보낸다. 화면의 칸 이름을 다듬어도 이 글은 그대로 둔다.
-export const KINDS = { pick: '칸을 고름', pass: '고르지 않고 내려감' };
+export const KINDS = { pick: '칸을 고름', pass: '고르지 않고 내려감', back: '내려갔다가 칸을 고름' };
 export const PICKS = {
   lab: 'LAB · 한국어', shift: 'SHIFT · AI 강의·자동화', pulse: 'PULSE · 광고·영상', path: 'PATH · 유학·취업',
-  app: '내 홈(회원)', other: '문의',
+  app: '내 홈(회원)', other: '문의', company: '회사 소개',
 };
 export const LANGS = { ko: '한국어 쪽', en: '영어 쪽' };
 export const SOURCES = {
   direct: '직접', search: '검색', instagram: '인스타그램', youtube: '유튜브', tiktok: '틱톡', threads: '스레드',
-  facebook: '페이스북', blog: '블로그', other: '다른 사이트', internal: 'SYNK 안',
+  facebook: '페이스북', x: 'X', linkedin: '링크드인', blog: '블로그', other: '다른 사이트', internal: 'SYNK 안',
 };
 export const DEVICES = { phone: '휴대폰', wide: '컴퓨터·태블릿' };
 
@@ -36,11 +37,13 @@ const HOSTS = [
   [/(^|\.)tiktok\.com$/, 'tiktok'],
   [/(^|\.)threads\.(net|com)$/, 'threads'],
   [/(^|\.)(facebook\.com|fb\.me|fb\.com)$/, 'facebook'],
+  [/(^|\.)(x\.com|twitter\.com|t\.co)$/, 'x'],
+  [/(^|\.)(linkedin\.com|lnkd\.in)$/, 'linkedin'],
   [/(^|\.)(blog\.naver\.com|tistory\.com|brunch\.co\.kr|medium\.com)$/, 'blog'],
   [/(^|\.)(google\.[a-z.]+|bing\.com|search\.naver\.com|daum\.net|search\.yahoo\.[a-z.]+|duckduckgo\.com|baidu\.com|yandex\.[a-z.]+|ecosia\.org|search\.brave\.com)$/, 'search'],
 ];
 // 꼬리표 이름 → 들어온 곳(링크에 ?from=ig-… 처럼 붙인 경우 referrer보다 앞선다 — 앱 안 브라우저는 referrer를 자주 비운다)
-const TAGS = [[/^(ig|insta)/, 'instagram'], [/^(yt|youtube)/, 'youtube'], [/^(tt|tiktok)/, 'tiktok'], [/^(th|threads)/, 'threads'], [/^(fb|facebook)/, 'facebook'], [/^(blog|tistory|naver)/, 'blog']];
+const TAGS = [[/^(ig|insta)/, 'instagram'], [/^(yt|youtube)/, 'youtube'], [/^(tt|tiktok)/, 'tiktok'], [/^(th|threads)/, 'threads'], [/^(fb|facebook)/, 'facebook'], [/^(x|twitter)(-|$)/, 'x'], [/^(li|linkedin)(-|$)/, 'linkedin'], [/^(blog|tistory|naver)/, 'blog']];
 const SELF_TAGS = /^(self|qa)$/;
 const BOTS = /bot|crawl|spider|slurp|preview|facebookexternalhit|headless|lighthouse|pagespeed/i;
 
@@ -68,11 +71,11 @@ export const deviceOf = width => (width <= 700 ? 'phone' : 'wide');
 
 /** 폼에 보낼 값. 허용 목록 밖의 값이면 null(보내지 않는다). */
 export function payload(kind, pick, ctx, form = FORM) {
-  if (!KINDS[kind] || (kind === 'pick') !== Boolean(PICKS[pick])) return null;
+  if (!KINDS[kind] || (kind !== 'pass') !== Boolean(PICKS[pick])) return null;
   if (!LANGS[ctx.lang] || !SOURCES[ctx.source] || !DEVICES[ctx.device]) return null;
   const p = new URLSearchParams();
   p.set(form.kind, KINDS[kind]);
-  if (kind === 'pick') p.set(form.pick, PICKS[pick]);
+  if (kind !== 'pass') p.set(form.pick, PICKS[pick]);
   p.set(form.lang, LANGS[ctx.lang]);
   p.set(form.source, SOURCES[ctx.source]);
   p.set(form.device, DEVICES[ctx.device]);
@@ -108,16 +111,18 @@ export function createCounter({ win = globalThis.window, doc = globalThis.docume
     device: deviceOf(win.innerWidth),
     from: fromTag(win.location.href),
   };
-  let done = false;
-  try { done = win.sessionStorage.getItem(DONE_KEY) === '1'; } catch {}
-  /** 고름 또는 지나침을 한 탭에 한 번만 보낸다. 보냈으면 true. */
+  // 이 탭의 상태: '' 아직 없음 · 'pass' 지나침을 보냄 · '1' 칸을 고름(끝). 다시 불러와도 이어진다.
+  let state = '';
+  try { state = win.sessionStorage.getItem(DONE_KEY) || ''; } catch {}
+  /** 고름 또는 지나침을 보낸다. 고름은 탭에 한 번, 지나침도 한 번이고, 지나침 뒤의 고름은 표시를 달리해 보낸다. 보냈으면 true. */
   function send(kind, pick) {
-    if (!on || done) return false;
+    if (!on || state === '1') return false;
     if (doc.visibilityState && doc.visibilityState !== 'visible') return false;
-    const body = payload(kind, pick, ctx, form);
+    if (kind === 'pass' && state) return false;
+    const body = payload(kind === 'pick' && state === 'pass' ? 'back' : kind, pick, ctx, form);
     if (!body) return false;
-    done = true;
-    try { win.sessionStorage.setItem(DONE_KEY, '1'); } catch {}
+    state = kind === 'pass' ? 'pass' : '1';
+    try { win.sessionStorage.setItem(DONE_KEY, state); } catch {}
     try {
       fetcher(form.action, { method: 'POST', mode: 'no-cors', credentials: 'omit', referrerPolicy: 'no-referrer', keepalive: true, body }).catch(() => {});
     } catch {}
