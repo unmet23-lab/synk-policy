@@ -1,7 +1,7 @@
 {
- "createdAt": "2026-10-31T09:08:28.671Z",
- "commit": "52c7dd9455d0a5e7bd0f43bae4678f599e9a75ab",
- "run": 41186449311,
+ "createdAt": "2026-10-31T12:25:28.503Z",
+ "commit": "e94d7a8016546707db408edd8c7dcac2a2a2c8dc",
+ "run": 41199940701,
  "env": {
   "chromium": "151.0.7922.34",
   "os": "ubuntu24"
@@ -10,15 +10,15 @@
   "/": {
    "desktop": {
     "file": "desktop/home.jpg",
-    "sha256": "78989ddda7767c718e8622135179b4d81b69909b6c36d707f67f92b70fdf2888",
+    "sha256": "7400096b007f8d8edccb0abc81db46f413620e6c292c6aaceff9d9dd94045116",
     "cssHeight": 12369,
-    "run": 41179336313
+    "run": 41199940701
    },
    "mobile": {
     "file": "mobile/home.jpg",
-    "sha256": "6fcbae401e493687bc00892b4dda438520deb77833707a829869a4488369d228",
+    "sha256": "289fcc666ffa6d91e00df2b737fc450a8e7101df16dd2d9403ba1930f85f3acc",
     "cssHeight": 16312,
-    "run": 41179336313
+    "run": 41199940701
    }
   },
   "/atlas/": {
@@ -108,15 +108,15 @@
   "/en/": {
    "desktop": {
     "file": "desktop/en.jpg",
-    "sha256": "b005d693b32d92e7c158ccced8af647e47dd04407781a9d4892f2ef332361339",
+    "sha256": "19614055216a65446cf6efa65d0eb8cb34184438f899894f484618d223a89f42",
     "cssHeight": 12823,
-    "run": 41179336313
+    "run": 41199940701
    },
    "mobile": {
     "file": "mobile/en.jpg",
-    "sha256": "d241af83f8cb97b5ba46b9668366627ed07c446cb3c2b6e9c313583517bacba5",
-    "cssHeight": 18080,
-    "run": 41179336313
+    "sha256": "6c0f7b39f33c988d3fadc5cd7bb5fb01d68afe9df021bf3a37f9afdb1b14abc8",
+    "cssHeight": 18018,
+    "run": 41199940701
    }
   },
   "/en/atlas/": {
@@ -360,15 +360,15 @@
   "/privacy/": {
    "desktop": {
     "file": "desktop/privacy.jpg",
-    "sha256": "ba2d66bd35231b2ffee70c5ba41fc513432f78ce5d2fc92a4c79d5bd3d2539e9",
-    "cssHeight": 17685,
-    "run": 41186449311
+    "sha256": "040523d0a435e8c9ca7059719512d43eacef4f9975664c756946414abab202fe",
+    "cssHeight": 17713,
+    "run": 41199940701
    },
    "mobile": {
     "file": "mobile/privacy.jpg",
-    "sha256": "ee8a4b4cb3e74973be31048439aa79cda14ba1122bee903568f60eb4ca9fdc85",
-    "cssHeight": 26926,
-    "run": 41186449311
+    "sha256": "9b2586e4c9c02b7c5e4579c96350d3b2c0ec5cfde386d9e763a5ac0a9fe81df2",
+    "cssHeight": 26980,
+    "run": 41199940701
    }
   },
   "/prompts/": {
