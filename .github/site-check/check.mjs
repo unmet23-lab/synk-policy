@@ -5,7 +5,8 @@
 //    개인정보·약관처럼 처리 업체를 적어야 하는 곳과 도구 사용법 안내(brief)는 뺀다(2026-10-02 원칙).
 //    찾을 이름 목록은 이 저장소가 공개라 검색에 걸리지 않게 base64로 적었다.
 // 3. 페이지 — 주요 페이지를 컴퓨터·휴대폰으로 열어 콘솔 오류·실패한 요청·가로 넘침이 없는지 본다.
-// 4. LAB 게임 — LAB 게임 카드(data-game)마다 /try/<게임>/을 열고 시작 단추가 풀리면 눌러 8초 뒤 오류가 없는지 본다. 카드 그림도 받아지는지 본다.
+// 4. LAB 상황극 · 게임 — LAB 첫 구역의 K드라마 상황극 장면 재생기(#drama [data-scene])가 부르는 소리 · 그림이 다 받아지는지 보고, 기기마다 「끝까지 듣기」를 눌러
+//    8초 안에 자막이 나오고 오류가 없는지 본다. 게임은 /try/<게임>/에 그대로 있어 아래 표의 게임마다 시작 단추를 눌러 8초 뒤 오류가 없는지 본다.
 // 5. 질문창 — LAB 질문창에 하나 물어 답이 나오는지 본다.
 // 6. 기준 이미지·접근성(2026-10-21) — 3단계의 쪽마다 컴퓨터·휴대폰 전체 화면을 기준 그림(baseline/)과 odiff로 견주고, axe 위반을 기준과 견준다.
 //    달라진 쪽은 보고만 하고(차이 그림은 visual/), 새로 생긴 치명 접근성 위반만 실패로 센다. 기준은 의도한 변경일 때만 따로 바꾼다(visual.mjs 머리글).
@@ -204,18 +205,46 @@ for (const device of devices) for (const route of routes) {
 }
 console.log(`  ${routes.length}쪽 × ${devices.length}기기`);
 
-// 4. LAB 게임 — 게임 카드에서 게임 목록을 읽는다. 10-05부터 카드에 게임으로 가는 링크가 없고, 10-13부터 플레이 장면 창도 없이 그림과 글만 둔다(게임은 /try/<id>/에 그대로 둔다).
+// 4. LAB 상황극 · 게임 — 2026-10-31부터 LAB에는 게임 카드가 없고 첫 구역이 K드라마 상황극 장면 재생기다. 게임은 /try/<id>/에 그대로 두고 아래 표로 연다.
 // 게임마다 시작 단추는 아래 표로 정한다(새 게임은 여기에 더한다).
-console.log('4. LAB 게임');
+console.log('4. LAB 상황극 · 게임');
 const startOf = {racing: '#watch', rhythm: '#start-button', runner: '#start', 'order-rush': '#start', 'story-classroom': '#start', 'entry-check': '#rec-start', 'blank-slice': '#btn-start', 'talk-rally': '#btn-start'};
-let games = [];
 {
-  const s = await open(devices[0], '/lab/');
-  games = await s.page.evaluate(() => Promise.all([...document.querySelectorAll('article.game-card[data-game]')].map(async a => { const picture = a.querySelector('img')?.getAttribute('src') || ''; return {id: a.dataset.game, href: `/try/${a.dataset.game}/`, picture, pictureOk: picture ? (await fetch(picture, {method: 'HEAD', cache: 'no-store'}).catch(() => ({ok: false}))).ok : false}; })));
-  await s.context.close();
-  if (!games.length) fail('게임', 'LAB 페이지에서 게임 카드를 못 찾음');
-  for (const g of games) if (!g.pictureOk) fail('게임', `LAB 카드 ${g.id}: 그림 ${g.picture || '(주소 없음)'}을 못 받음`);
+  let s;
+  try {
+    s = await open(devices[0], '/lab/');
+    const scene = await s.page.evaluate(async () => {
+      const root = document.querySelector('#drama [data-scene]');
+      const raw = root?.querySelector('script[data-scene-data]')?.textContent;
+      if (!raw) return null;
+      const data = JSON.parse(raw);
+      const sounds = [...new Set([...data.lines.flatMap(l => [l.audio, l.note?.say?.audio, l.note?.praise?.audio]), data.next?.audio].filter(Boolean))].map(a => data.base + a);
+      const pictures = [...root.querySelectorAll('img[data-panel]')].map(i => i.getAttribute('src'));
+      const bad = [];
+      for (const u of [...sounds, ...pictures]) { try { if (!(await fetch(u, {cache: 'no-store'})).ok) bad.push(u); } catch { bad.push(u); } }
+      return {lines: data.lines.length, sounds: sounds.length, pictures: pictures.length, bad};
+    });
+    if (!scene) fail('상황극', 'LAB 페이지에서 장면 재생기(#drama [data-scene])나 장면 자료를 못 찾음');
+    else {
+      if (scene.lines < 2) fail('상황극', `장면 대본이 ${scene.lines}줄뿐`);
+      for (const u of scene.bad) fail('상황극', `${u}을 못 받음`);
+      console.log(`  장면 ${scene.lines}줄 · 소리 ${scene.sounds}개 · 그림 ${scene.pictures}장`);
+    }
+  } catch (e) { fail('상황극', String(e).split('\n')[0].slice(0, 140)); }
+  await s?.context.close();
 }
+for (const device of devices) {
+  await checkScenario('상황극', device, '/lab/', async (page, assertions) => {
+    const watch = page.locator('#drama [data-scene-start="watch"]');
+    await watch.scrollIntoViewIfNeeded({timeout: 30000});
+    await page.waitForSelector('#drama [data-scene-start="watch"]:not([disabled])', {state: 'visible', timeout: 30000});
+    await watch.click({timeout: 10000});
+    await page.waitForTimeout(8000);
+    const said = await page.evaluate(() => document.querySelector('#drama [data-scene-ko]')?.textContent.trim() || '');
+    if (!said) assertions.push('「끝까지 듣기」를 누르고 8초가 지나도 자막이 없음');
+  });
+}
+const games = Object.keys(startOf).map(id => ({id, href: `/try/${id}/`}));
 for (const device of devices) for (const game of games) {
   await checkScenario('게임', device, game.href, async page => {
     await page.waitForTimeout(1500);
@@ -273,7 +302,7 @@ await browser.close();
 const status = problems.length ? 'failed' : recoveredScenarios.length ? 'transient-recovered' : 'passed';
 fs.writeFileSync(path.join(out, 'result.json'), JSON.stringify({status, checkedAt: new Date().toISOString(), problems, notes, recoveredScenarios, visual, a11y}, null, 2) + '\n');
 const summary = [`## synk.im 배포 점검 ${problems.length ? `— 문제 ${problems.length}개` : recoveredScenarios.length ? `— 일시 오류 ${recoveredScenarios.length}개 재검사로 복구` : '— 문제 없음'}`, '',
-  ...(problems.length ? problems.map(p => `- ${p}`) : ['- 반영, 도구 이름, 페이지, LAB 게임, 질문창 모두 통과']),
+  ...(problems.length ? problems.map(p => `- ${p}`) : ['- 반영, 도구 이름, 페이지, LAB 상황극 · 게임, 질문창 모두 통과']),
   ...(visual || a11y ? ['', '### 기준 이미지·접근성', ...summaryLines(visual, a11y)] : []),
   ...(notes.length ? ['', ...notes.map(n => `- 참고: ${n}`)] : [])].join('\n');
 if (process.env.GITHUB_STEP_SUMMARY) fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY, summary + '\n');

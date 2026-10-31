@@ -1,0 +1,192 @@
+/* 드라마 상황극 · 2026-10-30 — 홈 #drama 띠, LAB #drama 구역(어두운 띠)과 장면 재생기, LAB #world 한 덩어리, 홈 아틀라스 판의 원칙 줄.
+   홈 · LAB(한 · 영) 네 쪽만 싣는다(build.mjs DRAMA_PAGES) — site.css를 건드리지 않아 나머지 열한 쪽의 판 번호가 그대로다.
+   밝은 본문 안의 어두운 띠는 처마 입구와 같은 밤색(#08090c). 사업 색은 LAB 산호색을 「내 대사」에만, 감독 노트는 호박색 하나만 쓴다.
+   움직임은 나타나기와 칸 바뀜(살짝 겹쳐 바뀜)뿐이고, 움직임 줄이기 설정이면 끈다. 소리는 누를 때만 나온다(drama.js). */
+
+.drama{
+  --d-bg:#08090c;--d-ink:#f5f5f4;--d-ink-2:#c8cad0;--d-ink-3:#8d9098;--d-line:rgba(245,245,244,.13);--d-card:#131419;--d-card-2:#1a1b21;
+  --d-me:#ff7b6b;--d-note:#f6bd4c;--d-rec:#ff4a3d;--d-rec-btn:#d42e22;
+  position:relative;background:var(--d-bg);color:var(--d-ink);padding:clamp(76px,9vw,132px) 0;overflow:hidden;isolation:isolate}
+.drama::before{content:'';position:absolute;inset:-20% -10% auto auto;width:min(70vw,900px);aspect-ratio:1;border-radius:50%;background:radial-gradient(closest-side,rgba(249,104,89,.16),rgba(249,104,89,0));z-index:-1;pointer-events:none}
+.drama ::selection{background:rgba(255,123,107,.35);color:#fff}
+.drama :focus-visible{outline:2px solid #fafaf9;outline-offset:3px}
+.drama .label{color:var(--d-ink-3)}
+.drama .status{color:var(--d-ink-2);border-color:var(--d-line)}
+.drama .status small{color:var(--d-ink-3)}
+.drama-title{margin:0;font-size:clamp(38px,4.9vw,74px);line-height:1.06;letter-spacing:-.045em;font-weight:var(--hw);color:#fff;text-wrap:balance}
+.drama-title>span{display:block}
+.drama-lead{margin:22px 0 0;max-width:31em;font-size:clamp(16.5px,1.3vw,19px);line-height:1.72;color:var(--d-ink-2);text-wrap:pretty}
+.drama-no{font-family:var(--mono);font-size:12.5px;letter-spacing:.04em;color:var(--d-me);font-variant-numeric:tabular-nums}
+
+/* 홈 띠: 왼쪽 머리 · 몸, 오른쪽 재생기(900px 아래는 머리 → 재생기 → 몸) */
+.drama-grid{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,6fr);grid-template-areas:'head player' 'body player';column-gap:clamp(40px,6vw,104px);align-items:center}
+.drama-copy-head{grid-area:head;align-self:end}
+.drama-copy-body{grid-area:body;align-self:start}
+.drama-player{grid-area:player}
+.drama-points{list-style:none;margin:34px 0 0;padding:0;border-top:1px solid var(--d-line);max-width:32em}
+.drama-points li{display:grid;grid-template-columns:34px minmax(0,1fr);column-gap:10px;padding:17px 0 18px;border-bottom:1px solid var(--d-line)}
+.drama-points .drama-no{padding-top:5px;grid-row:span 2}
+.drama-points b{font-size:17.5px;line-height:1.45;font-weight:650;color:#fff;letter-spacing:-.01em}
+.drama-points p{margin:4px 0 0;font-size:15px;line-height:1.6;color:var(--d-ink-3);text-wrap:pretty}
+.drama-go{margin:30px 0 0}
+.drama-link{display:inline-flex;align-items:center;gap:8px;color:#fff;font-weight:650;text-decoration:none;border-bottom:1.5px solid currentColor;padding-bottom:2px;line-height:1.3}
+.drama-link .arr{font-family:var(--mono);font-size:14px;transition:transform .2s var(--ease)}
+.drama-link:hover .arr{transform:translateX(3px)}
+
+/* ---------- 장면 재생기 ---------- */
+.dscene{position:relative;display:grid;gap:16px;align-items:start}
+.scene-main{display:grid;gap:14px;min-width:0}
+.scene-stage{position:relative;border-radius:22px;overflow:hidden;background:#000;aspect-ratio:4/5;box-shadow:0 0 0 1px var(--d-line),0 50px 100px -50px rgba(0,0,0,.9)}
+.dscene--compact .scene-stage{aspect-ratio:1/1}
+.scene-frame{position:absolute;inset:0;margin:0}
+.scene-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 40%;opacity:0;transition:opacity .55s var(--ease)}
+.scene-img.is-on{opacity:1}
+.scene-slate{position:absolute;top:14px;left:14px;z-index:2;display:flex;flex-wrap:wrap;gap:6px;margin:0;font-family:var(--mono);font-size:11.5px;letter-spacing:.07em;color:#fff;pointer-events:none}
+.scene-slate>span{padding:6px 10px 5px;border-radius:999px;background:rgba(8,9,12,.66);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);line-height:1.2}
+.scene-rec::before{content:'';display:inline-block;width:7px;height:7px;margin-right:7px;border-radius:50%;background:var(--d-rec);vertical-align:1px}
+/* 슬레이트의 REC 점은 실제로 녹음할 때만 깜박인다(재생 중에는 가만히 — 녹음하는 것처럼 보이지 않게) */
+.dscene.is-recording .scene-rec::before{animation:scene-rec 1.1s steps(2,jump-none) infinite}
+@keyframes scene-rec{50%{opacity:.25}}
+.scene-ctrl{position:absolute;top:12px;right:12px;z-index:3;display:flex;gap:6px}
+.scene-chip{height:32px;padding:0 13px;border:0;border-radius:999px;background:rgba(8,9,12,.66);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);color:#fff;font:inherit;font-size:13px;font-weight:600;cursor:pointer}
+.scene-chip:hover{background:rgba(8,9,12,.85)}
+
+.scene-poster{position:absolute;inset:0;z-index:2;display:flex;flex-direction:column;justify-content:flex-end;padding:clamp(20px,3vw,34px);background:linear-gradient(180deg,rgba(8,9,12,0) 28%,rgba(8,9,12,.55) 55%,rgba(8,9,12,.94) 100%)}
+/* display:flex가 hidden 속성의 display:none을 덮지 않게(같은 무게의 선택자라 뒤에 온 이 파일이 이긴다) */
+.scene-poster[hidden]{display:none}
+.scene-stage:focus{outline:none}
+.scene-stage:focus-visible{outline:2px solid #fafaf9;outline-offset:3px}
+.scene-kicker{margin:0;font-size:13.5px;font-weight:560;color:var(--d-ink-2);letter-spacing:.01em}
+.scene-name{margin:8px 0 20px;font-size:clamp(25px,2.5vw,36px);line-height:1.2;font-weight:650;letter-spacing:-.03em;color:#fff;text-wrap:balance}
+.scene-start{display:flex;flex-wrap:wrap;gap:10px}
+.scene-hint{margin:14px 0 0;font-size:13px;color:var(--d-ink-3)}
+.no-js .scene-start{display:none}
+
+.scene-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:46px;padding:0 18px;border:1px solid rgba(245,245,244,.24);border-radius:999px;background:transparent;color:#fff;font:inherit;font-size:15.5px;font-weight:650;letter-spacing:-.01em;cursor:pointer;transition:background .2s,border-color .2s,transform .2s var(--ease)}
+.scene-btn:hover{border-color:#fff;transform:translateY(-1px)}
+.scene-btn.primary{background:#fafaf9;border-color:#fafaf9;color:#0b0b0d}
+.scene-btn.primary:hover{background:#fff}
+.scene-btn:disabled{opacity:.45;cursor:default;transform:none}
+.scene-dot{width:9px;height:9px;border-radius:50%;background:var(--d-rec)}
+.scene-btn.is-rec{background:var(--d-rec-btn);border-color:var(--d-rec-btn)}
+.dscene.is-recording .scene-btn[data-act="mine"]{visibility:hidden}
+.scene-btn.is-rec .scene-dot{background:#fff;animation:scene-rec 1.1s steps(2,jump-none) infinite}
+
+/* 자막: 무대 아래쪽 */
+.scene-sub{position:absolute;left:0;right:0;bottom:0;z-index:1;padding:64px clamp(18px,3vw,30px) clamp(18px,2.6vw,26px);background:linear-gradient(180deg,rgba(0,0,0,0),rgba(0,0,0,.82) 42%);opacity:0;transform:translateY(6px);transition:opacity .3s,transform .3s var(--ease);pointer-events:none}
+.scene-sub.is-on{opacity:1;transform:none}
+.scene-who{margin:0 0 7px;font-size:12.5px;font-weight:650;letter-spacing:.02em;color:var(--d-ink-3)}
+.scene-sub[data-who="me"] .scene-who{color:var(--d-me)}
+.scene-sub[data-who="director"] .scene-who{color:var(--d-note)}
+.scene-ko{margin:0;font-size:clamp(19px,1.85vw,25px);line-height:1.45;font-weight:640;letter-spacing:-.015em;color:#fff;text-wrap:balance}
+.scene-mean{margin:7px 0 0;font-size:14.5px;line-height:1.5;color:var(--d-ink-3)}
+.scene-mean:empty{display:none}
+
+/* 카드: 내 대사 · 감독 노트 · 끝 */
+.scene-deck{padding:clamp(18px,2.2vw,24px);border-radius:18px;background:var(--d-card);box-shadow:0 0 0 1px var(--d-line)}
+.scene-card-label{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 10px;margin:0;font-size:13px;font-weight:700;letter-spacing:.02em;color:var(--d-me)}
+.scene-card-label span{font-weight:560;color:var(--d-ink-3)}
+.scene-card-label.is-note{color:var(--d-note)}
+.scene-card-label.is-end{font-size:clamp(20px,1.8vw,24px);letter-spacing:-.02em;color:#fff}
+.scene-card-line{margin:10px 0 0;font-size:clamp(20px,1.8vw,24px);line-height:1.45;font-weight:650;letter-spacing:-.02em;color:#fff;text-wrap:balance}
+.scene-card-mean{margin:6px 0 0;font-size:14.5px;line-height:1.5;color:var(--d-ink-3)}
+.scene-acts{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+.scene-card-note{margin:14px 0 0;font-size:12.5px;line-height:1.5;color:var(--d-ink-3)}
+.scene-take{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 12px;margin:12px 0 0;font-size:clamp(19px,1.7vw,22px);line-height:1.45;font-weight:620;color:#fff}
+.scene-take-no{font-family:var(--mono);font-size:11.5px;letter-spacing:.08em;color:var(--d-ink-3);padding:4px 8px;border-radius:6px;background:var(--d-card-2)}
+.scene-miss{display:inline-block;min-width:1.4em;margin-left:2px;padding:0 4px;border:1.5px dashed var(--d-note);border-radius:6px;background:transparent;color:var(--d-note);text-align:center}
+.scene-tip{display:flex;flex-wrap:wrap;gap:4px 10px;margin:12px 0 0;font-size:15px;line-height:1.55;color:var(--d-ink-2)}
+.scene-tip b{color:var(--d-note);font-weight:700}
+.scene-example{margin:12px 0 0;padding-top:12px;border-top:1px solid var(--d-line);font-size:13.5px;line-height:1.55;color:var(--d-ink-2)}
+.scene-end-next{margin:8px 0 0;font-size:15px;color:var(--d-ink-2)}
+
+/* 대본 칸(LAB) — 지금 줄을 밝힌다. 스크립트가 없으면 홈에서도 대본이 글로 보인다. */
+.scene-side{min-width:0}
+.scene-side-label{display:block;margin:0 0 10px;font-size:13px;font-weight:700;letter-spacing:.02em;color:var(--d-ink-3);list-style:none;cursor:default}
+.scene-side-label::-webkit-details-marker{display:none}
+.scene-script{list-style:none;margin:0;padding:0;border-top:1px solid var(--d-line)}
+.scene-script li{border-bottom:1px solid var(--d-line)}
+.scene-script button{display:grid;grid-template-columns:96px minmax(0,1fr);gap:12px;width:100%;padding:11px 4px;border:0;background:none;color:var(--d-ink-3);font:inherit;font-size:15px;line-height:1.5;text-align:left;cursor:pointer;transition:color .2s}
+.scene-script button:disabled{cursor:default}
+.scene-script button:not(:disabled):hover{color:var(--d-ink)}
+.scene-script-who{font-size:12.5px;font-weight:650;padding-top:2px}
+.scene-script li[data-who="me"] .scene-script-who{color:var(--d-me)}
+.scene-script li[data-who="director"] .scene-script-who{color:var(--d-note)}
+.scene-script li[aria-current] button{color:#fff}
+.scene-script li[aria-current] .scene-script-ko{font-weight:650}
+.js .dscene--compact .scene-side{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+.scene-foot{grid-column:1/-1;margin:2px 0 0;font-size:13px;line-height:1.55;color:var(--d-ink-3)}
+
+/* LAB: 머리 · 재생기(무대 + 카드 | 대본) · 다른 점 넷 · 시즌 셋 */
+.drama--lab .drama-head{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:24px 64px;align-items:end;margin-bottom:clamp(36px,4.6vw,60px)}
+.drama--lab .drama-head .drama-lead{margin:0}
+.dscene--full{grid-template-columns:minmax(0,560px) minmax(0,1fr);gap:20px clamp(28px,4vw,56px)}
+.dscene--full .scene-side{padding-top:4px}
+.drama-more{margin-top:clamp(56px,7vw,92px)}
+.drama-more-title{margin:0 0 18px;font-size:13px;font-weight:700;letter-spacing:.02em;color:var(--d-ink-3)}
+.drama-diff,.drama-seasons{list-style:none;margin:0;padding:0;display:grid;gap:0;border-top:1px solid rgba(245,245,244,.4)}
+.drama-diff{grid-template-columns:repeat(4,minmax(0,1fr))}
+.drama-seasons{grid-template-columns:repeat(3,minmax(0,1fr))}
+.drama-diff li,.drama-seasons li{padding:22px 24px 26px 0;border-bottom:1px solid var(--d-line)}
+.drama-diff li+li,.drama-seasons li+li{padding-left:24px;border-left:1px solid var(--d-line)}
+.drama-diff h4,.drama-seasons h4{margin:10px 0 0;font-size:18px;line-height:1.4;font-weight:650;letter-spacing:-.015em;color:#fff;text-wrap:balance}
+.drama-diff p,.drama-seasons p{margin:8px 0 0;font-size:15px;line-height:1.62;color:var(--d-ink-3);text-wrap:pretty}
+.drama-season-no{font-family:var(--mono);font-size:13px;letter-spacing:.06em;color:var(--d-me)}
+.drama-seasons .status{margin-top:14px}
+.drama-note{margin:clamp(36px,4vw,52px) 0 0;max-width:52em;font-size:13.5px;line-height:1.6;color:var(--d-ink-3)}
+
+/* LAB 첫 화면 실물(웹툰 칸)은 4:5 그대로 */
+.p-hero-tall .p-frame img{aspect-ratio:4/5;object-position:50% 30%}
+
+/* LAB #world: 게임 여덟 장 대신 그림 한 장과 다섯 줄 */
+.lab-world{display:grid;grid-template-columns:minmax(0,7fr) minmax(0,5fr);gap:clamp(32px,5vw,72px);align-items:center}
+.lab-world-media{margin:0;border-radius:14px;overflow:hidden;background:var(--stage);box-shadow:0 0 0 1px var(--line)}
+.lab-world-media img{display:block;width:100%;height:auto}
+.lab-world-body .lead{margin-top:18px}
+.lab-world-body .feats{margin:24px 0 26px}
+.lab-world-body .note{margin-top:14px}
+
+/* 홈 아틀라스 판 맨 아래의 원칙 줄(예전 「일하는 방식」 구역) */
+.atlas-rules{margin-top:clamp(32px,4vw,48px);padding-top:22px;border-top:1px solid var(--line);display:grid;grid-template-columns:minmax(0,180px) minmax(0,1fr);gap:12px 32px}
+.atlas-rules-label{margin:0;font-size:14px;font-weight:700;line-height:1.5;color:var(--ink)}
+.atlas-rules ul{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px 28px}
+.atlas-rules li{display:grid;gap:4px;font-size:14px;line-height:1.55;color:var(--ink-3)}
+.atlas-rules b{font-size:15px;font-weight:650;color:var(--ink);line-height:1.45}
+
+@media (max-width:1100px){
+  .drama-diff{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .drama-diff li:nth-child(3){padding-left:0;border-left:0}
+}
+@media (max-width:900px){
+  .drama-grid,.dscene--full,.drama--lab .drama-head,.lab-world{grid-template-columns:minmax(0,1fr)}
+  .drama-grid{grid-template-areas:'head' 'player' 'body';row-gap:36px}
+  .drama-copy-body .drama-points{margin-top:0}
+  /* 휴대폰의 대본 목록은 접어 둔다(drama.js가 연다 · 닫는다 — 스크립트가 없으면 늘 펼침) */
+  .dscene--full .scene-side-label{display:flex;align-items:center;justify-content:space-between;min-height:44px;margin:0;padding:0 2px;border-top:1px solid var(--d-line);cursor:pointer;color:var(--d-ink-2)}
+  .dscene--full .scene-side-label::after{content:'+';font-family:var(--mono);font-size:16px}
+  .dscene--full .scene-side[open] .scene-side-label::after{content:'−'}
+  .drama--lab .drama-head{gap:18px}
+  .dscene--full .scene-stage{max-width:560px}
+  .dscene--full .scene-main{max-width:560px}
+  .drama-seasons{grid-template-columns:minmax(0,1fr)}
+  .drama-seasons li+li{padding-left:0;border-left:0}
+  .atlas-rules,.atlas-rules ul{grid-template-columns:minmax(0,1fr)}
+}
+@media (max-width:640px){
+  .drama-diff{grid-template-columns:minmax(0,1fr)}
+  .drama-diff li+li{padding-left:0;border-left:0}
+  .dscene--compact .scene-stage{aspect-ratio:4/5}
+  .scene-stage{border-radius:16px}
+  .scene-btn{min-height:44px;padding:0 15px;font-size:15px}
+  .scene-script button{grid-template-columns:78px minmax(0,1fr);font-size:14.5px}
+  .scene-poster{padding:18px}
+  /* 재생이 시작되면 오른쪽 위 멈춤 · 처음부터 단추가 슬레이트를 덮지 않게 가운데 칩(시즌 · 화 · 장면)을 감춘다 — 포스터에서는 그대로 */
+  .dscene.is-started .scene-slate>span:nth-child(2){display:none}
+}
+@media (max-width:379px){
+  .dscene.is-started .scene-slate>[data-scene-take]{display:none}
+}
+@media (prefers-reduced-motion:reduce){
+  .scene-img,.scene-sub,.scene-btn,.drama-link .arr{transition:none}
+  .dscene.is-recording .scene-rec::before,.scene-btn.is-rec .scene-dot{animation:none}
+}
