@@ -118,12 +118,17 @@ button,input,textarea{font:inherit;color:inherit}
   .bar-inner{width:100%;justify-content:space-between}
   .bar-nav,.bar-sep,.bar-lang,.bar-cta{display:none}
   .bar-toggle{display:inline-flex}
-  .bar-panel{display:block;position:fixed;inset:70px 10px auto;max-height:calc(100dvh - 86px);overflow:auto;padding:10px;border-radius:26px;
+  /* 상자 바닥은 둥근 모서리(26px)만큼 화면 밖으로 내린다(2026-11-01): 바닥이 보이면 줄 경계에서 잘렸을 때 메뉴가 거기서 끝난 것처럼 보인다(360×640에서 SYNK LAB 줄까지만). 내린 만큼 아래 여백을 더해, 끝까지 내리면 맨 아래 줄이 화면 안에 든다. scroll-padding은 Tab으로 옮겨 간 줄도 화면 안에 들게 한다 */
+  .bar-panel{display:block;position:fixed;inset:70px 10px auto;max-height:calc(100dvh - 44px);overflow:auto;padding:10px 10px 36px;scroll-padding-bottom:36px;border-radius:26px;
     background:rgba(255,255,255,.96);-webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px);border:1px solid rgba(12,12,16,.07);box-shadow:var(--shadow-float);
     opacity:0;transform:translateY(-8px);visibility:hidden;transition:opacity .2s,transform .2s var(--ease),visibility 0s .2s;pointer-events:auto}
   .bar.open .bar-panel{opacity:1;transform:none;visibility:visible;transition:opacity .2s,transform .2s var(--ease)}
   .bar-panel a{display:flex;justify-content:space-between;align-items:center;padding:15px 14px;border-radius:14px;text-decoration:none;font-weight:650;font-size:17px}
   .bar-panel a:hover{background:var(--stage)}
+  /* 덧말 있는 줄(2026-11-01): 이름 아래 회색 둘째 줄. 그 줄만 위아래 여백을 줄여 메뉴가 덜 길어지게(누르는 칸은 60px 남짓) */
+  .bar-panel a.has-sub{padding-block:11px}
+  .bar-panel .panel-text{display:flex;flex-direction:column;gap:3px;min-width:0}
+  .bar-panel .panel-text small{font-size:13.5px;font-weight:500;line-height:1.35;color:var(--ink-3)}
   .bar-panel .panel-group{padding:6px 0;border-top:1px solid var(--line)}
   .bar-panel .panel-group:first-child{border-top:0}
   .bar-panel .panel-label{display:block;padding:10px 14px 4px;font-family:var(--mono);font-size:12px;color:var(--ink-3);letter-spacing:.04em}
