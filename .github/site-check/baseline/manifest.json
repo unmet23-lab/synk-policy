@@ -1,7 +1,7 @@
 {
- "createdAt": "2026-11-01T05:33:58.427Z",
- "commit": "556dc1125f880d8ad029a239b404fe92443ecb81",
- "run": 41276530113,
+ "createdAt": "2026-11-01T07:09:41.513Z",
+ "commit": "9e39d9d1306306cedeb1901c62a6604a6b527203",
+ "run": 41282628001,
  "env": {
   "chromium": "151.0.7922.34",
   "os": "ubuntu24"
@@ -472,15 +472,15 @@
   "/world/": {
    "desktop": {
     "file": "desktop/world.jpg",
-    "sha256": "223905c11731bbbd10f29585982edca5cbeabf3bee1001c70ca992291adb525c",
+    "sha256": "b75931c924f8f7ba13bf4e674f370c6d3f7afa588e5e827fa0c9030433d358e6",
     "cssHeight": 900,
-    "run": 39700254781
+    "run": 41282628001
    },
    "mobile": {
     "file": "mobile/world.jpg",
-    "sha256": "415c43ef62bcf97b17efb2c522835d6e304c9e5853ddffc384b0c6a56101e674",
+    "sha256": "67fe67b96edf8eb2ab9dbe7cdd04a8a27e945c26a170948eec03b5f446dc0cfb",
     "cssHeight": 844,
-    "run": 39700254781
+    "run": 41282628001
    }
   },
   "/world/hangul-stage/": {
