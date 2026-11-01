@@ -1,0 +1,255 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>AI 홈페이지가 다 똑같을 때 · yuhobuilds</title>
+<meta name="description" content="같은 부탁을 일곱 번씩 네 가지로 해 본 실제 화면 28장, 물건 고르는 법, 우리 가게 요청문 만들기. 적은 글은 서버로 보내지 않아요.">
+<meta name="theme-color" content="#060709">
+<script>
+/* 화면 테마: SYNK 플랫폼(웹, 같은 synk.im)에서 고른 밤·낮·기기 설정을 따른다. 고른 적이 없으면 밤(core/signal.css). */
+(function(){var v='night';try{v=localStorage.getItem('synk.platform.theme')||'night'}catch(e){}if(['night','day','system'].indexOf(v)<0)v='night';document.documentElement.setAttribute('data-theme',v);var day=v==='day'||(v==='system'&&window.matchMedia&&matchMedia('(prefers-color-scheme: light)').matches);document.querySelector('meta[name="theme-color"]').setAttribute('content',day?'#ECECEA':'#060709')})();
+</script>
+<link rel="canonical" href="https://synk.im/builds/homepage/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="yuhobuilds">
+<meta property="og:title" content="AI 홈페이지가 다 똑같을 때 · 물건 하나 직접 적기">
+<meta property="og:description" content="같은 부탁을 일곱 번씩 네 가지로 해 본 실제 화면 28장, 물건 고르는 법, 우리 가게 요청문 만들기. 적은 글은 서버로 보내지 않아요.">
+<meta property="og:url" content="https://synk.im/builds/homepage/">
+<meta property="og:image" content="https://synk.im/builds/homepage/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" type="image/png" href="assets/favicon-32.png">
+<link rel="preload" href="assets/SUIT-subset.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="app.css">
+<style>
+/* 이 쪽에만 있는 부품(싱ㅋ 시그널 토큰만 쓴다). 공통 양식은 app.css(core/signal.css). */
+#app{counter-reset:blk}
+section.block{counter-increment:blk;scroll-margin-top:84px}
+section.block>h2 .no::before{content:counter(blk,decimal-leading-zero)}
+.intro h1{font-size:clamp(38px,4.2vw,60px)}
+.intro .meta{margin-bottom:24px}
+.cta{display:flex;flex-wrap:wrap;gap:10px}
+/* 우체통은 세로로 길어서 큰 글자 머리 위에서 끝나게 높이로 맞춘다 */
+.intro .poster.tall .cut{top:8%;right:11%;width:auto;height:62%}
+/* 네 단계: 붙인 말 → 일곱 화면 + 집계 칸 → 한 줄. 몰린 판만 버터 테, 끝 단계엔 테가 없어진다 */
+.round{margin:0;padding:28px 0;border-bottom:1px solid var(--line)}
+.round:first-of-type{padding-top:14px}
+.round:last-of-type{padding-bottom:0;border-bottom:0}
+.round-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.round-no{margin:0 0 2px;font-size:13px;font-weight:550;color:var(--ink-3)}
+.round h3{margin:0;font-size:20px;font-weight:650;line-height:1.35;letter-spacing:-.015em}
+.gray-btn{flex:none;min-height:44px;padding:0 15px;font-size:14px;margin-top:-2px}
+.said{margin:12px 0 14px;padding:12px 16px 13px;border-radius:16px;background:var(--surface-1);box-shadow:inset 0 0 0 1px var(--line);font-size:15.5px;line-height:1.6;color:var(--ink-2);text-wrap:pretty}
+.said b{display:block;margin:0 0 2px;font-size:13px;font-weight:550;color:var(--ink-3)}
+.shots{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:8px}
+.shot{position:relative;display:block;overflow:hidden;border-radius:10px;background:var(--surface-2);box-shadow:0 0 0 1px var(--line)}
+.shot img{width:100%;height:auto;aspect-ratio:3/5;object-fit:cover;object-position:top;transition:filter .18s var(--ease)}
+.shot.on::after{content:"";position:absolute;inset:0;border-radius:inherit;box-shadow:inset 0 0 0 3px var(--led-check);pointer-events:none}
+.shots.gray img{filter:grayscale(1)}
+@media(forced-colors:active){.shot.on{outline:3px solid Highlight;outline-offset:-3px}}
+.tally{display:flex;flex-direction:column;justify-content:flex-end;gap:4px;min-width:0;padding:10px;border-radius:10px;background:var(--surface-2);box-shadow:inset 0 0 0 1px var(--line-2)}
+.tally b{font-size:30px;font-weight:680;line-height:1;letter-spacing:-.03em;font-variant-numeric:tabular-nums}
+.tally span{font-size:13px;font-weight:550;line-height:1.3;color:var(--ink-2)}
+.tally.win{background:var(--studio),var(--face);color:var(--on-face);box-shadow:inset 0 1px 0 rgba(255,255,255,.16)}
+.tally.win span{color:var(--on-face)}
+.read{margin:12px 0 0;font-size:15.5px;line-height:1.6;color:var(--ink);text-wrap:pretty}
+/* 물건 고르는 법: 기준 셋 + 실제 물건 일곱 + 만들기로 가는 칸 */
+.rules{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:0;padding:0;list-style:none;counter-reset:rule}
+.rules li{counter-increment:rule;padding:18px 20px;border-radius:var(--r-lg);background:var(--surface-1);box-shadow:inset 0 0 0 1px var(--line)}
+.rules li::before{content:counter(rule,decimal-leading-zero);display:block;margin:0 0 10px;font:500 11.5px/1 var(--mono);letter-spacing:.08em;color:var(--ink-3)}
+.rules b{display:block;font-size:17px;font-weight:600;line-height:1.35;letter-spacing:-.01em}
+.rules p{margin:6px 0 0;font-size:15px;line-height:1.6;color:var(--ink-2);text-wrap:pretty}
+.picks{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:14px 0 0;padding:0;list-style:none}
+.pick{display:flex;flex-direction:column;height:100%;overflow:hidden;border-radius:18px;background:var(--surface-1);box-shadow:inset 0 0 0 1px var(--line);color:var(--ink);text-decoration:none}
+.pick img{width:100%;height:auto;aspect-ratio:4/5;object-fit:cover;object-position:top}
+.pick b{display:block;padding:12px 14px 0;font-size:15.5px;font-weight:600;line-height:1.4;letter-spacing:-.01em}
+.pick span{display:block;padding:2px 14px 14px;font-size:13px;color:var(--ink-3)}
+.pick.go{justify-content:flex-end;gap:6px;padding:16px;background:var(--ink);color:var(--on-ink);box-shadow:none}
+.pick.go b{padding:0;font-size:17px;font-weight:650}
+.pick.go span{padding:0;font-size:14px;color:inherit;opacity:.72}
+/* 요청문 만들기 */
+.maker{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px 14px}
+.fld{min-width:0}
+.fld label{display:block;margin:0 0 8px;font-size:15.5px;font-weight:600}
+.fld input{display:block;width:100%;min-height:52px;padding:0 16px;border:0;border-radius:14px;background:var(--surface-1);box-shadow:inset 0 0 0 1px var(--line-2);font-size:16px}
+.fld input::placeholder{color:var(--ink-3)}
+.fld input:focus{outline:2px solid var(--tint);outline-offset:1px}
+.fld .hint{margin:10px 0 0}
+.kinds{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0 0}
+.kinds .chip{padding:0 14px;font-size:14px}
+.maker .copybox{grid-column:1 / -1;margin:0}
+.maker .copybox textarea{min-height:128px;resize:none}
+@supports not (field-sizing:content){.maker .copybox textarea{min-height:176px}}
+.maker .status{flex:1 1 180px}
+.maker .privacy{grid-column:1 / -1;display:flex;align-items:flex-start;gap:9px;margin:0;font-size:14px;color:var(--ink-3)}
+.maker .privacy::before{content:"";flex:none;width:7px;height:7px;margin-top:8px;border-radius:50%;background:var(--led-ok);box-shadow:0 0 0 3px rgba(125,180,90,.22)}
+/* 조건과 한계 */
+dl.facts{display:grid;gap:0;margin:0}
+dl.facts>div{display:grid;grid-template-columns:150px minmax(0,1fr);gap:16px;padding:14px 0;border-top:1px solid var(--line)}
+dl.facts>div:first-child{border-top:0;padding-top:6px}
+dl.facts dt{font-size:15px;font-weight:600;color:var(--ink)}
+dl.facts dd{margin:0;max-width:66ch;font-size:15.5px;line-height:1.66;color:var(--ink-2);text-wrap:pretty}
+.links{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:18px 0 0;padding:0;list-style:none}
+.links a{display:flex;flex-direction:column;gap:4px;height:100%;padding:16px 18px;border-radius:18px;background:var(--surface-1);box-shadow:inset 0 0 0 1px var(--line);text-decoration:none}
+.links b{font-size:15.5px;font-weight:650}
+.links span{font-size:14px;color:var(--ink-3)}
+/* 크게 보기 */
+.lb{width:min(100vw,460px);max-width:100vw;max-height:100dvh;margin:auto;padding:0;border:0;background:transparent;color:#FAFAF9;overflow:hidden}
+.lb::backdrop{background:rgba(6,7,9,.95)}
+.lb figure{display:flex;flex-direction:column;align-items:center;gap:10px;margin:0;padding:calc(12px + env(safe-area-inset-top,0px)) 16px calc(12px + env(safe-area-inset-bottom,0px))}
+/* 그림 밖 칸(위아래 여백 · 캡션 두 줄 · 단추 줄 · 홈 막대)을 다 빼고 남는 높이만 그림에 준다 */
+.lb img{width:auto;max-width:100%;height:auto;max-height:calc(100vh - 150px);max-height:calc(100dvh - 150px - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px));aspect-ratio:390/844;border-radius:12px;background:#121317}
+.lb figcaption{min-height:1.5em;font-size:14px;font-weight:550;text-align:center}
+.lb-bar{display:flex;gap:8px;width:100%}
+.lb-bar button{flex:1;min-height:48px;border:0;border-radius:999px;background:rgba(255,255,255,.1);color:#FAFAF9;font-size:15px;font-weight:600}
+.lb-bar [data-close]{background:#FAFAF9;color:#08090C}
+@media(hover:hover){.shot:hover,.pick:hover{box-shadow:0 0 0 1px var(--ink-4)}.links a:hover{box-shadow:inset 0 0 0 1px var(--line-2);background:var(--surface-2)}}
+@media(prefers-reduced-motion:reduce){.shot img{transition:none}}
+@media(max-width:880px){.rules{grid-template-columns:minmax(0,1fr)}.links{grid-template-columns:minmax(0,1fr)}}
+/* 휴대폰: 포스터는 낮은 띠로, 화면은 4칸 두 줄(집계가 여덟째 칸) */
+@media(max-width:760px){
+  .intro .poster.tall{min-height:196px;--word-scale:44cqw}
+  .intro .poster.tall .cut{top:6%;right:5%;width:auto;height:88%}
+  .intro .poster .led-chip{display:none}
+  .intro h1{margin:12px 0 16px}
+  .shots{grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
+  .picks{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .maker{grid-template-columns:minmax(0,1fr)}
+}
+@media(max-width:560px){
+  .tool{padding-left:8px;padding-right:8px}
+  .tool>main{padding:22px 14px 26px}
+  .tally{padding:8px}
+  .rules li{padding:14px 16px}
+  .rules li::before{margin-bottom:6px}
+  .tally b{font-size:24px}
+  dl.facts>div{grid-template-columns:minmax(0,1fr);gap:4px}
+  .cta .btn{flex:1 1 0;padding:0 16px}
+  .intro .meta{display:none}
+  .intro .lead{margin-bottom:20px}
+}
+@media print{.bar,.gray-btn,.lb{display:none}.maker .copybox textarea{display:block!important}}
+</style>
+</head>
+<body>
+<div class="tool">
+  <header class="bar">
+    <a class="brand" href="https://synk.im/builds/" aria-label="yuhobuilds 맞춤 프로그램 모음">
+      <span class="bead"><img src="assets/brand-shift.webp" alt="synk SHIFT" width="88" height="24"></span>
+      <span class="crumb" aria-hidden="true">yuhobuilds <i>/</i> homepage</span>
+    </a>
+  </header>
+  <main id="app">
+    <section class="intro">
+      <div>
+        <p class="eyebrow">Homepage</p>
+        <h1 tabindex="-1">AI 홈페이지가 다 똑같을 때<br><span class="hl">물건 하나 직접 적기</span></h1>
+        <p class="lead">같은 부탁을 일곱 번씩, 네 가지로 해 본 실제 화면이에요. 어디서 몰렸고 언제 풀렸는지 보고, 우리 가게 요청문까지 만들어 가세요.</p>
+        <ul class="meta" aria-label="이 화면에 든 것">
+          <li>실제 화면 28장</li>
+          <li>물건 고르는 법</li>
+          <li>요청문 만들기</li>
+          <li>PDF 한 장</li>
+        </ul>
+        <div class="cta">
+          <a class="btn primary" href="#make">요청문 만들기</a>
+          <a class="btn soft" href="guide.pdf" download="AI홈페이지_물건하나_자료.pdf">PDF 받기</a>
+        </div>
+      </div>
+      <div class="art">
+        <div class="poster tall" data-word="물건" style="--len:2">
+          <span class="label">One object</span>
+          <span class="led-chip">실제 화면</span>
+          <img class="cut" src="assets/homepage-art-intro.webp" alt="" width="502" height="900">
+        </div>
+      </div>
+    </section>
+
+    <section class="block" aria-labelledby="h-rounds">
+      <h2 id="h-rounds"><span class="no"></span>이렇게 됐어요</h2>
+      <p class="sub">빵집 · 필라테스 · 세무사 두 번씩과 꽃집까지, 같은 일곱 판에 부탁만 바꿨어요. 노란 테가 둘러진 화면이 한쪽으로 몰린 판이에요. 화면을 누르면 크게 볼 수 있어요.</p>
+      <article class="round" id="s1">
+        <div class="round-head"><div><p class="round-no">1단계</p><h3>그냥 맡기기</h3></div><button type="button" class="chip gray-btn" data-gray="grid-s1" aria-pressed="false">색 빼고 보기</button></div>
+        <p class="said"><b>끝에 붙인 말</b>아무 말도 붙이지 않았어요.</p>
+        <div class="shots" id="grid-s1"><a class="shot on" href="shots/s1/flower-1-l.webp" data-open="s1" data-cap="1단계 · 꽃집" data-alt="1단계 · 꽃집 실제 화면, 한쪽으로 몰린 판"><img src="shots/s1/flower-1.webp" alt="1단계 · 꽃집 실제 화면, 한쪽으로 몰린 판" width="240" height="519" loading="lazy" decoding="async"></a><a class="shot on" href="shots/s1/bakery-1-l.webp" data-open="s1" data-cap="1단계 · 빵집 ①" data-alt="1단계 · 빵집 ① 실제 화면, 한쪽으로 몰린 판"><img src="shots/s1/bakery-1.webp" alt="1단계 · 빵집 ① 실제 화면, 한쪽으로 몰린 판" width="240" height="519" loading="lazy" decoding="async"></a><a class="shot on" href="shots/s1/bakery-2-l.webp" data-open="s1" data-cap="1단계 · 빵집 ②" data-alt="1단계 · 빵집 ② 실제 화면, 한쪽으로 몰린 판"><img src="shots/s1/bakery-2.webp" alt="1단계 · 빵집 ② 실제 화면, 한쪽으로 몰린 판" width="240" height="519" loading="lazy" decoding="async"></a><a class="shot on" href="shots/s1/tax-1-l.webp" data-open="s1" data-cap="1단계 · 세무사 ①" data-alt="1단계 · 세무사 ① 실제 화면, 한쪽으로 몰린 판"><img src="shots/s1/tax-1.webp" alt="1단계 · 세무사 ① 실제 화면, 한쪽으로 몰린 판" width="240" height="519" loading="lazy" decoding="async"></a><a class="shot on" href="shots/s1/tax-2-l.webp" data-open="s1" data-cap="1단계 · 세무사 ②" data-alt="1단계 · 세무사 ② 실제 화면, 한쪽으로 몰린 판"><img src="shots/s1/tax-2.webp" alt="1단계 · 세무사 ② 실제 화면, 한쪽으로 몰린 판" width="240" height="519" loading="lazy" decoding="async"></a><a class="shot on" href="shots/s1/pilates-1-l.webp" data-open="s1" data-cap="1단계 · 필라테스 ①" data-alt="1단계 · 필라테스 ① 실제 화면, 한쪽으로 몰린 판"><img src="shots/s1/pilates-1.webp" alt="1단계 · 필라테스 ① 실제 화면, 한쪽으로 몰린 판" width="240" height="519" loading="lazy" decoding="async"></a><a class="shot on" href="shots/s1/pilates-2-l.webp" data-open="s1" data-cap="1단계 · 필라테스 ②" data-alt="1단계 · 필라테스 ② 실제 화면, 한쪽으로 몰린 판"><img src="shots/s1/pilates-2.webp" alt="1단계 · 필라테스 ② 실제 화면, 한쪽으로 몰린 판" width="240" height="519" loading="lazy" decoding="async"></a><div class="tally"><b>7/7</b><span>같은 틀</span></div></div>
+        <p class="read">색만 다르고 순서가 같아요. 큰 제목, 설명 한두 줄, 단추, 그 아래 그림이나 카드.</p>
+      </article>
+      <article class="round" id="s2">
+        <div class="round-head"><div><p class="round-no">2단계</p><h3>물건을 AI가 고르게</h3></div></div>
+        <p class="said"><b>끝에 붙인 말</b>「먼저 이 가게에 어울리는 실제 물건 하나(간판, 포장지, 메뉴판 같은)를 정하고, 그 물건의 색과 글씨로 화면을 만들어 줘.」</p>
+        <div class="shots" id="grid-s2"><a class="shot on" href="shots/s2/flower-1-l.webp" data-open="s2" data-cap="2단계 · 꽃집" data-alt="2단계 · 꽃집 실제 화면, 한쪽으로 몰린 판"><img src="shots/s2/flower-1.webp" alt="2단계 · 꽃집 실제 화면, 한쪽으로 몰린 판" width="240" height="519" loading="lazy" decoding="async"></a><a class="shot on" href="shots/s2/bakery-1-l.webp" data-open="s2" data-cap="2단계 · 빵집 ①" data-alt="2단계 · 빵집 ① 실제 화면, 한쪽으로 몰린 판"><img src="shots/s2/bakery-1.webp" alt="2단계 · 빵집 ① 실제 화면, 한쪽으로 몰린 판" width="240" height="519" loading="lazy" decoding="async"></a><a class="shot on" href="shots/s2/bakery-2-l.webp" data-open="s2" data-cap="2단계 · 빵집 ②" data-alt="2단계 · 빵집 ② 실제 화면, 한쪽으로 몰린 판"><img src="shots/s2/bakery-2.webp" alt="2단계 · 빵집 ② 실제 화면, 한쪽으로 몰린 판" width="240" height="519" loading="lazy" decoding="async"></a><a class="shot on" href="shots/s2/tax-1-l.webp" data-open="s2" data-cap="2단계 · 세무사 ①" data-alt="2단계 · 세무사 ① 실제 화면, 한쪽으로 몰린 판"><img src="shots/s2/tax-1.webp" alt="2단계 · 세무사 ① 실제 화면, 한쪽으로 몰린 판" width="240" height="519" loading="lazy" decoding="async"></a><a class="shot" href="shots/s2/tax-2-l.webp" data-open="s2" data-cap="2단계 · 세무사 ②" data-alt="2단계 · 세무사 ② 실제 화면"><img src="shots/s2/tax-2.webp" alt="2단계 · 세무사 ② 실제 화면" width="240" height="519" loading="lazy" decoding="async"></a><a class="shot on" href="shots/s2/pilates-1-l.webp" data-open="s2" data-cap="2단계 · 필라테스 ①" data-alt="2단계 · 필라테스 ① 실제 화면, 한쪽으로 몰린 판"><img src="shots/s2/pilates-1.webp" alt="2단계 · 필라테스 ① 실제 화면, 한쪽으로 몰린 판" width="240" height="519" loading="lazy" decoding="async"></a><a class="shot on" href="shots/s2/pilates-2-l.webp" data-open="s2" data-cap="2단계 · 필라테스 ②" data-alt="2단계 · 필라테스 ② 실제 화면, 한쪽으로 몰린 판"><img src="shots/s2/pilates-2.webp" alt="2단계 · 필라테스 ② 실제 화면, 한쪽으로 몰린 판" width="240" height="519" loading="lazy" decoding="async"></a><div class="tally"><b>6/7</b><span>종이 · 크라프트</span></div></div>
+        <p class="read">틀은 달라졌는데, 이번엔 누런 종이 느낌으로 몰렸어요.</p>
+      </article>
+      <article class="round" id="s3">
+        <div class="round-head"><div><p class="round-no">3단계</p><h3>「종이는 빼고」 더하기</h3></div></div>
+        <p class="said"><b>끝에 붙인 말</b>「단, 종이·크라프트 느낌은 빼고.」</p>
+        <div class="shots" id="grid-s3"><a class="shot on" href="shots/s3/flower-1-l.webp" data-open="s3" data-cap="3단계 · 꽃집" data-alt="3단계 · 꽃집 실제 화면, 한쪽으로 몰린 판"><img src="shots/s3/flower-1.webp" alt="3단계 · 꽃집 실제 화면, 한쪽으로 몰린 판" width="240" height="519" loading="lazy" decoding="async"></a><a class="shot on" href="shots/s3/bakery-1-l.webp" data-open="s3" data-cap="3단계 · 빵집 ①" data-alt="3단계 · 빵집 ① 실제 화면, 한쪽으로 몰린 판"><img src="shots/s3/bakery-1.webp" alt="3단계 · 빵집 ① 실제 화면, 한쪽으로 몰린 판" width="240" height="519" loading="lazy" decoding="async"></a><a class="shot on" href="shots/s3/bakery-2-l.webp" data-open="s3" data-cap="3단계 · 빵집 ②" data-alt="3단계 · 빵집 ② 실제 화면, 한쪽으로 몰린 판"><img src="shots/s3/bakery-2.webp" alt="3단계 · 빵집 ② 실제 화면, 한쪽으로 몰린 판" width="240" height="519" loading="lazy" decoding="async"></a><a class="shot on" href="shots/s3/tax-1-l.webp" data-open="s3" data-cap="3단계 · 세무사 ①" data-alt="3단계 · 세무사 ① 실제 화면, 한쪽으로 몰린 판"><img src="shots/s3/tax-1.webp" alt="3단계 · 세무사 ① 실제 화면, 한쪽으로 몰린 판" width="240" height="519" loading="lazy" decoding="async"></a><a class="shot on" href="shots/s3/tax-2-l.webp" data-open="s3" data-cap="3단계 · 세무사 ②" data-alt="3단계 · 세무사 ② 실제 화면, 한쪽으로 몰린 판"><img src="shots/s3/tax-2.webp" alt="3단계 · 세무사 ② 실제 화면, 한쪽으로 몰린 판" width="240" height="519" loading="lazy" decoding="async"></a><a class="shot" href="shots/s3/pilates-1-l.webp" data-open="s3" data-cap="3단계 · 필라테스 ①" data-alt="3단계 · 필라테스 ① 실제 화면"><img src="shots/s3/pilates-1.webp" alt="3단계 · 필라테스 ① 실제 화면" width="240" height="519" loading="lazy" decoding="async"></a><a class="shot" href="shots/s3/pilates-2-l.webp" data-open="s3" data-cap="3단계 · 필라테스 ②" data-alt="3단계 · 필라테스 ② 실제 화면"><img src="shots/s3/pilates-2.webp" alt="3단계 · 필라테스 ② 실제 화면" width="240" height="519" loading="lazy" decoding="async"></a><div class="tally"><b>5/7</b><span>짙은 초록 · 금색</span></div></div>
+        <p class="read">하나를 막으니 다른 한쪽으로 옮겨 갔어요.</p>
+      </article>
+      <article class="round" id="s4">
+        <div class="round-head"><div><p class="round-no">4단계</p><h3>물건을 직접 정해 주기</h3></div></div>
+        <p class="said"><b>끝에 붙인 말</b>「우리 가게 ○○의 색과 글씨로 화면을 만들어 줘.」</p>
+        <div class="shots" id="grid-s4"><a class="shot" href="shots/s4/flower-1-l.webp" data-open="s4" data-cap="4단계 · 꽃집 · 하늘색 양철 물뿌리개" data-alt="4단계 · 꽃집 · 하늘색 양철 물뿌리개 실제 화면"><img src="shots/s4/flower-1.webp" alt="4단계 · 꽃집 · 하늘색 양철 물뿌리개 실제 화면" width="240" height="519" loading="lazy" decoding="async"></a><a class="shot" href="shots/s4/bakery-1-l.webp" data-open="s4" data-cap="4단계 · 빵집 ① · 가게 앞 파란 줄무늬 차양" data-alt="4단계 · 빵집 ① · 가게 앞 파란 줄무늬 차양 실제 화면"><img src="shots/s4/bakery-1.webp" alt="4단계 · 빵집 ① · 가게 앞 파란 줄무늬 차양 실제 화면" width="240" height="519" loading="lazy" decoding="async"></a><a class="shot" href="shots/s4/bakery-2-l.webp" data-open="s4" data-cap="4단계 · 빵집 ② · 계산대 옆 노란 플라스틱 빵 바구니" data-alt="4단계 · 빵집 ② · 계산대 옆 노란 플라스틱 빵 바구니 실제 화면"><img src="shots/s4/bakery-2.webp" alt="4단계 · 빵집 ② · 계산대 옆 노란 플라스틱 빵 바구니 실제 화면" width="240" height="519" loading="lazy" decoding="async"></a><a class="shot" href="shots/s4/tax-1-l.webp" data-open="s4" data-cap="4단계 · 세무사 ① · 문 앞 빨간 우체통" data-alt="4단계 · 세무사 ① · 문 앞 빨간 우체통 실제 화면"><img src="shots/s4/tax-1.webp" alt="4단계 · 세무사 ① · 문 앞 빨간 우체통 실제 화면" width="240" height="519" loading="lazy" decoding="async"></a><a class="shot" href="shots/s4/tax-2-l.webp" data-open="s4" data-cap="4단계 · 세무사 ② · 회색 철제 서류함" data-alt="4단계 · 세무사 ② · 회색 철제 서류함 실제 화면"><img src="shots/s4/tax-2.webp" alt="4단계 · 세무사 ② · 회색 철제 서류함 실제 화면" width="240" height="519" loading="lazy" decoding="async"></a><a class="shot" href="shots/s4/pilates-1-l.webp" data-open="s4" data-cap="4단계 · 필라테스 ① · 주황색 요가 매트" data-alt="4단계 · 필라테스 ① · 주황색 요가 매트 실제 화면"><img src="shots/s4/pilates-1.webp" alt="4단계 · 필라테스 ① · 주황색 요가 매트 실제 화면" width="240" height="519" loading="lazy" decoding="async"></a><a class="shot" href="shots/s4/pilates-2-l.webp" data-open="s4" data-cap="4단계 · 필라테스 ② · 입구의 분홍 네온 간판" data-alt="4단계 · 필라테스 ② · 입구의 분홍 네온 간판 실제 화면"><img src="shots/s4/pilates-2.webp" alt="4단계 · 필라테스 ② · 입구의 분홍 네온 간판 실제 화면" width="240" height="519" loading="lazy" decoding="async"></a><div class="tally win"><b>7/7</b><span>그 물건대로</span></div></div>
+        <p class="read">일곱 번 다 준 물건을 따랐고, 초록 · 금색으로 몰린 판은 하나도 없었어요.</p>
+      </article>
+    </section>
+
+    <section class="block" aria-labelledby="h-pick">
+      <h2 id="h-pick"><span class="no"></span>물건 고르는 법</h2>
+      <p class="sub">「우리 가게 ○○」의 ○○ 자리에 넣을 물건이에요. 이 세 가지만 보면 돼요.</p>
+      <ol class="rules"><li><b>가게에 실제로 있는 것</b><p>지어내지 말고 가게에 있는 물건에서 골라요. 차양, 바구니, 간판, 매트처럼요.</p></li><li><b>색이 또렷한 것</b><p>「파란 줄무늬」, 「분홍 네온」처럼 색을 말로 적을 수 있는 물건이요. 일곱 번 다 색을 같이 적었어요.</p></li><li><b>하나만</b><p>여럿을 늘어놓지 않고 물건 하나만 적어요. 일곱 번 다 하나씩만 줬어요.</p></li></ol>
+      <ul class="picks" aria-label="일곱 판에 정해 준 물건"><li><a class="pick" href="shots/s4/flower-1-l.webp" data-open="picks" data-cap="꽃집 · 하늘색 양철 물뿌리개" data-alt="꽃집 실제 화면, 정해 준 물건은 하늘색 양철 물뿌리개"><img src="shots/s4/flower-1-l.webp" alt="꽃집 실제 화면, 정해 준 물건은 하늘색 양철 물뿌리개" width="585" height="1266" loading="lazy" decoding="async"><b>하늘색 양철 물뿌리개</b><span>꽃집</span></a></li><li><a class="pick" href="shots/s4/bakery-1-l.webp" data-open="picks" data-cap="빵집 ① · 가게 앞 파란 줄무늬 차양" data-alt="빵집 ① 실제 화면, 정해 준 물건은 가게 앞 파란 줄무늬 차양"><img src="shots/s4/bakery-1-l.webp" alt="빵집 ① 실제 화면, 정해 준 물건은 가게 앞 파란 줄무늬 차양" width="585" height="1266" loading="lazy" decoding="async"><b>가게 앞 파란 줄무늬 차양</b><span>빵집 ①</span></a></li><li><a class="pick" href="shots/s4/bakery-2-l.webp" data-open="picks" data-cap="빵집 ② · 계산대 옆 노란 플라스틱 빵 바구니" data-alt="빵집 ② 실제 화면, 정해 준 물건은 계산대 옆 노란 플라스틱 빵 바구니"><img src="shots/s4/bakery-2-l.webp" alt="빵집 ② 실제 화면, 정해 준 물건은 계산대 옆 노란 플라스틱 빵 바구니" width="585" height="1266" loading="lazy" decoding="async"><b>계산대 옆 노란 플라스틱 빵 바구니</b><span>빵집 ②</span></a></li><li><a class="pick" href="shots/s4/tax-1-l.webp" data-open="picks" data-cap="세무사 ① · 문 앞 빨간 우체통" data-alt="세무사 ① 실제 화면, 정해 준 물건은 문 앞 빨간 우체통"><img src="shots/s4/tax-1-l.webp" alt="세무사 ① 실제 화면, 정해 준 물건은 문 앞 빨간 우체통" width="585" height="1266" loading="lazy" decoding="async"><b>문 앞 빨간 우체통</b><span>세무사 ①</span></a></li><li><a class="pick" href="shots/s4/tax-2-l.webp" data-open="picks" data-cap="세무사 ② · 회색 철제 서류함" data-alt="세무사 ② 실제 화면, 정해 준 물건은 회색 철제 서류함"><img src="shots/s4/tax-2-l.webp" alt="세무사 ② 실제 화면, 정해 준 물건은 회색 철제 서류함" width="585" height="1266" loading="lazy" decoding="async"><b>회색 철제 서류함</b><span>세무사 ②</span></a></li><li><a class="pick" href="shots/s4/pilates-1-l.webp" data-open="picks" data-cap="필라테스 ① · 주황색 요가 매트" data-alt="필라테스 ① 실제 화면, 정해 준 물건은 주황색 요가 매트"><img src="shots/s4/pilates-1-l.webp" alt="필라테스 ① 실제 화면, 정해 준 물건은 주황색 요가 매트" width="585" height="1266" loading="lazy" decoding="async"><b>주황색 요가 매트</b><span>필라테스 ①</span></a></li><li><a class="pick" href="shots/s4/pilates-2-l.webp" data-open="picks" data-cap="필라테스 ② · 입구의 분홍 네온 간판" data-alt="필라테스 ② 실제 화면, 정해 준 물건은 입구의 분홍 네온 간판"><img src="shots/s4/pilates-2-l.webp" alt="필라테스 ② 실제 화면, 정해 준 물건은 입구의 분홍 네온 간판" width="585" height="1266" loading="lazy" decoding="async"><b>입구의 분홍 네온 간판</b><span>필라테스 ②</span></a></li><li><a class="pick go" href="#make"><b>우리 가게 물건으로</b><span>요청문 만들기로 가기</span></a></li></ul>
+    </section>
+
+    <section class="block" id="make" aria-labelledby="h-make">
+      <h2 id="h-make"><span class="no"></span>요청문 만들기</h2>
+      <p class="sub">업종과 물건을 적으면 요청문이 완성돼요. 복사해서 채팅 AI 새 대화에 붙여 넣으세요.</p>
+      <form class="maker" data-make data-template="{업종} 홈페이지 첫 화면을 만들어 줘. HTML 파일 하나로. 우리 가게 {물건}의 색과 글씨로 화면을 만들어 줘." data-msg-empty="업종과 물건을 적으면 복사할 수 있어요." data-msg-done="복사했어요. 채팅 AI 새 대화에 붙여 넣으세요." data-msg-fail="복사하지 못했어요. 위 글을 길게 눌러 복사해 주세요." autocomplete="off">
+        <div class="fld">
+          <label for="make-kind">어떤 가게인가요?</label>
+          <input id="make-kind" name="kind" type="text" maxlength="40" placeholder="1인 세무사 사무실" enterkeyhint="next">
+          <div class="kinds" role="group" aria-label="업종 예시"><button type="button" class="chip" data-kind="동네 빵집" aria-pressed="false">동네 빵집</button><button type="button" class="chip" data-kind="동네 꽃집" aria-pressed="false">동네 꽃집</button><button type="button" class="chip" data-kind="필라테스 학원" aria-pressed="false">필라테스 학원</button><button type="button" class="chip" data-kind="1인 세무사 사무실" aria-pressed="false">1인 세무사 사무실</button></div>
+        </div>
+        <div class="fld">
+          <label for="make-object">가게의 어떤 물건인가요?</label>
+          <input id="make-object" name="object" type="text" maxlength="60" placeholder="문 앞 빨간 우체통" enterkeyhint="done">
+          <p class="hint">색까지 같이 적어 주세요.</p>
+        </div>
+        <div class="copybox main">
+          <label for="make-out">완성된 요청문</label>
+          <textarea id="make-out" data-out readonly>【업종】 홈페이지 첫 화면을 만들어 줘. HTML 파일 하나로. 우리 가게 【물건】의 색과 글씨로 화면을 만들어 줘.</textarea>
+          <div class="row"><button type="button" class="btn primary" data-copy disabled>요청문 복사</button><span class="status" data-status role="status"></span></div>
+        </div>
+        <p class="privacy">적은 글은 이 화면 안에만 있어요. 서버로 보내지도, 저장하지도 않아요.</p>
+      </form>
+    </section>
+
+    <section class="block" aria-labelledby="h-limit">
+      <h2 id="h-limit"><span class="no"></span>해 본 조건과 한계</h2>
+      <dl class="facts"><div><dt>확인한 것</dt><dd>AI 하나, 대화 기록 없는 새 창, 일곱 판, 판마다 한 번씩이에요. 그 안에서 화면이 한쪽으로 몰리던 것이 물건을 정해 주자 사라졌어요. 여기까지가 확인한 전부예요.</dd></div><div><dt>해 본 날</dt><dd>1 · 2단계는 10월 25일, 3 · 4단계는 10월 31일에 돌렸어요. 그사이 AI가 새 판으로 바뀌었을 수 있어요.</dd></div><div><dt>해 보지 않은 것</dt><dd>다른 AI에서는 해 보지 않았어요. 이 화면을 쓴 뒤 손님이나 매출이 어떻게 달라지는지도 재지 않았어요.</dd></div><div><dt>물건을 준 방식</dt><dd>일곱 물건은 실험을 위해 우리가 정해 준 예시이고, 판마다 다르게 줬어요. 그러니 결과가 서로 다른 건 어느 정도 당연해요. 우리가 본 것은 「준 물건을 따르나, 또 한쪽으로 돌아가나」예요.</dd></div><div><dt>왜 몰리나</dt><dd>실험으로 밝힌 게 아니에요. 따로 말하지 않으면 흔하고 무난한 쪽을 고르는 것 같다는 건 우리 추측이에요.</dd></div><div><dt>새 창의 뜻</dt><dd>우리 작업 컴퓨터 안에서 판마다 새로 띄워 돌렸어요. 저장소 규칙은 무시하도록 막았지만, 아무것도 없는 대화와 완전히 같다고 장담하지는 못해요.</dd></div><div><dt>화면 속 글</dt><dd>가게 이름과 전화번호는 AI가 지어낸 예시예요. 사람 이름처럼 보이는 글자는 흐렸어요.</dd></div></dl>
+      <ul class="links">
+        <li><a href="guide.pdf" download="AI홈페이지_물건하나_자료.pdf"><b>PDF로 받기</b><span>이 화면과 같은 내용 한 장</span></a></li>
+        <li><a href="https://synk.im/prompts/#my-object-homepage"><b>프롬프트 모음에서 보기</b><span>같은 요청문을 빈칸 꼴로 복사해 가는 곳</span></a></li>
+        <li><a href="https://synk.im/builds/"><b>다른 맞춤 프로그램</b><span>영상에서 본 프로그램 모음</span></a></li>
+      </ul>
+    </section>
+  </main>
+  <footer class="foot">
+    <span>yuhobuilds · 유호 · AI와 회사 만들기</span>
+    <span><a href="https://www.instagram.com/yuhobuilds/" target="_blank" rel="noopener">Instagram</a> · <a href="https://www.youtube.com/@yuhobuilds" target="_blank" rel="noopener">YouTube</a></span>
+  </footer>
+  <dialog class="lb" data-box aria-label="화면 크게 보기">
+    <figure>
+      <img alt="" width="390" height="844">
+      <figcaption></figcaption>
+      <div class="lb-bar"><button type="button" data-prev>이전</button><button type="button" data-next>다음</button><button type="button" data-close>닫기</button></div>
+    </figure>
+  </dialog>
+</div>
+<noscript><p style="max-width:680px;margin:40px auto;padding:0 20px;font-size:17px">요청문 만들기는 브라우저 안에서 돌아요. 자바스크립트를 켜 주세요.</p></noscript>
+<script src="request.js"></script>
+<script src="view.js"></script>
+</body>
+</html>
