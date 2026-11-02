@@ -17,7 +17,7 @@
 //  · 학습 기록(Atlas Trail, 응답 꼴 spoken, 11-02): 차례마다 보임 하나 · 테이크마다 시도 하나(atlas-learning.js). WORLD 계정 학습 호스트가
 //    있을 때만 남고, 호스트는 학습 기록 동의가 켜진 계정에서만 보낸다 — 없으면 아무것도 남지 않는다. 받아 적은 글 · 소리는 넣지 않고,
 //    「혼자 해 봄」 여부는 서버가 테이크 응답의 trail로 정한다.
-import { STR, endingFix } from './strings.mjs?v=f99bd61dd91f';
+import { STR, endingFix } from './strings.mjs?v=42e62b406369';
 import { newAttemptState, resetAttempts, beginTake, talkObservation, nextCount, settleTake } from './takes.mjs?v=bdb4c66179eb';
 
 const $ = (id) => document.getElementById(id);
@@ -51,7 +51,7 @@ const FALLBACK = {
   noteOther: { text: '이 장면을 다시 해 볼까요?', audio: null },
   wrap: { text: '오늘은 여기까지! 수고했어요.', audio: null },
  },
- assets: { listenLoop: 'media/taeo-listen.mp4', poster: 'media/taeo-still.webp', backdrop: 'media/taeo-still-blur.webp' },
+ assets: { listenLoop: 'media/taeo-listen.mp4', poster: 'media/taeo-still.webp', backdrop: 'media/taeo-still-blur.webp', nextImage: 'media/next-fair.webp' },
 };
 const NOTE_ORDER = { ending: 0, length: 1, missing: 2 };
 
@@ -943,7 +943,7 @@ async function studentTurn(item, s, ctx) {
    revealBlanks(!!L.endingMissed);
    orbMode('success', 'Nice');
    if (L.misses) celebrate(s);
-   await sleep(s, L.misses ? 1500 : 800);
+   await sleep(s, L.misses ? 2000 : 1200);
    if (!live(s)) return;
   }
   // pass · pending · 세 번째 어긋남 → 진행
@@ -1078,6 +1078,8 @@ async function runTransfer(kind = 'transfer') {
  // firstHinted: 첫 「말해 본 시도」가 시작될 때 모범이 공개돼 있었는지 — 첫 시도에서 한 번만 정하고 뒤 시도로 덮지 않는다.
  const slot = delayed ? 'delayedRun' : 'transfer';
  const T = S[slot] || (S[slot] = { tries: 0, spoke: 0, firstHinted: null, revealed: null, revealedBeforeFirst: false, last: null, selfCheck: null, unheard: 0 });
+ // C에 기록 없이 다시 들어오면 지난 안내(받아쓰기 꺼짐 · 다시 녹음 등)는 지우고 지금 상태로 새로 그린다 — 시도 수 · 모범 본 사실은 둔다(화면 검수 r2).
+ if (delayed && !T.trail?.recorded) Object.assign(T, { last: null, lastTakeId: null, selfCheck: null, invalid: 0 });
  const markSpoken = (d) => {
   // 서버 take.hinted는 이전 실행(다시하기 전)의 모범 공개도 포함한다. 받아쓰기 없이 녹음한 경우는 이 창의 기억으로만 안다.
   if (!T.spoke) T.firstHinted = d?.take ? (!!d.take.hinted || T.revealedBeforeFirst) : (!!T.revealed || (!delayed && S.revealedEver));
@@ -1151,7 +1153,7 @@ function transferPanel(s, tr, T) {
  const promptKo = S.lang === 'ko' && tr.promptKo ? tr.promptKo : null;
  const p = choose(s, (go) => {
   if (micUnusable()) hideMic();
-  else orbMode('listening', T.tries ? 'Say it again' : 'Tap to speak', { action: () => go('record'), aria: T.tries ? tx('tryAgain') : tx('record') });
+  else orbMode('listening', obs?.kind === 'pass' && T.selfCheck !== 'differs' ? 'One more' : T.tries ? 'Say it again' : 'Tap to speak', { action: () => go('record'), aria: T.tries ? tx('tryAgain') : tx('record') });
   return [stepper('transfer'), h('div', { class: 'transfer' },
   h('p', { class: 'k' }, h('span', { class: 'dot', 'aria-hidden': 'true' }), 'New situation', h('b', {}, tx(isDelayed(tr.id) ? 'delayedTitle' : 'transferTitle'))),
   h('p', { class: 'lead' }, tx('transferLead')),
@@ -1222,6 +1224,12 @@ async function wrap({ replay = true } = {}) {
   const p = choose(s, (go) => [stepper('wrap'), h('div', { class: 'wrap' },
   h('p', { class: 'k' }, 'Today', h('b', {}, tx('episode'))),
   h('h2', {}, tx('wrapTitle')),
+  // 끝 그림 = 다음 회(콘티 56–60초). 칸 15에는 태오가 없다.
+  h('div', { class: 'next-ep' }, h('img', { class: 'next-img', src: { ...FALLBACK.assets, ...(S.boot.lesson.assets || {}) }.nextImage, alt: '', decoding: 'async' }),
+   h('div', { class: 'next-body' }, h('p', { class: 'eyebrow' }, tx('wrapNext')), h('p', { class: 'strong' }, tx('nextTitle')), h('p', { class: 'fine' }, tx('nextLine')))),
+  // 선배의 메모 · 오늘 배운 표현 — 쇼케이스 콘티 「오늘의 끝」 글(10-31 굽기 전 검수 반영본).
+  h('div', { class: 'memo' }, h('p', { class: 'eyebrow' }, tx('wrapMemoFrom')), h('p', { class: 'ko line', lang: 'ko' }, '처음엔 \'선배님\'이 안전해요. 나한텐 그냥 \'선배\'! —\u00a0태오'), S.lang === 'ko' ? null : h('p', { class: 'mean' }, tx('wrapMemoMean'))),
+  h('div', { class: 'learned' }, h('p', { class: 'eyebrow' }, tx('wrapLearned')), h('p', { class: 'ko line', lang: 'ko' }, '혹시 (장소)이/가 어디에 있는지 아세요?'), S.lang === 'ko' ? null : h('p', { class: 'mean' }, tx('wrapLearnedMean'))),
   h('ul', { class: 'log' },
    h('li', {}, tick(spoken > 0), h('div', {}, h('b', {}, tx('wrapSpoken')), h('p', {}, tx('wrapLines', spoken, items.length)),
     readAlong ? h('p', { class: 'fine' }, tx('wrapReadAlong', readAlong)) : null, h('p', { class: 'fine' }, tx('wrapAnalysis')[mode]),
@@ -1231,8 +1239,7 @@ async function wrap({ replay = true } = {}) {
    h('li', {}, tick(!!T?.spoke), h('div', {}, h('b', {}, tx('wrapTransfer')), h('p', {}, T?.spoke ? tx('wrapTransferTried') : T?.tries ? tx('wrapTransferUnheard') : T?.invalid ? tx('wrapTransferInvalid') : tx('wrapTransferNot')),
     hintState ? h('p', { class: 'fine' }, tx(hintState)) : null)),
   ),
-  h('div', { class: 'next-ep' }, h('p', { class: 'eyebrow' }, tx('wrapNext')), h('p', { class: 'strong' }, tx('nextTitle')), h('p', { class: 'fine' }, tx('nextLine'))),
-  h('div', { class: 'takes' }, h('p', { class: 'eyebrow' }, tx('myTakes')),
+  h('details', { class: 'takes', open: msg ? '' : null }, h('summary', { class: 'eyebrow' }, tx('myTakes')),
    S.takes.length ? h('div', { class: 'take-list' }, S.takes.map((k) => {
     const it = items.find((x) => x.id === k.lineId);
     const label = it ? `${it.text.slice(0, 14)}… · ${tx('takeLabel', k.n)}` : `${tx(isDelayed(k.lineId) ? 'delayedTitle' : 'transferTitle')} · ${tx('takeLabel', k.n)}`;
