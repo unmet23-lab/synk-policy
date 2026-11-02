@@ -1057,6 +1057,7 @@ async function runTransfer() {
  // 표지가 사라진 뒤에 카드가 올라온다(겹치지 않게).
  if (T.tries === 0 && !T.introShown) { T.introShown = true; slate(tx('transferTitle'), { k: 'New situation', ms: 1200 }); await sleep(s, 1650); if (!live(s)) return; hideSlate(); }
  await retryWorldStatus();
+ if (!live(s)) return;
  await ensureConsent(s);
  if (!live(s)) return;
  const item = { id: tr.id };
