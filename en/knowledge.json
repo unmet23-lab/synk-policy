@@ -1,5 +1,5 @@
 {
-  "version": "2026-09-15-selected-experiences-copy-9bfc4e4ce8-rhythm-20261001-copy-3910676d01-release-copy-3e4ed3be6d-en-002b14631325-bm-platform-20261007-a885b0d303-travel-20261007-ce148dd860-real-20261007-ab58ee7076-homepage-current-20261009-033c24b61f29-homepage-v10-20261010-2d78c2ebbf41",
+  "version": "2026-09-15-selected-experiences-copy-9bfc4e4ce8-rhythm-20261001-copy-3910676d01-release-copy-3e4ed3be6d-en-002b14631325-bm-platform-20261007-a885b0d303-travel-20261007-ce148dd860-real-20261007-ab58ee7076-homepage-current-20261009-033c24b61f29-homepage-v10-20261010-938eb9b94eb8",
   "updatedAt": "2026-11-03",
   "docs": [
     {
@@ -8,7 +8,7 @@
       "paragraphs": [
         "SYNK builds Atlas, a personalization engine that reads a person’s goals and what they have actually done, then fits the next practice to them. With it we run four businesses: Korean education, AI lectures and work automation, ad videos, and preparing to study in Korea.",
         "It began in a classroom in Ulaanbaatar, Mongolia. Every student was good at different things, got stuck in different places and had different reasons for learning. Atlas is our attempt to tailor teaching to each person with technology.",
-        "SYNK LAB is making a K-drama role-play where you speak Korean as one of the cast (pilot in preparation), runs TOPIK practice and Korean games in SYNK WORLD, and is preparing a one-year course aimed at TOPIK Level 4. SYNK SHIFT gives AI-era lectures on careers and work at schools, companies and institutions, and automates repetitive work with AI for companies that took a lecture. SYNK PULSE makes ads and model videos and grows our own music and character stories. SYNK PATH helps with travel plans and with preparing to study, work and settle in Korea.",
+        "SYNK LAB is making a K-drama role-play where you speak Korean as one of the cast (pilot in preparation), runs TOPIK practice and Korean games in SYNK WORLD, and is preparing a one-year course aimed at TOPIK Level 4. SYNK SHIFT gives AI-era lectures on careers and work at schools, companies and institutions, and automates repetitive work with AI for companies that took a lecture. SYNK PULSE makes AI ads that show you every cut first, and grows our own music and character stories. SYNK PATH helps with travel plans and with preparing to study, work and settle in Korea.",
         "The SYNK platform is open now as a web preview and as a PC app preview for Windows and Mac. Anything still in preparation is labelled as such on each business page.",
         "To build AI that gets to know you the more you use it — so that anyone, in their 20s or their 60s, gets help that matches their goal and situation when they play, study or ask for advice.",
         "LAB covers Korean-language education; SHIFT, AI lectures and work automation; PULSE, ads and model videos, music and characters; and PATH, the Seoul day planner and preparation for studying, working and settling in Korea. All four use the Atlas engines they need.",
@@ -311,14 +311,15 @@
     },
     {
       "id": "pulse",
-      "title": "SYNK PULSE — Ads and model videos, plus our own music and characters",
+      "title": "SYNK PULSE — AI ads that show you every cut first",
       "paragraphs": [
-        "SYNK PULSE makes product ads, brand films, AI model lookbooks and how-to videos from plan to final cut. We also create the music and stories of Mongle, Kkamong and Marin, and look for partners to license them or make something together.",
-        "We start with where a video will run and who will see it, deliver files sized for websites, product pages and social channels, and choose with you between AI video and live shooting, whichever suits the brand.",
+        "SYNK PULSE makes product ads, brand films, AI model lookbooks and how-to videos with AI, from plan to final cut. We also create the music and stories of Mongle, Kkamong and Marin, and look for partners to license them or make something together.",
+        "We start with where a video will run and who will see it. We show you every cut as a scene image before the video, build only from the cuts you have checked, and deliver files sized for websites, product pages and social channels.",
         "There is a casting book of twenty-one AI models, and with the person’s own consent we can create a model based on a brand’s CEO or staff. AI profiles, introduction decks and studio and equipment rental are in preparation and not taking bookings yet.",
         "We do not build educational or emotional profiles from what people listen to or watch, and we do not promise learning or therapeutic effects from our works.",
-        "To make ads and model videos, and to grow our own music and characters.",
-        "SYNK PULSE makes product ads, brand films, AI model lookbooks and how-to videos, from planning to the final cut. We also create the music and stories of Mongle, Kkamong and Marin, and look for partners to license them or make something together.",
+        "To make AI ads that show you every cut first, and to create our own music and character stories.",
+        "Before we make the video, we show you every cut as a scene image. We build only from the cuts you have checked, and composite products, logos and on-screen text from your real files. A first conversation needs just one product photo and where the ad will run.",
+        "We also create the music and stories of Mongle, Kkamong and Marin, and look for partners to license them or make something together.",
         "PULSE makes relaxed music and video for everyday listening, and stories about Mongle, Kkamong and Marin. If you would like to use or make a piece with us, ask PULSE.",
         "We check that sound and picture fit and flow naturally from start to finish before publishing.",
         "PULSE's music, videos, characters, and stories are created to be enjoyed. Not all of them are designed for Korean learning. LAB prepares Korean education and learning content.",
@@ -330,7 +331,7 @@
         "Public examples do not confirm acceptance of a project or a delivery schedule. Advertising work owned by a client is not treated as SYNK-owned creative work.",
         "A public listening or viewing link does not grant permission to redistribute a work, put it in a video, play it in a shop, or use it in advertising or commercially. Please confirm availability and rights first.",
         "To start an inquiry, email hello@synk.im with the work title, media, location, duration, and intended use. This question panel does not grant permission or make a final copyright determination.",
-        "We are not featuring a radio on this website right now. The music and character stories PULSE makes are introduced on the PULSE page, under the two pieces in Works.",
+        "We are not featuring a radio on this website right now. The music and character stories PULSE makes are introduced on the PULSE page, under the pieces in Works.",
         "To use or make music with us, ask PULSE.",
         "Client videos are made for where they will run; our own works are made to be watched again.",
         "For client videos we start with where they will be used and who will see them. The product, people and style rules set at the start carry into every later video so that many videos still look like one brand, using two Atlas engines: Loom for the picture and Reed for sound.",
@@ -343,12 +344,12 @@
         "Listening to published works is different from using them commercially. If you want to use them somewhere, please ask first.",
         "We make ads that introduce brands through PULSE’s music and characters. We fit music, video and characters to the message and channel, and agree purpose, rights, usage terms and any required ad labelling first.",
         "Commissioned product ads, brand films and AI model videos are handled under PULSE video production. AI lectures and work automation are SHIFT’s job.",
-        "Yes. We make product ads, brand films and commercials, AI model lookbooks and service how-to videos from plan to final cut, sized for websites, product pages and social channels. Together we choose between AI video and live shooting, whichever suits the brand.",
+        "Yes. We make product ads, brand films and commercials, AI model lookbooks and service how-to videos from plan to final cut with AI, sized for websites, product pages and social channels. Before the video you check, in turn, the model you choose, the one line the ad should leave and its written storyboard, and a scene image for every cut, and we build only from the cuts you have checked.",
         "Product ads — short ads showing the product’s details and real use, plus cuts for each channel from the same footage.",
         "Brand films and commercials — one film that shows what the company does and what it does well, with cuts for the website, sales and events.",
         "AI models and lookbooks — product images, lookbooks and fashion videos with the AI model you choose, with colour and fit checked against reference photos.",
         "Service and how-to videos — introductions and how-to videos from the real screens in the real order, with subtitles and channel cuts.",
-        "This is made-to-order production. Length, formats, revisions, usage rights, quote and schedule are agreed per project.",
+        "Prices start at KRW 390,000 for a 15-second ad, KRW 890,000 for a 30-second ad with cutdowns and KRW 2,500,000 for company campaigns. Length, formats, revisions, usage rights and schedule are agreed in the consultation.",
         "The twenty-one PULSE AI models were made with AI. Yuho is based on SYNK founder Yuho Yang himself; the other twenty (Ian, Harin, Seojin, Taejun, Yuna, Jiyu, Soyeon, Minjae, Eunjeong, Chaewon, Junho, Hangyeol and the two idol groups’ Yunseul, Roha, Saebom, Haein, Dohyeon, Haram, Seoyul and Jion) are virtual models, not real people. With the person’s own consent, we can also create a model based on a brand’s CEO or staff.",
         "Each model has a casting book with front, side and back views, several expressions, three hairstyles and two looks, and height and clothing sizes in one place. We produce exactly what you choose; voices are performed to fit the scenes of your ad, and you hear them at the draft stage.",
         "Two idol groups — the girl group OPALINE is Yunseul, Roha, Saebom and Haein, and the boy group OUTBLUE is Dohyeon, Haram, Seoyul and Jion. Each is a group of four, and you can also pick one member.",
@@ -435,7 +436,7 @@
         "SYNK — AI that gets to know you the more you use it.",
         "SYNK LAB — Join the cast of a K-drama, and speak Korean.",
         "SYNK SHIFT — AI lectures, plus work automation.",
-        "SYNK PULSE — Ads and model videos, plus our own music and characters.",
+        "SYNK PULSE — AI ads that show you every cut first.",
         "SYNK PATH — Studying, working and living in Korea, prepared with you.",
         "Each business page separates what you can use today from what is still in preparation."
       ],
@@ -513,7 +514,7 @@
         "Tell me about SYNK’s work",
         "Where can I read about the company?"
       ],
-      "answer": "SYNK builds Atlas, a personalization engine that reads a person’s goals and what they have actually done, then fits the next practice to them. With it we run four businesses: Korean education, AI lectures and work automation, ad videos, and preparing to study in Korea.\n\nIt began in a classroom in Ulaanbaatar, Mongolia. Every student was good at different things, got stuck in different places and had different reasons for learning. Atlas is our attempt to tailor teaching to each person with technology.\n\nSYNK LAB is making a K-drama role-play where you speak Korean as one of the cast (pilot in preparation), runs TOPIK practice and Korean games in SYNK WORLD, and is preparing a one-year course aimed at TOPIK Level 4. SYNK SHIFT gives AI-era lectures on careers and work at schools, companies and institutions, and automates repetitive work with AI for companies that took a lecture. SYNK PULSE makes ads and model videos and grows our own music and character stories. SYNK PATH helps with travel plans and with preparing to study, work and settle in Korea.\n\nThe SYNK platform is open now as a web preview and as a PC app preview for Windows and Mac. Anything still in preparation is labelled as such on each business page.",
+      "answer": "SYNK builds Atlas, a personalization engine that reads a person’s goals and what they have actually done, then fits the next practice to them. With it we run four businesses: Korean education, AI lectures and work automation, ad videos, and preparing to study in Korea.\n\nIt began in a classroom in Ulaanbaatar, Mongolia. Every student was good at different things, got stuck in different places and had different reasons for learning. Atlas is our attempt to tailor teaching to each person with technology.\n\nSYNK LAB is making a K-drama role-play where you speak Korean as one of the cast (pilot in preparation), runs TOPIK practice and Korean games in SYNK WORLD, and is preparing a one-year course aimed at TOPIK Level 4. SYNK SHIFT gives AI-era lectures on careers and work at schools, companies and institutions, and automates repetitive work with AI for companies that took a lecture. SYNK PULSE makes AI ads that show you every cut first, and grows our own music and character stories. SYNK PATH helps with travel plans and with preparing to study, work and settle in Korea.\n\nThe SYNK platform is open now as a web preview and as a PC app preview for Windows and Mac. Anything still in preparation is labelled as such on each business page.",
       "sourceId": "company",
       "relatedIds": [
         "synk-vision",
@@ -586,7 +587,7 @@
         "What are the visions of SYNK LAB, SHIFT, and PULSE?",
         "How do the visions of LAB, SHIFT, and PULSE differ?"
       ],
-      "answer": "In one line each:\n\nSYNK — AI that gets to know you the more you use it.\n\nSYNK LAB — Join the cast of a K-drama, and speak Korean.\n\nSYNK SHIFT — AI lectures, plus work automation.\n\nSYNK PULSE — Ads and model videos, plus our own music and characters.\n\nSYNK PATH — Studying, working and living in Korea, prepared with you.\n\nEach business page separates what you can use today from what is still in preparation.",
+      "answer": "In one line each:\n\nSYNK — AI that gets to know you the more you use it.\n\nSYNK LAB — Join the cast of a K-drama, and speak Korean.\n\nSYNK SHIFT — AI lectures, plus work automation.\n\nSYNK PULSE — AI ads that show you every cut first.\n\nSYNK PATH — Studying, working and living in Korea, prepared with you.\n\nEach business page separates what you can use today from what is still in preparation.",
       "sourceId": "vision",
       "relatedIds": [
         "synk-vision",
@@ -1396,7 +1397,7 @@
         "What does PULSE create?",
         "Do you create music and stories?"
       ],
-      "answer": "SYNK PULSE makes product ads, brand films, AI model lookbooks and how-to videos from plan to final cut. We also create the music and stories of Mongle, Kkamong and Marin, and look for partners to license them or make something together.\n\nWe start with where a video will run and who will see it, deliver files sized for websites, product pages and social channels, and choose with you between AI video and live shooting, whichever suits the brand.\n\nThere is a casting book of twenty-one AI models, and with the person’s own consent we can create a model based on a brand’s CEO or staff. AI profiles, introduction decks and studio and equipment rental are in preparation and not taking bookings yet.\n\nWe do not build educational or emotional profiles from what people listen to or watch, and we do not promise learning or therapeutic effects from our works.",
+      "answer": "SYNK PULSE makes product ads, brand films, AI model lookbooks and how-to videos with AI, from plan to final cut. We also create the music and stories of Mongle, Kkamong and Marin, and look for partners to license them or make something together.\n\nWe start with where a video will run and who will see it. We show you every cut as a scene image before the video, build only from the cuts you have checked, and deliver files sized for websites, product pages and social channels.\n\nThere is a casting book of twenty-one AI models, and with the person’s own consent we can create a model based on a brand’s CEO or staff. AI profiles, introduction decks and studio and equipment rental are in preparation and not taking bookings yet.\n\nWe do not build educational or emotional profiles from what people listen to or watch, and we do not promise learning or therapeutic effects from our works.",
       "sourceId": "pulse",
       "relatedIds": [
         "pulse-vision",
@@ -1436,7 +1437,7 @@
         "What future does PULSE work toward?",
         "I'd like to know the future SYNK PULSE wants to create"
       ],
-      "answer": "To make ads and model videos, and to grow our own music and characters.\n\nSYNK PULSE makes product ads, brand films, AI model lookbooks and how-to videos, from planning to the final cut. We also create the music and stories of Mongle, Kkamong and Marin, and look for partners to license them or make something together.",
+      "answer": "To make AI ads that show you every cut first, and to create our own music and character stories.\n\nBefore we make the video, we show you every cut as a scene image. We build only from the cuts you have checked, and composite products, logos and on-screen text from your real files. A first conversation needs just one product photo and where the ad will run.\n\nWe also create the music and stories of Mongle, Kkamong and Marin, and look for partners to license them or make something together.",
       "sourceId": "pulse",
       "relatedIds": [
         "pulse-intro",
@@ -2687,7 +2688,7 @@
       "sourceId": "pulse",
       "brand": "pulse",
       "title": "Where can I listen to the radio?",
-      "answer": "We are not featuring a radio on this website right now. The music and character stories PULSE makes are introduced on the PULSE page, under the two pieces in Works.\n\nTo use or make music with us, ask PULSE.",
+      "answer": "We are not featuring a radio on this website right now. The music and character stories PULSE makes are introduced on the PULSE page, under the pieces in Works.\n\nTo use or make music with us, ask PULSE.",
       "questionExamples": [
         "Where can I listen to the radio?",
         "Is there a 24-hour radio stream?",
@@ -3909,7 +3910,7 @@
         "What videos do you make?",
         "Can PULSE make a video for us?"
       ],
-      "answer": "Yes. We make product ads, brand films and commercials, AI model lookbooks and service how-to videos from plan to final cut, sized for websites, product pages and social channels. Together we choose between AI video and live shooting, whichever suits the brand.\n\nProduct ads — short ads showing the product’s details and real use, plus cuts for each channel from the same footage.\n\nBrand films and commercials — one film that shows what the company does and what it does well, with cuts for the website, sales and events.\n\nAI models and lookbooks — product images, lookbooks and fashion videos with the AI model you choose, with colour and fit checked against reference photos.\n\nService and how-to videos — introductions and how-to videos from the real screens in the real order, with subtitles and channel cuts.\n\nThis is made-to-order production. Length, formats, revisions, usage rights, quote and schedule are agreed per project.",
+      "answer": "Yes. We make product ads, brand films and commercials, AI model lookbooks and service how-to videos from plan to final cut with AI, sized for websites, product pages and social channels. Before the video you check, in turn, the model you choose, the one line the ad should leave and its written storyboard, and a scene image for every cut, and we build only from the cuts you have checked.\n\nProduct ads — short ads showing the product’s details and real use, plus cuts for each channel from the same footage.\n\nBrand films and commercials — one film that shows what the company does and what it does well, with cuts for the website, sales and events.\n\nAI models and lookbooks — product images, lookbooks and fashion videos with the AI model you choose, with colour and fit checked against reference photos.\n\nService and how-to videos — introductions and how-to videos from the real screens in the real order, with subtitles and channel cuts.\n\nPrices start at KRW 390,000 for a 15-second ad, KRW 890,000 for a 30-second ad with cutdowns and KRW 2,500,000 for company campaigns. Length, formats, revisions, usage rights and schedule are agreed in the consultation.",
       "relatedIds": [
         "pulse-atlas-value",
         "pulse-models",
@@ -3919,7 +3920,7 @@
         "label": "See video production",
         "href": "/en/pulse/#film"
       },
-      "reviewedAt": "2026-10-23",
+      "reviewedAt": "2026-11-03",
       "aliases": [
         "PULSE에서 광고·모델 영상을 만들 수 있나요?",
         "광고 영상 제작을 맡기고 싶어요",
@@ -5088,8 +5089,8 @@
     },
     "pulse": {
       "name": "SYNK PULSE",
-      "headline": "Ads and model videos, plus our own music and characters",
-      "subtext": "SYNK PULSE makes product ads, brand films, AI model lookbooks and how-to videos, from planning to the final cut. We also create the music and stories of Mongle, Kkamong and Marin, and look for partners to license them or make something together."
+      "headline": "AI ads that show you every cut first",
+      "subtext": "Before we make the video, we show you every cut as a scene image. We build only from the cuts you have checked, and composite products, logos and on-screen text from your real files. A first conversation needs just one product photo and where the ad will run."
     },
     "path": {
       "name": "SYNK PATH",
