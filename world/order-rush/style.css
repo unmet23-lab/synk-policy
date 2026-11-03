@@ -1,0 +1,233 @@
+/* 주문 폭주 — 공통 화면(입구·게임 바·안내·멈춤·결과·펠트 부품)은 kit/lab.css(SYNK LAB PLAY 키트, 원본 experiences/play-common/kit/).
+ * 여기에는 주문 폭주에만 있는 것: 입구 그림, 영업 방식 쿠션, 계산대(손님·말풍선·줄 선 손님), 컵 작업대, 재료 쿠션, 결과의 주문 줄. */
+
+/* ── 입구 그림: 주문하는 사슴 손님과 말풍선, 펠트 재료(커피콩·우유·얼음), 바리스타 몽글 ── */
+.hero-art{isolation:isolate}
+.hero-bubble{position:absolute;z-index:2;left:24%;top:1%;max-width:min(64%,330px);margin:0;padding:12px 18px 14px;border-radius:22px 22px 22px 6px;
+  font:800 clamp(18px,4.6vw,26px)/1.3 var(--sans);letter-spacing:-.02em}
+.hero-guest{position:absolute;left:0;bottom:0;height:86%;width:auto;filter:drop-shadow(0 10px 12px rgba(80,25,15,.25))}
+.hero-bit{position:absolute;width:auto;filter:drop-shadow(0 6px 6px rgba(80,25,15,.26))}
+.hero-bit.b-coffee{left:31%;bottom:3%;height:24%}
+.hero-bit.b-milk{left:47%;bottom:3%;height:33%}
+.hero-bit.b-ice{left:55%;bottom:2%;height:21%;transform:rotate(-8deg)}
+.hero-art .hero-mongle{width:min(31%,176px)}
+
+/* ── 입구: 영업 방식 쿠션 둘(고르지 않은 쪽 크림, 고른 쪽 버터·분홍 + 칼선 스티커) ── */
+.modes{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:2px 0 4px}
+.modes.single{grid-template-columns:1fr}
+.mode{position:relative;display:grid;align-content:center;justify-items:start;gap:4px;min-height:96px;padding:6px 10% 19px 10%;border:0;text-align:left;
+  background:url(assets/felt/cushion-cream-phone.webp) center/100% 100% no-repeat;filter:drop-shadow(0 4px 5px rgba(73,45,30,.14));
+  transition:transform .14s var(--ease),filter .16s}
+.mode b{font:800 17px/1.25 var(--sans);letter-spacing:-.01em}
+.mode small{font-size:12.5px;line-height:1.4;color:var(--ink-2)}
+.mode small span{display:block;white-space:nowrap}
+.mode:active{transform:translateY(3px)}
+.mode[aria-pressed=true]{transform:translateY(-3px);filter:var(--sticker) drop-shadow(0 10px 10px rgba(73,45,30,.26))}
+.mode.m-calm[aria-pressed=true]{background-image:url(kit/felt/cushion-butter-phone.webp)}
+.mode.m-rush[aria-pressed=true]{background-image:url(kit/felt/cushion-blush-phone.webp)}
+.mode.m-calm[aria-pressed=true] small{color:#4a3a10}
+.mode.m-rush[aria-pressed=true] small{color:#6b3326}
+.start-options .fine{flex:1 1 12em}
+.fine.warn{color:var(--coral-deep);font-weight:700}
+
+/* ── 영업: 계산대(위) + 컵 작업대(아래), 넓은 화면은 두 칸 ── */
+.play{flex:1;min-height:0;display:flex;flex-direction:column}
+.counter-scene{--counter:clamp(30px,15%,96px);flex:0 0 auto;height:clamp(150px,calc(100svh - 560px),300px)}
+.counter-scene::after{content:none}
+.counter{position:absolute;z-index:2;left:0;right:0;bottom:0;height:var(--counter);
+  background:linear-gradient(rgba(249,104,89,.3),rgba(249,104,89,.3)),url(kit/felt/tex-coral.webp) 0 0/150px 150px,var(--coral);
+  box-shadow:0 -6px 14px -8px rgba(120,40,25,.45)}
+/* 손님: 계산대 뒤에 선 펠트 동물(아랫부분은 계산대에 가린다). 바뀔 때 한 번 들어오고, 받아 가면 한 번 나간다 */
+.guest{position:absolute;z-index:1;left:2%;top:12px;bottom:0;width:40%;margin:0;pointer-events:none}
+.guest img{width:100%;height:100%;object-fit:contain;object-position:50% 100%;filter:drop-shadow(0 10px 12px rgba(80,25,15,.22))}
+.guest.enter{animation:guestIn .36s var(--ease) both}
+.guest.leave{animation:guestOut .34s ease-in both}
+@keyframes guestIn{from{opacity:0;transform:translateX(-22px)}to{opacity:1;transform:none}}
+@keyframes guestOut{to{opacity:0;transform:translateX(26px)}}
+/* 말풍선(종이): 손님 쪽으로 꼬리. 글자 크기 --say는 넘치면 app.mjs fitBubble이 줄인다 */
+.bubble{--say:clamp(16px,4.4vw,22px);position:absolute;z-index:3;left:43%;right:12px;top:14px;max-height:calc(100% - 22px);
+  display:grid;gap:8px;align-content:start;padding:12px 14px 13px;border-radius:20px}
+.bubble::before{content:"";position:absolute;left:-7px;top:26px;width:16px;height:16px;border-radius:3px;background:var(--paper);transform:rotate(45deg)}
+.bubble.right::after{content:"";position:absolute;right:-8px;top:-10px;width:44px;height:44px;background:url(kit/felt/badge-check.webp) center/contain no-repeat;
+  filter:drop-shadow(0 3px 3px rgba(73,45,30,.3));animation:pop .32s var(--ease) both}
+.b-dots{display:flex;align-items:center;gap:6px;height:24px;margin:0}
+.b-dots i{width:10px;height:10px;border-radius:50%;background:var(--coral);animation:dots 1s infinite ease-in-out}
+.b-dots i:nth-child(2){animation-delay:.15s}
+.b-dots i:nth-child(3){animation-delay:.3s}
+@keyframes dots{0%,100%{opacity:.35}50%{opacity:1}}
+.b-cap{margin:0;font:600 13.5px/1.45 var(--sans);color:var(--ink-2)}
+.b-line{margin:0;font:800 var(--say)/1.4 var(--sans);letter-spacing:-.01em}
+.b-note{margin:0;padding:8px 12px 9px;border-radius:12px;background:var(--coral-wash);font:800 calc(var(--say) - 1px)/1.42 var(--sans);color:#5c2318}
+.b-note small{display:block;margin-top:2px;font:600 13px/1.4 var(--sans);color:var(--ink-2)}
+.b-note.thanks{padding:0 30px 0 0;background:none;font:800 var(--say)/1.4 var(--sans);color:var(--ink)}
+.b-tools{display:flex;flex-wrap:wrap;gap:6px 8px}
+.b-tools .chip-btn{min-height:38px;padding:0 14px 3px;font-size:13.5px}
+/* 기다림 막대(점심 러시): 남은 만큼 — 넉넉하면 초록, 반쯤 버터, 얼마 안 남으면 코랄 */
+.patience{display:block;height:6px;border-radius:3px;background:var(--line);overflow:hidden}
+.patience i{display:block;height:100%;width:calc(var(--left,1) * 100%);border-radius:3px;background:var(--meadow)}
+.patience[data-level=mid] i{background:var(--butter)}
+.patience[data-level=low] i{background:var(--coral)}
+/* 줄 선 손님: 계산대 오른쪽에 놓인 작은 종이 표(얼굴 + 기다림 막대). 누르면 그 손님 주문으로 바꾼다 */
+.line-up{position:absolute;z-index:3;right:10px;bottom:5px;display:flex;align-items:flex-end;gap:6px}
+.ticket{display:grid;justify-items:center;gap:3px;width:44px;padding:4px 5px 5px;border:0;border-radius:10px;background:var(--paper);box-shadow:var(--shadow-paper);
+  transition:transform .12s var(--ease)}
+.ticket img{width:30px;height:30px;border-radius:50%;background:url(kit/felt/badge-cream.webp) center/112% 112% no-repeat}
+.ticket .patience{width:100%;height:4px}
+.ticket:active{transform:translateY(3px)}
+/* 벽의 메뉴판(넓은 화면만): 레시피 도움 세 줄 */
+.menu-card{display:none}
+/* 계산대 위 안내(기다림·떠난 손님)는 가운데. 순간 맞춤 한 줄은 컵 작업대의 빈 벽 위(말풍선·줄 선 손님과 겹치지 않게) */
+.counter-scene .tip{z-index:4;top:50%;bottom:auto;transform:translate(-50%,-60%);width:min(420px,calc(100% - 28px))}
+.flow-line{position:absolute;z-index:1;left:50%;top:10px;transform:translateX(-50%);width:max-content;max-width:calc(100% - 24px);margin:0;padding:6px 14px 7px;
+  border-radius:999px;background:rgba(255,253,248,.96);box-shadow:var(--shadow-paper);font:700 13.5px/1.35 var(--sans);text-align:center;pointer-events:none;
+  animation:tipIn .28s var(--ease) both}
+@keyframes tipIn{from{opacity:0}to{opacity:1}}
+.counter-scene .pop{z-index:5}
+
+/* 컵 작업대: 컵 탭 → 작업대 창(3D) → 재료 쿠션 3×2 → 서빙 */
+.station{flex:1;min-height:0;display:flex;flex-direction:column;gap:8px;padding:10px 12px calc(12px + env(safe-area-inset-bottom));background:var(--cream)}
+.cup-row{display:flex;align-items:center;gap:6px;min-height:40px}
+.cup-tabs{display:flex;gap:6px}
+.cup-row .chip-btn{min-height:38px;padding:0 14px 3px;font-size:14px}
+.cup-tab[aria-pressed=true]{background-image:url(kit/felt/slab-coral-long.webp);color:#fff;text-shadow:0 1px 1px rgba(120,30,20,.4)}
+#remove-cup{margin-left:auto}
+.bench{position:relative;flex:1 1 auto;min-height:84px;border-radius:18px;overflow:hidden;
+  background:radial-gradient(ellipse at 50% 30%,rgba(255,255,255,.35),rgba(255,255,255,0) 60%),
+    linear-gradient(rgba(251,247,240,.38),rgba(251,247,240,.38)),url(kit/felt/wide-cream.webp) center/max(2560px,100%) auto no-repeat,#efe3d0}
+.bench canvas{position:absolute;inset:0;display:block;touch-action:manipulation}
+.bench.served .cup-desc{visibility:hidden}
+.cup-desc{position:absolute;z-index:1;left:50%;bottom:8px;transform:translateX(-50%);max-width:calc(100% - 20px);margin:0;padding:5px 14px 6px;border-radius:999px;
+  background:rgba(255,253,248,.95);box-shadow:var(--shadow-paper);font:800 14px/1.3 var(--sans);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;pointer-events:none}
+/* 재료: 크림 펠트 쿠션 위 펠트 재료, 모서리에 숫자 키 단추. 넣은 재료는 분홍 쿠션 + 칼선 스티커, 누르면 3px 내려앉는다 */
+.ingredients{--ing-h:76px;--ing-img:40px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.ing{position:relative;display:flex;align-items:center;justify-content:center;gap:6px;min-height:var(--ing-h);padding:3px 9% 13px;border:0;
+  background:url(assets/felt/cushion-cream-tile.webp) center/100% 100% no-repeat;filter:drop-shadow(0 4px 5px rgba(73,45,30,.14));
+  font:800 15px/1.2 var(--sans);color:var(--ink);transition:transform .12s var(--ease),filter .16s}
+.ing img{height:var(--ing-img);width:auto;max-width:48%;object-fit:contain;filter:drop-shadow(0 3px 3px rgba(73,45,30,.22))}
+.ing span{white-space:nowrap}
+.ing .no{position:absolute;left:-4px;top:-8px;display:grid;place-items:center;width:24px;height:24px;background:url(kit/felt/badge-cream.webp) center/contain no-repeat;
+  color:#2b2320;font:800 11.5px/1 var(--mono);filter:drop-shadow(0 2px 2px rgba(73,45,30,.22))}
+.ing:active{transform:translateY(3px)}
+.ing[aria-pressed=true]{background-image:url(assets/felt/cushion-blush-tile.webp);color:#5c2318;filter:var(--sticker) drop-shadow(0 8px 8px rgba(73,45,30,.24))}
+.serve{min-height:58px}
+
+/* ── 결과 ── */
+.r-note .nb{white-space:nowrap}
+.big-cap{margin:4px 0 0;font:700 14px/1.3 var(--sans);color:rgba(43,35,32,.82)}
+.log li{grid-template-columns:30px 1fr auto}
+.log .mark{width:30px;height:30px;font:800 11.5px/1 var(--sans);background:url(kit/felt/badge-cream.webp) center/contain no-repeat;color:var(--ink-2)}
+.log li.ok .mark{background:none}
+.log li.ko .mark{background:url(kit/felt/badge-cream.webp) center/contain no-repeat;color:var(--coral-deep)}
+.log .mark img{width:30px;height:30px}
+.log .sent{display:block;font:800 15.5px/1.45 var(--sans)}
+.log li.skip .sent{font-weight:700;color:var(--ink-2)}
+.log li.empty{display:block;color:var(--ink-2)}
+.recipe{margin-top:4px;font-size:13px;color:var(--ink-2)}
+.recipe summary{cursor:pointer;font-weight:700;color:var(--ink);text-underline-offset:3px;text-decoration:underline}
+.recipe p{margin:4px 0 0}
+.say-again{min-height:34px;padding:0 12px 2px;font-size:13px;align-self:center}
+.skills .reason{font-size:14.5px}
+.flow-box{display:grid;gap:6px;padding:12px 14px;border-radius:14px;background:var(--cream)}
+.flow-box h3{margin:0;font:800 15px/1.3 var(--sans)}
+.skills .flow-box ul{display:block;margin:0;padding-left:18px;list-style:disc;font-size:14px;line-height:1.5}
+.skills .flow-box li{display:list-item;padding:0;border-radius:0;background:none}
+.skills .flow-box li.suggest{color:var(--coral-deep);font-weight:700}
+.metrics{display:grid;grid-template-columns:1fr auto;gap:6px 12px;margin:2px 0;padding:12px 14px;border-radius:14px;background:var(--cream);font-size:14px}
+.metrics dt{color:var(--ink-2)}
+.metrics dd{margin:0;font:500 13.5px/1.5 var(--mono);text-align:right}
+.skills{display:grid;gap:10px}
+.skills .fine{margin:0}
+.pause-why{margin:-6px 0 14px}
+
+/* ── 높이가 낮은 휴대폰(667px 이하): 계산대·재료·서빙 단추를 낮춘다 ── */
+@media (max-height:700px) and (max-width:959px){
+  .counter-scene{height:clamp(140px,calc(100svh - 470px),220px)}
+  .ingredients{--ing-h:62px;--ing-img:32px;gap:8px}
+  .ing{font-size:14px;padding-bottom:11px}
+  .cup-row{min-height:36px}
+  .cup-row .chip-btn{min-height:34px;font-size:13px;padding:0 12px 3px}
+  .serve{min-height:52px;font-size:17px}
+  .serve .disc{width:34px;height:34px}
+  .station{gap:6px;padding-top:8px}
+  .bubble{--say:clamp(14px,4vw,18px);padding:10px 12px 11px;gap:6px}
+  .b-tools .chip-btn{min-height:34px;font-size:13px;padding:0 12px 3px}
+}
+/* 게임 바: 375px 휴대폰에서 멈춤 단추가 밀려나지 않게 작은 로고는 뺀다(게임 이름은 남긴다) */
+@media (max-width:379px){.game-bar .logo-mini{display:none}}
+/* ── 아주 좁은 화면(359px 이하) ── */
+@media (max-width:359px){
+  .modes{gap:8px}
+  .mode{padding:6px 8% 17px;min-height:88px}
+  .mode b{font-size:15.5px}
+  .mode small{font-size:11.5px}
+  .ing{gap:4px;padding:3px 7% 11px;font-size:13.5px}
+  .ing img{max-width:42%}
+  .ing .no{width:22px;height:22px;font-size:11px;left:-3px;top:-7px}
+  .cup-row .chip-btn{padding:0 10px 3px}
+  .guest{width:34%}
+  .bubble{left:36%;right:8px}
+  .hero-art{display:none}
+  /* 320×568에서도 ‘카페 문 열기’가 첫 화면에: 입구 카드 간격을 조금씩 줄인다 */
+  .topbar.on-field .kicker{display:none}
+  .hero{padding-bottom:34px}
+  .start-card{padding:16px 16px 16px;gap:8px}
+  .start-card h2{font-size:24px}
+  .start-card .reason{font-size:14px;line-height:1.55}
+  .mode{min-height:80px}
+  #start{min-height:58px}
+}
+
+/* ── 휴대폰·태블릿 입구: 시작 단추가 첫 화면에 가깝게 그림을 줄이고 긴 설명은 ‘하는 방법’에 맡긴다 ── */
+@media (max-width:959px){.hero-art{height:min(50vw,300px)}}
+@media (max-width:599px){
+  .hero{padding-bottom:40px}
+  .hero .sub{display:none}
+  .hero-art{height:min(48vw,196px);margin-top:4px}
+  .hero-bubble{left:30%;padding:9px 14px 11px}
+}
+
+/* ── 넓은 화면: 계산대 왼쪽, 컵 작업대 오른쪽 ── */
+@media (min-width:960px){
+  .hero-art{height:310px}
+  .mode{min-height:92px;background-image:url(assets/felt/cushion-cream-mid.webp);padding:6px 9% 20px}
+  .mode.m-calm[aria-pressed=true]{background-image:url(kit/felt/cushion-butter-mid.webp)}
+  .mode.m-rush[aria-pressed=true]{background-image:url(kit/felt/cushion-blush-mid.webp)}
+  .mode b{font-size:18px}
+  .mode small{font-size:13px}
+  .play{flex-direction:row}
+  .counter-scene{--counter:clamp(80px,15%,128px);flex:1 1 auto;height:auto}
+  .guest{left:4%;width:42%;top:auto;height:min(82%,520px)}
+  /* 말풍선은 손님 머리 옆에서 시작한다(손님 그림 윗변 + 5%) */
+  .bubble{--say:clamp(19px,1.7vw,25px);left:47%;right:5%;top:max(24px,calc(100% - min(82%,520px) + 5%));max-height:none;
+    padding:18px 20px 18px;gap:12px;border-radius:24px}
+  .bubble::before{top:36px;left:-8px;width:18px;height:18px}
+  .menu-card{position:absolute;z-index:2;right:5%;top:24px;display:grid;gap:8px;width:min(280px,38%);padding:14px 16px 14px;font-size:14px;line-height:1.5}
+  .menu-card ul{list-style:none;margin:0;padding:0;display:grid;gap:4px}
+  .menu-card li{display:flex;justify-content:space-between;gap:10px;border-bottom:1px dashed var(--line);padding-bottom:4px}
+  .menu-card li b{font-weight:800}
+  .menu-card p{margin:0;font-size:12.5px;color:var(--muted)}
+  .flow-line{top:14px;font-size:14.5px;padding:7px 16px 8px}
+  .line-up{right:24px;bottom:10px;gap:10px}
+  .b-cap{font-size:14.5px}
+  .b-tools .chip-btn{min-height:42px;font-size:14px}
+  .ticket{width:62px;padding:6px 7px 7px;gap:5px}
+  .ticket img{width:46px;height:46px}
+  .ticket .patience{height:5px}
+  .station{flex:0 0 clamp(440px,40vw,600px);gap:12px;padding:18px 24px 22px;border-left:1px solid var(--line)}
+  .cup-row .chip-btn{min-height:42px;font-size:14.5px}
+  .ingredients{--ing-h:94px;--ing-img:52px;gap:14px 12px}
+  .ing{font-size:17px;gap:10px}
+  .ing .no{width:26px;height:26px;font-size:12px;left:-5px;top:-9px}
+  .cup-desc{font-size:15px;bottom:12px}
+  .serve{min-height:64px}
+}
+@media (min-width:960px) and (max-height:820px){
+  .ingredients{--ing-h:82px;--ing-img:44px;gap:12px}
+  .station{gap:10px;padding:14px 22px 18px}
+  .serve{min-height:58px}
+}
+/* First-day Korean is a separate entry; the original cafe modes keep their rules. */
+.beginner-entry{grid-column:1/-1;padding:24px 32px;display:flex;align-items:center;justify-content:space-between;gap:24px}
+.beginner-entry h2{font-size:26px;margin:8px 0 10px}.beginner-entry p{max-width:560px;line-height:1.7;font-size:16px;margin:0;word-break:keep-all}
+.beginner-entry .felt-cta{flex:0 0 320px;min-height:64px;text-decoration:none;text-align:center;display:flex;align-items:center;justify-content:center;gap:16px}
+@media(max-width:700px){.beginner-entry{padding:24px;display:block}.beginner-entry h2{font-size:23px}.beginner-entry .felt-cta{margin-top:16px;width:100%;min-height:60px;font-size:17px}}

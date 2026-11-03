@@ -1,0 +1,211 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#f96859">
+<title>주문 폭주 · SYNK LAB PLAY</title>
+<meta name="description" content="손님의 한국어 주문을 듣고 컵에 재료를 담아 서빙하는 카페 듣기 게임. 수량·온도·빼기·바꾸기 같은 조건을 끝까지 듣는 연습을 해요.">
+<link rel="icon" href="kit/felt/sparkle.webp" type="image/webp">
+<script src="./world-host.js"></script>
+<link rel="preload" href="kit/fonts/SUIT-Variable.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="kit/lab.css">
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="world-skin.css">
+<script src="./atlas-learning.js"></script>
+<script type="module" src="./app.mjs"></script>
+</head>
+<body>
+<p id="sr-live" class="sr" aria-live="polite"></p>
+
+<!-- 입구 -->
+<main id="lobby" class="screen lobby">
+  <header class="topbar on-field">
+    <a class="logo-tag" href="./" aria-label="주문 폭주 처음으로"><img src="kit/brand/logo-lab.webp" alt="SYNK LAB" width="96" height="30"></a>
+    <span class="kicker">LAB · LISTEN &amp; MAKE</span>
+    <button class="sound-toggle" type="button" aria-pressed="true" data-sound-toggle><span class="sr">소리</span></button>
+  </header>
+
+  <section class="hero">
+    <div class="hero-copy">
+      <span class="kicker">ORDER RUSH · A CAFE GAME</span>
+      <h1>주문 폭주</h1>
+      <p class="lede">손님 주문을 듣고,<br><span class="crayon-under">딱 맞는 음료</span>를 만들어요!</p>
+      <p class="sub">따뜻하게? 얼음 없이? 두 잔? 끝까지 듣고 컵에 담아 서빙해요. 주문과 다르게 만들면 손님이 어디가 다른지 말해 줘요.</p>
+    </div>
+    <figure class="hero-art" aria-hidden="true">
+      <div class="hero-bubble paper">아이스라테 두 잔 주세요!</div>
+      <img class="hero-guest" src="assets/cast/deer.webp" alt="">
+      <img class="hero-bit b-coffee" src="assets/felt/coffee.webp" alt="">
+      <img class="hero-bit b-milk" src="assets/felt/milk.webp" alt="">
+      <img class="hero-bit b-ice" src="assets/felt/ice.webp" alt="">
+      <img class="hero-mongle diecut" src="kit/brand/mongle-cheer.webp" alt="">
+    </figure>
+  </section>
+
+  <section class="plan">
+    <article class="paper start-card">
+      <span class="tag">오늘의 영업</span>
+      <h2 id="l-title">주문 <b>8개</b></h2>
+      <p id="learning-reason" class="reason" role="status"></p>
+      <div class="modes" role="group" aria-label="영업 방식">
+        <button class="mode m-calm" type="button" data-mode="practice" aria-pressed="true"><b>한가한 오픈</b><small><span>주문 8개</span> <span>시간 제한 없이</span></small></button>
+        <button class="mode m-rush" type="button" data-mode="rush" aria-pressed="false"><b>점심 러시</b><small><span>90초</span> <span>손님이 줄을 서요</span></small></button>
+      </div>
+      <button id="start" class="felt-cta coral" type="button"><span>카페 문 열기</span><i class="disc" aria-hidden="true"></i></button>
+      <button id="followup-start" class="chip-btn" type="button" hidden>며칠 뒤 주문 한 번 확인</button>
+      <div class="start-options">
+        <button id="flow-toggle" class="chip-btn" type="button" aria-pressed="true">나에게 맞춘 속도 켜짐</button>
+        <span class="fine" id="flow-note">내가 하는 걸 보고 손님 속도와 주문이 달라져요.</span>
+      </div>
+      <p id="sound-note" class="fine warn" hidden>듣기 게임이에요. 소리를 켜야 손님 주문이 들리고 학습 기록에도 남아요.</p>
+      <p id="storage-note" class="fine" hidden></p>
+      <p class="synk-collection-line"><span data-collection-balance>코인을 불러오고 있어요.</span><a data-collection-garage href="/try/racing/?garage=1">공통 차고 →</a></p>
+    </article>
+    <section class="paper how" aria-labelledby="how-title">
+      <span class="tag" id="how-title">하는 방법</span>
+      <ol class="how-steps">
+        <li><b class="num">1</b><strong>주문 듣기</strong><span>손님이 한국어로 주문해요. 듣는 동안에는 영업 시간이 멈춰요. 다시 듣거나 글로 볼 수도 있어요.</span></li>
+        <li><b class="num">2</b><strong>컵에 담기</strong><span>커피·차·우유·얼음·설탕을 눌러 담아요. 커피에 우유를 넣으면 라테, 얼음을 넣으면 차가워져요. 두 잔이면 ‘컵 하나 더’를 눌러요.</span></li>
+        <li><b class="num">3</b><strong>서빙하기</strong><span>맞으면 손님이 받아 가요. 다르면 손님이 무엇이 다른지 말해 줘요. 고쳐서 다시 서빙하면 돼요.</span></li>
+      </ol>
+      <p class="fine">얼음 없이 차갑게 만들려면 ‘차갑게’를 눌러요. 넣은 재료를 다시 누르면 빠져요. 키보드로도 할 수 있어요: 1~6 재료 · Q 컵 하나 더 · ⌫ 컵 빼기 · R 다시 듣기 · Space 서빙 · Esc 멈춤.</p>
+    </section>
+  </section>
+
+  <footer class="lobby-foot">
+    <p>TOPIK I 듣기처럼 생활 대화의 세부 내용(수량·온도·빼기·바꾸기)을 끝까지 듣는 연습이에요. 점수와 별은 TOPIK 급수와 상관없어요. 주문 음성은 합성 음성이에요.</p>
+    <p><span id="learning-scope">학습 기록은 이 브라우저에만 저장되고, 같은 주소에서 연 다른 SYNK 게임과 같이 써요.</span> <button id="learning-reset" class="text-link" type="button">이 브라우저의 모든 게임 학습 기록 지우기</button></p>
+  </footer>
+</main>
+
+<!-- 영업 -->
+<main id="game" class="screen game" hidden>
+  <header class="topbar game-bar">
+    <img class="logo-mini" src="kit/brand/logo-lab.webp" alt="SYNK LAB" width="78" height="24">
+    <strong class="game-title">주문 폭주</strong>
+    <div class="hud" aria-live="off">
+      <span class="pill"><small id="g-count-label">손님</small><b id="g-count">1 / 8</b></span>
+      <span class="pill" id="g-score-wrap"><small>점수</small><b id="g-score">0</b></span>
+      <span class="pill combo" id="g-combo-wrap"><small>콤보</small><b id="g-combo">0</b></span>
+    </div>
+    <button id="pause" class="disc-btn" type="button" aria-label="잠깐 멈춤"><span aria-hidden="true">Ⅱ</span></button>
+  </header>
+
+  <div class="play">
+    <section class="arena counter-scene" id="arena" aria-label="계산대">
+      <aside class="menu-card paper" aria-label="카페 메뉴">
+        <span class="tag">오늘의 메뉴</span>
+        <ul>
+          <li><b>라테</b> 커피 + 우유</li>
+          <li><b>아이스</b> 얼음을 넣어요</li>
+          <li><b>얼음 없이 차갑게</b> ‘차갑게’</li>
+        </ul>
+        <p>넣은 재료를 다시 누르면 빠져요.</p>
+      </aside>
+      <p class="tip" id="tip" hidden></p>
+      <figure class="guest" id="guest" hidden><img id="guest-img" src="assets/cast/bear.webp" alt=""></figure>
+      <div class="bubble paper" id="bubble" hidden>
+        <p class="b-dots" id="b-dots"><i></i><i></i><i></i><span class="sr">손님이 주문하는 중</span></p>
+        <p class="b-cap" id="b-cap"></p>
+        <p class="b-line" id="order-text" hidden></p>
+        <p class="b-note" id="b-note" hidden></p>
+        <div class="b-tools" id="b-tools">
+          <button id="listen" class="chip-btn" type="button">다시 듣기</button>
+          <button id="show-text" class="chip-btn" type="button" aria-pressed="false">글로 보기</button>
+        </div>
+        <span class="patience" id="b-patience" hidden><i></i></span>
+      </div>
+      <div class="counter" aria-hidden="true"></div>
+      <div class="line-up" id="queue" role="group" aria-label="줄 선 손님"></div>
+      <p class="pop" id="pop" hidden aria-hidden="true"></p>
+    </section>
+
+    <section class="station" aria-label="음료 만들기">
+      <div class="cup-row">
+        <div class="cup-tabs" id="cup-tabs" role="group" aria-label="만들 컵"></div>
+        <button id="add-cup" class="chip-btn add" type="button">+ 컵 하나 더</button>
+        <button id="remove-cup" class="chip-btn" type="button">비우기</button>
+      </div>
+      <div class="bench" id="bench">
+        <canvas id="stage" aria-hidden="true"></canvas>
+        <p class="flow-line" id="flow-line" role="status" hidden></p>
+        <p class="cup-desc" id="cup-description" aria-live="polite">빈 컵</p>
+      </div>
+      <div class="ingredients" role="group" aria-label="재료">
+        <button class="ing" type="button" data-ingredient="coffee" aria-pressed="false"><img src="assets/felt/coffee.webp" alt=""><span>커피</span><b class="no" aria-hidden="true">1</b></button>
+        <button class="ing" type="button" data-ingredient="tea" aria-pressed="false"><img src="assets/felt/tea.webp" alt=""><span>차</span><b class="no" aria-hidden="true">2</b></button>
+        <button class="ing" type="button" data-ingredient="milk" aria-pressed="false"><img src="assets/felt/milk.webp" alt=""><span>우유</span><b class="no" aria-hidden="true">3</b></button>
+        <button class="ing" type="button" data-ingredient="ice" aria-pressed="false"><img src="assets/felt/ice.webp" alt=""><span>얼음</span><b class="no" aria-hidden="true">4</b></button>
+        <button class="ing" type="button" data-ingredient="sugar" aria-pressed="false"><img src="assets/felt/sugar.webp" alt=""><span>설탕</span><b class="no" aria-hidden="true">5</b></button>
+        <button class="ing" type="button" data-ingredient="cold" aria-pressed="false"><img src="assets/felt/cold.webp" alt=""><span>차갑게</span><b class="no" aria-hidden="true">6</b></button>
+      </div>
+      <button id="serve" class="felt-cta coral serve" type="button"><span>서빙하기</span><i class="disc" aria-hidden="true"></i></button>
+    </section>
+  </div>
+</main>
+
+<!-- 결과 -->
+<main id="results" class="screen results" hidden>
+  <header class="topbar on-field">
+    <span class="logo-tag"><img src="kit/brand/logo-lab.webp" alt="SYNK LAB" width="96" height="30"></span>
+    <span class="kicker">SHIFT COMPLETE</span>
+  </header>
+  <section class="res-hero">
+    <div>
+      <span class="kicker ko" id="r-kicker">주문 폭주 · 한가한 오픈</span>
+      <h1 id="r-title" tabindex="-1">영업 끝!</h1>
+      <p class="big"><b id="r-correct">0</b><span>/ <i id="r-total">8</i></span></p>
+      <p class="big-cap">첫 서빙에 맞힌 주문</p>
+      <p class="stars" id="r-stars" aria-label="별 3개 중 0개"></p>
+      <p class="r-note" id="r-note"></p>
+      <p class="synk-collection-line"><span id="r-coins" role="status"></span><a data-collection-garage href="/try/racing/?garage=1">공통 차고 →</a></p>
+    </div>
+    <img class="res-mongle diecut" id="r-mongle" src="kit/brand/mongle-smile.webp" alt="">
+  </section>
+  <section class="res-grid">
+    <article class="paper log">
+      <span class="tag">이번 영업의 주문</span>
+      <ol id="r-log"></ol>
+    </article>
+    <article class="paper skills">
+      <span class="tag">듣기 연습 기록</span>
+      <p id="result-learning" class="reason" role="status"></p>
+      <section class="flow-box" id="result-flow" hidden>
+        <h3>나에게 맞춰 바꾼 것</h3>
+        <ul></ul>
+        <p class="fine">내가 하는 모습을 보고 손님 속도와 주문 종류만 바꿨어요. 점수나 실력을 매긴 것은 아니에요. 다음 영업은 여기서부터 이어서 시작해요.</p>
+      </section>
+      <dl class="metrics" id="result-metrics"></dl>
+      <p class="fine">첫 서빙 정확도는 답한 주문 가운데 처음 서빙한 컵이 맞은 비율이에요. 글로 확인한 주문도 들어가요. 서빙 점수는 고쳐서 낸 주문에도 쌓이고, 답하지 않은 주문은 따로 세요.</p>
+      <p id="result-scope" class="fine">주문 음성은 합성 음성이에요. 학습 효과는 아직 학생들과 확인하지 않았어요. 지금 연습한 기록은 저장할 수 있을 때 이 브라우저에 남아요.</p>
+    </article>
+    <article class="paper next">
+      <span class="tag">다음 영업</span>
+      <p id="r-next-reason" class="reason"></p>
+      <button id="review-start" class="felt-cta coral" type="button"><span>새 주문 연습</span><i class="disc" aria-hidden="true"></i></button>
+      <button id="followup-result" class="chip-btn" type="button" hidden>며칠 뒤 주문 한 번 확인</button>
+      <div class="r-actions">
+        <button id="replay" class="chip-btn" type="button">다시 영업하기</button>
+        <button id="home" class="chip-btn" type="button">처음으로</button>
+      </div>
+    </article>
+  </section>
+</main>
+
+<dialog id="pause-dialog" class="paper lab-dialog" aria-labelledby="pause-title">
+  <span class="kicker" id="pause-kicker">PAUSED</span>
+  <h2 id="pause-title">카페도 잠깐 쉬어요</h2>
+  <p>주문과 영업 시간이 함께 멈췄어요. 이어서 하거나 처음으로 돌아갈 수 있어요.</p>
+  <p id="game-learning" class="fine pause-why"></p>
+  <div class="dialog-actions">
+    <button id="resume" class="felt-cta coral" type="button"><span>이어 하기</span><i class="disc" aria-hidden="true"></i></button>
+    <div class="dialog-toggles">
+      <button class="chip-btn" type="button" data-sound-toggle data-sound-label aria-pressed="true">소리 켜짐</button>
+    </div>
+    <button id="quit" class="chip-btn wide" type="button">처음으로</button>
+  </div>
+</dialog>
+<script src="./collection.js"></script>
+</body>
+</html>
