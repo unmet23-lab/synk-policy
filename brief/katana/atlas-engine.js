@@ -80,6 +80,8 @@
       if (!validId(event.decisionId) || !validId(event.experienceId) || !validId(event.variant)) throw new TypeError('Atlas: invalid completion');
     } else if (event.type === 'feedback.given') {
       if (!validId(event.completionId) || !['helpful', 'too_much', 'want_more', 'not_fit'].includes(event.value)) throw new TypeError('Atlas: invalid feedback');
+      // A response may also name its completion's decision, so a store that folds by decision keeps them together.
+      if (event.decisionId !== undefined && !validId(event.decisionId)) throw new TypeError('Atlas: invalid feedback');
     } else if (event.type === 'signal.observed') {
       // An adapter's summary of what was observed. Raw text, audio and identifiers never enter.
       if (!SIGNALS.includes(event.kind) || !validId(event.key) || !unit(event.strength) || !Number.isInteger(event.n) || event.n < 0 || !flag(event.assisted)) throw new TypeError('Atlas: invalid signal');
@@ -132,6 +134,7 @@
     if (event.type === 'feedback.given') {
       const completion = find(event.completionId, 'experience.completed');
       if (!completion || scopeKey(completion.scope) !== scopeKey(event.scope) || ms(completion.at) > ms(event.at)) throw new Error('Atlas: feedback requires a prior completion in the same scope');
+      if (event.decisionId !== undefined && event.decisionId !== completion.decisionId) throw new Error('Atlas: feedback names another decision than its completion');
     }
     if (event.type === 'experience.completed') {
       const decision = find(event.decisionId, 'decision.made');
@@ -154,6 +157,54 @@
   }
   function append(events, event) {
     return admit(events, event) ? [...copy(events), copy(event)] : copy(events);
+  }
+  // Storage adapters may validate a bounded batch against already-admitted, immutable
+  // history. Only direct parents and each presentation's last attempt are needed:
+  // Trail guarantees consecutive attempt numbers and nondecreasing attempt times.
+  // These are storage lookups, not a second set of graph rules.
+  function validationNeeds(events) {
+    if (!Array.isArray(events)) throw new TypeError('Atlas: invalid events');
+    const ids = new Set(), presentations = new Set();
+    for (const event of events) {
+      validate(event);
+      ids.add(event.id);
+      if (isPractice(event)) {
+        ids.add(event.type === 'practice.presented' ? event.decisionId : event.presentationId);
+        if (event.type === 'practice.attempted') presentations.add(event.presentationId);
+      }
+      if (event.type === 'experience.completed' || event.type === 'outcome.observed') ids.add(event.decisionId);
+      if (event.type === 'outcome.observed' && event.attemptId != null) ids.add(event.attemptId);
+      if (event.type === 'feedback.given') ids.add(event.completionId);
+      if (event.type === 'record.excluded') ids.add(event.targetId);
+    }
+    return { ids: [...ids], presentations: [...presentations] };
+  }
+  function validateIncrement({ events, scope, references = [], attempts = [] }) {
+    const key = scopeKey(scope), needs = validationNeeds(events);
+    const wanted = new Set(needs.ids), parents = new Map(), stats = new Map();
+    for (const event of references) {
+      validate(event);
+      if (!wanted.has(event.id) || parents.has(event.id)) throw new TypeError('Atlas: invalid reference lookup');
+      parents.set(event.id, event);
+    }
+    for (const event of attempts) {
+      validate(event);
+      if (event.type !== 'practice.attempted' || !needs.presentations.includes(event.presentationId)
+        || stats.has(event.presentationId) || scopeKey(event.scope) !== key) throw new TypeError('Atlas: invalid attempt lookup');
+      stats.set(event.presentationId, { count: event.attemptNo, latest: ms(event.at) });
+    }
+    if (typeof trail().link !== 'function') throw new Error('Atlas: indexed Trail validation unavailable');
+    const fresh = new Map(), lookup = {
+      byId: id => fresh.get(id) || parents.get(id),
+      attempts: id => stats.get(id) || { count: 0, latest: -Infinity },
+    };
+    for (const event of events) {
+      if (scopeKey(event.scope) !== key) throw new TypeError('Atlas: event outside session scope');
+      if (!admitWith(lookup, event)) continue;
+      fresh.set(event.id, event);
+      if (event.type === 'practice.attempted') stats.set(event.presentationId, { count: event.attemptNo, latest: ms(event.at) });
+    }
+    return [...fresh.values()];
   }
   // Internal reading. understand() publishes the state; decide() also needs the decision history.
   function read(events, scope, asOf, recordedAsOf = asOf) {
@@ -458,7 +509,7 @@
         const existing = completions.get(decision.id);
         return existing ? copy(existing) : record({ type: 'experience.completed', decisionId: decision.id, experienceId: decision.experienceId, variant: decision.selected.id });
       },
-      feedback: (completionId, value) => record({ type: 'feedback.given', completionId, value }),
+      feedback: (completionId, value, decisionId) => record({ type: 'feedback.given', completionId, value, ...(decisionId !== undefined ? { decisionId } : {}) }),
       practice: (kind, fields) => {
         if (!fields || typeof fields !== 'object' || Array.isArray(fields) || typeof kind !== 'string') throw new TypeError('Atlas: invalid practice fields');
         return record({ ...fields, type: kind.startsWith('practice.') ? kind : `practice.${kind}` });
@@ -471,5 +522,5 @@
       lines: () => understand(log, scope, clock()).lines,
     };
   }
-  return Object.freeze({ VERSION, POLICIES, CONTEXT, validate, append, understand, decide, choice, createSession });
+  return Object.freeze({ VERSION, POLICIES, CONTEXT, validate, append, validationNeeds, validateIncrement, understand, decide, choice, createSession });
 });
