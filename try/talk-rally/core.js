@@ -1,5 +1,5 @@
 // 말 랠리 — 한 판 구성·점수·공 속도·긋기 방향 판정·원고 검사(순수 함수, 화면 없음).
-import { ITEMS, SKILL_LABEL, ROUND_SIZE } from './content.js';
+import { ITEMS, SKILL_LABEL, KIND_LABEL, ROUND_SIZE } from './content.js?v=2296ead93ddc';
 
 /** 시험용 결정적 난수(xorshift). */
 export function rng(seed = 1) {
@@ -14,24 +14,29 @@ export function shuffled(arr, rand = Math.random) {
 
 /**
  * 한 판(기본 12번 주고받기) 고르기 — 빈칸 베기와 같은 규칙.
- * 아틀라스 필요 순서(ranked)를 앞에, 두 학습 항목을 적어도 4개씩, 처음이면 난도 1부터, 고른 뒤 쉬운 것부터.
+ * 아틀라스 필요 순서(ranked)를 앞에, 두 종류(묻는 말에 대답·이어지는 말)를 적어도 4개씩, 처음이면 난도 1부터, 고른 뒤 쉬운 것부터.
+ * 종류로 나누는 까닭: 두 종류가 한 학습 항목(듣고 알맞게 대답하기)이 된 10-21 뒤에도 판마다 둘이 섞이게(그전에는 항목이 종류마다 달랐다).
  * 아틀라스 순서가 없으면 seed(판 번호)로 섞어 판마다 다른 말이 나오게 한다.
  */
-export function composeRound(items = ITEMS, { ranked = null, size = ROUND_SIZE, firstTime = false, seed = 0 } = {}) {
+export function composeRound(items = ITEMS, { ranked = null, size = ROUND_SIZE, firstTime = false, seed = 0, lead = null } = {}) {
   const byId = new Map(items.map((x) => [x.id, x]));
   const base = !ranked?.length && !firstTime && seed ? shuffled(items, rng(seed * 7919)) : items;
-  let order = [...(ranked || []).filter((id) => byId.has(id)), ...base.map((x) => x.id)]
+  // lead: 재방문 맞춤 연습의 말. 판에 반드시 들어가고 정렬 뒤에도 첫 공이다. 다른 기기의 기록을 받은 새 기기는 처음 판이면서 lead가 있어, 난도와 관계없이 앞에 둔다.
+  let order = [...(byId.has(lead) ? [lead] : []), ...(ranked || []).filter((id) => byId.has(id)), ...base.map((x) => x.id)]
     .filter((id, i, a) => a.indexOf(id) === i).map((id) => byId.get(id));
-  if (firstTime) order = [...order.filter((x) => x.difficulty === 1), ...order.filter((x) => x.difficulty !== 1)];
+  if (firstTime) { const easy = (x) => x.id === lead || x.difficulty === 1; order = [...order.filter(easy), ...order.filter((x) => !easy(x))]; }
   const n = Math.min(size, items.length);
   const minEach = Math.min(4, Math.floor(n / 3));
   const picked = [];
-  for (const skill of Object.keys(SKILL_LABEL)) {
-    for (const x of order.filter((y) => y.skill === skill).slice(0, minEach)) if (!picked.includes(x)) picked.push(x);
+  for (const kind of Object.keys(KIND_LABEL)) {
+    for (const x of order.filter((y) => y.kind === kind).slice(0, minEach)) if (!picked.includes(x)) picked.push(x);
   }
   for (const x of order) { if (picked.length >= n) break; if (!picked.includes(x)) picked.push(x); }
   const rank = new Map(order.map((x, i) => [x.id, i]));
-  return picked.slice(0, n).sort((a, b) => a.difficulty - b.difficulty || rank.get(a.id) - rank.get(b.id));
+  const round = picked.slice(0, n).sort((a, b) => a.difficulty - b.difficulty || rank.get(a.id) - rank.get(b.id));
+  const at = round.findIndex((x) => x.id === lead);
+  if (at > 0) round.unshift(...round.splice(at, 1));
+  return round;
 }
 
 /** 맞게 받아치면 100점, 랠리가 이어질수록 20점씩 더(최대 +100). 세 번 연속마다 스매시(+50). 공이 라켓에 닿기 전에 고르면 ‘빠르게!’(+50). */
@@ -75,7 +80,7 @@ export function swipeLane(dx, dy, { minPx = 36 } = {}) {
   return deg < -22 ? 0 : deg > 22 ? 2 : 1;
 }
 
-/** 원고 검사: id·보기 셋이 서로 다름·정답 = 첫 보기·학습 항목·난도·설명·음성 파일 이름. */
+/** 원고 검사: id·보기 셋이 서로 다름·정답 = 첫 보기·학습 항목·종류(판 구성이 나누는 기준)·난도·설명·음성 파일 이름. */
 export function validateItems(items = ITEMS) {
   const errors = [], ids = new Set();
   for (const x of items) {
@@ -84,6 +89,7 @@ export function validateItems(items = ITEMS) {
     if (x.options.length !== 3 || new Set(x.options).size !== 3) errors.push(`${x.id}: 서로 다른 대답 셋`);
     if (x.options[0] !== x.answer) errors.push(`${x.id}: 정답은 첫 보기`);
     if (!SKILL_LABEL[x.skill]) errors.push(`${x.id}: 모르는 학습 항목 ${x.skill}`);
+    if (!KIND_LABEL[x.kind]) errors.push(`${x.id}: 모르는 종류 ${x.kind}`);
     if (![1, 2].includes(x.difficulty)) errors.push(`${x.id}: 난도 1·2`);
     if (!x.why) errors.push(`${x.id}: 설명 없음`);
     if (x.voice !== `assets/voice/${x.id}.mp3`) errors.push(`${x.id}: 음성 파일 이름`);

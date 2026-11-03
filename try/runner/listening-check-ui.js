@@ -2,11 +2,11 @@
 // 기록 규칙은 listening-check.js가 맡는다. 이 파일은 화면만: 끝까지 듣기 전에는 카드를 잠그고, 들은 뒤의 다시 듣기만 도움으로 남기고,
 // 답한 뒤 다시 듣기는 재채점 없이 복습한다. 소리가 끊기면 다시 들은 뒤 답하게 한다.
 // 요소 이름(#listening-check·#check-choices button 등)은 WORLD 확인 도구가 그대로 쓴다.
-import { createListeningCheck, createListeningCheckRound, listeningCheckFeedback } from './listening-check.js';
+import { createListeningCheck, createListeningCheckRound, listeningCheckFeedback } from './listening-check.js?v=b4f90dd3bd9d';
 import { InstructionAudio } from './audio.js';
 import { fitText } from './kit/lab.js';
 
-export function mountListeningCheck({ coach, beforeOpen, onClose = () => {}, onFeedback = () => {}, onListen = () => {} }) {
+export function mountListeningCheck({ coach, beforeOpen, onClose = () => {}, onFeedback = () => {}, onListen = () => {}, chooseLead = () => null }) {
   const $ = (id) => document.getElementById(id), dialog = $('listening-check-dialog');
   let check = null, context, bank, gain, round = null, index = 0, epoch = 0, pending = false, rightCount = 0, stopped = false, recheckSource = null;
   const status = (text) => { $('check-status').textContent = text; };
@@ -118,7 +118,7 @@ export function mountListeningCheck({ coach, beforeOpen, onClose = () => {}, onF
     if (!coach) { status('학습 기록을 준비하지 못했어요. 앱을 다시 열어 주세요.'); $('check-choices').replaceChildren(); $('check-next').hidden = true; dialog.showModal(); return; }
     try {
       check ||= createListeningCheck(coach);
-      round = createListeningCheckRound(coach); index = 0;
+      round = createListeningCheckRound(coach, { lead: chooseLead() }); index = 0;
       const plan = round.next();
       if (plan.status !== 'ready') { $('check-choices').replaceChildren(); $('check-feedback').textContent = ''; $('check-plan').textContent = ''; $('check-count').textContent = ''; $('check-next').hidden = true; $('check-replay').hidden = true; status('이 목표에 맞는 문항을 준비하지 못했어요. WORLD에서 학습 목표를 다시 확인해 주세요.'); dialog.showModal(); return; }
       $('check-replay').hidden = false;
