@@ -713,8 +713,8 @@ const games={runner:{get title(){return t('game.runner.title');},path:'korean-ru
  racing:{get title(){return t('game.racing.title');},path:'korean-racing/'},
  // 말 랠리(11-04, 캠퍼스 판 겉 — talk-rally/world-skin.css): 홈 「놀이」가 해금 표로 연 뒤에만 여기로 온다.
  rally:{get title(){return t('game.rally.title');},path:'talk-rally/'},
- // 환승 러시(11-04): 홈 「놀이」가 해금 표로 연 뒤에만 여기로 온다.
- subway:{get title(){return t('game.subway.title');},path:'subway-rush/'},
+ // 환승 러시(11-04): 홈 「놀이」와 이번 주 계획 · 튜터 후보가 해금 표로 연 뒤에만 여기로 온다. 찰칵 낱말처럼 시험 목표 급을 넘긴다 — 3급 이상이면 고른 난도가 없을 때 바쁜 아침부터(level.mjs).
+ subway:{get title(){return t('game.subway.title');},get path(){let grade=0;try{grade=Number(life.progress?.learningProfileValues?.().targetGrade)||0;}catch{grade=0;}return grade>=3?`subway-rush/?grade=${grade}`:'subway-rush/';}},
  // 찰칵 낱말(11-04): 학생이 고른 시험 목표 급을 넘긴다 — 능력 판단이 아니라 3급 안내문을 켠 채 시작할지 정하는 데만 쓴다.
  snap:{get title(){return t('game.snap.title');},get path(){let grade=0;try{grade=Number(life.progress?.learningProfileValues?.().targetGrade)||0;}catch{grade=0;}return grade>=3?`snap-words/?grade=${grade}`:'snap-words/';}},
  // 게시판 해독(11-04): 3→4급 읽기. 홈 「놀이」가 해금 표로 연 뒤에만 여기로 온다.
