@@ -2,7 +2,7 @@
 // 기록 규칙은 listening-check.js가 맡는다. 이 파일은 화면만: 끝까지 듣기 전에는 카드를 잠그고, 들은 뒤의 다시 듣기만 도움으로 남기고,
 // 답한 뒤 다시 듣기는 재채점 없이 복습한다. 소리가 끊기면 다시 들은 뒤 답하게 한다.
 // 요소 이름(#listening-check·#check-choices button 등)은 WORLD 확인 도구가 그대로 쓴다.
-import { createListeningCheck, createListeningCheckRound, listeningCheckFeedback } from './listening-check.js?v=b4f90dd3bd9d';
+import { createListeningCheck, createListeningCheckRound, listeningCheckFeedback } from './listening-check.js?v=513d3754352f';
 import { InstructionAudio } from './audio.js';
 import { fitText } from './kit/lab.js';
 
