@@ -1,0 +1,99 @@
+/* 공통 차고(?garage=1) — 키트(kit/lab.css)의 코랄 펠트 머리 면과 종이 판 위에, 차고에만 있는 것:
+ * 3D 미리보기 종이 액자, 꾸미기 펠트 쿠션 카드(장착 = 크림 칼선 + 펠트 체크, 보는 중 = 들뜸), 그 색으로 물들인 크림 펠트 원, 목표 차 계기. */
+.garage-screen{min-height:100svh;background:var(--cream)}
+.garage-screen>.topbar,.garage-hero{background:linear-gradient(rgba(249,104,89,.36),rgba(249,104,89,.36)),url(kit/felt/tex-coral.webp) 0 0/190px 190px,var(--coral)}
+.garage-back{margin-left:auto;min-height:38px;padding:0 15px 3px;font-size:13.5px}
+.garage-hero{position:relative;display:grid;gap:14px;padding:6px 16px 52px}
+.garage-copy h1{margin:6px 0 0;font:900 clamp(52px,15vw,112px)/.94 var(--sans);letter-spacing:-.055em;text-shadow:0 1px 0 rgba(255,255,255,.22),0 -1px 0 rgba(120,30,20,.22)}
+.garage-copy .lede{margin:12px 0 0;font:800 clamp(20px,5.4vw,28px)/1.32 var(--sans);letter-spacing:-.02em}
+.garage-copy .sub{max-width:34em;margin:10px 0 0;font-size:15px;line-height:1.6;color:rgba(43,35,32,.86)}
+.garage-balance{margin:14px 0 0}
+.coin-pill{display:inline-grid;min-width:120px;padding:6px 18px 10px}
+.coin-pill small{font-size:11.5px}
+.coin-pill b{font:500 22px/1.15 var(--mono)}
+
+/* 3D 미리보기: 종이 액자 안의 캔버스. 차는 액자 가운데(app.js가 이 크기에 맞춰 카메라를 둔다) */
+.garage-preview{position:relative;margin:0;height:min(68vw,380px);padding:8px;border-radius:24px}
+.garage-world{position:absolute;inset:8px;border-radius:17px;overflow:hidden;background:#ead9c6}
+.garage-world canvas{display:block;width:100%;height:100%}
+.preview-wait{position:absolute;inset:8px;display:grid;place-items:center;margin:0;border-radius:17px;font:700 14px/1.4 var(--sans);color:var(--ink-2)}
+.preview-cap{position:absolute;left:18px;top:18px;display:grid;justify-items:start;gap:3px;max-width:calc(100% - 36px);padding:8px 12px 9px;border-radius:14px;background:rgba(255,253,248,.94);box-shadow:var(--shadow-paper)}
+.preview-cap strong{font:800 17px/1.25 var(--sans)}
+.preview-cap span:last-child{font:600 12.5px/1.35 var(--sans);color:var(--ink-2)}
+.preview-cap .tag{min-height:24px;font-size:11.5px}
+.garage-rotation{position:absolute;left:50%;bottom:16px;transform:translateX(-50%);width:min(280px,72%);display:block}
+.garage-rotation input{-webkit-appearance:none;appearance:none;display:block;width:100%;height:34px;margin:0;background:url(assets/felt/cushion-cream-strip.webp) center/100% 24px no-repeat;cursor:pointer}
+.garage-rotation input::-webkit-slider-runnable-track{height:34px;background:transparent}
+.garage-rotation input::-webkit-slider-thumb{-webkit-appearance:none;width:34px;height:34px;border:0;background:url(kit/felt/badge-coral.webp) center/contain no-repeat;filter:drop-shadow(0 3px 3px rgba(80,25,15,.3))}
+.garage-rotation input::-moz-range-track{height:34px;background:transparent}
+.garage-rotation input::-moz-range-thumb{width:34px;height:34px;border:0;background:url(kit/felt/badge-coral.webp) center/contain no-repeat}
+
+.garage-plan{position:relative;z-index:1;margin:-28px 0 0;padding:0 16px 40px;display:grid;gap:14px}
+.garage-shop{padding:18px 16px;display:grid;gap:12px}
+.shop-head{display:flex;flex-wrap:wrap;align-items:center;gap:6px 12px}
+.garage-tabs{display:flex;flex-wrap:wrap;gap:8px}
+.garage-tabs .chip-btn{min-height:40px;padding:0 16px 3px;font-size:14px}
+.garage-items{display:grid;grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:16px 10px;padding-top:6px}
+.garage-items:focus-visible{outline:3px solid var(--focus);outline-offset:4px;border-radius:12px}
+/* 꾸미기 카드: 도톰한 펠트 쿠션. 글은 쿠션의 평평한 면 안에 */
+.garage-item{position:relative;display:grid;justify-items:center;align-content:center;gap:2px;min-height:128px;padding:8px 10% 24px;border:0;text-align:center;
+  background:transparent center/100% 100% no-repeat;filter:drop-shadow(0 4px 5px rgba(73,45,30,.15));transition:transform .14s var(--ease),filter .16s}
+.garage-item.c-blush{background-image:url(kit/felt/cushion-blush-phone.webp);color:#5c2318}
+.garage-item.c-butter{background-image:url(kit/felt/cushion-butter-phone.webp);color:#3a2a08}
+.garage-item.c-lapis{background-image:url(kit/felt/cushion-lapis-phone.webp);color:#fffaf2;text-shadow:0 1px 1px rgba(16,36,96,.45)}
+.garage-item:active{transform:translateY(3px)}   /* 눌림 = 3px 내려앉기 */
+.garage-item.selected{transform:translateY(-5px);filter:drop-shadow(0 12px 10px rgba(73,45,30,.3))}
+.garage-item.equipped{filter:var(--sticker) drop-shadow(0 8px 8px rgba(73,45,30,.26))}   /* 장착: 크림 칼선 */
+.garage-item.equipped::after{content:"";position:absolute;right:-6px;top:-10px;width:34px;height:34px;background:url(kit/felt/badge-check.webp) center/contain no-repeat;filter:drop-shadow(0 2px 2px rgba(73,45,30,.3))}
+.gi-name{font:800 15px/1.25 var(--sans);letter-spacing:-.01em}
+.gi-state{font:700 12px/1.25 var(--sans);opacity:.9}
+.gi-wish{position:absolute;left:-4px;top:-12px;padding:4px 10px 6px;font:800 11px/1 var(--sans);color:var(--coral-deep);text-shadow:none;background:url(kit/felt/chip-blush-long.webp) center/100% 100% no-repeat}
+/* 견본: 크림 펠트 원(사진)을 그 색으로 물들인다 — 결은 사진 그대로 남는다 */
+.swatch{position:relative;display:block;width:46px;height:46px;margin-bottom:2px;isolation:isolate;background:url(kit/felt/badge-cream.webp) center/contain no-repeat;filter:drop-shadow(0 2px 2px rgba(73,45,30,.25))}
+.swatch::before{content:"";position:absolute;inset:0;background:var(--c,#c9ced3);mix-blend-mode:multiply;
+  -webkit-mask:url(kit/felt/badge-cream.webp) center/contain no-repeat;mask:url(kit/felt/badge-cream.webp) center/contain no-repeat}
+.swatch svg{position:absolute;inset:25% 22%;width:56%;height:50%;z-index:1;stroke-width:0;opacity:.9}
+.swatch.badge{background-image:url(kit/felt/badge-check.webp)}
+.swatch.badge::before{display:none}
+
+.garage-side{display:grid;gap:14px;align-content:start}
+.garage-detail{padding:18px;display:grid;gap:8px}
+.garage-detail h2{margin:2px 0 0;font:800 24px/1.2 var(--sans);letter-spacing:-.02em}
+.garage-price{margin:0;font:700 15px/1.3 var(--sans);color:var(--coral-deep)}
+.garage-actions{display:grid;gap:10px;justify-items:start;margin-top:4px}
+.garage-actions .felt-cta{width:100%}
+.garage-have,.garage-need{margin:0;display:flex;align-items:center;gap:8px;padding:10px 12px;border-radius:14px;background:var(--cream);font:700 14px/1.4 var(--sans)}
+.garage-have .check{width:26px;height:26px;flex:none;background:url(kit/felt/badge-check.webp) center/contain no-repeat}
+.garage-need b{color:var(--coral-deep)}
+.garage-actions .chip-btn{min-height:40px;font-size:13.5px}
+.garage-notice{margin:0;font:700 13.5px/1.45 var(--sans);color:var(--ink-2)}
+.garage-notice:empty{display:none}
+.garage-notice[data-kind=error]{color:var(--coral-deep)}
+.garage-goal{padding:16px 18px;display:grid;gap:6px;justify-items:start}
+.garage-goal strong{font:800 17px/1.3 var(--sans)}
+.garage-goal .chip-btn{min-height:40px;margin-top:2px;font-size:13.5px}
+.goal-track{position:relative;display:block;width:100%;height:22px;margin-top:4px;background:url(assets/felt/cushion-cream-strip.webp) center/100% 100% no-repeat}
+.goal-track i{position:absolute;inset:0;background:url(kit/felt/cushion-butter-strip.webp) center/100% 100% no-repeat;clip-path:inset(0 100% 0 0)}
+
+@media (max-width:480px){.garage-screen>.topbar>.kicker{display:none}}
+@media (max-width:599px){
+  .garage-tabs{gap:6px}
+  .garage-tabs .chip-btn{min-height:38px;padding:0 12px 3px;font-size:13.5px}
+  .garage-hero{padding-bottom:44px}
+  .garage-copy .sub{display:none}
+  .garage-preview{height:min(72vw,300px)}
+  .garage-items{grid-template-columns:repeat(2,minmax(0,1fr));gap:14px 8px}
+  .garage-item{min-height:118px}
+}
+@media (max-width:359px){
+  .garage-item{padding:7px 8% 22px}
+  .gi-name{font-size:14px}
+}
+@media (min-width:960px){
+  .garage-hero{grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);align-items:center;gap:28px;padding:10px 32px 64px}
+  .garage-preview{height:420px}
+  .garage-plan{grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);align-items:start;padding:0 32px 48px;margin-top:-34px;gap:18px}
+  .garage-shop{padding:22px 22px 24px}
+  .garage-items{grid-template-columns:repeat(auto-fill,minmax(168px,1fr));gap:18px 14px}
+  .garage-item{min-height:136px}
+}

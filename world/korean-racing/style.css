@@ -1,0 +1,312 @@
+/* 레이싱 — 공통 화면(입구·게임 바·멈춤·결과·펠트 부품)은 kit/lab.css(SYNK LAB PLAY 키트, 원본 experiences/play-common/kit/).
+ * 여기에는 레이싱에만 있는 것: 입구의 해안도로 사진 액자, 오늘의 코스·함께 달릴 친구, 코스 고르기 창(펠트 쿠션 타일),
+ * 3D 해안도로 위의 문제 카드·차선 답 꼬리표·조작 단추·부스터 계기, 완주 뒤 드라이브, 결과의 문제 목록·보상.
+ * 펠트는 실제 펠트 사진(kit/felt, assets/felt/cushion-cream-*)만 쓰고, 읽는 면은 종이로 둔다. 화면을 흔들지 않는다. */
+
+/* ── 입구 ── */
+.topbar .garage-link{margin-left:auto;min-height:38px;padding:0 15px 3px;font-size:13.5px}
+.topbar .garage-link+.sound-toggle{margin-left:0}
+/* 입구 그림: 실제 3D 해안도로를 한 번 그린 사진을 종이 액자에, 몽글은 옆자리 친구(움직이지 않는다) */
+.hero-art{display:grid;align-items:center}
+.hero-frame{position:relative;height:100%;max-height:100%;padding:8px;border-radius:24px;overflow:hidden}
+.hero-shot{width:100%;height:100%;object-fit:cover;object-position:50% 58%;border-radius:17px;background:#f3d9c4}
+.hero-art .hero-mongle{position:absolute;right:-4px;bottom:-14px;width:min(28%,150px)}
+
+.course-now{display:grid;gap:4px;margin-top:4px}
+.course-meta{font:700 12.5px/1.35 var(--sans);color:var(--ink-2)}
+.course-now h2{margin:0;font:800 26px/1.2 var(--sans);letter-spacing:-.02em}
+.medals{display:flex;align-items:center;gap:3px;min-height:22px;font:600 12.5px/1 var(--sans);color:var(--ink-2)}
+.medals i,.ct-status i{width:20px;height:20px;flex:none;background:url(kit/felt/sparkle-off.webp) center/contain no-repeat}   /* 못 받은 메달도 펠트 사진(키트 결과 별과 같이) */
+.medals i.on,.ct-status i.on{background-image:url(kit/felt/sparkle.webp)}
+.medals span{margin-left:6px}
+.start-options .chip-btn,.driver-pick .chip-btn{min-height:40px;padding:0 15px 3px;font-size:13.5px}
+.driver-pick{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+.driver-pick .fine{margin-right:2px}
+.chip-btn.driver{gap:6px;padding-left:9px}
+.chip-btn.driver img{width:26px;height:26px;border-radius:50%;object-fit:cover;background:#fbe9df}
+/* 고른 칩: 글자 앞에 작은 펠트 체크(납작한 회색 비활성 없음) */
+.chip-btn[aria-pressed=true]::before{content:"";width:17px;height:17px;margin:0 6px 0 -4px;flex:none;background:url(kit/felt/badge-check.webp) center/contain no-repeat}
+.chip-btn.driver[aria-pressed=true]::before{order:2;margin:0 -4px 0 2px}
+#subtitles[aria-pressed=true]::before{margin-right:4px}
+.world-status{color:var(--ink-2)}
+.world-status.warn{color:var(--coral-deep);font-weight:700}
+.world-status .chip-btn{min-height:34px;margin-left:6px;font-size:13px}
+.how-more{display:flex;flex-wrap:wrap;gap:8px}
+.how-more .chip-btn{min-height:38px;font-size:13.5px}
+.other-games{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:0}
+.other-games .fine{margin-right:2px}
+.other-games .chip-btn{min-height:36px;padding:0 14px 3px;font-size:13.5px}
+.other-games .chip-btn::after{content:"→";margin-left:6px;color:var(--coral-deep)}
+.credits summary{cursor:pointer;font-weight:700;color:var(--ink-2)}
+.credits p{margin:8px 0 0}
+.lobby-foot a{color:var(--ink-2);text-underline-offset:3px}
+
+/* ── 코스 고르기: 종이 창 + 펠트 쿠션 타일(고른 코스는 크림 칼선 + 펠트 체크) ── */
+dialog.course-dialog{width:min(920px,calc(100% - 20px));max-height:min(860px,calc(100svh - 24px));padding:18px 16px 16px;overflow:auto;overscroll-behavior:contain}
+.course-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.course-head h2{margin:2px 0 0}
+.course-head .disc-btn{padding:0 2px 2px 0;font:800 15px/1 var(--sans);color:var(--ink)}
+.course-tabs,.course-quick,.filter-chips{display:flex;flex-wrap:wrap;gap:8px}
+.course-tabs{margin-top:10px}
+.course-tabs .chip-btn{min-height:42px}
+.course-stats{margin:12px 0 0;font:700 14px/1.45 var(--sans);color:var(--ink-2)}
+.course-stats b{color:var(--ink);font-weight:800}
+.course-quick{margin-top:10px}
+.course-quick .chip-btn,.filter-chips .chip-btn{min-height:38px;padding:0 14px 3px;font-size:13.5px}
+.word-tools{display:grid;gap:10px;margin-top:12px}
+.search input{width:100%;min-height:46px;padding:0 16px;border:0;border-radius:14px;background:var(--cream);box-shadow:inset 0 0 0 1.5px var(--line);font:600 16px/1 var(--sans);color:var(--ink)}
+.search input:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+.course-rule{margin:12px 0 4px}
+.course-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px 12px;margin-top:12px}
+.course-tile{position:relative;display:grid;align-content:center;gap:2px;min-height:108px;padding:8px 10% 21px;border:0;text-align:left;
+  background:transparent center/100% 100% no-repeat;filter:drop-shadow(0 4px 5px rgba(73,45,30,.15));transition:transform .14s var(--ease),filter .16s}
+.course-tile.c-blush{background-image:url(kit/felt/cushion-blush-mid.webp);color:#5c2318}
+.course-tile.c-butter{background-image:url(kit/felt/cushion-butter-mid.webp);color:#3a2a08}
+.course-tile.c-lapis{background-image:url(kit/felt/cushion-lapis-mid.webp);color:#fffaf2;text-shadow:0 1px 1px rgba(16,36,96,.45)}
+.ct-meta{font:700 11.5px/1.3 var(--sans);opacity:.86}
+.ct-title{font:800 17px/1.25 var(--sans);letter-spacing:-.02em}
+.ct-sub{font:600 12.5px/1.35 var(--sans);opacity:.9;overflow:hidden;display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical}
+.ct-status{display:flex;align-items:center;gap:2px;margin-top:2px;font:700 12px/1.3 var(--sans)}
+.ct-status i{width:16px;height:16px}
+.ct-status span{margin-left:4px}
+.course-tile:active{transform:translateY(3px)}   /* 눌림 = 3px 내려앉기 */
+.course-tile[aria-pressed=true]{transform:translateY(-4px);filter:var(--sticker) drop-shadow(0 10px 9px rgba(73,45,30,.28))}
+.course-tile[aria-pressed=true]::after{content:"";position:absolute;right:-6px;top:-10px;width:32px;height:32px;background:url(kit/felt/badge-check.webp) center/contain no-repeat;filter:drop-shadow(0 2px 2px rgba(73,45,30,.3))}
+/* 잠긴 코스·결승: 모서리 꼬리표(색은 그대로, 납작한 회색 없음). 잠긴 코스도 자동 시연으로 구경할 수 있다 */
+.course-tile .ct-flag{position:absolute;left:-4px;top:-12px;padding:4px 10px 6px;font:800 11px/1 var(--sans);color:var(--coral-deep);text-shadow:none;
+  background:url(kit/felt/chip-blush-long.webp) center/100% 100% no-repeat;filter:drop-shadow(0 2px 2px rgba(73,45,30,.18))}
+.course-tile.locked .ct-title,.course-tile.locked .ct-sub{opacity:.78}
+.empty-stages{grid-column:1/-1;margin:8px 0;color:var(--ink-2)}
+.course-pages{display:flex;align-items:center;justify-content:center;gap:12px;margin-top:16px}
+.course-pages span{font:500 13px/1 var(--mono);color:var(--ink-2)}
+.course-pages .chip-btn{min-height:38px;font-size:13.5px}
+.course-pages .chip-btn:disabled{visibility:hidden}
+
+/* ── 레이스: 3D 해안도로 위에 위 카드(문제·연습·드라이브·안내) · 차선 답 꼬리표 · 아래 조작 단추와 부스터 ── */
+body.playing{overflow:hidden}
+.race .arena{background:#d9c9b4}
+.race .arena::after{display:none}   /* 바닥은 3D 도로가 그린다 */
+.world{position:absolute;inset:0;z-index:0}
+.world canvas{display:block;width:100%;height:100%}
+.cruise-loop{position:absolute;inset:0;z-index:1;background:var(--cream);opacity:0;pointer-events:none}
+.game-bar .course-line{position:absolute;left:0;right:0;bottom:-1px;height:3px;background:rgba(43,35,32,.06)}
+.course-line i{display:block;width:0;height:100%;background:var(--coral)}
+.speed-pill b i{margin-left:2px;font-style:normal;font-size:10.5px;opacity:.75}
+
+.top-stack{position:absolute;z-index:4;left:12px;right:12px;top:10px;display:grid;justify-items:center;gap:8px;pointer-events:none}
+.top-stack>*{pointer-events:auto}
+.demo-tag{justify-self:center}
+/* 문제 카드(종이): 듣기 → 고르기 → 답. 기울이지 않는다 */
+.qcard{width:min(520px,100%);margin:0;padding:12px 14px 12px;display:grid;gap:6px;animation:cardIn .26s var(--ease) both}
+.q-head{display:flex;align-items:center;gap:8px;min-height:30px}
+.q-ear{display:none;align-items:center;gap:4px}
+.qcard.narrating .q-ear{display:inline-flex}
+.q-ear i{width:8px;height:8px;border-radius:50%;background:var(--coral);opacity:.35;animation:dots 1s infinite ease-in-out}   /* 밝기만 바뀐다(움직이지 않는다) */
+.q-ear i:nth-child(2){animation-delay:.15s}
+.q-ear i:nth-child(3){animation-delay:.3s}
+.q-ask{margin:0;font:800 20px/1.32 var(--sans);letter-spacing:-.02em}
+.qcard[data-phase=answer] .q-ask{color:var(--coral-deep)}
+.qcard[data-result=ok] .q-ask::before{content:"";display:inline-block;width:28px;height:28px;margin:-6px 8px -6px 0;vertical-align:middle;background:url(kit/felt/badge-check.webp) center/contain no-repeat}
+.qcard[data-result=miss] .q-ask{color:var(--ink)}
+.qcard[data-result=miss] .q-ask b{padding:0 .2em;border-radius:6px;background:var(--marker)}
+.q-passage{margin:0;padding:9px 12px 10px;border-radius:12px;background:var(--cream);font:700 15.5px/1.5 var(--sans);white-space:pre-line}
+.q-caption{margin:0;padding:7px 11px 8px;border-radius:12px;background:var(--cream);font:600 14px/1.45 var(--sans);color:var(--ink-2);
+  display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.q-hint{margin:0;font:600 13px/1.45 var(--sans);color:var(--ink-2)}
+.q-tools{display:flex;flex-wrap:wrap;gap:6px}
+.q-tools .chip-btn{min-height:36px;padding:0 13px 3px;font-size:13px}
+.qcard[data-phase=answer] .q-tools{display:none}
+.qcard[data-phase=answer] .q-tools:has(#feedback-continue:not([hidden])){display:flex}
+.qcard[data-phase=answer]:has(#feedback-continue:not([hidden])){max-height:calc(100dvh - 150px);overflow:auto;overscroll-behavior:contain}
+.qcard[data-phase=listening] #question-toggle{display:none}   /* 들을 때는 글을 꺼내지 않는다(다 듣고 나면 ‘글로 보기’) */
+@keyframes cardIn{from{opacity:0}to{opacity:1}}
+@keyframes dots{0%,100%{opacity:.3}50%{opacity:1}}
+.race .tip{position:static;transform:none;width:auto;max-width:min(520px,100%);padding:9px 15px 10px;font-size:14px}
+
+/* 첫 플레이 조작 연습 */
+.tutorial-card{width:min(440px,100%);margin:0;padding:12px 14px 12px;display:grid;gap:6px}
+.t-head{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.t-dots{display:flex;gap:5px}
+.t-dots i{width:15px;height:15px;background:url(kit/felt/badge-cream.webp) center/contain no-repeat}
+.t-dots i.done{background-image:url(kit/felt/badge-coral.webp)}
+.tutorial-card h2{margin:2px 0 0;font:800 19px/1.3 var(--sans);letter-spacing:-.02em}
+.tutorial-card p{margin:0;font:600 13.5px/1.45 var(--sans);color:var(--ink-2)}
+.t-actions{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:2px}
+.t-actions .chip-btn{min-height:36px;padding:0 13px 3px;font-size:13px}
+.t-actions .felt-cta{width:auto;flex:1 1 200px;min-height:54px;font-size:16px}
+
+/* 완주 뒤 드라이브 */
+.cruise-card{width:min(440px,100%);margin:0;padding:12px 16px 12px;display:grid;gap:4px;justify-items:start}
+.cruise-card strong{font:800 18px/1.35 var(--sans)}
+.cruise-card p{margin:0;font:600 13.5px/1.5 var(--sans);color:var(--ink-2)}
+.cruise-card .chip-btn{min-height:36px;margin-top:4px;font-size:13px}
+.cruise-action{width:100%;margin-top:6px}
+.cruise-action .felt-cta{min-height:56px;font-size:16px;padding-left:20px}
+
+/* 차선 답 꼬리표: 크림 펠트 쿠션 셋(화면의 왼쪽·가운데·오른쪽 길). 도로 위에서도 읽히고, 누르면 그 길을 고른다 */
+/* 자리: 멈춤선에서 본 게이트 발치 바로 아래(app.js placeLaneAnchor가 --lane-top을 잰다) — 게이트의 답 판 아래, 내 차 위의 도로 */
+.lane-tags{position:absolute;z-index:3;left:50%;top:calc(var(--lane-top,52%) + 6px);transform:translateX(-50%);width:min(620px,calc(100% - 16px));
+  display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;pointer-events:none}
+.lane-tag{position:relative;display:grid;align-content:center;justify-items:center;gap:1px;min-height:64px;padding:5px 9% 14px;border:0;text-align:center;pointer-events:auto;
+  background:transparent url(assets/felt/cushion-cream-wide.webp) center/100% 100% no-repeat;filter:drop-shadow(0 5px 6px rgba(40,24,16,.35));
+  color:var(--ink);transition:transform .14s var(--ease),filter .16s,opacity .2s}
+.lane-tag .dir{font:700 11px/1.2 var(--sans);color:var(--ink-2)}
+.lane-tag .say{width:100%;font:800 17px/1.22 var(--sans);letter-spacing:-.01em;text-wrap:balance;overflow-wrap:normal}
+.lane-tag .say .nb{white-space:nowrap}
+.lane-tag.picture .say{font-size:26px;line-height:1.1}
+.lane-tag:active{transform:translateY(3px)}
+.lane-tag.chosen{transform:translateY(-4px);filter:var(--sticker) drop-shadow(0 8px 8px rgba(40,24,16,.38))}
+.lane-tag.right::after{content:"";position:absolute;right:-6px;top:-12px;width:34px;height:34px;background:url(kit/felt/badge-check.webp) center/contain no-repeat;filter:drop-shadow(0 2px 2px rgba(73,45,30,.3))}
+.lane-tags.judged .lane-tag:not(.right):not(.chosen){opacity:.55}
+.lane-tags.judged .lane-tag{pointer-events:none}
+.race .pop{left:50%;top:var(--pop-y,38%)}   /* 차선 꼬리표 위 하늘에서 떠올랐다 사라진다(차·꼬리표를 덮지 않게) */
+.race .pop{z-index:5;font-size:26px}
+
+/* 아래 조작: 펠트 단추(왼쪽·오른쪽 아래 모서리, ‘이 길로’는 오른쪽 단추 위) — 차를 가리지 않게 모서리에. 부스터 계기는 휴대폰에서 두 단추 사이, 넓은 화면에서는 오른쪽 위 하늘 */
+.dash{position:absolute;z-index:3;left:max(10px,env(safe-area-inset-left));right:max(10px,env(safe-area-inset-right));bottom:max(10px,env(safe-area-inset-bottom));
+  display:flex;justify-content:space-between;align-items:end;pointer-events:none}
+.dash>*{pointer-events:auto}
+.steer-btn{position:relative;display:grid;place-items:center;width:62px;height:62px;padding:0 3px 4px 0;border:0;background:url(kit/felt/badge-cream.webp) center/contain no-repeat;
+  font:800 26px/1 var(--sans);color:var(--ink);filter:drop-shadow(0 5px 6px rgba(40,24,16,.35));touch-action:none;user-select:none;-webkit-user-select:none;
+  -webkit-tap-highlight-color:transparent;transition:transform .08s var(--ease),filter .1s}
+.steer-btn:active,.steer-btn.held{transform:translateY(3px);filter:drop-shadow(0 2px 3px rgba(40,24,16,.32))}
+.steer-btn.go{position:absolute;right:0;bottom:72px;width:66px;height:66px;align-content:center;gap:1px;padding:0 3px 5px 0;background-image:url(kit/felt/badge-coral.webp);
+  color:#fff;text-shadow:0 1px 1px rgba(120,30,20,.45);font-size:24px}
+.steer-btn.go small{font:800 11px/1 var(--sans)}
+.steer-btn.tutorial-target{filter:var(--sticker) drop-shadow(0 0 9px rgba(255,200,60,.9));animation:hintGlow 1.1s ease-in-out infinite}   /* 금빛 밝기만 숨 쉬듯(움직이지 않는다) */
+@keyframes hintGlow{0%,100%{filter:var(--sticker) drop-shadow(0 0 5px rgba(255,200,60,.55))}50%{filter:var(--sticker) drop-shadow(0 0 13px rgba(255,200,60,.95))}}
+/* 부스터 계기: 크림 펠트 띠 위에 버터 펠트 띠를 잘라(clip-path) 채운다 */
+.boost{position:absolute;z-index:3;left:50%;bottom:max(14px,env(safe-area-inset-bottom));transform:translateX(-50%);width:min(260px,calc(100% - 172px));
+  display:grid;gap:3px;padding:6px 10px 8px;border-radius:16px;background:rgba(255,253,248,.92);box-shadow:var(--shadow-paper)}
+.boost-head{display:flex;align-items:baseline;justify-content:space-between;gap:8px;min-width:0}
+.boost-label{font:800 12.5px/1.2 var(--sans);white-space:nowrap}
+.boost-note{font:700 11.5px/1.2 var(--sans);color:var(--coral-deep);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.boost-track{position:relative;display:block;height:24px;background:url(assets/felt/cushion-cream-strip.webp) center/100% 100% no-repeat}
+.boost-track i{position:absolute;inset:0;background:url(kit/felt/cushion-butter-strip.webp) center/100% 100% no-repeat;clip-path:inset(0 100% 0 0)}
+.race.boosting .boost{box-shadow:var(--shadow-paper),0 0 0 2px rgba(245,196,69,.7)}
+
+.world-error{position:absolute;z-index:6;left:50%;top:50%;transform:translate(-50%,-50%);width:min(380px,calc(100% - 32px));padding:18px;display:grid;gap:8px}
+.world-error strong{font:800 18px/1.3 var(--sans)}
+.world-error p{margin:0;font-size:14px;color:var(--ink-2)}
+
+/* 상태별로 보이는 것 */
+.race.coasting .qcard,.race.coasting .lane-tags,.race.coasting .boost,.race.coasting #go,.race.coasting .demo-tag{display:none}
+.race.tutorial .hud,.race.tutorial .qcard,.race.tutorial .boost{visibility:hidden}
+.race.tutorial-done #pause,.race.tutorial-done .dash{display:none}
+.race:not(.coasting) .cruise-action{display:none}
+
+/* ── 결과 ── */
+.r-label{margin:4px 0 0;font:800 15px/1.3 var(--sans);color:rgba(43,35,32,.82)}
+#r-stars i:nth-child(1){animation-delay:.3s}
+#r-stars i:nth-child(2){animation-delay:.52s}
+#r-stars i:nth-child(3){animation-delay:.74s}
+.r-stats{display:flex;flex-wrap:wrap;gap:6px;margin:12px 0 0}
+.r-stats .pill{min-width:70px}
+.log li{grid-template-columns:30px minmax(0,1fr) auto}
+.log li.ok .mark,.log li.ko .mark{width:28px;height:28px;border-radius:0;background:transparent center/contain no-repeat;color:var(--ink-2)}
+.log li.ok .mark{background-image:url(kit/felt/badge-check.webp)}   /* 맞힘: 펠트 체크 배지 */
+.log li.ko .mark{background-image:url(kit/felt/badge-cream.webp);padding:0 2px 2px 0;font:700 13px/1 var(--mono)}   /* 다시 볼 문제: 크림 펠트 원에 번호(빨간 X 없음) */
+.log .q{display:block;font:800 15.5px/1.45 var(--sans)}
+.log .a{display:block;margin-top:2px;font:700 14px/1.45 var(--sans);color:var(--ink-2)}
+.log .a b{margin-left:4px;padding:0 .25em;border-radius:6px;background:var(--marker);color:var(--ink)}
+.log .why{display:block;margin-top:4px;font-size:13px;line-height:1.5;color:var(--ink-2)}
+.say-again{min-height:34px;padding:0 12px 2px;font-size:13px;align-self:center}
+.rewards ul{list-style:none;margin:10px 0 10px;padding:0;display:grid;gap:8px}
+.rewards li{display:flex;align-items:baseline;justify-content:space-between;gap:10px;padding:9px 12px;border-radius:14px;background:var(--cream);font:700 14px/1.4 var(--sans)}
+.rewards li b{font:500 13px/1 var(--mono);white-space:nowrap;color:var(--coral-deep)}
+.rewards li.unlock{background:var(--coral-wash)}
+.rewards li.plain{display:block;font-weight:600;color:var(--ink-2)}
+.next .felt-cta[hidden]{display:none}
+.next .other-games{margin-top:2px}
+
+/* ── 휴대폰·태블릿 ── */
+@media (max-width:959px){.hero-art{height:min(50vw,320px)}}
+@media (max-width:599px){
+  .hero{padding-bottom:40px}
+  .hero .sub{display:none}
+  .hero-art{height:min(54vw,214px);margin-top:6px}
+  .hero-frame{padding:6px;border-radius:20px}
+  .hero-shot{border-radius:15px}
+  .hero-art .hero-mongle{width:min(27%,108px);right:-2px;bottom:-12px}
+  .course-now h2{font-size:24px}
+  .course-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px 8px}
+  .course-tile{min-height:104px;padding:7px 9% 19px}
+  .course-tile.c-blush{background-image:url(kit/felt/cushion-blush-phone.webp)}
+  .course-tile.c-butter{background-image:url(kit/felt/cushion-butter-phone.webp)}
+  .course-tile.c-lapis{background-image:url(kit/felt/cushion-lapis-phone.webp)}
+  .ct-title{font-size:15px}
+  .ct-sub{display:none}
+  .ct-meta{font-size:11px}
+  dialog.course-dialog{padding:16px 12px 14px}
+}
+@media (max-width:599px) and (max-height:700px){
+  .hero{padding-bottom:36px}
+  .hero-art{height:104px}
+  .hero-art .hero-mongle{width:auto;height:104%;bottom:-8px}
+}
+@media (max-width:700px){
+  .lane-tag{background-image:url(assets/felt/cushion-cream-mid.webp);min-height:58px;padding:4px 9% 12px}
+  .lane-tag .say{font-size:15px}
+  .lane-tag.picture .say{font-size:24px}
+  .qcard{padding:10px 12px 11px;gap:5px}
+  .q-ask{font-size:18px}
+  .q-passage{font-size:14.5px;padding:7px 10px 8px}
+}
+@media (max-width:480px){.lobby>.topbar>.kicker{display:none}}   /* 공통 차고 칩이 들어가도록 머리 줄의 영문 kicker는 넓은 화면에서만 */
+@media (max-width:440px){
+  .game-bar .logo-mini{display:none}
+  .top-stack{left:8px;right:8px;top:8px}
+  .steer-btn{width:58px;height:58px;font-size:24px}
+  .steer-btn.go{width:62px;height:62px;bottom:66px}
+  .boost{padding:5px 9px 7px}
+  .lane-tags{gap:6px;width:calc(100% - 10px)}
+  .lane-tag .dir{font-size:11px}
+  .cruise-action .felt-cta{min-height:52px;font-size:15px;padding-left:16px}
+}
+@media (max-width:359px){
+  .hero-art{display:none}
+  .lane-tag{background-image:url(assets/felt/cushion-cream-phone.webp);min-height:54px;padding:4px 8% 11px}
+  .lane-tag .say{font-size:14px}
+  .steer-btn{width:56px;height:56px}
+  .steer-btn.go{width:58px;height:58px;bottom:62px}
+  .boost-note{display:none}
+  .course-grid{gap:12px 6px}
+  .ct-title{font-size:14px}
+}
+@media (max-height:600px){
+  /* 키 작은 휴대폰(320×568): 게이트 발치와 차 지붕 사이가 좁다 → 낮은 꼬리표(방향 글은 자리로 알 수 있어 뺀다) */
+  .lane-tags{top:calc(var(--lane-top,52%) + 3px)}
+  .lane-tag{min-height:40px;padding:3px 8% 9px;background-image:url(assets/felt/cushion-cream-mid.webp)}
+  .lane-tag .dir{display:none}
+  .lane-tag .say{font-size:14px}
+  .lane-tag.picture .say{font-size:20px}
+  .game-bar{padding:7px 10px}
+  .game-bar .pill{padding:2px 9px 5px}
+  .game-bar .disc-btn{width:38px;height:38px}
+  .qcard{gap:4px}
+  .q-ask{font-size:16.5px}
+  .q-hint{font-size:12.5px}
+  .q-tools .chip-btn{min-height:34px}
+}
+
+/* ── 넓은 화면 ── */
+@media (min-width:960px){
+  .hero-art{height:400px}
+  .hero-art .hero-mongle{width:min(30%,170px);right:-10px;bottom:-20px}
+  .start-card h2{font-size:28px}
+  .top-stack{left:24px;right:auto;top:18px;width:min(480px,calc(100% - 48px));justify-items:start}
+  .demo-tag{justify-self:start}
+  .qcard{padding:16px 18px 15px;gap:8px}
+  .q-ask{font-size:22px}
+  .q-passage{font-size:16.5px}
+  .dash{left:24px;right:24px;bottom:22px}
+  .boost{left:auto;right:24px;top:18px;bottom:auto;transform:none;width:300px}   /* 넓은 화면: 하늘(오른쪽 위)에 — 아래 가운데는 차의 자리 */
+  .lane-tag{min-height:64px}
+  .lane-tag .say{font-size:18px}
+  .course-grid{gap:16px 14px}
+}
+@media (min-width:960px) and (max-height:860px){   /* 키 낮은 노트북(1366×768, 1280×720): 레이스 시작 단추가 첫 화면에 들게 */
+  .hero h1{font-size:clamp(64px,9vw,112px)}
+  .hero .sub{display:none}
+  .hero-art{height:320px}
+}

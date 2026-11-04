@@ -30,7 +30,9 @@ const games={
  // 말의 리듬(11-04, 캠퍼스 판 겉 — 축제 무대 연습실): 그림은 실사 인화지(흰 바탕 마이크). 해금은 축제 무대 연습 회차가 생기면 play-unlocks.mjs로.
  rhythm:{get title(){return t('game.rhythm.title');},get detail(){return t('game.rhythm.detail');},label:'RHYTHM',path:'../korean-rhythm/',image:'world-play/rhythm.webp',area:'짧은 발화를 듣고 내용 일치 판단 연습'},
  // 주문 폭주(11-03, 캠퍼스 판 겉): 싱크타운 카페 이야기에서 열린다(play-unlocks.mjs). 그림은 손님 실사 판의 인화지 한 장.
- order:{get title(){return t('game.order.title');},get detail(){return t('game.order.detail');},label:'LISTEN & MAKE',path:'../order-rush/',image:'world-play/order-rush.webp',area:'주문의 수량·온도·추가·빼기·바꾸기 듣기 연습'}
+ order:{get title(){return t('game.order.title');},get detail(){return t('game.order.detail');},label:'LISTEN & MAKE',path:'../order-rush/',image:'world-play/order-rush.webp',area:'주문의 수량·온도·추가·빼기·바꾸기 듣기 연습'},
+ // MT 바닷가 레이스(11-04, 1인칭 자전거 판 — korean-racing/world-skin.css): 지도 찾기 이야기에서 열린다(play-unlocks.mjs). 그림은 자전거 벨 한 컷.
+ racing:{get title(){return t('game.racing.title');},get detail(){return t('game.racing.detail');},label:'LISTEN & RIDE',path:'../korean-racing/',image:'world-play/racing.webp',area:'문장을 듣고 답이 있는 길로 옮기는 듣기 연습'}
 };
 let lastFocus=null,panelKind='',inView=true,manualReduced=false,frameTimer,displayPreference='auto',layout='portrait';
 let learningUI=null,learningLoader=null,education=null,reminders=null;
