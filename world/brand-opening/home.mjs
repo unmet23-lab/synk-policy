@@ -32,7 +32,9 @@ const games={
  // 주문 폭주(11-03, 캠퍼스 판 겉): 싱크타운 카페 이야기에서 열린다(play-unlocks.mjs). 그림은 손님 실사 판의 인화지 한 장.
  order:{get title(){return t('game.order.title');},get detail(){return t('game.order.detail');},label:'LISTEN & MAKE',path:'../order-rush/',image:'world-play/order-rush.webp',area:'주문의 수량·온도·추가·빼기·바꾸기 듣기 연습'},
  // MT 바닷가 레이스(11-04, 1인칭 자전거 판 — korean-racing/world-skin.css): 지도 찾기 이야기에서 열린다(play-unlocks.mjs). 그림은 자전거 벨 한 컷.
- racing:{get title(){return t('game.racing.title');},get detail(){return t('game.racing.detail');},label:'LISTEN & RIDE',path:'../korean-racing/',image:'world-play/racing.webp',area:'문장을 듣고 답이 있는 길로 옮기는 듣기 연습'}
+ racing:{get title(){return t('game.racing.title');},get detail(){return t('game.racing.detail');},label:'LISTEN & RIDE',path:'../korean-racing/',image:'world-play/racing.webp',area:'문장을 듣고 답이 있는 길로 옮기는 듣기 연습'},
+ // 찰칵 낱말(11-04, 새 게임): 「처음 만난 날」 이야기 뒤에 열린다(play-unlocks.mjs). 그림은 흰 바탕 위 물건 하나 — 필름 카메라.
+ snap:{get title(){return t('game.snap.title');},get detail(){return t('game.snap.detail');},label:'SNAP & READ',path:'../snap-words/',image:'world-play/snap-words.webp',area:'간판·안내판 낱말 읽기 연습'}
 };
 let lastFocus=null,panelKind='',inView=true,manualReduced=false,frameTimer,displayPreference='auto',layout='portrait';
 let learningUI=null,learningLoader=null,education=null,reminders=null;
