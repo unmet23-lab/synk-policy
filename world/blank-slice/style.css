@@ -1,0 +1,54 @@
+/* 빈칸 베기 — 공통 화면(입구·게임 바·안내·멈춤·결과·펠트 부품)은 kit/lab.css(SYNK LAB PLAY 키트, 원본 experiences/play-common/kit/).
+ * 여기에는 빈칸 베기에만 있는 것: 입구 그림(문장·낱말 조각·칼빛), 베기 판의 문장과 빈칸, 날아가는 낱말, 해설, 멈춘 보기, 결과 기록의 문장과 펠트 표시.
+ * 3D 조각의 펠트 결도 키트의 같은 펠트 사진(kit/felt/tex-cream)을 곱해서 만든다(stage.mjs).
+ */
+#r-title:focus,#check-title:focus{outline:none}
+.topbar.on-field .kicker{color:rgba(43,35,32,.78)}   /* 코랄 면 위 영문 kicker(키트에는 없는 규칙) */
+
+/* ── 입구 그림 ── */
+.hero-sentence{position:absolute;left:4%;right:10%;top:4%;padding:14px 16px;font:800 clamp(16px,4.4vw,21px)/1.4 var(--sans);text-align:center}
+.hero-sentence .hb{display:inline-block;min-width:1.8em;padding:0 .3em;border-radius:8px;background:var(--marker);color:var(--ink)}
+/* 입구 그림의 낱말 조각: 게임의 3D 펠트 조각을 실제 무대에서 찍은 그림(qa/bake-hero.cjs) */
+.hero-pieces{position:absolute;left:0;top:28%;width:94%;height:auto;pointer-events:none}
+.slash{position:absolute;left:24%;top:26%;width:30%;height:6px;border-radius:6px;background:linear-gradient(90deg,rgba(255,255,255,0),#fff 40%,#fff 70%,rgba(255,255,255,0));transform:rotate(-24deg);box-shadow:0 0 14px rgba(249,104,89,.6)}
+
+/* ── 베기 판: 3D 조각의 그림자가 키트의 크림 펠트 벽에 떨어진다 ── */
+.stage-gl{position:absolute;inset:0;z-index:1;pointer-events:none}
+.trail{position:absolute;inset:0;z-index:2;touch-action:none;cursor:crosshair}
+.sentence{position:absolute;z-index:3;left:50%;top:12px;transform:translateX(-50%);width:min(760px,calc(100% - 24px));padding:12px 18px 16px;display:grid;gap:4px;text-align:center;pointer-events:none}
+.s-text{margin:0;font:800 clamp(19px,5vw,30px)/1.45 var(--sans);letter-spacing:-.02em}
+.blank{display:inline-block;min-width:2.6em;margin:0 .12em;padding:0 .3em;border-radius:10px;vertical-align:baseline;line-height:1.25;
+  background:var(--cream);box-shadow:inset 0 0 0 2.5px rgba(249,104,89,.55),inset 0 -4px 0 rgba(0,0,0,.05);color:transparent;transition:background .2s ease}
+.blank.filled{color:var(--ink);min-width:0;margin:0 .02em;padding:0 .14em}
+.blank.ok{background:var(--marker);box-shadow:inset 0 0 0 2.5px rgba(245,196,69,.9)}
+.blank.answer{background:var(--coral-wash);color:var(--coral-deep);box-shadow:inset 0 0 0 2.5px rgba(249,104,89,.7)}
+/* 낱말이 끼워지는 순간: 납작하게 눌렸다가 튀어 오르며 제자리 */
+.blank.snap{animation:snap .42s cubic-bezier(.2,.9,.3,1.25) both}
+.sentence.done{box-shadow:0 0 0 3px var(--marker),var(--shadow-paper)}
+.fly-chip{position:absolute;z-index:4;padding:6px 14px 8px;border-radius:12px;background:var(--marker);font:800 22px/1 var(--sans);color:var(--ink);pointer-events:none;
+  box-shadow:0 10px 18px -8px rgba(60,30,20,.45);transform:translate(-50%,-50%)}
+.x-sentence{margin:0;font:800 19px/1.45 var(--sans)}
+.x-sentence b{padding:0 .2em;border-radius:6px;background:var(--marker)}
+.x-why{margin:0;font-size:15px;line-height:1.55;color:var(--ink-2)}
+.x-why b{display:inline-block;margin-right:4px;padding:1px 8px 2px;border-radius:999px;background:var(--marker);font:800 12px/1.5 var(--sans);color:var(--ink)}
+/* 멈춘 보기(두 번 놓친 문장): 시간 제한 없이 답을 고르는 종이 */
+.answer-check{position:absolute;z-index:5;inset:12px;max-width:620px;margin:auto;padding:24px;overflow:auto;display:flex;flex-direction:column;gap:16px;height:fit-content;max-height:calc(100% - 24px);word-break:keep-all}
+.answer-check h2{font-size:22px;line-height:1.35;margin:0}
+.answer-check p{margin:0;line-height:1.6}
+#check-sentence{font-size:21px;font-weight:700;overflow-wrap:anywhere}
+.check-options{display:grid;gap:8px}
+.check-options .chip-btn{width:100%;min-height:56px;white-space:normal;padding:12px 20px 15px;font-size:18px;line-height:1.35}
+
+/* ── 결과 ── */
+/* 아직 못 받은 별: 회색 필터 대신 같은 펠트 별을 키트 크림색으로 바꾼 그림(입장 검사와 같은 파일) */
+.stars i{background-image:url(assets/felt/sparkle-off.webp);filter:none}
+.stars i.on{background-image:url(kit/felt/sparkle.webp)}
+/* 이번 판의 문장: 표시는 펠트 그림(img.mark — 체크 배지·물방울·빈 원)이라 키트의 둥근 색 바탕을 쓰지 않는다 */
+.log li{grid-template-columns:28px 1fr}
+.log .mark,.log li.ok .mark,.log li.ko .mark{display:block;width:28px;height:28px;border-radius:0;background:none;font:inherit;object-fit:contain}
+.log .sent{display:block;font:700 15px/1.45 var(--sans)}
+.log .sent b{padding:0 .15em;border-radius:5px;background:var(--marker)}
+
+@media (min-width:960px){
+  .sentence{top:20px;padding:16px 26px 20px}
+}

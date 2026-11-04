@@ -1,0 +1,167 @@
+// 게임은 원고와 판정을 맡고, 아틀라스는 공통 기록과 다음 연습의 선택을 맡는다.
+// 문장 하나 = 읽기 문항 하나. 벤 말이 그 문장의 답이다(맞음·틀림 손맛은 베는 순간에 바로, 10-03 「3번」).
+// 두 번 던져도 못 베면(손이 늦은 것인지 몰랐던 것인지 가를 수 없어) 정답을 보이기 전에 멈춘 보기에서 시간 제한 없이 답한다.
+// 그만두기로 확인을 닫은 경우는 오답이 아니라 평가하지 않는 응답이다.
+import { ITEMS, SKILL_LABEL } from './content.mjs';
+import { returnPractice } from './kit/return-practice.mjs';
+
+export const GAME_ID = 'blank-slice';
+export const FORMAT = 'single-choice';
+
+// 조사·문형 문항이 쓰는 TOPIK I 문형(strata/topik-i.grammar.json). 정답과 빈칸 뒤 말을 보고 Strata의
+// grammarOf(strata/topik-i-forms.js)가 고른 것이고, 시험이 둘이 같은지 본다(교원 검수 전 초안).
+// 이음말(그래서·하지만·그리고)은 문형이 아니라 잇지 않는다.
+export const GRAMMAR = Object.freeze({ p01: 'G203', p02: 'G207', p03: 'G201', t01: 'G208', p04: 'G309', p05: 'G210', e01: 'G303',
+  e02: 'G301', e03: 'G401', e04: 'G305', e05: 'G406', a01: 'G209', e06: 'G211', e07: 'G302', e08: 'G308', e09: 'G506', e10: 'G501', p06: 'G203' });
+
+// 문장·보기·정답을 바꾸면 그 문항의 판을 올린다(학습기준 §7-2 문항 내용 판). 같은 빈칸·같은 정답을 다듬은 판은
+// 같은 계열(familyKey)로 두어, 예전 판을 이미 본 사람에게는 새 문항이 아니라 반복으로 남는다.
+// 2026-10-03: 뜻을 가려 주는 단서 문장을 더한 넷이 2판. 바꾸고 판을 안 올리면 grammar-links 옆 시험이 잡는다.
+// 2026-10-08: 단서 문장을 자연스럽게 다시 쓴 넷(v06·v07·e01·e08)이 3판, 문장만 다듬은 e02·e07이 2판(빈칸·보기·정답 그대로).
+// 2026-10-21: 문항 검수 판정대로 보기를 바꾼 둘이 2판 — e06(뜻이 다른 동사를 빼고 같은 동사의 다른 어미로), v08(「달아요」도 물을 찾는 까닭이 될 수 있어 「맛있어요」로).
+export const ITEM_VERSION = Object.freeze({ v06: 3, v07: 3, e01: 3, e08: 3, e02: 2, e07: 2, e06: 2, v08: 2 });
+// 낱말 문항은 정답 낱말의 기본형을 Strata 낱말 층(strata/topik-i.words.json, ko.word.*)에 잇는다(2026-10-03).
+// 활용형(입어요·매워요·작은·샀어요)은 기본형(입다·맵다·작다·사다)으로. 시험이 낱말 이름과 대조한다(교원 검수 전 초안).
+export const WORD = Object.freeze({ v01: 'w0011', v02: 'w0301', v03: 'w0041', v04: 'w0608', v05: 'w0038', v06: 'w0025', v07: 'w0745',
+  v08: 'w0777', v09: 'w0452', v10: 'w0040', v11: 'w0624', v12: 'w1674', v13: 'w0087', a02: 'w0396', v14: 'w0100' });
+const conceptsOf = (id) => GRAMMAR[id] ? [GRAMMAR[id]] : WORD[id] ? [`ko.word.${WORD[id]}`] : [];
+export function itemMetadata(item) {
+  const family = `${GAME_ID}.${item.id}.v1`, key = `${GAME_ID}.${item.id}.v${ITEM_VERSION[item.id] || 1}`;
+  return { id: `${GAME_ID}.${item.id}`, itemKey: key, familyKey: family, skillId: item.skill, difficulty: item.difficulty,
+    modality: 'reading', responseFormat: FORMAT, audioRequired: false, confounded: false, conceptIds: conceptsOf(item.id) };
+}
+
+/** WORLD가 확정한 실제 문항만 출제한다. null은 기존 자유 플레이다. */
+export function assignmentItems(target, items = ITEMS) {
+  if (!target) return null;
+  const selected = new Map();
+  for (const required of target.items || []) {
+    const item = items.find(x => {
+      const m = itemMetadata(x);
+      return m.itemKey === required.itemKey && m.familyKey === required.familyKey
+        && m.skillId === required.skillId && m.difficulty === required.difficulty
+        && m.modality === required.modality && m.responseFormat === required.responseFormat
+        && m.skillId === target.skillId && m.difficulty === target.difficulty
+        && m.modality === target.modality && m.responseFormat === target.responseFormat;
+    });
+    // 고정 과제에서 사라진 판을 빼고 시작하면 끝까지 풀어도 목표 수에 못 미친다.
+    if (!item) return [];
+    selected.set(required.familyKey, item);
+  }
+  if (target.requiredAttempts != null && (!Number.isInteger(target.requiredAttempts) || target.requiredAttempts < 1 || selected.size < target.requiredAttempts)) return [];
+  return [...selected.values()];
+}
+
+export const assignmentLabel = target => target?.description || (target ? `${SKILL_LABEL[target.skillId] || '목표 읽기'} · 난도 ${target.difficulty} · 목표 ${target.requiredAttempts}문항` : '');
+
+export function candidates(items) {
+  return items.map((x) => {
+    const m = itemMetadata(x);
+    return { id: m.id, itemId: x.id, skillIds: [m.skillId], difficulty: m.difficulty, modality: m.modality,
+      responseFormat: m.responseFormat, itemKey: m.itemKey, familyKey: m.familyKey, conceptIds: m.conceptIds };
+  });
+}
+
+/** 필요 순서. 아틀라스를 못 쓰면 null(원고 순서로 진행). */
+export function rankItems(coach, items) {
+  if (!coach) return null;
+  try {
+    const r = coach.recommend(candidates(items), { audioAvailable: true });
+    if (r.status !== 'ready') return null;
+    return { order: [r.selected, ...r.alternatives].map((x) => x.itemId), reason: r.reason, skillId: r.focusSkillId, state: r.state };
+  } catch { return null; }
+}
+
+/* 재방문 맞춤 연습: 낱말·문형 두 항목 안에서 실제로 갈리는 말의 종류로 나눈다. 때(1)·세는 말(2)·꾸미는 말(2)은 세 번 만나고 남는
+ * 새 문장이 없어 패턴을 두지 않는다(기존 추천만). 이음말은 셋뿐이라 두 문장에서 두 번 놓치면 말한다. */
+export const RETURN_PATTERNS = Object.freeze({
+  particle: { why: '지난 판에서 낱말 뒤에 붙는 조사를 놓친 적이 있어요.', next: '이번 첫 문장도 그런 문장이에요. 빈칸 앞뒤 말을 함께 읽어 보세요.' },
+  ending: { why: '지난 판에서 문장 끝이나 중간의 문형을 놓친 적이 있어요.', next: '이번 첫 문장도 그런 문장이에요. 문장 전체의 뜻을 읽고 골라 보세요.' },
+  connector: { minEvidence: 2, why: '지난 판에서 두 문장을 잇는 말을 놓친 적이 있어요.', next: '이번 첫 문장도 그런 문장이에요. 앞뒤 문장이 어떤 관계인지 읽어 보세요.' },
+  noun: { why: '지난 판에서 이름을 나타내는 낱말을 놓친 적이 있어요.', next: '이번 첫 문장도 그런 문장이에요. 앞뒤 말에서 단서를 찾아 보세요.' },
+  predicate: { why: '지난 판에서 동작이나 상태를 나타내는 낱말을 놓친 적이 있어요.', next: '이번 첫 문장도 그런 문장이에요. 앞뒤 말에서 단서를 찾아 보세요.' },
+});
+const PATTERN_OF_KIND = Object.freeze({ particle: 'particle', ending: 'ending', connector: 'connector', noun: 'noun', verb: 'predicate', adjective: 'predicate' });
+export const patternOfItem = (item) => PATTERN_OF_KIND[item.kind] || null;
+const ITEM_OF_FAMILY = new Map(ITEMS.map((x) => [itemMetadata(x).familyKey, x]));
+export function missedPractice(coach) {
+  return returnPractice({ coach, gameId: GAME_ID, patterns: RETURN_PATTERNS,
+    patternOfFamily: (family) => { const item = ITEM_OF_FAMILY.get(family); return item ? patternOfItem(item) : null; },
+    freshItems: (pattern) => ITEMS.filter((x) => patternOfItem(x) === pattern).map((x) => ({ id: x.id, item: x, meta: itemMetadata(x) })) });
+}
+
+/** 벤 말 또는 멈춘 보기에서 고른 답. 둘 다 정답을 보이기 전의 독립 응답이다. */
+export const answerPayload = (correct) => ({ correct, assessable: true });
+/** 답하지 않고 그만둠. */
+export const missedPayload = () => ({ correct: null, assessable: false, reason: 'unanswered' });
+
+/** 문장마다 답 한 번만 기록한다(벤 말, 놓쳤으면 멈춘 보기에서 고른 답). 그만두면 평가하지 않는 응답으로 닫는다. */
+export function createReadingConfirmation(coach, item) {
+  const pid = coach.present(itemMetadata(item)); let closed = false;
+  return {
+    pid,
+    // 기록이 거절돼도(다른 탭에서 기록을 지움, WORLD 수행이 끝남) 게임은 멈추지 않는다: 이 답은 기록 없이 지나간다.
+    confirm(choice) {
+      if (closed) return null;
+      if (!item.options.includes(choice)) throw new Error('보기에서 답을 골라 주세요.');
+      closed = true;
+      try { return coach.answer(pid, answerPayload(choice === item.answer)); } catch { return null; }
+    },
+    cancel() { if (closed) return null; closed = true; try { return coach.answer(pid, missedPayload()); } catch { return null; } },
+  };
+}
+
+const STATUS = {
+  unseen: { text: '아직 기록이 적어요', tone: 'quiet' },
+  checking: { text: '확인하는 중이에요', tone: 'quiet' },
+  practice: { text: '조금 더 연습하면 좋아요', tone: 'focus' },
+  supported: { text: '도움과 함께 해냈어요', tone: 'quiet' },
+  'recent-independent': { text: '최근 혼자 해냈어요', tone: 'good' },
+  review: { text: '다시 볼 때예요', tone: 'focus' },
+};
+const PRIORITY = { practice: 6, review: 5, supported: 4, checking: 3, unseen: 2, 'recent-independent': 1 };
+const LEVEL_LABEL = { 1: '쉬운 문장', 2: '조금 어려운 문장' };
+// 학습 항목마다 이 게임의 문장에 실제로 있는 난도
+const LEVELS = Object.fromEntries(Object.keys(SKILL_LABEL).map((id) =>
+  [id, [...new Set(ITEMS.filter((x) => x.skill === id).map((x) => x.difficulty))].sort((a, b) => a - b)]));
+
+/**
+ * 공통 기록 요약에서 이 게임의 두 학습 항목 상태(같은 형식·읽기 기록만).
+ * 난도마다 따로 말한다. 쉬운 문장은 혼자 해냈어도 조금 어려운 문장은 아직 기록이 적을 수 있다.
+ * ‘다음 연습’(tone: focus)은 아틀라스가 다음 판에 고른 항목(focusSkillId)을 따른다.
+ * 그래서 결과의 꼬리표와 다음 판 이유가 같은 말을 한다. focusSkillId가 없으면 상태의 우선순위로 정한다.
+ */
+export function skillReport(summary, { focusSkillId = null } = {}) {
+  if (!summary?.skills) return [];
+  return Object.keys(SKILL_LABEL).map((id) => {
+    const s = summary.skills.find((x) => x.id === id);
+    const levels = LEVELS[id].map((d) => {
+      const f = s?.levels?.[d]?.formats?.[FORMAT];
+      const status = f && (f.lastAt || f.assisted) && STATUS[f.status] ? f.status : 'unseen';
+      return { d, status, n: f?.n || 0, correct: f?.correct || 0 };
+    });
+    const seen = levels.filter((l) => l.status !== 'unseen');
+    const status = [...seen].sort((a, b) => (PRIORITY[b.status] || 0) - (PRIORITY[a.status] || 0))[0]?.status || 'unseen';
+    const same = levels.every((l) => l.status === levels[0].status);
+    const text = same ? STATUS[levels[0].status].text
+      : levels.map((l) => `${LEVEL_LABEL[l.d] || `난도 ${l.d}`}: ${STATUS[l.status].text}`).join(' · ');
+    const own = STATUS[status].tone;
+    const tone = !focusSkillId ? own : id === focusSkillId ? 'focus' : own === 'focus' ? 'quiet' : own;
+    return { id, label: SKILL_LABEL[id], status, text, tone, levels,
+      n: seen.reduce((sum, l) => sum + l.n, 0), correct: seen.reduce((sum, l) => sum + l.correct, 0) };
+  });
+}
+
+/* 순간 맞춤(Core flow.js): 조각이 떠 있는 시간만 이 사람에 맞춘다. 문장·보기·정답과 읽기 기록은 그대로다.
+ * 값은 쉬운 것(오래 떠 있음)부터, 처음은 원래 게임(1배). 맞는 조각을 베면 성공(그때까지 쓴 체공 시간의 비율이
+ * 압박), 다른 조각을 베면 시간 안의 실수, 조각을 놓치면 시간 부족이다. 베기는 읽기 근거가 아니다(정적 확인만). */
+export const FLOW_SLICE = { id: 'blank-slice.hang', version: 1, target: 0.8, knobs: [
+  { id: 'hang', kind: 'pace', label: '조각이 떠 있는 시간', values: [1.3, 1.2, 1.1, 1, 0.95, 0.9], start: 3 }] };
+export const FLOW_WORDS = { 'raise.pace': '조각이 조금 빨라져요.', 'ease.pace': '조각이 조금 더 오래 떠 있어요.', 'start.memory': '', 'start.prior': '',
+  'start.tired': '오늘은 조각이 빨라지지 않아요.', 'start.returning': '오랜만이라 조각을 천천히 던져요.' };
+/** 한 번 던진 결과를 순간 맞춤의 관측으로. word가 null이면 놓침. used: 체공 시간 중 쓴 비율. */
+export function sliceObservation({ word, answer, used = null }) {
+  if (word == null) return { outcome: 'timeout' };
+  const pressure = Number.isFinite(used) ? Math.min(1.5, Math.max(0, used)) : null;
+  return { outcome: word === answer ? 'success' : 'fail', pressure };
+}
