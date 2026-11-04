@@ -361,8 +361,10 @@ function mountLifeLearning({owner,keep}){
   prepare:async()=>{if(operating&&client.snapshot&&!window.SYNKLearningHost)await account.prepareGame({target:window});},
   // 싱크타운 「마을 준비 확인」(학습·개인화 다리 §4-2): 판정은 서버(town/check), 판은 진단과 같다. 계정 모드에서만.
   town:operating&&owner!=='guest'?{kit:worldTownCheck,check:body=>client.request('town/check',{method:'POST',body}),open:()=>town(),
-   passed:result=>{townEntry=result;},evidence:()=>quietTownCheck()}:null}),value=>{value.dispose();home.connectEducation?.(null);});
+   passed:result=>{townEntry=result;},evidence:()=>quietTownCheck()}:null}),value=>{value.dispose();home.connectEducation?.(null);home.connectPlayLevel?.(null);});
  home.connectEducation?.(education);window.__synkEducation=education;
+ // 게시판 해독 해금(11-04): TOPIK II 첫 답 기록은 코치에 있고 홈 진도에는 없어 여기서 잇는다.
+ home.connectPlayLevel?.(()=>{const evidence=education.townEvidence?.();return worldTownCheck.topik2Near({events:evidence?.events||[],evidenceComplete:evidence?.evidenceComplete===true});});
  // 학습 알림(10-19 결정 · 1단 기기 예약, world-reminder-device.mjs): 주인마다 이 기기에 따로 두고, 무엇을 알릴지는 복습 일정·이번 주 시험 계획·Core 추천에서 읽는다.
  // 「공부한 시각」은 읽기 전용 학습 기록(trail)에서 읽는다. 주인이 바뀔 때 보내지 않은 예약을 지우는 일(forgetPending)은 생활 세션이 한다.
  keep('trail',createTrailTimes({host:()=>window.SYNKLearningHost||null,
@@ -715,6 +717,8 @@ const games={runner:{get title(){return t('game.runner.title');},path:'korean-ru
  subway:{get title(){return t('game.subway.title');},path:'subway-rush/'},
  // 찰칵 낱말(11-04): 학생이 고른 시험 목표 급을 넘긴다 — 능력 판단이 아니라 3급 안내문을 켠 채 시작할지 정하는 데만 쓴다.
  snap:{get title(){return t('game.snap.title');},get path(){let grade=0;try{grade=Number(life.progress?.learningProfileValues?.().targetGrade)||0;}catch{grade=0;}return grade>=3?`snap-words/?grade=${grade}`:'snap-words/';}},
+ // 게시판 해독(11-04): 3→4급 읽기. 홈 「놀이」가 해금 표로 연 뒤에만 여기로 온다.
+ board:{get title(){return t('game.board.title');},path:'board-decode/'},
  // 드라마 말하기 1화(11-02, 설계 experiences/drama/qa/WORLD올리기-20261102/설계.md): 지금은 코호트 바로가기(?drama=1)로만 연다 — 첫 화면 줄은 입구 작업과 함께 정한다.
  // 제목은 번역 표 밖의 고정 글(새 키를 넣으면 모든 화면 언어의 검수가 따라온다).
  drama:{get title(){return currentLang()==='ko'?'드라마 말하기 · 1화':'Korean drama · Episode 1';},path:'drama/',microphone:true}};

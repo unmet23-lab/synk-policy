@@ -20,6 +20,9 @@ export const PLAY_UNLOCKS = Object.freeze({
   subway: Object.freeze({ where: 'play.where.lesson', open: (record) => record.lessons >= 1 }),
   // 말 랠리(11-04, 설계 talk-rally/qa/world-campus-20261104/설계.md): 동아리 탁구 회차가 아직 없어 빈칸 베기와 같이 가장 가까운 공부 기록 — 레슨 한 번(카페 첫 방문을 먼저 한 학생도 막지 않는다). 그 회차가 생기면 그 기록으로 옮긴다.
   rally: Object.freeze({ where: 'play.where.lesson', open: (record) => record.lessons >= 1 || record.cafeVisits >= 1 }),
+  // 게시판 해독(11-04, 설계 board-decode/설계.md 7절): 이야기가 아니라 실력 기록으로 열린다 — 가장 최근 TOPIK II 첫 답 6개 가운데 4개(싱크타운 입장 길 ②와 같은 말).
+  // 그 수는 오답으로 도로 떨어질 수 있어, 한 번 「새로 열림」을 본 놀이는 닫지 않는다(sticky). 잠김 글은 「이야기에서 열려요」가 아니다(lockOnly).
+  board: Object.freeze({ where: 'play.locked.level', lockOnly: true, sticky: true, open: (record) => record.topik2Near === true }),
 });
 
 // 대신하는 놀이가 그 학생에게 열리면 「놀이」 목록에서 그 자리를 이어받는다. 잠겨 있는 동안은 그대로 있어 듣기 놀이가 비지 않는다.
@@ -27,10 +30,11 @@ export const PLAY_UNLOCKS = Object.freeze({
 export const PLAY_REPLACED_BY = Object.freeze({ runner: 'subway' });
 
 /** 홈이 들고 있는 생활 진도(updateLearning의 summary)에서 해금에 쓰는 기록만. 아직 못 읽었으면 null(잠김으로 본다). */
-export function playRecord(learningData) {
+export function playRecord(learningData, extra = null) {
   const summary = learningData?.summary;
   if (!summary || summary.status?.phase === 'loading') return null;
   return Object.freeze({
+    topik2Near: extra?.topik2Near === true,
     cafeVisits: Number(summary.cafe?.completed) || 0,
     lessons: Number(summary.completed) || 0,
     directionsDone: Number(summary.packs?.find?.((pack) => pack.id === 'directions')?.completed) || 0,
@@ -50,10 +54,11 @@ export function playOrder(ids, record) {
 }
 
 /** 놀이 하나의 상태: { open } 또는 { open:false, where }. 규칙이 던지거나 기록이 없으면 잠김. */
-export function playState(id, record) {
+export function playState(id, record, seen = null) {
   const rule = PLAY_UNLOCKS[id];
   if (!rule) return { open: true };
+  if (rule.sticky && Array.isArray(seen) && seen.includes(id)) return { open: true };
   let open = false;
   try { open = !!record && rule.open(record) === true; } catch { open = false; }
-  return open ? { open: true } : { open: false, where: rule.where };
+  return open ? { open: true } : { open: false, where: rule.where, ...(rule.lockOnly ? { lockOnly: true } : {}) };
 }
