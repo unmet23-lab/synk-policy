@@ -17,7 +17,7 @@
 //  · 학습 기록(Atlas Trail, 응답 꼴 spoken, 11-02): 차례마다 보임 하나 · 테이크마다 시도 하나(atlas-learning.js). WORLD 계정 학습 호스트가
 //    있을 때만 남고, 호스트는 학습 기록 동의가 켜진 계정에서만 보낸다 — 없으면 아무것도 남지 않는다. 받아 적은 글 · 소리는 넣지 않고,
 //    「혼자 해 봄」 여부는 서버가 테이크 응답의 trail로 정한다.
-import { STR, endingFix } from './strings.mjs?v=b40759af1582';
+import { STR, endingFix } from './strings.mjs?v=b616c00312b4';
 import { newAttemptState, resetAttempts, beginTake, talkObservation, nextCount, settleTake } from './takes.mjs?v=bdb4c66179eb';
 
 const $ = (id) => document.getElementById(id);
