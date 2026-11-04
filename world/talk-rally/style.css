@@ -1,0 +1,170 @@
+/* 말 랠리 — 공통 화면(입구·게임 바·안내·멈춤·결과·펠트 부품)은 kit/lab.css(SYNK LAB PLAY 키트, 원본 experiences/play-common/kit/).
+ * 여기에는 말 랠리에만 있는 것: 입구 그림, 탁구 화면, 대답 카드(펠트 쿠션), 공이 기다릴 때 안내, 해설·복습 줄. */
+.pop[data-kind="quick"]{color:#1d5f99}   /* 빠르게: 하늘 펠트의 짙은 파랑(스매시·랠리 점수와 구분) */
+.say-again{min-height:34px;padding:0 12px 2px;font-size:13px;align-self:center}
+.x-tools{display:flex;flex-wrap:wrap;gap:8px}
+/* ── 말 랠리 ── */
+/* 입구 그림: 몽글의 말풍선, 대답 카드 셋(맞는 카드가 튀어나옴), 공 */
+.hero-bubble{position:absolute;left:4%;top:4%;padding:12px 18px 14px;border-radius:22px 22px 22px 6px;font:800 clamp(19px,4.8vw,28px)/1.3 var(--sans);letter-spacing:-.02em}
+.hero-cards{position:absolute;left:4%;right:34%;bottom:6%;display:grid;gap:8px;justify-items:start}
+/* 대답 칩: 게임 카드와 같은 펠트 쿠션 판을 길게 늘인 것(6:1). 번호는 크림 펠트 단추, 글자는 판의 평평한 면 높이에 맞춰 위 여백을 아래보다 작게 */
+.card-chip{display:flex;align-items:center;gap:.45em;width:min(100%,15em);padding:.4em 1em .7em .5em;font:800 clamp(15px,3.8vw,19px)/1.2 var(--sans);
+  background:transparent center/100% 100% no-repeat;filter:drop-shadow(0 4px 5px rgba(73,45,30,.18))}
+.card-chip .no{flex:none;display:grid;place-items:center;width:1.3em;height:1.3em;background:url(kit/felt/badge-cream.webp) center/contain no-repeat;color:#2b2320;text-shadow:none;font:800 max(11px,.62em)/1 var(--mono)}
+.card-chip.c1{background-image:url(kit/felt/cushion-blush-strip.webp);color:#5c2318}
+.card-chip.c2{background-image:url(kit/felt/cushion-butter-strip.webp);color:#3a2a08}
+.card-chip.c3{background-image:url(kit/felt/cushion-lapis-strip.webp);color:#fffaf2;text-shadow:0 1px 1px rgba(16,36,96,.45)}
+.card-chip.on{transform:translateX(14px);filter:var(--sticker) drop-shadow(0 8px 8px rgba(73,45,30,.25))}
+.hero-ball{position:absolute;right:33%;top:30%;width:28px;height:28px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fffdf3,#f6dc8f 70%);box-shadow:0 8px 12px -6px rgba(120,60,40,.45)}
+.hero-art .hero-mongle{width:min(34%,180px)}
+
+/* 게임 */
+.fx{position:absolute;inset:0;z-index:2;pointer-events:none}
+.speech{position:absolute;z-index:3;left:50%;top:10px;transform:translateX(-50%);display:flex;gap:6px;align-items:center;margin:0;padding:11px 16px 12px;border-radius:999px;background:rgba(255,253,248,.96);box-shadow:var(--shadow-paper)}
+.speech i{width:10px;height:10px;border-radius:50%;background:var(--coral);animation:dots 1s infinite ease-in-out}
+.speech i:nth-child(2){animation-delay:.15s}
+.speech i:nth-child(3){animation-delay:.3s}
+.cards{position:absolute;z-index:3;left:50%;bottom:22px;transform:translateX(-50%);width:min(780px,calc(100% - 16px));display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+/* 대답 카드: 도톰한 펠트 쿠션 판(분홍·버터·라피스 — docs/디자인/펠트부품/assets/cushion을 카드 비율로 늘인 것). 판에 두께가 있어 CSS 윤곽·상자 그림자는 넣지 않는다.
+   둥근 판은 가장자리가 부풀어 평평한 면이 상자보다 작다(위 빛받이 약 5%, 아래 옆면 약 19%) → 글자는 그 면 가운데에, 양옆은 판 폭의 10%를 비운다.
+   번호는 면을 차지하지 않게 왼쪽 위 모서리에 단 크림 펠트 단추. 낱말이 면보다 길면 그 카드만 글자를 줄인다(app.mjs fitCards — 낱말 중간에서 끊지 않는다). */
+.card{position:relative;display:grid;grid-template-columns:minmax(0,1fr);align-content:center;min-height:78px;padding:8px 9% 18px;border:0;text-align:center;
+  font:800 clamp(15px,3.9vw,20px)/1.28 var(--sans);letter-spacing:-.01em;word-break:keep-all;overflow-wrap:anywhere;
+  background:transparent center/100% 100% no-repeat;filter:drop-shadow(0 4px 5px rgba(73,45,30,.14));transition:transform .14s var(--ease),opacity .2s,filter .16s}
+.card .no{position:absolute;left:-4px;top:-10px;display:grid;place-items:center;width:26px;height:26px;background:url(kit/felt/badge-cream.webp) center/contain no-repeat;
+  color:#2b2320;text-shadow:none;font:800 12px/1 var(--mono);filter:drop-shadow(0 2px 2px rgba(73,45,30,.22))}
+.card.l0{background-image:url(kit/felt/cushion-blush-wide.webp);color:#5c2318}
+.card.l1{background-image:url(kit/felt/cushion-butter-wide.webp);color:#3a2a08}
+.card.l2{background-image:url(kit/felt/cushion-lapis-wide.webp);color:#fffaf2;text-shadow:0 1px 1px rgba(16,36,96,.45)}
+@media (max-width:700px){   /* 판 비율을 카드 비율에 맞춘다(휴대폰 1.6:1, 중간 2.4:1, 넓은 화면 3.2:1) — 모서리·옆면이 찌그러지지 않게 */
+  .card.l0{background-image:url(kit/felt/cushion-blush-mid.webp)}
+  .card.l1{background-image:url(kit/felt/cushion-butter-mid.webp)}
+  .card.l2{background-image:url(kit/felt/cushion-lapis-mid.webp)}
+}
+@media (max-width:500px){
+  .card.l0{background-image:url(kit/felt/cushion-blush-phone.webp)}
+  .card.l1{background-image:url(kit/felt/cushion-butter-phone.webp)}
+  .card.l2{background-image:url(kit/felt/cushion-lapis-phone.webp)}
+}
+.card:active{transform:translateY(3px)}   /* 눌림 = 3px 내려앉기 */
+.card[aria-pressed=true]{transform:translateY(-8px);filter:var(--sticker) drop-shadow(0 12px 10px rgba(73,45,30,.32))}
+/* 맞는 카드: 모서리에 코랄 펠트 체크 배지(틀린 카드에는 따로 표시하지 않는다) */
+.card.right::after{content:"";position:absolute;right:-6px;top:-14px;width:38px;height:38px;background:url(kit/felt/badge-check.webp) center/contain no-repeat;filter:drop-shadow(0 3px 3px rgba(73,45,30,.3))}
+.card.dim{opacity:.5}
+/* 펠트 판을 다 받기 전(느린 연결의 첫 카드): 같은 색 납작한 판 — 라피스 위 크림 글자가 바닥에 묻히지 않게(app.mjs preloadFelt) */
+.cards:not(.felt-ready) .card{background-image:none;border-radius:16px}
+.cards:not(.felt-ready) .card.l0{background-color:#f0cbbc}
+.cards:not(.felt-ready) .card.l1{background-color:#f2be3e}
+.cards:not(.felt-ready) .card.l2{background-color:#2d5ab8}
+.cards.locked .card{pointer-events:none}
+/* 공이 기다릴 때: 위쪽에 짧은 안내와 다시 듣기·글로 보기(대답 카드·기다리는 공을 가리지 않게, 넓은 화면은 몽글을 피해 왼쪽 위) */
+.wait{position:absolute;z-index:4;left:50%;top:64px;transform:translateX(-50%);width:min(440px,calc(100% - 28px));margin:0;padding:12px 14px;display:grid;gap:8px;justify-items:center;text-align:center;animation:waitIn .25s var(--ease) both}
+.wait-title{margin:0;display:flex;flex-wrap:wrap;justify-content:center;gap:2px 8px;font:800 16px/1.35 var(--sans)}
+.wait-title span{font-weight:600;color:var(--ink-2)}
+.wait-line{margin:0;font:800 19px/1.4 var(--sans);word-break:keep-all;overflow-wrap:anywhere}
+.wait-tools{display:flex;flex-wrap:wrap;justify-content:center;gap:8px}
+@keyframes waitIn{from{opacity:0}to{opacity:1}}
+@media (min-width:960px){.game .wait{left:24px;transform:none;width:min(380px,calc(100% - 48px));justify-items:start;text-align:left}.game .wait-title,.game .wait-tools{justify-content:flex-start}}
+.x-line{margin:0;font:700 15px/1.45 var(--sans);color:var(--ink-2)}
+.x-answer{margin:0;font:800 19px/1.45 var(--sans)}
+.x-answer b{padding:0 .2em;border-radius:6px;background:var(--marker)}
+.fine.warn{color:var(--coral-deep);font-weight:700}
+.log .line{display:block;font-size:13px;color:var(--ink-2)}
+@keyframes dots{0%,100%{opacity:.35}50%{opacity:1}}
+/* 말 랠리: 안내는 위쪽(대답 카드와 겹치지 않게), 연습의 맞는 카드는 빛이 숨 쉬듯(움직이지 않고 밝기만) */
+.game .tip{top:64px;bottom:auto}
+@media (min-width:960px){.game .tip{left:24px;transform:none;width:min(380px,calc(100% - 48px));text-align:left}}
+.card.hint{filter:var(--sticker) drop-shadow(0 0 9px rgba(255,200,60,.9));animation:hintGlow 1.1s ease-in-out infinite}   /* 펠트 모양을 따라 금빛. 움직임 줄이기에서는 반복 없이 이 빛만 남는다 */
+@keyframes hintGlow{0%,100%{filter:var(--sticker) drop-shadow(0 0 5px rgba(255,200,60,.55))}50%{filter:var(--sticker) drop-shadow(0 0 13px rgba(255,200,60,.95))}}
+/* 대답 카드 글: 두 줄이면 쉼표 뒤나 어절 단위로 고르게(fitCards가 넘치는지 재도록 낱말은 넘치게 두고, 줄인 뒤에도 넘칠 때만 끊는다 — 모든 대답을 320~1280px에서 qa/cards-fit.cjs로 잼) */
+.card .say{text-wrap:balance;overflow-wrap:normal}
+.card .say .nb{white-space:nowrap}
+@media (max-width:420px){
+  .wait-tools{gap:6px}
+  .wait-tools .chip-btn{min-height:38px;padding:0 10px 3px;font-size:13px}   /* 공이 기다릴 때 단추 셋을 한 줄로(판이 몽글을 덜 가리게) */
+  .card{min-height:72px;padding:7px 10% 16px;font-size:15px}
+  .card .no{left:-2px;top:-9px;width:24px;height:24px;font-size:11.5px}
+  .card.right::after{right:-5px;top:-12px;width:34px;height:34px}
+  .cards{gap:5px;bottom:18px;width:calc(100% - 10px)}
+}
+@media (max-width:359px){.card{font-size:14px}}
+/* 휴대폰·태블릿 입구: 시작 단추가 첫 화면에 들어오게 그림을 줄이고(휴대폰은 긴 설명을 ‘하는 방법’에 맡김), 아주 좁은 화면은 그림을 뺀다(375×667까지 실측) */
+@media (max-width:959px){.hero-art{height:min(44vw,300px)}}
+@media (max-width:599px){
+  .hero{padding-bottom:40px}
+  .hero .sub{display:none}
+  .hero-art{height:min(46vw,210px);margin-top:6px}
+  .hero-bubble{top:2%;padding:9px 14px 11px}
+  .hero-cards{gap:5px}
+  .card-chip{padding:.3em .9em .55em .45em}
+  .hero-art .hero-mongle{width:min(31%,150px)}
+}
+@media (max-width:359px){.hero-art{display:none}}
+
+/* ── 하루 도전(2026-10-07): 입구의 크림 펠트 단추(시작보다 한 단계 아래) + 오늘 상태 한 줄, 결과의 기록 판 ── */
+.daily-start{display:grid;gap:6px}
+.daily-start .felt-cta{min-height:82px;padding:10px 16px 16px 32px}   /* 두 줄 글자가 펠트 판의 실땀 안쪽에 들게 */
+.felt-cta.cream .daily-label{display:grid;gap:4px;text-align:left}
+.felt-cta.cream .daily-label b{font:800 17px/1.1 var(--sans)}
+.felt-cta.cream .daily-label small{font:700 12.5px/1.2 var(--sans);color:var(--ink-2)}
+#daily-line{padding-left:4px;color:var(--ink-2);font-weight:600}
+.r-say{margin:6px 0 0;font:800 clamp(18px,4.6vw,26px)/1.3 var(--sans);letter-spacing:-.02em}
+.daily-rec{display:grid;gap:10px}
+.daily-rec .chip-btn{justify-self:start}
+.daily-best{margin:2px 0 0;display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px}
+.daily-best b{font:900 clamp(24px,6.4vw,30px)/1.15 var(--sans);letter-spacing:-.03em}
+.tag.new-best{color:#3a2a08;background-image:url(kit/felt/cushion-butter-strip.webp)}   /* 작은 부품이라 실땀 없는 버터 쿠션 */
+.week-title{margin:2px 0 -4px;font-weight:700;color:var(--ink-2)}
+/* 최근 7일: 마친 날은 펠트 체크 배지, 안 한 날은 빈 크림 펠트 원(회색으로 죽이지 않는다), 오늘은 크림 칼선 */
+.week{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:2px}
+.week li{display:grid;justify-items:center;gap:3px;min-width:0}
+.week small{font:700 12px/1.2 var(--sans);color:var(--ink-2);white-space:nowrap}
+.week i{width:28px;height:28px;background:url(kit/felt/badge-cream.webp) center/contain no-repeat}
+.week li.done i{background-image:url(kit/felt/badge-check.webp)}
+.week li.today i{filter:var(--sticker) drop-shadow(0 2px 3px rgba(73,45,30,.25))}
+.week li.today small{color:var(--coral-deep)}
+.week b{font:700 11.5px/1.2 var(--sans);font-variant-numeric:tabular-nums;letter-spacing:-.01em;color:var(--ink);white-space:nowrap}   /* 네 자리 점수 일곱이 320px에서도 붙지 않게(고정폭 글꼴은 너무 넓었다) */
+@media (max-width:359px){.week b{font-size:10.5px}}
+.week li.empty b{color:var(--muted)}
+/* ── 꾸미기(2026-10-07): 라켓·공 줄. 견본은 크림 펠트 원(사진)을 그 색으로 물들인 것(레이싱 차고와 같은 방식 — 결은 사진 그대로) ── */
+.plan-side{display:grid;gap:14px;align-content:start}
+.gear{padding:18px;display:grid;gap:12px}
+.gear-head{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:6px 12px}
+.gear-coins{font:700 13.5px/1.3 var(--sans);color:var(--ink-2)}
+.gear-rows{display:grid;gap:10px}
+.gear-row{display:grid;grid-template-columns:2.6em minmax(0,1fr);align-items:start;column-gap:8px}
+.gear-kind{padding-top:16px;font:800 15px/1.2 var(--sans)}
+.gear-swatches{display:grid;grid-template-columns:repeat(4,minmax(0,84px));gap:4px}
+.gear-swatch{position:relative;display:grid;justify-items:center;gap:1px;min-width:0;padding:6px 0 4px;border:0;background:none;color:var(--ink);transition:transform .14s var(--ease)}
+.gear-swatch .swatch{position:relative;display:block;width:44px;height:44px;margin-bottom:3px;isolation:isolate;background:url(kit/felt/badge-cream.webp) center/contain no-repeat;filter:drop-shadow(0 2px 2px rgba(73,45,30,.25))}
+.gear-swatch .swatch::before{content:"";position:absolute;inset:0;background:var(--c,#c9ced3);mix-blend-mode:multiply;
+  -webkit-mask:url(kit/felt/badge-cream.webp) center/contain no-repeat;mask:url(kit/felt/badge-cream.webp) center/contain no-repeat}
+.gear-swatch:active{transform:translateY(2px)}
+.gear-swatch[aria-pressed=true]{transform:translateY(-4px)}
+.gear-swatch[aria-pressed=true] .swatch{filter:var(--sticker) drop-shadow(0 6px 6px rgba(73,45,30,.28))}   /* 고른 견본: 크림 칼선 스티커 */
+.gear-swatch.equipped::after{content:"";position:absolute;left:calc(50% + 10px);top:0;width:22px;height:22px;background:url(kit/felt/badge-check.webp) center/contain no-repeat;filter:drop-shadow(0 2px 2px rgba(73,45,30,.3))}
+.g-name{font:800 13px/1.25 var(--sans);white-space:nowrap}
+.g-state{font:600 11.5px/1.25 var(--sans);color:var(--ink-2);white-space:nowrap}
+.gear-swatch.equipped .g-state{color:var(--coral-deep)}
+.gear-act{display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;padding:10px 12px;border-radius:14px;background:var(--cream)}
+.gear-act:empty{display:none}
+.gear-pick{margin:0;display:grid;gap:1px;margin-right:auto}
+.gear-pick b{font:800 16px/1.3 var(--sans)}
+.gear-pick span{font:700 13px/1.3 var(--sans);color:var(--ink-2)}
+.gear-have,.gear-need{margin:0;font:700 14px/1.4 var(--sans)}
+.gear-have{display:flex;align-items:center;gap:8px}
+.gear-have .check{width:24px;height:24px;flex:none;background:url(kit/felt/badge-check.webp) center/contain no-repeat}
+.gear-need b{color:var(--coral-deep)}
+.chip-btn.buy{background-image:url(kit/felt/cushion-butter-strip.webp);color:#3a2a08}   /* 사기: 실땀 없는 버터 쿠션 */
+.gear-note{margin:0;font:700 13.5px/1.45 var(--sans);color:var(--ink-2)}
+.gear-note:empty{display:none}
+.gear-note[data-kind=error]{color:var(--coral-deep)}
+@media (max-width:359px){.gear-row{grid-template-columns:minmax(0,1fr)}.gear-kind{padding-top:0}.gear-swatch .swatch{width:40px;height:40px}}
+@media (min-width:960px){.plan-side{gap:18px}.gear{padding:20px 22px}}
+
+@media (min-width:960px){   /* 결과 넓은 화면: 하루 도전 판과 다음 판을 셋째 줄에 겹쳐 쌓는다 */
+  .res-grid.daily-on .daily-rec{grid-column:3;grid-row:1}
+  .res-grid.daily-on .log{grid-column:1;grid-row:1 / span 2}
+  .res-grid.daily-on .skills{grid-column:2;grid-row:1 / span 2}
+  .res-grid.daily-on .next{grid-column:3;grid-row:2}
+}
