@@ -18,6 +18,8 @@ export const PLAY_UNLOCKS = Object.freeze({
   // 환승 러시: 이야기 자리는 1화 아침인데 드라마 기록이 생활 요약에 없어, 가장 가까운 이야기 기록인 레슨 하나를 마침으로 연다(설계 9절) —
   // 1화에 등굣길 장면이 생기면 그 기록으로 바꾼다.
   subway: Object.freeze({ where: 'play.where.lesson', open: (record) => record.lessons >= 1 }),
+  // 말 랠리(11-04, 설계 talk-rally/qa/world-campus-20261104/설계.md): 동아리 탁구 회차가 아직 없어 빈칸 베기와 같이 가장 가까운 공부 기록 — 레슨 한 번(카페 첫 방문을 먼저 한 학생도 막지 않는다). 그 회차가 생기면 그 기록으로 옮긴다.
+  rally: Object.freeze({ where: 'play.where.lesson', open: (record) => record.lessons >= 1 || record.cafeVisits >= 1 }),
 });
 
 // 대신하는 놀이가 그 학생에게 열리면 「놀이」 목록에서 그 자리를 이어받는다. 잠겨 있는 동안은 그대로 있어 듣기 놀이가 비지 않는다.

@@ -38,7 +38,9 @@ const games={
  // 찰칵 낱말(11-04, 새 게임): 「처음 만난 날」 이야기 뒤에 열린다(play-unlocks.mjs). 그림은 흰 바탕 위 물건 하나 — 필름 카메라.
  snap:{get title(){return t('game.snap.title');},get detail(){return t('game.snap.detail');},label:'SNAP & READ',path:'../snap-words/',image:'world-play/snap-words.webp',area:'간판·안내판 낱말 읽기 연습'},
  // 환승 러시(11-04, 캠퍼스 판): 레슨 하나를 마치면 열린다(play-unlocks.mjs). 열린 뒤에는 바람길 카드 자리를 이어받는다.
- subway:{get title(){return t('game.subway.title');},get detail(){return t('game.subway.detail');},label:'LISTEN & GO',path:'../subway-rush/',image:'world-play/subway-rush.webp',area:'지하철 안내방송을 듣고 문·통로·출구 고르기 연습'}
+ subway:{get title(){return t('game.subway.title');},get detail(){return t('game.subway.detail');},label:'LISTEN & GO',path:'../subway-rush/',image:'world-play/subway-rush.webp',area:'지하철 안내방송을 듣고 문·통로·출구 고르기 연습'},
+ // 말 랠리(11-04, 캠퍼스 판 겉 — 동아리 탁구장): 태오 선배와 주고받는다. 레슨 한 번 뒤 열린다(play-unlocks.mjs). 그림은 라켓과 공 인화지 한 장.
+ rally:{get title(){return t('game.rally.title');},get detail(){return t('game.rally.detail');},label:'LISTEN & RALLY',path:'../talk-rally/',image:'world-play/talk-rally.webp',area:'묻는 말 · 이어지는 말을 듣고 알맞은 대답 고르기 연습'}
 };
 let lastFocus=null,panelKind='',inView=true,manualReduced=false,frameTimer,displayPreference='auto',layout='portrait';
 let learningUI=null,learningLoader=null,education=null,reminders=null;

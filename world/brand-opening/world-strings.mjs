@@ -179,6 +179,8 @@ export default {
  'game.snap.detail':{ko:'간판과 물건을 찍어 낱말을 모아요',en:'Snap signs and objects to collect words',mn:'Самбар, эд зүйлийн зураг авч үг цуглуулна'},
  'game.subway.title':{ko:'환승 러시',en:'Transfer Rush',mn:'Метро дамжин суух'},
  'game.subway.detail':{ko:'안내방송을 듣고 갈아타서 첫 수업에 닿아요',en:'Follow the announcements, transfer, and make it to your first class',mn:'Буудал зарлахыг сонсоод метро дамжин сууж, эхний хичээлдээ амжина'},
+ 'game.rally.title':{ko:'말 랠리',en:'Talk Rally',mn:'Ярианы ралли'},
+ 'game.rally.detail':{ko:'태오 선배의 말을 듣고 알맞은 대답으로 받아쳐요',en:'Hear Tae-o and hit back with the right reply',mn:'Тэогийн яриаг сонсоод зөв хариултыг сонгож бөмбөгийг цохино'},
  'play.locked':{ko:'이야기에서 열려요 — {where}',en:'Opens in the story — {where}',mn:'{where} нээгдэнэ'},   // 몽골어는 동사가 끝 — 「…-д очиход нээгдэнэ」(…에 가면 열려요)
  'play.where.cafe':{ko:'싱크타운 카페 첫 방문',en:'your first visit to the SYNK Town café',mn:'SYNK Таун кафед анх очиход'},
  'play.where.lesson':{ko:'첫 학습을 마치면',en:'after your first lesson',mn:'Эхний хичээлээ дуусгахад'},

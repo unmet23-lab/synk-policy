@@ -709,6 +709,8 @@ const games={runner:{get title(){return t('game.runner.title');},path:'korean-ru
  blank:{get title(){return t('game.blank.title');},path:'blank-slice/'},
  // MT 바닷가 레이스(11-04, 1인칭 자전거 판 — korean-racing/world-skin.css): 홈 「놀이」가 해금 표로 연 뒤에만 여기로 온다.
  racing:{get title(){return t('game.racing.title');},path:'korean-racing/'},
+ // 말 랠리(11-04, 캠퍼스 판 겉 — talk-rally/world-skin.css): 홈 「놀이」가 해금 표로 연 뒤에만 여기로 온다.
+ rally:{get title(){return t('game.rally.title');},path:'talk-rally/'},
  // 환승 러시(11-04): 홈 「놀이」가 해금 표로 연 뒤에만 여기로 온다.
  subway:{get title(){return t('game.subway.title');},path:'subway-rush/'},
  // 찰칵 낱말(11-04): 학생이 고른 시험 목표 급을 넘긴다 — 능력 판단이 아니라 3급 안내문을 켠 채 시작할지 정하는 데만 쓴다.
