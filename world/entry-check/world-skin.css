@@ -52,6 +52,7 @@
 /* 화면 바꿈 가림막(world-play.mjs): 바꾸는 순간 바탕색으로 덮고, 새 화면이 두 장 그려지면 260ms에 걷는다 — 첫 그리기의 끊김을 가린다 */
 :root[data-host=world] #w-curtain{position:fixed;inset:0;z-index:60;background:var(--w-panel);opacity:0;pointer-events:none;will-change:opacity}
 :root[data-host=world] #w-curtain.on{opacity:.99}   /* 1이면 그래픽 칩이 아래 화면을 가려졌다고 그리지 않아, 걷기 시작해서야 셰이더를 굽고 장을 버렸다 — 99%면 덮인 동안 미리 그린다 */
+:root[data-host=world] .w-sr{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip-path:inset(50%);white-space:nowrap;border:0}
 :root[data-host=world] :is(button,a):focus-visible{outline:2px solid var(--w-ink);outline-offset:3px}
 :root[data-host=world] :is(.notice,.memo-card,.doc,.w-stampcard) :is(button,a):focus-visible{outline-color:#1B1B1E}
 :root[data-host=world] [tabindex="-1"]:focus{outline:none}

@@ -127,6 +127,9 @@ export function createWorldPlay({ sound, CAST = {}, view = () => null }) {
   /* ── DOM: WORLD에서만 붙이는 층(id · data-* · 클래스는 LAB 그대로) ── */
   function setup() {
     const frame = $('.frame'), guest = $('#guest');
+    // 근무 화면의 제목 · 별점을 읽기 프로그램도 알게(LAB HTML은 그대로): 근무 화면에 숨은 제목, 별점은 그림 하나로
+    if (!$('#game h1')) { const h = document.createElement('h1'); h.className = 'w-sr'; h.textContent = '입장 검사 근무'; $('#game')?.prepend(h); }
+    $('#r-stars')?.setAttribute('role', 'img');
     for (const id of ['#who', '#line']) { const n = $(id); if (n) n.textContent = ''; }   // LAB HTML에 적힌 자리 글(옛 손님 이름) — 첫 손님이 오면 app.mjs가 채운다
     if (frame && !$('.w-booth', frame)) {
       const booth = new Image(); booth.className = 'w-booth'; booth.alt = ''; booth.src = 'assets/world/booth.webp'; booth.decoding = 'async';
@@ -484,6 +487,8 @@ export function createWorldPlay({ sound, CAST = {}, view = () => null }) {
     // 새 화면의 첫 그리기(큰 사진 · 게임 화면)가 끝난 뒤에 움직인다 — 같이 시작하면 처음 몇 장이 끊긴다
     fx.spatial($('#brief-title'), [{ transform: 'translateY(16px)', opacity: 0 }, { transform: 'none', opacity: 1 }], fx.M.base, { delay: 320 });
     fx.effect($('.brief-card p', n), [{ opacity: 0 }, { opacity: 1 }], fx.M.eslow, { delay: 480 });
+    // 첫 손님 표정 판은 안내 화면의 움직임이 지난 뒤에 미리 받는다(느린 회선에서도 첫 표정이 제때 바뀌게). 다음 손님들은 onGuest가 받는다
+    setTimeout(() => { const s = view(), who = s?.queue?.[s.index ?? 0]; if (who) warmGuest(who); }, 900);
   }
   function onBegin() {
     ensure(); ambient();
@@ -494,8 +499,6 @@ export function createWorldPlay({ sound, CAST = {}, view = () => null }) {
       if (moving()) fx.spatial(blind, [{ transform: 'translateY(0)' }, { transform: 'translateY(-101%)' }], fx.M.slow, { fill: 'forwards' });
     }
     setTimeout(() => music?.play('calm'), 300);
-    // 다음 손님 표정 판은 블라인드가 다 걷힌 뒤에 받는다(받는 동안 움직임이 끊기지 않게)
-    setTimeout(() => { const st = view(); for (const who of st?.queue?.slice((st.index ?? 0) + 1, (st.index ?? 0) + 3) || []) warmGuest(who); }, 900);
   }
   function closeBlind() {
     const blind = $('.w-blind');
