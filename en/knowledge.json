@@ -1,5 +1,5 @@
 {
-  "version": "2026-09-15-selected-experiences-copy-9bfc4e4ce8-rhythm-20261001-copy-3910676d01-release-copy-3e4ed3be6d-en-002b14631325-bm-platform-20261007-a885b0d303-travel-20261007-ce148dd860-real-20261007-ab58ee7076-homepage-current-20261009-033c24b61f29-homepage-v10-20261010-69816e1683c8",
+  "version": "2026-09-15-selected-experiences-copy-9bfc4e4ce8-rhythm-20261001-copy-3910676d01-release-copy-3e4ed3be6d-en-002b14631325-bm-platform-20261007-a885b0d303-travel-20261007-ce148dd860-real-20261007-ab58ee7076-homepage-current-20261009-033c24b61f29-homepage-v10-20261010-bd87608bece1",
   "updatedAt": "2026-11-05",
   "docs": [
     {
@@ -311,14 +311,14 @@
     },
     {
       "id": "pulse",
-      "title": "SYNK PULSE — Natural is directed · AI ad production",
+      "title": "SYNK PULSE — We teach AI models to act · AI ad production",
       "paragraphs": [
         "SYNK PULSE makes product ads, brand films, AI model lookbooks and how-to videos with AI, from plan to final cut. We also create the music and stories of Mongle, Kkamong and Marin, and look for partners to license them or make something together.",
         "We start with where a video will run and who will see it. We show you every cut as a scene image before the video, build only from the cuts you have checked, and deliver files sized for websites, product pages and social channels.",
         "There is a casting book of twenty-one AI models, and with the person’s own consent we can create a model based on a brand’s CEO or staff. AI profiles, introduction decks and studio and equipment rental are in preparation and not taking bookings yet.",
         "We do not build educational or emotional profiles from what people listen to or watch, and we do not promise learning or therapeutic effects from our works.",
-        "To make AI video ads, directed to look natural, and to create our own music and character stories.",
-        "The glance, the hand holding the product, the timing of a smile. A founder with ten years in front of and behind the camera directs every one of those details. A first conversation needs just one product photo and where the ad will run.",
+        "To teach AI models to act and make AI video ads with them, and to create our own music and character stories.",
+        "A founder with ten years as an actor and ad model directs the glance, the hand holding the product, the timing of a smile. A first conversation needs just one product photo and where the ad will run.",
         "We also create the music and stories of Mongle, Kkamong and Marin, and look for partners to license them or make something together.",
         "PULSE makes relaxed music and video for everyday listening, and stories about Mongle, Kkamong and Marin. If you would like to use or make a piece with us, ask PULSE.",
         "We check that sound and picture fit and flow naturally from start to finish before publishing.",
@@ -436,7 +436,7 @@
         "SYNK — AI that gets to know you the more you use it.",
         "SYNK LAB — Join the cast of a K-drama, and speak Korean.",
         "SYNK SHIFT — AI lectures, plus work automation.",
-        "SYNK PULSE — Natural is directed. We make AI video ads.",
+        "SYNK PULSE — We teach AI models to act. We make AI video ads.",
         "SYNK PATH — Studying, working and living in Korea, prepared with you.",
         "Each business page separates what you can use today from what is still in preparation."
       ],
@@ -587,7 +587,7 @@
         "What are the visions of SYNK LAB, SHIFT, and PULSE?",
         "How do the visions of LAB, SHIFT, and PULSE differ?"
       ],
-      "answer": "In one line each:\n\nSYNK — AI that gets to know you the more you use it.\n\nSYNK LAB — Join the cast of a K-drama, and speak Korean.\n\nSYNK SHIFT — AI lectures, plus work automation.\n\nSYNK PULSE — Natural is directed. We make AI video ads.\n\nSYNK PATH — Studying, working and living in Korea, prepared with you.\n\nEach business page separates what you can use today from what is still in preparation.",
+      "answer": "In one line each:\n\nSYNK — AI that gets to know you the more you use it.\n\nSYNK LAB — Join the cast of a K-drama, and speak Korean.\n\nSYNK SHIFT — AI lectures, plus work automation.\n\nSYNK PULSE — We teach AI models to act. We make AI video ads.\n\nSYNK PATH — Studying, working and living in Korea, prepared with you.\n\nEach business page separates what you can use today from what is still in preparation.",
       "sourceId": "vision",
       "relatedIds": [
         "synk-vision",
@@ -1436,7 +1436,7 @@
         "What future does PULSE work toward?",
         "I'd like to know the future SYNK PULSE wants to create"
       ],
-      "answer": "To make AI video ads, directed to look natural, and to create our own music and character stories.\n\nThe glance, the hand holding the product, the timing of a smile. A founder with ten years in front of and behind the camera directs every one of those details. A first conversation needs just one product photo and where the ad will run.\n\nWe also create the music and stories of Mongle, Kkamong and Marin, and look for partners to license them or make something together.",
+      "answer": "To teach AI models to act and make AI video ads with them, and to create our own music and character stories.\n\nA founder with ten years as an actor and ad model directs the glance, the hand holding the product, the timing of a smile. A first conversation needs just one product photo and where the ad will run.\n\nWe also create the music and stories of Mongle, Kkamong and Marin, and look for partners to license them or make something together.",
       "sourceId": "pulse",
       "relatedIds": [
         "pulse-intro",
@@ -5088,8 +5088,8 @@
     },
     "pulse": {
       "name": "SYNK PULSE",
-      "headline": "Natural is directed",
-      "subtext": "The glance, the hand holding the product, the timing of a smile. A founder with ten years in front of and behind the camera directs every one of those details. A first conversation needs just one product photo and where the ad will run."
+      "headline": "We teach AI models to act",
+      "subtext": "A founder with ten years as an actor and ad model directs the glance, the hand holding the product, the timing of a smile. A first conversation needs just one product photo and where the ad will run."
     },
     "path": {
       "name": "SYNK PATH",
