@@ -1,6 +1,6 @@
 /* 드라마 상황극 · 2026-10-30 — 홈 #drama 띠, LAB #drama 구역(어두운 띠)과 장면 재생기, LAB #world 한 덩어리, 홈 아틀라스 판의 원칙 줄.
    홈 · LAB(한 · 영) 네 쪽만 싣는다(build.mjs DRAMA_PAGES) — site.css를 건드리지 않아 나머지 열한 쪽의 판 번호가 그대로다.
-   밝은 본문 안의 어두운 띠는 처마 입구와 같은 밤색(#08090c). 사업 색은 LAB 산호색을 「내 대사」에만, 감독 노트는 호박색 하나만 쓴다.
+   밝은 본문 안의 어두운 띠는 처마 입구와 같은 밤색(#08090c). 사업 색은 LAB 산호색을 「내 대사」에만, 코치 노트는 호박색 하나만 쓴다(11-06 감독 → 코치).
    움직임은 나타나기와 칸 바뀜(살짝 겹쳐 바뀜)뿐이고, 움직임 줄이기 설정이면 끈다. 소리는 누를 때만 나온다(drama.js). */
 
 .drama{
@@ -41,11 +41,11 @@
 .scene-frame{position:absolute;inset:0;margin:0}
 .scene-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 40%;opacity:0;transition:opacity .55s var(--ease)}
 .scene-img.is-on{opacity:1}
-.scene-slate{position:absolute;top:14px;left:14px;z-index:2;display:flex;flex-wrap:wrap;gap:6px;margin:0;font-family:var(--mono);font-size:11.5px;letter-spacing:.07em;color:#fff;pointer-events:none}
+.scene-slate{position:absolute;top:14px;left:14px;z-index:2;display:flex;flex-wrap:wrap;gap:6px;margin:0;font-size:13px;font-weight:600;letter-spacing:.01em;color:#fff;pointer-events:none}
 .scene-slate>span{padding:6px 10px 5px;border-radius:999px;background:rgba(8,9,12,.66);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);line-height:1.2}
-.scene-rec::before{content:'';display:inline-block;width:7px;height:7px;margin-right:7px;border-radius:50%;background:var(--d-rec);vertical-align:1px}
-/* 슬레이트의 REC 점은 실제로 녹음할 때만 깜박인다(재생 중에는 가만히 — 녹음하는 것처럼 보이지 않게) */
-.dscene.is-recording .scene-rec::before{animation:scene-rec 1.1s steps(2,jump-none) infinite}
+/* 11-06 스토리형: 슬레이트는 「1화 · 장면 2」 하나와, 코치 노트 뒤 다시 하는 동안만 켜지는 「한 번 더」 칩(호박색 — 코치 노트와 같은 색) */
+.scene-slate>[hidden]{display:none}
+.scene-slate>.scene-once{background:var(--d-note);color:#16130a;font-weight:650}
 @keyframes scene-rec{50%{opacity:.25}}
 .scene-ctrl{position:absolute;top:12px;right:12px;z-index:3;display:flex;gap:6px}
 .scene-chip{height:32px;padding:0 13px;border:0;border-radius:999px;background:rgba(8,9,12,.66);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);color:#fff;font:inherit;font-size:13px;font-weight:600;cursor:pointer}
@@ -77,12 +77,12 @@
 .scene-sub.is-on{opacity:1;transform:none}
 .scene-who{margin:0 0 7px;font-size:12.5px;font-weight:650;letter-spacing:.02em;color:var(--d-ink-3)}
 .scene-sub[data-who="me"] .scene-who{color:var(--d-me)}
-.scene-sub[data-who="director"] .scene-who{color:var(--d-note)}
+.scene-sub[data-who="coach"] .scene-who{color:var(--d-note)}
 .scene-ko{margin:0;font-size:clamp(19px,1.85vw,25px);line-height:1.45;font-weight:640;letter-spacing:-.015em;color:#fff;text-wrap:balance}
 .scene-mean{margin:7px 0 0;font-size:14.5px;line-height:1.5;color:var(--d-ink-3)}
 .scene-mean:empty{display:none}
 
-/* 카드: 내 대사 · 감독 노트 · 끝 */
+/* 카드: 내 대사 · 코치 노트 · 끝 */
 .scene-deck{padding:clamp(18px,2.2vw,24px);border-radius:18px;background:var(--d-card);box-shadow:0 0 0 1px var(--d-line)}
 .scene-card-label{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 10px;margin:0;font-size:13px;font-weight:700;letter-spacing:.02em;color:var(--d-me)}
 .scene-card-label span{font-weight:560;color:var(--d-ink-3)}
@@ -93,7 +93,8 @@
 .scene-acts{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
 .scene-card-note{margin:14px 0 0;font-size:12.5px;line-height:1.5;color:var(--d-ink-3)}
 .scene-take{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 12px;margin:12px 0 0;font-size:clamp(19px,1.7vw,22px);line-height:1.45;font-weight:620;color:#fff}
-.scene-take-no{font-family:var(--mono);font-size:11.5px;letter-spacing:.08em;color:var(--d-ink-3);padding:4px 8px;border-radius:6px;background:var(--d-card-2)}
+/* 「처음 말한 것」 — 한글이 든 라벨이라 모노를 쓰지 않는다(11-06, 옛 영문 촬영 칩 자리) */
+.scene-take-no{font-size:13px;font-weight:600;letter-spacing:0;color:var(--d-ink-3);padding:4px 9px;border-radius:6px;background:var(--d-card-2)}
 .scene-miss{display:inline-block;min-width:1.4em;margin-left:2px;padding:0 4px;border:1.5px dashed var(--d-note);border-radius:6px;background:transparent;color:var(--d-note);text-align:center}
 .scene-tip{display:flex;flex-wrap:wrap;gap:4px 10px;margin:12px 0 0;font-size:15px;line-height:1.55;color:var(--d-ink-2)}
 .scene-tip b{color:var(--d-note);font-weight:700}
@@ -111,7 +112,7 @@
 .scene-script button:not(:disabled):hover{color:var(--d-ink)}
 .scene-script-who{font-size:12.5px;font-weight:650;padding-top:2px}
 .scene-script li[data-who="me"] .scene-script-who{color:var(--d-me)}
-.scene-script li[data-who="director"] .scene-script-who{color:var(--d-note)}
+.scene-script li[data-who="coach"] .scene-script-who{color:var(--d-note)}
 .scene-script li[aria-current] button{color:#fff}
 .scene-script li[aria-current] .scene-script-ko{font-weight:650}
 .js .dscene--compact .scene-side{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
@@ -180,13 +181,10 @@
   .scene-btn{min-height:44px;padding:0 15px;font-size:15px}
   .scene-script button{grid-template-columns:78px minmax(0,1fr);font-size:14.5px}
   .scene-poster{padding:18px}
-  /* 재생이 시작되면 오른쪽 위 멈춤 · 처음부터 단추가 슬레이트를 덮지 않게 가운데 칩(시즌 · 화 · 장면)을 감춘다 — 포스터에서는 그대로 */
-  .dscene.is-started .scene-slate>span:nth-child(2){display:none}
-}
-@media (max-width:379px){
-  .dscene.is-started .scene-slate>[data-scene-take]{display:none}
+  /* 재생이 시작되면 오른쪽 위 멈춤 · 처음부터 단추가 슬레이트를 덮지 않게 화 · 장면 칩을 감춘다(「한 번 더」 칩만 남는다) — 포스터에서는 그대로 */
+  .dscene.is-started .scene-slate>span:first-child{display:none}
 }
 @media (prefers-reduced-motion:reduce){
   .scene-img,.scene-sub,.scene-btn,.drama-link .arr{transition:none}
-  .dscene.is-recording .scene-rec::before,.scene-btn.is-rec .scene-dot{animation:none}
+  .scene-btn.is-rec .scene-dot{animation:none}
 }

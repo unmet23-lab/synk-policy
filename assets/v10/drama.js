@@ -1,6 +1,7 @@
 // 드라마 상황극 장면 재생기 · 2026-10-30 (홈 #drama 띠 · LAB #drama 구역, build.mjs scenePlayer가 그린 마크업을 켠다 — 뿌리 클래스는 .dscene: site.css의 .scene(PULSE 장면 카드)과 겹치지 않게)
-// · 「내가 배역 맡기」는 내 대사에서 멈추고(모범 듣기 · 녹음 · 다음), 「끝까지 듣기」는 모범 읽기까지 틀며 멈추지 않는다.
-// · 감독 노트가 붙은 내 대사 뒤에는 노트 예시(테이크 1 → 노트 → 테이크 2 → 칭찬)가 나온다. 이 쪽은 말을 판정하지 않는다 — 예시는 원고 그대로다.
+// · 「내가 말해 보기」는 내 대사에서 멈추고(모범 듣기 · 녹음 · 다음), 「끝까지 듣기」는 모범 읽기까지 틀며 멈추지 않는다.
+// · 2026-11-06 스토리형: 코치는 장면 안에서 말하지 않는다. 장면이 끝나면 노트가 붙은 줄 하나에 코치 노트 예시(처음 말한 것 → 코치 목소리)가 오고,
+//   「한 번 더」는 그 줄의 바로 앞 상대 대사부터 다시 듣고 내 줄을 말한다(기획 §3-2) → 칭찬 → 마치는 말. 이 쪽은 말을 판정하지 않는다 — 예시는 원고 그대로다.
 // · 소리는 누를 때만 받는다(오디오 요소 하나를 다시 쓴다 — iOS가 사용자 동작 뒤의 연속 재생을 막지 않게). 다음 줄만 미리 받는다.
 // · 녹음은 누를 때만 마이크를 묻고 최대 10초, 이 기기 메모리(Blob URL)에서만 다시 듣는다. 어디로도 보내지 않는다.
 // · 소리를 못 받으면 글자 길이만큼 기다렸다 넘어간다. 탭이 가려지면 멈춘다. 움직임 줄이기 설정이면 CSS가 전환을 끈다.
@@ -25,7 +26,7 @@ function setup(root) {
   const audio = new Audio();
   audio.preload = 'none';
   let warm = null;
-  let idx = -1, mode = 'cast', token = 0, paused = false, engaged = false, recorder = null, recTimer = 0, asking = false;
+  let idx = -1, mode = 'cast', token = 0, paused = false, engaged = false, recorder = null, recTimer = 0, asking = false, coached = false;
   const takes = new Map();
   const watchers = new Set();
   const stage = $('.scene-stage');
@@ -58,7 +59,8 @@ function setup(root) {
     el.mean.textContent = mean || '';
   };
   const mark = n => el.script.forEach((li, k) => { if (k === n) li.setAttribute('aria-current', 'step'); else li.removeAttribute('aria-current'); });
-  const setTake = t => { el.take.textContent = 'TAKE ' + t; };
+  // 무대 왼쪽 위 「한 번 더」 칩 — 코치 노트 뒤 다시 하는 동안만 보인다.
+  const once = on => { el.take.hidden = !on; };
   const busy = on => {
     root.classList.toggle('is-playing', on);
     el.pause.hidden = !on && !paused;
@@ -128,12 +130,12 @@ function setup(root) {
   };
   const start = m => {
     stopRec(); cancel(); begin(m);
-    setTake(1);
+    once(false); coached = false;
     idx = -1; step();
   };
   const step = async () => {
     idx++;
-    if (idx >= data.lines.length) return end();
+    if (idx >= data.lines.length) return coach();
     const line = data.lines[idx];
     if (line.panel) showPanel(line.panel);
     mark(idx);
@@ -145,14 +147,13 @@ function setup(root) {
     }
     if (mode === 'watch') {
       card('');
-      if (line.note) return noteFlow(line);
       if (await play(line.audio, 'me', line.ko, line.mean)) step();
       return;
     }
     myTurn(line);
   };
 
-  // 내 차례: 대사 카드에서 멈춘다. retake면 감독 노트 뒤의 테이크 2.
+  // 내 차례: 대사 카드에서 멈춘다. retake면 코치 노트 뒤의 「한 번 더」.
   const myTurn = (line, { retake = false, focus } = {}) => {
     subtitle('me', line.ko, line.mean);
     const key = idx + (retake ? ':2' : '');
@@ -167,33 +168,44 @@ function setup(root) {
     focusDeck(focus);
   };
 
-  // 감독 노트 예시: 테이크 1(원고의 예시 글) → 노트 소리 → 테이크 2(배역 맡기면 내가, 끝까지 듣기면 모범 읽기) → 칭찬 → 다음 줄.
-  const noteFlow = async line => {
-    const N = line.note;
+  // 장면이 끝난 뒤의 코치 노트 예시: 처음 말한 것(원고의 예시 글) → 코치 목소리 → 「한 번 더」(바로 앞 상대 대사 → 내 줄:
+  // 「내가 말해 보기」면 내가, 「끝까지 듣기」면 모범 읽기) → 칭찬 → 끝. 노트가 붙은 줄이 없거나 이번 판에 이미 했으면 바로 끝.
+  const coach = async () => {
+    const n = data.lines.findIndex(l => l.note);
+    if (n < 0 || coached) return end();
+    coached = true;
+    const line = data.lines[n], N = line.note;
+    idx = n; mark(n); showPanel(panelAt(n));
     // 빠진 「요」는 점선 칸으로 보이되, 읽어 주기에서는 맞는 문장으로 들리지 않게 칸 글자를 감추고 「(빠진 끝맺음: 요)」로 읽힌다.
-    const take1 = esc(N.take1).replace(esc(N.at), `${esc(N.at)}<span class="scene-miss" aria-hidden="true">${esc(N.want)}</span><span class="sr-only"> (${esc(N.missLabel)})</span>`);
+    const first = esc(N.take1).replace(esc(N.at), `${esc(N.at)}<span class="scene-miss" aria-hidden="true">${esc(N.want)}</span><span class="sr-only"> (${esc(N.missLabel)})</span>`);
     card(`<p class="scene-card-label is-note">${esc(U.noteLabel)}<span>${esc(U.example)}</span></p>
-<p class="scene-take"><span class="scene-take-no">TAKE 1</span><span lang="ko">${take1}</span></p>
+<p class="scene-take"><span class="scene-take-no">${esc(U.first)}</span><span lang="ko">${first}</span></p>
 <p class="scene-tip"><b>${esc(N.kind)}</b>${esc(N.tip)}</p>
 <p class="scene-example">${esc(U.exampleNote)}</p>`);
     el.deck.dataset.key = '';
-    setTake(1);
-    if (!(await play(N.say.audio, 'director', N.say.ko, N.say.mean))) return;
-    setTake(2);
+    if (!(await play(N.say.audio, 'coach', N.say.ko, N.say.mean))) return;
+    once(true);
+    const prev = data.lines[n - 1];
+    if (prev && prev.who !== 'me') {
+      card('');
+      idx = n - 1; mark(idx);
+      const ok = await play(prev.audio, prev.who, prev.ko, prev.mean);
+      if (!ok) return;
+      idx = n; mark(n);
+    }
     if (mode === 'cast') return myTurn(line, { retake: true });
-    if (!(await play(line.audio, 'me', line.ko, line.mean))) return;
-    if (!(await play(N.praise.audio, 'director', N.praise.ko, N.praise.mean))) return;
-    setTake(1);
-    step();
-  };
-  const afterRetake = async line => {
     card('');
-    if (!(await play(line.note.praise.audio, 'director', line.note.praise.ko, line.note.praise.mean))) return;
-    setTake(1);
-    step();
+    if (!(await play(line.audio, 'me', line.ko, line.mean))) return;
+    praise(line);
+  };
+  const praise = async line => {
+    card('');
+    if (!(await play(line.note.praise.audio, 'coach', line.note.praise.ko, line.note.praise.mean))) return;
+    once(false);
+    end();
   };
 
-  const end = () => {
+  const end = async () => {
     mark(-1);
     showPanel('next');
     subtitle('', '');
@@ -202,9 +214,11 @@ function setup(root) {
 <div class="scene-acts">${data.next ? `<button class="scene-btn" type="button" data-act="nextvoice"><span aria-hidden="true">▶</span> ${esc(U.endVoice)}</button>` : ''}<button class="scene-btn primary" type="button" data-act="again">${esc(U.replay)} <span aria-hidden="true">↺</span></button></div>`);
     el.deck.dataset.key = '';
     focusDeck('again');
+    // 코치의 마치는 말 — 끝 카드는 그대로 두고 한 번 들려준 뒤 자막을 걷는다(그사이 「처음부터」를 누르면 끊긴다).
+    if (data.wrap && await play(data.wrap.audio, 'coach', data.wrap.ko, data.wrap.mean)) subtitle('', '');
   };
   const reset = () => {
-    stopRec(); cancel(); card(''); subtitle('', ''); mark(-1); showPanel('poster'); setTake(1);
+    stopRec(); cancel(); card(''); subtitle('', ''); mark(-1); showPanel('poster'); once(false); coached = false;
     el.poster.hidden = false; el.restart.hidden = true; root.classList.remove('is-started'); idx = -1;
     const s = el.poster.querySelector('button');
     if (s && engaged) s.focus({ preventScroll: true });
@@ -270,12 +284,12 @@ function setup(root) {
       return;
     }
     if (b.dataset.sceneJump) {
-      // 대본 줄을 누르면 그 줄부터 — 아직 시작 전이면 「내가 배역 맡기」로 시작한다.
+      // 대본 줄을 누르면 그 줄부터 — 아직 시작 전이면 「내가 말해 보기」로 시작한다. 장면 끝의 코치 노트는 다시 온다.
       stopRec(); cancel();
       if (!root.classList.contains('is-started')) begin('cast');
       const n = Number(b.dataset.sceneJump);
       showPanel(panelAt(n));
-      setTake(1);
+      once(false); coached = false;
       idx = n - 1; step();
       return;
     }
@@ -287,8 +301,7 @@ function setup(root) {
     if (act === 'mine') { if (recorder) return; const url = takes.get(el.deck.dataset.key); if (url) { cancel(); play(url, 'me', line.ko, line.mean); } return; }
     if (act === 'next') {
       stopRec(); cancel();
-      if (el.deck.dataset.retake) return afterRetake(line);
-      if (line && line.note) return noteFlow(line);
+      if (el.deck.dataset.retake) return praise(line);
       return step();
     }
     if (act === 'nextvoice' && data.next) { cancel(); play(data.next.audio, data.next.who, data.next.ko, data.next.mean); return; }
