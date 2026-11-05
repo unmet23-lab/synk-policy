@@ -1,6 +1,6 @@
 {
-  "version": "2026-09-15-selected-experiences-copy-9bfc4e4ce8-rhythm-20261001-copy-3910676d01-release-copy-3e4ed3be6d-en-002b14631325-bm-platform-20261007-a885b0d303-travel-20261007-ce148dd860-real-20261007-ab58ee7076-homepage-current-20261009-033c24b61f29-homepage-v10-20261010-6a0cf65710e4",
-  "updatedAt": "2026-11-04",
+  "version": "2026-09-15-selected-experiences-copy-9bfc4e4ce8-rhythm-20261001-copy-3910676d01-release-copy-3e4ed3be6d-en-002b14631325-bm-platform-20261007-a885b0d303-travel-20261007-ce148dd860-real-20261007-ab58ee7076-homepage-current-20261009-033c24b61f29-homepage-v10-20261010-69816e1683c8",
+  "updatedAt": "2026-11-05",
   "docs": [
     {
       "id": "company",
@@ -8,7 +8,7 @@
       "paragraphs": [
         "SYNK builds Atlas, a personalization engine that reads a person’s goals and what they have actually done, then fits the next practice to them. With it we run four businesses: Korean education, AI lectures and work automation, ad videos, and preparing to study in Korea.",
         "It began in a classroom in Ulaanbaatar, Mongolia. Every student was good at different things, got stuck in different places and had different reasons for learning. Atlas is our attempt to tailor teaching to each person with technology.",
-        "SYNK LAB is making a K-drama role-play where you speak Korean as one of the cast (pilot in preparation), runs TOPIK practice and Korean games in SYNK WORLD, and is preparing a one-year course aimed at TOPIK Level 4. SYNK SHIFT gives AI-era lectures on careers and work at schools, companies and institutions, and automates repetitive work with AI for companies that took a lecture. SYNK PULSE makes AI ads that show you every cut first, and grows our own music and character stories. SYNK PATH helps with travel plans and with preparing to study, work and settle in Korea.",
+        "SYNK LAB is making a K-drama role-play where you speak Korean as one of the cast (pilot in preparation), runs TOPIK practice and Korean games in SYNK WORLD, and is preparing a one-year course aimed at TOPIK Level 4. SYNK SHIFT gives AI-era lectures on careers and work at schools, companies and institutions, and automates repetitive work with AI for companies that took a lecture. SYNK PULSE makes AI video ads, and grows our own music and character stories. SYNK PATH helps with travel plans and with preparing to study, work and settle in Korea.",
         "The SYNK platform is open now as a web preview and as a PC app preview for Windows and Mac. Anything still in preparation is labelled as such on each business page.",
         "To build AI that gets to know you the more you use it — so that anyone, in their 20s or their 60s, gets help that matches their goal and situation when they play, study or ask for advice.",
         "LAB covers Korean-language education; SHIFT, AI lectures and work automation; PULSE, ads and model videos, music and characters; and PATH, the Seoul day planner and preparation for studying, working and settling in Korea. All four use the Atlas engines they need.",
@@ -82,7 +82,7 @@
         "Each program stores progress differently. Guest progress stays in that browser; with a SYNK ID, supported records are kept in your account. Anything done before signing up does not move to your account automatically.",
         "In SHIFT lectures and work automation, material and records are used only for the purpose and consent agreed with whoever made the request. You can find how each service keeps, shows and deletes data in the privacy policy."
       ],
-      "updatedAt": "2026-11-04"
+      "updatedAt": "2026-11-05"
     },
     {
       "id": "lab",
@@ -311,14 +311,14 @@
     },
     {
       "id": "pulse",
-      "title": "SYNK PULSE — AI ads that show you every cut first",
+      "title": "SYNK PULSE — Natural is directed · AI ad production",
       "paragraphs": [
         "SYNK PULSE makes product ads, brand films, AI model lookbooks and how-to videos with AI, from plan to final cut. We also create the music and stories of Mongle, Kkamong and Marin, and look for partners to license them or make something together.",
         "We start with where a video will run and who will see it. We show you every cut as a scene image before the video, build only from the cuts you have checked, and deliver files sized for websites, product pages and social channels.",
         "There is a casting book of twenty-one AI models, and with the person’s own consent we can create a model based on a brand’s CEO or staff. AI profiles, introduction decks and studio and equipment rental are in preparation and not taking bookings yet.",
         "We do not build educational or emotional profiles from what people listen to or watch, and we do not promise learning or therapeutic effects from our works.",
-        "To make AI ads that show you every cut first, and to create our own music and character stories.",
-        "Before we make the video, we show you every cut as a scene image. We build only from the cuts you have checked, and composite products, logos and on-screen text from your real files. A first conversation needs just one product photo and where the ad will run.",
+        "To make AI video ads, directed to look natural, and to create our own music and character stories.",
+        "The glance, the hand holding the product, the timing of a smile. A founder with ten years in front of and behind the camera directs every one of those details. A first conversation needs just one product photo and where the ad will run.",
         "We also create the music and stories of Mongle, Kkamong and Marin, and look for partners to license them or make something together.",
         "PULSE makes relaxed music and video for everyday listening, and stories about Mongle, Kkamong and Marin. If you would like to use or make a piece with us, ask PULSE.",
         "We check that sound and picture fit and flow naturally from start to finish before publishing.",
@@ -368,7 +368,7 @@
         "We only use photos of you, or of an adult who has agreed to the work. The plan is to deliver a finished version you can show right away plus an editable template where you can swap photos and text. Photography is not included.",
         "The number of photos, the number of slides, the revision scope, schedule and price will be set before sale. If you would like to talk it through early, ask PULSE."
       ],
-      "updatedAt": "2026-11-03"
+      "updatedAt": "2026-11-05"
     },
     {
       "id": "philosophy",
@@ -436,11 +436,11 @@
         "SYNK — AI that gets to know you the more you use it.",
         "SYNK LAB — Join the cast of a K-drama, and speak Korean.",
         "SYNK SHIFT — AI lectures, plus work automation.",
-        "SYNK PULSE — AI ads that show you every cut first.",
+        "SYNK PULSE — Natural is directed. We make AI video ads.",
         "SYNK PATH — Studying, working and living in Korea, prepared with you.",
         "Each business page separates what you can use today from what is still in preparation."
       ],
-      "updatedAt": "2026-10-30"
+      "updatedAt": "2026-11-05"
     },
     {
       "id": "path",
@@ -514,7 +514,7 @@
         "Tell me about SYNK’s work",
         "Where can I read about the company?"
       ],
-      "answer": "SYNK builds Atlas, a personalization engine that reads a person’s goals and what they have actually done, then fits the next practice to them. With it we run four businesses: Korean education, AI lectures and work automation, ad videos, and preparing to study in Korea.\n\nIt began in a classroom in Ulaanbaatar, Mongolia. Every student was good at different things, got stuck in different places and had different reasons for learning. Atlas is our attempt to tailor teaching to each person with technology.\n\nSYNK LAB is making a K-drama role-play where you speak Korean as one of the cast (pilot in preparation), runs TOPIK practice and Korean games in SYNK WORLD, and is preparing a one-year course aimed at TOPIK Level 4. SYNK SHIFT gives AI-era lectures on careers and work at schools, companies and institutions, and automates repetitive work with AI for companies that took a lecture. SYNK PULSE makes AI ads that show you every cut first, and grows our own music and character stories. SYNK PATH helps with travel plans and with preparing to study, work and settle in Korea.\n\nThe SYNK platform is open now as a web preview and as a PC app preview for Windows and Mac. Anything still in preparation is labelled as such on each business page.",
+      "answer": "SYNK builds Atlas, a personalization engine that reads a person’s goals and what they have actually done, then fits the next practice to them. With it we run four businesses: Korean education, AI lectures and work automation, ad videos, and preparing to study in Korea.\n\nIt began in a classroom in Ulaanbaatar, Mongolia. Every student was good at different things, got stuck in different places and had different reasons for learning. Atlas is our attempt to tailor teaching to each person with technology.\n\nSYNK LAB is making a K-drama role-play where you speak Korean as one of the cast (pilot in preparation), runs TOPIK practice and Korean games in SYNK WORLD, and is preparing a one-year course aimed at TOPIK Level 4. SYNK SHIFT gives AI-era lectures on careers and work at schools, companies and institutions, and automates repetitive work with AI for companies that took a lecture. SYNK PULSE makes AI video ads, and grows our own music and character stories. SYNK PATH helps with travel plans and with preparing to study, work and settle in Korea.\n\nThe SYNK platform is open now as a web preview and as a PC app preview for Windows and Mac. Anything still in preparation is labelled as such on each business page.",
       "sourceId": "company",
       "relatedIds": [
         "synk-vision",
@@ -526,7 +526,7 @@
         "label": "See the four businesses",
         "href": "/en/#business"
       },
-      "reviewedAt": "2026-10-30",
+      "reviewedAt": "2026-11-05",
       "aliases": [
         "SYNK는 어떤 회사인가요?",
         "싱크가 하는 일을 알려 주세요",
@@ -587,7 +587,7 @@
         "What are the visions of SYNK LAB, SHIFT, and PULSE?",
         "How do the visions of LAB, SHIFT, and PULSE differ?"
       ],
-      "answer": "In one line each:\n\nSYNK — AI that gets to know you the more you use it.\n\nSYNK LAB — Join the cast of a K-drama, and speak Korean.\n\nSYNK SHIFT — AI lectures, plus work automation.\n\nSYNK PULSE — AI ads that show you every cut first.\n\nSYNK PATH — Studying, working and living in Korea, prepared with you.\n\nEach business page separates what you can use today from what is still in preparation.",
+      "answer": "In one line each:\n\nSYNK — AI that gets to know you the more you use it.\n\nSYNK LAB — Join the cast of a K-drama, and speak Korean.\n\nSYNK SHIFT — AI lectures, plus work automation.\n\nSYNK PULSE — Natural is directed. We make AI video ads.\n\nSYNK PATH — Studying, working and living in Korea, prepared with you.\n\nEach business page separates what you can use today from what is still in preparation.",
       "sourceId": "vision",
       "relatedIds": [
         "synk-vision",
@@ -600,7 +600,7 @@
         "label": "See the four businesses",
         "href": "/en/#business"
       },
-      "reviewedAt": "2026-10-30",
+      "reviewedAt": "2026-11-05",
       "aliases": [
         "네 브랜드의 비전을 모두 알려 주세요",
         "SYNK LAB SHIFT PULSE의 비전은 무엇인가요?",
@@ -1436,7 +1436,7 @@
         "What future does PULSE work toward?",
         "I'd like to know the future SYNK PULSE wants to create"
       ],
-      "answer": "To make AI ads that show you every cut first, and to create our own music and character stories.\n\nBefore we make the video, we show you every cut as a scene image. We build only from the cuts you have checked, and composite products, logos and on-screen text from your real files. A first conversation needs just one product photo and where the ad will run.\n\nWe also create the music and stories of Mongle, Kkamong and Marin, and look for partners to license them or make something together.",
+      "answer": "To make AI video ads, directed to look natural, and to create our own music and character stories.\n\nThe glance, the hand holding the product, the timing of a smile. A founder with ten years in front of and behind the camera directs every one of those details. A first conversation needs just one product photo and where the ad will run.\n\nWe also create the music and stories of Mongle, Kkamong and Marin, and look for partners to license them or make something together.",
       "sourceId": "pulse",
       "relatedIds": [
         "pulse-intro",
@@ -1447,7 +1447,7 @@
         "label": "See PULSE",
         "href": "/en/pulse/"
       },
-      "reviewedAt": "2026-10-10",
+      "reviewedAt": "2026-11-05",
       "aliases": [
         "PULSE의 비전은 무엇인가요?",
         "펄스가 지향하는 미래는 무엇인가요?",
@@ -5088,8 +5088,8 @@
     },
     "pulse": {
       "name": "SYNK PULSE",
-      "headline": "AI ads that show you every cut first",
-      "subtext": "Before we make the video, we show you every cut as a scene image. We build only from the cuts you have checked, and composite products, logos and on-screen text from your real files. A first conversation needs just one product photo and where the ad will run."
+      "headline": "Natural is directed",
+      "subtext": "The glance, the hand holding the product, the timing of a smile. A founder with ten years in front of and behind the camera directs every one of those details. A first conversation needs just one product photo and where the ad will run."
     },
     "path": {
       "name": "SYNK PATH",
