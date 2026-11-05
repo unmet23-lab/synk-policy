@@ -33,6 +33,18 @@ export function softLimit(x) {
   return Math.sign(x) * (k + (top - k) * Math.tanh((a - k) / (top - k)));
 }
 
+/** 끝 리미터: 목소리 · 효과음 · 음악이 겹쳐도 스피커로 1.0을 넘겨 찌그러지지 않게 같은 곡선으로 한 번 더 받는다. 입력 마디를 돌려준다(WORLD 소리 길의 맨 끝). 보통 흐름에서는 없어도 0.925로 넘지 않지만(11-05 실측) 빠르게 찍으면 도장과 말이 겹칠 수 있어 보증으로 둔다. */
+export function createLimiter(c, destination = c.destination) {
+  const half = c.createGain(); half.gain.value = 0.5;
+  const limit = c.createWaveShaper();
+  const curve = new Float32Array(1025);
+  for (let i = 0; i < curve.length; i += 1) { const x = (i / 512 - 1) * 2; curve[i] = softLimit(x) / 2; }
+  limit.curve = curve;
+  const back = c.createGain(); back.gain.value = 2;
+  half.connect(limit); limit.connect(back); back.connect(destination);
+  return half;
+}
+
 /**
  * 소리 길: 소리마다 → out(켜기 · 끄기 · 전체 크기) → 리미터 → 스피커.
  * 브라우저 압축기는 한계 아래 소리까지 줄여서(사운드킷 실측) 쓰지 않는다.
@@ -234,8 +246,8 @@ export function renderSfx(bus, name, when = 0, opts = {}) {
 const DUCK = Math.pow(10, -4 / 20);   // 손님 목소리가 나오는 동안 효과음 −4dB(조사_소리 「음성 중 효과음」)
 
 /** 게임에서 쓰는 손잡이: 문맥을 받아 bus를 만들고, 이름으로 부른다. on()이 거짓이면 아무것도 내지 않는다. */
-export function createSfx(c, { seed = (Date.now() >>> 0), on = () => true, volume = 1 } = {}) {
-  const bus = createBus(c, { seed });
+export function createSfx(c, { seed = (Date.now() >>> 0), on = () => true, volume = 1, destination = c.destination } = {}) {
+  const bus = createBus(c, { seed, destination });
   let vol = Math.min(1, Math.max(0, volume)), ducked = false;
   const apply = () => bus.out.gain.setTargetAtTime(vol * (ducked ? DUCK : 1), c.currentTime, 0.05);
   bus.out.gain.value = vol;

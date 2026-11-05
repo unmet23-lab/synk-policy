@@ -564,7 +564,8 @@ function showFeedback(item, choice, result) {
     : followup?.status === 'new' ? '새 손님으로 확인' : followup?.status === 'review' ? '복습 손님으로 확인' : '다음 손님';
   $('#fb-kicker').classList.toggle('ko', !result.correct);
   fb.hidden = false;
-  announce(`${$('#fb-title').textContent}. ${correction} ${$('#fb-reply').textContent} 왜? ${item.why}${wrongPassOrReject ? ` 그 뒤에 생긴 일: ${item.oops}` : ''} ${state.cur.recheck?.line || ''} ${followup?.line || ''}`);
+  const fbTitle = $('#fb-title').textContent;   // WORLD 판정 제목은 「정확해요!」처럼 부호로 끝난다 — 마침표를 겹쳐 붙이지 않는다
+  announce(`${WORLD && /[!?.]$/.test(fbTitle) ? fbTitle : `${fbTitle}.`} ${correction} ${$('#fb-reply').textContent} 왜? ${item.why}${wrongPassOrReject ? ` 그 뒤에 생긴 일: ${item.oops}` : ''} ${state.cur.recheck?.line || ''} ${followup?.line || ''}`);
   $('#fb-reply').closest('.fb-reply').classList.remove('speaking');
   $('#btn-next').focus({ preventScroll: true });
   // 휴대폰: 아래 판이 동그라미 친 규칙을 가리지 않게 그만큼 내려 볼 자리를 만들고 규칙을 판 위로 올린다

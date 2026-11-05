@@ -6,6 +6,9 @@ export const PLAY_UNLOCKS = Object.freeze({
   // 주문 폭주: 싱크타운 카페 알바 시작에서 열린다. 지금 앱의 싱크타운 카페 이야기는 첫 방문(cafe-apply) 하나라 그 완료를 기록으로 읽는다 —
   // 1화 뒤 카페 알바 장면이 생기면 그 장면의 기록으로 바꾼다.
   order: Object.freeze({ where: 'play.where.cafe', open: (record) => record.cafeVisits >= 1 }),
+  // 입장 검사(11-04): 축제 · 콘서트 입장 스태프 알바에서 열린다. 그 회차가 아직 없어, 가장 가까운 이야기 기록인 싱크타운 카페 첫 방문(알바 지원)으로 연다 —
+  // 축제 스태프 회차가 생기면 그 기록으로 옮긴다.
+  entry: Object.freeze({ where: 'play.where.cafe', open: (record) => record.cafeVisits >= 1 }),
   // 빈칸 베기(11-04): 이야기 자리는 중간고사 전날 밤 도서관(3급 뼈대 U08). 그 회차가 아직 없어 가장 가까운 공부 기록 — 레슨 한 번 — 으로 열고,
   // 카페 첫 방문을 먼저 한 학생도 막지 않는다(엄격하게 막지 않는다). 중간고사 회차가 생기면 그 기록으로 옮긴다.
   blank: Object.freeze({ where: 'play.where.lesson', open: (record) => record.lessons >= 1 || record.cafeVisits >= 1 }),

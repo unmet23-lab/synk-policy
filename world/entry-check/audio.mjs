@@ -24,6 +24,8 @@ export function useWorldMode({ skipVoice = () => false } = {}) { worldMode = { s
 export const context = () => ctx;
 /** 목소리가 지나는 마디(WORLD 목소리 막대가 분석기를 옆에 단다 — 소리 길은 그대로). */
 export const voiceOutput = () => voiceBus;
+/** 목소리 끝 마디를 스피커 대신 주어진 마디로 잇는다(WORLD 끝 리미터 — LAB은 부르지 않는다). */
+export function routeOutput(node) { if (master) { master.disconnect(); master.connect(node); } }
 /** 말하는 줄이 바뀔 때마다(id 또는 null) — onSpeaking(화면 표시)과 따로 여럿이 듣는다(WORLD 음악 덕킹 · 목소리 막대). */
 export const addSpeakingListener = (fn) => { speakers.add(fn); return () => speakers.delete(fn); };
 const speaking = (id) => { onSpeak?.(id); for (const fn of speakers) { try { fn(id); } catch { /* 듣는 쪽 오류가 말하기를 막지 않는다 */ } } };

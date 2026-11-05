@@ -5,7 +5,7 @@
 //
 // 표정(5절): 찍기 전 반응(긴장)은 답과 상관없이 늘 같다 — 표정이 답을 알려 주면 혼자 해낸 읽기 기록이 오염된다.
 // 맞고 틀림은 찍은 뒤의 얼굴로만 돌려준다(통과 · 머쓱 · 몰래 · 갸웃). 움직임은 도장이 닿는 순간과 얼굴에 몰아 쓴다(조사: 많이 움직일수록 싸 보인다).
-import { createSfx } from './world-sfx.mjs';
+import { createSfx, createLimiter } from './world-sfx.mjs';
 import { createMusic } from './world-music.mjs';
 import * as fx from './world-fx.mjs';
 import { WORLD_VENUES, MOODS, RULE_KEYS, EXPRESSIONS, SNEAKY, worldGuestImage, worldGuestFace } from './world-content.mjs';
@@ -40,8 +40,10 @@ export function createWorldPlay({ sound, CAST = {}, view = () => null }) {
     if (sfx) return true;
     const ctx = sound.context();
     if (!ctx) return false;
-    sfx = createSfx(ctx, { on: () => sound.isOn() && pref('sound') });
-    music = createMusic(ctx, { storage: (() => { try { return localStorage; } catch { return null; } })() });
+    const output = createLimiter(ctx);   // 목소리 · 효과음 · 음악의 합이 스피커에서 찌그러지지 않게 한 끝으로 모은다
+    sound.routeOutput(output);
+    sfx = createSfx(ctx, { on: () => sound.isOn() && pref('sound'), destination: output });
+    music = createMusic(ctx, { storage: (() => { try { return localStorage; } catch { return null; } })(), destination: output });
     music.setOn(sound.isOn());
     try {   // 목소리 막대: 목소리 마디 옆에 분석기만 단다(소리 길은 그대로)
       analyser = ctx.createAnalyser(); analyser.fftSize = 256; analyser.smoothingTimeConstant = 0.55;
@@ -509,6 +511,8 @@ export function createWorldPlay({ sound, CAST = {}, view = () => null }) {
   /** 결과: 음악이 물러나고 근무 끝 소리, 큰 숫자가 오르고, 도장 판에 손님마다 잉크가 찍히고, 그날 읽은 표현이 나온다. 탭하면 바로 끝. */
   let counter = null, stampTimers = [];
   function onResults() {
+    const srLive = $('#sr-live');
+    if (srLive) srLive.textContent = '';   // 결과 화면을 읽을 때 직전 손님 판정이 먼저 들리지 않게
     music?.stop(1.2);
     play('done'); haptic('done');
     const big = $('#r-correct'), to = Number(big?.textContent) || 0;
