@@ -978,8 +978,6 @@ body[data-site="path"] .qa-term:hover{--term:#526956}
 .svc-tab:hover{color:var(--ink-2)}
 .svc-tab[aria-selected="true"]{color:var(--ink)}
 .svc-tab[aria-selected="true"] .mono{color:var(--accent-ink)}
-.svc-tab .svc-name::after{content:'';display:inline-block;width:.2em;height:.2em;margin-left:.16em;border-radius:50%;background:transparent;vertical-align:.02em}
-.svc-tab[aria-selected="true"] .svc-name::after{background:var(--accent)}
 .svc-tab:focus-visible{outline:2px solid var(--ink);outline-offset:4px;border-radius:6px}
 .svc-title{display:flex;align-items:baseline;gap:14px;margin:0 0 18px;font-size:clamp(26px,6.4vw,34px);font-weight:calc(var(--hw) + 20);letter-spacing:-.028em;line-height:1.2}
 .svc-title .mono{font-size:12.5px;letter-spacing:.04em;color:var(--accent-ink);flex:none}
