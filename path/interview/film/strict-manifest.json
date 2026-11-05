@@ -46,11 +46,11 @@
           "fallbackSrc": "../assets/interview/film/strict-question-4k.mp4"
         },
         "720p": {
-          "src": "https://storage.googleapis.com/synk-path-media/path/v2/interview/film/c7b71793b8c646f5/strict-question-720p.mp4",
+          "src": "https://storage.googleapis.com/synk-path-media/path/v2/interview/film/e2d0ea7852b1be0c/strict-question-720p.mp4",
           "width": 1280,
           "height": 720,
           "fps": "24/1",
-          "sha256": "c7b71793b8c646f5a966475d19c2d599ab73e339ee672fc689fed7b7bef8cff7",
+          "sha256": "e2d0ea7852b1be0cef96ae7e39d6f28802ba9cac82d9f9d0a8ceff8ced2316ad",
           "durationSeconds": 10.08,
           "fallbackSrc": "../assets/interview/film/strict-question-720p.mp4"
         }
@@ -97,11 +97,11 @@
           "fallbackSrc": "../assets/interview/film/strict-listening-4k.mp4"
         },
         "720p": {
-          "src": "https://storage.googleapis.com/synk-path-media/path/v2/interview/film/10a9d1ad6b07c701/strict-listening-720p.mp4",
+          "src": "https://storage.googleapis.com/synk-path-media/path/v2/interview/film/14eb1af29d50856c/strict-listening-720p.mp4",
           "width": 1280,
           "height": 720,
           "fps": "24/1",
-          "sha256": "10a9d1ad6b07c701efd01a14961ecfec47dd31d9846ee0b5a240a1b8c53ff81c",
+          "sha256": "14eb1af29d50856c3abf9fba66695efd0d5826d009b14ecf4894dfb0289200f5",
           "durationSeconds": 10.08,
           "fallbackSrc": "../assets/interview/film/strict-listening-720p.mp4"
         }
@@ -146,11 +146,11 @@
           "fallbackSrc": "../assets/interview/film/strict-followup-experience-4k.mp4"
         },
         "720p": {
-          "src": "https://storage.googleapis.com/synk-path-media/path/v2/interview/film/5d1680de4b5c7234/strict-followup-experience-720p.mp4",
+          "src": "https://storage.googleapis.com/synk-path-media/path/v2/interview/film/d17c39ee6218fc5d/strict-followup-experience-720p.mp4",
           "width": 1280,
           "height": 720,
           "fps": "24/1",
-          "sha256": "5d1680de4b5c7234482c0202dea23357e4b8b135dab32ae835cc053083e4b685",
+          "sha256": "d17c39ee6218fc5d3aaa7fc68c7cffadaef28fe79fa9791ffceddaed3be78556",
           "durationSeconds": 10.041667,
           "fallbackSrc": "../assets/interview/film/strict-followup-experience-720p.mp4"
         }
@@ -195,11 +195,11 @@
           "fallbackSrc": "../assets/interview/film/strict-followup-plan-4k.mp4"
         },
         "720p": {
-          "src": "https://storage.googleapis.com/synk-path-media/path/v2/interview/film/d2853c0c84408e45/strict-followup-plan-720p.mp4",
+          "src": "https://storage.googleapis.com/synk-path-media/path/v2/interview/film/28aae1abf62e8e7c/strict-followup-plan-720p.mp4",
           "width": 1280,
           "height": 720,
           "fps": "24/1",
-          "sha256": "d2853c0c84408e45222c4cd041ea4d707cb5ce2a4a7ddbf09b2972a9787aed94",
+          "sha256": "28aae1abf62e8e7c424248bbe66ca1b2ba2c0306583ab6daa76ad1fe1f8be5de",
           "durationSeconds": 10.041667,
           "fallbackSrc": "../assets/interview/film/strict-followup-plan-720p.mp4"
         }
