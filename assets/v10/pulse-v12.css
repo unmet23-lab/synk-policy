@@ -1,0 +1,174 @@
+/* SYNK PULSE 「시사실」 v12 · 2026-11-06 — /pulse/ · /en/pulse/ 두 쪽만 싣는다(build.mjs shell). site.css 위에 덮는다.
+   시안: SYNK-appsscript docs/디자인/synk.im_리디자인_20261106/시안/pulse.html (시안 검수 반영판).
+   바닥: 11-04 크롤링 평균 — 작품이 화면 87~100%, 글자 3~4단, 단추 · 칸 · 둥글림 없음, 작은 글은 귀퉁이, 전환 0.7~1.2초 · 손 반응 0.2~0.3초.
+   11-06 디자인 참고 장부 평균: 제목 자간 −0.012em 안팎(한글은 0), 한글 본문 17px, 직사각 단추, 고정폭은 숫자에만.
+   검은 칸(시사실 · 작품 · 영상 제작 · AI 모델 · 만드는 사람) → 인화지 의뢰 띠 → 흰 문의 칸(site.css 그대로). */
+@font-face{font-family:'SYNK Pulse Serif';src:url('/assets/v10/serif-pulse-v12.woff2') format('woff2');font-weight:300;font-display:swap}
+.pv-hall,.pv-dark{--ink:#f2efe9;--ink-2:rgba(242,239,233,.72);--ink-3:rgba(242,239,233,.6);--ink-4:rgba(242,239,233,.48);--line:rgba(242,239,233,.16);--line-2:rgba(242,239,233,.3);--pv-bg:#0a0a0b;background:var(--pv-bg);color:var(--ink-2);color-scheme:dark}
+.pv-dark :focus-visible,.pv-hall :focus-visible{outline-color:#f2efe9}
+.pv-serif{font-family:'SYNK Pulse Serif','Noto Serif KR','Nanum Myeongjo',serif;font-weight:300;letter-spacing:0;color:var(--ink);text-wrap:balance}
+.pv-serif>span{display:block}
+.pv-name{font-family:'SUIT Variable','Hiragino Sans','Yu Gothic','Meiryo','Malgun Gothic',sans-serif;font-weight:500;letter-spacing:0;font-size:.88em}
+.pv-no{font-family:var(--mono);font-size:12.5px;letter-spacing:.04em;color:var(--ink-3);font-variant-numeric:tabular-nums}
+.pv-link{display:inline-flex;align-items:center;gap:6px;color:var(--ink);font-weight:600;font-size:15px;text-decoration:none;border-bottom:1px solid var(--line-2);padding-bottom:3px;transition:border-color .25s,gap .25s cubic-bezier(.19,1,.22,1)}
+.pv-link:hover{border-color:currentColor;gap:10px}
+.pv-dark .label,.pv-hall .label{color:var(--ink-3)}
+.pv-dark .status{border-color:var(--line-2);color:var(--ink-2)}
+.pv-dark .reveal,.pv-ask .reveal{transform:translateY(24px);transition:opacity 1s cubic-bezier(.19,1,.22,1),transform 1s cubic-bezier(.19,1,.22,1)}
+.pv-dark .reveal.in,.pv-ask .reveal.in{transform:none}
+
+/* ① 시사실 — 화면 전부를 덮는 소리 없는 쇼릴 */
+.pv-hall{position:relative;height:100svh;min-height:600px;overflow:hidden;background:#000}
+.pv-reel{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
+.pv-hall::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,rgba(0,0,0,.66),rgba(0,0,0,0) 60%),linear-gradient(0deg,rgba(0,0,0,.6),rgba(0,0,0,0) 46%),linear-gradient(180deg,rgba(0,0,0,.4),rgba(0,0,0,0) 22%);pointer-events:none}
+.pv-hall-in{position:absolute;inset:0;z-index:2;width:min(100% - var(--gut)*2,var(--wrap));margin-inline:auto}
+.pv-copy{position:absolute;left:0;bottom:clamp(96px,13vh,136px);max-width:min(62%,880px)}
+.pv-copy .label{margin:0}
+.pv-h1{margin:16px 0 0;font-size:clamp(36px,5.4vw,84px);line-height:1.1}
+.pv-hall .lead{margin:24px 0 0;max-width:30em;font-size:17px;line-height:1.7;color:var(--ink-2);font-weight:450}
+.pv-side{position:absolute;right:0;bottom:clamp(96px,13vh,136px);display:flex;flex-direction:column;align-items:flex-end;gap:20px;text-align:right;max-width:30%}
+.pv-now{margin:0;min-height:44px}
+.pv-now strong{display:block;font-weight:600;font-size:15px;color:var(--ink)}
+.pv-now span{font-size:13px;color:var(--ink-3)}
+.pv-now.swap{animation:pv-now .9s cubic-bezier(.19,1,.22,1)}
+@keyframes pv-now{from{opacity:0;transform:translateY(6px)}}
+.btn.pv-cta{border-radius:0;min-height:54px;padding:0 24px;gap:20px;background:#f2efe9;color:#0a0a0b;font-size:15.5px;font-weight:650;letter-spacing:0;border:0;transition:gap .25s cubic-bezier(.19,1,.22,1),background .25s}
+.btn.pv-cta:hover{background:#fff;gap:28px;transform:none}
+.btn.pv-cta .arr{transform:none}
+.pv-index{position:absolute;left:50%;bottom:36px;transform:translateX(-50%);display:flex;gap:24px}
+.pv-index button{all:unset;cursor:pointer;display:grid;gap:9px;justify-items:center;font-family:var(--mono);font-size:12.5px;letter-spacing:.04em;color:var(--ink-3);font-variant-numeric:tabular-nums;padding:6px 2px;transition:color .25s}
+.pv-index button:hover,.pv-index button.on{color:var(--ink)}
+.pv-index button span{display:block;width:48px;height:1px;background:var(--line-2);position:relative;overflow:hidden}
+.pv-index button span::after{content:'';position:absolute;inset:0;background:var(--ink);transform:scaleX(var(--p,0));transform-origin:left}
+.pv-index button:focus-visible{outline:1px solid var(--ink);outline-offset:6px}
+
+/* 칸 머리 — 큰 명조 제목 왼쪽, 소개 오른쪽 아래 */
+.pv-head{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:24px 64px;align-items:end;margin-bottom:clamp(48px,6vw,88px);padding-top:18px;border-top:1px solid var(--line)}
+.pv-head .label{margin:0 0 18px}
+.pv-h2{font-size:clamp(34px,4.4vw,64px);line-height:1.14}
+.pv-lead{margin:0;font-size:17px;line-height:1.75;color:var(--ink-2);max-width:32em}
+.pv-h3{font-size:clamp(26px,2.8vw,40px);line-height:1.2}
+.pv-h4{margin:0;font-size:19px;line-height:1.45;font-weight:650;letter-spacing:0;color:var(--ink)}
+
+/* ② 작품 — 어긋나게 놓인 큰 영상 */
+.pv-works{display:grid;gap:clamp(72px,8vw,120px)}
+.pv-work{display:grid;gap:24px}
+.pv-work:nth-child(even){width:84%;margin-left:auto}
+.pv-frame{margin:0;position:relative;aspect-ratio:16/9;background:#141416;overflow:hidden}
+.pv-frame video{width:100%;height:100%;object-fit:cover;display:block;transform:scale(1.02);transition:transform 1.2s cubic-bezier(.19,1,.22,1)}
+.pv-work:hover .pv-frame video,.pv-work.playing .pv-frame video{transform:scale(1)}
+.pv-cap{display:grid;grid-template-columns:auto minmax(0,1fr) minmax(0,25em);gap:20px 28px;align-items:start}
+.pv-cap .pv-no{padding-top:.7em}
+.pv-meta{font-size:15px;line-height:1.7;color:var(--ink-2)}
+.pv-meta p{margin:0}
+.pv-meta p+p{margin-top:12px}
+.pv-kicker{font-size:12.5px;letter-spacing:.08em;font-weight:600;color:var(--ink)!important}
+.pv-meta .pv-kicker+p{margin-top:8px}
+.pv-work.is-tall{grid-template-columns:minmax(0,min(36%,400px)) minmax(0,1fr);gap:clamp(28px,5vw,80px);align-items:end}
+.pv-work.is-tall .pv-frame{aspect-ratio:9/16}
+.pv-work.is-tall .pv-cap{grid-template-columns:auto minmax(0,1fr);max-width:40em}
+.pv-work.is-tall .pv-meta{grid-column:2}
+.pv-more{margin-top:clamp(80px,9vw,128px);display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.4fr);gap:20px 64px;padding-top:22px;border-top:1px solid var(--line)}
+.pv-more p{margin:0;font-size:15.5px;line-height:1.75}
+.pv-soon{display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px;margin:40px 0 0;font-size:14.5px;color:var(--ink-3)}
+.pv-soon .status{margin:0}
+
+/* ③ 영상 제작 — 네 갈래 번호 줄과 만드는 방식 */
+.pv-types{list-style:none;margin:0;padding:0;border-top:1px solid var(--line)}
+.pv-types>li{display:grid;grid-template-columns:64px minmax(0,.9fr) minmax(0,1.3fr);gap:16px 32px;padding:clamp(28px,3.4vw,44px) 0;border-bottom:1px solid var(--line);scroll-margin-top:96px}
+.pv-types .pv-no{padding-top:.9em}
+.pv-type-what{margin:0 0 18px;font-size:17px;line-height:1.7;color:var(--ink)}
+.pv-types dl{margin:0;display:grid;grid-template-columns:1fr 1fr;gap:16px 28px}
+.pv-types dt{font-size:13px;font-weight:600;color:var(--ink-3);margin-bottom:4px}
+.pv-types dd{margin:0;font-size:15px;line-height:1.65;color:var(--ink-2)}
+.pv-how{margin-top:clamp(72px,8vw,112px);display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.5fr);gap:28px 64px}
+.pv-how>div p{margin:14px 0 0;font-size:15.5px;line-height:1.75}
+.pv-how ol{list-style:none;margin:0;padding:0;border-top:1px solid var(--line)}
+.pv-how li{display:grid;grid-template-columns:44px minmax(0,11em) minmax(0,1fr);gap:6px 20px;padding:18px 0;border-bottom:1px solid var(--line);font-size:15px;line-height:1.65}
+.pv-how li b{color:var(--ink);font-weight:600}
+.pv-how .pv-no{padding-top:.15em}
+
+/* ④ AI 모델 — 한 줄로 흐르는 얼굴 */
+.pv-cast-head{display:flex;justify-content:space-between;align-items:end;gap:24px 48px;margin-bottom:40px;padding-top:18px;border-top:1px solid var(--line)}
+.pv-cast-head .label{margin:0 0 18px}
+.pv-cast-head .pv-lead{margin-top:20px}
+.pv-cast-acts{display:flex;align-items:center;gap:10px;flex:none}
+.pv-cast-acts button{all:unset;cursor:pointer;width:44px;height:44px;display:grid;place-items:center;border:1px solid var(--line-2);color:var(--ink);font-size:15px;transition:border-color .25s,opacity .25s}
+.pv-cast-acts button:hover{border-color:var(--ink)}
+.pv-cast-acts button:disabled{opacity:.35;cursor:default}
+.pv-cast-acts button:focus-visible{outline:1px solid var(--ink);outline-offset:3px}
+.pv-cast-acts .pv-link{margin-left:16px}
+.pv-cast{display:flex;gap:14px;overflow-x:auto;padding-bottom:18px;scroll-snap-type:x proximity;scrollbar-width:thin;scrollbar-color:var(--line-2) transparent;outline-offset:6px}
+.pv-face{flex:0 0 clamp(150px,13vw,200px);margin:0;scroll-snap-align:start}
+.pv-face img{width:100%;height:auto;aspect-ratio:3/4;object-fit:cover;display:block;filter:grayscale(1) contrast(1.05);transition:filter .7s cubic-bezier(.19,1,.22,1)}
+.pv-face:hover img{filter:none}
+.pv-face figcaption{margin-top:10px;font-size:13px;line-height:1.5;color:var(--ink-3)}
+.pv-face figcaption b{display:block;font-size:14.5px;font-weight:600;color:var(--ink)}
+.pv-teams{display:flex;flex-wrap:wrap;align-items:baseline;gap:12px 36px;margin:36px 0 0;padding-top:18px;border-top:1px solid var(--line)}
+.pv-teams-title{font-size:13px;font-weight:600;color:var(--ink-3)}
+.pv-teams a{color:var(--ink-2);text-decoration:none;font-size:15px;transition:color .25s}
+.pv-teams a:hover{color:var(--ink)}
+.pv-teams a b{color:var(--ink);font-weight:650;letter-spacing:.02em}
+.pv-team-logo{display:inline-block;height:30px;width:auto;vertical-align:middle;margin-right:4px}
+.pv-teams small{font-size:13.5px;color:var(--ink-3)}
+.pv-note{margin:24px 0 0;font-size:13.5px;line-height:1.6;color:var(--ink-3);max-width:48em}
+
+/* ⑤ 만드는 사람 */
+.pv-maker{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:clamp(32px,6vw,96px);align-items:end;padding-top:18px;border-top:1px solid var(--line)}
+.pv-credits{list-style:none;margin:28px 0 0;padding:0;border-top:1px solid var(--line)}
+.pv-credits li{padding:14px 0;border-bottom:1px solid var(--line);font-size:15px;line-height:1.6;color:var(--ink-2)}
+
+/* ⑥ 의뢰 띠 — 인화지 한 장 */
+.pv-ask{--ink:#111113;--ink-2:#45464b;--ink-3:#66686e;--line:rgba(17,17,19,.14);--line-2:rgba(17,17,19,.3);background:#efece6;color:var(--ink-2);padding-block:clamp(72px,8vw,120px)}
+.pv-ask-in{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:48px clamp(40px,6vw,96px);align-items:start}
+.pv-ask-text{margin:22px 0 32px;font-size:17px;line-height:1.75;max-width:30em}
+.btn.pv-cta-ink{background:#111113;color:#efece6}
+.btn.pv-cta-ink:hover{background:#000;color:#fff}
+.pv-ask-side{display:grid;gap:40px}
+.pv-ask-side>div{padding-top:18px;border-top:1px solid var(--line)}
+.pv-ask-side p{margin:12px 0 0;font-size:15px;line-height:1.7}
+.pv-brief{list-style:none;margin:14px 0 0;padding:0;display:grid;grid-template-columns:1fr 1fr;gap:8px 24px;font-size:15px;line-height:1.55}
+.pv-brief li{display:grid;grid-template-columns:28px 1fr}
+.pv-brief .pv-no{padding-top:.15em}
+.pv-ask .pv-link{margin-top:6px}
+.pv-ask-note{font-size:13.5px!important;color:var(--ink-3)}
+.pv-ask :focus-visible{outline-color:#111113}
+
+@media (max-width:900px){
+  .pv-copy{right:0;max-width:none;bottom:214px}
+  .pv-side{left:0;right:0;bottom:92px;align-items:flex-start;text-align:left;max-width:none;gap:14px}
+  .pv-now{min-height:0}
+  .pv-now strong{font-size:13.5px}
+  .pv-now span{display:none}
+  .pv-index{bottom:28px}
+  .pv-head,.pv-more,.pv-how,.pv-maker,.pv-ask-in{grid-template-columns:1fr}
+  .pv-work:nth-child(even){width:100%}
+  .pv-cap{grid-template-columns:auto minmax(0,1fr)}
+  .pv-cap .pv-meta{grid-column:1/-1}
+  .pv-work.is-tall{grid-template-columns:1fr}
+  .pv-work.is-tall .pv-frame{width:min(100%,360px)}
+  .pv-work.is-tall .pv-meta{grid-column:1/-1}
+  .pv-types>li{grid-template-columns:40px minmax(0,1fr)}
+  .pv-type-body{grid-column:1/-1}
+  .pv-how li{grid-template-columns:40px minmax(0,1fr)}
+  .pv-how li>span:last-child{grid-column:2}
+  .pv-cast-head{flex-direction:column;align-items:flex-start}
+  .pv-cast-acts .pv-link{margin-left:10px}
+}
+@media (max-width:600px){
+  .pv-hall{min-height:640px}
+  .pv-copy{bottom:200px}
+  .pv-h1{font-size:clamp(34px,10vw,44px)}
+  .pv-hall .lead{font-size:16px;margin-top:18px}
+  .pv-side{bottom:84px}
+  .btn.pv-cta{width:100%;justify-content:space-between}
+  .pv-index{gap:18px}
+  .pv-index button span{width:40px}
+  .pv-types dl,.pv-brief{grid-template-columns:1fr}
+  .pv-face{flex-basis:40vw}
+}
+@media (prefers-reduced-motion:reduce){
+  .pv-now.swap{animation:none}
+  .pv-frame video,.pv-face img{transition:none}
+  .pv-dark .reveal,.pv-ask .reveal{transform:none;transition:none}
+}
