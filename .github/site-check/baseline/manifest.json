@@ -402,15 +402,15 @@
   "/pulse/casting/": {
    "desktop": {
     "file": "desktop/pulse~casting.jpg",
-    "sha256": "6be4e8a1236d7ec8593435f757979b7ed3748349c51850eb57652245b66312af",
-    "cssHeight": 4664,
-    "run": 41883939094
+    "sha256": "ea6d1f6a0ce6537b63c8164ba21155f3dc7e7bdb21d5f5aa15e8431220f11cf6",
+    "cssHeight": 4689,
+    "run": 42103023187
    },
    "mobile": {
     "file": "mobile/pulse~casting.jpg",
-    "sha256": "6913b0f88628eb10af5e4950d636dc9f74cbcda1bddb8daa9660d109d1fcf4d5",
-    "cssHeight": 6289,
-    "run": 41883939094
+    "sha256": "1c04e51e76316ef3a82128a21509d6c24468a98f8df3d14b34a0806304154830",
+    "cssHeight": 6391,
+    "run": 42103023187
    }
   },
   "/rl/": {
