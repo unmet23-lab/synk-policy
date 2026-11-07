@@ -224,19 +224,60 @@ function syncPlayable() {
  for (const b of ui.panel.querySelectorAll('[data-sound]')) b.disabled = !!S.rec;
  if (S.orbAction && !S.rec && !S.upload) { ui.orbBtn.disabled = S.playing; ui.orbBtn.classList.toggle('wait', S.playing); }
 }
+// 재생은 늘 하나만 살아 있다(11-07). 멈춤(stopSound)이 오면 번호를 올리고 살아 있던 재생을 바로 접는다 — 듣기 · 안전 시계를 모두 떼고
+// 기다리던 쪽에는 false를 준다(전에는 다시 듣기가 앞 소리를 끊으면 앞 약속이 끝내 안 풀렸다). 접힌 재생의 늦은 소식(실패 · 정보 받음 ·
+// 구간 끝)은 자기 번호가 아니면 미디어를 멈추거나 「재생 중」을 풀지 않는다 — 지금 나오는 소리를 건드리지 않게.
+let playGen = 0, current = null;
 function stopSound() {
+ playGen++;
+ const c = current; current = null; if (c) c();
  for (const m of [ui.voice, ui.reply]) { try { m.pause(); } catch {} }
  ui.voice.removeAttribute('src'); try { ui.voice.load(); } catch {}
  if (S.playing) setPlaying(false);
+}
+// 재생 끝 소식(ended)이 끝내 오지 않는 브라우저 · 기기(헤드리스 · 블루투스 전환 등)에서는 「재생 중」이 풀리지 않아 녹음 단추가
+// 잠긴 채 장면이 멈췄다(11-07). 재생이 시작되면 남은 길이에 여유를 더한 때를, 시작조차 안 되면 기다릴 만큼을 재고, 그때까지
+// 안 끝나면 멈추고 다음으로 잇는다 — 느린 망에서 잠깐 멈추는 정도로는 걸리지 않게 넉넉히 둔다.
+const END_GRACE_MS = 8000, END_CAP_S = 30, START_WAIT_MS = 15000;
+function endGuard(m, s, left, isDone, finish) {
+ const started = { v: false };
+ let lastAt = -1, rearms = 0;
+ const arm = (sec) => s.timer(check, (Number.isFinite(sec) ? Math.max(0, sec) : END_CAP_S) * 1000 + END_GRACE_MS);
+ // 시계가 울리면: 아직 나아가는 중이면(느린 망) 남은 만큼 다시 기다리고, 멈춰 있으면 끝 근처일 때만 끝난 것으로 —
+ // 아니면 false로 풀어 대사를 통째 자막 · 다시 듣기로 보인다(반만 듣고 자막이 사라진 채 넘어가지 않게).
+ function check() {
+  if (isDone()) return;
+  const at = m.currentTime;
+  if (!m.paused && !m.ended && at > lastAt + 0.5 && rearms < 4) { lastAt = at; rearms++; arm(left()); return; }
+  const near = m.ended || !(left() > 1);
+  try { m.pause(); } catch {}
+  finish(near);
+ }
+ const onPlaying = () => {
+  if (started.v) return; started.v = true;
+  lastAt = m.currentTime; arm(left());
+ };
+ m.addEventListener('playing', onPlaying);
+ s.timer(() => { if (!isDone() && !started.v) { try { m.pause(); } catch {} finish(false); } }, START_WAIT_MS);
+ return () => m.removeEventListener('playing', onPlaying);
 }
 function playUrl(url, s) {
  return new Promise((res) => {
   if (!url || !live(s) || S.rec) return res(false);
   stopSound();
-  let settled = false; const m = ui.voice;
-  const done = (ok) => { if (settled) return; settled = true; m.removeEventListener('ended', onEnd); m.removeEventListener('error', onErr); s.signal.removeEventListener('abort', onAbort); setPlaying(false); res(ok); };
-  const onEnd = () => done(true); const onErr = () => done(false); const onAbort = () => { try { m.pause(); } catch {} done(false); };
+  const gen = playGen, m = ui.voice; let settled = false; let unguard = () => {};
+  const done = (ok) => {
+   if (settled) return; settled = true; unguard();
+   m.removeEventListener('ended', onEnd); m.removeEventListener('error', onErr); s.signal.removeEventListener('abort', onAbort);
+   if (current === cancel) current = null;
+   if (gen === playGen) setPlaying(false);
+   res(ok);
+  };
+  const cancel = () => done(false);
+  const onEnd = () => done(true); const onErr = () => done(false); const onAbort = () => { if (gen === playGen) { try { m.pause(); } catch {} } done(false); };
   m.addEventListener('ended', onEnd); m.addEventListener('error', onErr); s.signal.addEventListener('abort', onAbort, { once: true });
+  current = cancel;
+  unguard = endGuard(m, s, () => m.duration - m.currentTime, () => settled || gen !== playGen, done);
   m.src = url; setPlaying(true);
   m.play().catch(() => done(false));
  });
@@ -245,13 +286,28 @@ function playVideo(url, from, to, s) {
  return new Promise((res) => {
   if (!url || !live(s) || S.rec) return res(false);
   stopSound();
-  const v = ui.reply; let settled = false;
-  const done = (ok) => { if (settled) return; settled = true; v.removeEventListener('ended', onEnd); v.removeEventListener('error', onErr); v.removeEventListener('timeupdate', onTime); s.signal.removeEventListener('abort', onAbort); try { v.pause(); } catch {} setPlaying(false); res(ok); };
+  const gen = playGen, v = ui.reply; let settled = false; let unguard = () => {}; let go = null;
+  // 정보 받음(loadedmetadata)을 기다리던 go도 접을 때 뗀다 — 먼저 접힌 뒤 늦게 온 소식이 접힌 영상을 혼자 틀지 않게(11-07)
+  const done = (ok) => {
+   if (settled) return; settled = true; unguard();
+   if (go) v.removeEventListener('loadedmetadata', go);
+   v.removeEventListener('ended', onEnd); v.removeEventListener('error', onErr); v.removeEventListener('timeupdate', onTime); s.signal.removeEventListener('abort', onAbort);
+   if (current === cancel) current = null;
+   if (gen === playGen) { try { v.pause(); } catch {} setPlaying(false); }
+   res(ok);
+  };
+  const cancel = () => done(false);
   const onEnd = () => done(true); const onErr = () => done(false); const onAbort = () => done(false);
   const onTime = () => { if (to && v.currentTime >= to - 0.04) done(true); };
   v.addEventListener('ended', onEnd); v.addEventListener('error', onErr); v.addEventListener('timeupdate', onTime); s.signal.addEventListener('abort', onAbort, { once: true });
+  current = cancel;
+  unguard = endGuard(v, s, () => (to || v.duration) - v.currentTime, () => settled || gen !== playGen, done);
   if (!v.src.endsWith(url)) v.src = url;
-  const go = () => { try { v.currentTime = from || 0; } catch {} v.muted = false; setPlaying(true); v.play().catch(() => done(false)); };
+  go = () => {
+   if (settled || gen !== playGen) return;
+   if (S.rec || !live(s)) { done(false); return; }
+   try { v.currentTime = from || 0; } catch {} v.muted = false; setPlaying(true); v.play().catch(() => done(false));
+  };
   if (v.readyState >= 1) go(); else v.addEventListener('loadedmetadata', go, { once: true });
  });
 }
@@ -796,7 +852,7 @@ function followCues(cues, media, from) {
  let raf = 0;
  const tick = () => { if (!media.paused) show(media.currentTime); raf = requestAnimationFrame(tick); };
  // 탭을 옮기거나 창을 가리면 그림 틱이 멈춘다 — 소리는 계속 나므로 소리 시각 · 끝 소식으로도 넘긴다(끝나면 마지막 화면).
- const onTime = () => show(media.currentTime);
+ const onTime = () => { if (!media.paused || media.ended) show(media.currentTime); };
  media.addEventListener('timeupdate', onTime); media.addEventListener('ended', onTime);
  show(from);
  raf = requestAnimationFrame(tick);
