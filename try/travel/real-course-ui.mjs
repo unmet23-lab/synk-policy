@@ -1,10 +1,10 @@
-import { REAL_PLACES } from './real-places.mjs?v=20261019-hours';
-import { mapLink } from './real-guide.mjs?v=20261019-hours';
-import { REAL_COURSE_OFFERINGS } from './real-course-data.mjs?v=20261019-hours';
+import { REAL_PLACES } from './real-places.mjs?v=300ff69f01df';
+import { mapLink } from './real-guide.mjs?v=021cfc5ea662';
+import { REAL_COURSE_OFFERINGS } from './real-course-data.mjs?v=51c7781996b6';
 import {
   createRealCourseFromSelection, createRealCourseExample, normalizeRealCourse,
   evaluateRealCourse, suggestRealCourseAlternatives, replaceRealCourseStop, exportRealCourseMemo,
-} from './real-course.mjs?v=20261019-hours';
+} from './real-course.mjs?v=85bf8389b0d1';
 
 const $ = selector => document.querySelector(selector);
 const choices = REAL_PLACES.filter(place => place.category !== 'stay');

@@ -1,4 +1,4 @@
-import { REAL_PLACES, REAL_META, REAL_CONDITION_CALENDAR } from './real-places.mjs?v=20261019-hours';
+import { REAL_PLACES, REAL_META, REAL_CONDITION_CALENDAR } from './real-places.mjs?v=300ff69f01df';
 import { normalizeRealQuery, evaluateRealConditions } from './real-conditions.mjs?v=20261019-hours';
 import * as DomainModule from './atlas/domain.js';
 

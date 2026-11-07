@@ -1,7 +1,7 @@
-import { REAL_PLACES, REAL_CONDITION_CALENDAR } from './real-places.mjs?v=20261019-hours';
+import { REAL_PLACES, REAL_CONDITION_CALENDAR } from './real-places.mjs?v=300ff69f01df';
 import { normalizeRealQuery, evaluateRealConditions, evaluateRealStay, REAL_CONDITION_LABELS } from './real-conditions.mjs?v=20261019-hours';
-import { rankRealPlaces, mapLink } from './real-guide.mjs?v=20261019-hours';
-import { REAL_COURSE_OFFERINGS } from './real-course-data.mjs?v=20261019-hours';
+import { rankRealPlaces, mapLink } from './real-guide.mjs?v=021cfc5ea662';
+import { REAL_COURSE_OFFERINGS } from './real-course-data.mjs?v=51c7781996b6';
 
 // This is an editable timetable, not measured routing or a saved taste record.
 export const REAL_COURSE_LIMITS = Object.freeze({ minStops: 2, maxStops: 3, minStay: 10, maxStay: 180, minTransfer: 0, maxTransfer: 180 });
