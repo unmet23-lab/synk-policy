@@ -360,15 +360,15 @@
   "/privacy/": {
    "desktop": {
     "file": "desktop/privacy.jpg",
-    "sha256": "aff11e66583b689414ca99d783f10bc9bdd0c300c5e9342dccd70a9d21f24093",
-    "cssHeight": 19592,
-    "run": 41908169876
+    "sha256": "a3b413dbdb0ebd4ebcba65f8c1adbd9d59ff3ee1f65a4eff114a21152e124014",
+    "cssHeight": 19857,
+    "run": 42376261951
    },
    "mobile": {
     "file": "mobile/privacy.jpg",
-    "sha256": "27c541623b6531a6efec98d0660621caca90ff4a43e50cc43aab47dac340a47e",
-    "cssHeight": 29756,
-    "run": 41908169876
+    "sha256": "76986b7b9a5bde520f65257ce10122564c95dfb002c4a626987ff6062c073b03",
+    "cssHeight": 30229,
+    "run": 42376261951
    }
   },
   "/prompts/": {
@@ -472,15 +472,15 @@
   "/world/": {
    "desktop": {
     "file": "desktop/world.jpg",
-    "sha256": "032f0b76def85536898726a14ac36ff9d7525ce321e5a72e9940b1496be60c2c",
+    "sha256": "8122f5448da6f71eff6aa8fd30f368b81af0674185b2401272887a96f52802d1",
     "cssHeight": 900,
-    "run": 41355512817
+    "run": 42376261951
    },
    "mobile": {
     "file": "mobile/world.jpg",
-    "sha256": "fd7f760da7d251af606017ca047d7a268a54c9831ba14685b92293e009a560c3",
+    "sha256": "8051b36c9db022c2d5e68a7621a932c3339267174b63d544ff1f8be4b964da0f",
     "cssHeight": 844,
-    "run": 41355512817
+    "run": 42376261951
    }
   },
   "/world/hangul-stage/": {
