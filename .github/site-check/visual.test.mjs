@@ -121,6 +121,49 @@ test('찍고 견주기: 첫 회차는 기준 없음 → 그 캡처를 기준으�
   assert.ok(third.critical.some(x => x.id === 'button-name'), '이름 없는 단추는 새 치명 위반');
 });
 
+test('동영상은 숨긴 채 찍어 위에 얹은 글이 보이고, 캔버스는 그대로 분홍 상자다(11-07)', async t => {
+  if (!browser) return t.skip('플레이라이트가 없다');
+  // 화면 전부를 덮는 영상(포스터 = 빨강) 위에 흰 판(글 자리), 뒤 바탕은 남색. 아래에 캔버스(초록으로 칠함). 쪽 스크립트가 나중에 붙이는 영상도 하나.
+  // CSP가 인라인 스타일 태그를 막아도(style-src 'self') 숨김은 먹어야 한다.
+  const poster = 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="4" height="4"><rect width="4" height="4" fill="#e00"/></svg>');
+  const server = http.createServer((request, response) => {
+    response.setHeader('Content-Type', 'text/html; charset=utf-8');
+    response.setHeader('Content-Security-Policy', "default-src 'self' data:; script-src 'unsafe-inline'; style-src 'self' 'unsafe-hashes'");
+    response.end(`<!doctype html><html lang="ko"><meta charset="utf-8"><meta name="viewport" content="width=device-width"><link rel="icon" href="data:,"><title>영상</title>
+<body><section id="s"><video id="v" poster="${poster}" muted></video><div id="board"></div></section><canvas id="c" width="300" height="200"></canvas><div id="late"></div>
+<script>
+const css=(el,o)=>{for(const[k,v]of Object.entries(o))el.style.setProperty(k,v)};
+css(document.body,{margin:'0',background:'#123456'});css(document.getElementById('s'),{position:'relative',height:'600px'});
+css(document.getElementById('v'),{position:'absolute',inset:'0',width:'100%',height:'100%','object-fit':'cover'});
+css(document.getElementById('board'),{position:'absolute',left:'40px',top:'40px',width:'200px',height:'120px',background:'#fff'});
+css(document.getElementById('c'),{display:'block',width:'300px',height:'200px'});css(document.getElementById('late'),{position:'relative',height:'300px'});
+const g=document.getElementById('c').getContext('2d');g.fillStyle='#0a0';g.fillRect(0,0,300,200);
+setTimeout(()=>{const v=document.createElement('video');v.poster=${JSON.stringify(poster)};css(v,{position:'absolute',inset:'0',width:'100%',height:'100%','object-fit':'cover'});document.getElementById('late').appendChild(v)},50);
+</script></body></html>`);
+  });
+  await new Promise(r => server.listen(0, '127.0.0.1', r));
+  t.after(() => new Promise(r => server.close(r)));
+  const shotsDir = fs.mkdtempSync(path.join(os.tmpdir(), 'site-check-video-'));
+  t.after(() => fs.rmSync(shotsDir, {recursive: true, force: true}));
+  const mobile = VISUAL_DEVICES.find(d => d.key === 'mobile');
+  const p = await capturePage({browser, base: `http://127.0.0.1:${server.address().port}`, route: '/', device: mobile, shotsDir});
+  const page = await browser.newPage();
+  t.after(() => page.context().close());
+  const at = await page.evaluate(async b64 => {
+    const image = await createImageBitmap(new Blob([Uint8Array.from(atob(b64), c => c.charCodeAt(0))], {type: 'image/jpeg'}));
+    const canvas = Object.assign(document.createElement('canvas'), {width: image.width, height: image.height});
+    const g = canvas.getContext('2d', {willReadFrequently: true});
+    g.drawImage(image, 0, 0);
+    const px = (x, y) => [...g.getImageData(x, y, 1, 1).data.slice(0, 3)];
+    return {board: px(140, 100), behind: px(320, 400), canvas: px(150, 700), late: px(200, 950)};
+  }, fs.readFileSync(path.join(shotsDir, p.shot.file)).toString('base64'));
+  const near = (c, want, tol = 24) => c.every((v, i) => Math.abs(v - want[i]) <= tol);
+  assert.ok(near(at.board, [255, 255, 255]), `영상 위 흰 판이 보인다: ${at.board}`);
+  assert.ok(near(at.behind, [0x12, 0x34, 0x56]), `영상 자리는 뒤 바탕(포스터 · 분홍 아님): ${at.behind}`);
+  assert.ok(near(at.canvas, [255, 0, 255]), `캔버스는 분홍 상자: ${at.canvas}`);
+  assert.ok(near(at.late, [0x12, 0x34, 0x56]), `나중에 붙은 영상도 숨긴다: ${at.late}`);
+});
+
 test('긴 휴대폰 쪽: 8192px 아래도 그 자리의 화면이 찍히고, 조각 사이에 이음매가 없다', async t => {
   if (!browser) return t.skip('플레이라이트가 없다');
   // 띠마다 색이 다르고(500px) 맨 위는 100vh 머리 — 나눠 찍을 때 화면 높이가 바뀌면 머리 높이가 달라진다.

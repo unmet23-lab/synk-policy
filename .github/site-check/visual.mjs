@@ -6,7 +6,9 @@
 // 한 번에 찍는 높이는 장치 화소 8192까지다(10-26) — CI 실행기의 소프트웨어 GPU(SwiftShader)는 그보다 긴 전체 화면을 8192행부터
 // 쪽 머리로 되풀이해 찍는다. 그보다 긴 그림(휴대폰의 긴 쪽)은 고르게 나눠 PNG로 찍고 그 쪽에서 떼어 둔 캔버스로 이어 JPEG 한 장으로 만든다.
 // 흔들림: 두 번 잇달아 같은 그림이 나올 때까지(최대 6번) 찍고, 끝내 같지 않으면 견주지 않고 「흔들림」으로 남긴다
-// (10-21 두 회차 견줌에서 /world/는 한 번은 검은 화면, 한 번은 첫 그림이었다). 동영상·캔버스·iframe은 분홍 상자로 가린다.
+// (10-21 두 회차 견줌에서 /world/는 한 번은 검은 화면, 한 번은 첫 그림이었다). 캔버스·iframe은 분홍 상자로 가린다.
+// 동영상은 상자째 가리지 않고 숨긴 채 찍는다(11-07) — 화면 전부를 덮는 쇼릴 위에 얹은 제목 · 단추 · 글(/pulse/ 첫 화면)이 분홍에 묻혀
+// 그림 비교의 사각이 됐다. 영상 자체(프레임 · 포스터)는 여전히 견주지 않고, 그 자리에는 영상 뒤 바탕이 찍힌다(hideVideos).
 // 새로 생긴 치명(critical) 접근성 위반만 점검을 실패시키고, 그림 차이와 나머지 위반은 보고만 한다.
 import fs from 'node:fs';
 import path from 'node:path';
@@ -42,6 +44,19 @@ export async function settle(page) {
     })));
   }).catch(() => {});
   await page.waitForLoadState('networkidle', {timeout: 5000}).catch(() => {});
+}
+
+/**
+ * 쪽의 모든 video를 visibility:hidden으로 숨긴다(포스터도 함께 안 보인다) — 겹쳐 놓은 글은 그대로 찍힌다(11-07).
+ * 스타일 태그가 아니라 요소마다 CSSOM으로 넣는다: CSP가 인라인 스타일을 막는 쪽에서도 먹고(CSSOM은 CSP 대상이 아니다),
+ * 찍는 사이에 스크립트가 새로 붙이는 video도 MutationObserver로 같이 숨긴다.
+ */
+export async function hideVideos(page) {
+  await page.evaluate(() => {
+    const hide = root => { for (const v of root.querySelectorAll ? root.querySelectorAll('video') : []) v.style.setProperty('visibility', 'hidden', 'important'); if (root.tagName === 'VIDEO') root.style.setProperty('visibility', 'hidden', 'important'); };
+    hide(document);
+    new MutationObserver(list => { for (const m of list) for (const n of m.addedNodes) if (n.nodeType === 1) hide(n); }).observe(document.documentElement, {childList: true, subtree: true});
+  }).catch(() => {});
 }
 
 /** 위에서 height(CSS px)까지를 scale배로 찍을 조각: 조각마다 장치 화소 limit 아래가 되게 고르게 나눈다(짧으면 한 조각). */
@@ -114,10 +129,11 @@ export async function capturePage({browser, base, route, device, shotsDir, axeSo
     const page = await context.newPage();
     await page.goto(base + route, {waitUntil: 'load', timeout: 90000});
     await settle(page);
+    await hideVideos(page);
     const height = await page.evaluate(() => Math.max(document.documentElement.scrollHeight, document.body?.scrollHeight || 0));
     const clipHeight = Math.min(height, MAX_HEIGHT);
     const width = device.options.viewport.width;
-    const common = {fullPage: true, animations: 'disabled', caret: 'hide', mask: [page.locator('video, canvas, iframe')], maskColor: '#FF00FF'};
+    const common = {fullPage: true, animations: 'disabled', caret: 'hide', mask: [page.locator('canvas, iframe')], maskColor: '#FF00FF'};
     const tiles = tilesOf(clipHeight, device.options.deviceScaleFactor);
     const shoot = tiles.length === 1
       ? () => page.screenshot({type: 'jpeg', quality: JPEG_QUALITY, ...common, clip: {x: 0, y: 0, width, height: clipHeight}})
