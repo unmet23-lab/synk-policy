@@ -79,6 +79,8 @@
 .hs-h3{margin:12px 0 0;font-size:clamp(18px,1.45vw,21px);line-height:1.38;font-weight:700;letter-spacing:0;color:var(--ink)}
 html[lang="en"] .hs-h3{letter-spacing:-.01em}
 .hs-h3>span{display:block}
+/* 제목 아래 증거 한 줄(PULSE — 공개 이력, 11-07) */
+.hs-proof{margin:8px 0 0;font-size:13px;line-height:1.5;color:var(--ink-2)}
 .hs-status{list-style:none;margin:14px 0 0;padding:12px 0 0;border-top:1px solid var(--line);display:grid;gap:8px;font-size:13px;line-height:1.5;color:var(--ink-2)}
 .hs-status li{display:grid;grid-template-columns:auto minmax(0,1fr);gap:8px;align-items:baseline}
 .hs-status .status{padding:0;border:0;border-radius:0;font-size:13px;color:var(--ink);gap:5px}
