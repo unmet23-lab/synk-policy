@@ -1,7 +1,7 @@
 {
- "createdAt": "2026-11-06T23:29:08.916Z",
- "commit": "9bb747daf0984e651f446becb20285f802610da9",
- "run": 42307175753,
+ "createdAt": "2026-11-07T13:37:39.892Z",
+ "commit": "8c04f0db9f0e4a72ad57dc504de5e24b8b0a3add",
+ "run": 42376261951,
  "env": {
   "chromium": "151.0.7922.34",
   "os": "ubuntu24"
@@ -10,15 +10,15 @@
   "/": {
    "desktop": {
     "file": "desktop/home.jpg",
-    "sha256": "1ed3e1218d090334ad5ef82f8c5ffc3f8c47408e539e05767b522cd3ad83a22b",
-    "cssHeight": 8265,
-    "run": 42103023187
+    "sha256": "9a8f6b8bea125ca02787d69fcd4718364c597c5de50468d818c65dad5e095b94",
+    "cssHeight": 7872,
+    "run": 42376261951
    },
    "mobile": {
     "file": "mobile/home.jpg",
-    "sha256": "c26d2bfad18f0197b4a73161c1e7d2749008a595494fb1e67799d02cf7befd21",
-    "cssHeight": 10961,
-    "run": 42103023187
+    "sha256": "a652580be3838b3bf8879c4e4f39c30bcd7549ffaf97fbb2e649dc85dfea2c23",
+    "cssHeight": 9728,
+    "run": 42376261951
    }
   },
   "/atlas/": {
@@ -108,15 +108,15 @@
   "/en/": {
    "desktop": {
     "file": "desktop/en.jpg",
-    "sha256": "36ef0e1cf4c581fe9b43006506e8f0d39674ab6c7f4b01fb26b59c8433e5fe53",
-    "cssHeight": 8419,
-    "run": 42103023187
+    "sha256": "54d91a75b0b5e8f8f16ce8163d1632867c2f82a03e9d8b55b039bfb4054a4d16",
+    "cssHeight": 8098,
+    "run": 42376261951
    },
    "mobile": {
     "file": "mobile/en.jpg",
-    "sha256": "e9d61044ea42dca3ea02c570a8e72436396396c0499df09e20bf15a5a80ac966",
-    "cssHeight": 11910,
-    "run": 42103023187
+    "sha256": "5bb5e30e81fcbcc3a9da825930d6ffca7f5fe85846d76998a3c08708085324e6",
+    "cssHeight": 10309,
+    "run": 42376261951
    }
   },
   "/en/atlas/": {
@@ -136,15 +136,15 @@
   "/en/founder/": {
    "desktop": {
     "file": "desktop/en~founder.jpg",
-    "sha256": "a64607534917332a9077052678e7db9a0af2794844b2a787fc672c8cc1fecc2d",
-    "cssHeight": 6439,
-    "run": 42103023187
+    "sha256": "413afc02fd13d8519e01f6540b62b8d22babaf7468b75b97bce138bbe716f738",
+    "cssHeight": 6540,
+    "run": 42376261951
    },
    "mobile": {
     "file": "mobile/en~founder.jpg",
-    "sha256": "b5e5be3b6bfb1d730e20f728c5833c881810429130b90ef49419c873cc63b95b",
-    "cssHeight": 9099,
-    "run": 42103023187
+    "sha256": "52f98d64faa9e45d8091f929686d88f2ca1752e9dc8b0bba37265c875e3cc118",
+    "cssHeight": 9232,
+    "run": 42376261951
    }
   },
   "/en/lab/": {
@@ -164,29 +164,29 @@
   "/en/path/": {
    "desktop": {
     "file": "desktop/en~path.jpg",
-    "sha256": "aac5ae06a0d85df61aa0cff4114b574983de39275a67b89191c73e685718a48f",
-    "cssHeight": 8397,
-    "run": 41179336313
+    "sha256": "d2a27623258de0282342fd660f29ab00731d5dbee17e750ff972a61e868c4e95",
+    "cssHeight": 4945,
+    "run": 42376261951
    },
    "mobile": {
     "file": "mobile/en~path.jpg",
-    "sha256": "01d4f2fca45076fa7e967d1d1068e83c8241e7a0bb3436a568d93a2e8606d90c",
-    "cssHeight": 10868,
-    "run": 41179336313
+    "sha256": "8297f879a39c227b7b305e74ce818ad73a5b37fa9c5d154ec158109ae8c1bef5",
+    "cssHeight": 7155,
+    "run": 42376261951
    }
   },
   "/en/pulse/": {
    "desktop": {
     "file": "desktop/en~pulse.jpg",
-    "sha256": "705697082e70efd774fd2c8640f0c749246c70856269d622e4dfcef5463319d2",
-    "cssHeight": 10719,
-    "run": 42307175753
+    "sha256": "1105a6a21d9a7a5280c2ac21640f534dc572420ba572c659f77fcf698eb2e102",
+    "cssHeight": 10796,
+    "run": 42376261951
    },
    "mobile": {
     "file": "mobile/en~pulse.jpg",
-    "sha256": "726585af7f52ba60f4bae6af38201d98476c8e79e8c50564a4b87b1b6b6f1841",
-    "cssHeight": 12151,
-    "run": 42307175753
+    "sha256": "115e613cc596f9518078cac49987655f055bc334d3afb87ddb899e95510192cd",
+    "cssHeight": 12252,
+    "run": 42376261951
    }
   },
   "/en/shift/": {
@@ -220,15 +220,15 @@
   "/founder/": {
    "desktop": {
     "file": "desktop/founder.jpg",
-    "sha256": "1aa7ff513365632e7514c2cd15e4da217557a5c444289b45850a4e18308463f8",
+    "sha256": "c3fbacdc6674b36d25c160104cf224097b5524182909c4c435ed8e2e899deffd",
     "cssHeight": 6301,
-    "run": 42103023187
+    "run": 42376261951
    },
    "mobile": {
     "file": "mobile/founder.jpg",
-    "sha256": "43a36f185ef3159b6c8831637a74c5d5a13c7cc759c8e34f51e1a05731ae6e02",
-    "cssHeight": 8567,
-    "run": 42103023187
+    "sha256": "4ad965ac390b4de5c0a2d267f7e64314204a4f88f92a917e8f7f25d84840ace7",
+    "cssHeight": 8650,
+    "run": 42376261951
    }
   },
   "/lab/": {
@@ -332,15 +332,15 @@
   "/path/": {
    "desktop": {
     "file": "desktop/path.jpg",
-    "sha256": "cdf35b47be598c3155903bbf410bca4a37b2aafc1172aa3fa2613acb76798ae5",
-    "cssHeight": 8036,
-    "run": 41179336313
+    "sha256": "ad50c584a9e872b89fe0bce80d6796867e8f919c95f805902c61a60141059242",
+    "cssHeight": 4857,
+    "run": 42376261951
    },
    "mobile": {
     "file": "mobile/path.jpg",
-    "sha256": "bf4485dc3b49c0531105cb80d762bc6cf7045dc469ad682ad945ff95119d2182",
-    "cssHeight": 9798,
-    "run": 41179336313
+    "sha256": "653a76ac53f3532fa818401209265e194415bbe5c4a60b5527ca8f0528696bfe",
+    "cssHeight": 6719,
+    "run": 42376261951
    }
   },
   "/practice/": {
@@ -388,29 +388,29 @@
   "/pulse/": {
    "desktop": {
     "file": "desktop/pulse.jpg",
-    "sha256": "0aa8189ecd1b273deb99a60decad7a0bdd43c7f1bc1c6e5450631b0403d48806",
-    "cssHeight": 10239,
-    "run": 42307175753
+    "sha256": "b971009f2282eb386f169eabcf9365308a55252fa57783c23fea04668c538b6a",
+    "cssHeight": 10316,
+    "run": 42376261951
    },
    "mobile": {
     "file": "mobile/pulse.jpg",
-    "sha256": "5dd8323e142ff9fb37f6eff494ca79110b9306d7230185699805531e5ed63669",
-    "cssHeight": 11180,
-    "run": 42307175753
+    "sha256": "05f03d443dbb485397e73193a01c574a52f88e84bd7108cff3a7c98d7167ba5e",
+    "cssHeight": 11281,
+    "run": 42376261951
    }
   },
   "/pulse/casting/": {
    "desktop": {
     "file": "desktop/pulse~casting.jpg",
-    "sha256": "ea6d1f6a0ce6537b63c8164ba21155f3dc7e7bdb21d5f5aa15e8431220f11cf6",
+    "sha256": "c5ea8efc1a3aa901e10e21871d39df34bdd0623fbf67f2d3722328d1a39fbbcb",
     "cssHeight": 4689,
-    "run": 42103023187
+    "run": 42376261951
    },
    "mobile": {
     "file": "mobile/pulse~casting.jpg",
-    "sha256": "1c04e51e76316ef3a82128a21509d6c24468a98f8df3d14b34a0806304154830",
+    "sha256": "2e4e5ef791827a129a5dabded12b0cb3e3d5306af431809d5f846c85d84a8ccc",
     "cssHeight": 6391,
-    "run": 42103023187
+    "run": 42376261951
    }
   },
   "/rl/": {
