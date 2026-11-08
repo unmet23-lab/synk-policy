@@ -58,18 +58,30 @@ if (hall && reel) {
 }
 
 /* ② 작품 영상 */
-const films = [...document.querySelectorAll('.pv-work video[data-src]')];
-const play = v => { if (still) return; if (!v.getAttribute('src')) v.src = v.dataset.src; v.muted = true; v.play().catch(() => {}); v.closest('.pv-work')?.classList.add('playing'); };
-const rest = v => { clearTimeout(v._t); v.closest('.pv-work')?.classList.remove('playing'); if (v.getAttribute('src') && !v.paused) { v.pause(); v.currentTime = 0; v.load(); } };
+// 11-09: 「더 많은 작품」 목록(.pv-tile)도 같다. 넓은 화면은 한 줄에 둘 · 셋이 함께 보여, 손이 있는 화면에서는 손을 올린 한 편만 튼다(가운데 1초 규칙은 손이 없는 화면에서만).
+const films = [...document.querySelectorAll('.pv-work video[data-src], .pv-tile video[data-src]')];
+const hover = matchMedia('(hover: hover) and (pointer: fine)').matches;
+const card = v => v.closest('.pv-work, .pv-tile');
+const going = v => !!v.getAttribute('src') && !v.paused;
+const play = v => { if (still) return; if (!v.getAttribute('src')) v.src = v.dataset.src; v.muted = true; v.play().catch(() => {}); card(v)?.classList.add('playing'); };
+const rest = v => { clearTimeout(v._t); card(v)?.classList.remove('playing'); if (going(v)) { v.pause(); v.currentTime = 0; v.load(); } };
 if (films.length && !still) {
   if ('IntersectionObserver' in window) {
+    // 손 없는 화면은 세로 작품 둘이 한 줄에 함께 보이므로 한 번에 한 편만 돈다 — 보이는 칸 가운데 앞 번호가 1초 뒤 돌고,
+    // 그 편이 화면을 나가면 아직 보이는 다음 칸이 1초 뒤 돈다. 손 있는 화면은 손을 올린 칸과 가운데 규칙(큰 줄)이 따로 돈다.
+    const inView = new Set();
+    let turn = 0;
+    const next = () => { clearTimeout(turn); if (films.some(going)) return; const v = films.find(x => inView.has(x)); if (v) turn = setTimeout(() => play(v), 1000); };
     const io = new IntersectionObserver(es => {
       for (const e of es) {
         const v = e.target;
-        if (e.isIntersecting) { clearTimeout(v._t); v._t = setTimeout(() => play(v), 1000); } else rest(v);
+        if (!e.isIntersecting) { inView.delete(v); rest(v); }
+        else if (hover) { clearTimeout(v._t); v._t = setTimeout(() => play(v), 1000); }
+        else inView.add(v);
       }
+      if (!hover) next();
     }, { threshold: 0.7 });
-    films.forEach(v => io.observe(v));
+    films.filter(v => !(hover && v.closest('.pv-tile'))).forEach(v => io.observe(v));
   }
   for (const v of films) {
     const box = v.parentElement;

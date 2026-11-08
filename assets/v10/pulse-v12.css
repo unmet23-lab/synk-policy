@@ -68,6 +68,21 @@
 .pv-work.is-tall .pv-frame{aspect-ratio:9/16}
 .pv-work.is-tall .pv-cap{grid-template-columns:auto minmax(0,1fr);max-width:40em}
 .pv-work.is-tall .pv-meta{grid-column:2}
+/* ②-2 더 많은 작품(11-09) — 한 줄에 둘 · 셋을 화면 비율 그대로 높이를 맞춰 놓는다(--ar = 가로/세로, flex-grow가 비율이라 높이가 같다). 1000px 아래는 가로 작품 한 줄 · 세로 작품 둘씩(원고가 줄마다 가로 작품을 맨 앞이나 맨 뒤에 둬 번호 차례 그대로 줄이 바뀐다) */
+.pv-shelf{margin-top:clamp(96px,10vw,152px);padding-top:22px;border-top:1px solid var(--line)}
+.pv-shelf-title{margin:0 0 clamp(32px,4vw,52px)}
+.pv-row{display:flex;gap:clamp(16px,2vw,28px);align-items:flex-start}
+.pv-row+.pv-row{margin-top:clamp(48px,5vw,72px)}
+.pv-tile{flex:var(--ar) 1 0;min-width:0;display:grid;gap:16px;align-content:start}
+.pv-screen{margin:0;position:relative;aspect-ratio:var(--ar);background:#141416;overflow:hidden}
+.pv-screen video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;transform:scale(1.02);transition:transform 1.2s cubic-bezier(.19,1,.22,1)}
+.pv-tile:hover .pv-screen video,.pv-tile.playing .pv-screen video{transform:scale(1)}
+.pv-tile-cap{display:grid;grid-template-columns:auto minmax(0,1fr);gap:12px;align-items:start}
+.pv-tile-cap .pv-no{padding-top:.4em}
+.pv-h5{margin:0;font-size:clamp(18px,1.5vw,22px);line-height:1.35}
+.pv-tile-meta{margin:8px 0 0;display:grid;gap:4px;font-size:14px;line-height:1.6;color:var(--ink-3)}
+.pv-tile-meta .pv-kicker{font-size:12px}
+.pv-tile-cap p+p{margin:10px 0 0;font-size:14.5px}
 .pv-more{margin-top:clamp(80px,9vw,128px);display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.4fr);gap:20px 64px;padding-top:22px;border-top:1px solid var(--line)}
 .pv-more p{margin:0;font-size:15.5px;line-height:1.75}
 .pv-soon{display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px;margin:40px 0 0;font-size:14.5px;color:var(--ink-3)}
@@ -134,6 +149,11 @@
 .pv-ask-note{font-size:13.5px!important;color:var(--ink-3)}
 .pv-ask :focus-visible{outline-color:#111113}
 
+@media (max-width:1000px){
+  .pv-row{flex-wrap:wrap;row-gap:clamp(36px,6vw,48px)}
+  .pv-tile{flex:1 1 100%}
+  .pv-tile.is-tall{flex:1 1 calc(50% - clamp(16px,2vw,28px))}
+}
 @media (max-width:900px){
   .pv-copy{right:0;max-width:none;bottom:214px}
   .pv-side{left:0;right:0;bottom:92px;align-items:flex-start;text-align:left;max-width:none;gap:14px}
@@ -169,6 +189,6 @@
 }
 @media (prefers-reduced-motion:reduce){
   .pv-now.swap{animation:none}
-  .pv-frame video,.pv-face img{transition:none}
+  .pv-frame video,.pv-screen video,.pv-face img{transition:none}
   .pv-dark .reveal,.pv-ask .reveal{transform:none;transition:none}
 }
