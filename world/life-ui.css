@@ -652,18 +652,15 @@ h3.life-poster-sub{margin-bottom:0}
 .wfol-head{display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 8px;margin:0}
 .wfol-head strong{font-size:15.5px;line-height:1.4;font-weight:var(--wt-strong);color:var(--w-ink)}
 .wfol-head small{font-size:13px;line-height:1.4;color:var(--w-ink-3)}
-/* 1 · 7 · 30일은 누르는 칸이 아니라 시간 줄 위의 점 셋이다(11-09 — 테두리 칸 셋이 단추처럼 보여 아래 「…에서 확인하기 →」와 헷갈렸다).
-   점: 아직이면 빈 고리, 지금 확인할 때면 노란 불, 확인했으면 초록 불(확인한 점 뒤 줄도 초록). 누르는 것은 카드 아래 단추 하나다. */
+/* 1 · 7 · 30일은 누르는 칸이 아니다(11-09): 테두리 칸 셋은 단추처럼 보여 아래 「…에서 확인하기 →」와 헷갈렸고, 작은 점 타임라인은 이 구역 첫 시안에서 기각된 꼴이다(슬롭 점검표 36 · 그래프 문법).
+   글 세 칸을 1px 선으로만 나눈다(디자인 규칙 「카드 안 카드 금지 — 안쪽은 1px 선」). 지금이면 노란 불, 확인했으면 초록 불. 누르는 것은 카드 아래 단추 하나다. */
 .wfol-steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0;margin:2px 0 0;padding:0;list-style:none}
-.wfol-steps>li{position:relative;display:grid;align-content:start;gap:3px;min-width:0;padding:20px 10px 0 0}
-.wfol-steps>li:not(:last-child)::before{content:'';position:absolute;top:4px;left:0;right:0;height:2px;border-radius:1px;background:var(--w-ink-4)}
-.wfol-steps>li::after{content:'';position:absolute;top:0;left:0;width:10px;height:10px;border-radius:50%;background:var(--w-s1);box-shadow:inset 0 0 0 2px var(--w-ink-4)}
-.wfol-steps>li[data-status=due]::after{background:var(--w-led-check);box-shadow:0 0 10px rgba(245,196,69,.5)}
-.wfol-steps>li[data-status=observed]::after{background:var(--w-led-ok);box-shadow:0 0 10px rgba(125,180,90,.55)}
-.wfol-steps>li[data-status=observed]:not(:last-child)::before{background:color-mix(in srgb,var(--w-led-ok) 55%,transparent)}
+.wfol-steps>li{display:grid;align-content:start;gap:4px;min-width:0;padding:1px 8px 2px 10px;border-left:1px solid var(--w-line-2)}
+.wfol-steps>li:first-child{padding-left:0;border-left:0}
 .wfol-window{font-size:13px;line-height:1.35;font-weight:var(--wt-label);color:var(--w-ink-3);overflow-wrap:anywhere}
 .wfol-state{display:block;min-width:0;font-size:14px;line-height:1.35;font-weight:var(--wt-strong);color:var(--w-ink);overflow-wrap:anywhere;text-wrap:balance}
-.wfol-state>.w-led{display:none}
+html[lang=ko] .wfol-state{font-size:15.5px}
+.wfol-state>.w-led{margin-right:6px;vertical-align:.12em}
 .wfol-steps>li[data-status=due] .wfol-state{color:var(--w-check-text)}
 .wfol-steps>li[data-status=observed] .wfol-state{color:var(--w-ok-text)}
 .wfol-steps>li:is([data-status=missed],[data-status=invalidated],[data-status=unavailable]) .wfol-state{font-size:13px;font-weight:var(--wt-label);color:var(--w-ink-3)}
