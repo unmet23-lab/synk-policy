@@ -1,7 +1,7 @@
 {
- "createdAt": "2026-11-09T19:03:13.342Z",
- "commit": "448a56d626be23cbfd4bfa6b210134f4315041b1",
- "run": 42676379491,
+ "createdAt": "2026-11-09T22:31:39.877Z",
+ "commit": "5663f740fef226c6be4c48a96838e5347f567b03",
+ "run": 42709371372,
  "env": {
   "chromium": "151.0.7922.34",
   "os": "ubuntu24"
@@ -178,15 +178,15 @@
   "/en/pulse/": {
    "desktop": {
     "file": "desktop/en~pulse.jpg",
-    "sha256": "683aabda6c767819a233564fa062ec135f259ae621becc02058e9075f8b31dd7",
+    "sha256": "14d507ad7bd46c77b3e2bdb6434d23567ccd0146f154c57105098a81634e52cc",
     "cssHeight": 13513,
-    "run": 42537687029
+    "run": 42709371372
    },
    "mobile": {
     "file": "mobile/en~pulse.jpg",
-    "sha256": "5cb97bd666bd71bc0c96bf3e77aa555fe4075259588700407395f8a42130514a",
-    "cssHeight": 15665,
-    "run": 42537687029
+    "sha256": "c3d81fbeec14774a35570d482ba7edaa07a4ee359f60c4b0a61bf303949b9f5f",
+    "cssHeight": 15868,
+    "run": 42709371372
    }
   },
   "/en/shift/": {
@@ -388,15 +388,15 @@
   "/pulse/": {
    "desktop": {
     "file": "desktop/pulse.jpg",
-    "sha256": "8a27a57c3605693c14db25f46fb805c3cfc6e60ef45969ae86b3a6f68e667da6",
+    "sha256": "7e62a65630f8fcad78a0653c191083a981797cc81883793133fb8dbcf64712ac",
     "cssHeight": 13087,
-    "run": 42537687029
+    "run": 42709371372
    },
    "mobile": {
     "file": "mobile/pulse.jpg",
-    "sha256": "1a6049703619b3634bababbd91c4edeaa0ed91e0f4ad566dbb3fad95eeb71f46",
-    "cssHeight": 14689,
-    "run": 42537687029
+    "sha256": "8a2afaa23672e1ba6b574865874a96d8670ec2d69675059c4a36feaa97cc1805",
+    "cssHeight": 14838,
+    "run": 42709371372
    }
   },
   "/pulse/casting/": {
