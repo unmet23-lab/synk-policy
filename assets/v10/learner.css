@@ -171,7 +171,7 @@ html[lang="ko"] .lw-title>span{text-wrap:pretty}
   .lwq-prompt{margin-bottom:12px}
   .lwq-choice{min-height:50px;font-size:17px}
 }
-/* LAB 넓은 화면: 왼쪽 글 · 단추 · 진행, 오른쪽 교실 사진 + 문제 카드. 글을 칠판에 얹지 않는다(칠판 글은 사진 속 분필) — 화면 글꼴이 칠판 위에 뜨면 합성으로 읽힌다 */
+/* LAB 넓은 화면: 왼쪽 글 · 단추 · 진행, 오른쪽 교실 사진 + 문제 카드. 글을 칠판에 얹지 않는다(칠판에는 지운 자국만 — 날마다 바뀌는 때는 이 왼쪽 칸에) — 화면 글꼴이 칠판 위에 뜨면 합성으로 읽힌다 */
 @media (min-width:901px){
   .lw--try{--lw-try-text:clamp(330px,33vw,480px);display:grid;grid-template-columns:max(var(--gut),calc((100% - var(--wrap)) / 2)) var(--lw-try-text) clamp(28px,3.6vw,56px) minmax(0,1fr);grid-template-rows:auto auto auto 1fr auto;min-height:min(calc(100svh - 76px),880px,62vw)}
   .lw--try .lw-head{display:contents}
@@ -195,8 +195,8 @@ html[lang="ko"] .lw-title>span{text-wrap:pretty}
   .lw--try .lw-go{grid-column:2;grid-row:4;align-self:end;justify-content:flex-start;padding:clamp(18px,1.8vw,26px) 0 0}
   .lw--try .lw-note{grid-column:2;grid-row:5;width:auto;max-width:none;margin:6px 0 0;padding:0 0 clamp(36px,3.6vw,52px)}
 }
-/* 사진 속 분필 글(1664×920 기준 가운데 x 652, 폭 328)을 사진 왼쪽 끝과 카드 사이 빈자리 한가운데에 둔다. 사진은 칸을 덮으므로 배율 --s가 칸 크기에 따라 달라 고정 %로는 어긋난다.
-   칸이 좁은 1060px 아래는 글이 카드에 걸리므로 칠판을 빼고 창 쪽만 보인다.
+/* 칠판 가운데보다 오른쪽 자리(1664×920 기준 x 652 — 지우기 전 분필 글 가운데)를 사진 왼쪽 끝과 카드 사이 빈자리 한가운데에 둔다. 이 자리를 지켜 창이 넓게 보인다. 사진은 칸을 덮으므로 배율 --s가 칸 크기에 따라 달라 고정 %로는 어긋난다.
+   칸이 좁은 1060px 아래는 칠판이 카드에 가리므로 칠판을 빼고 창 쪽만 보인다.
    var()가 든 선언은 파싱을 통과해 앞줄을 이긴 뒤 무효가 되어 50%로 떨어지므로, 컨테이너 단위를 모르는 브라우저가 위 62%(1440에서 글이 카드 앞)에 남도록 @supports로 감싼다 */
 @media (min-width:901px) and (max-width:1060px){.lw--try .lw-photo{object-position:100% 50%;transform:scale(1.07);transform-origin:100% 50%}}
 @supports (width:1cqw){@media (min-width:1061px){
