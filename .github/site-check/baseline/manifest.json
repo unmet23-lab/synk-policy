@@ -1,7 +1,7 @@
 {
- "createdAt": "2026-11-09T00:17:05.269Z",
- "commit": "6368fe1ec5e86d6c2a533bb76bf54a2443030eb2",
- "run": 42537687029,
+ "createdAt": "2026-11-09T19:03:13.342Z",
+ "commit": "448a56d626be23cbfd4bfa6b210134f4315041b1",
+ "run": 42676379491,
  "env": {
   "chromium": "151.0.7922.34",
   "os": "ubuntu24"
@@ -10,29 +10,29 @@
   "/": {
    "desktop": {
     "file": "desktop/home.jpg",
-    "sha256": "bc8e6c83a7d8a47e0d7da341e5db9895fa7da4774e20c47658455e239f427c13",
+    "sha256": "63a308cb7aa61b1cf9e6e5f84939f456c08ccdf26c543c1c5dbad455f75a8901",
     "cssHeight": 9169,
-    "run": 42520963726
+    "run": 42676379491
    },
    "mobile": {
     "file": "mobile/home.jpg",
-    "sha256": "b77932b88286ff9d626de7d9d50b174a09e8ff59fcb52677a7dd540133b0db3a",
-    "cssHeight": 10825,
-    "run": 42520963726
+    "sha256": "cbf57cb606c0978c43fd591bd7aaa360ffda6595958620621e9f2264036ef227",
+    "cssHeight": 10854,
+    "run": 42676379491
    }
   },
   "/atlas/": {
    "desktop": {
     "file": "desktop/atlas.jpg",
-    "sha256": "8c1bf63fbb6c7f8d2a0a3db2cb82eff3b52ef551d5b4c5c7c8174cfd636249aa",
+    "sha256": "44906b419ec3cee44384b97f569ff62d4dc4038671d09d00da522faad97ca908",
     "cssHeight": 8618,
-    "run": 42520963726
+    "run": 42676379491
    },
    "mobile": {
     "file": "mobile/atlas.jpg",
-    "sha256": "554dfc8337f1e909dc6ea3f7597025e2c10cdb76c6849b07b4924f5dfadb4bd9",
-    "cssHeight": 11798,
-    "run": 42520963726
+    "sha256": "9539a5f1337faf60cb17fae07969f944e72c765a8d244e2960109dab9db23be3",
+    "cssHeight": 11827,
+    "run": 42676379491
    }
   },
   "/builds/": {
@@ -108,29 +108,29 @@
   "/en/": {
    "desktop": {
     "file": "desktop/en.jpg",
-    "sha256": "90c562f45df2744afd974f7d073b98bcd87d9b592d0885e74d7467706f25c394",
+    "sha256": "87192237bc36bfaa141bdd4661494c4db42a6fd2743d6a781232d7ccd632def5",
     "cssHeight": 9373,
-    "run": 42520963726
+    "run": 42676379491
    },
    "mobile": {
     "file": "mobile/en.jpg",
-    "sha256": "27c6e49e2b571dad2c27b9aacbffb05dc756b267be72f40749f0cc8e947a8313",
-    "cssHeight": 11507,
-    "run": 42520963726
+    "sha256": "a7aa4e1c7b5170027ec1d798bb68d83dfac20425cbf8bf66f51e7f8d1a2b48db",
+    "cssHeight": 11486,
+    "run": 42676379491
    }
   },
   "/en/atlas/": {
    "desktop": {
     "file": "desktop/en~atlas.jpg",
-    "sha256": "2654c2163e49b006f6e26f9448185093400a84f93031be4e8b27583e988e821f",
+    "sha256": "772275daf0594520d92edb84ba4effb8b24613c254775e0354a1eefdbb30f09b",
     "cssHeight": 8759,
-    "run": 42520963726
+    "run": 42676379491
    },
    "mobile": {
     "file": "mobile/en~atlas.jpg",
-    "sha256": "e0484b9ae6b6f31656027816b249cc34dedb9c190d834b2cf017986d8a148ff2",
-    "cssHeight": 12558,
-    "run": 42520963726
+    "sha256": "34169e110f7c75189be05ee87ae33b5aa6cf93a6ee1e150d919b102263786c22",
+    "cssHeight": 12587,
+    "run": 42676379491
    }
   },
   "/en/founder/": {
@@ -150,15 +150,15 @@
   "/en/lab/": {
    "desktop": {
     "file": "desktop/en~lab.jpg",
-    "sha256": "5624f0de6914d05c5b0fb1d07a95c188550948855d4bb57d280c4b5bba345a07",
-    "cssHeight": 12534,
-    "run": 42520963726
+    "sha256": "54a3303d52857ea51d8fd388c683720244118b997b9e81dcf6293a651fb2b7be",
+    "cssHeight": 12089,
+    "run": 42676379491
    },
    "mobile": {
     "file": "mobile/en~lab.jpg",
-    "sha256": "586fefdc2bbbb1675482293317cc44f0bac6e1d25d61d3780a523db428be1039",
-    "cssHeight": 17396,
-    "run": 42520963726
+    "sha256": "730a6411e916b6119530606b0ee61c6ecc7aa9481e01c13c1117630480b0f96a",
+    "cssHeight": 17414,
+    "run": 42676379491
    }
   },
   "/en/path/": {
@@ -234,15 +234,15 @@
   "/lab/": {
    "desktop": {
     "file": "desktop/lab.jpg",
-    "sha256": "ce0c6fcb45d8a78714b24bae79912485d4c1ae6cfec0b6936832d70c24eb9894",
-    "cssHeight": 11826,
-    "run": 42520963726
+    "sha256": "c70c603584146f4abec4860c01666a9f2bb7bc7ba6c6c367a76aa867977a82ba",
+    "cssHeight": 11359,
+    "run": 42676379491
    },
    "mobile": {
     "file": "mobile/lab.jpg",
-    "sha256": "38299a26dbb736aa93d84c02b45a42a4742c0c4bf14e2161d4df51ecfcfe20be",
-    "cssHeight": 15981,
-    "run": 42520963726
+    "sha256": "9fb8497a6192d87f1135df11ae610af2003db5674047755dc5a11c9cfc2ecc9c",
+    "cssHeight": 15999,
+    "run": 42676379491
    }
   },
   "/lab/topik4/": {
