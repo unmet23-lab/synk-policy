@@ -19,6 +19,9 @@ html[lang="en"] .lw-title{font-size:clamp(30px,3.7vw,52px);letter-spacing:-.035e
 html[lang="ko"] .lw-title>span{text-wrap:pretty}
 .lw .nb,.lw-more .nb{white-space:nowrap}
 .lw-go{display:flex;align-items:center;gap:24px;flex:none;padding-bottom:6px}
+/* 머리 단추는 테두리 — 조각 속 앱 화면의 흰 알약과 같은 꼴이 한 화면에 둘이면 어디를 누를지 갈린다 */
+.lw-go .btn-light{background:transparent;color:#fff;border-color:rgba(255,255,255,.5)}
+.lw-go .btn-light:hover{background:rgba(255,255,255,.08);border-color:#fff}
 .lw-link{display:inline-flex;align-items:center;gap:6px;min-height:44px;color:#fff;font-weight:650;text-decoration:none;white-space:nowrap}
 .lw-link .arr{font-family:var(--mono);font-size:14px;transition:transform .2s var(--ease)}
 .lw-link:hover .arr{transform:translateX(3px)}
@@ -36,12 +39,14 @@ html[lang="ko"] .lw-title>span{text-wrap:pretty}
 .lw-visual{position:absolute;inset:0;overflow:hidden}
 .lw-photo{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 62%}
 /* 벽 쪽 글을 받치는 그늘: 사진마다 벽 밝기가 달라도 글 대비가 4.5:1 아래로 내려가지 않게 */
-.lw-visual::after{content:'';position:absolute;inset:0;z-index:1;pointer-events:none;background:linear-gradient(90deg,rgba(8,9,12,.58),rgba(8,9,12,.36) 24%,rgba(8,9,12,0) 42%),linear-gradient(180deg,#08090c,rgba(8,9,12,0) 13%,rgba(8,9,12,0) 78%,rgba(8,9,12,.62))}
+.lw-visual::after{content:'';position:absolute;inset:0;z-index:1;pointer-events:none;background:linear-gradient(90deg,rgba(8,9,12,.5),rgba(8,9,12,.26) 20%,rgba(8,9,12,0) 33%),linear-gradient(180deg,#08090c,rgba(8,9,12,0) 13%,rgba(8,9,12,0) 78%,rgba(8,9,12,.62))}
 .lw-copy{position:absolute;z-index:3;left:var(--lw-side);top:22%;width:var(--lw-copy)}
 .lw-when{margin:0 0 14px;font-size:14px;font-weight:600;line-height:1.3;color:var(--lw-hot)}
 .lw-q{margin:0;font-size:clamp(30px,3.1vw,44px);line-height:1.16;letter-spacing:-.035em;font-weight:var(--hw);color:#fff;text-wrap:balance}
 .lw-a{margin:18px 0 0;font-size:clamp(16px,1.25vw,18px);line-height:1.62;color:var(--lw-ink-2);text-wrap:pretty}
 .lw-a b{font-weight:650;color:#fff}
+/* 넓은 화면은 왼쪽 여백이 커져 글 끝이 창틀에 걸린다(벽은 사진 폭의 38%까지, 1920에서 730px) — 글이 벽 안에 들게 폭을 막는다. 한국어 물음은 그대로 한 줄이다 */
+@media (min-width:1600px){.lw-frame .lw-q{max-width:390px}.lw-frame .lw-a{max-width:20em}}
 .lw-by{margin:16px 0 0;font-size:14px;line-height:1.4;color:#fff;font-weight:600}
 .lw-by span{margin-right:8px;color:var(--lw-ink-3);font-weight:500}
 .lw-frame .lw-copy,.lw-frame .lw-piece{opacity:0;transition:opacity .3s linear}
@@ -166,6 +171,40 @@ html[lang="ko"] .lw-title>span{text-wrap:pretty}
   .lwq-prompt{margin-bottom:12px}
   .lwq-choice{min-height:50px;font-size:17px}
 }
+/* LAB 넓은 화면: 왼쪽 글 · 단추 · 진행, 오른쪽 교실 사진 + 문제 카드. 글을 칠판에 얹지 않는다(칠판 글은 사진 속 분필) — 화면 글꼴이 칠판 위에 뜨면 합성으로 읽힌다 */
+@media (min-width:901px){
+  .lw--try{--lw-try-text:clamp(330px,33vw,480px);display:grid;grid-template-columns:max(var(--gut),calc((100% - var(--wrap)) / 2)) var(--lw-try-text) clamp(28px,3.6vw,56px) minmax(0,1fr);grid-template-rows:auto auto auto 1fr auto;min-height:min(calc(100svh - 76px),880px,62vw)}
+  .lw--try .lw-head{display:contents}
+  .lw--try .lw-head>div:first-child{grid-column:2;grid-row:1;padding-block:clamp(56px,6.2vw,92px) clamp(24px,2.5vw,36px)}
+  .lw--try .lw-title{font-size:clamp(30px,3.2vw,46px)}
+  html[lang="en"] .lw--try .lw-title{font-size:clamp(26px,2.7vw,38px)}
+  .lw--try .lw-stage,.lw--try .lw-tryframe{display:contents}
+  .lw--try .lw-copy{grid-column:2;grid-row:2;position:relative;inset:auto;width:auto}
+  .lw--try .lw-copy>[aria-live]{min-height:clamp(156px,11.2vw,168px)}
+  html[lang="en"] .lw--try .lw-copy>[aria-live]{min-height:168px}
+  .lw--try .lw-q{font-size:clamp(23px,2.15vw,31px)}
+  .lw--try .lw-a{margin-top:14px;font-size:clamp(15px,1.15vw,17px)}
+  .lw--try .lw-next{position:static;min-height:54px;margin-top:10px}
+  .lw--try .lw-visual{grid-column:4;grid-row:1/-1;position:relative;inset:auto;background:#15110e}
+  .lw--try .lw-visual::after{display:none}
+  .lw--try .lw-photo{object-position:62% 50%}
+  .lw--try .lw-piece{right:clamp(20px,4.5%,72px);top:50%}
+  .lw--try .lw-rail-wrap{grid-column:2;grid-row:3;width:auto;max-width:none;margin:clamp(18px,2vw,28px) 0 0;padding:0}
+  .lw--try .lw-steps{column-gap:clamp(6px,.9vw,14px)}
+  .lw--try .lw-steps li{font-size:clamp(13px,1vw,15px);letter-spacing:-.02em;white-space:nowrap}
+  .lw--try .lw-go{grid-column:2;grid-row:4;align-self:end;justify-content:flex-start;padding:clamp(18px,1.8vw,26px) 0 0}
+  .lw--try .lw-note{grid-column:2;grid-row:5;width:auto;max-width:none;margin:6px 0 0;padding:0 0 clamp(36px,3.6vw,52px)}
+}
+/* 사진 속 분필 글(1664×920 기준 가운데 x 652, 폭 328)을 사진 왼쪽 끝과 카드 사이 빈자리 한가운데에 둔다. 사진은 칸을 덮으므로 배율 --s가 칸 크기에 따라 달라 고정 %로는 어긋난다.
+   칸이 좁은 1060px 아래는 글이 카드에 걸리므로 칠판을 빼고 창 쪽만 보인다.
+   var()가 든 선언은 파싱을 통과해 앞줄을 이긴 뒤 무효가 되어 50%로 떨어지므로, 컨테이너 단위를 모르는 브라우저가 위 62%(1440에서 글이 카드 앞)에 남도록 @supports로 감싼다 */
+@media (min-width:901px) and (max-width:1060px){.lw--try .lw-photo{object-position:100% 50%;transform:scale(1.07);transform-origin:100% 50%}}
+@supports (width:1cqw){@media (min-width:1061px){
+  .lw--try .lw-visual{container-type:size}
+  .lw--try .lw-photo{--s:max(calc(100cqw / 1664),calc(100cqh / 920));--mid:calc((16px + 100cqw - var(--lw-piece) - clamp(20px,4.5cqw,72px)) / 2);object-position:clamp(calc(100cqw - var(--s) * 1664),calc(var(--mid) - var(--s) * 652),0px) 50%}
+}}
+@media (min-width:1061px) and (max-width:1179px){.lw--try{--lw-piece:330px}}
+@media (min-width:1180px) and (max-width:1279px){.lw--try{--lw-piece:360px}}
 /* ── 휴대폰 · 작은 태블릿: 옆으로 넘기는 줄. 글을 사진 위에 얹지 않는다(물음 → 사진 위 실제 화면 → 답). 단추는 다 본 뒤 맨 아래 ── */
 @media (max-width:900px){
   .lw{display:flex;flex-direction:column}
@@ -174,28 +213,28 @@ html[lang="ko"] .lw-title>span{text-wrap:pretty}
   .lw-stage{order:2;aspect-ratio:auto;max-height:none;min-height:0;background:none}
   .lw-rail-wrap{order:3}
   .lw-go,.lw-go .lw-link{display:flex}
-  .lw-go .btn-light{background:transparent;color:#fff;border-color:rgba(255,255,255,.5)}
-  .lw-go .btn-light:hover{background:rgba(255,255,255,.08);border-color:#fff}
+  .lw:not(.lw--try) .lw-go .lw-link{display:none}
   .lw-go{order:4;flex-wrap:wrap;gap:6px 22px;margin:20px var(--gut) 0;padding:0}
   .lw-note{order:5;margin-top:16px;padding-bottom:48px}
-  .lw-frames{position:static;display:flex;gap:24px;overflow-x:auto;scroll-snap-type:x mandatory;padding-inline:var(--gut);scroll-padding-inline:var(--gut);scrollbar-width:none;-webkit-overflow-scrolling:touch;align-items:stretch}
+  .lw-frames{position:static;display:flex;gap:calc(var(--gut) * 2);overflow-x:auto;scroll-snap-type:x mandatory;padding-inline:var(--gut);scroll-padding-inline:var(--gut);scrollbar-width:none;-webkit-overflow-scrolling:touch;align-items:stretch}
   .lw-frames::-webkit-scrollbar{display:none}
   .lw-frames:focus-visible{outline-offset:-2px;border-radius:0}
   .lw-frame{position:relative;inset:auto;flex:0 0 100%;display:flex;flex-direction:column;opacity:1;visibility:visible;scroll-snap-align:start;transition:none}
   .lw-frame .lw-copy{display:contents}
   .lw-frame .lw-piece{opacity:1;transition:none}
-  .lw-when{order:1;margin:0 0 8px}
-  .lw-q,.lw--try .lw-q{order:2;font-size:clamp(27px,7.4vw,36px)}
-  .lw-visual{order:3;position:relative;inset:auto;overflow:visible;margin-top:16px;padding-top:clamp(150px,42vw,230px);isolation:isolate}
-  .lw-a{order:4;margin-top:16px;font-size:16px}
+  .lw-when{order:2;margin:18px 0 8px}
+  .lw-q,.lw--try .lw-q{order:3;font-size:clamp(27px,7.4vw,36px)}
+  .lw-visual{order:1;position:relative;inset:auto;overflow:visible;padding-top:clamp(190px,50vw,280px);isolation:isolate}
+  .lw-a{order:4;margin-top:12px;font-size:16px}
   .lw-by{order:5}
   .lw-photo{position:absolute;inset:0 0 auto 0;height:clamp(240px,66vw,360px);object-position:62% 50%;z-index:-1;-webkit-mask-image:linear-gradient(#000 60%,transparent);mask-image:linear-gradient(#000 60%,transparent)}
   .lw-visual::after{display:none}
   /* 칸 높이는 가장 긴 칸에 맞춰 같아진다 — 남는 높이는 사진이 채우고(조각은 아래로), 답 글은 칸 바닥에 맞춘다 */
-  .lw-frame .lw-visual{flex:1 0 auto;display:flex;flex-direction:column}
+  .lw-frame .lw-visual{flex:1 0 auto;display:flex;flex-direction:column;margin-inline:calc(var(--gut) * -1)}
   .lw-frame .lw-photo{height:calc(100% - 40px);min-height:clamp(240px,66vw,360px)}
   .lw-piece,.lw-frame.is-on .lw-piece{position:relative;right:auto;top:auto;width:100%;margin:0;transform:none}
-  .lw-frames .lw-frame .lw-piece{margin-top:auto}
+  /* 조각은 휴대폰 폭으로 찍은 실제 화면이라 태블릿 폭만큼 늘리면 앱 글과 단추가 거대해진다 — 480px에서 멈추고, 넓은 화면처럼 창 쪽(오른쪽)에 둔다 */
+  .lw-frames .lw-frame .lw-piece{width:min(calc(100% - var(--gut) * 2),480px);margin:auto var(--gut) 0 auto}
   .lw-piece img{border-radius:18px}
   .lw-rail{display:none}
   .lw-count{display:flex;align-items:center;gap:14px;margin:16px 0 0}
@@ -203,10 +242,14 @@ html[lang="ko"] .lw-title>span{text-wrap:pretty}
   .lw-step{appearance:none;display:grid;place-items:center;width:44px;height:44px;margin:0;padding:0;border:1px solid var(--lw-line);border-radius:50%;background:none;color:#fff;cursor:pointer}
   .lw-step[data-step="-1"] svg{transform:scaleX(-1)}
   .lw-step:disabled{opacity:.32;cursor:default}
+  /* 단추 · 번호는 줄지 않고, 자리가 모자라면 글이 받는다(대체 글꼴처럼 글이 넓어져도 원이 타원이 되지 않게) */
+  .lw-step,.lw-count-no{flex:none}
+  .lw-count-next{min-width:0;overflow:hidden;text-overflow:ellipsis;font-size:14px;line-height:1.3;color:var(--lw-ink-3);white-space:nowrap}
   .lw-tryframe{position:static;display:flex;flex-direction:column}
   .lw--try .lw-copy{order:2;position:static;width:auto;margin:22px var(--gut) 0}
   .lw--try .lw-visual{order:1;margin-top:0;padding-top:clamp(130px,36vw,200px)}
-  .lw--try .lw-piece{width:calc(100% - var(--gut) * 2);margin-inline:auto}
+  .lw--try .lw-photo{object-position:44% 50%}
+  .lw--try .lw-piece{width:min(calc(100% - var(--gut) * 2),480px);margin:0 var(--gut) 0 auto}
   .lw--try .lw-q{margin-top:0}
   .lw--try .lw-a{margin-top:12px}
   .lw--try .lw-next{position:static;margin-top:20px}
@@ -224,6 +267,8 @@ html[lang="ko"] .lw-title>span{text-wrap:pretty}
   .lwt-mark{width:11px;height:11px;margin:-5.5px 0 0 -5.5px}
   .lwt-start,.lwt-next{font-size:13px;letter-spacing:-.01em}
 }
+/* 좁은 휴대폰: 번호 줄이 한 줄에 들게 간격을 줄이고, 긴 영어는 「Next ·」을 뺀다(끝 낱말만 다음 줄로 꺾이지 않게) */
+@media (max-width:389px){.lw-count{gap:8px}.lw-count-no{min-width:0}html[lang="en"] .lw-count-up{display:none}}
 /* 스크립트가 없으면: 넓은 화면도 모든 칸을 아래로 펼친다 */
 html:not(.js) .lw-stage{aspect-ratio:auto;max-height:none;min-height:0}
 html:not(.js) .lw-frames{position:static}

@@ -80,6 +80,7 @@ for (const root of document.querySelectorAll('[data-lw]')) {
     piece.addEventListener('click', () => { location.href = go.href; });
   }
   const count = root.querySelector('[data-lw-count]');
+  const upNext = root.querySelector('[data-lw-next]');
   const steps = [...root.querySelectorAll('.lw-step')];
   // 좁은 화면: 지금 보이는 칸(가운데에 가장 가까운 칸)
   const current = () => {
@@ -98,6 +99,7 @@ for (const root of document.querySelectorAll('[data-lw]')) {
       const best = current();
       if (steps.length) { steps[0].disabled = best === 0; steps[1].disabled = best === frames.length - 1; }
       count.textContent = `${String(best + 1).padStart(2, '0')} / ${total}`;
+      if (upNext) { const after = tabs[best + 1]; upNext.hidden = !after; if (after) upNext.lastElementChild.textContent = after.textContent.trim(); }
     }, { passive: true });
   }
 }
