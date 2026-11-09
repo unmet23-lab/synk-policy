@@ -64,29 +64,45 @@ const hover = matchMedia('(hover: hover) and (pointer: fine)').matches;
 const card = v => v.closest('.pv-work, .pv-tile');
 const going = v => !!v.getAttribute('src') && !v.paused;
 const play = v => { if (still) return; if (!v.getAttribute('src')) v.src = v.dataset.src; v.muted = true; v.play().catch(() => {}); card(v)?.classList.add('playing'); };
-const rest = v => { clearTimeout(v._t); card(v)?.classList.remove('playing'); if (going(v)) { v.pause(); v.currentTime = 0; v.load(); } };
+const rest = v => { card(v)?.classList.remove('playing'); if (going(v)) { v.pause(); v.currentTime = 0; v.load(); } };
 if (films.length && !still) {
+  // 저절로 도는 것은 어느 화면이든 한 번에 한 편이다(큰 모니터 · 세로 작품 줄에서 여럿이 함께 보여도) — 보이는 칸 가운데 앞 번호가 1초 뒤 돌고,
+  // 그 편이 화면을 나가면 아직 보이는 다음 칸이 1초 뒤 돈다. 고른 칸이 그대로면 다른 칸이 드나들어도 1초를 다시 세지 않는다.
+  // 손 있는 화면의 목록 칸은 손을 올린 칸만 돌고 이 차례에 들지 않는다(목록에 손을 올려도 도는 큰 줄은 멈추지 않는다).
+  const pool = films.filter(v => !(hover && v.closest('.pv-tile')));
+  const inView = new Set();
+  let turn = 0, waiting = null;
+  const hold = () => { clearTimeout(turn); waiting = null; };
+  const next = () => {
+    if (pool.some(going)) { hold(); return; }
+    const v = pool.find(x => inView.has(x)) || null;
+    if (v === waiting) return;
+    hold(); waiting = v;
+    if (v) turn = setTimeout(() => { waiting = null; play(v); }, 1000);
+  };
   if ('IntersectionObserver' in window) {
-    // 손 없는 화면은 세로 작품 둘이 한 줄에 함께 보이므로 한 번에 한 편만 돈다 — 보이는 칸 가운데 앞 번호가 1초 뒤 돌고,
-    // 그 편이 화면을 나가면 아직 보이는 다음 칸이 1초 뒤 돈다. 손 있는 화면은 손을 올린 칸과 가운데 규칙(큰 줄)이 따로 돈다.
-    const inView = new Set();
-    let turn = 0;
-    const next = () => { clearTimeout(turn); if (films.some(going)) return; const v = films.find(x => inView.has(x)); if (v) turn = setTimeout(() => play(v), 1000); };
     const io = new IntersectionObserver(es => {
       for (const e of es) {
         const v = e.target;
         if (!e.isIntersecting) { inView.delete(v); rest(v); }
-        else if (hover) { clearTimeout(v._t); v._t = setTimeout(() => play(v), 1000); }
         else inView.add(v);
       }
-      if (!hover) next();
+      next();
     }, { threshold: 0.7 });
-    films.filter(v => !(hover && v.closest('.pv-tile'))).forEach(v => io.observe(v));
+    pool.forEach(v => io.observe(v));
   }
+  // 차례에 드는 칸에 손을 올리면 그 칸이 차례를 넘겨받고, 손을 떼도 화면에 있으면 그대로 돈다.
   for (const v of films) {
-    const box = v.parentElement;
-    box.addEventListener('pointerenter', e => { if (e.pointerType === 'mouse') play(v); });
-    box.addEventListener('pointerleave', e => { if (e.pointerType === 'mouse') rest(v); });
+    const box = v.parentElement, inTurn = pool.includes(v);
+    box.addEventListener('pointerenter', e => {
+      if (e.pointerType !== 'mouse') return;
+      if (inTurn) { hold(); pool.forEach(x => { if (x !== v) rest(x); }); }
+      play(v);
+    });
+    box.addEventListener('pointerleave', e => {
+      if (e.pointerType !== 'mouse' || (inTurn && inView.has(v))) return;
+      rest(v); next();
+    });
   }
 }
 
