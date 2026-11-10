@@ -34,10 +34,10 @@ function setup(root) {
 
   for (const b of root.querySelectorAll('[data-scene-start],[data-scene-jump]')) b.disabled = false;
   root.classList.add('is-ready');
-  // 대본 칸(details): 홈(compact)에서는 화면에서 감춘 글이라 초점 · 읽기 순서에서 뺀다(inert — 자막과 카드가 같은 글을 전한다).
+  // 대본 칸(details): 홈(compact)은 접어 두고 제목을 눌러 펼친다.
   // LAB은 넓은 화면에서 늘 펼쳐 두고(제목은 누를 거리가 아니라 Tab에서도 뺀다), 900px 아래에서는 접어 둔 채 시작해 제목으로 연다.
   const side = root.querySelector('details.scene-side');
-  if (side && root.classList.contains('dscene--compact')) side.inert = true;
+  if (side && root.classList.contains('dscene--compact')) side.open = false;
   else if (side) {
     const narrow = matchMedia('(max-width:900px)');
     const summary = side.querySelector('summary');

@@ -36,11 +36,11 @@ Windows 64비트와 Mac(Apple Silicon·Intel, macOS 13 이상)용 Preview 0.4.86
 
 ### SYNK LAB — K드라마 속 유학생이 되어, 한국어로 말합니다
 
-SYNK LAB은 직접 말하며 배우는 한국어를 만듭니다. K드라마 상황극에서는 이야기 속 유학생이 되어 소리 내어 대답하고, 장면이 끝나면 코치가 고칠 점 하나만 짚어 그 한 줄을 한 번 더 해 봅니다. 1화 장면은 지금 바로 해 볼 수 있고, 시범판과 TOPIK 4급 과정은 준비하고 있습니다. 매일의 연습은 SYNK WORLD에서 합니다.
+SYNK LAB은 직접 말하며 배우는 한국어를 만듭니다. K드라마 상황극의 1화 장면은 지금 듣고 말해 볼 수 있고, 매일의 연습·게임은 SYNK WORLD에서 이용할 수 있습니다. 내 말을 듣고 코치가 고칠 점을 짚는 전체 시범판과 TOPIK 4급 과정은 준비 중입니다.
 
-K드라마 속 유학생이 되어 말하는 한국어 상황극과 매일 연습하는 SYNK WORLD를 만들고, TOPIK 4급 반과 교재 「시냅스」를 준비합니다.
+K드라마 상황극의 1화 장면 체험과 SYNK WORLD의 연습·게임은 지금 이용할 수 있습니다. 전체 말하기 시범판, TOPIK 4급 반과 교재 「시냅스」는 준비 중입니다.
 
-- K드라마 상황극 — 이야기 속 유학생이 되어 말하기(준비 중 · 시범판)
+- K드라마 상황극 — 1화 장면 체험은 지금 이용, 전체 시범판은 준비 중
 - SYNK WORLD — TOPIK 연습과 한국어 게임(지금 이용 · 미리보기)
 - TOPIK 4급 8주 온라인 반(준비 중 · 관심 등록)
 - TOPIK 4급 목표 정규 1년 과정(준비 중 · 개원 준비)
@@ -133,7 +133,7 @@ SYNK SHIFT는 학교·기업·기관에서 AI 시대에 필요한 역량을 강�
 
 AI that gets to know you the more you use it. SYNK builds Atlas, a personalization engine that reads a person’s goals and what they have actually done, then fits the next practice to them. With it we run four businesses: Korean education, AI lectures and work automation, ad videos, and preparing to study in Korea.
 
-- SYNK LAB — Step into a K-drama, and speak Korean. SYNK LAB makes Korean you actually speak. In our K-drama role-play you are the international student in the story and answer out loud; when the scene ends, a coach points out just one thing and you try that line once more. You can play an Episode 1 scene right now; the pilot and the TOPIK Level 4 courses are in preparation. Daily practice happens in SYNK WORLD. We are making a Korean role-play where you speak as the international student in a K-drama story, and SYNK WORLD for your daily practice; the TOPIK Level 4 class and the Synapse textbooks are in preparation.
+- SYNK LAB — Step into a K-drama, and speak Korean. SYNK LAB makes Korean you actually speak. You can listen and speak along with the Episode 1 scene now, and use SYNK WORLD for daily practice and games. The full pilot that listens to your speech and gives a coach’s feedback, and the TOPIK Level 4 courses, are in preparation. The Episode 1 scene demo and SYNK WORLD practice and games are available now. The full speaking pilot, TOPIK Level 4 class and Synapse textbooks are in preparation.
 - SYNK SHIFT — AI lectures, plus work automation. SYNK SHIFT teaches the skills the AI era calls for at schools, companies and institutions, then automates repetitive work with AI for companies that took a lecture, to cut fixed costs. In schools we also give AI career lectures on how to steer a career in the AI era and what to prepare for it. We also run an instructor agency that finds instructors and assigns them to fit each request. Hands-on AI lectures for companies and institutions, where staff practise on their own work, and AI career lectures for schools on the careers and skills the AI era calls for. We find and assign instructors who fit each request, and automate repetitive work with AI for companies that took a lecture.
 - SYNK PULSE — Ten years on set, an actor directs AI models. A founder who has appeared on Netflix and tvN and led a web drama seen 10 million times on Facebook directs the glance, the hand holding the product, the timing of a smile. A first conversation needs just one product photo and where the ad will run. AI product ads, brand films and lookbooks, with every cut shown to you as a scene image before the video. We also make the music and stories of Mongle, Kkamong and Marin.
 - SYNK PATH — Studying, working and living in Korea, prepared with you. From packing your bags to settling into life in Korea, we are preparing to work through the Korean you need, the requirements, interviews and daily life with you, one step at a time. SYNK LAB takes care of the Korean — SYNK WORLD’s TOPIK practice is open now, and we are preparing to open the one-year course. The Seoul day planner and caregiver interview practice in VR are available now; help with preparing to study, finding out job requirements and settling into life in Korea is in preparation. We do not guarantee admission, visas, jobs or residence.
