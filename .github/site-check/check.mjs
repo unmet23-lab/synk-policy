@@ -23,6 +23,7 @@ import {pathToFileURL} from 'node:url';
 import {createBrowserProbe} from './browser-probe.mjs';
 import {runScenarioCheck} from './scenario-recovery.mjs';
 import {runVisualCheck, summaryLines, IMPACT_NAME, deviceName} from './visual.mjs';
+import {splitPageRoutes, checkRedirectContract, REDIRECT_CASES} from './redirect-contract.mjs';
 
 const base = (process.env.SITE_BASE || 'https://synk.im').replace(/\/$/, '');
 const ci = process.env.CI === 'true';
@@ -190,9 +191,20 @@ async function checkScenario(step, device, route, exercise) {
 console.log('3. 페이지');
 // 저장소의 두 단계 아래까지 있는 index.html이 페이지다. 게임(try/)은 4단계에서 따로 보고, 로그인 흐름(id/·id-rehearsal/)과
 // 회의 안내(brief/)는 들어오는 조건이 따로 있어 뺀다.
-const routes = git('ls-files', '-z').toString('utf8').split('\0')
+const discoveredRoutes = git('ls-files', '-z').toString('utf8').split('\0')
   .filter(f => /^(?:[^/]+\/){0,2}index\.html$/.test(f) && !/^(try|id|id-rehearsal|brief)\//.test(f))
   .map(f => '/' + f.replace(/index\.html$/, ''));
+const {pages: routes, redirects} = splitPageRoutes(discoveredRoutes);
+const redirectChecks = [];
+for (const device of devices) for (const contract of redirects) {
+  for (const variant of [...REDIRECT_CASES, {search: '', hash: '', javaScriptEnabled: false}]) {
+    const result = await checkRedirectContract({browser, base, device, contract, ...variant});
+    redirectChecks.push(result);
+    if (!result.ok) fail('호환 이동', `${device.name} ${contract.path} ${result.mode}: ${result.issues.slice(0, 3).join(' | ')}`);
+  }
+}
+fs.writeFileSync(path.join(out, 'redirect-contracts.json'), JSON.stringify(redirectChecks, null, 2) + '\n');
+console.log(`  호환 이동 ${redirectChecks.length}회: ${redirectChecks.filter(r => r.ok).length} 통과`);
 for (const device of devices) for (const route of routes) {
   await checkScenario('페이지', device, route, async (page, assertions) => {
     const height = await page.evaluate(() => document.documentElement.scrollHeight);
@@ -300,9 +312,9 @@ let visual = null, a11y = null;
 await browser.close();
 
 const status = problems.length ? 'failed' : recoveredScenarios.length ? 'transient-recovered' : 'passed';
-fs.writeFileSync(path.join(out, 'result.json'), JSON.stringify({status, checkedAt: new Date().toISOString(), problems, notes, recoveredScenarios, visual, a11y}, null, 2) + '\n');
+fs.writeFileSync(path.join(out, 'result.json'), JSON.stringify({status, checkedAt: new Date().toISOString(), problems, notes, recoveredScenarios, redirectChecks, visual, a11y}, null, 2) + '\n');
 const summary = [`## synk.im 배포 점검 ${problems.length ? `— 문제 ${problems.length}개` : recoveredScenarios.length ? `— 일시 오류 ${recoveredScenarios.length}개 재검사로 복구` : '— 문제 없음'}`, '',
-  ...(problems.length ? problems.map(p => `- ${p}`) : ['- 반영, 도구 이름, 페이지, LAB 상황극 · 게임, 질문창 모두 통과']),
+  ...(problems.length ? problems.map(p => `- ${p}`) : ['- 반영, 도구 이름, 페이지, 호환 이동, LAB 상황극 · 게임, 질문창 모두 통과']),
   ...(visual || a11y ? ['', '### 기준 이미지·접근성', ...summaryLines(visual, a11y)] : []),
   ...(notes.length ? ['', ...notes.map(n => `- 참고: ${n}`)] : [])].join('\n');
 if (process.env.GITHUB_STEP_SUMMARY) fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY, summary + '\n');
