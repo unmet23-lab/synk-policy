@@ -144,6 +144,14 @@
       "redirectUris": [
         "https://workspace.synk.im/api/teaching/callback"
       ]
+    },
+    {
+      "product": "platform",
+      "clientId": "f5f94a6c-5b51-402a-ba3e-76d2291ce91b",
+      "redirectUris": [
+        "http://127.0.0.1:4326/",
+        "https://synk.im/path/app/"
+      ]
     }
   ],
   "clients": {

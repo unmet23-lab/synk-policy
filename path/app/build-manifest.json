@@ -1,0 +1,135 @@
+{
+  "version": 1,
+  "product": "path-app",
+  "targetUrl": "https://synk.im/path/app/",
+  "configFile": "config.json",
+  "builder": {
+    "file": "tools/prepare-path-app-public.mjs",
+    "sha256": "e67b625fa97bd1edcd7c17e95b1fe4f02cecfcc5b1dbc4a864787b683b526f6b",
+    "esbuildVersion": "0.28.2"
+  },
+  "sourceFiles": [
+    {
+      "file": "docs/브랜드_폰트/플랫폼_웹/InterTight-Regular.woff2",
+      "sha256": "141691dedbf7ae404140c4666a7f654c5c9dceb3d9e7f1a3ba5aef84a6b093d5"
+    },
+    {
+      "file": "docs/브랜드_폰트/InterTight/OFL.txt",
+      "sha256": "7bb9fbf670a56dcfbb1889314d248fa21c92acf2548ae42c08a67788ea50336c"
+    },
+    {
+      "file": "docs/브랜드_폰트/SUIT/LICENSE_OFL.txt",
+      "sha256": "6d13f474c0732e3e2269bd2cc66df5ce0cbaba0b0e8836b0acfaf85309af72e9"
+    },
+    {
+      "file": "docs/브랜드_폰트/SUIT/SUIT-Variable.woff2",
+      "sha256": "aa894a204d5a6fbae259dac6868d350cbd373a390caee0313f92946af741df23"
+    },
+    {
+      "file": "experiences/path-app/account-ui.mjs",
+      "sha256": "1fdcb67358f3c57a7d9d1c32a0d27752c4adc7ccd894bf5ef3cab7a6cb24c38b"
+    },
+    {
+      "file": "experiences/path-app/account.mjs",
+      "sha256": "df9769384afcb81f2c69bbac24a85211fc6f9c814ac385ac4ef1504df6b4ec34"
+    },
+    {
+      "file": "experiences/path-app/app.mjs",
+      "sha256": "4e82d8db9be4da5a3e98d69ecb85af1939ae683ae6a0be049ae98d23d1b4ccc2"
+    },
+    {
+      "file": "experiences/path-app/content.mjs",
+      "sha256": "44d4880933984d204bfe2e4fea3f9a3f60113dcb59960fb0fe58bc3a4654f58a"
+    },
+    {
+      "file": "experiences/path-app/document.mjs",
+      "sha256": "224241afa4ada2ceb5030e396751b2f2fcaf5fe25e30f7a3ddf81cbd5f5061d6"
+    },
+    {
+      "file": "experiences/path-app/index.html",
+      "sha256": "81193c7fe110ef9ea048dc1b642fb24abcb24dcb19e91ea75cab8c557ee85682"
+    },
+    {
+      "file": "experiences/path-app/jobs-ui.mjs",
+      "sha256": "ffc5ffd4f31e3dc87ac34df6496d879ea7fdb4865a0601ab2a77a210edfa2600"
+    },
+    {
+      "file": "experiences/path-app/state.mjs",
+      "sha256": "38899f3af262cf7c7ef323a05031855d43c10e78aea3159a254127c2f1242b68"
+    },
+    {
+      "file": "experiences/path-app/styles.css",
+      "sha256": "463e920e153196a8e50ae84d2c9b2982f4486b58997868726221a55b26f5a177"
+    },
+    {
+      "file": "experiences/synk-account/src/core.mjs",
+      "sha256": "fa34a9fb4c8715282f481c17c33428ae0d8bfe12ecb9d6d7d0a8d725c7a094b8"
+    },
+    {
+      "file": "experiences/synk-account/src/document-sync.mjs",
+      "sha256": "0da24831486febacd16b89b59c27df7d2b4f5ccb42f62d854f0344aba52407fb"
+    },
+    {
+      "file": "experiences/synk-account/src/platform-entry.mjs",
+      "sha256": "48f39e2c57949005c5abe197b546e3518b8f3421e11b2b7b8786033b2e2712ac"
+    },
+    {
+      "file": "experiences/synk-account/src/product-account.mjs",
+      "sha256": "203270336542bce9e78dbf226243e7c78f5a0bfa2c4576fb4b45c27f6b5e99de"
+    }
+  ],
+  "files": [
+    {
+      "name": "app.mjs",
+      "bytes": 211867,
+      "sha256": "637e4e343bbbdf04d93ebe11fe4fce1e1cd2a2f2e6bf8e570338ee85933415cd"
+    },
+    {
+      "name": "assets/SUIT-Variable.woff2",
+      "bytes": 624536,
+      "sha256": "aa894a204d5a6fbae259dac6868d350cbd373a390caee0313f92946af741df23"
+    },
+    {
+      "name": "assets/InterTight.woff2",
+      "bytes": 108048,
+      "sha256": "141691dedbf7ae404140c4666a7f654c5c9dceb3d9e7f1a3ba5aef84a6b093d5"
+    },
+    {
+      "name": "assets/SUIT-LICENSE.txt",
+      "bytes": 4473,
+      "sha256": "6d13f474c0732e3e2269bd2cc66df5ce0cbaba0b0e8836b0acfaf85309af72e9"
+    },
+    {
+      "name": "assets/InterTight-LICENSE.txt",
+      "bytes": 4476,
+      "sha256": "7bb9fbf670a56dcfbb1889314d248fa21c92acf2548ae42c08a67788ea50336c"
+    },
+    {
+      "name": "styles.css",
+      "bytes": 28881,
+      "sha256": "c77a925522061e20e1149235408ef22b0fd702cbe1b0bb5978c08721d8924534"
+    },
+    {
+      "name": "config.json",
+      "bytes": 610,
+      "sha256": "eab2c5d961e981e08578c2682aaf05629e91718872ddb0f48104951d99d33869"
+    },
+    {
+      "name": "index.html",
+      "bytes": 1571,
+      "sha256": "8f0594010c99b5bae91ee9cc4a4023866b5dddefdbc93a276bd6ab9a36cd88d1"
+    }
+  ],
+  "transformations": [
+    "bundle complete PATH and canonical account module graph",
+    "relative approved font assets",
+    "self-only script and style CSP, configured account origins",
+    "entry cache tokens"
+  ],
+  "limitations": {
+    "registrationVerified": false,
+    "realLoginVerified": false,
+    "browserVerified": false,
+    "deployed": false
+  }
+}
