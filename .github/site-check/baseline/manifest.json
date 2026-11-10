@@ -1,7 +1,7 @@
 {
- "createdAt": "2026-11-10T01:37:08.124Z",
- "commit": "c8e3f9ed1aa2a856a2745807e49f526283efb282",
- "run": 42734971817,
+ "createdAt": "2026-11-10T03:15:08.205Z",
+ "commit": "d23d106bb51df4e08f0ca37f2dde36cceb9f11b0",
+ "run": 42745699640,
  "env": {
   "chromium": "151.0.7922.34",
   "os": "ubuntu24"
@@ -341,6 +341,20 @@
     "sha256": "653a76ac53f3532fa818401209265e194415bbe5c4a60b5527ca8f0528696bfe",
     "cssHeight": 6719,
     "run": 42376261951
+   }
+  },
+  "/path/app/": {
+   "desktop": {
+    "file": "desktop/path~app.jpg",
+    "sha256": "7883b2fdd89c940378de48904912133051b8aa6878f9e52557515c941c4e1566",
+    "cssHeight": 905,
+    "run": 42745699640
+   },
+   "mobile": {
+    "file": "mobile/path~app.jpg",
+    "sha256": "6d9c34db79f91d6efd1cb5913311df4dd81358b181fceef46f97a1abb87e7b3f",
+    "cssHeight": 844,
+    "run": 42745699640
    }
   },
   "/practice/": {

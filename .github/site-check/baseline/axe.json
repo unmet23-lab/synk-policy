@@ -43,6 +43,8 @@
  "/name/|mobile": {},
  "/nombre/|desktop": {},
  "/nombre/|mobile": {},
+ "/path/app/|desktop": {},
+ "/path/app/|mobile": {},
  "/path/|desktop": {},
  "/path/|mobile": {},
  "/practice/|desktop": {},
