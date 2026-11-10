@@ -16,9 +16,21 @@
   if (!accountKey || !Number.isSafeInteger(revision) || typeof guard != "function") throw new TypeError("Verified WORLD account required");
   if (personalMemory && (!identifier(personalMemory.accountKey) || !Number.isSafeInteger(personalMemory.revision) || personalMemory.revision < 1 || typeof personalMemory.storage?.getItem != "function" || typeof personalMemory.storage?.setItem != "function" || typeof personalMemory.connected != "boolean")) throw new TypeError("Verified personal WORLD memory required");
   let sync, primary, memory, memoryReady, personal, privacyBlocked = !1, closed = !1, run = null, generation = 0;
-  const coaches = /* @__PURE__ */ new Set(), memoryListeners = /* @__PURE__ */ new Set(), check = () => {
+  const enumerated = (target, store) => {
+  if (typeof store?.key !== "function" || !("length" in store)) return target;
+  Object.defineProperty(target, "length", { enumerable: true, get() {
+    check();
+    return store.length;
+  } });
+  target.key = (index) => {
+    check();
+    return store.key(index);
+  };
+  return target;
+};
+const coaches = /* @__PURE__ */ new Set(), memoryListeners = /* @__PURE__ */ new Set(), check = () => {
     if (guard(), closed || privacyBlocked) throw failure("WORLD account session ended", "MEMORY_SESSION_ENDED");
-  }, shared = {
+  }, shared = enumerated({
     getItem(key) {
       return check(), storage.getItem(key);
     },
@@ -28,7 +40,7 @@
     removeItem(key) {
       check(), storage.removeItem(key);
     }
-  }, ownerKey = (eventId) => `${OWNER}.${eventId}`;
+  },storage), ownerKey = (eventId) => `${OWNER}.${eventId}`;
   function owners(ids, now) {
     const raw = shared.getItem(OWNERS);
     try {
@@ -113,7 +125,7 @@
       createLearningSync: createSync
     };
     if (personalMemory && !personal) {
-      const own2 = personalMemory, ownStorage = Object.fromEntries(["getItem", "setItem", "removeItem"].map((method) => [method, (...args) => (check(), own2.storage[method]?.(...args))]));
+      const own2 = personalMemory, ownStorage = enumerated(Object.fromEntries(["getItem", "setItem", "removeItem"].map((method) => [method, (...args) => (check(), own2.storage[method]?.(...args))])),own2.storage);
       personal = make.createGame({
         gameId: "world-personal-memory",
         storage: ownStorage,
