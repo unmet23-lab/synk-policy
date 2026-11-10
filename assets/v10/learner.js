@@ -132,11 +132,21 @@ for (const root of document.querySelectorAll('[data-try]')) {
     return b;
   };
   const link = (label, href) => { const a = document.createElement('a'); a.className = 'btn btn-light'; a.href = href; a.innerHTML = label; return a; };
+  // 좁은 화면은 글(위) · 문제 카드 · 누를 곳(아래) 순서라, 답하거나 다음 문제로 넘어가면 바뀐 글이나 단추가 화면 밖에 걸릴 수 있다.
+  // 글 머리부터 end(단추 · 마지막 보기)까지 한 화면에 들면 그만큼 끌어 올리고, 안 들면(360×640 같은 작은 화면) 바뀐 글부터 보인다.
+  // 위 기준은 화면 위에 붙은 사이트 머리띠(.bar, 약 66px) 아래다 — 16px에 맞추면 때 글과 물음이 머리띠 뒤로 숨었다(11-10 검수)
+  const lift = end => {
+    if (!started || !narrow.matches || !end) return;
+    const bar = document.querySelector('.bar'), br = bar && getComputedStyle(bar).position === 'fixed' ? bar.getBoundingClientRect() : null;
+    const top = (br && br.bottom > 0 ? br.bottom : 0) + 12, head = when.parentElement.getBoundingClientRect(), bottom = end.getBoundingClientRect().bottom;
+    const behavior = reduce ? 'auto' : 'smooth';
+    if (bottom - head.top + top + 16 <= innerHeight) { if (head.top < top) scrollBy({ top: head.top - top, behavior }); else if (bottom > innerHeight - 16) scrollBy({ top: bottom - innerHeight + 16, behavior }); }
+    else if (head.top < top || head.top > innerHeight / 2) scrollBy({ top: head.top - top, behavior });
+  };
   const act = (...els) => {
     next.replaceChildren(...els);
     if (els[0] && document.activeElement && (root.contains(document.activeElement) || document.activeElement === document.body) && started) els[0].focus({ preventScroll: true });
-    // 좁은 화면은 글이 사진 아래로 내려가, 답한 뒤 누를 곳이 화면 밖에 걸릴 수 있다 — 필요한 만큼만 끌어 올린다
-    if (els[0] && started && narrow.matches) els[0].scrollIntoView({ block: 'nearest', behavior: reduce ? 'auto' : 'smooth' });
+    lift(els[0]);
   };
   let started = false;
   // 부품 그림을 눌러도 막히지 않게: 지금 단계의 주 단추와 같다.
@@ -164,13 +174,19 @@ for (const root of document.querySelectorAll('[data-try]')) {
     }
     next.replaceChildren();
     if (started) box.firstElementChild.focus({ preventScroll: true });
+    // 다음 문제(1분 뒤 · 30일 뒤)로 넘어갈 때도 새 때 · 물음부터 보이게
+    lift(box.lastElementChild);
   };
+  // 한 날: 실제 화면 한 장(shot), 또는 그날 처음 보는 문제(ask — 30일 뒤 다시 확인. 답하면 맞음 · 틀림 글로 바뀐다)
   const day = i => {
     const d = Q.days[i];
-    text(d.when, d.say, d.sub);
-    scene(d.at); showShot(d.shot); stepTo(d.step);
-    if (d.next) act(button(`${d.next} ${arrow}`, () => day(i + 1)));
-    else act(link(`${Q.go.label} <span class="arr" aria-hidden="true">${Q.go.arrow}</span>`, Q.go.href), button(Q.again, () => { started = true; first(); }, 'lw-link lw-again'));
+    scene(d.at); stepTo(d.step);
+    const onward = () => {
+      if (d.next) act(button(`${d.next} ${arrow}`, () => day(i + 1)));
+      else act(link(`${Q.go.label} <span class="arr" aria-hidden="true">${Q.go.arrow}</span>`, Q.go.href), button(Q.again, () => { started = true; first(); }, 'lw-link lw-again'));
+    };
+    if (d.ask) ask({ ...d.ask, when: d.when, say: d.say, sub: d.sub }, right => { const r = right ? d.right : d.wrong; text(null, r.say, r.sub); onward(); });
+    else { text(d.when, d.say, d.sub); showShot(d.shot); onward(); }
   };
   const second = () => {
     scene(Q.start); stepTo(1);
