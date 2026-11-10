@@ -1,5 +1,5 @@
 {
-  "version": "2026-09-15-selected-experiences-copy-9bfc4e4ce8-rhythm-20261001-copy-3910676d01-release-copy-3e4ed3be6d-en-002b14631325-bm-platform-20261007-a885b0d303-travel-20261007-ce148dd860-real-20261007-ab58ee7076-homepage-current-20261009-033c24b61f29-homepage-v10-20261010-172a6de24d1b",
+  "version": "2026-09-15-selected-experiences-copy-9bfc4e4ce8-rhythm-20261001-copy-3910676d01-release-copy-3e4ed3be6d-en-002b14631325-bm-platform-20261007-a885b0d303-travel-20261007-ce148dd860-real-20261007-ab58ee7076-homepage-current-20261009-033c24b61f29-homepage-v10-20261010-f4b25ff9f578",
   "updatedAt": "2026-11-10",
   "docs": [
     {
@@ -88,7 +88,7 @@
       "id": "lab",
       "title": "SYNK LAB — Step into a K-drama, and speak Korean",
       "paragraphs": [
-        "SYNK LAB makes Korean you actually speak. In our K-drama role-play you are the international student in the story and answer out loud; when the scene ends, a coach points out just one thing and you try that line once more. You can play an Episode 1 scene right now; the pilot and the TOPIK Level 4 courses are in preparation. Daily practice happens in SYNK WORLD.",
+        "SYNK LAB makes Korean you actually speak. You can listen and speak along with the Episode 1 scene now, and use SYNK WORLD for daily practice and games. The full pilot that listens to your speech and gives a coach’s feedback, and the TOPIK Level 4 courses, are in preparation.",
         "K-drama role-play — you are the new international student in a K-drama; when a character speaks to you, you answer out loud and the story carries on. If your line doesn’t land, the character asks again in the scene, and the coach gives no note unless it is sure. The student-cafeteria scene of Episode 1, “First Day of Term”, is on the LAB page to hear and say along with.",
         "Games — we have made eight: Racing, Words in Rhythm, Wind Path, Order Rush, The Teacher Is Back, Entry Check, Blank Slice and Talk Rally, and in November we added Transfer Rush, Snap Words and Board Decode to SYNK WORLD. Sign in with SYNK ID on the SYNK platform to play them in SYNK WORLD, plus two beginner games you can start without knowing Hangul.",
         "One-year course — an in-person course that prepares you for TOPIK Level 4 and for classes and daily life at a Korean university. In every 90-minute class, 30 minutes are group speaking, and native Korean conversation, English classes and K-POP activities are planned.",
@@ -232,7 +232,7 @@
         "The student-cafeteria scene of Episode 1, “First Day of Term”, is on the LAB page: listen, record your own voice and compare it with the model reading. That recording plays back only on your device and is never sent anywhere. Price and launch date will be announced once they are set.",
         "We are preparing a Korean patent application for the personalization technology (planned for 2028). Until it is filed, we do not publish the details of the technology."
       ],
-      "updatedAt": "2026-11-04"
+      "updatedAt": "2026-11-10"
     },
     {
       "id": "shift",
@@ -744,7 +744,7 @@
         "What kind of education does LAB offer?",
         "Is LAB a Korean language academy?"
       ],
-      "answer": "SYNK LAB makes Korean you actually speak. In our K-drama role-play you are the international student in the story and answer out loud; when the scene ends, a coach points out just one thing and you try that line once more. You can play an Episode 1 scene right now; the pilot and the TOPIK Level 4 courses are in preparation. Daily practice happens in SYNK WORLD.\n\nK-drama role-play — you are the new international student in a K-drama; when a character speaks to you, you answer out loud and the story carries on. If your line doesn’t land, the character asks again in the scene, and the coach gives no note unless it is sure. The student-cafeteria scene of Episode 1, “First Day of Term”, is on the LAB page to hear and say along with.\n\nGames — we have made eight: Racing, Words in Rhythm, Wind Path, Order Rush, The Teacher Is Back, Entry Check, Blank Slice and Talk Rally, and in November we added Transfer Rush, Snap Words and Board Decode to SYNK WORLD. Sign in with SYNK ID on the SYNK platform to play them in SYNK WORLD, plus two beginner games you can start without knowing Hangul.\n\nOne-year course — an in-person course that prepares you for TOPIK Level 4 and for classes and daily life at a Korean university. In every 90-minute class, 30 minutes are group speaking, and native Korean conversation, English classes and K-POP activities are planned.\n\nTextbooks — six Synapse Core books for grammar and two Synapse Talk books for conversation; all eight are written and being prepared for publication.\n\nDates and entry requirements will be in the enrolment notice, and learning results are not guaranteed.",
+      "answer": "SYNK LAB makes Korean you actually speak. You can listen and speak along with the Episode 1 scene now, and use SYNK WORLD for daily practice and games. The full pilot that listens to your speech and gives a coach’s feedback, and the TOPIK Level 4 courses, are in preparation.\n\nK-drama role-play — you are the new international student in a K-drama; when a character speaks to you, you answer out loud and the story carries on. If your line doesn’t land, the character asks again in the scene, and the coach gives no note unless it is sure. The student-cafeteria scene of Episode 1, “First Day of Term”, is on the LAB page to hear and say along with.\n\nGames — we have made eight: Racing, Words in Rhythm, Wind Path, Order Rush, The Teacher Is Back, Entry Check, Blank Slice and Talk Rally, and in November we added Transfer Rush, Snap Words and Board Decode to SYNK WORLD. Sign in with SYNK ID on the SYNK platform to play them in SYNK WORLD, plus two beginner games you can start without knowing Hangul.\n\nOne-year course — an in-person course that prepares you for TOPIK Level 4 and for classes and daily life at a Korean university. In every 90-minute class, 30 minutes are group speaking, and native Korean conversation, English classes and K-POP activities are planned.\n\nTextbooks — six Synapse Core books for grammar and two Synapse Talk books for conversation; all eight are written and being prepared for publication.\n\nDates and entry requirements will be in the enrolment notice, and learning results are not guaranteed.",
       "sourceId": "lab",
       "relatedIds": [
         "lab-vision",
@@ -757,7 +757,7 @@
         "label": "See LAB",
         "href": "/en/lab/"
       },
-      "reviewedAt": "2026-11-04",
+      "reviewedAt": "2026-11-10",
       "aliases": [
         "SYNK LAB을 소개해 주세요",
         "LAB은 어떤 교육을 하나요?",
@@ -782,7 +782,7 @@
         "What future is LAB working toward?",
         "Tell me about SYNK LAB’s educational vision"
       ],
-      "answer": "To get people speaking Korean, as the international student in a K-drama story.\n\nSYNK LAB makes Korean you actually speak. In our K-drama role-play you are the international student in the story and answer out loud; when the scene ends, a coach points out just one thing and you try that line once more. You can play an Episode 1 scene right now; the pilot and the TOPIK Level 4 courses are in preparation. Daily practice happens in SYNK WORLD.",
+      "answer": "To get people speaking Korean, as the international student in a K-drama story.\n\nSYNK LAB makes Korean you actually speak. You can listen and speak along with the Episode 1 scene now, and use SYNK WORLD for daily practice and games. The full pilot that listens to your speech and gives a coach’s feedback, and the TOPIK Level 4 courses, are in preparation.",
       "sourceId": "lab",
       "relatedIds": [
         "lab-intro",
@@ -793,7 +793,7 @@
         "label": "See LAB",
         "href": "/en/lab/"
       },
-      "reviewedAt": "2026-10-30",
+      "reviewedAt": "2026-11-10",
       "aliases": [
         "LAB의 비전은 무엇인가요?",
         "랩이 지향하는 미래가 궁금해요",
@@ -5244,7 +5244,7 @@
     "lab": {
       "name": "SYNK LAB",
       "headline": "Step into a K-drama, and speak Korean",
-      "subtext": "SYNK LAB makes Korean you actually speak. In our K-drama role-play you are the international student in the story and answer out loud; when the scene ends, a coach points out just one thing and you try that line once more. You can play an Episode 1 scene right now; the pilot and the TOPIK Level 4 courses are in preparation. Daily practice happens in SYNK WORLD."
+      "subtext": "SYNK LAB makes Korean you actually speak. You can listen and speak along with the Episode 1 scene now, and use SYNK WORLD for daily practice and games. The full pilot that listens to your speech and gives a coach’s feedback, and the TOPIK Level 4 courses, are in preparation."
     },
     "shift": {
       "name": "SYNK SHIFT",
