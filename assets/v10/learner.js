@@ -74,7 +74,7 @@ for (const root of document.querySelectorAll('[data-lw]')) {
   };
   narrow.addEventListener('change', mode); mode();
   // 부품은 실제 화면 그림이다. 그 안의 단추를 눌러 보는 사람이 막히지 않게 누르면 다음 걸음으로 간다(키보드 · 화면 읽기는 머리의 진짜 단추).
-  const go = root.querySelector('.lw-go a.btn');
+  const go = root.querySelector('.lw-go a.btn, .lw-go a.k-btn'); // 한국어 뼈대 홈은 k-btn(2026-11-11)
   if (go) for (const piece of root.querySelectorAll('.lw-piece')) {
     piece.classList.add('is-go');
     piece.addEventListener('click', () => { location.href = go.href; });

@@ -321,8 +321,8 @@ body .more>summary,body details.more>summary{font-weight:600}
   .k-svc>li{grid-template-columns:minmax(0,1fr) auto;align-items:center;row-gap:10px;padding:18px 0}
   .k-svc>li>h3,.k-svc>li>.k-body{grid-column:1/-1}
   .k-svc>li>.k-btn{grid-column:2;grid-row:3;min-height:44px;padding:0 16px}
-  .k-svc details{grid-column:1/-1;grid-row:3}
-  .k-svc details[open]{grid-row:4}
+  .k-svc details{grid-column:1;grid-row:3}
+  .k-svc details[open]{grid-column:1/-1;grid-row:4}
   .k-teacher-me{grid-template-columns:96px minmax(0,1fr);gap:16px}
   .k-teacher-me .lc-photo img{width:96px;height:96px}
   .k-teacher-me>div:not(.lc-photo){display:contents}
@@ -625,7 +625,7 @@ body[data-k="pulse"] .pv-now strong{font-size:var(--k2)}
 body[data-k="pulse"] .pv-ask-note{font-size:var(--k1)}
 /* 휴대폰: 목표별 예시 네 칸은 옆으로 넘겨 본다(쪽 길이) */
 @media (max-width:700px){
-  .k-at-goals .goal-grid{display:flex;gap:16px;margin-inline:calc(var(--gut)*-1);padding-inline:var(--gut);overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none}
+  .k-at-goals .goal-grid{display:flex;gap:16px;margin-inline:calc(var(--gut)*-1);padding-inline:var(--gut);scroll-padding-inline:var(--gut);overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none}
   .k-at-goals .goal-grid::-webkit-scrollbar{display:none}
   .k-at-goals .goal.panel{flex:0 0 84%;scroll-snap-align:start}
 }
@@ -652,3 +652,7 @@ body[data-k="pulse"] .pv-ask-note{font-size:var(--k1)}
 /* 첫 화면의 머리 줄 — 바로 아래 쪽 주장의 선이 오므로 머리 줄 자신의 선은 감춘다(맹검 4회: 「가로선이 이중으로 겹친다」) */
 .k-hero>.wrap>.k-rule,.k-sv-hero>.wrap>.k-rule{margin-bottom:14px}
 .k-hero>.wrap>.k-rule::after,.k-sv-hero>.wrap>.k-rule::after{content:none}
+
+/* 머리 줄을 얹은 옛 판(PULSE 작품 · 영상 제작 · AI 모델 · 연출, PATH 서울 하루)은 제 위 선 · 위 여백을 걷는다 — 머리 줄 아래 선이 한 줄 더 서지 않게(화면 검수 5.2) */
+.k-rule+.pv-head,.k-rule+.pv-cast-head,.k-rule+.pv-maker{border-top:0;padding-top:0}
+.k-pa-day .pa-plan{border-top:0;padding-top:0}
