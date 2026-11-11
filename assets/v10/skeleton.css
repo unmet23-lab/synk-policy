@@ -322,7 +322,8 @@ body .more>summary,body details.more>summary{font-weight:600}
   .k-svc>li>h3,.k-svc>li>.k-body{grid-column:1/-1}
   .k-svc>li>.k-btn{grid-column:2;grid-row:3;min-height:44px;padding:0 16px}
   .k-svc details{grid-column:1;grid-row:3}
-  .k-svc details[open]{grid-column:1/-1;grid-row:4}
+  .k-svc details[open]{grid-column:1/-1;grid-row:3}
+  .k-svc>li:has(details[open])>.k-btn{grid-column:1/-1;grid-row:4;justify-self:start}  /* 펴도 요약은 제자리, 단추가 아래 줄로(화면 검수 5.2) */
   .k-teacher-me{grid-template-columns:96px minmax(0,1fr);gap:16px}
   .k-teacher-me .lc-photo img{width:96px;height:96px}
   .k-teacher-me>div:not(.lc-photo){display:contents}
@@ -655,4 +656,6 @@ body[data-k="pulse"] .pv-ask-note{font-size:var(--k1)}
 
 /* 머리 줄을 얹은 옛 판(PULSE 작품 · 영상 제작 · AI 모델 · 연출, PATH 서울 하루)은 제 위 선 · 위 여백을 걷는다 — 머리 줄 아래 선이 한 줄 더 서지 않게(화면 검수 5.2) */
 .k-rule+.pv-head,.k-rule+.pv-cast-head,.k-rule+.pv-maker{border-top:0;padding-top:0}
-.k-pa-day .pa-plan{border-top:0;padding-top:0}
+@media (min-width:1241px){.k-pa-day .pa-plan{border-top:0;padding-top:0}}  /* 1240px 이하는 지도 뒤에 오므로 옛 선 · 여백을 둔다(화면 검수 5.2) */
+/* 400px 이하: 요약 「누구에게 · 남는 것 · 순서」와 문의 단추가 한 줄에 다 들지 않는다 — 단추를 요약 아래 줄로(펼친 내용은 요약과 단추 사이) */
+@media (max-width:400px){.k-svc>li>.k-btn{grid-column:1/-1;grid-row:4;justify-self:start}.k-svc details,.k-svc details[open]{grid-column:1/-1;grid-row:3}.k-svc summary{white-space:nowrap;gap:6px}}

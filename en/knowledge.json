@@ -1,5 +1,5 @@
 {
-  "version": "2026-09-15-selected-experiences-copy-9bfc4e4ce8-rhythm-20261001-copy-3910676d01-release-copy-3e4ed3be6d-en-002b14631325-bm-platform-20261007-a885b0d303-travel-20261007-ce148dd860-real-20261007-ab58ee7076-homepage-current-20261009-033c24b61f29-homepage-v10-20261010-f4b25ff9f578",
+  "version": "2026-09-15-selected-experiences-copy-9bfc4e4ce8-rhythm-20261001-copy-3910676d01-release-copy-3e4ed3be6d-en-002b14631325-bm-platform-20261007-a885b0d303-travel-20261007-ce148dd860-real-20261007-ab58ee7076-homepage-current-20261009-033c24b61f29-homepage-v10-20261010-b37e03c37b82",
   "updatedAt": "2026-11-10",
   "docs": [
     {
@@ -311,7 +311,7 @@
     },
     {
       "id": "pulse",
-      "title": "SYNK PULSE — Ten years on set, an actor directs AI models · AI ad production",
+      "title": "SYNK PULSE — AI models can look real. We make them act. · AI ad production",
       "paragraphs": [
         "SYNK PULSE makes product ads, brand films, AI model lookbooks and how-to videos with AI, from plan to final cut. We also create the music and stories of Mongle, Kkamong and Marin, and look for partners to license them or make something together.",
         "We start with where a video will run and who will see it. We show you every cut as a scene image before the video, build only from the cuts you have checked, and deliver files sized for websites, product pages and social channels.",
@@ -442,7 +442,7 @@
         "SYNK — AI that gets to know you the more you use it.",
         "SYNK LAB — Step into a K-drama, and speak Korean.",
         "SYNK SHIFT — AI lectures, plus work automation.",
-        "SYNK PULSE — Ten years on set, an actor directs AI models. We make AI video ads.",
+        "SYNK PULSE — AI models can look real. We make them act. We make AI video ads.",
         "SYNK PATH — Studying, working and living in Korea, prepared with you.",
         "Each business page separates what you can use today from what is still in preparation."
       ],
@@ -593,7 +593,7 @@
         "What are the visions of SYNK LAB, SHIFT, and PULSE?",
         "How do the visions of LAB, SHIFT, and PULSE differ?"
       ],
-      "answer": "In one line each:\n\nSYNK — AI that gets to know you the more you use it.\n\nSYNK LAB — Step into a K-drama, and speak Korean.\n\nSYNK SHIFT — AI lectures, plus work automation.\n\nSYNK PULSE — Ten years on set, an actor directs AI models. We make AI video ads.\n\nSYNK PATH — Studying, working and living in Korea, prepared with you.\n\nEach business page separates what you can use today from what is still in preparation.",
+      "answer": "In one line each:\n\nSYNK — AI that gets to know you the more you use it.\n\nSYNK LAB — Step into a K-drama, and speak Korean.\n\nSYNK SHIFT — AI lectures, plus work automation.\n\nSYNK PULSE — AI models can look real. We make them act. We make AI video ads.\n\nSYNK PATH — Studying, working and living in Korea, prepared with you.\n\nEach business page separates what you can use today from what is still in preparation.",
       "sourceId": "vision",
       "relatedIds": [
         "synk-vision",
@@ -5253,7 +5253,7 @@
     },
     "pulse": {
       "name": "SYNK PULSE",
-      "headline": "Ten years on set, an actor directs AI models",
+      "headline": "AI models can look real. We make them act.",
       "subtext": "A founder who has appeared on Netflix and tvN and led a web drama seen 10 million times on Facebook directs the glance, the hand holding the product, the timing of a smile. A first conversation needs just one product photo and where the ad will run."
     },
     "path": {
