@@ -259,9 +259,20 @@ namespace Synk.SignalInstaller
                 install(progress);
                 stage = "verify-installed";
                 VerifyInstalled(progress);
-                stage = "relaunch";
-                launch(Path.Combine(session.Directory,spec.ExecutableName),"");
+                // The verified new version is committed before it is opened. Once
+                // it runs, its files are in use and can no longer be rolled back,
+                // so a failure after this point must never start a restore.
+                stage = "commit";
                 EndTransaction(backup,"updated");
+                mutationStarted = false;
+                stage = "relaunch";
+                try { launch(Path.Combine(session.Directory,spec.ExecutableName),""); }
+                catch (Exception launchFailure)
+                {
+                    RecordUpdateFailure(session.Version,stage,"updated",launchFailure,null);
+                    TryCleanupBackupPayload(backup);
+                    return new AutomaticUpdateResult { Updated=true, Relaunched=false, Message="업데이트를 마쳤어요. 앱을 다시 열어 주세요." };
+                }
                 // Retain the compact transaction receipt. Verified old application
                 // files are removed only from this invocation's private cache.
                 TryCleanupBackupPayload(backup);
@@ -280,7 +291,15 @@ namespace Synk.SignalInstaller
                     VerifyPrevious(session);
                     string marker = WriteRecoveryMarker(session, mutationStarted ? "rolled-back" : "unchanged");
                     if (backup != null&&mutationStarted) EndTransaction(backup,"restored");
-                    launch(Path.Combine(session.Directory,spec.ExecutableName),"--synk-update-recovery="+session.Nonce);
+                    // The verified previous version is settled here: failing only to open
+                    // it must not turn into a recovery barrier that blocks later updates.
+                    try { launch(Path.Combine(session.Directory,spec.ExecutableName),"--synk-update-recovery="+session.Nonce); }
+                    catch (Exception launchFailure)
+                    {
+                        RecordUpdateFailure(session.Version,"relaunch",mutationStarted?"rolled-back":"unchanged",launchFailure,failure);
+                        if (backup != null) TryCleanupBackupPayload(backup);
+                        return new AutomaticUpdateResult { Restored=true, Relaunched=false, RecoveryFile=marker, Message="업데이트를 마치지 못해 이전 버전으로 두었어요. 앱을 다시 열어 주세요.\n"+failure.Message };
+                    }
                     if (backup != null) TryCleanupBackupPayload(backup);
                     return new AutomaticUpdateResult { Restored=true, Relaunched=true, RecoveryFile=marker, Message="업데이트를 마치지 못해 이전 버전을 다시 열었어요. 앱에서 다시 해 볼 수 있어요.\n"+failure.Message };
                 }
@@ -332,7 +351,7 @@ namespace Synk.SignalInstaller
         void RestorePrevious(UpdateBackup backup, Action<InstallProgress> progress)
         {
             if (backup == null || activeTransaction!=backup.Directory) throw new IOException("되돌릴 파일 위치가 맞지 않아요.");
-            var running=Process.GetProcessesByName(Path.GetFileNameWithoutExtension(spec.ExecutableName));try { if (running.Length!=0) throw new IOException("앱이 켜져 있어 되돌릴 파일을 남겨 뒀어요. 앱을 닫아 주세요."); } finally { foreach (var process in running) process.Dispose(); }
+            if (ApplicationProcessCount()!=0) throw new IOException("앱이 켜져 있어 되돌릴 파일을 남겨 뒀어요. 앱을 닫아 주세요.");
             RejectReparsePoints(backup.OriginalDirectory);RejectReparsePoints(backup.Directory);
             foreach (var file in backup.Files) if (HashFile(Inside(Path.Combine(backup.Directory,"application"),file.RelativePath))!=file.SHA256) throw new IOException("되돌릴 원본을 확인하지 못했어요.");
             progress(new InstallProgress(InstallStage.Restoring, "이전 버전으로 되돌려요","앱 파일과 설치 정보를 되돌려요.",null));
@@ -381,23 +400,19 @@ namespace Synk.SignalInstaller
             var security=new DirectorySecurity();security.SetAccessRuleProtection(true,false);var sid=WindowsIdentity.GetCurrent().User;security.SetOwner(sid);security.AddAccessRule(new FileSystemAccessRule(sid,FileSystemRights.FullControl,InheritanceFlags.ContainerInherit|InheritanceFlags.ObjectInherit,PropagationFlags.None,AccessControlType.Allow));new DirectoryInfo(root).SetAccessControl(security);
         }
         // Electron's renderer, GPU and crash-reporter children can outlive the main
-        // process for a moment, and Preflight refuses any process of this name. Wait
-        // passively within a limit; never kill, and leave the decision to Preflight.
+        // process for a moment, and Preflight refuses any process of this name in this
+        // Windows session. Wait passively within a limit; never kill, and leave the
+        // decision to Preflight.
         void WaitForApplicationProcesses(int milliseconds)
         {
-            string name=Path.GetFileNameWithoutExtension(spec.ExecutableName);
             for(var clock=Stopwatch.StartNew();clock.ElapsedMilliseconds<milliseconds;Thread.Sleep(100))
-            {
-                Process[] running=Process.GetProcessesByName(name);
-                int count=running.Length;
-                foreach(Process process in running)process.Dispose();
-                if(count==0)return;
-            }
+                if(ApplicationProcessCount()==0)return;
         }
+        // Diagnostics name only this session's copies, the ones that blocked the update.
         List<string> RunningApplicationProcesses()
         {
             var rows=new List<string>();
-            foreach(Process process in Process.GetProcessesByName(Path.GetFileNameWithoutExtension(spec.ExecutableName)))
+            foreach(Process process in ApplicationProcessesInSession(CurrentSessionId()))
             {
                 using(process)
                 {
