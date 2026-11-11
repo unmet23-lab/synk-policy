@@ -322,8 +322,9 @@ body .more>summary,body details.more>summary{font-weight:600}
   .k-svc>li>h3,.k-svc>li>.k-body{grid-column:1/-1}
   .k-svc>li>.k-btn{grid-column:2;grid-row:3;min-height:44px;padding:0 16px}
   .k-svc details{grid-column:1;grid-row:3}
-  .k-svc details[open]{grid-column:1/-1;grid-row:3}
-  .k-svc>li:has(details[open])>.k-btn{grid-column:1/-1;grid-row:4;justify-self:start}  /* 펴도 요약은 제자리, 단추가 아래 줄로(화면 검수 5.2) */
+  .k-svc details[open]{grid-column:1/-1;grid-row:4}
+  /* :has()를 아는 브라우저만 — 펴도 요약은 제자리, 단추가 아래 줄로. 모르는 브라우저는 펼친 접이가 다음 줄로 내려가 단추를 덮지 않는다(화면 검수 5.2) */
+  @supports selector(:has(a)){.k-svc details[open]{grid-row:3}.k-svc>li:has(details[open])>.k-btn{grid-column:1/-1;grid-row:4;justify-self:start}}
   .k-teacher-me{grid-template-columns:96px minmax(0,1fr);gap:16px}
   .k-teacher-me .lc-photo img{width:96px;height:96px}
   .k-teacher-me>div:not(.lc-photo){display:contents}

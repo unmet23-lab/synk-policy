@@ -25,6 +25,7 @@
 .pv-copy{position:absolute;left:0;bottom:clamp(96px,13vh,136px);max-width:min(62%,880px)}
 .pv-copy .label{margin:0}
 .pv-h1{margin:16px 0 0;font-size:clamp(36px,5.4vw,84px);line-height:1.1}
+
 .pv-hall .lead{margin:24px 0 0;max-width:30em;font-size:17px;line-height:1.7;color:var(--ink-2);font-weight:450}
 .pv-side{position:absolute;right:0;bottom:clamp(96px,13vh,136px);display:flex;flex-direction:column;align-items:flex-end;gap:20px;text-align:right;max-width:30%}
 .pv-now{margin:0;min-height:44px}
@@ -155,8 +156,13 @@
   .pv-tile.is-tall{flex:1 1 calc(50% - clamp(16px,2vw,28px))}
 }
 @media (max-width:900px){
-  .pv-copy{right:0;max-width:none;bottom:214px}
-  .pv-side{left:0;right:0;bottom:92px;align-items:flex-start;text-align:left;max-width:none;gap:14px}
+  /* 가로형(화면이 4:5보다 넓음) — 글 칸과 오른쪽 칸을 바닥에서 고정 거리(214 · 92px)로 띄우면, 오른쪽 칸이 길 때(한국어 값 안내 두 줄) 소개 줄과 작품 줄이
+     겹치고 제목이 세 줄이면(영어) 머리글이 머리 막대 밑으로 들어갔다(11-11 검수). 아래에서부터 차례로 쌓고(오른쪽 칸 바닥 92px · 글 칸과 40px),
+     모자라면 첫 화면이 내용만큼 길어진다(쇼릴 · 그늘은 inset:0이라 따라 는다). 세로형은 아래 ①-2가 이 값들을 되돌린다. */
+  .pv-hall{height:auto;min-height:max(600px,100vh);min-height:max(600px,100svh)}
+  .pv-hall-in{position:relative;inset:auto;min-height:inherit;display:flex;flex-direction:column;justify-content:flex-end;padding:92px 0}
+  .pv-copy{position:static;max-width:none}
+  .pv-side{position:static;margin-top:40px;align-items:flex-start;text-align:left;max-width:none;gap:14px}
   .pv-now{min-height:0}
   .pv-now strong{font-size:13.5px}
   .pv-now span{display:none}
@@ -176,11 +182,10 @@
   .pv-cast-acts .pv-link{margin-left:10px}
 }
 @media (max-width:600px){
-  .pv-hall{min-height:640px}
-  .pv-copy{bottom:200px}
+  .pv-hall{min-height:max(640px,100vh);min-height:max(640px,100svh)}
+  .pv-hall-in{padding-bottom:84px}
   .pv-h1{font-size:clamp(34px,10vw,44px)}
   .pv-hall .lead{font-size:16px;margin-top:18px}
-  .pv-side{bottom:84px}
   .btn.pv-cta{width:100%;justify-content:space-between}
   .pv-index{gap:18px}
   .pv-index button span{width:40px}
@@ -200,7 +205,7 @@
   .pv-reel,.pv-hall::after{bottom:auto;height:100vh;height:100svh}
   /* 글은 화면 아래 44% 안에만 있으니 바닥 그늘을 거기서만 짙게 한다(턱 자리는 거의 그대로) — 끝 색은 아래 칸과 같은 바탕색 */
   .pv-hall::after{background:linear-gradient(90deg,rgba(0,0,0,.66),rgba(0,0,0,0) 60%),linear-gradient(0deg,#0a0a0b,rgba(10,10,11,.78) 14%,rgba(10,10,11,.6) 34%,rgba(10,10,11,0) 44%),linear-gradient(180deg,rgba(0,0,0,.4),rgba(0,0,0,0) 22%)}
-  .pv-hall-in{position:relative;inset:auto;display:grid;grid-template-columns:minmax(0,1fr);
+  .pv-hall-in{position:relative;inset:auto;min-height:0;padding:0;justify-content:normal;display:grid;grid-template-columns:minmax(0,1fr);
     grid-template-rows:minmax(calc(50vh + (var(--pv-face) - .5) * max(100vh,177.78vw) + 12px),1fr) repeat(5,auto);
     grid-template-rows:minmax(calc(50svh + (var(--pv-face) - .5) * max(100svh,177.78vw) + 12px),1fr) repeat(5,auto)}
   .pv-hall-in::before{content:'';grid-area:1/1/6/2;min-height:100vh;min-height:100svh}
@@ -227,3 +232,10 @@
   .pv-frame video,.pv-screen video,.pv-face img{transition:none}
   .pv-dark .reveal,.pv-ask .reveal{transform:none;transition:none}
 }
+/* 2026-11-11 영어 제목: 가장 긴 줄 「We make them act.」(약 9.2em)이 글 칸 안에 들게 글자 크기를 맞춘다 — 넓은 화면은 82px 위로 키우지 않고(글 칸 769px 고정),
+   좁은 화면은 칸 폭(화면 − 여백 둘)의 1/9.6을 넘지 않게. 줄을 한 줄로 묶기만 하면 휴대폰에서 칸을 5~14px 넘었다. */
+/* 1550px 위에서는 셋째 줄이 쇼릴의 세로 작품 칸(화면 왼쪽 43%부터)에 들어가, 흰 침구 · 흰 셔츠 컷(04 · 10.4~12.3초)에서 「act.」가 흐려졌다(11-11 검수) —
+   글자 크기는 두고 세로형 머리글과 같은 옅은 그림자로 받친다. */
+html[lang="en"] .pv-h1{font-size:clamp(36px,5.2vw,82px);text-shadow:0 1px 10px rgba(0,0,0,.6)}
+@media (max-width:600px){html[lang="en"] .pv-h1{font-size:clamp(28px,min(10vw,(100vw - var(--gut) * 2) / 9.6),44px)}}
+@media (max-width:600px) and (max-aspect-ratio:4/5){html[lang="en"] .pv-h1{font-size:clamp(28px,min(10vw,5.2svh,(100vw - var(--gut) * 2) / 9.6),44px)}}
