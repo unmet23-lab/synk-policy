@@ -2,35 +2,35 @@
   "schemaVersion": 1,
   "product": "platform",
   "channel": "preview",
-  "version": "0.4.87",
-  "releaseId": "platform-preview-0.4.87",
-  "buildId": "20261111.1",
+  "version": "0.4.88",
+  "releaseId": "platform-preview-0.4.88",
+  "buildId": "20261111.2",
   "manifestUrl": "https://synk.im/desktop/releases/preview.json",
   "baselines": [
     {
       "platform": "win32",
       "arch": "x64",
-      "url": "https://github.com/unmet23-lab/synk-policy/releases/download/platform-preview-0.4.86/SYNK-Platform-Preview-0.4.86-Signal-win-x64.exe",
-      "bytes": 408642560,
-      "sha256": "51413aba8a933fa482c046854d4f46145d6a44722deecbfd13dd9324ec27f6ab",
-      "asarSHA256": "928f3b95fbae3622a441cc982edd1179bac7f32cc5d5196292a8185a394a2875",
-      "backendSHA256": "3dabe1a2287f9594c8145df3f58bfc00f2ea5bd23106b25d0aa26bfd386fb22a"
+      "url": "https://github.com/unmet23-lab/synk-policy/releases/download/platform-preview-0.4.87/SYNK-Platform-Preview-0.4.87-Signal-win-x64.exe",
+      "bytes": 408649216,
+      "sha256": "11bb783c8bb22c862d423cb058acf54c5036a9ebf9606f7eca2ff9e489620e8f",
+      "asarSHA256": "4f3b64c79c0a140fe6fc1a94b241d7de20ff0fb3418113cc62bc652c3c4670a3",
+      "backendSHA256": "d4ebfb4935dad564fa18f14b2277fcb8281550de19047d34c81bd0f1dc0229be"
     },
     {
       "platform": "darwin",
       "arch": "arm64",
-      "url": "https://github.com/unmet23-lab/synk-policy/releases/download/platform-preview-0.4.86/SYNK-Platform-Preview-0.4.86-Signal-mac-arm64.dmg",
-      "bytes": 463029726,
-      "sha256": "26abf88987271f334ef540fc3894ecd29d177d2a2738240ff652c807d140265d",
-      "asarSHA256": "f9fdd63e8d065c832cda7ae97c3ffedf22ddb19efc7ae9925b4727682c00aeb6"
+      "url": "https://github.com/unmet23-lab/synk-policy/releases/download/platform-preview-0.4.87/SYNK-Platform-Preview-0.4.87-Signal-mac-arm64.dmg",
+      "bytes": 463024194,
+      "sha256": "011692d152d03f93e208143e297562470d724ca5c50dbf76d68af3c99ea5b34e",
+      "asarSHA256": "32fdbc8c0a1fddad86f5dcbe5eaeeaf5ab04daeefbcfeb4996b3e1dcd43cc6ae"
     },
     {
       "platform": "darwin",
       "arch": "x64",
-      "url": "https://github.com/unmet23-lab/synk-policy/releases/download/platform-preview-0.4.86/SYNK-Platform-Preview-0.4.86-Signal-mac-x64.dmg",
-      "bytes": 479583983,
-      "sha256": "038496df7d683a0c23079749336bf85c00ac4355e458db63c106706a727997db",
-      "asarSHA256": "93e196320de297c0c81ce6263f888cdaa2ee0677ea6800c0547002f071184b74"
+      "url": "https://github.com/unmet23-lab/synk-policy/releases/download/platform-preview-0.4.87/SYNK-Platform-Preview-0.4.87-Signal-mac-x64.dmg",
+      "bytes": 479606584,
+      "sha256": "078d0fad5731f31c6e05a9bd19f798fe20d25dc2e3ed317f78369f28c19a886f",
+      "asarSHA256": "068a584e5244fb1f89040b5ef25616804658a47246c4a5af7394b1daca80090f"
     }
   ],
   "additionalLegacyPins": [
@@ -63,7 +63,7 @@
     }
   ],
   "electronVersion": "44.10.0",
-  "sourceHash": "3400b3a748376ec6c5931a66db8890268b24e17b7635d514907aaa4f30c5b47e",
+  "sourceHash": "27700e1f79d5b1eaee1eda23ecae3276957a027550487f50ef11232d18f3d7f2",
   "sourceFiles": [
     {
       "path": "assets/launcher/benefit-care.webp",
@@ -279,6 +279,11 @@
       "path": "assets/launcher/world-cover.webp",
       "bytes": 269190,
       "sha256": "de50792266bbafb375e85be5b34799b6039246087c1146509a814643cc44d7be"
+    },
+    {
+      "path": "assets/launcher/world-qr.svg",
+      "bytes": 1191,
+      "sha256": "a1a596dc35654afd774be8e2222acc436bd9033ffd7889fe07f5b96eff704fa5"
     },
     {
       "path": "assets/launcher/world.png",
@@ -523,7 +528,7 @@
     {
       "path": "renderer/generated/member-activity-data.manifest.json",
       "bytes": 4795,
-      "sha256": "dc4ccf83bbd5f95f0088163c403022926847df5bb825828b690466b1ef19087f"
+      "sha256": "bfdb4964b24a3dea2d10c6d383b8f0d76422a8b61e386316a2e400006e874062"
     },
     {
       "path": "renderer/generated/member-activity-data.mjs",
@@ -533,12 +538,12 @@
     {
       "path": "renderer/generated/member-activity.manifest.json",
       "bytes": 4766,
-      "sha256": "a2d7b5701a557d9e0903aca0f2de8b3391595c9c554193035b7dd7704fc530d9"
+      "sha256": "a6e7c526a2d161d4ee9305cb2eedc67d064e5ff9825d6274d7b00abcdccce065"
     },
     {
       "path": "renderer/generated/member-activity.mjs",
-      "bytes": 14216,
-      "sha256": "1e34593cbc793150f58cb8584a83d9884b7d67c9e790d5cbe3c8c48cdd6d169d"
+      "bytes": 14437,
+      "sha256": "9bd8df95b9e511026bea875705a7f4b4bacc6acd2978c27bf3d5a0b9e94fc34b"
     },
     {
       "path": "renderer/generated/member-shared/chunk-2PM2464V.mjs",
@@ -558,7 +563,7 @@
     {
       "path": "renderer/generated/member-understanding-data.manifest.json",
       "bytes": 4800,
-      "sha256": "72b049f3ce4a194ad27390c14f71a7d1145c7c959f65dc0e3ef951e13dc9d03d"
+      "sha256": "3bd0c0ab9f841c2036e495a0f3753a6af2d42091df1b4d8070058392ee3b7dc6"
     },
     {
       "path": "renderer/generated/member-understanding-data.mjs",
@@ -568,32 +573,32 @@
     {
       "path": "renderer/generated/member-understanding.manifest.json",
       "bytes": 4771,
-      "sha256": "56210762c1be7e4bf62f9316d00ad53fca4db549de84fe6d00f91d3dacfe5bae"
+      "sha256": "8a5d61d23aa9c44b7e6cfbf48e1e581536ec23fb77f3214fd4be0dad735edd74"
     },
     {
       "path": "renderer/generated/member-understanding.mjs",
-      "bytes": 67585,
-      "sha256": "5ca243e887e3dd7c73c7f70e3bc6be12bd69637e29afdff07ef0a95c2af870c0"
+      "bytes": 67644,
+      "sha256": "9a86905d16e40a4fe9bdecfdaddfaaccc6136b28cebcce65605f85a50afe10eb"
     },
     {
       "path": "renderer/index.html",
-      "bytes": 23741,
-      "sha256": "b8d8da3893c364cf7f4acc1bf05375e0e47e1f714054ba95d6e762972ac3faaa"
+      "bytes": 24154,
+      "sha256": "4331aecd85d9cdb5f8b8a2c7fab60ccd76ef5588e48418edf21a0a1cb890b047"
     },
     {
       "path": "renderer/launcher.css",
-      "bytes": 49564,
-      "sha256": "61800cb2e7689da57ef6037c11d677ec3d3dc749d9d6c41ce23230444f3339ba"
+      "bytes": 49782,
+      "sha256": "04cf1de889e81efc1bcb8cd87342feddf6bfcd5161037ec4fcae419f68929549"
     },
     {
       "path": "renderer/launcher.mjs",
-      "bytes": 81632,
-      "sha256": "82cf8baab336fd8d64909e0554b29b59681efd9a78f000201775b5b7483739d9"
+      "bytes": 84067,
+      "sha256": "dd6b3ef480b3e7407629823cbfadb29e1b3f33dbab024d2892844445816ae724"
     },
     {
       "path": "renderer/library.mjs",
-      "bytes": 5234,
-      "sha256": "91914af4cc06166dd158decdd5fd1935dbc5610f2d4a0f624efbc6cb46561954"
+      "bytes": 6240,
+      "sha256": "7d9b9d4fd88f275518566aa76cde8deee221eb89466dd4a84c48362018622df4"
     },
     {
       "path": "renderer/member-activity-controller.mjs",
@@ -602,13 +607,13 @@
     },
     {
       "path": "renderer/member-home.css",
-      "bytes": 10731,
-      "sha256": "08cbde19b062fd69a8cdae42432e0028647c2f311a6c826a598da031cde6e7d5"
+      "bytes": 11770,
+      "sha256": "261109b4f6a63849785255a103bfe5381bdec67e84d78571d3fa68ef1a5481d3"
     },
     {
       "path": "renderer/member-home.mjs",
-      "bytes": 36324,
-      "sha256": "7827d56012936e269862e7548ea01f64b890e3af1b2b26859d0504eb69a185f7"
+      "bytes": 38110,
+      "sha256": "043c32ffd5629f5dab076d90dc2acb8f1ec319931bba301ddfd0d3acdfff96d4"
     },
     {
       "path": "renderer/member-insight-model.mjs",
@@ -647,8 +652,8 @@
     },
     {
       "path": "renderer/personalization.mjs",
-      "bytes": 5935,
-      "sha256": "4a8414eee4264e7718f0777af88292fc970681915bbd2cf158097873cad5902f"
+      "bytes": 6696,
+      "sha256": "7c8f730ce8bab2c9ca828854fe28ebe6e41f97e809a16df1dae6a5f5a10c5868"
     },
     {
       "path": "renderer/platform-continuity.css",
@@ -657,8 +662,8 @@
     },
     {
       "path": "renderer/platform-continuity.mjs",
-      "bytes": 169093,
-      "sha256": "9f04e0139134c4a9342e3dabaf17465117c5e1a5323f1d44784a25e161baf401"
+      "bytes": 169309,
+      "sha256": "8d088a17872edc8a321c642266cfaab4ace959b7f64ea06c6b034c86ffa9ec3e"
     },
     {
       "path": "renderer/pulse-client.css",
@@ -724,6 +729,11 @@
       "path": "renderer/update-view.mjs",
       "bytes": 9047,
       "sha256": "f5371f8629a861970c4e40239d8c0003c3fb7844dd5a74b7c1756b448e2f09ab"
+    },
+    {
+      "path": "renderer/world-phone.mjs",
+      "bytes": 1884,
+      "sha256": "5cb24cd74f9c89c2e5dfc24c49f11ae57085c4f9eb0548b96506136ac85ecca0"
     },
     {
       "path": "src/account-requests.cjs",
