@@ -68,13 +68,16 @@ namespace Synk.SignalInstaller
                                             return engine.InstallAutomaticUpdate(request, delegate(InstallProgress progress) { window.Dispatcher.Invoke(delegate { window.ShowProgress(progress); }); });
                                         }
                                     });
-                                    if (result.Updated) { window.ShowComplete(); window.Close(); }
+                                    // Updated but not reopened: keep the finished window so its
+                                    // open button can start the new version.
+                                    if (result.Updated) { window.ShowComplete(); if (result.Relaunched) window.Close(); }
                                     else
                                     {
                                         // Not updated. Unless restored and relaunched (closed
                                         // below), the files may have changed, so the window
                                         // must not promise a retry.
-                                        window.ShowAutomaticFailure(result.Message, false);
+                                        // Restored: the previous version is in place, so the window says the app is unchanged.
+                                        window.ShowAutomaticFailure(result.Message, result.Restored);
                                         // The restored app owns the failure/retry
                                         // gate. Release this installer's mutex so
                                         // retry does not require closing two UIs.
