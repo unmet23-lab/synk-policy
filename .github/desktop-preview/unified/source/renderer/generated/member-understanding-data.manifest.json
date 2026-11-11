@@ -11,7 +11,7 @@
     "atlas/member-understanding-contract.js": "88a8c244eb7a7aece0b4e963f3cfb0a1193a0e3030e36b9f34bc66593cdbbb2d",
     "atlas/member-understanding.js": "fb1d0be2b573741167f6317da4ae213615610956302b4ab5ec5e44a8696e34fb",
     "atlas/trail-periods.js": "4ec4419d3abe982bcc300993d4bba5dd2dd27b1174aca5c6d9bf3621171df637",
-    "atlas/vellum.js": "4bb31f9ed6549f886164ba2203c87b464430f284c10088c9b5a54bef470965e6",
+    "atlas/vellum.js": "e58f1a17f0ead078342b299ea535216852649419a11839eadf3a844ecb6629a1",
     "experiences/synk-account/src/member-activity-data.mjs": "03aba1b188c5860fdb14488bf21ff658705aedb6a26290c37338233ecf3b39dd",
     "experiences/synk-account/src/member-statement-contract.cjs": "e62ce44eb90d6089c4589256739ad8e5f66c85961ddd504b5f8992afcd545700",
     "experiences/synk-account/src/member-statement-v1.cjs": "80af2773ef8f5870c8342dc8c6658d81dd0519fadbff5b80f3ad95295b9ea823",
@@ -28,7 +28,7 @@
     "experiences/synk-account/src/member-statement-v9.cjs": "a49fe82eaea20135170a2ef92644089df1f8034541d6c7b2375b1aa106b099a3",
     "experiences/synk-account/src/member-statement.cjs": "50e2e3fccba5e2564c47f6a3b10999044e84bec41f230870f3f1c97d51b9875e",
     "experiences/synk-account/src/member-understanding-data.mjs": "b05543646d5f154be5336ad7a2eb6ff5ec781369ccb9220ccf2d1fb3fd309866",
-    "experiences/synk-account/src/vellum-insight.cjs": "3b207667003ad7798dda238c147caa5c053e01e42ae56d68664f1d002a487d68"
+    "experiences/synk-account/src/vellum-insight.cjs": "e5febdbe48a500d897abac9bac2b1fc06809cd772e51ec86e684968d7203f42e"
   },
   "files": {
     "member-activity-data.mjs": {
@@ -38,7 +38,7 @@
       ]
     },
     "member-activity.mjs": {
-      "sha256": "1e34593cbc793150f58cb8584a83d9884b7d67c9e790d5cbe3c8c48cdd6d169d",
+      "sha256": "9bd8df95b9e511026bea875705a7f4b4bacc6acd2978c27bf3d5a0b9e94fc34b",
       "imports": [
         "member-shared/chunk-2PM2464V.mjs",
         "member-shared/chunk-LTC7WTSF.mjs"
@@ -68,7 +68,7 @@
       ]
     },
     "member-understanding.mjs": {
-      "sha256": "5ca243e887e3dd7c73c7f70e3bc6be12bd69637e29afdff07ef0a95c2af870c0",
+      "sha256": "9a86905d16e40a4fe9bdecfdaddfaaccc6136b28cebcce65605f85a50afe10eb",
       "imports": [
         "member-shared/chunk-2PM2464V.mjs",
         "member-shared/chunk-4G5MC6EL.mjs",
