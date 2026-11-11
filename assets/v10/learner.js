@@ -2,6 +2,7 @@
 // 안 B의 일정은 SYNK WORLD 코드와 같은 규칙이다: 틀림 1분 뒤 · 처음 맞힘 내일(experiences/synk-world-app/life-progress.mjs), 틀린 답도 1 · 7 · 30일 확인의 첫 기록(atlas/temper.js).
 const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const narrow = matchMedia('(max-width:900px)');
+const stacked = matchMedia('(max-width:1179px)'); // 아틀라스 판단 기록이 카드 아래에 놓이는 폭(901~1179px 포함)
 const DUR = 8000; // 한 칸 상영(자동 넘김). 사람이 고르면 자동 넘김은 멈춘다.
 
 /* ── 홈 · 아틀라스: 시간 줄을 누르면 그때의 창가 · 물음 · 실제 화면. 좁은 화면은 옆으로 넘기는 줄(모두 펼침). ── */
@@ -136,10 +137,26 @@ for (const root of document.querySelectorAll('[data-try]')) {
   // 글 머리부터 end(단추 · 마지막 보기)까지 한 화면에 들면 그만큼 끌어 올리고, 안 들면(360×640 같은 작은 화면) 바뀐 글부터 보인다.
   // 위 기준은 화면 위에 붙은 사이트 머리띠(.bar, 약 66px) 아래다 — 16px에 맞추면 때 글과 물음이 머리띠 뒤로 숨었다(11-10 검수)
   const lift = end => {
-    if (!started || !narrow.matches || !end) return;
+    if (!started || !end || !(narrow.matches || jbox && stacked.matches)) return;
     const bar = document.querySelector('.bar'), br = bar && getComputedStyle(bar).position === 'fixed' ? bar.getBoundingClientRect() : null;
-    const top = (br && br.bottom > 0 ? br.bottom : 0) + 12, head = when.parentElement.getBoundingClientRect(), bottom = end.getBoundingClientRect().bottom;
+    const top = (br && br.bottom > 0 ? br.bottom : 0) + 12, head = when.parentElement.getBoundingClientRect();
     const behavior = reduce ? 'auto' : 'smooth';
+    const er = end.getBoundingClientRect(), bottom = er.bottom;
+    if (jbox) {
+      // 판단 기록이 있는 쪽: 지금 보이는 화면(카드) · 바뀐 세 줄 · 누를 곳이 한 덩어리다(지나온 판단 줄은 덩어리에 넣지 않는다).
+      // 덩어리의 위 끝은 글 머리와 카드 윗변 가운데 높은 쪽 — 901~1179px에서는 카드가 오른쪽 칸에 있어 글 머리보다 높다.
+      const card = [...root.querySelectorAll('.lw-piece')].find(e => !e.hidden), cr = (card || when.parentElement).getBoundingClientRect();
+      const rows = jbox.querySelector('.k-judge-rows').getBoundingClientRect();
+      const blockTop = Math.min(head.top, cr.top), blockBottom = Math.max(bottom, rows.bottom), low = innerHeight - 16;
+      let dy;
+      if (blockBottom - blockTop <= low - top) dy = blockTop < top ? blockTop - top : blockBottom > low ? blockBottom - low : 0; // 한 화면에 든다 — 가려진 쪽만 맞춘다
+      else if (!next.firstElementChild) dy = narrow.matches && blockBottom - cr.top <= low - top ? blockBottom - low : cr.top - top; // 답하기 전: 물음(카드 머리)이 먼저 — 휴대폰은 카드부터 세 줄까지 들면 아래를 맞춘다
+      else if (narrow.matches) dy = blockBottom - low; // 휴대폰 · 답한 뒤: 아래부터 — 바뀐 세 줄과 포커스 받은 다음 단추
+      else dy = Math.min(blockBottom - low, Math.min(head.top, er.top) - top); // 901~1179px · 답한 뒤: 세 줄 끝까지 내리되 왼쪽 글 머리 · 다음 단추가 머리띠 뒤로 가지 않게
+      if (Math.abs(dy) >= 1) scrollBy({ top: dy, behavior });
+      return;
+    }
+    // 글 머리부터 end(단추 · 마지막 보기)까지 한 화면에 들면 그만큼 끌어 올리고, 안 들면 바뀐 글부터 보인다.
     if (bottom - head.top + top + 16 <= innerHeight) { if (head.top < top) scrollBy({ top: head.top - top, behavior }); else if (bottom > innerHeight - 16) scrollBy({ top: bottom - innerHeight + 16, behavior }); }
     else if (head.top < top || head.top > innerHeight / 2) scrollBy({ top: head.top - top, behavior });
   };
@@ -149,8 +166,39 @@ for (const root of document.querySelectorAll('[data-try]')) {
     lift(els[0]);
   };
   let started = false;
-  // 부품 그림을 눌러도 막히지 않게: 지금 단계의 주 단추와 같다.
-  for (const s of shots) s.addEventListener('click', () => next.querySelector('.btn')?.click());
+  const jbox = root.querySelector('[data-judge]'), jrest = root.querySelector('[data-judge-rest]'), jfoot = root.querySelector('[data-judge-foot]');
+  // 아틀라스 쪽 「판단 기록」(2026-11-11): 답과 시간에 따라 읽은 것 · 고른 것 · 까닭 세 줄이 바뀐다. 글은 쪽이 준 표(data-judge-data)이고, 표가 없는 쪽(LAB · 영어)에서는 아무 일도 하지 않는다.
+  const J = (() => { const s = root.querySelector('[data-judge-data]'); return s ? JSON.parse(s.textContent) : null; })();
+  const jrows = J ? [...root.querySelectorAll('[data-judge-row]')] : [], jwhen = $('[data-judge-when]'), jpast = $('[data-judge-past]');
+  let jkey = '', jtimer = 0;
+  const judge = key => {
+    const s = J && J.states[key]; if (!s) return;
+    // 지나온 판단은 한 줄씩 아래에 쌓인다(처음으로 돌아가면 비운다)
+    if (jpast) {
+      if (key === 'first') jpast.replaceChildren();
+      const was = J.states[jkey];
+      if (was && was.log && key !== jkey) { const li = document.createElement('li'); li.textContent = was.log; jpast.append(li); while (jpast.children.length > (J.keep || 4)) jpast.firstElementChild.remove(); }
+    }
+    jkey = key;
+    if (jwhen) jwhen.textContent = s.when;
+    // 쉬는 화면의 맺음 줄(이 추천이 도움이 됐는지는 뒤에 다시 확인한다)
+    if (jfoot) { jfoot.hidden = !s.foot; if (s.foot) { jfoot.firstElementChild.textContent = s.foot.text; jfoot.lastElementChild.textContent = s.foot.tag || s.foot.by; } }
+    clearTimeout(jtimer);
+    for (const row of jrows) {
+      const r = s[row.dataset.judgeRow]; if (!r) continue;
+      const main = row.querySelector('[data-judge-text]'), sub = row.querySelector('[data-judge-sub]'), tag = row.querySelector('[data-judge-tag]'), was = row.querySelector('[data-judge-was]');
+      const by = r.tag || r.by; // 꼬리표에 보이는 글: 엔진 이름 + 하는 일 한 낱말(「Trail · 기록」)
+      const changed = main.textContent !== r.text || tag.textContent !== by;
+      main.textContent = r.text; tag.textContent = by; tag.hidden = !by; sub.textContent = r.sub || ''; sub.hidden = !r.sub;
+      // 같은 자리의 앞 판단(「첫날」 · 「답하기 전」)에 줄을 그어 함께 보인다 — 무엇에서 무엇으로 바뀌었나
+      if (was) { was.hidden = !r.was; was.firstElementChild.textContent = r.was ? s.wasLabel || '' : ''; was.lastElementChild.textContent = r.was || ''; }
+      row.classList.remove('is-new');
+      if (changed && started) { void row.offsetWidth; row.classList.add('is-new'); }
+    }
+    jtimer = setTimeout(() => jrows.forEach(r => r.classList.remove('is-new')), 2400);
+  };
+  // 부품 그림을 눌러도 막히지 않게: 지금 단계의 주 단추와 같다(아틀라스 쉬는 화면의 그림 둘도).
+  for (const s of [...shots, ...(jrest ? jrest.querySelectorAll('figure') : [])]) s.addEventListener('click', () => next.querySelector('.btn')?.click());
   const ask = (q, done) => {
     text(q.when, q.say, q.sub);
     showShot(null);
@@ -180,29 +228,41 @@ for (const root of document.querySelectorAll('[data-try]')) {
   // 한 날: 실제 화면 한 장(shot), 또는 그날 처음 보는 문제(ask — 30일 뒤 다시 확인. 답하면 맞음 · 틀림 글로 바뀐다)
   const day = i => {
     const d = Q.days[i];
-    scene(d.at); stepTo(d.step);
+    scene(d.at); stepTo(d.step); judge('day' + i);
     const onward = () => {
       if (d.next) act(button(`${d.next} ${arrow}`, () => day(i + 1)));
       else act(link(`${Q.go.label} <span class="arr" aria-hidden="true">${Q.go.arrow}</span>`, Q.go.href), button(Q.again, () => { started = true; first(); }, 'lw-link lw-again'));
     };
-    if (d.ask) ask({ ...d.ask, when: d.when, say: d.say, sub: d.sub }, right => { const r = right ? d.right : d.wrong; text(null, r.say, r.sub); onward(); });
+    if (d.ask) ask({ ...d.ask, when: d.when, say: d.say, sub: d.sub }, right => { const r = right ? d.right : d.wrong; text(null, r.say, r.sub); judge('day' + i + (right ? '.right' : '.wrong')); onward(); });
     else { text(d.when, d.say, d.sub); showShot(d.shot); onward(); }
   };
   const second = () => {
-    scene(Q.start); stepTo(1);
+    scene(Q.start); stepTo(1); judge('second');
     ask(Q.second, right => {
+      judge(right ? 'second.right' : 'second.wrong');
       if (right) { text(null, Q.backRight.say, Q.backRight.sub); act(button(`${Q.toDay1} ${arrow}`, () => day(0))); }
       else { text(null, Q.backWrong.say, Q.backWrong.sub); act(button(`${Q.toMinute} ${arrow}`, second)); }
     });
   };
   function first() {
-    scene(Q.start); stepTo(0);
+    if (jrest) jrest.hidden = true;
+    scene(Q.start); stepTo(0); judge('first');
     ask(Q.first, right => {
+      judge(right ? 'first.right' : 'first.wrong');
       if (right) { text(null, Q.right.say, Q.right.sub); act(button(`${Q.toDay1} ${arrow}`, () => day(0))); }
       else { text(null, Q.wrong.say, Q.wrong.sub); act(button(`${Q.toMinute} ${arrow}`, second)); }
     });
   }
-  first();
+  // 아틀라스의 쉬는 화면: 예시 학습자의 한 사례 — 게임에서 놓친 답(실제 화면) · 그 사이의 판단(첫날 판단에 줄을 긋고 바뀐 판단) · 다음에 앱을 열면 뜨는 튜터 카드.
+  // 단추를 누르면 첫날부터 방문자의 답이 기록을 바꾼다.
+  const example = () => {
+    const E = J.rest;
+    scene(Q.start); stepTo(-1); judge('example');
+    text(E.when, E.say, E.sub); showShot('-'); // 문제 카드 · 날마다의 화면은 접어 둔다
+    jrest.hidden = false;
+    act(button(`${E.go} ${arrow}`, () => { started = true; first(); }));
+  };
+  if (J && J.rest && jrest) example(); else first();
   const near = new IntersectionObserver(es => { if (es[0].isIntersecting) { for (const i of root.querySelectorAll('img')) i.loading = 'eager'; near.disconnect(); } }, { rootMargin: '900px 0px' });
   near.observe(root);
 }

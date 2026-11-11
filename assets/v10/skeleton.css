@@ -660,3 +660,91 @@ body[data-k="pulse"] .pv-ask-note{font-size:var(--k1)}
 @media (min-width:1241px){.k-pa-day .pa-plan{border-top:0;padding-top:0}}  /* 1240px 이하는 지도 뒤에 오므로 옛 선 · 여백을 둔다(화면 검수 5.2) */
 /* 400px 이하: 요약 「누구에게 · 남는 것 · 순서」와 문의 단추가 한 줄에 다 들지 않는다 — 단추를 요약 아래 줄로(펼친 내용은 요약과 단추 사이) */
 @media (max-width:400px){.k-svc>li>.k-btn{grid-column:1/-1;grid-row:4;justify-self:start}.k-svc details,.k-svc details[open]{grid-column:1/-1;grid-row:3}.k-svc summary{white-space:nowrap;gap:6px}}
+
+/* ── 아틀라스 첫 화면 「판단 기록」(2026-11-11 3단계) ──
+   같은 30일을 엔진 쪽에서 본다: 왼쪽 문제 카드(학습자가 보는 화면) 옆에서 읽은 것 · 고른 것 · 까닭 세 줄이 답과 시간에 따라 바뀐다(learner.js judge).
+   교실 사진(빈 칠판)은 이 쪽에서 뺐다 — 2단계 맹검 「빈 칠판 사진 탓에 어학 복습 앱처럼 보인다 · 엔진의 판단이 안 보인다」. 상자를 더하지 않고 구역 머리 줄과 같은 선으로 긋는다. */
+.lw--judge .lw-visual{background:none}
+.k-judge{min-width:0}
+.k-judge-head{display:flex;align-items:baseline;justify-content:space-between;gap:16px;margin:0;padding-bottom:12px;border-bottom:1px solid var(--lw-line);font-size:var(--k1);font-weight:500;line-height:1.4;color:var(--lw-ink-3)}
+.k-judge-head b{font-size:var(--k3);font-weight:600;color:#fff}
+.k-judge-head>span:first-child{display:flex;align-items:baseline;gap:12px;min-width:0}
+/* 쉬는 화면의 실제 화면 둘(예시 학습자의 한 사례): 학습자가 한 것(게임에서 놓친 답) → 다음에 앱을 열면(튜터 카드). 그 사이의 판단이 오른쪽 기록이다 */
+.k-judge-rest{display:grid;gap:18px;min-width:0}
+.k-judge-rest[hidden]{display:none}
+.k-judge-shot{display:grid;gap:9px;min-width:0;margin:0;cursor:pointer}
+.k-judge-shot figcaption{display:flex;align-items:baseline;gap:10px;font-size:var(--k1);font-weight:500;line-height:1.4;color:var(--lw-ink-3)}
+.k-judge-shot figcaption em{font-style:normal;font-weight:600;color:#fff}
+.k-judge-shot--did figcaption em{color:var(--lw-hot)}
+.k-judge-shot>div{border-radius:22px;overflow:hidden;box-shadow:0 0 0 1px rgba(255,255,255,.08),0 44px 90px -28px rgba(0,0,0,.78)}
+.k-judge-shot img{display:block;width:100%;height:auto}
+/* 게임 화면(환승 러시 고르는 판 780×514)은 물음 줄과 세 칸의 한글 이름까지 — 아래 영문 꼬리 줄 앞에서 자른다 */
+.k-judge-shot--did>div{aspect-ratio:780/420}
+.k-judge-shot--did img{height:100%;object-fit:cover;object-position:50% 0}
+.k-judge-rows{margin:0}
+.k-judge-rows>div{position:relative;padding:11px 0 12px;border-bottom:1px solid rgba(255,255,255,.14)}
+.k-judge-rows dt{display:flex;align-items:baseline;justify-content:space-between;gap:12px;font-size:var(--k1);font-weight:500;line-height:1.4;color:var(--lw-ink-3)}
+.k-judge-rows dt em{font-style:normal;font-weight:600;color:#fff;text-align:right}
+.k-judge-rows dd{margin:5px 0 0}
+.k-judge-rows p{margin:0}
+.k-judge-rows [data-judge-text]{font-size:var(--k4);font-weight:600;line-height:1.38;letter-spacing:-.02em;color:#fff;text-wrap:pretty;word-break:keep-all}
+.k-judge-rows [data-judge-sub]{margin-top:5px;font-size:var(--k2);font-weight:400;line-height:1.55;color:var(--lw-ink-2);text-wrap:pretty;word-break:keep-all}
+/* 같은 자리의 앞 판단(「첫날에는 · …」 「답하기 전 · …」): 무엇에서 무엇으로 바뀌었는지 */
+.k-judge-was{display:flex;align-items:baseline;gap:10px;margin-bottom:3px!important;font-size:var(--k2);font-weight:400;line-height:1.5;color:var(--lw-ink-3)}
+.k-judge-was[hidden]{display:none}
+.k-judge-was span{flex:none;font-size:var(--k1);font-weight:500}
+.k-judge-was s{min-width:0;text-decoration:line-through;text-decoration-color:rgba(255,255,255,.5);text-wrap:pretty;word-break:keep-all}
+/* 쉬는 화면의 맺음 줄: 이 추천이 도움이 됐는지는 뒤에 다시 확인한다 */
+.k-judge-foot{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin:0;padding-top:11px;font-size:var(--k2);font-weight:400;line-height:1.5;color:var(--lw-ink-2)}
+.k-judge-foot[hidden]{display:none}
+.k-judge-foot span{min-width:0;text-wrap:pretty;word-break:keep-all}
+.k-judge-foot em{flex:none;font-style:normal;font-size:var(--k1);font-weight:600;color:#fff}
+/* 방금 바뀐 줄: 이름 앞에 산호 점이 켜지고 글이 다시 떠오른다 */
+.k-judge-rows dt span{position:relative}
+.k-judge-rows dt span::after{content:"";position:absolute;left:calc(100% + 8px);top:50%;width:6px;height:6px;margin-top:-3px;border-radius:50%;background:var(--lw-hot);opacity:0;transition:opacity .5s}
+.k-judge-rows .is-new dt span::after{opacity:1;transition:none}
+.k-judge-rows .is-new dd{animation:k-judge-in .55s var(--ease) both}
+@keyframes k-judge-in{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.k-judge-past{list-style:none;margin:0;padding:12px 0 0;display:grid;gap:4px;font-size:var(--k1);font-weight:400;line-height:1.5;color:var(--lw-ink-3)}
+.k-judge-past:empty{display:none}
+@media (prefers-reduced-motion:reduce){.k-judge-rows .is-new dd{animation:none}}
+@media (min-width:901px){
+  /* 오른쪽 칸: 「학습자가 보는 화면」(문제 카드 · 실제 화면 조각) 아래에 「판단 기록」 — 1180px부터는 둘이 나란히.
+     칸의 크기 가둠(learner.css의 container-type:size — LAB 교실 사진 자리 셈용, 1061px 이상)은 푼다: 이 쪽은 사진이 없고, 가둔 채로는 칸의 내용(카드 · 기록)이
+     무대 구역 높이에 들지 않아 기록이 구역 아래로 넘치고 다음 구역에 덮였다(1061~1179px 세 줄 모두 · 1200~1280px 낮은 창 맺음 줄 — 화면 검수 P1) */
+  .lw--judge.lw--try .lw-head>div:first-child{padding-top:clamp(32px,3.2vw,46px)}
+  .lw--judge .lw-visual{display:grid;grid-template-columns:minmax(0,1fr);container-type:normal;align-content:start;row-gap:0;padding:clamp(32px,3.2vw,46px) max(var(--gut),calc((100vw - var(--wrap)) / 2)) clamp(36px,3.6vw,52px) 0;overflow:visible}
+  .lw--judge .lw-piece{position:relative;right:auto;top:auto;width:auto;max-width:540px;margin-top:18px;transform:none}
+  .lw--judge .k-judge-rest{max-width:540px;margin-top:18px}
+  .lw--judge .k-judge{margin-top:28px}
+}
+@media (min-width:1180px){
+  .lw--judge .lw-visual{grid-template-columns:minmax(0,1fr) minmax(0,1fr);grid-template-rows:auto auto 1fr;column-gap:clamp(28px,3vw,48px)}
+  .lw--judge .k-judge-did,.lw--judge .lw-piece,.lw--judge .k-judge-rest{grid-column:1}
+  .lw--judge .k-judge{grid-column:2;grid-row:1/-1;align-self:start;margin-top:0}
+}
+@media (max-width:900px){
+  /* 휴대폰: 사진 자리를 걷고 문제 카드 바로 아래에 판단 기록 — 답 고르기와 바뀌는 세 줄이 한 화면에 든다 */
+  .lw--judge .lw-visual{padding-top:0;margin-top:16px}
+  .lw--judge .k-judge-did{margin:0 var(--gut) 12px}
+  .lw--judge .lw-piece{margin:0 auto 0 var(--gut)}  /* 카드는 머리 줄 · 기록과 같은 왼쪽 끝에서 */
+  .lw--judge .k-judge-rest{width:min(calc(100% - var(--gut) * 2),480px);margin:0 auto 0 var(--gut);gap:16px}
+  .k-judge-shot>div{border-radius:18px}
+  .lw--judge .k-judge{margin:18px var(--gut) 0}
+  .k-judge-rows>div{padding:9px 0 10px}
+  .k-judge-past li:not(:last-child){display:none}  /* 휴대폰은 바로 앞 판단 한 줄만 */
+  .k-judge-rows dd{margin-top:4px}
+  .k-judge-rows [data-judge-text]{font-size:var(--k3);line-height:1.4}
+  .k-judge-rows [data-judge-sub]{margin-top:2px;font-size:var(--k1);line-height:1.5}
+  .k-judge-was{margin-bottom:2px!important;font-size:var(--k1)}
+  .k-judge-foot{padding-top:10px;font-size:var(--k1)}
+  .k-judge-head{padding-bottom:9px}
+  .k-judge-past{padding-top:9px}
+}
+@media (min-width:720px) and (max-width:900px){
+  /* 태블릿 폭: 카드와 기록이 나란히 */
+  .lw--judge .lw-visual{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);grid-template-rows:auto auto 1fr;column-gap:clamp(24px,3.4vw,32px);align-content:start;margin-inline:var(--gut)}
+  .lw--judge .k-judge-did{grid-column:1;margin:0 0 12px}
+  .lw--judge .lw-piece,.lw--judge .k-judge-rest{grid-column:1;width:auto;margin:0}
+  .lw--judge .k-judge{grid-column:2;grid-row:1/-1;align-self:start;margin:0}
+}
