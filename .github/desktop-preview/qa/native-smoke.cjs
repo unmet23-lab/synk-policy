@@ -9,7 +9,7 @@ const isolation=path.join(out,'profile');fs.mkdirSync(isolation);fs.mkdirSync(pa
 const input={...config,platform:process.platform,client,mode:args.mode,out,appData:isolation,archive:bundle.archive,version:bundle.version,runnerArch:process.env.RUNNER_ARCH||null,softwareGpu:process.env.SYNK_QA_SOFTWARE_GPU==="1",visible:process.env.SYNK_QA_VISIBLE==="1",unlimitedFrames:process.env.SYNK_QA_UNLIMITED_FRAMES==="1",prefix:'SYNK_MAC_QA '};
 function observe(config){
   process.stderr.write('SYNK_QA_TRACE observer-installed\n');
-  const {app,shell}=require('electron'),fs=require('node:fs'),path=require('node:path');
+  const {app,shell}=require('electron'),fs=require('node:fs'),path=require('node:path'),crypto=require('node:crypto');
   app.setPath('appData',config.appData);app.once('ready',()=>{if(!config.visible)app.dock?.hide();});
   // Only the read/launch root is substituted. The production installation
   // verifier still checks actual DMG-copied metadata, executables and archives.
@@ -22,11 +22,19 @@ function observe(config){
   if(config.client==='platform'){
     const updates=require(app.getAppPath()+'/src/platform-update.cjs'),original=updates.createPlatformUpdater;
     const runtime=JSON.parse(fs.readFileSync(app.getAppPath()+'/runtime.json','utf8'));
-    updates.createPlatformUpdater=options=>original({...options,request:async url=>{
+    // 0.4.87: the candidate must pin real signing keys and refuse an unsigned feed; the QA feed is signed by a throwaway key
+    // handed only to this isolated updater, never by the publisher's key.
+    const pinned=Array.isArray(updates.UPDATE_SIGNING_KEYS)&&updates.UPDATE_SIGNING_KEYS.length>=1&&updates.trustedSigningKeys(updates.UPDATE_SIGNING_KEYS).length===updates.UPDATE_SIGNING_KEYS.length;
+    let unsignedRejected=false;try{updates.verifyManifestSignature({schemaVersion:1});}catch(error){unsignedRejected=error.updateCode==='UPDATE_SIGNATURE_INVALID';}
+    if(!pinned||!unsignedRejected)throw Error('QA_UPDATE_SIGNING_NOT_ENFORCED');
+    const qaKey=crypto.generateKeyPairSync('ed25519'),qaSpki=qaKey.publicKey.export({type:'spki',format:'der'});
+    const qaKeys=updates.trustedSigningKeys([{keyId:crypto.createHash('sha256').update(qaSpki).digest('hex').slice(0,16),spki:qaSpki.toString('base64')}]);
+    const signQa=value=>({...value,signature:{alg:'ed25519',keyId:qaKeys[0].keyId,value:crypto.sign(null,updates.signedManifestPayload(value),qaKey.privateKey).toString('base64')}});
+    updates.createPlatformUpdater=options=>original({...options,trustedKeys:qaKeys,request:async url=>{
       if(url!==updates.MANIFEST_URL)throw Error('QA_INSTALLER_DOWNLOAD_FORBIDDEN');syntheticFeedRequests++;
       await startupReady;
       const manifest={schemaVersion:1,product:'platform',channel:'preview',version:config.version,releaseId:runtime.update.releaseId,buildId:runtime.update.buildId,publishedAt:new Date().toISOString(),artifacts:[{platform:config.platform,arch:config.arch,url:'https://github.com/unmet23-lab/synk-policy/releases/download/'+runtime.update.releaseId+'/qa-never-downloaded.'+(config.platform==='win32'?'exe':'dmg'),bytes:1,sha256:'a'.repeat(64),asarSHA256:'b'.repeat(64)}]};
-      return {status:200,headers:{},body:require('node:stream').Readable.from([Buffer.from(JSON.stringify(manifest))])};
+      return {status:200,headers:{},body:require('node:stream').Readable.from([Buffer.from(JSON.stringify(signQa(manifest)))])};
     },onChange:value=>{startupStates.push(value.state);options.onChange?.(value);}});
   }
   globalThis.fetch=async(...args)=>{providerRequests.push(String(args[0]));throw Error('QA_EMPTY_VAULT_MUST_NOT_FETCH');};
