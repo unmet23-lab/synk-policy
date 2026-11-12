@@ -8,7 +8,7 @@ import { PEOPLE, CARS, planDay } from './people.mjs';
 import { createScene, loadImage } from './scene.mjs?v=d3a545206d69';
 import { createLed } from './led.mjs';
 import { createHud } from './hud.mjs?v=map20261110';
-import { createPickPanel } from './pickpanel.mjs?v=sign20261111';
+import { createPickPanel } from './pickpanel.mjs?v=f1d0d72446dd';
 import { createSound, haptic } from './audio.mjs?v=map20261110';
 import { createMusic } from './music.mjs';
 import { GAME_ID, decisionMeta, meetingMeta, answerPayload, createExchange, preferJourney, missedPractice, entryNote } from './learning.mjs?v=return-20261105';
@@ -60,7 +60,7 @@ const hud = createHud({ route: $('hud-route'), clock: $('hud-clock'), status: $(
 // 옛 index.html(캐시 10분)이 새 app.mjs를 부르면 #pick이 없다 — 그때는 판 자리를 만들어 붙인다(검수: root null로 모듈이 죽어 입구도 안 떴다)
 // 그때는 옛 style.css(판 규칙 없음)도 캐시에 있기 쉬워 판이 안 보이므로, 새 주소로 style.css를 한 번 더 붙인다(새 style.css는 옛 index.html과도 맞는다)
 const pickRoot = $('pick') || (() => {
-  document.head.append(Object.assign(document.createElement('link'), { rel: 'stylesheet', href: `style.css?v=37ac10867b13${Date.now()}` }));
+  document.head.append(Object.assign(document.createElement('link'), { rel: 'stylesheet', href: `style.css?v=008e0c423b82${Date.now()}` }));
   return $('stage').appendChild(Object.assign(document.createElement('section'), { id: 'pick', className: 'pick', hidden: true }));
 })();
 const panel = createPickPanel({ root: pickRoot });
