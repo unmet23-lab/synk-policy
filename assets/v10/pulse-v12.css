@@ -192,6 +192,19 @@
   .pv-types dl,.pv-brief{grid-template-columns:1fr}
   .pv-face{flex-basis:40vw}
 }
+/* ①-1 한국어 가로형의 아래 칸(11-12 검수) — 폭 601~900 · 화면이 4:5보다 넓음 · 높이 600 이상(세로로 든 태블릿 768×954 · 810×1010, 화면을 반으로 나눈 창).
+   작품 줄 · 단추 · 값 안내 두 줄을 글 칸 아래에 쌓으면 아래 칸이 156px라 글 뭉치가 그만큼 올라가, 쇼릴 03 클로즈업 1.8초 동안 제목 첫 줄이 배우 입 · 턱
+   (낮은 창에서는 눈) 위에 왔다. 가로 쇼릴의 얼굴은 화면 높이의 48%(입) · 53%(턱)까지 내려온다(쇼릴을 바꾸면 다시 잰다).
+   글 뭉치를 올리지 않고, 넓은 화면처럼 글 칸은 왼쪽 · 아래 칸은 오른쪽에 나란히 바닥에 붙인다 — 글 칸 바닥이 앞 공개본(바닥에서 214px)보다 130px 낮아진다.
+   아래 칸의 작품 줄이 한 줄 · 두 줄로 바뀌어도 제 칸 안에서 위로만 자라 제목은 움직이지 않는다. 아래 칸 폭은 단추(150px)보다 조금 넓게, 글 칸에는
+   제목 첫 줄(약 9.3em)이 들어갈 폭을 남긴다. 영어 쪽은 값 안내가 없어 아래 칸이 낮고 제목 줄이 짧아 얼굴 겹침이 없으니 그대로 둔다.
+   세로형(①-2)과 높이 600 아래(가로로 든 휴대폰 — 첫 화면이 600px로 화면보다 길다)는 이 칸 밖이다. */
+@media (min-width:600.02px) and (max-width:900px) and (min-height:600px){@media not all and (max-aspect-ratio:4/5){
+  html[lang="ko"] .pv-hall-in{flex-direction:row;justify-content:space-between;align-items:flex-end;gap:0 24px;padding-bottom:84px}
+  html[lang="ko"] .pv-copy{flex:1 1 0;min-width:0}
+  html[lang="ko"] .pv-side{flex:none;width:clamp(164px,30%,212px);margin-top:0;align-items:flex-end;text-align:right}
+  html[lang="ko"] .pv-now{text-wrap:balance}
+}}
 /* ①-2 세로 화면의 시사실(11-10) — 첫 화면 글은 얼굴 줄 아래에만 둔다(쇼릴 규칙 「첫 화면 글이 얼굴을 덮지 않는 프레임만」).
    폭 900 아래에서 화면이 4:5보다 길면 pulse-v12.js가 세로 쇼릴(1080×1920)을 싣는데, 그 쇼릴은 얼굴이 원본 높이의 58%까지 내려온다
    (오미톡 2.42~2.54초 입을 크게 벌린 턱이 y 약 1,105 — 쇼릴을 바꾸면 --pv-face를 다시 잰다). 쇼릴은 화면 한 장 높이에 가운데 맞춤 cover로 깔리니
@@ -239,3 +252,10 @@
 html[lang="en"] .pv-h1{font-size:clamp(36px,5.2vw,82px);text-shadow:0 1px 10px rgba(0,0,0,.6)}
 @media (max-width:600px){html[lang="en"] .pv-h1{font-size:clamp(28px,min(10vw,(100vw - var(--gut) * 2) / 9.6),44px)}}
 @media (max-width:600px) and (max-aspect-ratio:4/5){html[lang="en"] .pv-h1{font-size:clamp(28px,min(10vw,5.2svh,(100vw - var(--gut) * 2) / 9.6),44px)}}
+/* 2026-11-12 영어 세로형 · 높이 620~700의 드문 크기(검수): 세로 쇼릴은 폭이 넓을수록 크게 깔려 얼굴 줄이 내려오는데(위 ①-2의 첫 행) 제목 크기는 높이만 보아,
+   폭 420~560에서 세 줄 제목 + 작품 줄 + 단추가 얼굴 줄 아래에 다 들지 못하고 의뢰 단추가 첫 화면 밖으로 1~10px 나갔다. 얼굴 줄 아래 남는 높이
+   (화면 − 얼굴 줄 − 머리글 18 · 작품 줄 22 · 단추 54 · 사이 6.2svh, 여유 1.5px)를 세 줄(3.3em)로 나눈 값을 제목 크기의 위 한계에 더한다 — 이미 들던 크기는
+   이 값이 더 커서 그대로다. 높이 620 아래는 작품 줄을 빼므로(위) 이 한계를 걸지 않는다. 폭 345 아래는 가장 긴 작품 이름(약 305px)이 두 줄로 꺾이니
+   작품 줄을 두 줄(44px)로 셈한다. */
+@media (max-width:600px) and (max-aspect-ratio:4/5) and (min-height:620px){html[lang="en"] .pv-h1{font-size:clamp(28px,min(10vw,5.2svh,(100vw - var(--gut) * 2) / 9.6,(43.8svh - .08 * max(100svh,177.78vw) - 108px) / 3.3),44px)}}
+@media (max-width:344.98px) and (max-aspect-ratio:4/5) and (min-height:620px){html[lang="en"] .pv-h1{font-size:clamp(28px,min(10vw,5.2svh,(100vw - var(--gut) * 2) / 9.6,(43.8svh - .08 * max(100svh,177.78vw) - 130px) / 3.3),44px)}}
