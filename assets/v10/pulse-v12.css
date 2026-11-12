@@ -30,7 +30,11 @@
 .pv-side{position:absolute;right:0;bottom:clamp(96px,13vh,136px);display:flex;flex-direction:column;align-items:flex-end;gap:20px;text-align:right;max-width:30%}
 .pv-now{margin:0;min-height:44px}
 .pv-now strong{display:block;font-weight:600;font-size:15px;color:var(--ink)}
-.pv-now span{font-size:13px;color:var(--ink-3)}
+.pv-now>span{font-size:13px;color:var(--ink-3)}
+/* 「…」 작품 이름은 한 덩이 — 칸이 좁으면 회사 이름 뒤에서 꺾인다(pulse-v12.js nameLine · build.mjs pvNow) */
+.pv-now strong>span{display:inline-block}
+/* 값 안내(한국어 뼈대의 .k-pv-price) 두 줄은 고르게 나눈다 — 칸 끝까지 채우면 「…고르면 그 / 자리에서…」로 꺾였다(11-13) */
+.pv-side .k-pv-price{text-wrap:balance}
 .pv-now.swap{animation:pv-now .9s cubic-bezier(.19,1,.22,1)}
 @keyframes pv-now{from{opacity:0;transform:translateY(6px)}}
 .btn.pv-cta{border-radius:0;min-height:54px;padding:0 24px;gap:20px;background:#f2efe9;color:#0a0a0b;font-size:15.5px;font-weight:650;letter-spacing:0;border:0;transition:gap .25s cubic-bezier(.19,1,.22,1),background .25s}
@@ -165,7 +169,7 @@
   .pv-side{position:static;margin-top:40px;align-items:flex-start;text-align:left;max-width:none;gap:14px}
   .pv-now{min-height:0}
   .pv-now strong{font-size:13.5px}
-  .pv-now span{display:none}
+  .pv-now>span{display:none}
   .pv-index{bottom:28px}
   .pv-head,.pv-more,.pv-how,.pv-maker,.pv-ask-in{grid-template-columns:1fr}
   .pv-work:nth-child(even){width:100%}
@@ -196,18 +200,26 @@
    작품 줄 · 단추 · 값 안내 두 줄을 글 칸 아래에 쌓으면 아래 칸이 156px라 글 뭉치가 그만큼 올라가, 쇼릴 03 클로즈업 1.8초 동안 제목 첫 줄이 배우 입 · 턱
    (낮은 창에서는 눈) 위에 왔다. 가로 쇼릴의 얼굴은 화면 높이의 48%(입) · 53%(턱)까지 내려온다(쇼릴을 바꾸면 다시 잰다).
    글 뭉치를 올리지 않고, 넓은 화면처럼 글 칸은 왼쪽 · 아래 칸은 오른쪽에 나란히 바닥에 붙인다 — 글 칸 바닥이 앞 공개본(바닥에서 214px)보다 130px 낮아진다.
-   아래 칸의 작품 줄이 한 줄 · 두 줄로 바뀌어도 제 칸 안에서 위로만 자라 제목은 움직이지 않는다. 아래 칸 폭은 단추(150px)보다 조금 넓게, 글 칸에는
+   아래 칸의 작품 줄이 한 줄 · 두 줄로 바뀌어도 제 칸 안에서 위로만 자라 제목은 움직이지 않는다. 아래 칸 폭은 단추(150px)보다 넓게 · 값 안내가 두 줄에 드는 172px부터(11-13 — 164px에서는 세 줄), 글 칸에는
    제목 첫 줄(약 9.3em)이 들어갈 폭을 남긴다. 영어 쪽은 값 안내가 없어 아래 칸이 낮고 제목 줄이 짧아 얼굴 겹침이 없으니 그대로 둔다.
    세로형(①-2)과 높이 600 아래(가로로 든 휴대폰 — 첫 화면이 600px로 화면보다 길다)는 이 칸 밖이다. */
 @media (min-width:600.02px) and (max-width:900px) and (min-height:600px){@media not all and (max-aspect-ratio:4/5){
   html[lang="ko"] .pv-hall-in{flex-direction:row;justify-content:space-between;align-items:flex-end;gap:0 24px;padding-bottom:84px}
   html[lang="ko"] .pv-copy{flex:1 1 0;min-width:0}
-  html[lang="ko"] .pv-side{flex:none;width:clamp(164px,30%,212px);margin-top:0;align-items:flex-end;text-align:right}
+  html[lang="ko"] .pv-side{flex:none;width:clamp(172px,30%,212px);margin-top:0;align-items:flex-end;text-align:right}
   html[lang="ko"] .pv-now{text-wrap:balance}
   /* 아래 칸이 왼쪽 그늘 밖(오른쪽 아래)에 놓여, 낮은 창의 밝은 컷(도담 첫 장면 · 해변)에서 작품 줄 · 값 안내가 묻혔다(11-12 검수 — 601×600 대비 1.7 · 2.7).
      오른쪽 아래 구석에만 작은 그늘 한 겹(높이 340px 안이라 얼굴 줄에 닿지 않는다)과 옅은 글자 그림자를 더한다. 나머지 세 겹은 23줄 그대로다. */
   html[lang="ko"] .pv-hall::after{background:radial-gradient(ellipse 300px 340px at 100% 100%,rgba(0,0,0,.5),rgba(0,0,0,.34) 55%,rgba(0,0,0,0) 100%),linear-gradient(90deg,rgba(0,0,0,.66),rgba(0,0,0,0) 60%),linear-gradient(0deg,rgba(0,0,0,.6),rgba(0,0,0,0) 46%),linear-gradient(180deg,rgba(0,0,0,.4),rgba(0,0,0,0) 22%)}
   html[lang="ko"] .pv-now strong,html[lang="ko"] .pv-side .k-pv-price{text-shadow:0 0 2px rgba(0,0,0,.55),0 1px 12px rgba(0,0,0,.75)}
+  /* 머리글은 그늘이 옅은 얼굴 줄 바로 아래라 밝은 컷에서 흐렸다(11-13 — 900×600 대비 3.2) — 세로형(①-2)과 같은 한 단 밝은 글색 · 옅은 그림자 */
+  html[lang="ko"] .pv-copy .label{color:var(--ink-2);text-shadow:0 1px 10px rgba(0,0,0,.6)}
+  /* 높이 600~680의 낮은 창(11-13): 글 칸(제목 세 줄 + 소개 서너 줄)이 바닥 84px 위에 쌓이면 제목 첫 줄이 입 띠(화면 높이의 47.9%)에 11~33px 걸렸다.
+     번호 줄을 빼고(휴대폰 세로와 같다 — 네 작품은 바로 아래 「작품」에 같은 번호로 있다) 바닥 여백을 44px로 줄여 글 칸을 40px 내린다. 680부터는 앞 배치 그대로 든다. */
+  @media (max-height:679.98px){
+    html[lang="ko"] .pv-hall-in{padding-bottom:44px}
+    html[lang="ko"] .pv-index{display:none}
+  }
 }}
 /* ①-2 세로 화면의 시사실(11-10) — 첫 화면 글은 얼굴 줄 아래에만 둔다(쇼릴 규칙 「첫 화면 글이 얼굴을 덮지 않는 프레임만」).
    폭 900 아래에서 화면이 4:5보다 길면 pulse-v12.js가 세로 쇼릴(1080×1920)을 싣는데, 그 쇼릴은 얼굴이 원본 높이의 58%까지 내려온다
@@ -263,3 +275,38 @@ html[lang="en"] .pv-h1{font-size:clamp(36px,5.2vw,82px);text-shadow:0 1px 10px r
    작품 줄을 두 줄(44px)로 셈한다. */
 @media (max-width:600px) and (max-aspect-ratio:4/5) and (min-height:620px){html[lang="en"] .pv-h1{font-size:clamp(28px,min(10vw,5.2svh,(100vw - var(--gut) * 2) / 9.6,(43.8svh - .08 * max(100svh,177.78vw) - 108px) / 3.3),44px)}}
 @media (max-width:344.98px) and (max-aspect-ratio:4/5) and (min-height:620px){html[lang="en"] .pv-h1{font-size:clamp(28px,min(10vw,5.2svh,(100vw - var(--gut) * 2) / 9.6,(43.8svh - .08 * max(100svh,177.78vw) - 130px) / 3.3),44px)}}
+/* 2026-11-13 한국어 세로형 · 높이 620~660 × 폭 440~520(4:5 경계 가까이)도 같은 까닭으로 의뢰 단추가 첫 화면 밖으로 0~6px 나갔다 — 영어와 같은 식에
+   한국어 값(머리글 18 · 작품 줄 25 · 단추 48 · 얼굴 줄 12 · 여유 1.5 = 104.5px)을 넣는다. 한국어 작품 이름은 가장 긴 것이 약 211px라 폭 320에서도 한 줄이다. */
+@media (max-width:600px) and (max-aspect-ratio:4/5) and (min-height:620px){html[lang="ko"] .pv-h1{font-size:clamp(28px,min(10vw,5.2svh,(43.8svh - .08 * max(100svh,177.78vw) - 104.5px) / 3.3),44px)}}
+/* ①-3 낮은 가로 화면(11-13) — 폭 540 이상 · 높이 600 아래 · 세로형 아님(가로로 든 휴대폰, 낮게 줄인 창, 125%로 키운 작은 노트북).
+   첫 화면 최소 높이(600px)가 화면보다 커서 의뢰 단추가 첫 화면 아래로 4~236px 밀리고 제목이 쇼릴 얼굴 위에 놓였다. 세로형(①-2)과 같은 틀로 푼다 —
+   쇼릴은 화면 한 장 높이로 깔고, 가로 쇼릴의 얼굴 줄(입 바닥이 쇼릴 높이의 47.9% · 쇼릴은 max(화면 높이, 폭 × 0.625) 높이로 가운데 맞춤) 아래에
+   왼쪽은 머리글 · 제목, 오른쪽은 작품 줄 · 단추 · 값 안내를 바닥에서 24px 띄워 붙인다. 소개 줄은 쇼릴 바로 아래로 옮기고 번호 줄은 뺀다(둘 다 세로형과 같다).
+   제목 크기는 얼굴 줄 아래 남는 높이(화면 − 얼굴 줄 12 − 머리글 18 − 사이 12 − 바닥 24, 여유 2 = 68px)를 세 줄(3.3em)로 나눈 값과 왼쪽 칸 폭(가장 긴 줄
+   약 9.3em → 9.7로 나눔)을 넘지 않는다. 머리글과 제목 사이는 큰 글자(60px 위)에서 0.2em으로 늘어, 그때는 (남는 높이 − 56px) ÷ 3.5가 한계다. 높이 440 아래(휴대폰)는 오른쪽 칸이 얼굴 줄 아래에 들도록 작품 줄을 뺀다(세로형이 620 아래에서 빼는 것과 같다).
+   폭 540 아래의 낮은 창은 두 칸이 서지 않아 앞 배치 그대로다. 쇼릴을 바꾸면 --pv-face를 다시 잰다. */
+@media (min-width:540px) and (max-height:599.98px){@media not all and (max-aspect-ratio:4/5){
+  .pv-hall{--pv-face:.479;--pv-low-in:min(100vw - var(--gut) * 2,var(--wrap));--pv-low-side:clamp(172px,var(--pv-low-in) * .3,212px);height:auto;min-height:0;background:var(--pv-bg)}
+  .pv-reel,.pv-hall::after{bottom:auto;height:100vh;height:100svh}
+  /* 바닥 그늘은 쇼릴 끝에서 아래 칸 바탕색이 되어 아래로 옮긴 소개 줄과 이어지고, 오른쪽 아래 구석 그늘 한 겹이 오른쪽 칸의 작은 글을 받친다(①-1과 같은 값) */
+  .pv-hall::after{background:radial-gradient(ellipse 300px 340px at 100% 100%,rgba(0,0,0,.5),rgba(0,0,0,.34) 55%,rgba(0,0,0,0) 100%),linear-gradient(90deg,rgba(0,0,0,.66),rgba(0,0,0,0) 60%),linear-gradient(0deg,#0a0a0b,rgba(10,10,11,.78) 14%,rgba(10,10,11,.6) 34%,rgba(10,10,11,0) 50%),linear-gradient(180deg,rgba(0,0,0,.4),rgba(0,0,0,0) 22%)}
+  .pv-hall-in{position:relative;inset:auto;min-height:0;padding:0;justify-content:normal;align-items:normal;display:grid;grid-template-columns:minmax(0,1fr) var(--pv-low-side);column-gap:24px;
+    grid-template-rows:minmax(calc(50vh + (var(--pv-face) - .5) * max(100vh,62.5vw) + 12px),1fr) auto auto auto;
+    grid-template-rows:minmax(calc(50svh + (var(--pv-face) - .5) * max(100svh,62.5vw) + 12px),1fr) auto auto auto}
+  .pv-hall-in::before{content:'';grid-area:1/1/4/2;min-height:100vh;min-height:100svh}
+  .pv-copy{display:contents}
+  .pv-copy .label{grid-area:2/1;color:var(--ink-2);text-shadow:0 1px 10px rgba(0,0,0,.6)}
+  /* 남는 높이를 변수에 담지 않는다 — 변수는 모르는 단위(svh)도 받아들여 앞 줄(vh)로 물러나지 못한다 */
+  html[lang] .pv-h1{grid-area:3/1;margin:max(12px,.2em) 0 24px;
+    font-size:clamp(28px,min(5.4vw,(var(--pv-low-in) - var(--pv-low-side) - 24px) / 9.7,(50vh + (.5 - var(--pv-face)) * max(100vh,62.5vw) - 68px) / 3.3,(50vh + (.5 - var(--pv-face)) * max(100vh,62.5vw) - 56px) / 3.5),84px);
+    font-size:clamp(28px,min(5.4vw,(var(--pv-low-in) - var(--pv-low-side) - 24px) / 9.7,(50svh + (.5 - var(--pv-face)) * max(100svh,62.5vw) - 68px) / 3.3,(50svh + (.5 - var(--pv-face)) * max(100svh,62.5vw) - 56px) / 3.5),84px)}
+  .pv-side{grid-area:1/2/4/3;position:static;align-self:end;max-width:none;margin:0 0 24px;gap:12px;align-items:flex-end;text-align:right}
+  .pv-side .k-pv-price{margin-top:0}
+  .pv-now{min-height:0;text-wrap:balance}
+  .pv-now>span{display:none}
+  .pv-now strong,.pv-side .k-pv-price{text-shadow:0 0 2px rgba(0,0,0,.55),0 1px 12px rgba(0,0,0,.75)}
+  .btn.pv-cta{width:auto}
+  .pv-index{display:none}
+  .pv-hall .lead{grid-area:4/1/5/3;margin:40px 0 0}
+}}
+@media (min-width:540px) and (max-height:439.98px){@media not all and (max-aspect-ratio:4/5){.pv-now{display:none}}}
