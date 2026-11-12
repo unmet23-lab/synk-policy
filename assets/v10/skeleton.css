@@ -712,8 +712,10 @@ body[data-k="pulse"] .pv-ask-note{font-size:var(--k1)}
   /* 오른쪽 칸: 「학습자가 보는 화면」(문제 카드 · 실제 화면 조각) 아래에 「판단 기록」 — 1180px부터는 둘이 나란히.
      칸의 크기 가둠(learner.css의 container-type:size — LAB 교실 사진 자리 셈용, 1061px 이상)은 푼다: 이 쪽은 사진이 없고, 가둔 채로는 칸의 내용(카드 · 기록)이
      무대 구역 높이에 들지 않아 기록이 구역 아래로 넘치고 다음 구역에 덮였다(1061~1179px 세 줄 모두 · 1200~1280px 낮은 창 맺음 줄 — 화면 검수 P1) */
+  /* 오른쪽 여백은 왼쪽과 같은 식의 다섯째 칸이다(구역 폭 기준) — 창 폭(100vw)으로 셈하면 스크롤 막대가 자리를 차지하는 창에서 기록의 오른쪽 끝이 다른 구역보다 막대 폭의 절반만큼 안쪽으로 들어온다 */
+  .lw--judge.lw--try{grid-template-columns:max(var(--gut),calc((100% - var(--wrap)) / 2)) var(--lw-try-text) clamp(28px,3.6vw,56px) minmax(0,1fr) max(var(--gut),calc((100% - var(--wrap)) / 2))}
   .lw--judge.lw--try .lw-head>div:first-child{padding-top:clamp(32px,3.2vw,46px)}
-  .lw--judge .lw-visual{display:grid;grid-template-columns:minmax(0,1fr);container-type:normal;align-content:start;row-gap:0;padding:clamp(32px,3.2vw,46px) max(var(--gut),calc((100vw - var(--wrap)) / 2)) clamp(36px,3.6vw,52px) 0;overflow:visible}
+  .lw--judge .lw-visual{display:grid;grid-template-columns:minmax(0,1fr);container-type:normal;align-content:start;row-gap:0;padding:clamp(32px,3.2vw,46px) 0 clamp(36px,3.6vw,52px);overflow:visible}
   .lw--judge .lw-piece{position:relative;right:auto;top:auto;width:auto;max-width:540px;margin-top:18px;transform:none}
   .lw--judge .k-judge-rest{max-width:540px;margin-top:18px}
   .lw--judge .k-judge{margin-top:28px}

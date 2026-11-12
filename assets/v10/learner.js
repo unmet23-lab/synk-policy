@@ -3,6 +3,7 @@
 const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const narrow = matchMedia('(max-width:900px)');
 const stacked = matchMedia('(max-width:1179px)'); // 아틀라스 판단 기록이 카드 아래에 놓이는 폭(901~1179px 포함)
+const beside = matchMedia('(min-width:720px) and (max-width:900px)'); // 그 가운데 기록이 카드 옆에 놓이는 폭(가로로 든 휴대폰 · 태블릿)
 const DUR = 8000; // 한 칸 상영(자동 넘김). 사람이 고르면 자동 넘김은 멈춘다.
 
 /* ── 홈 · 아틀라스: 시간 줄을 누르면 그때의 창가 · 물음 · 실제 화면. 좁은 화면은 옆으로 넘기는 줄(모두 펼침). ── */
@@ -151,7 +152,7 @@ for (const root of document.querySelectorAll('[data-try]')) {
       let dy;
       if (blockBottom - blockTop <= low - top) dy = blockTop < top ? blockTop - top : blockBottom > low ? blockBottom - low : 0; // 한 화면에 든다 — 가려진 쪽만 맞춘다
       else if (!next.firstElementChild) dy = narrow.matches && blockBottom - cr.top <= low - top ? blockBottom - low : cr.top - top; // 답하기 전: 물음(카드 머리)이 먼저 — 휴대폰은 카드부터 세 줄까지 들면 아래를 맞춘다
-      else if (narrow.matches) dy = blockBottom - low; // 휴대폰 · 답한 뒤: 아래부터 — 바뀐 세 줄과 포커스 받은 다음 단추
+      else if (narrow.matches) dy = beside.matches ? Math.min(blockBottom - low, rows.top - top) : blockBottom - low; // 휴대폰 · 답한 뒤: 아래부터 — 바뀐 세 줄과 포커스 받은 다음 단추. 기록이 카드 옆인 폭의 낮은 창은 세 줄의 윗줄이 머리띠 뒤로 가지 않는 데까지만(단추는 바로 아래)
       else dy = Math.min(blockBottom - low, Math.min(head.top, er.top) - top); // 901~1179px · 답한 뒤: 세 줄 끝까지 내리되 왼쪽 글 머리 · 다음 단추가 머리띠 뒤로 가지 않게
       if (Math.abs(dy) >= 1) scrollBy({ top: dy, behavior });
       return;
