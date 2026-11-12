@@ -15,7 +15,7 @@ if (hall && reel) {
   const tallMq = matchMedia('(max-aspect-ratio: 4/5)'), posterWide = reel.getAttribute('poster');
   const now = hall.querySelector('[data-now]'), live = hall.querySelector('[data-now-live]');
   const buttons = [...hall.querySelectorAll('[data-index] button')];
-  let shown = data.timeline[0]?.work, visible = true, raf = 0, hold = null;
+  let shown = data.timeline[0]?.work, visible = true, raf = 0, hold = null, swap = 0;
   const segAt = t => { let cur = data.timeline[0]; for (const seg of data.timeline) if (t >= seg.at) cur = seg; return cur; };
   // 작품 이름 줄: 「…」로 묶인 작품 이름은 한 덩이로 둔다 — 칸이 좁아 줄이 꺾일 때 회사 이름 뒤에서 꺾인다(작품 이름 가운데가 아니라).
   const nameLine = w => {
@@ -45,7 +45,8 @@ if (hall && reel) {
   const start = () => { if (!raf) raf = requestAnimationFrame(loop); };
   // 쇼릴 판(가로 · 세로)은 화면 비율(4:5)로 고른다. 기기를 돌리거나 창 비율이 그 선을 넘나들면 다시 고른다 — 첫 화면 배치가 같은 선으로 갈리고(pulse-v12.css ①-1 · ①-2 · ①-3),
   // 배치마다 「글은 얼굴 줄 아래」를 그 판에서 쟀다. 두 판은 시각표가 같아 보던 자리에서 잇는다. 새 판이 그 자리로 갈 때까지는 영상 시각이 0이라,
-  // 작품 줄 · 번호 줄은 보던 시각(hold)으로 그린다(첫 작품으로 깜빡이지 않게).
+  // 작품 줄 · 번호 줄은 보던 시각(hold)으로 그린다(첫 작품으로 깜빡이지 않게). 그 사이 번호 단추를 누르면 hold가 누른 작품의 시각으로 바뀌고, 새 판은 그때의 hold로 간다.
+  // hold는 새 판이 그 자리에 닿으면(seeked) 풀고, seeked가 오지 않는 브라우저를 받쳐 자리를 넣은 4초 뒤에도 푼다. 판을 연달아 바꾸면 마지막 것만 푼다(swap).
   const pick = () => {
     const tall = tallMq.matches, poster = tall && reel.dataset.posterTall ? reel.dataset.posterTall : posterWide;
     if (poster && reel.getAttribute('poster') !== poster) reel.poster = poster;
@@ -57,8 +58,8 @@ if (hall && reel) {
     reel.muted = true;
     if (at > 0) {
       hold = at;
-      const free = () => { hold = null; };
-      reel.addEventListener('loadedmetadata', () => { reel.currentTime = at; reel.addEventListener('seeked', free, { once: true }); }, { once: true });
+      const mine = ++swap, free = () => { if (swap === mine) hold = null; };
+      reel.addEventListener('loadedmetadata', () => { reel.currentTime = hold ?? at; reel.addEventListener('seeked', free, { once: true }); setTimeout(free, 4000); }, { once: true });
       reel.addEventListener('error', free, { once: true });
     }
     if (visible) reel.play().catch(() => {});
@@ -77,7 +78,7 @@ if (hall && reel) {
     const w = data.works[b.dataset.work];
     if (still) { document.getElementById(b.dataset.target)?.scrollIntoView(); return; }
     const seg = data.timeline.find(x => x.work === b.dataset.work);
-    if (seg) { reel.currentTime = seg.at + 0.05; reel.play().catch(() => {}); start(); }
+    if (seg) { if (hold != null) hold = seg.at + 0.05; reel.currentTime = seg.at + 0.05; reel.play().catch(() => {}); start(); }
     if (live && w) live.textContent = w.say || w.title;
   });
 }
