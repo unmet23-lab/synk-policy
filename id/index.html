@@ -3,7 +3,7 @@
 <link rel="icon" type="image/png" sizes="16x16" href="/assets/favicon-synk-20260919-16.png">
 <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon-synk-20260919-32.png">
 <link rel="icon" type="image/png" sizes="48x48" href="/assets/favicon-synk-20260919-48.png">
-<link rel="icon" type="image/svg+xml" sizes="any" media="(prefers-color-scheme: dark)" href="/assets/favicon-synk-dark-20260919.svg"><title>SYNK ID</title><link rel="stylesheet" href="./id.css?v=64015eb5a881"></head>
+<link rel="icon" type="image/svg+xml" sizes="any" media="(prefers-color-scheme: dark)" href="/assets/favicon-synk-dark-20260919.svg"><title>SYNK ID</title><link rel="stylesheet" href="./id.css?v=554910b8598c"></head>
 <body class="sid"><main class="sid-main">
 <!-- A 한 칸(2026-11-11): 싱ㅋ 표 → 「SYNK ID」 회색 머리 → 장면마다 제목 하나 · 짧은 안내 하나 → 폼 → 바닥 링크. 첫머리 · 카드 상자 · 영문 꼬리표 없음.
      요소 id · 부모 관계는 portal.mjs · google-auth.mjs · portal-security.mjs가 기대는 그대로다(설계 README 5절의 계약 다섯). preview.html은 id가 한 벌이다. -->
@@ -44,6 +44,8 @@
 </section>
 <section id="google-onboarding" class="google-onboarding" aria-labelledby="google-onboarding-heading" hidden>
   <div class="intro-copy"><h1 id="google-onboarding-heading" tabindex="-1">가입을 마무리해요.</h1><p id="google-onboarding-copy">휴대폰을 인증하고 기본 정보를 입력해 주세요. 아이디와 비밀번호는 따로 만들지 않아요.</p></div>
+  <!-- 이미 SYNK ID가 있는 사람이 다른 주소의 Google로 들어온 자리: 양식을 채우기 전에 갈림길을 둔다. 누르면 이 가입(연결 없는 로그인 주인)을 지우고 로그인 화면으로. -->
+  <div id="google-existing-row" class="existing-row"><p class="switch-row"><span>이미 SYNK ID가 있나요?</span><button id="google-existing" class="link-button" type="button" aria-describedby="google-existing-note">기존 SYNK ID로 로그인</button></p><p id="google-existing-note" class="small">이 Google로 시작한 가입은 지우고 로그인 화면으로 가요. 로그인한 뒤 「로그인과 보안」에서 이 Google을 더할 수 있어요.</p></div>
   <form id="google-onboarding-form" class="auth-card google-onboarding-card" aria-labelledby="google-onboarding-heading">
     <div class="signup-choices google-signup-choices">
       <label class="toggle"><input id="google-privacy" type="checkbox" aria-describedby="google-privacy-summary" required><span>개인정보 수집·이용 안내를 확인했어요 <span class="muted">(필수)</span></span></label>
@@ -94,7 +96,7 @@
     </li>
     <li class="row security-row">
       <div class="row-main"><h3>로그인 방법</h3><p id="security-methods" class="security-value"></p></div>
-      <div id="google-linking" class="google-linking" hidden><button id="google-link" class="sb-btn soft compact google-btn" type="button" aria-describedby="google-link-status"><span class="google-mark" aria-hidden="true"></span><span>Google 계정 연결</span></button><p id="google-link-status" class="small" role="status" aria-live="polite" aria-atomic="true"></p></div>
+      <div id="google-linking" class="google-linking" hidden><button id="google-link" class="sb-btn soft compact google-btn" type="button" aria-describedby="google-link-status"><span class="google-mark" aria-hidden="true"></span><span id="google-link-label">Google 계정 연결</span></button><p id="google-link-status" class="small" role="status" aria-live="polite" aria-atomic="true"></p></div>
     </li>
     <li class="row security-row">
       <div class="row-main"><h3>비밀번호</h3><p>바꾸면 이 브라우저를 뺀 다른 기기와 앱(PC 앱·WORLD 포함)에서는 로그아웃돼요.</p></div>
@@ -113,4 +115,4 @@
 </section>
 <section id="account" class="account" hidden></section><section id="world-games" hidden></section>
 <section id="account-next" class="account-next" aria-labelledby="account-next-heading" hidden><div class="section-head"><h2 id="account-next-heading">SYNK 앱으로</h2></div><div class="next-links"><a class="sb-btn soft compact" href="https://synk.im/account/platform.html#home">SYNK 플랫폼</a><a class="sb-btn soft compact" href="https://synk.im/world/">SYNK WORLD</a><a class="sb-btn soft compact" href="https://synk.im/care/">플레저</a><a class="sb-btn soft compact" href="https://synk.im/">SYNK 홈</a></div></section>
-<footer class="sid-foot"><p class="footer-links"><a href="https://synk.im/">SYNK 홈</a><a href="https://synk.im/privacy/#synk-id">개인정보 처리 안내</a><a href="mailto:hello@synk.im">문의 hello@synk.im</a></p></footer></main><script src="./vendor/atlas-learning.js?v=08b82ec2cb45"></script><script type="module" src="./dist/app.js?v=f1ce9f22fc46"></script></body></html>
+<footer class="sid-foot"><p class="footer-links"><a href="https://synk.im/">SYNK 홈</a><a href="https://synk.im/privacy/#synk-id">개인정보 처리 안내</a><a href="mailto:hello@synk.im">문의 hello@synk.im</a></p></footer></main><script src="./vendor/atlas-learning.js?v=08b82ec2cb45"></script><script type="module" src="./dist/app.js?v=b8cc1ee12a84"></script></body></html>
