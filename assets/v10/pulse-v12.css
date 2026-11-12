@@ -204,6 +204,10 @@
   html[lang="ko"] .pv-copy{flex:1 1 0;min-width:0}
   html[lang="ko"] .pv-side{flex:none;width:clamp(164px,30%,212px);margin-top:0;align-items:flex-end;text-align:right}
   html[lang="ko"] .pv-now{text-wrap:balance}
+  /* 아래 칸이 왼쪽 그늘 밖(오른쪽 아래)에 놓여, 낮은 창의 밝은 컷(도담 첫 장면 · 해변)에서 작품 줄 · 값 안내가 묻혔다(11-12 검수 — 601×600 대비 1.7 · 2.7).
+     오른쪽 아래 구석에만 작은 그늘 한 겹(높이 340px 안이라 얼굴 줄에 닿지 않는다)과 옅은 글자 그림자를 더한다. 나머지 세 겹은 23줄 그대로다. */
+  html[lang="ko"] .pv-hall::after{background:radial-gradient(ellipse 300px 340px at 100% 100%,rgba(0,0,0,.5),rgba(0,0,0,.34) 55%,rgba(0,0,0,0) 100%),linear-gradient(90deg,rgba(0,0,0,.66),rgba(0,0,0,0) 60%),linear-gradient(0deg,rgba(0,0,0,.6),rgba(0,0,0,0) 46%),linear-gradient(180deg,rgba(0,0,0,.4),rgba(0,0,0,0) 22%)}
+  html[lang="ko"] .pv-now strong,html[lang="ko"] .pv-side .k-pv-price{text-shadow:0 0 2px rgba(0,0,0,.55),0 1px 12px rgba(0,0,0,.75)}
 }}
 /* ①-2 세로 화면의 시사실(11-10) — 첫 화면 글은 얼굴 줄 아래에만 둔다(쇼릴 규칙 「첫 화면 글이 얼굴을 덮지 않는 프레임만」).
    폭 900 아래에서 화면이 4:5보다 길면 pulse-v12.js가 세로 쇼릴(1080×1920)을 싣는데, 그 쇼릴은 얼굴이 원본 높이의 58%까지 내려온다
