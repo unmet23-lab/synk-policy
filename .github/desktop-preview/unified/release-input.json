@@ -2,9 +2,9 @@
   "schemaVersion": 1,
   "product": "platform",
   "channel": "preview",
-  "version": "0.4.88",
-  "releaseId": "platform-preview-0.4.88",
-  "buildId": "20261111.2",
+  "version": "0.4.89",
+  "releaseId": "platform-preview-0.4.89",
+  "buildId": "20261114.1",
   "manifestUrl": "https://synk.im/desktop/releases/preview.json",
   "baselines": [
     {
@@ -63,7 +63,7 @@
     }
   ],
   "electronVersion": "44.10.0",
-  "sourceHash": "27700e1f79d5b1eaee1eda23ecae3276957a027550487f50ef11232d18f3d7f2",
+  "sourceHash": "a7f10eb1c3e843f830eeb059759aca926cf845521f3409b38bf79b4ffa7f90b6",
   "sourceFiles": [
     {
       "path": "assets/launcher/benefit-care.webp",
@@ -211,9 +211,14 @@
       "sha256": "acaabc6e3f992484ff4038d1d11bc026259513a262fe4b8694651e29b0e92fc0"
     },
     {
+      "path": "assets/launcher/solio-object.webp",
+      "bytes": 302266,
+      "sha256": "b08b5567209ca8f56562587f8d9c4937a8997dbbb79e3b705441c59e64779420"
+    },
+    {
       "path": "assets/launcher/sources.json",
-      "bytes": 9863,
-      "sha256": "063676cf9da1c78bc6e7abf497802e03574568d8972673c1d66cbcb77673d2fc"
+      "bytes": 10102,
+      "sha256": "665c7b7990eb0718444332515b0dec9c39cc3cb7b5d0ab60eba4593e4664a95d"
     },
     {
       "path": "assets/launcher/studio-camera.webp",
@@ -492,13 +497,13 @@
     },
     {
       "path": "renderer/account-page.mjs",
-      "bytes": 34419,
-      "sha256": "ed08e4668449f0ca40d9af8fc575356d75aed0801d6828d1f5da372f7577dc85"
+      "bytes": 35246,
+      "sha256": "16539e14d1b8842f90770e49ed3864639cf142e91c47b4bb01ea53f8f495d47c"
     },
     {
       "path": "renderer/benefits.mjs",
-      "bytes": 4856,
-      "sha256": "b3b4b0bc67fd8f090eb084df24765c729b064ac5ff94c319b947759665d571fc"
+      "bytes": 3835,
+      "sha256": "e5d7b1361a2bd01dbfc1682aa30f3e8802d64fe815631c82e2e88df7f3502996"
     },
     {
       "path": "renderer/care-notifications.mjs",
@@ -507,8 +512,8 @@
     },
     {
       "path": "renderer/convenience-state.mjs",
-      "bytes": 5727,
-      "sha256": "fa39a16807645d4efce2aa93efbdf95f7f2173286bb589ca9a041ce62aa3890a"
+      "bytes": 6211,
+      "sha256": "ea800dc6447f67f0c9c6d4ad327e022b7d75cd4b77f89d3d1e1bf7769c05647c"
     },
     {
       "path": "renderer/convenience.css",
@@ -517,8 +522,8 @@
     },
     {
       "path": "renderer/convenience.mjs",
-      "bytes": 26766,
-      "sha256": "f9ff0994d35dd6e9b514f5323f8c3a676fe8c8011657a2afb0c22fd2ead3c4ef"
+      "bytes": 27230,
+      "sha256": "510004046627f1a4caf4337d6d952f2abfd8372c7224e000d9448482a323d6f5"
     },
     {
       "path": "renderer/draft-recovery.mjs",
@@ -582,23 +587,23 @@
     },
     {
       "path": "renderer/index.html",
-      "bytes": 24154,
-      "sha256": "4331aecd85d9cdb5f8b8a2c7fab60ccd76ef5588e48418edf21a0a1cb890b047"
+      "bytes": 26394,
+      "sha256": "e42511f5a8dd6cd8a88825690297ac1978dbe60bc0601ed230334c6ca78401e8"
     },
     {
       "path": "renderer/launcher.css",
-      "bytes": 49782,
-      "sha256": "04cf1de889e81efc1bcb8cd87342feddf6bfcd5161037ec4fcae419f68929549"
+      "bytes": 53160,
+      "sha256": "634ce99443381de300c730dace9096c9efbcbaffcfe7d48e7c5a6b14cfd75add"
     },
     {
       "path": "renderer/launcher.mjs",
-      "bytes": 84067,
-      "sha256": "dd6b3ef480b3e7407629823cbfadb29e1b3f33dbab024d2892844445816ae724"
+      "bytes": 93099,
+      "sha256": "79779eb5b699975bc1d4eef37d9a09f469835d98c413c141be60a230cb59bb3d"
     },
     {
       "path": "renderer/library.mjs",
-      "bytes": 6240,
-      "sha256": "7d9b9d4fd88f275518566aa76cde8deee221eb89466dd4a84c48362018622df4"
+      "bytes": 6236,
+      "sha256": "703ee55a00066c94670d6116fafebea4c3a0f54fbdc244f1cb03a6e5dbfe0453"
     },
     {
       "path": "renderer/member-activity-controller.mjs",
@@ -607,13 +612,13 @@
     },
     {
       "path": "renderer/member-home.css",
-      "bytes": 11770,
-      "sha256": "261109b4f6a63849785255a103bfe5381bdec67e84d78571d3fa68ef1a5481d3"
+      "bytes": 12064,
+      "sha256": "7188a3bd843506ab8026bf6d76ca446ba34a3444d9aa0447d6d83a50e6c0a4e2"
     },
     {
       "path": "renderer/member-home.mjs",
-      "bytes": 38110,
-      "sha256": "043c32ffd5629f5dab076d90dc2acb8f1ec319931bba301ddfd0d3acdfff96d4"
+      "bytes": 39159,
+      "sha256": "5d27d212615e29320e6cdd3ad18786a6c296f1378c14f1345eb36a5e73d869cb"
     },
     {
       "path": "renderer/member-insight-model.mjs",
@@ -622,8 +627,8 @@
     },
     {
       "path": "renderer/member-insight-view.mjs",
-      "bytes": 44306,
-      "sha256": "8007c95ed1ec7ae4d71ef656241f78fb7843e1471a9700b5781eee6eec7e3302"
+      "bytes": 44177,
+      "sha256": "fc382e148138e1d746a9f816bd56741404ef9256d78e31412b1a5c3040315911"
     },
     {
       "path": "renderer/member-insight.css",
@@ -686,6 +691,11 @@
       "sha256": "083bc969e5ad373027ace198bab18f1c4ad7155118d4fd6bfecc7350593ba4a1"
     },
     {
+      "path": "renderer/solio.mjs",
+      "bytes": 7342,
+      "sha256": "e68d2eea938ab4232e7ff6fe5183e46d4451b27cac7a1cb3510154f42e38ee92"
+    },
+    {
       "path": "renderer/startup-update.css",
       "bytes": 3933,
       "sha256": "fb77563a812f960c31247425bfc3cd3b2eb14333c65381be2e9fbaa46571576f"
@@ -702,8 +712,8 @@
     },
     {
       "path": "renderer/state.mjs",
-      "bytes": 17637,
-      "sha256": "e3097a030edd076f71f122a7eda69a88a75462b27f212f7f3c85ea4340a579e0"
+      "bytes": 17652,
+      "sha256": "e5a1f8b5e84c62d56c1704988969675513abab960eeb71974a1aa5a0cecc67fb"
     },
     {
       "path": "renderer/subscriptions-model.mjs",
@@ -717,8 +727,8 @@
     },
     {
       "path": "renderer/subscriptions.mjs",
-      "bytes": 169562,
-      "sha256": "44aa113f9d05ed43cb181831a4d19739f27dd9488e14c798090559c0265903db"
+      "bytes": 168562,
+      "sha256": "bc0610c4d40ed14672327a8afc5cda52d876afd65e387e077eba97258dbd1244"
     },
     {
       "path": "renderer/town-records-card.mjs",
@@ -847,8 +857,8 @@
     },
     {
       "path": "src/diagnostics-clipboard.cjs",
-      "bytes": 1701,
-      "sha256": "89cf6922d13471b8fb0739cde3fee9243036e05a6c30645dbbc9cff41218d0f5"
+      "bytes": 1729,
+      "sha256": "f5513d8d2abab87ef6347a98efecd4962eee10f82a7e5b53a8dcdc78dd92a881"
     },
     {
       "path": "src/downloads.cjs",
@@ -1047,8 +1057,8 @@
     },
     {
       "path": "src/subscription-login.cjs",
-      "bytes": 11767,
-      "sha256": "4bb8e2b410eb23253283c7bc0224b8e95c07965fafd9ea5252d9956a57f3c8e7"
+      "bytes": 11774,
+      "sha256": "a727e917e1990a1e1d4152e005d11a1834f794d79666480981a5558e25a5c355"
     },
     {
       "path": "src/subscription-providers.cjs",
