@@ -256,13 +256,13 @@ if (stage) {
       if (document.readyState === 'complete') idle(); else addEventListener('load', idle, { once: true });
     } else for (const ev of ['pointerenter', 'pointerdown', 'focus']) hear.addEventListener(ev, warm, { once: true });
   }
-  if (!reduce) new IntersectionObserver(es => { for (const e of es) { if (e.isIntersecting) { if (listen) { load(listen); listen.play().catch(() => {}); } } else { if (listen) listen.pause(); ask.pause(); } } }, { threshold: .35 }).observe(stage);
   hear.hidden = false;
   // 누른 뒤 재생이 시작되기(playing) 전까지는 단추를 「불러오는 중」(돌아가는 표 · aria-busy)으로 두고 무대 · 대사 줄은 그대로 — 재생이 시작되면 질문 영상과
-  // 질문 글로 바꾼다. 미리 받아 둔 판은 바로 재생되므로 0.12초 안에 시작하면 표시하지 않는다(깜빡임 · aria-busy가 켜졌다 꺼지는 것을 막음).
+  // 질문 글로 바꾼다. 아직 덜 받았으면 0.12초, 다 받아 둔 판(한 번 재생했거나 받기가 끝난 판 — 끝난 뒤 다시 듣기 포함)은 0.45초 안에 시작하면
+  // 표시하지 않는다(깜빡임 · aria-busy가 켜졌다 꺼지는 것을 막음). 이미 「불러오는 중」인데 또 누르면 표시는 그대로 두고 타이머만 다시 건다.
   // 10초 넘게 시작하지 않으면 쉬는 상태로 돌아간다.
   const hearText = $('.pa-hear-text', hear), hearLabel = hearText ? hearText.textContent : '';
-  let starting = false, giveUpTimer = 0, busyTimer = 0;
+  let starting = false, played = false, giveUpTimer = 0, busyTimer = 0, tries = 0;
   // 「불러오는 중…」이 원래 글보다 짧아 단추가 좁아지면 휴대폰에서 옆 단추가 한 줄 위로 올라붙어 아래가 출렁인다 — 불러오는 동안 원래 폭을 붙잡는다
   const busy = on => {
     if (on && !hear.classList.contains('is-loading')) hear.style.minWidth = hear.getBoundingClientRect().width + 'px';
@@ -271,29 +271,42 @@ if (stage) {
     if (on) hear.setAttribute('aria-busy', 'true'); else hear.removeAttribute('aria-busy');
     if (hearText) hearText.textContent = on && R.loading ? R.loading : hearLabel;
   };
-  const giveUp = () => { clearTimeout(giveUpTimer); clearTimeout(busyTimer); starting = false; busy(false); stage.classList.remove('is-asking'); ask.pause(); say(R.wait, '', true); };
+  // 시작을 기다리는 표시 · 타이머를 푼다 — 재생이 시작될 때 · 끝날 때 · 그만둘 때 모두 여기로
+  const settle = () => { starting = false; clearTimeout(giveUpTimer); clearTimeout(busyTimer); busy(false); };
+  const giveUp = () => { settle(); stage.classList.remove('is-asking'); ask.pause(); say(R.wait, '', true); };
   ask.addEventListener('playing', () => {
+    played = true;
     if (!starting) return;
-    starting = false; clearTimeout(giveUpTimer); clearTimeout(busyTimer); busy(false);
+    settle();
     stage.classList.add('is-asking'); say(R.question, R.lang === 'ko' ? '' : R.gloss, false);
   });
   hear.addEventListener('click', async () => {
+    // 질문이 나오는 중에 다시 누르면 처음으로 되감기만 한다(무대 · 줄은 그대로라 기다림 표시가 필요 없다)
+    if (stage.classList.contains('is-asking') && !ask.paused) { ask.currentTime = 0; return; }
+    const my = ++tries, ready = played || ask.readyState >= 3;
     ask.preload = 'auto'; load(ask); ask.currentTime = 0; ask.muted = false;
     starting = true; clearTimeout(giveUpTimer); clearTimeout(busyTimer);
-    busyTimer = setTimeout(() => { if (starting) busy(true); }, 120);
+    if (!hear.classList.contains('is-loading')) busyTimer = setTimeout(() => { if (starting) busy(true); }, ready ? 450 : 120);
     giveUpTimer = setTimeout(giveUp, 10000);
-    try { await ask.play(); } catch { giveUp(); }
+    try { await ask.play(); } catch { if (my === tries && starting) giveUp(); }
   });
   // 첫 질문은 3.6초에서 끝난다(공개 면접 연습 strict-question의 answerStartSeconds) — 그 뒤는 답을 기다리는 장면이라 듣는 모습으로 돌아간다.
   // 짧은 판은 3.83초에 끝나므로 끝(ended)에서도 같은 자리로 돌아간다.
   const done = () => {
     if (!stage.classList.contains('is-asking')) return;
-    stage.classList.remove('is-asking'); ask.pause();
+    settle(); stage.classList.remove('is-asking'); ask.pause();
     if (!reduce && listen) { load(listen); listen.play().catch(() => {}); }
     say(R.after, '', true);
   };
   ask.addEventListener('timeupdate', () => { if (ask.currentTime > 3.6) done(); });
   ask.addEventListener('ended', done);
+  // 무대가 화면 밖으로 나가면 멈춘다 — 질문을 기다리던 중이거나 질문이 나오던 중이었으면 쉬는 상태로 돌려, 다시 올라왔을 때 멈춘 면접관 화면이 남지 않게 한다
+  if (!reduce) new IntersectionObserver(es => {
+    for (const e of es) {
+      if (e.isIntersecting) { if (listen) { load(listen); listen.play().catch(() => {}); } }
+      else { if (listen) listen.pause(); if (starting || stage.classList.contains('is-asking')) giveUp(); else ask.pause(); }
+    }
+  }, { threshold: .35 }).observe(stage);
 }
 
 // ③ 옛 주소로 들어오면 그 역의 「무엇을 하나요」를 연다
