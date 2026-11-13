@@ -1,7 +1,7 @@
 {
- "createdAt": "2026-11-13T15:57:40.684Z",
- "commit": "f606175e6866964aa9fa3d2e037c27942eebe95f",
- "run": 43454510667,
+ "createdAt": "2026-11-13T17:54:46.974Z",
+ "commit": "f36f964e258d4c4b82fe4cee66802bd44c6ccf2d",
+ "run": 43474489079,
  "env": {
   "chromium": "151.0.7922.34",
   "os": "ubuntu24"
@@ -192,15 +192,15 @@
   "/en/shift/": {
    "desktop": {
     "file": "desktop/en~shift.jpg",
-    "sha256": "6f0728b654178e91bec696e37e7ed63a30060d79a800db5c6c3cb680c2f7d1f0",
-    "cssHeight": 6545,
-    "run": 43347619333
+    "sha256": "147b30c6dcdf232f5d2538b7c1acb8c790ec9fda268399d4b7bfee962c8e57e3",
+    "cssHeight": 7177,
+    "run": 43474489079
    },
    "mobile": {
     "file": "mobile/en~shift.jpg",
-    "sha256": "339459785a061b480914f5e0dfeb43b6e0108bfce8165210307b9768f387a379",
-    "cssHeight": 9726,
-    "run": 43347619333
+    "sha256": "680716dfeceb0afe4ecc4b0c1fd472e800fac2d862174200fb56a839540aeca7",
+    "cssHeight": 10553,
+    "run": 43474489079
    }
   },
   "/fortune/": {
@@ -444,15 +444,15 @@
   "/shift/": {
    "desktop": {
     "file": "desktop/shift.jpg",
-    "sha256": "c13189c346f1a0a39f55d0ff246b54f904f0232cde3f42cf5578b2a77591f826",
-    "cssHeight": 6249,
-    "run": 42861165288
+    "sha256": "7581dd7273050c4421fd6684e22cddfd8736715e14d2eccdc4c4a4d74d772f84",
+    "cssHeight": 6866,
+    "run": 43474489079
    },
    "mobile": {
     "file": "mobile/shift.jpg",
-    "sha256": "32417e567f7362846f3d9ee0108152654736232a9867cf24ef5ed3860687a5ce",
-    "cssHeight": 8628,
-    "run": 42861165288
+    "sha256": "e0a2da5755efbc9a0a64431e576e67ecd3de2917e31fb3c03bb45fb35bf31f45",
+    "cssHeight": 9502,
+    "run": 43474489079
    }
   },
   "/terms/": {
