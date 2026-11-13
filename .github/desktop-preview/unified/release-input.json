@@ -2,9 +2,9 @@
   "schemaVersion": 1,
   "product": "platform",
   "channel": "preview",
-  "version": "0.4.89",
-  "releaseId": "platform-preview-0.4.89",
-  "buildId": "20261114.1",
+  "version": "0.4.90",
+  "releaseId": "platform-preview-0.4.90",
+  "buildId": "20261114.2",
   "manifestUrl": "https://synk.im/desktop/releases/preview.json",
   "baselines": [
     {
@@ -63,7 +63,7 @@
     }
   ],
   "electronVersion": "44.10.0",
-  "sourceHash": "a7f10eb1c3e843f830eeb059759aca926cf845521f3409b38bf79b4ffa7f90b6",
+  "sourceHash": "d034fde7f6febd82772ee77e429dfdb09512daf8230f6e9161bcad9fa3fcb5a2",
   "sourceFiles": [
     {
       "path": "assets/launcher/benefit-care.webp",
@@ -597,8 +597,8 @@
     },
     {
       "path": "renderer/launcher.mjs",
-      "bytes": 93099,
-      "sha256": "79779eb5b699975bc1d4eef37d9a09f469835d98c413c141be60a230cb59bb3d"
+      "bytes": 93748,
+      "sha256": "9a09fd21988f7f598d7fd0c0b8c664bc500f0f953f5bdeb4addbab163959b934"
     },
     {
       "path": "renderer/library.mjs",
