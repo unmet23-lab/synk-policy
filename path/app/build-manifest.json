@@ -5,13 +5,29 @@
   "configFile": "config.json",
   "builder": {
     "file": "tools/prepare-path-app-public.mjs",
-    "sha256": "e67b625fa97bd1edcd7c17e95b1fe4f02cecfcc5b1dbc4a864787b683b526f6b",
+    "sha256": "11b94442bee0bf546579f1f0d62d2f052618481847e844a56df67e3641fe09a0",
     "esbuildVersion": "0.28.2"
   },
   "sourceFiles": [
     {
+      "file": "docs/브랜드_폰트/플랫폼_웹/DMMono-Medium.woff2",
+      "sha256": "69108e2080a3ffb271187d6d913a51b6faa4faf895d8cf15fc64879f8906cd8e"
+    },
+    {
+      "file": "docs/브랜드_폰트/플랫폼_웹/InterTight-Medium.woff2",
+      "sha256": "3f79a810283d78922a31ce5167f2875d40ae19ba8f7688110de0e63cfe359494"
+    },
+    {
       "file": "docs/브랜드_폰트/플랫폼_웹/InterTight-Regular.woff2",
       "sha256": "141691dedbf7ae404140c4666a7f654c5c9dceb3d9e7f1a3ba5aef84a6b093d5"
+    },
+    {
+      "file": "docs/브랜드_폰트/플랫폼_웹/InterTight-SemiBold.woff2",
+      "sha256": "354af8ae232a7132e66a4d023e18b1fbb6e36e0793976cffbe09e82891101f55"
+    },
+    {
+      "file": "docs/브랜드_폰트/DM_Mono/OFL.txt",
+      "sha256": "2bada5ea45c3c63b7f1ea1f88ce9672c9e4f0c42b2c3b7378949084fe55a3066"
     },
     {
       "file": "docs/브랜드_폰트/InterTight/OFL.txt",
@@ -27,39 +43,39 @@
     },
     {
       "file": "experiences/path-app/account-ui.mjs",
-      "sha256": "1fdcb67358f3c57a7d9d1c32a0d27752c4adc7ccd894bf5ef3cab7a6cb24c38b"
+      "sha256": "5689faabbf9a9ed31086ac28d2274a448136afe5a01dd516cc56008f2f4a718e"
     },
     {
       "file": "experiences/path-app/account.mjs",
-      "sha256": "df9769384afcb81f2c69bbac24a85211fc6f9c814ac385ac4ef1504df6b4ec34"
+      "sha256": "8fb7626b40a1b0f9aa66365066938572cfcc45b041c148c0a7c709d2c08934c8"
     },
     {
       "file": "experiences/path-app/app.mjs",
-      "sha256": "4e82d8db9be4da5a3e98d69ecb85af1939ae683ae6a0be049ae98d23d1b4ccc2"
+      "sha256": "283a3e3c547177c6db3efc0c330c989204a4d9050f93a32ab150af915a8c1733"
     },
     {
       "file": "experiences/path-app/content.mjs",
-      "sha256": "44d4880933984d204bfe2e4fea3f9a3f60113dcb59960fb0fe58bc3a4654f58a"
+      "sha256": "695818031ec1b21f4248720d5be0cf11eccb1d6676982912069993e0f3ffa295"
     },
     {
       "file": "experiences/path-app/document.mjs",
-      "sha256": "224241afa4ada2ceb5030e396751b2f2fcaf5fe25e30f7a3ddf81cbd5f5061d6"
+      "sha256": "2fe10316bbfe549fb0cfa408c9135610d982cf213106193eb873b894bc4de16d"
     },
     {
       "file": "experiences/path-app/index.html",
-      "sha256": "81193c7fe110ef9ea048dc1b642fb24abcb24dcb19e91ea75cab8c557ee85682"
+      "sha256": "40bcfdb9376b9c9250ded22caae7f50e80fd324870af9d2ba7f6ccc357b85fe8"
     },
     {
       "file": "experiences/path-app/jobs-ui.mjs",
-      "sha256": "ffc5ffd4f31e3dc87ac34df6496d879ea7fdb4865a0601ab2a77a210edfa2600"
+      "sha256": "e746aecbc94176875dde2d7965f3664ce6cf9bf476d8b253d7bca3bbf68e54b6"
     },
     {
       "file": "experiences/path-app/state.mjs",
-      "sha256": "38899f3af262cf7c7ef323a05031855d43c10e78aea3159a254127c2f1242b68"
+      "sha256": "7c1d5f16e6a020a63cddac0244da34ded7a78b127c08f2b817ee44eccd11f5a7"
     },
     {
       "file": "experiences/path-app/styles.css",
-      "sha256": "463e920e153196a8e50ae84d2c9b2982f4486b58997868726221a55b26f5a177"
+      "sha256": "cbb48286ce1d7795ab826b8e9a152cb78ae76de2aaae232e6e5053b2296dae97"
     },
     {
       "file": "experiences/synk-account/src/core.mjs",
@@ -81,8 +97,8 @@
   "files": [
     {
       "name": "app.mjs",
-      "bytes": 211867,
-      "sha256": "637e4e343bbbdf04d93ebe11fe4fce1e1cd2a2f2e6bf8e570338ee85933415cd"
+      "bytes": 225731,
+      "sha256": "81417627a1db7d2e1205ff55c88e8dd80a64f7948d18fdf89e9bf68b4a5fae8d"
     },
     {
       "name": "assets/SUIT-Variable.woff2",
@@ -105,9 +121,29 @@
       "sha256": "7bb9fbf670a56dcfbb1889314d248fa21c92acf2548ae42c08a67788ea50336c"
     },
     {
+      "name": "assets/InterTight-Medium.woff2",
+      "bytes": 111908,
+      "sha256": "3f79a810283d78922a31ce5167f2875d40ae19ba8f7688110de0e63cfe359494"
+    },
+    {
+      "name": "assets/InterTight-SemiBold.woff2",
+      "bytes": 25216,
+      "sha256": "354af8ae232a7132e66a4d023e18b1fbb6e36e0793976cffbe09e82891101f55"
+    },
+    {
+      "name": "assets/DMMono-Medium.woff2",
+      "bytes": 14932,
+      "sha256": "69108e2080a3ffb271187d6d913a51b6faa4faf895d8cf15fc64879f8906cd8e"
+    },
+    {
+      "name": "assets/DMMono-LICENSE.txt",
+      "bytes": 4484,
+      "sha256": "2bada5ea45c3c63b7f1ea1f88ce9672c9e4f0c42b2c3b7378949084fe55a3066"
+    },
+    {
       "name": "styles.css",
-      "bytes": 28881,
-      "sha256": "c77a925522061e20e1149235408ef22b0fd702cbe1b0bb5978c08721d8924534"
+      "bytes": 40072,
+      "sha256": "4a65c0a9c932eb3d66784442ba7a05f50432eb02e106288104dee016deff4ac2"
     },
     {
       "name": "config.json",
@@ -116,8 +152,8 @@
     },
     {
       "name": "index.html",
-      "bytes": 1571,
-      "sha256": "8f0594010c99b5bae91ee9cc4a4023866b5dddefdbc93a276bd6ab9a36cd88d1"
+      "bytes": 3578,
+      "sha256": "8ff32cc0d5f92ea6d9602db363ea936187b03c90c3484c61cade28785dc6aa94"
     }
   ],
   "transformations": [
