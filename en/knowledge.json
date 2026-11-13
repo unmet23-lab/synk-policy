@@ -1,6 +1,6 @@
 {
-  "version": "2026-09-15-selected-experiences-copy-9bfc4e4ce8-rhythm-20261001-copy-3910676d01-release-copy-3e4ed3be6d-en-002b14631325-bm-platform-20261007-a885b0d303-travel-20261007-ce148dd860-real-20261007-ab58ee7076-homepage-current-20261009-033c24b61f29-homepage-v10-20261010-7fcf3e2a8b0c",
-  "updatedAt": "2026-11-12",
+  "version": "2026-09-15-selected-experiences-copy-9bfc4e4ce8-rhythm-20261001-copy-3910676d01-release-copy-3e4ed3be6d-en-002b14631325-bm-platform-20261007-a885b0d303-travel-20261007-ce148dd860-real-20261007-ab58ee7076-homepage-current-20261009-033c24b61f29-homepage-v10-20261010-51fe3569f7e6",
+  "updatedAt": "2026-11-13",
   "docs": [
     {
       "id": "company",
@@ -43,7 +43,7 @@
         "Awards — 2026 Seoullo Media Canvas short animation open call (“What the Bridge Remembers”, selected; on show at Seoullo Media Canvas, Dec 2026 – Feb 2027), 2019 Fine Art Photography Awards (Open Theme · Winner), 2017 MK Challenge · Maeil Business Newspaper (project leader · runner-up)",
         "Education — Chung-Ang University, Psychology",
         "Architecture taught him to see structure, psychology gave him an interest in how people think and act, and the stage taught him to make something with many people in step. He now uses all of it to build SYNK.",
-        "Without signing up you can use SYNK WORLD, the Episode 1 scene of the K-drama role-play on the LAB page, the PATH day planner for Seoul, and one member benefit, Pleasure. My learning profile and the AI subscription board (PC app) are free once you sign in with SYNK ID, and so are the Korean games. Most of them are in Korean.",
+        "Without signing up you can use SYNK WORLD, the Episode 1 scene of the K-drama role-play on the LAB page, the PATH day planner for Seoul, and the member benefit Pleasure. My learning profile (My account → Personal info) and the AI subscription manager in SOLIO (PC app) are free once you sign in with SYNK ID, and so are the Korean games. Most of them are in Korean.",
         "Korean games — two beginner games you can start without knowing Hangul, and eight games where you do what you hear and read. In SYNK WORLD you practise for TOPIK and hang out with Mongle as you pick up Korean, and the mini-games open once you sign in.",
         "Sign in with SYNK ID to see supported game progress and member benefits in My home. Each program stores progress differently, and anything done before signing up does not move to your account.",
         "Atlas is the personalization engine SYNK builds, and eight engines share the work. They understand the goal and situation (Core, Strata, Trail), fit the content, screens, words and sound to the person (Loom, Vellum, Reed), and check whether it helped (Prism, Temper).",
@@ -65,15 +65,14 @@
         "Lowering the music while a LAB game plays a sentence, and checking levels and narration before a PULSE video is delivered, are Reed’s work.",
         "Strata maps what to learn and in what order, and it is still in development. It links grammar, expressions and vocabulary by difficulty and learning order, and is the basis for deciding which foundations to practise again when a learner gets something wrong.",
         "Strata is still in development.",
-        "It is where you use SYNK apps and member benefits in one place with a single SYNK ID. From the platform section on our home page, you can download Preview 0.4.88 for 64-bit Windows or Mac, or open the web preview. Separate Apple Silicon and Intel downloads are available for macOS 13 or later. Check the chip or processor in About This Mac to choose your download.",
+        "It is where you use SYNK apps and SOLIO in one place with a single SYNK ID. From the platform section on our home page, you can download Preview 0.4.88 for 64-bit Windows or Mac, or open the web preview. Separate Apple Silicon and Intel downloads are available for macOS 13 or later. Check the chip or processor in About This Mac to choose your download.",
         "SYNK WORLD — Korean games and TOPIK practice. A short TOPIK diagnostic shows where you stand, then you practise listening, reading and TOPIK II writing (questions 51–54); signed in with SYNK ID, you get writing feedback up to three times a day. Exam-style speaking practice is there too, without scores. Tap places in Our Town, such as the café, the convenience store or the bus stop, to learn the Korean used there; eight Korean games share one learning record, and Atlas picks your next practice from it. It opens on the web (synk.im/world) and in the PC app.",
-        "Member benefits — My learning profile, the AI subscription board (PC app) and Pleasure, all free for SYNK ID members. The benefits are in Korean.",
+        "SOLIO — SYNK SOLIO, the all-in-one work app for one-person AI businesses. The PC-only AI subscription manager (free for members) is available now, and backup and restore is in preparation. In PC app 0.4.88 and earlier, open it under Member benefits → AI subscription board; in the new release, it moves to SOLIO → AI subscription manager. On the web and in the new release, “SOLIO” is in the top menu, the member benefit Pleasure is in the profile menu on the right, and My learning profile is under My account → Personal info. These screens are in Korean.",
         "One SYNK ID — no separate sign-up for each app, and once you sign in your supported records follow the same account. Keep the apps you open often in My library, and turn on the account library to carry them to your other devices.",
         "What we are building — showing only the apps that match your organization and access, and carrying the interests you choose and the moments you found hard in practice into what comes next. You choose, check and correct what is remembered.",
         "These preview builds do not yet have a verified publisher signature or Apple notarization, so you may see a security notice. On Mac, drag the app from the DMG into Applications. The home page includes instructions for the first launch.",
-        "The SYNK platform has three member benefits, all free: My learning profile, the AI subscription board and Pleasure. Pleasure needs no account, and all three are in Korean. The free horoscope is paused while we rework it, and any horoscope records you saved have not been deleted.",
-        "My learning profile — shows what you chose apart from what your practice records show, and lets you open the evidence behind each. Sign in with SYNK ID to see it.",
-        "AI subscription board — puts this week’s usage, reset times and billing dates for your AI subscriptions on one screen and recommends the account to use first today. It runs in the PC app, reads only the numbers each service officially reports, and keeps its records on that PC.",
+        "The SYNK platform’s member benefit is Pleasure, free and usable without an account (in Korean). On the web and in the new release, open it from “Member benefits” in the profile menu on the right and pin it to My home if you like, and see My learning profile under My account → Personal info. For the PC-only AI subscription feature, open Member benefits → AI subscription board in PC app 0.4.88 and earlier (where Pleasure and My learning profile are also under Member benefits); in the new release, it moves to SOLIO → AI subscription manager. The free horoscope is paused while we rework it, and any horoscope records you saved have not been deleted.",
+        "My learning profile (My account → Personal info) — shows what you chose apart from what your practice records show, and lets you open the evidence behind each. Sign in with SYNK ID to see it.",
         "Pleasure — who to get in touch with today, birthdays and anniversaries on lunar dates too, and the wedding and funeral gifts you have given and received, kept in one place. Start on the web and sign in to keep it on your account.",
         "They fall into three groups: engines that understand (Core, Strata, Trail), engines that fit the experience (Loom, Vellum, Reed) and engines that check (Prism, Temper). Each service uses the ones it needs.",
         "Core decides what is needed now and records why something was recommended or left out. Strata maps what to learn and in what order (in development). Trail records the process and what changed.",
@@ -83,7 +82,7 @@
         "Each program stores progress differently. Guest progress stays in that browser; with a SYNK ID, supported records are kept in your account. Anything done before signing up does not move to your account automatically.",
         "In SHIFT lectures and work automation, material and records are used only for the purpose and consent agreed with whoever made the request. You can find how each service keeps, shows and deletes data in the privacy policy."
       ],
-      "updatedAt": "2026-11-12"
+      "updatedAt": "2026-11-13"
     },
     {
       "id": "lab",
@@ -301,6 +300,9 @@
         "Automation build — scope and price for one task are agreed in a half-day review of your workflow. It depends on how many exceptions there are and which services it must connect to, and the price is based on the cost the automation saves.",
         "Monthly care — we agree how often we check and what we fix, and take it on month by month. Fees for external services the automation uses may be extra, and if the work changes enough to need a rebuild, scope and cost are agreed again.",
         "The earlier split into setup fees and operating fees is no longer used.",
+        "SYNK SOLIO is the all-in-one work app for one-person AI businesses. It is a product inside SHIFT, and on the web and in the new release you open it from “SOLIO” in the top menu of the SYNK platform (in Korean). The PC-only AI subscription manager (free for members) is available now, and backup and restore is in preparation. In PC app 0.4.88 and earlier, open it under Member benefits → AI subscription board; in the new release, it moves to SOLIO → AI subscription manager.",
+        "AI subscription manager — puts this week’s usage, reset times and billing dates for your AI subscriptions on one screen and recommends the account to use first today. Members signed in with SYNK ID use it free in the SYNK PC app; it reads only the numbers each service officially reports and keeps its records on that PC. It used to be called the AI subscription board.",
+        "Backup and restore — encrypted backup of work files and restore on a new PC is being built. No installer or price has been published, and there is nothing to sign up for yet.",
         "Not a general careers talk: a lecture for schools on how to steer a career in the AI era and which skills to build for it. Students look at how AI is changing work in a field they care about, then pick the skills that kind of work needs and what they can start on now.",
         "Each student leaves with a one-page plan for their own career: what AI is changing in their field and what they will prepare. Year group and class size, lesson time, and the devices and tools students can use are agreed with the school beforehand.",
         "Schedule and cost are agreed with each school. The lecture does not decide a student’s career for them.",
@@ -309,7 +311,7 @@
         "We do not lead with a headcount or a roster; for each request we find an instructor who fits and show you their profile sheet. We have not posted for instructors yet. If you would like to teach with us, tell us your field and what you have made yourself at hello@synk.im. Selection criteria, payment and rights to teaching material will be shared once they are set.",
         "The lectures and the instructor you can ask about now are under “What we do” and “Instructor” on the SHIFT page. Each lecture has an “Ask about this lecture” button, and if you need someone else, “Ask for an instructor” under “Finding an instructor” lets SYNK recommend one."
       ],
-      "updatedAt": "2026-11-12"
+      "updatedAt": "2026-11-13"
     },
     {
       "id": "pulse",
@@ -4258,7 +4260,7 @@
         "What can I try for free?",
         "Is there anything I can use right now?"
       ],
-      "answer": "Without signing up you can use SYNK WORLD, the Episode 1 scene of the K-drama role-play on the LAB page, the PATH day planner for Seoul, and one member benefit, Pleasure. My learning profile and the AI subscription board (PC app) are free once you sign in with SYNK ID, and so are the Korean games. Most of them are in Korean.\n\nKorean games — two beginner games you can start without knowing Hangul, and eight games where you do what you hear and read. In SYNK WORLD you practise for TOPIK and hang out with Mongle as you pick up Korean, and the mini-games open once you sign in.\n\nSign in with SYNK ID to see supported game progress and member benefits in My home. Each program stores progress differently, and anything done before signing up does not move to your account.",
+      "answer": "Without signing up you can use SYNK WORLD, the Episode 1 scene of the K-drama role-play on the LAB page, the PATH day planner for Seoul, and the member benefit Pleasure. My learning profile (My account → Personal info) and the AI subscription manager in SOLIO (PC app) are free once you sign in with SYNK ID, and so are the Korean games. Most of them are in Korean.\n\nKorean games — two beginner games you can start without knowing Hangul, and eight games where you do what you hear and read. In SYNK WORLD you practise for TOPIK and hang out with Mongle as you pick up Korean, and the mini-games open once you sign in.\n\nSign in with SYNK ID to see supported game progress and member benefits in My home. Each program stores progress differently, and anything done before signing up does not move to your account.",
       "relatedIds": [
         "synk-stage",
         "guide-contact"
@@ -4782,7 +4784,7 @@
         "What is SYNK WORLD?",
         "Where do I get the PC app?"
       ],
-      "answer": "It is where you use SYNK apps and member benefits in one place with a single SYNK ID. From the platform section on our home page, you can download Preview 0.4.88 for 64-bit Windows or Mac, or open the web preview. Separate Apple Silicon and Intel downloads are available for macOS 13 or later. Check the chip or processor in About This Mac to choose your download.\n\nSYNK WORLD — Korean games and TOPIK practice. A short TOPIK diagnostic shows where you stand, then you practise listening, reading and TOPIK II writing (questions 51–54); signed in with SYNK ID, you get writing feedback up to three times a day. Exam-style speaking practice is there too, without scores. Tap places in Our Town, such as the café, the convenience store or the bus stop, to learn the Korean used there; eight Korean games share one learning record, and Atlas picks your next practice from it. It opens on the web (synk.im/world) and in the PC app.\n\nMember benefits — My learning profile, the AI subscription board (PC app) and Pleasure, all free for SYNK ID members. The benefits are in Korean.\n\nOne SYNK ID — no separate sign-up for each app, and once you sign in your supported records follow the same account. Keep the apps you open often in My library, and turn on the account library to carry them to your other devices.\n\nWhat we are building — showing only the apps that match your organization and access, and carrying the interests you choose and the moments you found hard in practice into what comes next. You choose, check and correct what is remembered.\n\nThese preview builds do not yet have a verified publisher signature or Apple notarization, so you may see a security notice. On Mac, drag the app from the DMG into Applications. The home page includes instructions for the first launch.",
+      "answer": "It is where you use SYNK apps and SOLIO in one place with a single SYNK ID. From the platform section on our home page, you can download Preview 0.4.88 for 64-bit Windows or Mac, or open the web preview. Separate Apple Silicon and Intel downloads are available for macOS 13 or later. Check the chip or processor in About This Mac to choose your download.\n\nSYNK WORLD — Korean games and TOPIK practice. A short TOPIK diagnostic shows where you stand, then you practise listening, reading and TOPIK II writing (questions 51–54); signed in with SYNK ID, you get writing feedback up to three times a day. Exam-style speaking practice is there too, without scores. Tap places in Our Town, such as the café, the convenience store or the bus stop, to learn the Korean used there; eight Korean games share one learning record, and Atlas picks your next practice from it. It opens on the web (synk.im/world) and in the PC app.\n\nSOLIO — SYNK SOLIO, the all-in-one work app for one-person AI businesses. The PC-only AI subscription manager (free for members) is available now, and backup and restore is in preparation. In PC app 0.4.88 and earlier, open it under Member benefits → AI subscription board; in the new release, it moves to SOLIO → AI subscription manager. On the web and in the new release, “SOLIO” is in the top menu, the member benefit Pleasure is in the profile menu on the right, and My learning profile is under My account → Personal info. These screens are in Korean.\n\nOne SYNK ID — no separate sign-up for each app, and once you sign in your supported records follow the same account. Keep the apps you open often in My library, and turn on the account library to carry them to your other devices.\n\nWhat we are building — showing only the apps that match your organization and access, and carrying the interests you choose and the moments you found hard in practice into what comes next. You choose, check and correct what is remembered.\n\nThese preview builds do not yet have a verified publisher signature or Apple notarization, so you may see a security notice. On Mac, drag the app from the DMG into Applications. The home page includes instructions for the first launch.",
       "sourceId": "company",
       "relatedIds": [
         "synk-intro",
@@ -4793,7 +4795,7 @@
         "label": "Download or open the web preview",
         "href": "/en/#platform"
       },
-      "reviewedAt": "2026-10-30"
+      "reviewedAt": "2026-11-13"
     },
     {
       "id": "synk-benefits",
@@ -4803,20 +4805,19 @@
         "member benefits",
         "benefits",
         "learning profile",
-        "ai subscription",
-        "subscription board",
+        "personal info",
         "pleasure",
         "horoscope",
         "fortune"
       ],
       "questionExamples": [
         "What member benefits are there?",
-        "What is the AI subscription board?",
+        "Where is My learning profile now?",
         "What is My learning profile?",
         "What is Pleasure?",
         "Where can I read the free horoscope?"
       ],
-      "answer": "The SYNK platform has three member benefits, all free: My learning profile, the AI subscription board and Pleasure. Pleasure needs no account, and all three are in Korean. The free horoscope is paused while we rework it, and any horoscope records you saved have not been deleted.\n\nMy learning profile — shows what you chose apart from what your practice records show, and lets you open the evidence behind each. Sign in with SYNK ID to see it.\n\nAI subscription board — puts this week’s usage, reset times and billing dates for your AI subscriptions on one screen and recommends the account to use first today. It runs in the PC app, reads only the numbers each service officially reports, and keeps its records on that PC.\n\nPleasure — who to get in touch with today, birthdays and anniversaries on lunar dates too, and the wedding and funeral gifts you have given and received, kept in one place. Start on the web and sign in to keep it on your account.",
+      "answer": "The SYNK platform’s member benefit is Pleasure, free and usable without an account (in Korean). On the web and in the new release, open it from “Member benefits” in the profile menu on the right and pin it to My home if you like, and see My learning profile under My account → Personal info. For the PC-only AI subscription feature, open Member benefits → AI subscription board in PC app 0.4.88 and earlier (where Pleasure and My learning profile are also under Member benefits); in the new release, it moves to SOLIO → AI subscription manager. The free horoscope is paused while we rework it, and any horoscope records you saved have not been deleted.\n\nMy learning profile (My account → Personal info) — shows what you chose apart from what your practice records show, and lets you open the evidence behind each. Sign in with SYNK ID to see it.\n\nPleasure — who to get in touch with today, birthdays and anniversaries on lunar dates too, and the wedding and funeral gifts you have given and received, kept in one place. Start on the web and sign in to keep it on your account.",
       "sourceId": "company",
       "relatedIds": [
         "synk-platform",
@@ -4827,7 +4828,41 @@
         "label": "See the member benefits",
         "href": "/account/platform.html#benefits"
       },
-      "reviewedAt": "2026-10-30"
+      "reviewedAt": "2026-11-13"
+    },
+    {
+      "id": "shift-solio",
+      "title": "What is SYNK SOLIO?",
+      "brand": "shift",
+      "keywords": [
+        "solio",
+        "synk solio",
+        "one-person business",
+        "solo business",
+        "ai subscription",
+        "subscription manager",
+        "subscription board",
+        "backup and restore"
+      ],
+      "questionExamples": [
+        "What is SYNK SOLIO?",
+        "What is SOLIO?",
+        "Where do I manage my AI subscriptions?",
+        "Where did the AI subscription board go?",
+        "When is SOLIO backup coming?"
+      ],
+      "answer": "SYNK SOLIO is the all-in-one work app for one-person AI businesses. It is a product inside SHIFT, and on the web and in the new release you open it from “SOLIO” in the top menu of the SYNK platform (in Korean). The PC-only AI subscription manager (free for members) is available now, and backup and restore is in preparation. In PC app 0.4.88 and earlier, open it under Member benefits → AI subscription board; in the new release, it moves to SOLIO → AI subscription manager.\n\nAI subscription manager — puts this week’s usage, reset times and billing dates for your AI subscriptions on one screen and recommends the account to use first today. Members signed in with SYNK ID use it free in the SYNK PC app; it reads only the numbers each service officially reports and keeps its records on that PC. It used to be called the AI subscription board.\n\nBackup and restore — encrypted backup of work files and restore on a new PC is being built. No installer or price has been published, and there is nothing to sign up for yet.",
+      "sourceId": "shift",
+      "relatedIds": [
+        "synk-platform",
+        "synk-benefits",
+        "shift-services"
+      ],
+      "action": {
+        "label": "See SOLIO on the platform (Korean)",
+        "href": "/account/platform.html#solio"
+      },
+      "reviewedAt": "2026-11-13"
     },
     {
       "id": "atlas-engines",

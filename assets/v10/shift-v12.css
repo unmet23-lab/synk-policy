@@ -154,3 +154,7 @@ body[data-page="shift"] .lc-how{border-top:1px solid var(--ink);padding-top:16px
   .sv-every{grid-column:2}
 }
 @media (prefers-reduced-motion:reduce){.sv-rows li.flip .sv-t,.sv-rows li.flip .sv-what{animation:none}.sv-t,.sv-what,.sv-every{transition:none}}
+
+/* SYNK SOLIO(2026-11-13): 묻기 뒤 · 알아 두실 것 앞. 줄은 LAB 「다음에 여는 것」과 같은 1px 줄(skeleton.css .k-next)을 쓰고, 이 쪽에만 간격을 둔다. */
+.k-sv-solio .k-solio{margin-top:clamp(28px,4vw,48px)}
+.k-sv-solio .k-acts{margin-top:clamp(24px,3vw,36px)}
