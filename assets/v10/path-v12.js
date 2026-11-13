@@ -241,9 +241,12 @@ if (stage) {
     line.innerHTML = gloss ? `<span lang="ko">${esc(text)}</span><small>${esc(gloss)}</small>` : esc(text);
   };
   // 듣는 영상은 공개 면접 연습 manifest가 loop:false다 — 끝(10.08초)에서 처음으로 바로 넘기면 이음새가 보여, 안전 구간(9~9.98초)에 들면 0.1초로 되돌린다.
-  listen.addEventListener('timeupdate', () => { if (listen.currentTime > 9.3) listen.currentTime = 0.1; });
-  listen.addEventListener('ended', () => { listen.currentTime = 0.1; listen.play().catch(() => {}); });
-  if (!reduce) new IntersectionObserver(es => { for (const e of es) { if (e.isIntersecting) { load(listen); listen.play().catch(() => {}); } else { listen.pause(); ask.pause(); } } }, { threshold: .35 }).observe(stage);
+  // 11-13부터 쪽 첫 화면은 듣는 영상 대신 그림 한 장(「집에서 먼저」, skeleton-pages.mjs path) — 듣는 영상이 없으면 질문 영상만 다룬다.
+  if (listen) {
+    listen.addEventListener('timeupdate', () => { if (listen.currentTime > 9.3) listen.currentTime = 0.1; });
+    listen.addEventListener('ended', () => { listen.currentTime = 0.1; listen.play().catch(() => {}); });
+  }
+  if (!reduce) new IntersectionObserver(es => { for (const e of es) { if (e.isIntersecting) { if (listen) { load(listen); listen.play().catch(() => {}); } } else { if (listen) listen.pause(); ask.pause(); } } }, { threshold: .35 }).observe(stage);
   hear.hidden = false;
   hear.addEventListener('click', async () => {
     load(ask); ask.currentTime = 0; ask.muted = false; stage.classList.add('is-asking');
@@ -254,7 +257,7 @@ if (stage) {
   ask.addEventListener('timeupdate', () => {
     if (ask.currentTime <= 3.6 || !stage.classList.contains('is-asking')) return;
     stage.classList.remove('is-asking'); ask.pause();
-    if (!reduce) { load(listen); listen.play().catch(() => {}); }
+    if (!reduce && listen) { load(listen); listen.play().catch(() => {}); }
     say(R.after, '', true);
   });
 }
