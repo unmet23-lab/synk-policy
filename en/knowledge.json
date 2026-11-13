@@ -1,6 +1,6 @@
 {
-  "version": "2026-09-15-selected-experiences-copy-9bfc4e4ce8-rhythm-20261001-copy-3910676d01-release-copy-3e4ed3be6d-en-002b14631325-bm-platform-20261007-a885b0d303-travel-20261007-ce148dd860-real-20261007-ab58ee7076-homepage-current-20261009-033c24b61f29-homepage-v10-20261010-51fe3569f7e6",
-  "updatedAt": "2026-11-13",
+  "version": "2026-09-15-selected-experiences-copy-9bfc4e4ce8-rhythm-20261001-copy-3910676d01-release-copy-3e4ed3be6d-en-002b14631325-bm-platform-20261007-a885b0d303-travel-20261007-ce148dd860-real-20261007-ab58ee7076-homepage-current-20261009-033c24b61f29-homepage-v10-20261010-51fe3569f7e6-solio-quality-2abacf25c8f1",
+  "updatedAt": "2026-11-14",
   "docs": [
     {
       "id": "company",
@@ -82,7 +82,7 @@
         "Each program stores progress differently. Guest progress stays in that browser; with a SYNK ID, supported records are kept in your account. Anything done before signing up does not move to your account automatically.",
         "In SHIFT lectures and work automation, material and records are used only for the purpose and consent agreed with whoever made the request. You can find how each service keeps, shows and deletes data in the privacy policy."
       ],
-      "updatedAt": "2026-11-13"
+      "updatedAt": "2026-11-14"
     },
     {
       "id": "lab",
@@ -4269,7 +4269,7 @@
         "label": "See the SYNK platform",
         "href": "/en/#platform"
       },
-      "reviewedAt": "2026-11-04",
+      "reviewedAt": "2026-11-14",
       "aliases": [
         "SYNK 플랫폼에서는 무엇을 무료로 체험하나요?",
         "What can I try for free on the SYNK platform?"
@@ -4795,7 +4795,19 @@
         "label": "Download or open the web preview",
         "href": "/en/#platform"
       },
-      "reviewedAt": "2026-11-13"
+      "reviewedAt": "2026-11-13",
+      "aliases": [
+        "SYNK 플랫폼은 무엇인가요?",
+        "SYNK 플랫폼은 쓸수록 나에게 맞춰지나요?",
+        "SYNK ID로 무엇을 할 수 있나요?",
+        "내 홈은 어디인가요?",
+        "SYNK 앱은 어디서 받나요?",
+        "플랫폼은 언제 나오나요?",
+        "로그인하면 무엇이 이어지나요?",
+        "SYNK WORLD는 어디서 하나요?",
+        "SYNK WORLD는 무엇인가요?",
+        "PC 앱은 어디서 받나요?"
+      ]
     },
     {
       "id": "synk-benefits",
@@ -4828,7 +4840,16 @@
         "label": "See the member benefits",
         "href": "/account/platform.html#benefits"
       },
-      "reviewedAt": "2026-11-13"
+      "reviewedAt": "2026-11-13",
+      "aliases": [
+        "회원 혜택에는 무엇이 있나요?",
+        "회원 혜택은 어디서 보나요?",
+        "내 성향은 어디서 보나요?",
+        "맞춤 정보는 어디서 보나요?",
+        "내 성향 확인하기는 무엇인가요?",
+        "플레저는 무엇인가요?",
+        "무료 운세는 어디서 보나요?"
+      ]
     },
     {
       "id": "shift-solio",
@@ -4862,7 +4883,17 @@
         "label": "See SOLIO on the platform (Korean)",
         "href": "/account/platform.html#solio"
       },
-      "reviewedAt": "2026-11-13"
+      "reviewedAt": "2026-11-13",
+      "aliases": [
+        "SYNK SOLIO(솔리오)는 무엇인가요?",
+        "SYNK SOLIO는 무엇인가요?",
+        "싱크 솔리오는 무엇인가요?",
+        "솔리오는 무엇인가요?",
+        "AI 구독 관리는 어디서 하나요?",
+        "AI 구독 계정판은 어디로 갔나요?",
+        "솔리오 백업은 언제 나오나요?",
+        "솔리오 백업·복구는 언제 나오나요?"
+      ]
     },
     {
       "id": "atlas-engines",
