@@ -1,9 +1,10 @@
-// synk.im 뼈대(2026-11-10) — 한국어 일곱 쪽의 움직임(build.mjs가 한국어 쪽에만 싣는다, 정본 site-v10/README.md 「뼈대」 절).
+// synk.im 뼈대(2026-11-10) — 한국어 · 영어 일곱 쪽의 움직임(build.mjs가 뼈대 쪽에 싣는다 — 11-12부터 영어도, 정본 site-v10/README.md 「뼈대」 절).
 // ⓪ 접어 둔 구역 펼치기 · ① 홈에서 뺀 구역의 옛 주소를 사업 쪽으로 넘김 · ② 홈 문 넷 상영 · ③ 메뉴 막대 밝기 · SHIFT 시계.
 // ② 문 넷의 상영: home-v12.js의 규칙(한 칸씩 차례로 · 손을 올리면 그 칸부터 · 예약표는 서울 시각 · 동선은 다시 그림)을 새 짜임에 맞춰 옮겼다.
-//    넓은 화면은 차례로 돌고, 좁은 화면(문이 세로로 쌓임)은 화면 가운데에 가장 가까운 문 하나만 상영한다. 한국어 홈은 home-v12.js를 싣지 않는다.
+//    넓은 화면은 차례로 돌고, 좁은 화면(문이 세로로 쌓임)은 화면 가운데에 가장 가까운 문 하나만 상영한다. 뼈대 홈(한국어 · 영어)은 home-v12.js를 싣지 않는다.
 // ③ 메뉴 막대의 밝기: 밤 구역이 입구 아래로 이어지므로 막대 밑이 밤이면 어둡게 둔다.
-const 옮김 = { '#drama': '/lab/#drama', '#founder': '/founder/', '#founder-quote': '/founder/' };
+const 앞 = document.documentElement.lang === 'en' ? '/en' : ''; // 영어 쪽은 영어 쪽으로
+const 옮김 = { '#drama': 앞 + '/lab/#drama', '#founder': 앞 + '/founder/', '#founder-quote': 앞 + '/founder/' };
 if (document.body.dataset.k === 'home' && 옮김[location.hash]) location.replace(옮김[location.hash]);
 
 // ⓪ 접어 둔 구역의 주소로 들어오면 펼친다(「다음에 여는 것」 · 「왜 4급인가」 — data-open-for에 그 구역의 주소들이 적혀 있다)

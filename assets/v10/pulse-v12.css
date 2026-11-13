@@ -196,29 +196,29 @@
   .pv-types dl,.pv-brief{grid-template-columns:1fr}
   .pv-face{flex-basis:40vw}
 }
-/* ①-1 한국어 가로형의 아래 칸(11-12 검수) — 폭 601~900 · 화면이 4:5보다 넓음 · 높이 600 이상(세로로 든 태블릿 768×954 · 810×1010, 화면을 반으로 나눈 창).
+/* ①-1 가로형의 아래 칸(11-12 검수 · 한국어, 11-13 영어도) — 폭 601~900 · 화면이 4:5보다 넓음 · 높이 600 이상(세로로 든 태블릿 768×954 · 810×1010, 화면을 반으로 나눈 창).
    작품 줄 · 단추 · 값 안내 두 줄을 글 칸 아래에 쌓으면 아래 칸이 156px라 글 뭉치가 그만큼 올라가, 쇼릴 03 클로즈업 1.8초 동안 제목 첫 줄이 배우 입 · 턱
    (낮은 창에서는 눈) 위에 왔다. 가로 쇼릴의 얼굴은 화면 높이의 48%(입) · 53%(턱)까지 내려온다(쇼릴을 바꾸면 다시 잰다).
    글 뭉치를 올리지 않고, 넓은 화면처럼 글 칸은 왼쪽 · 아래 칸은 오른쪽에 나란히 바닥에 붙인다 — 글 칸 바닥이 앞 공개본(바닥에서 214px)보다 130px 낮아진다.
    아래 칸의 작품 줄이 한 줄 · 두 줄로 바뀌어도 제 칸 안에서 위로만 자라 제목은 움직이지 않는다. 아래 칸 폭은 단추(150px)보다 넓게 · 값 안내가 두 줄에 드는 172px부터(11-13 — 164px에서는 세 줄), 글 칸에는
-   제목 첫 줄(약 9.3em)이 들어갈 폭을 남긴다. 영어 쪽은 값 안내가 없어 아래 칸이 낮고 제목 줄이 짧아 얼굴 겹침이 없으니 그대로 둔다.
+   제목 첫 줄(약 9.3em)이 들어갈 폭을 남긴다. 11-13: 영어 쪽도 뼈대로 옮기며 값 안내 줄이 생겨 같은 일이 났다(768×954에서 제목이 입 줄보다 90px 위) — 이 칸은 두 언어 모두에 건다.
    세로형(①-2)과 높이 600 아래(가로로 든 휴대폰 — 첫 화면이 600px로 화면보다 길다)는 이 칸 밖이다. */
 @media (min-width:600.02px) and (max-width:900px) and (min-height:600px){@media not all and (max-aspect-ratio:4/5){
-  html[lang="ko"] .pv-hall-in{flex-direction:row;justify-content:space-between;align-items:flex-end;gap:0 24px;padding-bottom:84px}
-  html[lang="ko"] .pv-copy{flex:1 1 0;min-width:0}
-  html[lang="ko"] .pv-side{flex:none;width:clamp(172px,30%,212px);margin-top:0;align-items:flex-end;text-align:right}
-  html[lang="ko"] .pv-now{text-wrap:balance}
+  .pv-hall-in{flex-direction:row;justify-content:space-between;align-items:flex-end;gap:0 24px;padding-bottom:84px}
+  .pv-copy{flex:1 1 0;min-width:0}
+  .pv-side{flex:none;width:clamp(172px,30%,212px);margin-top:0;align-items:flex-end;text-align:right}
+  .pv-now{text-wrap:balance}
   /* 아래 칸이 왼쪽 그늘 밖(오른쪽 아래)에 놓여, 낮은 창의 밝은 컷(도담 첫 장면 · 해변)에서 작품 줄 · 값 안내가 묻혔다(11-12 검수 — 601×600 대비 1.7 · 2.7).
      오른쪽 아래 구석에만 작은 그늘 한 겹(높이 340px 안이라 얼굴 줄에 닿지 않는다)과 옅은 글자 그림자를 더한다. 나머지 세 겹은 23줄 그대로다. */
-  html[lang="ko"] .pv-hall::after{background:radial-gradient(ellipse 300px 340px at 100% 100%,rgba(0,0,0,.5),rgba(0,0,0,.34) 55%,rgba(0,0,0,0) 100%),linear-gradient(90deg,rgba(0,0,0,.66),rgba(0,0,0,0) 60%),linear-gradient(0deg,rgba(0,0,0,.6),rgba(0,0,0,0) 46%),linear-gradient(180deg,rgba(0,0,0,.4),rgba(0,0,0,0) 22%)}
-  html[lang="ko"] .pv-now strong,html[lang="ko"] .pv-side .k-pv-price{text-shadow:0 0 2px rgba(0,0,0,.55),0 1px 12px rgba(0,0,0,.75)}
+  .pv-hall::after{background:radial-gradient(ellipse 300px 340px at 100% 100%,rgba(0,0,0,.5),rgba(0,0,0,.34) 55%,rgba(0,0,0,0) 100%),linear-gradient(90deg,rgba(0,0,0,.66),rgba(0,0,0,0) 60%),linear-gradient(0deg,rgba(0,0,0,.6),rgba(0,0,0,0) 46%),linear-gradient(180deg,rgba(0,0,0,.4),rgba(0,0,0,0) 22%)}
+  .pv-now strong,.pv-side .k-pv-price{text-shadow:0 0 2px rgba(0,0,0,.55),0 1px 12px rgba(0,0,0,.75)}
   /* 머리글은 그늘이 옅은 얼굴 줄 바로 아래라 밝은 컷에서 흐렸다(11-13 — 900×600 대비 3.2) — 세로형(①-2)과 같은 한 단 밝은 글색 · 옅은 그림자 */
-  html[lang="ko"] .pv-copy .label{color:var(--ink-2);text-shadow:0 1px 10px rgba(0,0,0,.6)}
+  .pv-copy .label{color:var(--ink-2);text-shadow:0 1px 10px rgba(0,0,0,.6)}
   /* 높이 600~680의 낮은 창(11-13): 글 칸(제목 세 줄 + 소개 서너 줄)이 바닥 84px 위에 쌓이면 제목 첫 줄이 입 띠(화면 높이의 47.9%)에 11~33px 걸렸다.
      번호 줄을 빼고(휴대폰 세로와 같다 — 네 작품은 바로 아래 「작품」에 같은 번호로 있다) 바닥 여백을 44px로 줄여 글 칸을 40px 내린다. 680부터는 앞 배치 그대로 든다. */
   @media (max-height:679.98px){
-    html[lang="ko"] .pv-hall-in{padding-bottom:44px}
-    html[lang="ko"] .pv-index{display:none}
+    .pv-hall-in{padding-bottom:44px}
+    .pv-index{display:none}
   }
 }}
 /* ①-2 세로 화면의 시사실(11-10) — 첫 화면 글은 얼굴 줄 아래에만 둔다(쇼릴 규칙 「첫 화면 글이 얼굴을 덮지 않는 프레임만」).
@@ -271,10 +271,10 @@ html[lang="en"] .pv-h1{font-size:clamp(36px,5.2vw,82px);text-shadow:0 1px 10px r
 /* 2026-11-12 영어 세로형 · 높이 620~700의 드문 크기(검수): 세로 쇼릴은 폭이 넓을수록 크게 깔려 얼굴 줄이 내려오는데(위 ①-2의 첫 행) 제목 크기는 높이만 보아,
    폭 420~560에서 세 줄 제목 + 작품 줄 + 단추가 얼굴 줄 아래에 다 들지 못하고 의뢰 단추가 첫 화면 밖으로 1~10px 나갔다. 얼굴 줄 아래 남는 높이
    (화면 − 얼굴 줄 − 머리글 18 · 작품 줄 22 · 단추 54 · 사이 6.2svh, 여유 1.5px)를 세 줄(3.3em)로 나눈 값을 제목 크기의 위 한계에 더한다 — 이미 들던 크기는
-   이 값이 더 커서 그대로다. 높이 620 아래는 작품 줄을 빼므로(위) 이 한계를 걸지 않는다. 폭 345 아래는 가장 긴 작품 이름(약 305px)이 두 줄로 꺾이니
-   작품 줄을 두 줄(44px)로 셈한다. */
+   이 값이 더 커서 그대로다. 높이 620 아래는 작품 줄을 빼므로(위) 이 한계를 걸지 않는다. 가장 긴 작품 이름이 두 줄로 꺾이는 폭(뼈대의 15px 작품 줄은 384 아래 —
+   11-13, 그 전 13.5px 때는 345 아래)에서는 작품 줄을 두 줄(44px)로 셈한다. */
 @media (max-width:600px) and (max-aspect-ratio:4/5) and (min-height:620px){html[lang="en"] .pv-h1{font-size:clamp(28px,min(10vw,5.2svh,(100vw - var(--gut) * 2) / 9.6,(43.8svh - .08 * max(100svh,177.78vw) - 108px) / 3.3),44px)}}
-@media (max-width:344.98px) and (max-aspect-ratio:4/5) and (min-height:620px){html[lang="en"] .pv-h1{font-size:clamp(28px,min(10vw,5.2svh,(100vw - var(--gut) * 2) / 9.6,(43.8svh - .08 * max(100svh,177.78vw) - 130px) / 3.3),44px)}}
+@media (max-width:383.98px) and (max-aspect-ratio:4/5) and (min-height:620px){html[lang="en"] .pv-h1{font-size:clamp(28px,min(10vw,5.2svh,(100vw - var(--gut) * 2) / 9.6,(43.8svh - .08 * max(100svh,177.78vw) - 130px) / 3.3),44px)}}
 /* 2026-11-13 한국어 세로형 · 높이 620~660 × 폭 440~520(4:5 경계 가까이)도 같은 까닭으로 의뢰 단추가 첫 화면 밖으로 0~6px 나갔다 — 영어와 같은 식에
    한국어 값(머리글 18 · 작품 줄 25 · 단추 48 · 얼굴 줄 12 · 여유 1.5 = 104.5px)을 넣는다. 한국어 작품 이름은 가장 긴 것이 약 211px라 폭 320에서도 한 줄이다. */
 @media (max-width:600px) and (max-aspect-ratio:4/5) and (min-height:620px){html[lang="ko"] .pv-h1{font-size:clamp(28px,min(10vw,5.2svh,(43.8svh - .08 * max(100svh,177.78vw) - 104.5px) / 3.3),44px)}}

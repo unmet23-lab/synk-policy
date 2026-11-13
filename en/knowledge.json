@@ -1,16 +1,17 @@
 {
-  "version": "2026-09-15-selected-experiences-copy-9bfc4e4ce8-rhythm-20261001-copy-3910676d01-release-copy-3e4ed3be6d-en-002b14631325-bm-platform-20261007-a885b0d303-travel-20261007-ce148dd860-real-20261007-ab58ee7076-homepage-current-20261009-033c24b61f29-homepage-v10-20261010-b37e03c37b82",
-  "updatedAt": "2026-11-10",
+  "version": "2026-09-15-selected-experiences-copy-9bfc4e4ce8-rhythm-20261001-copy-3910676d01-release-copy-3e4ed3be6d-en-002b14631325-bm-platform-20261007-a885b0d303-travel-20261007-ce148dd860-real-20261007-ab58ee7076-homepage-current-20261009-033c24b61f29-homepage-v10-20261010-7fcf3e2a8b0c",
+  "updatedAt": "2026-11-12",
   "docs": [
     {
       "id": "company",
-      "title": "SYNK — AI that gets to know you the more you use it",
+      "title": "SYNK — We build AI that fits one person",
       "paragraphs": [
         "SYNK builds Atlas, a personalization engine that reads a person’s goals and what they have actually done, then fits the next practice to them. With it we run four businesses: Korean education, AI lectures and work automation, ad videos, and preparing to study in Korea.",
         "It began in a classroom in Ulaanbaatar, Mongolia. Every student was good at different things, got stuck in different places and had different reasons for learning. Atlas is our attempt to tailor teaching to each person with technology.",
         "SYNK LAB is making a K-drama role-play where you speak Korean as the international student in the story (pilot in preparation), runs TOPIK practice and Korean games in SYNK WORLD, and is preparing a one-year course aimed at TOPIK Level 4. SYNK SHIFT gives AI-era lectures on careers and work at schools, companies and institutions, and automates repetitive work with AI for companies that took a lecture. SYNK PULSE makes AI video ads, and grows our own music and character stories. SYNK PATH helps with travel plans and with preparing to study, work and settle in Korea.",
         "The SYNK platform is open now as a web preview and as a PC app preview for Windows and Mac. Anything still in preparation is labelled as such on each business page.",
-        "To build AI that gets to know you the more you use it — so that anyone, in their 20s or their 60s, gets help that matches their goal and situation when they play, study or ask for advice.",
+        "Everyone gets stuck somewhere different. We want to build AI that starts right there — so that anyone, in their 20s or their 60s, gets help that matches their goal and situation when they play, study or ask for advice.",
+        "We build Atlas, an engine that reads what one person has actually done and picks what they do next. Today SYNK works in four areas: Korean education, AI classes for companies, ad production, and preparing to study in Korea.",
         "LAB covers Korean-language education; SHIFT, AI lectures and work automation; PULSE, ads and model videos, music and characters; and PATH, the Seoul day planner and preparation for studying, working and settling in Korea. All four use the Atlas engines they need.",
         "LAB — an Episode 1 scene of the K-drama role-play you can try on the LAB page now (pilot in preparation), and TOPIK practice and Korean games in SYNK WORLD, open as a preview, with the TOPIK Level 4 eight-week online class (registering interest), a one-year course and the Synapse textbooks in preparation.",
         "SHIFT — AI lectures at schools, companies and institutions (including AI career lectures for schools), instructors assigned to fit each request, and AI automation of repetitive work for companies that took a lecture. We are taking enquiries now.",
@@ -18,7 +19,7 @@
         "PATH — plan a day in Seoul, and practise a caregiver interview in VR now. Help with preparing to study, finding out job requirements and settling into life in Korea is still in preparation.",
         "The four businesses are how SYNK divides its work. It does not mean there are four companies or that all four are already up and running.",
         "The SYNK platform is open as a Windows and Mac Preview and a web preview, and TOPIK practice in SYNK WORLD is open without signing up (its Korean games open once you sign in with SYNK ID). SHIFT is taking enquiries for lectures and work automation, PULSE for ads and model videos, and PATH’s Seoul day planner and VR interview practice can be used now. Everything else is in preparation.",
-        "LAB — you can listen to an Episode 1 scene of the K-drama role-play on the LAB page and say the lines yourself; the pilot, where a coach listens once the scene ends and gives a note, is in preparation. We have made eight Korean games and two beginner games, added Transfer Rush, Snap Words and Board Decode in November, and you can play all of them in SYNK WORLD on the SYNK platform by signing in with SYNK ID. SYNK WORLD also has a short TOPIK diagnostic, listening, reading and writing practice, and exam-style speaking practice, open as a preview. All eight textbooks are written; the TOPIK Level 4 eight-week online class, the one-year course and VR practice for visa interviews are in preparation.",
+        "LAB — you can listen to an Episode 1 scene of the K-drama role-play on the LAB page and say the lines yourself; the pilot, where the in-app coach goes over what you said once the scene ends and gives a note, is in preparation. We have made eight Korean games and two beginner games, added Transfer Rush, Snap Words and Board Decode in November, and you can play all of them in SYNK WORLD on the SYNK platform by signing in with SYNK ID. SYNK WORLD also has a short TOPIK diagnostic, listening, reading and writing practice, and exam-style speaking practice, open as a preview. All eight textbooks are written; the TOPIK Level 4 eight-week online class, the one-year course and VR practice for visa interviews are in preparation.",
         "SHIFT — taking enquiries for lectures and work automation. Prices and the terms for assigning instructors are not set yet, and results at client companies have not been checked yet.",
         "PULSE — taking ad and model video projects, and making music and character stories. The casting book of twenty-one AI models is open now. AI profiles, introduction decks and studio and equipment rental are in preparation and not taking bookings yet.",
         "PATH — the Seoul day planner (free) and caregiver interview practice in VR are available now; help with preparing to study, finding out job requirements and settling into life in Korea is in preparation.",
@@ -82,11 +83,11 @@
         "Each program stores progress differently. Guest progress stays in that browser; with a SYNK ID, supported records are kept in your account. Anything done before signing up does not move to your account automatically.",
         "In SHIFT lectures and work automation, material and records are used only for the purpose and consent agreed with whoever made the request. You can find how each service keeps, shows and deletes data in the privacy policy."
       ],
-      "updatedAt": "2026-11-05"
+      "updatedAt": "2026-11-12"
     },
     {
       "id": "lab",
-      "title": "SYNK LAB — Step into a K-drama, and speak Korean",
+      "title": "SYNK LAB — Say it, and the scene moves on · Korean through a K-drama role-play",
       "paragraphs": [
         "SYNK LAB makes Korean you actually speak. You can listen and speak along with the Episode 1 scene now, and use SYNK WORLD for daily practice and games. The full pilot that listens to your speech and gives a coach’s feedback, and the TOPIK Level 4 courses, are in preparation.",
         "K-drama role-play — you are the new international student in a K-drama; when a character speaks to you, you answer out loud and the story carries on. If your line doesn’t land, the character asks again in the scene, and the coach gives no note unless it is sure. The student-cafeteria scene of Episode 1, “First Day of Term”, is on the LAB page to hear and say along with.",
@@ -94,7 +95,8 @@
         "One-year course — an in-person course that prepares you for TOPIK Level 4 and for classes and daily life at a Korean university. In every 90-minute class, 30 minutes are group speaking, and native Korean conversation, English classes and K-POP activities are planned.",
         "Textbooks — six Synapse Core books for grammar and two Synapse Talk books for conversation; all eight are written and being prepared for publication.",
         "Dates and entry requirements will be in the enrolment notice, and learning results are not guaranteed.",
-        "To get people speaking Korean, as the international student in a K-drama story.",
+        "To get you speaking Korean out loud, not just reading it.",
+        "You are the student in a K-drama. Someone speaks first, and the next scene opens only when you answer aloud in Korean.",
         "LAB is preparing Korean-language education for anyone who wants to learn the language, with no limit by nationality or where you live. Lessons are planned around where you want to use Korean and how much you can do now.",
         "We are preparing to open the one-year course and the TOPIK Level 4 eight-week online class, and the eight textbooks are written. You can try an Episode 1 scene of the K-drama role-play on the LAB page now, and the Korean games and TOPIK practice are open as a preview in SYNK WORLD. Who each course is for, its starting level and how to join are announced course by course.",
         "We first explore what learners want to do in Korean and what they find difficult. We are preparing classes in which students use what they have learned in real situations, receive feedback, and practice again in the next task.",
@@ -232,18 +234,18 @@
         "The student-cafeteria scene of Episode 1, “First Day of Term”, is on the LAB page: listen, record your own voice and compare it with the model reading. That recording plays back only on your device and is never sent anywhere. Price and launch date will be announced once they are set.",
         "We are preparing a Korean patent application for the personalization technology (planned for 2028). Until it is filed, we do not publish the details of the technology."
       ],
-      "updatedAt": "2026-11-10"
+      "updatedAt": "2026-11-12"
     },
     {
       "id": "shift",
-      "title": "SYNK SHIFT — AI lectures, plus work automation",
+      "title": "SYNK SHIFT — When the AI lecture ends, you keep one thing you made",
       "paragraphs": [
-        "SYNK SHIFT teaches the skills the AI era calls for at schools, companies and institutions. For schools we give AI career lectures on how to steer a career in the AI era and what to prepare, and as an instructor agency we find AI and AI-career instructors and assign them to fit each request.",
+        "SYNK SHIFT teaches the skills the AI era calls for at schools, companies and institutions. For schools we give AI career lectures on how to steer a career in the AI era and what to prepare, and through “Finding an instructor” we find AI and AI-career instructors who fit each request and assign them.",
         "When a company that took a lecture wants it, we pick one repetitive task and automate it with AI to help cut fixed costs. In a half-day review we map the workflow together and demonstrate one automation, then agree scope and cost up front, build it and check it every month. Consulting, branding, market research and product testing come with lectures and automation where they need them.",
         "Prices for lectures and automation and the terms for assigning instructors are not set yet and are agreed per request. We do not promise learning results or savings in advance; we check them with you afterwards.",
-        "To teach careers and work for the AI era, and to automate repetitive tasks.",
-        "SYNK SHIFT teaches the skills the AI era calls for at schools, companies and institutions, then automates repetitive work with AI for companies that took a lecture, to cut fixed costs. In schools we also give AI career lectures on how to steer a career in the AI era and what to prepare for it. We also run an instructor agency that finds instructors and assigns them to fit each request.",
-        "Schools, companies and institutions getting ready for the AI era. Lectures and the instructor agency are for schools that want career education to reflect how AI is changing work, companies and public bodies that want staff to use AI in real work, and anyone with a topic who struggles to find a fitting instructor.",
+        "Not a lecture you just sit through: when it ends, each person keeps one thing they made.",
+        "Not a tour of tool names. Each person makes one piece of work from their own job and learns to do it again alone. After the lecture, we can automate one of your company’s repetitive tasks.",
+        "Schools, companies and institutions getting ready for the AI era. Lectures and finding instructors are for schools that want career education to reflect how AI is changing work, companies and public bodies that want staff to use AI in real work, and anyone with a topic who struggles to find a fitting instructor.",
         "Work automation suits small companies paying fixed costs for entry, sorting and reporting that people repeat. Rather than company size, we first look at whether there is one clear task to automate, whether before and after can be compared, and who will check the results.",
         "There are no open courses for individuals yet. If you run a business on your own, you can still ask about automating repetitive work.",
         "Each person leaves a lecture with one thing made. Students take a page on what AI is changing in their field and what they will prepare; staff take a piece of work from their own job and a request–check–fix routine to reuse.",
@@ -253,7 +255,7 @@
         "Because the result alone does not tell you what method was used or whether you could use it yourself. SYNK writes down the methods tried, the failures and the reasons for each fix, so that you can judge the method and take it into your own work.",
         "For example, when we made the site logo we put stitch decoration on both the SYNK letters and the business names, and the letters became hard to read. We kept the soft texture and took the stitches off the SYNK letters only, so the word that has to be read first comes first. The felt characters and objects on screen were designed as things you could hold in your hand, and the Loom engine was built to carry that texture onto the screen.",
         "Today you can see this process on the founder page and on the founder’s yuhobuilds channel. SHIFT lectures work the same way: people try things with real material, check the results and learn to fix them.",
-        "SHIFT’s work is AI lectures at schools, companies and institutions (including AI career lectures for schools), an instructor agency, and automating work for companies that took a lecture. Consulting, branding, market research and product testing are taken on to support that work.",
+        "SHIFT’s work is AI lectures at schools, companies and institutions (including AI career lectures for schools), finding instructors, and automating work for companies that took a lecture. Consulting, branding, market research and product testing are taken on to support that work.",
         "Consulting — work out which tasks to hand to AI first, and where a person should check.",
         "Branding — match lecture material, notices and any new screens from the automation to your company’s voice and look.",
         "Market research and product testing — interview the people who will use it, watch them try it, and report where they get stuck.",
@@ -269,10 +271,10 @@
         "We agree the scope of each request first, then quote.",
         "For work we can show publicly, we present the fixes as well as the finished result: where we got stuck and why we changed the method, based on the actual work.",
         "There is no collection of the exact prompts we sent to AI tools. The cases do explain what we asked for and what came back. Students’ and clients’ material and private operational documents are not published.",
-        "SHIFT gives AI lectures at schools, companies and institutions, runs an instructor agency, and automates work. Lectures come first; when a company that took a lecture wants it, we move on to automation.",
+        "SHIFT gives AI lectures at schools, companies and institutions, finds instructors, and automates work. Lectures come first; when a company that took a lecture wants it, we move on to automation.",
         "Hands-on AI lecture — staff at companies, public bodies and schools practise on their own work and leave with one piece of work and a request–check–fix routine they can reuse.",
         "AI career lectures for schools — not a general careers talk, but how to steer a career in the AI era and which skills to build. Each student leaves with a one-page plan for their own career.",
-        "Instructor agency — we find AI and AI-career instructors who fit the goal and audience of each request and assign them. You know exactly which instructor is coming before you sign.",
+        "Finding an instructor — we find AI and AI-career instructors who fit the goal and audience of each request and assign them. You know exactly which instructor is coming before you sign.",
         "AI work automation — we pick one repetitive task and automate it to help cut fixed costs, in the order half-day review, build one task, monthly care.",
         "Consulting, branding, market research and product testing come with lectures and automation where they need them.",
         "Lectures that leave each person with something made, and automation we stay responsible for even when it stops. A lecture is judged by what people made from their own career plans or work, not by how many tools were shown.",
@@ -283,7 +285,7 @@
         "Build one task — scope and price are agreed up front, then we automate one task, including where a person checks and how it alerts you when it stops. Connections to your existing systems are agreed within this scope.",
         "Monthly care — each month we check it still runs and adjust it when the work or the services it uses change. Time and cost saved are measured before and after under the same conditions, and we report them to you.",
         "We do not take on system builds that change many tasks at once; we go one task at a time. Where a person’s judgement differs a lot each time, the review looks at whether sorting out the work should come before automating it.",
-        "Not as a separate service any more. SHIFT now focuses on AI lectures at schools, companies and institutions, an instructor agency, and automating repetitive work for companies that took a lecture.",
+        "Not as a separate service any more. SHIFT now focuses on AI lectures at schools, companies and institutions, finding instructors, and automating repetitive work for companies that took a lecture.",
         "If you want AI to take repetitive work off your team, ask us about work automation. A lecture first looks at what your company can hand to AI, then in a half-day review we pick one task we can take on and agree scope and cost up front.",
         "Atlas is not something SHIFT sells separately; it is the technology inside, used to fit lectures and reviews to the people and companies taking them.",
         "Market research and product testing are being prepared as support for lectures and automation; they are not a main service we sell on their own.",
@@ -292,22 +294,22 @@
         "Participants, conditions, consent, compensation, schedule and cost are set within the request. We do not generalise a few reactions to the whole market.",
         "Atlas is not something SHIFT sells separately; it is the technology inside, used to fit lectures and reviews to the people and companies taking them. We are preparing it to choose practice tasks and explanations to fit each student’s interests or each company’s work, even on the same topic.",
         "SHIFT does not build and sell chatbot-style services; it teaches people how to use AI and automates repetitive work. We do not sell an API or engine licence for plugging Atlas into your systems.",
-        "No. SHIFT’s work today is AI lectures at schools, companies and institutions, an instructor agency and work automation. An API and engine licensing might be considered far in the future, but they are not part of the current business plan.",
+        "No. SHIFT’s work today is AI lectures at schools, companies and institutions, finding instructors and work automation. An API and engine licensing might be considered far in the future, but they are not part of the current business plan.",
         "The business grows from lectures into automating work for companies that took a lecture. Atlas is not something SHIFT sells separately; it is the technology inside, used to fit lectures and reviews to the people and companies taking them.",
         "We have not set a price list for lectures or automation. We agree the audience and scope for each request, then quote.",
         "Lectures — set by audience and size, length and number of sessions, the practice material to prepare and the venue. When we assign another instructor, their terms are confirmed too.",
-        "Automation build — scope and price for one task are agreed in the half-day review. It depends on how many exceptions there are and which services it must connect to, and the price is based on the cost the automation saves.",
+        "Automation build — scope and price for one task are agreed in a half-day review of your workflow. It depends on how many exceptions there are and which services it must connect to, and the price is based on the cost the automation saves.",
         "Monthly care — we agree how often we check and what we fix, and take it on month by month. Fees for external services the automation uses may be extra, and if the work changes enough to need a rebuild, scope and cost are agreed again.",
         "The earlier split into setup fees and operating fees is no longer used.",
         "Not a general careers talk: a lecture for schools on how to steer a career in the AI era and which skills to build for it. Students look at how AI is changing work in a field they care about, then pick the skills that kind of work needs and what they can start on now.",
         "Each student leaves with a one-page plan for their own career: what AI is changing in their field and what they will prepare. Year group and class size, lesson time, and the devices and tools students can use are agreed with the school beforehand.",
         "Schedule and cost are agreed with each school. The lecture does not decide a student’s career for them.",
-        "Yes. We hear the goal and the audience of the request, then find an AI or AI-career instructor who fits and assign them. First we show an evidence card for each instructor: who they teach and for what kind of work, what they have made themselves, samples they can share, and what stays after the class.",
+        "Yes. Tell us the goal and the audience of the request, and we find an AI or AI-career instructor who fits and assign them. First we show you a profile sheet for each instructor: who they teach and for what kind of work, what they have made themselves, samples they can share, and what stays after the class.",
         "You know exactly which instructor is coming before you sign. Running the day, a substitute if the instructor cannot come, cancellation and questions after the lecture are written into the contract only as far as we can really promise.",
-        "We do not lead with a headcount or a roster; for each request we find an instructor who fits and show you their evidence card. We have not posted for instructors yet. If you would like to teach with us, tell us your field and what you have made yourself at hello@synk.im. Selection criteria, payment and rights to teaching material will be shared once they are set.",
-        "You can see the instructor profile and lectures open for inquiry now under Lectures on the SHIFT page. Each lecture card has an “Ask about this lecture” button, and “Ask for an instructor” lets SYNK recommend someone else."
+        "We do not lead with a headcount or a roster; for each request we find an instructor who fits and show you their profile sheet. We have not posted for instructors yet. If you would like to teach with us, tell us your field and what you have made yourself at hello@synk.im. Selection criteria, payment and rights to teaching material will be shared once they are set.",
+        "The lectures and the instructor you can ask about now are under “What we do” and “Instructor” on the SHIFT page. Each lecture has an “Ask about this lecture” button, and if you need someone else, “Ask for an instructor” under “Finding an instructor” lets SYNK recommend one."
       ],
-      "updatedAt": "2026-10-27"
+      "updatedAt": "2026-11-12"
     },
     {
       "id": "pulse",
@@ -380,10 +382,10 @@
       "id": "philosophy",
       "title": "How SYNK works — three principles",
       "paragraphs": [
-        "We work by three principles: we do not guess from age, we keep your answers separate from AI guesses, and if something is not ready we say so.",
+        "We work by three principles: we do not guess from age, we keep your answers separate from AI guesses, and we only say something works when it does.",
         "We do not guess from age — we go by the settings a person chooses and what they actually did, not age, gender or nationality. When the goal changes, the next suggestion changes too.",
         "Your answers and AI guesses stay separate — what you wrote, what you did and what a teacher observed are kept as the original. Anything AI inferred is marked so you can check and correct it.",
-        "If it is not ready, we say so — we mark what you can use today separately from what we are still building, and we do not promise effects we have not checked.",
+        "We only say it works when it does — we list what works today separately from what we are preparing, and we do not claim effects we have not measured.",
         "We look at whether it helped, not just whether it was finished — whether people can now do more without help, whether the suggestion was right, and whether it was easy to use.",
         "We check that explanations are clear, screens are easy to use and promised features work. A new method is not rolled out if results get worse for anyone, in their 20s or their 60s.",
         "People can choose large text, shorter explanations or a sound-free mode, and first-time users should always see their next step.",
@@ -421,7 +423,7 @@
         "If you need it for a collaboration review, send the purpose and what you want to confirm to hello@synk.im. We will reply after checking what can be shared.",
         "The question box on this website does not receive consultation requests or retrieve student records. What you type here remains only in the page you have open.",
         "Keeping, viewing and deleting records from actual classes, consultations and apps follow that service’s privacy policy and its identity or guardian checks. That this question box keeps nothing does not mean other services keep no consultation records. Email hello@synk.im with the service you used and what you need.",
-        "There is no open job or instructor posting right now. If you are a school, company or institution looking for an instructor to teach, the SHIFT instructor agency finds one who fits your request and assigns them.",
+        "There is no open job or instructor posting right now. If you are a school, company or institution looking for an instructor to teach, SHIFT’s “Finding an instructor” finds one who fits your request and assigns them.",
         "If you would like to work with us, tell us your field and what you can do at hello@synk.im, and we will say whether we can let you know when a position opens. If you would like to teach as an AI or AI-career instructor with SHIFT, include your field and what you have made yourself.",
         "This question box does not accept applications. Please confirm that a position is open before sending anything with personal details, such as a CV.",
         "Each SYNK business has its own public channels. LAB is on YouTube @synkkorean, Instagram @synk.mn and Facebook synkworld; SHIFT is on YouTube and Instagram @synkbrief (SYNK Briefing); the founder is on YouTube and Instagram @yuhobuilds. They are also linked in the channels row at the bottom of every page.",
@@ -439,18 +441,18 @@
       "title": "SYNK — What the company and its four businesses set out to do",
       "paragraphs": [
         "In one line each:",
-        "SYNK — AI that gets to know you the more you use it.",
-        "SYNK LAB — Step into a K-drama, and speak Korean.",
-        "SYNK SHIFT — AI lectures, plus work automation.",
+        "SYNK — Everyone gets stuck somewhere different. We build AI that starts right there.",
+        "SYNK LAB — Say it, and the scene moves on. You answer in Korean as the international student in a K-drama.",
+        "SYNK SHIFT — When the AI lecture ends, you keep one thing you made.",
         "SYNK PULSE — AI models can look real. We make them act. We make AI video ads.",
-        "SYNK PATH — Studying, working and living in Korea, prepared with you.",
+        "SYNK PATH — Before you come to Korea, try it first.",
         "Each business page separates what you can use today from what is still in preparation."
       ],
-      "updatedAt": "2026-11-05"
+      "updatedAt": "2026-11-12"
     },
     {
       "id": "path",
-      "title": "SYNK PATH — Studying, working and living in Korea, prepared with you",
+      "title": "SYNK PATH — Before you come to Korea, try it first",
       "paragraphs": [
         "Study plans based on your major and career, help with applications and interviews, portfolios, finding out the visa, qualification and Korean requirements of the field you want to work in, and settling into life in Korea are in preparation. Caregiver interview practice in VR is available now. Ask us about what is available now and when.",
         "Job requirements — for fields that need a qualification, such as care work or manufacturing, we are preparing to set out what you need and by when, step by step and from your point of view. Training and exams for qualifications follow the accredited body’s guidance.",
@@ -459,8 +461,8 @@
         "Available now — the Seoul day planner (free, no sign-up) and caregiver interview practice in VR (60–90 seconds). SYNK LAB takes care of the Korean, and SYNK WORLD has TOPIK practice.",
         "In preparation — preparing to study around your major and career (a study plan, applications and interviews, a portfolio), finding out the visa, qualification and Korean requirements of each field, and settling into life in Korea (where to stay and the first weeks, a place to ask in your own language, places to get together).",
         "We are not taking move-in bookings yet. Student material is shared only within what the student has reviewed and agreed to, and admission, visas and jobs are not guaranteed.",
-        "To prepare together with you for studying, working and living in Korea.",
-        "From packing your bags to settling into life in Korea, we are preparing to work through the Korean you need, the requirements, interviews and daily life with you, one step at a time. SYNK LAB takes care of the Korean — SYNK WORLD’s TOPIK practice is open now, and we are preparing to open the one-year course.",
+        "To let you try the first interview and the first day you will face, before you come to Korea.",
+        "Rehearse your first interview and plan a day in Seoul. Study-abroad and job preparation open next, one at a time.",
         "Two people in the same city want different days, and everyone comes to Korea with different goals. PATH looks at what you want, your budget and how ready you are, and builds travel and life plans with you.",
         "The tastes you choose on one trip carry into the next, and learning and project experience feed into study and job preparation. Student material is shared only within what the student agreed to, and admission, visas and jobs are not guaranteed.",
         "We compare schools by the conditions that matter for your major and career after graduation, and set a timeline that fits your Korean level and the time you have. Step-by-step help from Korean study to applications and interviews is in preparation.",
@@ -497,7 +499,7 @@
         "Principles — you take part only with your consent, and we do not take foreign resident registration numbers or passport numbers. What you tell us is not used for enforcement, and participants pay nothing for the core support.",
         "The pilot — from March to August 2027 (spring semester and summer break), a dedicated manager and senior international students will look after 30–50 people. App notifications and the AI first reply will be open to up to 200 people once the app is released (target: February). Existing institutions keep their counselling and education as they are; we add follow-through to the end and settlement indicators."
       ],
-      "updatedAt": "2026-10-24"
+      "updatedAt": "2026-11-12"
     }
   ],
   "records": [
@@ -558,7 +560,7 @@
         "What future is SYNK working toward?",
         "What kind of future does SYNK imagine?"
       ],
-      "answer": "To build AI that gets to know you the more you use it — so that anyone, in their 20s or their 60s, gets help that matches their goal and situation when they play, study or ask for advice.\n\nSYNK builds Atlas, a personalization engine that reads a person’s goals and what they have actually done, then fits the next practice to them. With it we run four businesses: Korean education, AI lectures and work automation, ad videos, and preparing to study in Korea.",
+      "answer": "Everyone gets stuck somewhere different. We want to build AI that starts right there — so that anyone, in their 20s or their 60s, gets help that matches their goal and situation when they play, study or ask for advice.\n\nWe build Atlas, an engine that reads what one person has actually done and picks what they do next. Today SYNK works in four areas: Korean education, AI classes for companies, ad production, and preparing to study in Korea.",
       "sourceId": "company",
       "relatedIds": [
         "synk-visions",
@@ -569,7 +571,7 @@
         "label": "See the four businesses",
         "href": "/en/#business"
       },
-      "reviewedAt": "2026-10-30",
+      "reviewedAt": "2026-11-12",
       "aliases": [
         "SYNK의 비전은 무엇인가요?",
         "싱크가 지향하는 미래는 무엇인가요?",
@@ -593,7 +595,7 @@
         "What are the visions of SYNK LAB, SHIFT, and PULSE?",
         "How do the visions of LAB, SHIFT, and PULSE differ?"
       ],
-      "answer": "In one line each:\n\nSYNK — AI that gets to know you the more you use it.\n\nSYNK LAB — Step into a K-drama, and speak Korean.\n\nSYNK SHIFT — AI lectures, plus work automation.\n\nSYNK PULSE — AI models can look real. We make them act. We make AI video ads.\n\nSYNK PATH — Studying, working and living in Korea, prepared with you.\n\nEach business page separates what you can use today from what is still in preparation.",
+      "answer": "In one line each:\n\nSYNK — Everyone gets stuck somewhere different. We build AI that starts right there.\n\nSYNK LAB — Say it, and the scene moves on. You answer in Korean as the international student in a K-drama.\n\nSYNK SHIFT — When the AI lecture ends, you keep one thing you made.\n\nSYNK PULSE — AI models can look real. We make them act. We make AI video ads.\n\nSYNK PATH — Before you come to Korea, try it first.\n\nEach business page separates what you can use today from what is still in preparation.",
       "sourceId": "vision",
       "relatedIds": [
         "synk-vision",
@@ -606,7 +608,7 @@
         "label": "See the four businesses",
         "href": "/en/#business"
       },
-      "reviewedAt": "2026-11-05",
+      "reviewedAt": "2026-11-12",
       "aliases": [
         "네 브랜드의 비전을 모두 알려 주세요",
         "SYNK LAB SHIFT PULSE의 비전은 무엇인가요?",
@@ -673,7 +675,7 @@
         "What stage are the services at?",
         "Have your services launched?"
       ],
-      "answer": "The SYNK platform is open as a Windows and Mac Preview and a web preview, and TOPIK practice in SYNK WORLD is open without signing up (its Korean games open once you sign in with SYNK ID). SHIFT is taking enquiries for lectures and work automation, PULSE for ads and model videos, and PATH’s Seoul day planner and VR interview practice can be used now. Everything else is in preparation.\n\nLAB — you can listen to an Episode 1 scene of the K-drama role-play on the LAB page and say the lines yourself; the pilot, where a coach listens once the scene ends and gives a note, is in preparation. We have made eight Korean games and two beginner games, added Transfer Rush, Snap Words and Board Decode in November, and you can play all of them in SYNK WORLD on the SYNK platform by signing in with SYNK ID. SYNK WORLD also has a short TOPIK diagnostic, listening, reading and writing practice, and exam-style speaking practice, open as a preview. All eight textbooks are written; the TOPIK Level 4 eight-week online class, the one-year course and VR practice for visa interviews are in preparation.\n\nSHIFT — taking enquiries for lectures and work automation. Prices and the terms for assigning instructors are not set yet, and results at client companies have not been checked yet.\n\nPULSE — taking ad and model video projects, and making music and character stories. The casting book of twenty-one AI models is open now. AI profiles, introduction decks and studio and equipment rental are in preparation and not taking bookings yet.\n\nPATH — the Seoul day planner (free) and caregiver interview practice in VR are available now; help with preparing to study, finding out job requirements and settling into life in Korea is in preparation.",
+      "answer": "The SYNK platform is open as a Windows and Mac Preview and a web preview, and TOPIK practice in SYNK WORLD is open without signing up (its Korean games open once you sign in with SYNK ID). SHIFT is taking enquiries for lectures and work automation, PULSE for ads and model videos, and PATH’s Seoul day planner and VR interview practice can be used now. Everything else is in preparation.\n\nLAB — you can listen to an Episode 1 scene of the K-drama role-play on the LAB page and say the lines yourself; the pilot, where the in-app coach goes over what you said once the scene ends and gives a note, is in preparation. We have made eight Korean games and two beginner games, added Transfer Rush, Snap Words and Board Decode in November, and you can play all of them in SYNK WORLD on the SYNK platform by signing in with SYNK ID. SYNK WORLD also has a short TOPIK diagnostic, listening, reading and writing practice, and exam-style speaking practice, open as a preview. All eight textbooks are written; the TOPIK Level 4 eight-week online class, the one-year course and VR practice for visa interviews are in preparation.\n\nSHIFT — taking enquiries for lectures and work automation. Prices and the terms for assigning instructors are not set yet, and results at client companies have not been checked yet.\n\nPULSE — taking ad and model video projects, and making music and character stories. The casting book of twenty-one AI models is open now. AI profiles, introduction decks and studio and equipment rental are in preparation and not taking bookings yet.\n\nPATH — the Seoul day planner (free) and caregiver interview practice in VR are available now; help with preparing to study, finding out job requirements and settling into life in Korea is in preparation.",
       "sourceId": "company",
       "relatedIds": [
         "lab-intro",
@@ -782,7 +784,7 @@
         "What future is LAB working toward?",
         "Tell me about SYNK LAB’s educational vision"
       ],
-      "answer": "To get people speaking Korean, as the international student in a K-drama story.\n\nSYNK LAB makes Korean you actually speak. You can listen and speak along with the Episode 1 scene now, and use SYNK WORLD for daily practice and games. The full pilot that listens to your speech and gives a coach’s feedback, and the TOPIK Level 4 courses, are in preparation.",
+      "answer": "To get you speaking Korean out loud, not just reading it.\n\nYou are the student in a K-drama. Someone speaks first, and the next scene opens only when you answer aloud in Korean.",
       "sourceId": "lab",
       "relatedIds": [
         "lab-intro",
@@ -793,7 +795,7 @@
         "label": "See LAB",
         "href": "/en/lab/"
       },
-      "reviewedAt": "2026-11-10",
+      "reviewedAt": "2026-11-12",
       "aliases": [
         "LAB의 비전은 무엇인가요?",
         "랩이 지향하는 미래가 궁금해요",
@@ -1152,7 +1154,7 @@
         "What does SHIFT do?",
         "Do you cover branding for solo businesses?"
       ],
-      "answer": "SYNK SHIFT teaches the skills the AI era calls for at schools, companies and institutions. For schools we give AI career lectures on how to steer a career in the AI era and what to prepare, and as an instructor agency we find AI and AI-career instructors and assign them to fit each request.\n\nWhen a company that took a lecture wants it, we pick one repetitive task and automate it with AI to help cut fixed costs. In a half-day review we map the workflow together and demonstrate one automation, then agree scope and cost up front, build it and check it every month. Consulting, branding, market research and product testing come with lectures and automation where they need them.\n\nPrices for lectures and automation and the terms for assigning instructors are not set yet and are agreed per request. We do not promise learning results or savings in advance; we check them with you afterwards.",
+      "answer": "SYNK SHIFT teaches the skills the AI era calls for at schools, companies and institutions. For schools we give AI career lectures on how to steer a career in the AI era and what to prepare, and through “Finding an instructor” we find AI and AI-career instructors who fit each request and assign them.\n\nWhen a company that took a lecture wants it, we pick one repetitive task and automate it with AI to help cut fixed costs. In a half-day review we map the workflow together and demonstrate one automation, then agree scope and cost up front, build it and check it every month. Consulting, branding, market research and product testing come with lectures and automation where they need them.\n\nPrices for lectures and automation and the terms for assigning instructors are not set yet and are agreed per request. We do not promise learning results or savings in advance; we check them with you afterwards.",
       "sourceId": "shift",
       "relatedIds": [
         "shift-vision",
@@ -1193,7 +1195,7 @@
         "What future does SHIFT envision?",
         "What does SYNK SHIFT aim to become?"
       ],
-      "answer": "To teach careers and work for the AI era, and to automate repetitive tasks.\n\nSYNK SHIFT teaches the skills the AI era calls for at schools, companies and institutions, then automates repetitive work with AI for companies that took a lecture, to cut fixed costs. In schools we also give AI career lectures on how to steer a career in the AI era and what to prepare for it. We also run an instructor agency that finds instructors and assigns them to fit each request.",
+      "answer": "Not a lecture you just sit through: when it ends, each person keeps one thing they made.\n\nNot a tour of tool names. Each person makes one piece of work from their own job and learns to do it again alone. After the lecture, we can automate one of your company’s repetitive tasks.",
       "sourceId": "shift",
       "relatedIds": [
         "shift-intro",
@@ -1204,7 +1206,7 @@
         "label": "See SHIFT",
         "href": "/en/shift/"
       },
-      "reviewedAt": "2026-10-22",
+      "reviewedAt": "2026-11-12",
       "aliases": [
         "SHIFT의 비전은 무엇인가요?",
         "시프트가 꿈꾸는 미래는 무엇인가요?",
@@ -1231,7 +1233,7 @@
         "Who is SHIFT for?",
         "Is SHIFT for both companies and individuals?"
       ],
-      "answer": "Schools, companies and institutions getting ready for the AI era. Lectures and the instructor agency are for schools that want career education to reflect how AI is changing work, companies and public bodies that want staff to use AI in real work, and anyone with a topic who struggles to find a fitting instructor.\n\nWork automation suits small companies paying fixed costs for entry, sorting and reporting that people repeat. Rather than company size, we first look at whether there is one clear task to automate, whether before and after can be compared, and who will check the results.\n\nThere are no open courses for individuals yet. If you run a business on your own, you can still ask about automating repetitive work.",
+      "answer": "Schools, companies and institutions getting ready for the AI era. Lectures and finding instructors are for schools that want career education to reflect how AI is changing work, companies and public bodies that want staff to use AI in real work, and anyone with a topic who struggles to find a fitting instructor.\n\nWork automation suits small companies paying fixed costs for entry, sorting and reporting that people repeat. Rather than company size, we first look at whether there is one clear task to automate, whether before and after can be compared, and who will check the results.\n\nThere are no open courses for individuals yet. If you run a business on your own, you can still ask about automating repetitive work.",
       "sourceId": "shift",
       "relatedIds": [
         "shift-takeaway",
@@ -1607,7 +1609,7 @@
         "Which values do all SYNK brands share?",
         "Tell me about SYNK’s principles"
       ],
-      "answer": "We work by three principles: we do not guess from age, we keep your answers separate from AI guesses, and if something is not ready we say so.\n\nWe do not guess from age — we go by the settings a person chooses and what they actually did, not age, gender or nationality. When the goal changes, the next suggestion changes too.\n\nYour answers and AI guesses stay separate — what you wrote, what you did and what a teacher observed are kept as the original. Anything AI inferred is marked so you can check and correct it.\n\nIf it is not ready, we say so — we mark what you can use today separately from what we are still building, and we do not promise effects we have not checked.",
+      "answer": "We work by three principles: we do not guess from age, we keep your answers separate from AI guesses, and we only say something works when it does.\n\nWe do not guess from age — we go by the settings a person chooses and what they actually did, not age, gender or nationality. When the goal changes, the next suggestion changes too.\n\nYour answers and AI guesses stay separate — what you wrote, what you did and what a teacher observed are kept as the original. Anything AI inferred is marked so you can check and correct it.\n\nWe only say it works when it does — we list what works today separately from what we are preparing, and we do not claim effects we have not measured.",
       "sourceId": "philosophy",
       "relatedIds": [
         "synk-vision",
@@ -1888,7 +1890,7 @@
         "What other services is SHIFT preparing?",
         "I'd like to know about SHIFT's other business directions"
       ],
-      "answer": "SHIFT’s work is AI lectures at schools, companies and institutions (including AI career lectures for schools), an instructor agency, and automating work for companies that took a lecture. Consulting, branding, market research and product testing are taken on to support that work.\n\nConsulting — work out which tasks to hand to AI first, and where a person should check.\n\nBranding — match lecture material, notices and any new screens from the automation to your company’s voice and look.\n\nMarket research and product testing — interview the people who will use it, watch them try it, and report where they get stuck.",
+      "answer": "SHIFT’s work is AI lectures at schools, companies and institutions (including AI career lectures for schools), finding instructors, and automating work for companies that took a lecture. Consulting, branding, market research and product testing are taken on to support that work.\n\nConsulting — work out which tasks to hand to AI first, and where a person should check.\n\nBranding — match lecture material, notices and any new screens from the automation to your company’s voice and look.\n\nMarket research and product testing — interview the people who will use it, watch them try it, and report where they get stuck.",
       "sourceId": "shift",
       "relatedIds": [
         "shift-making",
@@ -2806,7 +2808,7 @@
       "sourceId": "guide",
       "brand": "synk",
       "title": "Are you hiring staff or instructors?",
-      "answer": "There is no open job or instructor posting right now. If you are a school, company or institution looking for an instructor to teach, the SHIFT instructor agency finds one who fits your request and assigns them.\n\nIf you would like to work with us, tell us your field and what you can do at hello@synk.im, and we will say whether we can let you know when a position opens. If you would like to teach as an AI or AI-career instructor with SHIFT, include your field and what you have made yourself.\n\nThis question box does not accept applications. Please confirm that a position is open before sending anything with personal details, such as a CV.",
+      "answer": "There is no open job or instructor posting right now. If you are a school, company or institution looking for an instructor to teach, SHIFT’s “Finding an instructor” finds one who fits your request and assigns them.\n\nIf you would like to work with us, tell us your field and what you can do at hello@synk.im, and we will say whether we can let you know when a position opens. If you would like to teach as an AI or AI-career instructor with SHIFT, include your field and what you have made yourself.\n\nThis question box does not accept applications. Please confirm that a position is open before sending anything with personal details, such as a CV.",
       "questionExamples": [
         "Are you hiring staff or instructors?",
         "Are you recruiting?",
@@ -2954,7 +2956,7 @@
       "brand": "shift",
       "category": "service",
       "title": "What services does SHIFT offer?",
-      "answer": "SHIFT gives AI lectures at schools, companies and institutions, runs an instructor agency, and automates work. Lectures come first; when a company that took a lecture wants it, we move on to automation.\n\nHands-on AI lecture — staff at companies, public bodies and schools practise on their own work and leave with one piece of work and a request–check–fix routine they can reuse.\n\nAI career lectures for schools — not a general careers talk, but how to steer a career in the AI era and which skills to build. Each student leaves with a one-page plan for their own career.\n\nInstructor agency — we find AI and AI-career instructors who fit the goal and audience of each request and assign them. You know exactly which instructor is coming before you sign.\n\nAI work automation — we pick one repetitive task and automate it to help cut fixed costs, in the order half-day review, build one task, monthly care.\n\nConsulting, branding, market research and product testing come with lectures and automation where they need them.\n\nPrices for lectures and automation and the terms for assigning instructors are not set yet and are agreed per request. We do not promise learning results or savings in advance; we check them with you afterwards.",
+      "answer": "SHIFT gives AI lectures at schools, companies and institutions, finds instructors, and automates work. Lectures come first; when a company that took a lecture wants it, we move on to automation.\n\nHands-on AI lecture — staff at companies, public bodies and schools practise on their own work and leave with one piece of work and a request–check–fix routine they can reuse.\n\nAI career lectures for schools — not a general careers talk, but how to steer a career in the AI era and which skills to build. Each student leaves with a one-page plan for their own career.\n\nFinding an instructor — we find AI and AI-career instructors who fit the goal and audience of each request and assign them. You know exactly which instructor is coming before you sign.\n\nAI work automation — we pick one repetitive task and automate it to help cut fixed costs, in the order half-day review, build one task, monthly care.\n\nConsulting, branding, market research and product testing come with lectures and automation where they need them.\n\nPrices for lectures and automation and the terms for assigning instructors are not set yet and are agreed per request. We do not promise learning results or savings in advance; we check them with you afterwards.",
       "questionExamples": [
         "What services does SHIFT offer?",
         "Do you offer both corporate AI training and branding?",
@@ -3199,7 +3201,7 @@
         "What is PATH's vision?",
         "What future does PATH work toward?"
       ],
-      "answer": "To prepare together with you for studying, working and living in Korea.\n\nFrom packing your bags to settling into life in Korea, we are preparing to work through the Korean you need, the requirements, interviews and daily life with you, one step at a time. SYNK LAB takes care of the Korean — SYNK WORLD’s TOPIK practice is open now, and we are preparing to open the one-year course.",
+      "answer": "To let you try the first interview and the first day you will face, before you come to Korea.\n\nRehearse your first interview and plan a day in Seoul. Study-abroad and job preparation open next, one at a time.",
       "sourceId": "path",
       "relatedIds": [
         "path-intro",
@@ -3210,7 +3212,7 @@
         "label": "See PATH",
         "href": "/en/path/"
       },
-      "reviewedAt": "2026-10-23",
+      "reviewedAt": "2026-11-12",
       "aliases": [
         "PATH의 비전은 무엇인가요?",
         "패스가 지향하는 미래는 무엇인가요?"
@@ -4054,7 +4056,7 @@
         "Can SHIFT build a service for my company?",
         "Can you build purchase advice for us?"
       ],
-      "answer": "Not as a separate service any more. SHIFT now focuses on AI lectures at schools, companies and institutions, an instructor agency, and automating repetitive work for companies that took a lecture.\n\nIf you want AI to take repetitive work off your team, ask us about work automation. A lecture first looks at what your company can hand to AI, then in a half-day review we pick one task we can take on and agree scope and cost up front.\n\nAtlas is not something SHIFT sells separately; it is the technology inside, used to fit lectures and reviews to the people and companies taking them.",
+      "answer": "Not as a separate service any more. SHIFT now focuses on AI lectures at schools, companies and institutions, finding instructors, and automating repetitive work for companies that took a lecture.\n\nIf you want AI to take repetitive work off your team, ask us about work automation. A lecture first looks at what your company can hand to AI, then in a half-day review we pick one task we can take on and agree scope and cost up front.\n\nAtlas is not something SHIFT sells separately; it is the technology inside, used to fit lectures and reviews to the people and companies taking them.",
       "relatedIds": [
         "shift-services",
         "shift-delivery"
@@ -4104,9 +4106,9 @@
       ],
       "action": {
         "label": "What we also take on",
-        "href": "/en/shift/#process"
+        "href": "/en/shift/#shift-research"
       },
-      "reviewedAt": "2026-10-22",
+      "reviewedAt": "2026-11-12",
       "aliases": [
         "시장조사와 제품 테스트는 어떻게 준비하나요?",
         "SHIFT에서 사용자 테스트를 맡길 수 있나요?",
@@ -4647,7 +4649,7 @@
         "Does SHIFT sell APIs or engine licenses?",
         "How will SHIFT expand its business?"
       ],
-      "answer": "No. SHIFT’s work today is AI lectures at schools, companies and institutions, an instructor agency and work automation. An API and engine licensing might be considered far in the future, but they are not part of the current business plan.\n\nThe business grows from lectures into automating work for companies that took a lecture. Atlas is not something SHIFT sells separately; it is the technology inside, used to fit lectures and reviews to the people and companies taking them.",
+      "answer": "No. SHIFT’s work today is AI lectures at schools, companies and institutions, finding instructors and work automation. An API and engine licensing might be considered far in the future, but they are not part of the current business plan.\n\nThe business grows from lectures into automating work for companies that took a lecture. Atlas is not something SHIFT sells separately; it is the technology inside, used to fit lectures and reviews to the people and companies taking them.",
       "relatedIds": [
         "shift-intro",
         "shift-philosophy"
@@ -4695,7 +4697,7 @@
         "How is the cost of building an automation decided?",
         "Is there a monthly fee?"
       ],
-      "answer": "We have not set a price list for lectures or automation. We agree the audience and scope for each request, then quote.\n\nLectures — set by audience and size, length and number of sessions, the practice material to prepare and the venue. When we assign another instructor, their terms are confirmed too.\n\nAutomation build — scope and price for one task are agreed in the half-day review. It depends on how many exceptions there are and which services it must connect to, and the price is based on the cost the automation saves.\n\nMonthly care — we agree how often we check and what we fix, and take it on month by month. Fees for external services the automation uses may be extra, and if the work changes enough to need a rebuild, scope and cost are agreed again.\n\nThe earlier split into setup fees and operating fees is no longer used.",
+      "answer": "We have not set a price list for lectures or automation. We agree the audience and scope for each request, then quote.\n\nLectures — set by audience and size, length and number of sessions, the practice material to prepare and the venue. When we assign another instructor, their terms are confirmed too.\n\nAutomation build — scope and price for one task are agreed in a half-day review of your workflow. It depends on how many exceptions there are and which services it must connect to, and the price is based on the cost the automation saves.\n\nMonthly care — we agree how often we check and what we fix, and take it on month by month. Fees for external services the automation uses may be extra, and if the work changes enough to need a rebuild, scope and cost are agreed again.\n\nThe earlier split into setup fees and operating fees is no longer used.",
       "relatedIds": [
         "shift-delivery",
         "shift-results"
@@ -4950,7 +4952,7 @@
         "How many instructors do you have?",
         "Who are the instructors?"
       ],
-      "answer": "Yes. We hear the goal and the audience of the request, then find an AI or AI-career instructor who fits and assign them. First we show an evidence card for each instructor: who they teach and for what kind of work, what they have made themselves, samples they can share, and what stays after the class.\n\nYou know exactly which instructor is coming before you sign. Running the day, a substitute if the instructor cannot come, cancellation and questions after the lecture are written into the contract only as far as we can really promise.\n\nWe do not lead with a headcount or a roster; for each request we find an instructor who fits and show you their evidence card. We have not posted for instructors yet. If you would like to teach with us, tell us your field and what you have made yourself at hello@synk.im. Selection criteria, payment and rights to teaching material will be shared once they are set.\n\nYou can see the instructor profile and lectures open for inquiry now under Lectures on the SHIFT page. Each lecture card has an “Ask about this lecture” button, and “Ask for an instructor” lets SYNK recommend someone else.",
+      "answer": "Yes. Tell us the goal and the audience of the request, and we find an AI or AI-career instructor who fits and assign them. First we show you a profile sheet for each instructor: who they teach and for what kind of work, what they have made themselves, samples they can share, and what stays after the class.\n\nYou know exactly which instructor is coming before you sign. Running the day, a substitute if the instructor cannot come, cancellation and questions after the lecture are written into the contract only as far as we can really promise.\n\nWe do not lead with a headcount or a roster; for each request we find an instructor who fits and show you their profile sheet. We have not posted for instructors yet. If you would like to teach with us, tell us your field and what you have made yourself at hello@synk.im. Selection criteria, payment and rights to teaching material will be shared once they are set.\n\nThe lectures and the instructor you can ask about now are under “What we do” and “Instructor” on the SHIFT page. Each lecture has an “Ask about this lecture” button, and if you need someone else, “Ask for an instructor” under “Finding an instructor” lets SYNK recommend one.",
       "sourceId": "shift",
       "relatedIds": [
         "shift-education",
@@ -4958,10 +4960,10 @@
         "shift-contract"
       ],
       "action": {
-        "label": "See lectures",
+        "label": "See what SHIFT does",
         "href": "/en/shift/#lectures"
       },
-      "reviewedAt": "2026-10-27"
+      "reviewedAt": "2026-11-12"
     },
     {
       "id": "path-companion",
@@ -5238,18 +5240,18 @@
   "visions": {
     "synk": {
       "name": "SYNK",
-      "headline": "AI that gets to know you the more you use it.",
-      "subtext": "SYNK builds Atlas, a personalization engine that reads a person’s goals and what they have actually done, then fits the next practice to them. With it we run four businesses: Korean education, AI lectures and work automation, ad videos, and preparing to study in Korea."
+      "headline": "Everyone gets stuck somewhere different. We build AI that starts right there.",
+      "subtext": "We build Atlas, an engine that reads what one person has actually done and picks what they do next. Today SYNK works in four areas: Korean education, AI classes for companies, ad production, and preparing to study in Korea."
     },
     "lab": {
       "name": "SYNK LAB",
-      "headline": "Step into a K-drama, and speak Korean",
-      "subtext": "SYNK LAB makes Korean you actually speak. You can listen and speak along with the Episode 1 scene now, and use SYNK WORLD for daily practice and games. The full pilot that listens to your speech and gives a coach’s feedback, and the TOPIK Level 4 courses, are in preparation."
+      "headline": "Say it, and the scene moves on",
+      "subtext": "You are the student in a K-drama. Someone speaks first, and the next scene opens only when you answer aloud in Korean."
     },
     "shift": {
       "name": "SYNK SHIFT",
-      "headline": "AI lectures, plus work automation",
-      "subtext": "SYNK SHIFT teaches the skills the AI era calls for at schools, companies and institutions, then automates repetitive work with AI for companies that took a lecture, to cut fixed costs. In schools we also give AI career lectures on how to steer a career in the AI era and what to prepare for it. We also run an instructor agency that finds instructors and assigns them to fit each request."
+      "headline": "When the AI lecture ends, you keep one thing you made",
+      "subtext": "Not a tour of tool names. Each person makes one piece of work from their own job and learns to do it again alone. After the lecture, we can automate one of your company’s repetitive tasks."
     },
     "pulse": {
       "name": "SYNK PULSE",
@@ -5258,8 +5260,8 @@
     },
     "path": {
       "name": "SYNK PATH",
-      "headline": "Studying, working and living in Korea, prepared with you",
-      "subtext": "From packing your bags to settling into life in Korea, we are preparing to work through the Korean you need, the requirements, interviews and daily life with you, one step at a time. SYNK LAB takes care of the Korean — SYNK WORLD’s TOPIK practice is open now, and we are preparing to open the one-year course."
+      "headline": "Before you come to Korea, try it first",
+      "subtext": "Rehearse your first interview and plan a day in Seoul. Study-abroad and job preparation open next, one at a time."
     }
   },
   "language": "en"

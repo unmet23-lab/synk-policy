@@ -46,7 +46,8 @@ if (hall && reel) {
   // 쇼릴 판(가로 · 세로)은 화면 비율(4:5)로 고른다. 기기를 돌리거나 창 비율이 그 선을 넘나들면 다시 고른다 — 첫 화면 배치가 같은 선으로 갈리고(pulse-v12.css ①-1 · ①-2 · ①-3),
   // 배치마다 「글은 얼굴 줄 아래」를 그 판에서 쟀다. 두 판은 시각표가 같아 보던 자리에서 잇는다. 새 판이 그 자리로 갈 때까지는 영상 시각이 0이라,
   // 작품 줄 · 번호 줄은 보던 시각(hold)으로 그린다(첫 작품으로 깜빡이지 않게). 그 사이 번호 단추를 누르면 hold가 누른 작품의 시각으로 바뀌고, 새 판은 그때의 hold로 간다.
-  // hold는 새 판이 그 자리에 닿으면(seeked) 풀고, seeked가 오지 않는 브라우저를 받쳐 자리를 넣은 4초 뒤에도 푼다. 판을 연달아 바꾸면 마지막 것만 푼다(swap).
+  // hold는 새 판의 영상 시각이 그 자리 가까이(0.5초 안) 왔을 때 푼다 — seeked가 와도 시각이 아직 0으로 읽히는 브라우저가 있어 seeked · timeupdate마다 시각을 본다.
+  // 그 사건이 오지 않는 브라우저를 받쳐 자리를 넣은 4초 뒤에도 푼다. 판을 연달아 바꾸면 마지막 것만 푼다(swap).
   const pick = () => {
     const tall = tallMq.matches, poster = tall && reel.dataset.posterTall ? reel.dataset.posterTall : posterWide;
     if (poster && reel.getAttribute('poster') !== poster) reel.poster = poster;
@@ -58,8 +59,10 @@ if (hall && reel) {
     reel.muted = true;
     if (at > 0) {
       hold = at;
-      const mine = ++swap, free = () => { if (swap === mine) hold = null; };
-      reel.addEventListener('loadedmetadata', () => { reel.currentTime = hold ?? at; reel.addEventListener('seeked', free, { once: true }); setTimeout(free, 4000); }, { once: true });
+      const mine = ++swap;
+      const free = () => { if (swap === mine) hold = null; reel.removeEventListener('seeked', reach); reel.removeEventListener('timeupdate', reach); };
+      const reach = () => { if (swap !== mine || hold == null || Math.abs(reel.currentTime - hold) < 0.5) free(); };
+      reel.addEventListener('loadedmetadata', () => { reel.currentTime = hold ?? at; reel.addEventListener('seeked', reach); reel.addEventListener('timeupdate', reach); setTimeout(free, 4000); }, { once: true });
       reel.addEventListener('error', free, { once: true });
     }
     if (visible) reel.play().catch(() => {});

@@ -85,7 +85,7 @@ body[data-k="home"] .k-proof-head{padding-top:clamp(92px,11.4vh,104px)}
 .k-door h3{margin:14px 0 0;font-size:var(--k5);font-weight:600;line-height:1.3;letter-spacing:-.025em;color:var(--k-ink)}
 .k-door h3>span{display:block}
 .k-nowline{margin:14px 0 18px;font-size:var(--k2);font-weight:400;line-height:1.55;color:var(--k-ink-2)}
-.k-nowline b{margin-right:10px;font-weight:600;color:var(--k-ink)}
+.k-nowline b{margin-right:calc(10px - .25em);font-weight:600;color:var(--k-ink)}
 .k-door .k-link{margin-top:auto}
 .k-doors-foot{margin:0;padding-top:20px;border-top:1px solid var(--k-line-2);font-size:var(--k3);line-height:1.6;color:var(--k-ink-2)}
 @media (max-width:1100px){
@@ -390,6 +390,8 @@ body .section#contact{padding-block:clamp(56px,8.4vh,88px)}
 .k-top{position:relative}
 .k-top-side{margin:18px 0 0;max-width:30em;font-size:var(--k3);line-height:1.6;color:var(--k-ink-2);text-wrap:pretty}
 @media (min-width:1101px){.k-top-side{position:absolute;right:0;bottom:1.05em;margin:0;width:min(29em,34%)}}
+/* 영어 받침 글은 한글보다 길어 1101~1279px에서는 서너 줄이 되고 주장 첫 줄 끝과 맞닿는다 — 그 폭에서는 주장 아래에 둔다(1280px부터 오른쪽 아래) */
+@media (min-width:1101px) and (max-width:1279px){html[lang="en"] .k-top-side{position:static;margin:18px 0 0;width:auto}}
 .k-cols{display:grid;grid-template-columns:repeat(var(--n,3),minmax(0,1fr));column-gap:clamp(24px,3vw,48px);margin-top:clamp(32px,5vh,52px)}
 @media (max-width:1100px){.k-cols{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media (max-width:700px){.k-cols{grid-template-columns:minmax(0,1fr);margin-top:24px}}
@@ -667,7 +669,8 @@ body[data-k="pulse"] .pv-ask-note{font-size:var(--k1)}
 .lw--judge .lw-visual{background:none}
 .k-judge{min-width:0}
 .k-judge-head{display:flex;align-items:baseline;justify-content:space-between;gap:16px;margin:0;padding-bottom:12px;border-bottom:1px solid var(--lw-line);font-size:var(--k1);font-weight:500;line-height:1.4;color:var(--lw-ink-3)}
-.k-judge-head b{font-size:var(--k3);font-weight:600;color:#fff}
+.k-judge-head b{font-size:var(--k3);font-weight:600;color:#fff;white-space:nowrap}
+.k-judge-head>span:last-child{flex:none}
 .k-judge-head>span:first-child{display:flex;align-items:baseline;gap:12px;min-width:0}
 /* 쉬는 화면의 실제 화면 둘(예시 학습자의 한 사례): 학습자가 한 것(게임에서 놓친 답) → 다음에 앱을 열면(튜터 카드). 그 사이의 판단이 오른쪽 기록이다 */
 .k-judge-rest{display:grid;gap:18px;min-width:0}
@@ -743,10 +746,56 @@ body[data-k="pulse"] .pv-ask-note{font-size:var(--k1)}
   .k-judge-head{padding-bottom:9px}
   .k-judge-past{padding-top:9px}
 }
-@media (min-width:720px) and (max-width:900px){
-  /* 태블릿 폭: 카드와 기록이 나란히 */
-  .lw--judge .lw-visual{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);grid-template-rows:auto auto 1fr;column-gap:clamp(24px,3.4vw,32px);align-content:start;margin-inline:var(--gut)}
-  .lw--judge .k-judge-did{grid-column:1;margin:0 0 12px}
-  .lw--judge .lw-piece,.lw--judge .k-judge-rest{grid-column:1;width:auto;margin:0}
+@media (min-width:720px) and (max-width:900px),(min-width:560px) and (max-width:719px) and (orientation:landscape){
+  /* 나란한 판(태블릿 폭 · 가로로 든 휴대폰): 왼쪽 칸에 글 · 다음 단추 · 화면(카드), 오른쪽 칸에 기록 — 넓은 화면의 왼쪽 글 칸과 같은 차례다.
+     단추를 무대 아래(또는 카드 아래)에 두면 낮은 창에서 바뀐 세 줄을 보이는 동안 포커스 받은 단추가 창 밖에 남았다(문제 카드가 창보다 길다).
+     격자는 글 · 화면 · 단추를 품는 틀(.lw-tryframe)이 잡고 화면 칸(.lw-visual)은 틀만 걷는다. 단추 자리는 비어 있을 때도 남겨 답한 뒤 카드가 밀리지 않는다 */
+  .lw--judge .lw-tryframe{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);grid-template-rows:auto auto auto auto 1fr;column-gap:clamp(24px,3.4vw,32px);align-content:start;margin-inline:var(--gut)}
+  .lw--judge .lw-copy>[aria-live]{grid-column:1;grid-row:1;margin:0}
+  .lw--judge .lw-next{grid-column:1;grid-row:2;min-height:54px;margin:16px 0 0}
+  .lw--judge .lw-visual{display:contents}
+  .lw--judge .k-judge-did{grid-column:1;grid-row:3;margin:22px 0 12px}
+  .lw--judge .lw-piece,.lw--judge .k-judge-rest{grid-column:1;grid-row:4;width:auto;margin:0}
   .lw--judge .k-judge{grid-column:2;grid-row:1/-1;align-self:start;margin:0}
 }
+
+/* ── 몽골어 회사 소개(/mn/, 2026-11-12) — 일곱 쪽과 같은 틀, 짜임만 이 쪽 것 ──
+   첫 화면(밤): 쪽 주장 · 소개 · 지금 쓸 수 있는 둘의 실제 몽골어 화면. 몽골어 소개 문단은 길어 주장 옆이 아니라 아래에 둔다 */
+html[lang="mn"] .k-top-side{position:static;margin:18px 0 0;width:auto;max-width:46em}
+.k-mn-hero .k-acts{margin-top:26px}
+.k-mn-now{margin-top:clamp(28px,3.2vw,40px);padding-top:clamp(20px,2.2vw,28px);border-top:1px solid var(--k-line)}
+.k-mn-h{margin:0;font-size:var(--k5);font-weight:600;line-height:1.3;letter-spacing:-.02em;color:var(--k-ink)}
+.k-mn-head .k-body{margin:10px 0 0;max-width:46em;color:var(--k-ink-2)}
+@media (min-width:901px){.k-mn-head{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.4fr);gap:clamp(24px,4vw,56px);align-items:baseline}.k-mn-head .k-body{margin:0}}
+.k-mn-now .biz-grid{margin-top:22px}
+/* 넓은 화면(1400px부터)은 소개 문단을 주장 오른쪽 아래에 — 실제 화면 둘이 첫 화면에 더 올라온다 */
+@media (min-width:1400px){html[lang="mn"] .k-top-side{position:absolute;right:0;bottom:1.05em;margin:0;width:min(36em,42%);max-width:none}}
+.k-mn-now .biz{background:rgba(250,250,249,.05);border-color:var(--k-line);color:var(--k-ink)}
+.k-mn-now .biz:hover{border-color:var(--k-line-2);box-shadow:none}
+.k-mn-now .biz-shot{border-bottom-color:var(--k-line)}
+.k-mn-now .biz-body{gap:10px}
+.k-mn-now .biz-body h3{font-size:var(--k4);font-weight:600;line-height:1.4;letter-spacing:-.015em;color:var(--k-ink)}
+.k-mn-now .biz-body p,.k-mn-now .biz-points li{font-size:var(--k2);line-height:1.6;color:var(--k-ink-2)}
+.k-mn-now .biz-body .k-when,.k-mn-goal .steps .k-when{margin:0;font-size:var(--k1);font-weight:500;line-height:1.4;color:var(--k-ink-3)}
+.k-mn-now .biz-points li::before{background:var(--k-ink-3)}
+.k-mn-now .biz-go{font-size:var(--k2);font-weight:600;color:var(--k-ink)}
+.k-mn-goal .steps{margin-top:clamp(32px,5vh,52px)}
+.k-mn-goal .steps .mono{font-size:var(--k1);font-weight:400}
+.k-mn-goal .steps .k-when{margin-top:12px}
+.k-mn-founder .founder-band{margin-top:clamp(24px,3vw,36px)}
+.k-mn-founder blockquote{margin:0;font-size:var(--k5);font-weight:600;line-height:1.35;letter-spacing:-.02em;color:var(--k-ink)}
+.k-mn-founder .lead{font-size:var(--k3);line-height:1.65}
+.k-mn-founder .who{font-size:var(--k2)}
+.k-mn-founder .who strong{font-weight:600}
+.k-mn-contact .k-small{margin:14px 0 0;color:var(--k-ink-3)}
+.k-mn-goal .k-mn-note{margin:clamp(20px,2.4vw,28px) 0 0;max-width:46em;color:var(--k-ink-3)}
+
+/* ── 영어 쪽(2026-11-12 4단계): 옛 영어 전용 규칙(html[lang="en"] …)이 뼈대 크기를 덮던 곳을 같은 단계로 되돌린다 ──
+   제목은 굵게가 아니라 크게, 단계 일곱 안 · 영어 쪽은 대문자 꼬리표 없음(바닥 머리 줄 · 질문 목록 머리는 한국어 쪽과 같은 본문 글꼴 13px) */
+html[lang="en"] .h2,html[lang="en"] .k-proof-head .lw-title,html[lang="en"] .lw--try .lw-title{font-size:var(--k6);letter-spacing:-.03em}
+html[lang="en"] .foot-col h2,html[lang="en"] .foot-channels>h2,html[lang="en"] .qx-head{font-family:var(--sans);font-size:var(--k1);font-weight:600;letter-spacing:0;text-transform:none}
+/* 영어 「하는 일」 줄: 단추 글이 길어(220~232px) 한국어 칸 168px에 안 들어가 왼쪽 설명 글에 얹혔다 → 영어만 칸을 넓힌다(11-13) */
+@media (min-width:900.02px){html[lang="en"] .k-svc>li{grid-template-columns:minmax(0,4fr) minmax(0,6fr) 240px}}
+/* 영어 시간축 탭: 「30 days」(13px에서 약 47px)가 폭 348 아래 여섯 등분 칸(320에서 42px)에 안 들어 두 줄로 꺾였다 →
+   좁은 폭에서만 칸이 제 글 폭 아래로 줄지 않게 하고 나머지 칸은 남은 폭을 똑같이 나눈다(11-13) */
+@media (max-width:359.98px){html[lang="en"] .lw-steps{grid-template-columns:repeat(6,minmax(min-content,1fr))}html[lang="en"] .lw-steps li{white-space:nowrap}}
