@@ -246,20 +246,54 @@ if (stage) {
     listen.addEventListener('timeupdate', () => { if (listen.currentTime > 9.3) listen.currentTime = 0.1; });
     listen.addEventListener('ended', () => { listen.currentTime = 0.1; listen.play().catch(() => {}); });
   }
+  // 질문 영상 미리 받기(11-14 유호님 「질문 영상 로딩이 너무 긴데? 기다리다 다 나갈갓같아 3.8초면」): 그림 무대(듣는 영상 없음)는 쪽 전용 짧은 판
+  // (0~3.8초 · 345KB)을 쪽이 뜬 뒤 한가할 때 preload=auto로 받아 둔다. 데이터 절약이면 미리 받지 않고 단추에 손이 가는 순간(포인터 · 눌림 · 초점) 받기 시작.
+  const saveData = !!(navigator.connection && navigator.connection.saveData);
+  const warm = () => { if (ask.getAttribute('src')) return; ask.preload = 'auto'; load(ask); };
+  if (!listen) {
+    if (!saveData) {
+      const idle = () => ('requestIdleCallback' in window ? requestIdleCallback(warm, { timeout: 600 }) : setTimeout(warm, 300));
+      if (document.readyState === 'complete') idle(); else addEventListener('load', idle, { once: true });
+    } else for (const ev of ['pointerenter', 'pointerdown', 'focus']) hear.addEventListener(ev, warm, { once: true });
+  }
   if (!reduce) new IntersectionObserver(es => { for (const e of es) { if (e.isIntersecting) { if (listen) { load(listen); listen.play().catch(() => {}); } } else { if (listen) listen.pause(); ask.pause(); } } }, { threshold: .35 }).observe(stage);
   hear.hidden = false;
+  // 누른 뒤 재생이 시작되기(playing) 전까지는 단추를 「불러오는 중」(돌아가는 표 · aria-busy)으로 두고 무대 · 대사 줄은 그대로 — 재생이 시작되면 질문 영상과
+  // 질문 글로 바꾼다. 미리 받아 둔 판은 바로 재생되므로 0.12초 안에 시작하면 표시하지 않는다(깜빡임 · aria-busy가 켜졌다 꺼지는 것을 막음).
+  // 10초 넘게 시작하지 않으면 쉬는 상태로 돌아간다.
+  const hearText = $('.pa-hear-text', hear), hearLabel = hearText ? hearText.textContent : '';
+  let starting = false, giveUpTimer = 0, busyTimer = 0;
+  // 「불러오는 중…」이 원래 글보다 짧아 단추가 좁아지면 휴대폰에서 옆 단추가 한 줄 위로 올라붙어 아래가 출렁인다 — 불러오는 동안 원래 폭을 붙잡는다
+  const busy = on => {
+    if (on && !hear.classList.contains('is-loading')) hear.style.minWidth = hear.getBoundingClientRect().width + 'px';
+    if (!on) hear.style.minWidth = '';
+    hear.classList.toggle('is-loading', on);
+    if (on) hear.setAttribute('aria-busy', 'true'); else hear.removeAttribute('aria-busy');
+    if (hearText) hearText.textContent = on && R.loading ? R.loading : hearLabel;
+  };
+  const giveUp = () => { clearTimeout(giveUpTimer); clearTimeout(busyTimer); starting = false; busy(false); stage.classList.remove('is-asking'); ask.pause(); say(R.wait, '', true); };
+  ask.addEventListener('playing', () => {
+    if (!starting) return;
+    starting = false; clearTimeout(giveUpTimer); clearTimeout(busyTimer); busy(false);
+    stage.classList.add('is-asking'); say(R.question, R.lang === 'ko' ? '' : R.gloss, false);
+  });
   hear.addEventListener('click', async () => {
-    load(ask); ask.currentTime = 0; ask.muted = false; stage.classList.add('is-asking');
-    say(R.question, R.lang === 'ko' ? '' : R.gloss, false);
-    try { await ask.play(); } catch { stage.classList.remove('is-asking'); say(R.wait, '', true); }
+    ask.preload = 'auto'; load(ask); ask.currentTime = 0; ask.muted = false;
+    starting = true; clearTimeout(giveUpTimer); clearTimeout(busyTimer);
+    busyTimer = setTimeout(() => { if (starting) busy(true); }, 120);
+    giveUpTimer = setTimeout(giveUp, 10000);
+    try { await ask.play(); } catch { giveUp(); }
   });
   // 첫 질문은 3.6초에서 끝난다(공개 면접 연습 strict-question의 answerStartSeconds) — 그 뒤는 답을 기다리는 장면이라 듣는 모습으로 돌아간다.
-  ask.addEventListener('timeupdate', () => {
-    if (ask.currentTime <= 3.6 || !stage.classList.contains('is-asking')) return;
+  // 짧은 판은 3.83초에 끝나므로 끝(ended)에서도 같은 자리로 돌아간다.
+  const done = () => {
+    if (!stage.classList.contains('is-asking')) return;
     stage.classList.remove('is-asking'); ask.pause();
     if (!reduce && listen) { load(listen); listen.play().catch(() => {}); }
     say(R.after, '', true);
-  });
+  };
+  ask.addEventListener('timeupdate', () => { if (ask.currentTime > 3.6) done(); });
+  ask.addEventListener('ended', done);
 }
 
 // ③ 옛 주소로 들어오면 그 역의 「무엇을 하나요」를 연다
