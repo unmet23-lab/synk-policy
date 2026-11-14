@@ -276,13 +276,22 @@ if (stage) {
   const giveUp = () => { settle(); stage.classList.remove('is-asking'); ask.pause(); say(R.wait, '', true); };
   ask.addEventListener('playing', () => {
     played = true;
-    if (!starting) return;
+    if (!starting) { if (stage.classList.contains('is-asking')) settle(); return; }
     settle();
     stage.classList.add('is-asking'); say(R.question, R.lang === 'ko' ? '' : R.gloss, false);
   });
+  // 질문을 기다리거나 질문이 나오는 중에 받기가 끊기면(오류) 멈춘 면접관 화면을 두지 않고 쉬는 상태로 돌린다 — 다시 누르면 아래에서 처음부터 다시 받는다
+  ask.addEventListener('error', () => { if (starting || stage.classList.contains('is-asking')) giveUp(); });
+  // 질문이 나오다 받기가 늦어 멈추면(waiting — 크롬은 끊겨도 오류 대신 이렇게 기다린다) 0.45초 뒤 단추를 「불러오는 중」으로 두고, 10초 안에 다시 흐르지 않으면 쉬는 상태로
+  ask.addEventListener('waiting', () => {
+    if (starting || !stage.classList.contains('is-asking')) return;
+    clearTimeout(busyTimer); clearTimeout(giveUpTimer);
+    busyTimer = setTimeout(() => { if (stage.classList.contains('is-asking') && !starting) busy(true); }, 450);
+    giveUpTimer = setTimeout(giveUp, 10000);
+  });
   hear.addEventListener('click', async () => {
-    // 질문이 나오는 중에 다시 누르면 처음으로 되감기만 한다(무대 · 줄은 그대로라 기다림 표시가 필요 없다)
-    if (stage.classList.contains('is-asking') && !ask.paused) { ask.currentTime = 0; return; }
+    // 질문이 나오는 중에 다시 누르면 처음으로 되감기만 한다(무대 · 줄은 그대로라 기다림 표시가 필요 없다). 받기 오류가 남아 있으면 되감지 않고 아래의 다시 받기로
+    if (stage.classList.contains('is-asking') && !ask.paused && !ask.error) { ask.currentTime = 0; return; }
     const my = ++tries, ready = !ask.error && (played || ask.readyState >= 3);
     // 받기가 한 번 실패한 영상(쪽이 뜰 때 망이 끊기는 등)은 오류가 남아, 다시 눌러도 재생이 바로 거절된다 — 누를 때 오류가 있으면 처음부터 다시 받는다
     ask.preload = 'auto'; load(ask); if (ask.error) ask.load(); ask.currentTime = 0; ask.muted = false;
