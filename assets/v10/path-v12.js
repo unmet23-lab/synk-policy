@@ -283,8 +283,9 @@ if (stage) {
   hear.addEventListener('click', async () => {
     // 질문이 나오는 중에 다시 누르면 처음으로 되감기만 한다(무대 · 줄은 그대로라 기다림 표시가 필요 없다)
     if (stage.classList.contains('is-asking') && !ask.paused) { ask.currentTime = 0; return; }
-    const my = ++tries, ready = played || ask.readyState >= 3;
-    ask.preload = 'auto'; load(ask); ask.currentTime = 0; ask.muted = false;
+    const my = ++tries, ready = !ask.error && (played || ask.readyState >= 3);
+    // 받기가 한 번 실패한 영상(쪽이 뜰 때 망이 끊기는 등)은 오류가 남아, 다시 눌러도 재생이 바로 거절된다 — 누를 때 오류가 있으면 처음부터 다시 받는다
+    ask.preload = 'auto'; load(ask); if (ask.error) ask.load(); ask.currentTime = 0; ask.muted = false;
     starting = true; clearTimeout(giveUpTimer); clearTimeout(busyTimer);
     if (!hear.classList.contains('is-loading')) busyTimer = setTimeout(() => { if (starting) busy(true); }, ready ? 450 : 120);
     giveUpTimer = setTimeout(giveUp, 10000);
