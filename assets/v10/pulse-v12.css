@@ -151,7 +151,7 @@
 .pv-brief li{display:grid;grid-template-columns:28px 1fr}
 .pv-brief .pv-no{padding-top:.15em}
 .pv-ask .pv-link{margin-top:6px}
-.pv-ask-note{font-size:13.5px!important;color:var(--ink-3)}
+.pv-ask-note{font-size:13px!important;color:var(--ink-3)}
 .pv-ask :focus-visible{outline-color:#111113}
 
 @media (max-width:1000px){
@@ -348,3 +348,98 @@ html[lang="en"] .pv-h1{font-size:clamp(36px,5.2vw,82px);text-shadow:0 1px 10px r
   .pv-now strong,.pv-now>span,.pv-side .k-pv-price{text-shadow:0 0 2px rgba(0,0,0,.55),0 1px 12px rgba(0,0,0,.75)}
   .pv-now>span{color:var(--ink-2)}
 }}
+
+/* ── 짧은 판(11-14 · 뼈대 남은 일) ─────────────────────────────────────────────────────────────
+   쪽이 컴퓨터 14.7 · 휴대폰 17.9화면이었다(관문 7 · 10). 작품 열둘은 그대로 두고 틀과 여백, 설명의 자리만 줄인다.
+   ① 큰 작품 넷: 가로(16:9) · 세로(9:16)를 한 줄에 짝지어 같은 높이로 둔다(칸 비 1.7778 : 0.5625 — 원고 차례가 가로 · 세로 · 가로 · 세로).
+     엇갈려 놓던 84% 폭 · 큰 여백을 걷고, 제목은 칸 제목 단계(28 · 22px)로. 휴대폰은 가로가 두 칸을 다 쓰고 세로 둘이 한 줄에 선다.
+   ② 더 많은 작품 여덟: 넷씩 두 줄(skeleton-pages.mjs가 묶는다 — 줄마다 가로 둘 · 세로 둘이라 높이가 같다). 1000px 이하는 두 칸 · 같은 정사각 틀, 휴대폰(700px 이하)은 옆으로 넘기는 한 줄(4:5).
+   ③ 영상 제작 네 갈래: 컴퓨터(1000px 넘음)는 이름 + 설명 줄 짜임, 1000px 이하는 두 칸, 700px 이하는 한 칸. 만드는 순서 다섯은 좁은 줄로. ④ 어두운 구역 위아래 · 머리 아래 · 묶음 사이 여백을 줄인다.
+   쇼릴 · 작품 재생(pulse-v12.js)은 그대로다 — 재생은 칸 크기와 상관없이 화면 가운데 · 손을 올린 칸 하나. */
+body[data-k="pulse"] .pv-dark.section{padding-block:clamp(56px,6vw,80px)}
+body[data-k="pulse"] .pv-head{margin-bottom:clamp(28px,3.4vw,44px)}
+.pv-works{grid-template-columns:minmax(0,1.7778fr) minmax(0,.5625fr);gap:clamp(40px,4vw,56px) clamp(16px,2vw,28px);align-items:start}
+.pv-work,.pv-work:nth-child(even){width:auto;margin:0}
+.pv-work.is-tall{grid-template-columns:minmax(0,1fr);gap:24px;align-items:start}
+.pv-work .pv-h3{font-size:var(--k5);line-height:1.3}
+.pv-cap{grid-template-columns:auto minmax(0,1fr) minmax(0,24em);gap:12px 24px}
+.pv-cap .pv-no{padding-top:.35em}
+.pv-work.is-tall .pv-cap{grid-template-columns:auto minmax(0,1fr)}
+.pv-work.is-tall .pv-meta{grid-column:1/-1}
+/* 폭 1200 이하(11-15): 가로 작품 칸이 좁아 설명 칸(24em)이 제목 칸을 144px까지 눌러 영어 제목이 여섯 줄로 꺾였다 — 설명을 제목 아래로 내린다(900px 이하는 아래 규칙이 한 칸으로 덮는다) */
+@media (max-width:1200px){.pv-cap{grid-template-columns:auto minmax(0,1fr)}.pv-cap .pv-meta{grid-column:1/-1}}
+/* 폭 901~1100(11-15): 세로 작품 캡션은 제목 칸이 151px로 눌려 서너 줄로 꺾였다 — 번호를 숨기고 제목을 한 단 낮춘다(900px 이하 규칙처럼 한 칸) */
+@media (min-width:900.02px) and (max-width:1100px){.pv-work.is-tall .pv-cap{grid-template-columns:minmax(0,1fr)}.pv-work.is-tall .pv-cap .pv-no{display:none}.pv-work.is-tall .pv-h3{font-size:var(--k4)}}
+.pv-shelf{margin-top:clamp(56px,6vw,80px)}
+.pv-shelf-title{margin-bottom:clamp(20px,2.4vw,32px)}
+.pv-row{gap:clamp(14px,1.6vw,22px)}
+.pv-row+.pv-row{margin-top:clamp(32px,3.4vw,44px)}
+.pv-tile .pv-h5{font-size:var(--k3);line-height:1.4}
+.pv-more{margin-top:clamp(48px,5vw,64px)}
+.pv-soon{margin-top:24px}
+.k-pv-mid{margin-top:40px}
+.pv-types{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 clamp(20px,2.4vw,36px);border-top:0}
+/* 구역 제목은 구역 제목 단계(40 · 27px) — 쪽 주장 단계(64 · 33px)는 첫 화면 제목 하나만(뼈대 1절). 명조 300 그대로 */
+.pv-dark .pv-h2,.pv-ask .pv-h2{font-size:var(--k6);line-height:1.2}
+.pv-types>li{display:block;padding:18px 0 0;border-top:1px solid var(--line);border-bottom:0}
+.pv-types .pv-h3{font-size:var(--k5);margin:0 0 12px}
+.pv-types .pv-type-what{margin:0 0 14px}
+.pv-types dl{grid-template-columns:minmax(0,1fr);gap:10px}
+.pv-how{margin-top:clamp(44px,4.4vw,60px)}
+.pv-how li{padding:12px 0}
+body[data-k="pulse"] .pv-cast-head{margin-bottom:28px}
+.pv-teams{margin-top:24px}
+.pv-credits{margin-top:20px;columns:2;column-gap:28px}
+.pv-credits li{break-inside:avoid;padding:9px 0}
+.pv-ask{padding-block:clamp(56px,6vw,84px)}
+.pv-ask-text{margin:18px 0 24px}
+.pv-ask-side{gap:28px}
+body[data-k="pulse"] .qa-mark{font-weight:600}
+@media (max-width:1000px){
+  .pv-row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px 14px;flex-wrap:nowrap}
+  .pv-tile,.pv-tile.is-tall{flex:none}
+  .pv-tile .pv-screen{aspect-ratio:1}
+  .pv-row+.pv-row{margin-top:24px}
+  .pv-types{grid-template-columns:repeat(2,minmax(0,1fr))}
+  /* 11-15: 701~1000px의 두 칸 두 줄에서 첫 줄 끝 글이 둘째 줄 위 선에 붙지 않게 아래 여백을 둔다(700px 이하는 아래 규칙이 덮는다) */
+  .pv-types>li{padding:18px 0 28px}
+}
+/* 짧은 판 · 컴퓨터(1000px 넘음): 영상 제작 네 갈래는 한 줄에 하나씩 — 왼쪽에 갈래 이름(칸 제목 단계), 오른쪽에 설명과 「누구에게 · 받는 것」 두 칸.
+   네 칸 격자는 이름이 작고 줄이 짧아, 맹검에서 「무엇을 하는 곳인지」가 라이브보다 한 점 낮았다(11-14). 라이브의 줄 짜임을 여백만 줄여 쓴다. */
+@media (min-width:1000.02px){
+  .pv-types{display:block;border-top:1px solid var(--line)}
+  .pv-types>li{display:grid;grid-template-columns:minmax(0,.62fr) minmax(0,1.38fr);gap:0 clamp(28px,3vw,48px);align-items:start;padding:26px 0 28px;border-top:0;border-bottom:1px solid var(--line)}
+  .pv-types .pv-h3{margin:0;line-height:1.2}
+  .pv-types .pv-type-what{margin:0 0 12px}
+  .pv-types dl{grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px 28px}
+}
+@media (max-width:700px){
+  .pv-types{grid-template-columns:minmax(0,1fr)}
+  .pv-types>li{padding:16px 0 20px}
+  .pv-types .pv-type-what{margin-bottom:10px}
+  .pv-types dl{gap:6px}
+  .pv-types dl>div{display:grid;grid-template-columns:5.5em minmax(0,1fr);gap:0 10px}
+  .pv-types dt{margin:0;padding-top:.15em}
+  .pv-types dd{font-size:var(--k1);line-height:1.55}
+}
+@media (max-width:900px){
+  .pv-works{grid-template-columns:repeat(2,minmax(0,1fr));grid-auto-flow:row dense;gap:36px 14px}
+  .pv-work:not(.is-tall){grid-column:1/-1}
+  .pv-work.is-tall .pv-frame{width:100%}
+  .pv-cap .pv-no{display:none}
+  .pv-cap{grid-template-columns:minmax(0,1fr);gap:8px}
+  .pv-work.is-tall .pv-cap{grid-template-columns:minmax(0,1fr)}
+  .pv-work.is-tall .pv-meta p:not(.pv-kicker){font-size:var(--k1);line-height:1.55}
+  .pv-work{gap:14px}
+  .pv-credits{columns:1}
+}
+/* 짧은 판 · 휴대폰(700px 이하): 「더 많은 작품」 여덟을 한 줄로 이어 옆으로 넘긴다(두 칸 네 줄이 1.6화면이었다). 다음 칸이 반쯤 보여 넘길 수 있음을 알린다.
+   「이렇게 만듭니다」 다섯 줄은 설명을 작은 글로 */
+@media (max-width:700px){
+  .pv-rows{display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x proximity;margin-inline:calc(var(--gut) * -1);padding:0 var(--gut) 14px;scroll-padding-inline:var(--gut);scrollbar-width:thin;scrollbar-color:var(--line-2) transparent;outline-offset:4px}
+  .pv-rows>.pv-row{display:contents}
+  .pv-rows .pv-tile,.pv-rows .pv-tile.is-tall{flex:0 0 min(60vw,260px);scroll-snap-align:start}
+  .pv-rows .pv-tile .pv-screen{aspect-ratio:4/5}
+  .pv-how li{padding:10px 0}
+  .pv-how li>span{font-size:var(--k1);line-height:1.55}
+}

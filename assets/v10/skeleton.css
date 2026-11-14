@@ -16,6 +16,8 @@ body{font-size:var(--k3);font-weight:400}
 
 /* ── 1. 구역 틀 ── */
 .k-sec{position:relative;padding-block:clamp(56px,8.4vh,88px);overflow-x:clip;background:var(--k-bg);color:var(--k-ink)}
+/* 휴대폰(700px 이하) 구역 여백은 clamp(44px, 6vh, 56px) — 844px 높이에서 71 → 51px(11-14 쪽 길이 관문). 기본 정의 바로 뒤에 두어, 구역마다 따로 정한 여백(뒤 규칙)이 그대로 이긴다 */
+@media (max-width:700px){.k-sec{padding-block:clamp(44px,6vh,56px)}}
 .k-night{--k-ink:#fafaf9;--k-ink-2:rgba(250,250,249,.8);--k-ink-3:rgba(250,250,249,.6);--k-line:rgba(250,250,249,.16);--k-line-2:rgba(250,250,249,.3);--k-bg:#08090c;background:#08090c;color:#fafaf9}
 /* 구역 머리 줄: 입구의 「싱ㅋ = SYNK ───」처럼 이름이 선 위에 앉는다. 영문 꼬리표 · 점 · 번호 없음 */
 .k-rule{display:flex;align-items:center;gap:16px;margin:0 0 clamp(26px,4vh,44px);font-size:var(--k1);font-weight:500;line-height:1;letter-spacing:.02em;color:var(--k-ink-3)}
@@ -807,3 +809,36 @@ html[lang="en"] .foot-col h2,html[lang="en"] .foot-channels>h2,html[lang="en"] .
 @media (max-width:600px){.k-pv-mid{flex-direction:column;align-items:stretch;gap:14px}.k-pv-mid .btn{justify-content:space-between}}
 /* 바닥 글 링크: 휴대폰 · 손가락 화면에서는 줄째 눌리는 44px 칸(「문의」가 25×17px이던 것 — 문의 동선 막힘, 11-14) */
 @media (max-width:900px),(pointer:coarse){.foot-col ul{gap:0}.foot-col h2,.foot-channels .foot-col h3{margin-bottom:4px}.foot-col li>a,.foot-col li>button{display:flex;align-items:center;min-height:44px;width:100%}}
+/* 바닥 「채널」(휴대폰 · 900px 이하): 사업마다 한 줄 — 이름 칸 + YouTube · Instagram · Facebook을 나란히(줄 높이 44px). 세 칸 격자에서 링크가 한 줄씩 쌓여
+   휴대폰 바닥이 1.47화면이었다(11-14 — 쪽 길이 관문). 링크 칸은 손가락 칸 44px 그대로다 */
+@media (max-width:900px){.foot-channels{grid-template-columns:minmax(0,1fr);gap:0}.foot-channels>h2{margin-bottom:4px}.foot-channels .foot-col{display:flex;align-items:center;gap:0 18px}.foot-channels .foot-col h3{flex:0 0 4.6em;margin:0}.foot-channels .foot-col ul{display:flex;flex-wrap:wrap;gap:0 18px}.foot-channels .foot-col li>a{width:auto}}
+
+/* 짧은 판 · 휴대폰(11-14 둘째 묶음): 모든 쪽 바닥의 큰 synk 글자표는 화면 폭의 62%로(139 → 약 86px), 아틀라스 엔진 여덟 줄은 설명을 작은 글로.
+   쪽 길이 관문(휴대폰 10화면)에 다가가려는 것이고, 글과 링크는 그대로다. */
+@media (max-width:700px){
+  .foot-mark{margin-top:24px}
+  .foot-mark-crop{width:62%}
+  .k-eng li{padding:12px 0}
+  .k-eng p{font-size:var(--k1);line-height:1.55}
+}
+
+/* 아틀라스 학습자 칸(11-15, 유호님 「시안 2로」): 게임 칸은 실제 게임에서 틀린 순간이다(piece-game-wrong — 고른 「서울역」 칸 + 안내문, 홈 무대의 piece-game은 그대로).
+   ① 학습자가 고른 칸에 테두리와 「고른 답 · 오답」 이름표(칸 바로 아래, 칸 왼쪽 끝에서 조금 들어간 자리의 안내문 종이 빈자리 — 칸 안에 두면 「서울역」 글자나 화살표 · ① 표지를 가렸다)를 붙여 그림만으로 틀린 선택이 읽히게 한다(칸 자리는 그림 780×492의 x 262~519 · y 0~199, 틀 780/420에 맞춘 백분율).
+   ④ 판단 기록이 가운데 칸 옆에 서는 폭(720~900px · 1180px부터)에서는 눈이 가운데 위 → 오른쪽 → 가운데 아래로 꺾인다 — 세 칸에 읽는 순서 1 · 2 · 3을 붙인다.
+      720~900px에서는 기록 칸이 두 화면보다 300px쯤 위에서 시작해 2가 1보다 먼저 보인다 — 번호가 순서를 바로잡는다고 보고 그대로 둔다(11-15 검수 확인).
+      기록 머리의 2는 머리 줄 밖 왼쪽 틈에 걸어 둔다 — 줄 안에 두면 1180px 언저리에서 「예시 학습자 · 게임에서 놓친 뒤」가 한 줄 더 꺾였다.
+      이름표는 고른 칸의 왼쪽 끝에서 조금 들어간 자리에 단다 — 오른쪽 끝에 맞추면 틀이 330px보다 좁을 때 영어 이름표가 안내문 머리 글 「이렇게 안내했어요」를 덮었다.
+      위아래로 쌓이는 폭(719px까지 · 901~1179px)은 차례대로 읽혀 번호를 숨긴다. 방문자가 직접 풀기 시작해 두 화면이 접히면 기록 머리의 번호도 숨긴다. */
+.k-judge-shot>div{position:relative}
+.k-judge-pick{position:absolute;top:0;left:33.59%;width:33.08%;height:47.62%;box-shadow:inset 0 0 0 3px var(--lw-hot);pointer-events:none}
+.k-judge-pick b{position:absolute;left:8%;top:calc(100% + 6px);padding:3px 10px;border-radius:999px;background:var(--lw-hot);color:#1a1210;font-size:13px;font-weight:600;line-height:1.4;white-space:nowrap}
+.k-step{display:none}
+@media (min-width:720px) and (max-width:900px),(min-width:1180px){
+  .k-step{display:inline-grid;place-items:center;flex:none;align-self:center;width:20px;height:20px;border-radius:50%;background:var(--lw-hot);color:#1a1210;font-style:normal;font-size:13px;font-weight:600;line-height:1}
+  .lw--judge:has(.k-judge-rest[hidden]) .k-judge-head .k-step{display:none}
+  .k-judge-head{position:relative}
+  .k-judge-head .k-step{position:absolute;left:-26px;top:2px}
+}
+@media (min-width:720px) and (max-width:900px){
+  .k-judge-head .k-step{left:-23px}
+}

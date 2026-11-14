@@ -347,6 +347,7 @@ export function createKnowledgeEngine(data){
   if(/\b(?:placement|level test|decide (?:my|the) (?:class )?level|which level|my level)\b/.test(q)&&/\b(?:english|korean|class|level)\b/.test(q))return from(['lab-languages']);
   if(/\b(?:chatgpt|ai|chatbots?)\b/.test(q)&&/\b(?:kids?|students?|class|children|teens?|teenagers?|young people|my (?:son|daughter|child)|learners?)\b/.test(q)&&/\b(?:use|using|banned|allowed|responsib\w*|teach|copy\w*|cheat\w*|depend\w*|rely)\b/.test(q))return from(['lab-ai']);
   if(/\b(?:visa interview|embassy|consulate)\b/.test(q)&&/\b(?:airport|immigration|arrival|land|border|entry)\b/.test(q))return from(brand==='path'?['path-journey']:['lab-vr']);
+  if(brand!=='path'&&/\b(?:airport|immigration|border)\b/.test(q)&&/\binterview\w*\b/.test(q)&&!/\bcaregiv\w*|\bcare work\w*/.test(q))return from(['lab-vr','path-journey']);
   if(/\b(?:native speakers?|real (?:koreans?|people|humans?)|talk(?:ing)? (?:to|with) (?:real )?koreans|speaking practice with|conversation with (?:a )?(?:real|native))\b/.test(q)&&/\b(?:practice|speak\w*|talk\w*|conversation|class|lessons?|or is it|all ai)\b/.test(q))return from(['lab-languages']);
   if(/\benglish (?:lessons?|class(?:es)?|courses?|track)\b/.test(q)&&/\b(?:included|separate|package|extra|also|still|too|as well|both|optional)\b/.test(q))return from(['lab-languages']);
   if(/\b(?:feedback|corrections?|corrected)\b/.test(q)&&/\b(?:writing|essays?|texts?|sentences?|homework|my work|what i (?:write|wrote))\b/.test(q)&&!/\bemail\b/.test(q))return from(['lab-game-demo']);

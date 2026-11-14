@@ -149,6 +149,14 @@ if (cast && go.length) {
   sync();
 }
 
+/* ③-2 더 많은 작품 줄: 옆으로 넘길 것이 있을 때(휴대폰)만 키보드로 닿게 한다 */
+const rows = document.querySelector('[data-rows]');
+if (rows) {
+  const reach = () => { if (rows.scrollWidth > rows.clientWidth + 2) rows.tabIndex = 0; else rows.removeAttribute('tabindex'); };
+  addEventListener('resize', reach, { passive: true });
+  reach();
+}
+
 /* ④ 머리 막대 */
 const bar = document.querySelector('[data-bar]'), light = document.getElementById('request');
 if (bar && light) {

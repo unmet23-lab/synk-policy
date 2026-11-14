@@ -1,4 +1,4 @@
-import {createKnowledgeEngine} from '/en/knowledge-engine.js?v=df30d4071556';
+import {createKnowledgeEngine} from '/en/knowledge-engine.js?v=2db602dc5f44';
 import {appendPublicActions} from '/public-actions.js?v=bf08f355cb8d';
 const $=s=>document.querySelector(s);
 const conversation=$('#questions'),form=$('#question-form'),input=$('#question'),send=$('#send'),messages=$('#messages'),dialog=$('#document-dialog');
