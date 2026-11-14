@@ -76,10 +76,10 @@ K드라마 상황극의 1화 장면 체험과 SYNK WORLD의 연습·게임은 �
 
 처음 마주할 면접을 미리 치러 보고, 서울에서 보낼 하루를 미리 짜 봅니다. 유학과 일자리 준비는 차례로 엽니다.
 
-서울 하루 일정과 요양보호사 면접 VR 연습은 지금 써 볼 수 있고, 유학 준비와 일자리 조건 알아보기, 한국 생활 정착을 준비하고 있습니다. 입학·비자·취업·체류를 보장하지 않습니다.
+서울 하루 일정과 요양보호사 면접 연습은 지금 써 볼 수 있고, 유학 준비와 일자리 조건 알아보기, 한국 생활 정착을 준비하고 있습니다. 입학·비자·취업·체류를 보장하지 않습니다.
 
 - 서울 하루 일정 · 무료, 가입 없이
-- 요양보호사 면접 VR 연습(60~90초)
+- 요양보호사 면접 연습(60~90초)
 - 유학 준비와 일자리 조건 알아보기(준비 중)
 - 한국 생활 정착(준비 중)
 
@@ -136,7 +136,7 @@ Everyone gets stuck somewhere different. We build AI that starts right there. We
 - SYNK LAB — Say it, and the scene moves on. You are the student in a K-drama. Someone speaks first, and the next scene opens only when you answer aloud in Korean. The Episode 1 scene demo and SYNK WORLD practice and games are available now. The full speaking pilot, TOPIK Level 4 class and Synapse textbooks are in preparation.
 - SYNK SHIFT — When the AI lecture ends, you keep one thing you made. Not a tour of tool names. Each person makes one piece of work from their own job and learns to do it again alone. After the lecture, we can automate one of your company’s repetitive tasks. Hands-on AI lectures for companies and institutions, where staff practise on their own work, and AI career lectures for schools on the careers and skills the AI era calls for. We find and assign instructors who fit each request, and automate repetitive work with AI for companies that took a lecture.
 - SYNK PULSE — AI models can look real. We make them act. A founder who has appeared on Netflix and tvN and led a web drama seen 10 million times on Facebook directs the glance, the hand holding the product, the timing of a smile. A first conversation needs just one product photo and where the ad will run. AI product ads, brand films and lookbooks, with every cut shown to you as a scene image before the video. We also make the music and stories of Mongle, Kkamong and Marin.
-- SYNK PATH — Before you come to Korea, try it first. Rehearse your first interview and plan a day in Seoul. Study-abroad and job preparation open next, one at a time. The Seoul day planner and caregiver interview practice in VR are available now; help with preparing to study, finding out job requirements and settling into life in Korea is in preparation. We do not guarantee admission, visas, jobs or residence.
+- SYNK PATH — Before you come to Korea, try it first. Rehearse your first interview and plan a day in Seoul. Study-abroad and job preparation open next, one at a time. “A day in Seoul” and caregiver interview practice are available now; help with preparing to study, finding out job requirements and settling into life in Korea is in preparation. We do not guarantee admission, visas, jobs or residence.
 
 Atlas: It reads what one person actually did, picks what comes next, and checks whether it helped. It runs in SYNK WORLD today.
 

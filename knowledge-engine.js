@@ -374,7 +374,7 @@ export function createKnowledgeEngine(data){
     if(/[56]급|오급|육급|고급(?:반|과정|단계)?/.test(c)&&/안가르|안해|없어|없나|있어|있나|배울수|가능|다루|까지|안배|못배/.test(c)&&(brand==='lab'||!brand))return from(['lab-provides']);
     if(/\d권/.test(c)&&/급|수준|레벨|내용|목표|배우|단계|뭐|어떤/.test(c)&&(brand==='lab'||!brand)&&!/구매|구입|살수|판매|가격|얼마/.test(c))return from(['lab-curriculum']);
     if(/자소서|자기소개서|학업계획서|(?<!지)원서|지원서류/.test(c)&&/도와|준비|첨삭|봐주|써주|써줘|같이/.test(c))return from([brand==='lab'?'lab-year':'path-personal']);
-    if(/면접|자기소개|입국심사|인터뷰/.test(c)&&/연습|준비|시켜|도와|무서|긴장|떨려|어떻게|뭐물어|무슨질문|어떤질문|질문(?:이|은)?뭐/.test(c)&&!/인터뷰요청|취재|기자|무료|유료|비용|돈|얼마|가격|수강료|지금바로|지금받|당장|신청|바로받|지금해볼|지금할수|지금가능/.test(c))return from([brand==='path'?'path-journey':'lab-vr']);
+    if(/면접|자기소개|입국심사|인터뷰/.test(c)&&/연습|준비|시켜|도와|무서|긴장|떨려|어떻게|뭐물어|무슨질문|어떤질문|질문(?:이|은)?뭐/.test(c)&&!/인터뷰요청|취재|기자|무료|유료|비용|돈|얼마|가격|수강료|지금바로|지금받|당장|신청|바로받|지금해볼|지금할수|지금가능/.test(c))return from([brand==='path'||/요양|간병|돌봄/.test(c)||(brand!=='lab'&&/면접|인터뷰/.test(c)&&!/비자|vr|대사관|영사|입국|lab|랩|대학|유학/.test(c))?'path-journey':'lab-vr']);
     if(/내성적|소극적|부끄러|낯가림|낯을가|말이없|말수가적|조용한(?:아이|편|성격)|수줍|발표(?:를|가|나)?.{0,4}(?:무서|싫어|못해|두려|떨)|토론(?:을|이)?.{0,4}(?:무서|싫어|못해)/.test(c)&&(brand==='lab'||/아이|학생|자녀|애/.test(c))&&!/춤|댄스|k컬처|공연|촬영|빠져도|빠질수|안해도|안하면/.test(c))return from(['lab-class']);
     if(/긴장|무서|떨려|걱정|자신없/.test(c)&&/교수님|질문|발표|수업|대화|생활/.test(c)&&!/(?:기계|ai|로봇|컴퓨터|앱)(?:가|이|만|으로|로)?.{0,6}(?:가르|수업|알아서|봐주)|선생님?없이|사람없이|담임/.test(c))return from([brand==='path'?'path-journey':'lab-languages']);
     if(/온라인|비대면|줌|원격|zoom|화상/.test(c)&&/강의|교육|수업|과정|컨설팅/.test(c)&&/가능|되나|돼요|있어|있나|해요|하나요/.test(c)&&!/비용|가격|수강료/.test(c))return from([(brand==='shift'||organizationService)?'shift-education':'lab-adult']);

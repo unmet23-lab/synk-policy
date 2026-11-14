@@ -150,9 +150,17 @@ for (const root of document.querySelectorAll('[data-try]')) {
       const blockTop = Math.min(head.top, cr.top), blockBottom = Math.max(bottom, rows.bottom), low = innerHeight - 16;
       let dy;
       if (blockBottom - blockTop <= low - top) dy = blockTop < top ? blockTop - top : blockBottom > low ? blockBottom - low : 0; // 한 화면에 든다 — 가려진 쪽만 맞춘다
-      else if (!next.firstElementChild) dy = narrow.matches && blockBottom - cr.top <= low - top ? blockBottom - low : cr.top - top; // 답하기 전: 물음(카드 머리)이 먼저 — 휴대폰은 카드부터 세 줄까지 들면 아래를 맞춘다
+      else if (!next.firstElementChild) {
+        dy = narrow.matches && blockBottom - cr.top <= low - top ? blockBottom - low : cr.top - top; // 답하기 전: 물음(카드 머리)이 먼저 — 휴대폰은 카드부터 세 줄까지 들면 아래를 맞춘다
+        // 문제 카드가 창보다 긴 아주 낮은 가로 창(568×320 · 640×360): 포커스를 받는 첫 보기까지는 창 안에 — 물음 머리가 위로 조금 가려지는 쪽을 고른다(11-14)
+        const first = box.firstElementChild?.getBoundingClientRect();
+        if (first && first.bottom - dy > low) dy = first.bottom - low;
+      }
       else if (narrow.matches) dy = Math.min(blockBottom - low, rows.top - top); // 900px 이하 · 답한 뒤: 아래부터(바뀐 세 줄과 다음 단추) — 다만 낮은 창(가로로 든 휴대폰)에서 세 줄의 윗줄이 머리띠 뒤로 가지 않는 데까지만. 세로 휴대폰은 아래 맞춤이 늘 더 작아 그대로다
       else dy = Math.min(blockBottom - low, Math.min(head.top, er.top) - top); // 901~1179px · 답한 뒤: 세 줄 끝까지 내리되 왼쪽 글 머리 · 다음 단추가 머리띠 뒤로 가지 않게
+      // 키보드로 걷는 중이면(:focus-visible) 포커스 받은 것(첫 보기 · 다음 단추)이 창 밖에 남지 않게 — 바뀐 줄을 먼저 보이는 맞춤보다 앞선다(11-14)
+      const f = document.activeElement;
+      if (f && f !== document.body && root.contains(f) && f.matches(':focus-visible')) { const fr = f.getBoundingClientRect(); if (fr.bottom - dy > low) dy = fr.bottom - low; else if (fr.top - dy < top) dy = fr.top - top; }
       if (Math.abs(dy) >= 1) scrollBy({ top: dy, behavior });
       return;
     }
