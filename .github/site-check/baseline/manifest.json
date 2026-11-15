@@ -1,7 +1,7 @@
 {
- "createdAt": "2026-11-15T16:19:37.987Z",
- "commit": "6dce7b1c0474db75a29f7fe437abf3adeb38630b",
- "run": 43731118070,
+ "createdAt": "2026-11-15T22:11:21.580Z",
+ "commit": "42a281b295dc058892360e2f36437ddc685067be",
+ "run": 43766068082,
  "env": {
   "chromium": "151.0.7922.34",
   "os": "ubuntu24"
@@ -24,15 +24,15 @@
   "/atlas/": {
    "desktop": {
     "file": "desktop/atlas.jpg",
-    "sha256": "bbef97e25fa8e1bc55d1e9228994607a42120c26f5d725491aeb7da6ff658986",
-    "cssHeight": 6126,
-    "run": 43731118070
+    "sha256": "bb0e3acc2a5eb3c888eb40907b0323101b7be22e5396768795187133e64ca1de",
+    "cssHeight": 6123,
+    "run": 43766068082
    },
    "mobile": {
     "file": "mobile/atlas.jpg",
-    "sha256": "6a7f4b580aed9537420ebb0e54c39a7818db7a0f36cb7f7958abe7597fb9a7ae",
-    "cssHeight": 8745,
-    "run": 43731118070
+    "sha256": "87113556ae1a291d594ee969b0acc88e4fab04dc7469891690e461f236361bbd",
+    "cssHeight": 8648,
+    "run": 43766068082
    }
   },
   "/builds/": {
@@ -122,15 +122,15 @@
   "/en/atlas/": {
    "desktop": {
     "file": "desktop/en~atlas.jpg",
-    "sha256": "3b21fc7298fa16d36ee02a4dd6ce650a4bf1f085783796830bfc7d605045b971",
-    "cssHeight": 6134,
-    "run": 43731118070
+    "sha256": "9886e31737ae5cfbb602a55c8a5406a014d79bf322e0d3d70f0bdcfeb29e58a8",
+    "cssHeight": 6166,
+    "run": 43766068082
    },
    "mobile": {
     "file": "mobile/en~atlas.jpg",
-    "sha256": "96f76042e5125889c637c218d5bac3b2825d48a6a9af6241692818bf5ff1399b",
-    "cssHeight": 8870,
-    "run": 43731118070
+    "sha256": "c456c2f9ac273281d708bcba046a5eaf8d40519dbd761e7d4ee1e20ba74237e5",
+    "cssHeight": 8799,
+    "run": 43766068082
    }
   },
   "/en/founder/": {
