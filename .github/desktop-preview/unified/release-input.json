@@ -2,9 +2,9 @@
   "schemaVersion": 1,
   "product": "platform",
   "channel": "preview",
-  "version": "0.4.91",
-  "releaseId": "platform-preview-0.4.91",
-  "buildId": "20261115.1",
+  "version": "0.4.92",
+  "releaseId": "platform-preview-0.4.92",
+  "buildId": "20261115.2",
   "manifestUrl": "https://synk.im/desktop/releases/preview.json",
   "baselines": [
     {
@@ -63,7 +63,7 @@
     }
   ],
   "electronVersion": "44.10.0",
-  "sourceHash": "471747c296e13e5705d7c52d08052abcd0b7d0059cc5ec55a0e673d90d8a5dc9",
+  "sourceHash": "a934218a9f74ce4e1dfe2ea883cef0d7c90db55e8ca38049f2dda0cd9022c3ef",
   "sourceFiles": [
     {
       "path": "assets/launcher/benefit-care.webp",
@@ -672,8 +672,8 @@
     },
     {
       "path": "renderer/portal-entry-state.mjs",
-      "bytes": 34946,
-      "sha256": "33fa2e68440dcbe0957be457e9ede373d9c5b2ce21fee4c1676dc46a03788b0d"
+      "bytes": 38612,
+      "sha256": "779beb6a56395db36be2bb0062cf74f7fcf6d903e9be267e4f637c62a8aeba6a"
     },
     {
       "path": "renderer/portal-entry.css",
@@ -682,13 +682,13 @@
     },
     {
       "path": "renderer/portal-entry.mjs",
-      "bytes": 78393,
-      "sha256": "0085afdb6d4ef1a3371aacc892e32c0e299b65f1f1efeba7b3e797e001ca6b18"
+      "bytes": 82715,
+      "sha256": "a860e650e0a63427a8236dbb66aae246cef4c1472668e9d4a41ebaeffc1bec99"
     },
     {
       "path": "renderer/portal-host.mjs",
-      "bytes": 80228,
-      "sha256": "9b3bbc6a258308853d55f16d60a11d4c349fb0892744a47b3b17060d1a7bc494"
+      "bytes": 84938,
+      "sha256": "6da5e4c31a526a4a0852e0f3bf5cc438d82c5aafab94903dd7c9a69c753a7bd1"
     },
     {
       "path": "renderer/portal-orb.mjs",
