@@ -297,10 +297,12 @@ body[data-k="shift"] .k-night{--k-bg:#08090c}
 .k-tail ul{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:clamp(40px,7vw,120px);margin-top:0}
 @media (max-width:700px){.k-tail ul{grid-template-columns:minmax(0,1fr)}}
 
-/* ── 12. 바닥: 여백만 줄인다(그림은 그대로) ── */
+/* ── 12. 바닥: 여백을 줄이고, 큰 synk 글자표는 모든 폭에서 화면 폭의 62%로 둔다 ── */
+/* 6단계(11-15, 쪽 길이 관문): 휴대폰에서 62%로 줄인 글자표(11-14)를 컴퓨터에도 건다 — 1440px에서 글자표 높이 약 540 → 335px, 모든 쪽이 약 205px 짧아진다. */
 .foot{margin-top:0}
 .foot-body{padding-top:clamp(48px,6vh,64px)}
 .foot-mark{margin-top:clamp(28px,4vh,44px)}
+.foot-mark-crop{width:62%}
 body .ask .ask-intro .h2{font-size:var(--k6);line-height:1.2;letter-spacing:-.03em;font-weight:600}
 body .foot .foot-channels h3,body .foot .foot-channels h3 .ko{font-weight:600}
 body .more>summary,body details.more>summary{font-weight:600}
@@ -813,11 +815,10 @@ html[lang="en"] .foot-col h2,html[lang="en"] .foot-channels>h2,html[lang="en"] .
    휴대폰 바닥이 1.47화면이었다(11-14 — 쪽 길이 관문). 링크 칸은 손가락 칸 44px 그대로다 */
 @media (max-width:900px){.foot-channels{grid-template-columns:minmax(0,1fr);gap:0}.foot-channels>h2{margin-bottom:4px}.foot-channels .foot-col{display:flex;align-items:center;gap:0 18px}.foot-channels .foot-col h3{flex:0 0 4.6em;margin:0}.foot-channels .foot-col ul{display:flex;flex-wrap:wrap;gap:0 18px}.foot-channels .foot-col li>a{width:auto}}
 
-/* 짧은 판 · 휴대폰(11-14 둘째 묶음): 모든 쪽 바닥의 큰 synk 글자표는 화면 폭의 62%로(139 → 약 86px), 아틀라스 엔진 여덟 줄은 설명을 작은 글로.
+/* 짧은 판 · 휴대폰(11-14 둘째 묶음): 모든 쪽 바닥의 큰 synk 글자표는 화면 폭의 62%로(139 → 약 86px — 6단계부터 모든 폭, 위 12절), 아틀라스 엔진 여덟 줄은 설명을 작은 글로.
    쪽 길이 관문(휴대폰 10화면)에 다가가려는 것이고, 글과 링크는 그대로다. */
 @media (max-width:700px){
   .foot-mark{margin-top:24px}
-  .foot-mark-crop{width:62%}
   .k-eng li{padding:12px 0}
   .k-eng p{font-size:var(--k1);line-height:1.55}
 }

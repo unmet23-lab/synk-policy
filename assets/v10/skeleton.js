@@ -105,6 +105,8 @@ const bar = $('[data-bar]');
 if (bar) {
   const tone = () => {
     const under = document.elementsFromPoint(innerWidth / 2, 46).find(e => !bar.contains(e));
+    // 창이 한순간 0×0 · 1×1이 되면(전체 화면을 찍는 도구) 아무것도 못 찾는다 — 그때는 색을 그대로 둔다
+    if (!under) return;
     const dark = !!under?.closest('.gate,.k-night,.lw:not(.lw-more),.sv-ask,.k-dark,.pv-hall');
     if (bar.classList.contains('on-dark') !== dark) bar.classList.toggle('on-dark', dark);
   };
