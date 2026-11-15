@@ -676,18 +676,6 @@ body[data-k="pulse"] .pv-ask-note{font-size:var(--k1)}
 .k-judge-head b{font-size:var(--k3);font-weight:600;color:#fff;white-space:nowrap}
 .k-judge-head>span:last-child{flex:none}
 .k-judge-head>span:first-child{display:flex;align-items:baseline;gap:12px;min-width:0}
-/* 쉬는 화면의 실제 화면 둘(예시 학습자의 한 사례): 학습자가 한 것(게임에서 놓친 답) → 다음에 앱을 열면(튜터 카드). 그 사이의 판단이 오른쪽 기록이다 */
-.k-judge-rest{display:grid;gap:18px;min-width:0}
-.k-judge-rest[hidden]{display:none}
-.k-judge-shot{display:grid;gap:9px;min-width:0;margin:0;cursor:pointer}
-.k-judge-shot figcaption{display:flex;align-items:baseline;gap:10px;font-size:var(--k1);font-weight:500;line-height:1.4;color:var(--lw-ink-3)}
-.k-judge-shot figcaption em{font-style:normal;font-weight:600;color:#fff}
-.k-judge-shot--did figcaption em{color:var(--lw-hot)}
-.k-judge-shot>div{border-radius:22px;overflow:hidden;box-shadow:0 0 0 1px rgba(255,255,255,.08),0 44px 90px -28px rgba(0,0,0,.78)}
-.k-judge-shot img{display:block;width:100%;height:auto}
-/* 게임 화면(환승 러시 고르는 판 780×514)은 물음 줄과 세 칸의 한글 이름까지 — 아래 영문 꼬리 줄 앞에서 자른다 */
-.k-judge-shot--did>div{aspect-ratio:780/420}
-.k-judge-shot--did img{height:100%;object-fit:cover;object-position:50% 0}
 .k-judge-rows{margin:0}
 .k-judge-rows>div{position:relative;padding:11px 0 12px;border-bottom:1px solid rgba(255,255,255,.14)}
 .k-judge-rows dt{display:flex;align-items:baseline;justify-content:space-between;gap:12px;font-size:var(--k1);font-weight:500;line-height:1.4;color:var(--lw-ink-3)}
@@ -724,12 +712,11 @@ body[data-k="pulse"] .pv-ask-note{font-size:var(--k1)}
   .lw--judge.lw--try .lw-head>div:first-child{padding-top:clamp(32px,3.2vw,46px)}
   .lw--judge .lw-visual{display:grid;grid-template-columns:minmax(0,1fr);container-type:normal;align-content:start;row-gap:0;padding:clamp(32px,3.2vw,46px) 0 clamp(36px,3.6vw,52px);overflow:visible}
   .lw--judge .lw-piece{position:relative;right:auto;top:auto;width:auto;max-width:540px;margin-top:18px;transform:none}
-  .lw--judge .k-judge-rest{max-width:540px;margin-top:18px}
   .lw--judge .k-judge{margin-top:28px}
 }
 @media (min-width:1180px){
   .lw--judge .lw-visual{grid-template-columns:minmax(0,1fr) minmax(0,1fr);grid-template-rows:auto auto 1fr;column-gap:clamp(28px,3vw,48px)}
-  .lw--judge .k-judge-did,.lw--judge .lw-piece,.lw--judge .k-judge-rest{grid-column:1}
+  .lw--judge .k-judge-did,.lw--judge .lw-piece{grid-column:1}
   .lw--judge .k-judge{grid-column:2;grid-row:1/-1;align-self:start;margin-top:0}
 }
 @media (max-width:900px){
@@ -737,8 +724,6 @@ body[data-k="pulse"] .pv-ask-note{font-size:var(--k1)}
   .lw--judge .lw-visual{padding-top:0;margin-top:16px}
   .lw--judge .k-judge-did{margin:0 var(--gut) 12px}
   .lw--judge .lw-piece{margin:0 auto 0 var(--gut)}  /* 카드는 머리 줄 · 기록과 같은 왼쪽 끝에서 */
-  .lw--judge .k-judge-rest{width:min(calc(100% - var(--gut) * 2),480px);margin:0 auto 0 var(--gut);gap:16px}
-  .k-judge-shot>div{border-radius:18px}
   .lw--judge .k-judge{margin:18px var(--gut) 0}
   .k-judge-rows>div{padding:9px 0 10px}
   .k-judge-past li:not(:last-child){display:none}  /* 휴대폰은 바로 앞 판단 한 줄만 */
@@ -759,7 +744,7 @@ body[data-k="pulse"] .pv-ask-note{font-size:var(--k1)}
   .lw--judge .lw-next{grid-column:1;grid-row:2;min-height:54px;margin:16px 0 0}
   .lw--judge .lw-visual{display:contents}
   .lw--judge .k-judge-did{grid-column:1;grid-row:3;margin:22px 0 12px}
-  .lw--judge .lw-piece,.lw--judge .k-judge-rest{grid-column:1;grid-row:4;width:auto;margin:0}
+  .lw--judge .lw-piece{grid-column:1;grid-row:4;width:auto;margin:0}
   .lw--judge .k-judge{grid-column:2;grid-row:1/-1;align-self:start;margin:0}
 }
 
@@ -823,23 +808,85 @@ html[lang="en"] .foot-col h2,html[lang="en"] .foot-channels>h2,html[lang="en"] .
   .k-eng p{font-size:var(--k1);line-height:1.55}
 }
 
-/* 아틀라스 학습자 칸(11-15, 유호님 「시안 2로」): 게임 칸은 실제 게임에서 틀린 순간이다(piece-game-wrong — 고른 「서울역」 칸 + 안내문, 홈 무대의 piece-game은 그대로).
-   ① 학습자가 고른 칸에 테두리와 「고른 답 · 오답」 이름표(칸 바로 아래, 칸 왼쪽 끝에서 조금 들어간 자리의 안내문 종이 빈자리 — 칸 안에 두면 「서울역」 글자나 화살표 · ① 표지를 가렸다)를 붙여 그림만으로 틀린 선택이 읽히게 한다(칸 자리는 그림 780×492의 x 262~519 · y 0~199, 틀 780/420에 맞춘 백분율).
-   ④ 판단 기록이 가운데 칸 옆에 서는 폭(720~900px · 1180px부터)에서는 눈이 가운데 위 → 오른쪽 → 가운데 아래로 꺾인다 — 세 칸에 읽는 순서 1 · 2 · 3을 붙인다.
-      720~900px에서는 기록 칸이 두 화면보다 300px쯤 위에서 시작해 2가 1보다 먼저 보인다 — 번호가 순서를 바로잡는다고 보고 그대로 둔다(11-15 검수 확인).
-      기록 머리의 2는 머리 줄 밖 왼쪽 틈에 걸어 둔다 — 줄 안에 두면 1180px 언저리에서 「예시 학습자 · 게임에서 놓친 뒤」가 한 줄 더 꺾였다.
-      이름표는 고른 칸의 왼쪽 끝에서 조금 들어간 자리에 단다 — 오른쪽 끝에 맞추면 틀이 330px보다 좁을 때 영어 이름표가 안내문 머리 글 「이렇게 안내했어요」를 덮었다.
-      위아래로 쌓이는 폭(719px까지 · 901~1179px)은 차례대로 읽혀 번호를 숨긴다. 방문자가 직접 풀기 시작해 두 화면이 접히면 기록 머리의 번호도 숨긴다. */
-.k-judge-shot>div{position:relative}
+/* 고른 칸 테두리와 「고른 답 · 오답」 이름표(아래 쉬는 화면의 게임 그림 위). 이름표는 고른 칸의 왼쪽 끝에서 조금 들어간 자리 — 오른쪽 끝에 맞추면 틀이 좁을 때 영어 이름표가 안내문 머리 글을 덮었다(11-15). */
 .k-judge-pick{position:absolute;top:0;left:33.59%;width:33.08%;height:47.62%;box-shadow:inset 0 0 0 3px var(--lw-hot);pointer-events:none}
 .k-judge-pick b{position:absolute;left:8%;top:calc(100% + 6px);padding:3px 10px;border-radius:999px;background:var(--lw-hot);color:#1a1210;font-size:13px;font-weight:600;line-height:1.4;white-space:nowrap}
-.k-step{display:none}
-@media (min-width:720px) and (max-width:900px),(min-width:1180px){
-  .k-step{display:inline-grid;place-items:center;flex:none;align-self:center;width:20px;height:20px;border-radius:50%;background:var(--lw-hot);color:#1a1210;font-style:normal;font-size:13px;font-weight:600;line-height:1}
-  .lw--judge:has(.k-judge-rest[hidden]) .k-judge-head .k-step{display:none}
-  .k-judge-head{position:relative}
-  .k-judge-head .k-step{position:absolute;left:-26px;top:2px}
+/* ── 아틀라스 학습자 칸의 쉬는 화면(2026-11-16 가′ · 유호님 「가′로 해」) ──
+   예시 학습자의 한 사례를 틀린 순간 → 판단 기록 → 바뀐 추천 한 줄로 읽는다(맹검 두 회차 1위). 쉬는 동안(.is-rest)은 이 칸만 보이고,
+   「첫날부터 직접 풀어 보기」를 누르면 learner.js가 is-rest를 걷어 문제 카드 · 판단 기록 무대가 나온다. 단계 줄은 그때부터 보인다.
+   게임 그림은 자르지 않는다(780:492 — 컴퓨터 세 칸의 아래 끝을 맞추려고, 판단 세션 11-16). 고른 칸 테두리 높이는 200/492. */
+.k-story{display:none}
+.lw--judge.is-rest>.k-story{display:block}
+.lw--judge.is-rest>:not(.k-story):not(script){display:none!important}
+.k-story{color:var(--lw-ink);padding-block:clamp(40px,4.2vw,60px) clamp(44px,4.6vw,64px)}
+@media (min-width:901px){.lw--judge.is-rest{min-height:0}.lw--judge.is-rest>.k-story{grid-column:2/-2;grid-row:1}}
+.k-story p{margin:0}
+.k-story-head{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:20px 48px;padding-bottom:clamp(24px,2.6vw,34px);border-bottom:1px solid var(--lw-line)}
+.k-story-head .label{margin:0 0 14px}
+.k-story-title{margin:0}
+.k-story-title span{display:block}
+.k-story-flow{list-style:none;margin:clamp(26px,2.8vw,38px) 0 0;padding:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));column-gap:64px;align-items:start}
+.k-story-step{position:relative;min-width:0}
+/* 칸 사이 화살표. 컴퓨터(901px부터)는 다음 칸 몸(판단 기록 · 카드 묶음)의 왼쪽, 게임 그림 높이의 가운데에 둔다. 그림 높이는 칸 폭의 492/780이고,
+   절대 위치 상자의 margin %는 칸 폭을 따른다 — 칸 머리가 몇 줄이든 같은 자리(11-16 화면 검수). 휴대폰 · 태블릿은 칸 위 가운데(아래 900px 묶음). */
+.k-story-rows,.k-story-cards{position:relative}
+.k-story-step+.k-story-step>.k-story-rows::before,.k-story-step+.k-story-step>.k-story-cards::before{content:"";position:absolute;left:-41px;top:0;margin-top:calc(31.5% - 7px);width:13px;height:13px;border-top:2px solid var(--lw-hot);border-right:2px solid var(--lw-hot);transform:rotate(45deg)}
+/* 칸 머리: 번호는 왼쪽에 띄우고, 이름과 꼬리는 그 오른쪽 한 열에서 흐른다. 꼬리가 다음 줄로 가도 이름과 같은 시작선에 선다(11-16 화면 검수) */
+.k-story-cap{position:relative;padding-left:32px;margin:0 0 12px!important;font-size:var(--k2);font-weight:600;line-height:1.4;color:#fff}
+.k-story-cap>span{margin-right:10px}
+.k-story-cap em{display:inline-block;font-style:normal;font-size:var(--k1);font-weight:500;color:var(--lw-ink-3)}
+.k-story-n{position:absolute;left:0;top:calc((1.4 * var(--k2) - 22px) / 2);display:grid;place-items:center;width:22px;height:22px;border-radius:50%;background:var(--lw-hot);color:#1a1210;font-style:normal;font-size:var(--k1);font-weight:600;line-height:1}
+.k-story-game,.k-story-card{position:relative;border-radius:20px;overflow:hidden;box-shadow:0 0 0 1px rgba(255,255,255,.08),0 36px 80px -30px rgba(0,0,0,.8)}
+.k-story-game img,.k-story-card img{display:block;width:100%;height:auto}
+.k-story-game .k-judge-pick{height:40.65%}
+.k-story-rows{margin:0;border-top:1px solid var(--lw-line)}
+.k-story-rows>div{padding:12px 0 13px;border-bottom:1px solid rgba(255,255,255,.14)}
+.k-story-rows dt{display:flex;align-items:baseline;justify-content:space-between;gap:12px;font-size:var(--k1);font-weight:500;line-height:1.4;color:var(--lw-ink-3)}
+.k-story-rows dt em{font-style:normal;text-align:right;white-space:nowrap}
+.k-story-rows dd{margin:5px 0 0;font-size:var(--k3);font-weight:600;line-height:1.42;letter-spacing:-.015em;color:#fff;text-wrap:pretty;word-break:keep-all}
+.k-story-rows small{display:block;margin-top:3px;font-size:var(--k1);font-weight:500;line-height:1.5;color:var(--lw-hot)}
+.k-story-mini{margin:0 0 8px!important;font-size:var(--k1);font-weight:500;line-height:1.4;color:var(--lw-ink-3)}
+.k-story-mini.is-now{margin-top:14px!important;color:var(--lw-hot);font-weight:600}
+.k-story-card--first{opacity:.72}
+@media (min-width:1180px){.k-story-card--first{width:84%}}  /* 셋째 칸이 첫째 · 둘째 칸보다 길어 왼쪽 아래가 비었다 — 컴퓨터에서만 첫날 카드를 조금 좁힌다(판단 세션 11-16) */
+.k-story-line{position:absolute;height:3px;border-radius:2px;background:var(--lw-hot);pointer-events:none}
+.k-story-card--first .k-story-line{background:rgba(255,255,255,.7)}
+.k-story-foot{display:flex;align-items:baseline;justify-content:space-between;gap:16px;margin-top:clamp(22px,2.4vw,32px)!important;padding-top:14px;border-top:1px solid var(--lw-line);font-size:var(--k2);line-height:1.5;color:var(--lw-ink-2)}
+.k-story-foot span{min-width:0;text-wrap:pretty;word-break:keep-all}
+.k-story-foot em{flex:none;font-style:normal;font-size:var(--k1);font-weight:500;color:var(--lw-ink-3)}
+@media (min-width:901px){
+  .k-story-step{display:grid;grid-row:span 2;grid-template-rows:subgrid;row-gap:0}
+  .k-story-step>:last-child{align-self:start}
 }
-@media (min-width:720px) and (max-width:900px){
-  .k-judge-head .k-step{left:-23px}
+.k-story-more{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:6px 24px;margin-top:16px!important;font-size:var(--k1);line-height:1.5;color:var(--lw-ink-3)}
+@media (min-width:901px) and (max-width:1179px){
+  /* 두 칸 + 셋째(카드 둘)는 아래 한 줄에 나란히 */
+  .k-story-flow{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .k-story-step:nth-child(3){grid-column:1/-1;margin-top:32px}
+  .k-story-step:nth-child(3)>.k-story-cards::before{content:none}
+  .k-story-cards{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);grid-template-rows:auto auto;grid-auto-flow:column;column-gap:64px;align-items:end}
+  .k-story-cards>.k-story-card{align-self:start}
+  .k-story-cards>.k-story-mini.is-now{margin-top:0!important}
+}
+@media (max-width:900px){
+  /* 휴대폰 · 태블릿: 세로로, 칸 사이에 아래 화살표. 맺음 줄 · 링크 · 출처 줄은 위아래로 */
+  .lw--judge.is-rest>.k-story{padding-inline:var(--gut)}
+  .k-story{padding-block:44px 48px}
+  .k-story-head{display:block;padding-bottom:22px}
+  .k-story-go{margin-top:18px;max-width:100%;white-space:normal;text-align:left;text-wrap:balance}
+  .k-story-flow{grid-template-columns:1fr;row-gap:44px;margin-top:24px}
+  .k-story-step+.k-story-step>.k-story-rows::before,.k-story-step+.k-story-step>.k-story-cards::before{content:none}
+  .k-story-step+.k-story-step::before{content:"";position:absolute;left:50%;top:-30px;margin-left:-7px;width:13px;height:13px;border-top:2px solid var(--lw-hot);border-right:2px solid var(--lw-hot);transform:rotate(135deg)}
+  .k-story-foot{display:block;font-size:var(--k1)}
+  .k-story-foot em{display:block;margin-top:4px}
+  .k-story-more{display:block}
+  .k-story-more span{display:block;margin-top:8px}
+}
+@media (max-width:359px){
+  /* 가장 좁은 휴대폰의 영어 쪽: 제목 두 토막을 이어 흘린다 — 첫 토막이 한 줄에 안 들어가 「change」 한 낱말만 한 줄에 남았다(11-16 최종 검수). 한국어는 두 토막 그대로가 뜻대로 끊긴다 */
+  .k-story-title:lang(en) span{display:inline}
+}
+@media (min-width:560px) and (max-width:900px){
+  /* 태블릿 폭 · 가로로 든 휴대폰: 그림이 칸 폭만큼 커지지 않게, 흐름 전체를 480px 한 열로 — 그림 · 판단 기록 · 아래 화살표가 같은 가운데 축에 선다(11-16 화면 검수) */
+  .k-story-flow{max-width:480px}
 }

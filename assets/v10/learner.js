@@ -174,7 +174,7 @@ for (const root of document.querySelectorAll('[data-try]')) {
     lift(els[0]);
   };
   let started = false;
-  const jbox = root.querySelector('[data-judge]'), jrest = root.querySelector('[data-judge-rest]'), jfoot = root.querySelector('[data-judge-foot]');
+  const jbox = root.querySelector('[data-judge]'), jfoot = root.querySelector('[data-judge-foot]');
   // 아틀라스 쪽 「판단 기록」(2026-11-11): 답과 시간에 따라 읽은 것 · 고른 것 · 까닭 세 줄이 바뀐다. 글은 쪽이 준 표(data-judge-data)이고, 표가 없는 쪽(LAB)에서는 아무 일도 하지 않는다(한국어 · 영어 아틀라스에 표가 있다).
   const J = (() => { const s = root.querySelector('[data-judge-data]'); return s ? JSON.parse(s.textContent) : null; })();
   const jrows = J ? [...root.querySelectorAll('[data-judge-row]')] : [], jwhen = $('[data-judge-when]'), jpast = $('[data-judge-past]');
@@ -205,8 +205,8 @@ for (const root of document.querySelectorAll('[data-try]')) {
     }
     jtimer = setTimeout(() => jrows.forEach(r => r.classList.remove('is-new')), 2400);
   };
-  // 부품 그림을 눌러도 막히지 않게: 지금 단계의 주 단추와 같다(아틀라스 쉬는 화면의 그림 둘도).
-  for (const s of [...shots, ...(jrest ? jrest.querySelectorAll('figure') : [])]) s.addEventListener('click', () => next.querySelector('.btn')?.click());
+  // 부품 그림을 눌러도 막히지 않게: 지금 단계의 주 단추와 같다.
+  for (const s of shots) s.addEventListener('click', () => next.querySelector('.btn')?.click());
   const ask = (q, done) => {
     text(q.when, q.say, q.sub);
     showShot(null);
@@ -253,7 +253,6 @@ for (const root of document.querySelectorAll('[data-try]')) {
     });
   };
   function first() {
-    if (jrest) jrest.hidden = true;
     scene(Q.start); stepTo(0); judge('first');
     ask(Q.first, right => {
       judge(right ? 'first.right' : 'first.wrong');
@@ -261,16 +260,11 @@ for (const root of document.querySelectorAll('[data-try]')) {
       else { text(null, Q.wrong.say, Q.wrong.sub); act(button(`${Q.toMinute} ${arrow}`, second)); }
     });
   }
-  // 아틀라스의 쉬는 화면: 예시 학습자의 한 사례 — 게임에서 놓친 답(실제 화면) · 그 사이의 판단(첫날 판단에 줄을 긋고 바뀐 판단) · 다음에 앱을 열면 뜨는 튜터 카드.
-  // 단추를 누르면 첫날부터 방문자의 답이 기록을 바꾼다.
-  const example = () => {
-    const E = J.rest;
-    scene(Q.start); stepTo(-1); judge('example');
-    text(E.when, E.say, E.sub); showShot('-'); // 문제 카드 · 날마다의 화면은 접어 둔다
-    jrest.hidden = false;
-    act(button(`${E.go} ${arrow}`, () => { started = true; first(); }));
-  };
-  if (J && J.rest && jrest) example(); else first();
+  // 아틀라스의 쉬는 화면(2026-11-16 가′ · 유호님 「가′로 해」): 예시 학습자의 한 사례(틀린 순간 → 판단 기록 → 바뀐 추천)를 따로 그린 칸(data-story)이
+  // 무대를 가린다(section.is-rest). 칸의 단추를 누르면 칸을 걷고, 첫날부터 방문자의 답이 기록을 바꾼다. 칸이 없는 쪽(LAB)은 바로 첫 문제다.
+  const story = root.querySelector('[data-story]');
+  if (story) story.querySelector('[data-story-go]').addEventListener('click', () => { root.classList.remove('is-rest'); root.setAttribute('aria-labelledby', 'learner-title'); started = true; first(); });
+  else first();
   const near = new IntersectionObserver(es => { if (es[0].isIntersecting) { for (const i of root.querySelectorAll('img')) i.loading = 'eager'; near.disconnect(); } }, { rootMargin: '900px 0px' });
   near.observe(root);
 }
