@@ -2,9 +2,9 @@
   "schemaVersion": 1,
   "product": "platform",
   "channel": "preview",
-  "version": "0.4.90",
-  "releaseId": "platform-preview-0.4.90",
-  "buildId": "20261114.2",
+  "version": "0.4.91",
+  "releaseId": "platform-preview-0.4.91",
+  "buildId": "20261115.1",
   "manifestUrl": "https://synk.im/desktop/releases/preview.json",
   "baselines": [
     {
@@ -63,7 +63,7 @@
     }
   ],
   "electronVersion": "44.10.0",
-  "sourceHash": "d034fde7f6febd82772ee77e429dfdb09512daf8230f6e9161bcad9fa3fcb5a2",
+  "sourceHash": "471747c296e13e5705d7c52d08052abcd0b7d0059cc5ec55a0e673d90d8a5dc9",
   "sourceFiles": [
     {
       "path": "assets/launcher/benefit-care.webp",
@@ -522,8 +522,8 @@
     },
     {
       "path": "renderer/convenience.mjs",
-      "bytes": 27230,
-      "sha256": "510004046627f1a4caf4337d6d952f2abfd8372c7224e000d9448482a323d6f5"
+      "bytes": 27739,
+      "sha256": "9d436b79ad94aab9af3c9f068e5b0d0531f71bbec654d10d1cc7f3838a8b2bfe"
     },
     {
       "path": "renderer/draft-recovery.mjs",
@@ -587,18 +587,18 @@
     },
     {
       "path": "renderer/index.html",
-      "bytes": 26394,
-      "sha256": "e42511f5a8dd6cd8a88825690297ac1978dbe60bc0601ed230334c6ca78401e8"
+      "bytes": 27557,
+      "sha256": "bbe8a3645093e4d8db506be110882a8376b938a780d49b06852c22c5a7e8278f"
     },
     {
       "path": "renderer/launcher.css",
-      "bytes": 53160,
-      "sha256": "634ce99443381de300c730dace9096c9efbcbaffcfe7d48e7c5a6b14cfd75add"
+      "bytes": 58589,
+      "sha256": "c9a5e8054ec092163243e594d727fc90318fa9b14a1ca8bb621c36f13a5dc027"
     },
     {
       "path": "renderer/launcher.mjs",
-      "bytes": 93748,
-      "sha256": "9a09fd21988f7f598d7fd0c0b8c664bc500f0f953f5bdeb4addbab163959b934"
+      "bytes": 107888,
+      "sha256": "62fb98e21bca46115ce66ac5e9f7e69372671f23f98739bc04208d66309ec21f"
     },
     {
       "path": "renderer/library.mjs",
@@ -671,6 +671,31 @@
       "sha256": "8d088a17872edc8a321c642266cfaab4ace959b7f64ea06c6b034c86ffa9ec3e"
     },
     {
+      "path": "renderer/portal-entry-state.mjs",
+      "bytes": 34946,
+      "sha256": "33fa2e68440dcbe0957be457e9ede373d9c5b2ce21fee4c1676dc46a03788b0d"
+    },
+    {
+      "path": "renderer/portal-entry.css",
+      "bytes": 23104,
+      "sha256": "fe7d9c0c8339646d8245e7a92a385c27f5884ea34690de048e653804207d6866"
+    },
+    {
+      "path": "renderer/portal-entry.mjs",
+      "bytes": 78393,
+      "sha256": "0085afdb6d4ef1a3371aacc892e32c0e299b65f1f1efeba7b3e797e001ca6b18"
+    },
+    {
+      "path": "renderer/portal-host.mjs",
+      "bytes": 80228,
+      "sha256": "9b3bbc6a258308853d55f16d60a11d4c349fb0892744a47b3b17060d1a7bc494"
+    },
+    {
+      "path": "renderer/portal-orb.mjs",
+      "bytes": 27087,
+      "sha256": "d3421730579b8804c2b8b7043b28271b7a2476c0bcbad842eba26e33aeabe19a"
+    },
+    {
       "path": "renderer/pulse-client.css",
       "bytes": 13836,
       "sha256": "c9109d68d714e36fa42b4eafd6da8234af6250becc0cdd9c03d54823769b870d"
@@ -697,18 +722,18 @@
     },
     {
       "path": "renderer/startup-update.css",
-      "bytes": 3933,
-      "sha256": "fb77563a812f960c31247425bfc3cd3b2eb14333c65381be2e9fbaa46571576f"
+      "bytes": 9325,
+      "sha256": "8bcc266ca36e1ed9001df5d57c807c659f0764a88132502bbb926ba5a3887448"
     },
     {
       "path": "renderer/startup-update.html",
-      "bytes": 2382,
-      "sha256": "7f2742f50f1bb5c300afcd53bf006257e219f09f05af9ee724e0cf26111be316"
+      "bytes": 1805,
+      "sha256": "2c63f5c42aedf61eee3b147d2d7dca59d1e94a94993bd92bb4507227201fa407"
     },
     {
       "path": "renderer/startup-update.mjs",
-      "bytes": 6916,
-      "sha256": "a48aabac6a53329a2ea488fa9c5a7f1302fd4ccb9a12acffb379ee157f3a3bf4"
+      "bytes": 8974,
+      "sha256": "b20629f5ad6796ccbb5d44eb4f9ab0f430721f33bf733c5104a7d246cf6ff889"
     },
     {
       "path": "renderer/state.mjs",
@@ -747,13 +772,13 @@
     },
     {
       "path": "src/account-requests.cjs",
-      "bytes": 13769,
-      "sha256": "50367bcb32a72a7304e1a4490a9e7acfd37d790d6ecc69b2b6b1cf1ca9c3b841"
+      "bytes": 14967,
+      "sha256": "8c89c99ef31586143645fbe0b0319ebcaa9d32aa5030d8dcb0c05a1132b5b9b2"
     },
     {
       "path": "src/account-response-contract.cjs",
-      "bytes": 3754,
-      "sha256": "d703a607193a9c483ef71341e8335abbc57cc56ef7e56cacb8c6667545bac30e"
+      "bytes": 5122,
+      "sha256": "e0ee3eb71f8ce54c27fc2b2b3812a6a4b7a0e3b940e0e04c780edbf7a0b5db0c"
     },
     {
       "path": "src/ai-prices.cjs",
@@ -782,8 +807,8 @@
     },
     {
       "path": "src/auth-service.cjs",
-      "bytes": 26000,
-      "sha256": "3c83513c1adaad240a303bdaaad126b7bcbed91c7f844fc77f3ecf40cfa3f41c"
+      "bytes": 31941,
+      "sha256": "e5f4123d76fca66f2354a6287259bc6e81b3e190479af01a9b14ac109af94325"
     },
     {
       "path": "src/auth-store.cjs",
@@ -834,6 +859,21 @@
       "path": "src/client-lifecycle.cjs",
       "bytes": 7029,
       "sha256": "ed4a313a54a80190f1b6bf28f470b5210a7d57b06e906526ef8e135786572b81"
+    },
+    {
+      "path": "src/company-entry-destinations.cjs",
+      "bytes": 24593,
+      "sha256": "ff8876521ec1a6e6bdf0099b2ea9b9dfed416f12f88c4e95d6c21193d9c9ce5f"
+    },
+    {
+      "path": "src/company-entry-preload.cjs",
+      "bytes": 12478,
+      "sha256": "67f3a10eb6d1b42aafa031eb6f05a839b09a4a45b2048aead472236e74f730af"
+    },
+    {
+      "path": "src/company-entry.cjs",
+      "bytes": 36693,
+      "sha256": "ebf3df3fad4de168410b8388182eef0e4cabb15184fbef5d804ef5a61f5faf42"
     },
     {
       "path": "src/company-requests.cjs",
@@ -907,8 +947,8 @@
     },
     {
       "path": "src/main.cjs",
-      "bytes": 43927,
-      "sha256": "632d38acbfa10398ec2f424b2241733a0f98c6abd07fee64dd1a0f55bc869620"
+      "bytes": 53355,
+      "sha256": "c0dad0df5e2edb2081bcf204770d30aa972a9a55d5343591522cc329f49f0a01"
     },
     {
       "path": "src/messenger-teacher.cjs",
@@ -966,9 +1006,14 @@
       "sha256": "284ada1485818a5e8bf1b2e38c9e3c2f71eafe5097a052ee3e81867429e8d7fa"
     },
     {
+      "path": "src/portal-navigation.cjs",
+      "bytes": 1584,
+      "sha256": "c3074b4dabf0a8a112ecd9335bd4dbaa677d8e7cd1c3f9820c4ac7352c1ac138"
+    },
+    {
       "path": "src/preload.cjs",
-      "bytes": 8314,
-      "sha256": "36c41428e357ffbdfe44c7d92304082bcba4723703118abe2462cb9544c316c1"
+      "bytes": 13987,
+      "sha256": "7c02eba5caaa6ddf9aaaa0aad05139e40179c47200509cfe8e9b2fc69f18a34c"
     },
     {
       "path": "src/product-main.cjs",
@@ -997,8 +1042,13 @@
     },
     {
       "path": "src/pulse-app.cjs",
-      "bytes": 10721,
-      "sha256": "9d17fa4ec67d0ee9084076fc048f78f94cb1c9c3673ad89a18fa5525a0d9123a"
+      "bytes": 34895,
+      "sha256": "49f9b6858d091022ba4e4c7470db151aef9c53d58b9a8e400bb3269e877838fa"
+    },
+    {
+      "path": "src/pulse-invite-preload.cjs",
+      "bytes": 11054,
+      "sha256": "eb59af99c26c8ad24e9b1f5b8413edf270170a337909c2fc5c9010e7593092ba"
     },
     {
       "path": "src/release-catalog.cjs",
