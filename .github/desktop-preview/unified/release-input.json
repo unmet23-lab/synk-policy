@@ -2,9 +2,9 @@
   "schemaVersion": 1,
   "product": "platform",
   "channel": "preview",
-  "version": "0.4.92",
-  "releaseId": "platform-preview-0.4.92",
-  "buildId": "20261115.2",
+  "version": "0.4.93",
+  "releaseId": "platform-preview-0.4.93",
+  "buildId": "20261116.1",
   "manifestUrl": "https://synk.im/desktop/releases/preview.json",
   "baselines": [
     {
@@ -63,7 +63,7 @@
     }
   ],
   "electronVersion": "44.10.0",
-  "sourceHash": "a934218a9f74ce4e1dfe2ea883cef0d7c90db55e8ca38049f2dda0cd9022c3ef",
+  "sourceHash": "046c8d4069447cddc505958dfc2836522e8cfd09dabd2e5f9755fa98f108d450",
   "sourceFiles": [
     {
       "path": "assets/launcher/benefit-care.webp",
@@ -497,8 +497,8 @@
     },
     {
       "path": "renderer/account-page.mjs",
-      "bytes": 35246,
-      "sha256": "16539e14d1b8842f90770e49ed3864639cf142e91c47b4bb01ea53f8f495d47c"
+      "bytes": 35301,
+      "sha256": "7104dee746e213f187582b014a9d94800722f97da0206debba7809d10b29a57c"
     },
     {
       "path": "renderer/benefits.mjs",
@@ -597,8 +597,8 @@
     },
     {
       "path": "renderer/launcher.mjs",
-      "bytes": 107888,
-      "sha256": "62fb98e21bca46115ce66ac5e9f7e69372671f23f98739bc04208d66309ec21f"
+      "bytes": 108125,
+      "sha256": "9971f214e15c1fbcb4f3d583905bbd26c1f6648e79ac4978480c30d333799892"
     },
     {
       "path": "renderer/library.mjs",
@@ -746,14 +746,19 @@
       "sha256": "2a613960fcac0ad86cf3569c55b37c82f4e05c86ae07845ec9651c9da938c64f"
     },
     {
+      "path": "renderer/subscriptions-tokens.mjs",
+      "bytes": 16392,
+      "sha256": "6ab7ec3876d66cefef97b858d6bf005927e51ebffeb1140ce246587f0d6b3b28"
+    },
+    {
       "path": "renderer/subscriptions.css",
-      "bytes": 50840,
-      "sha256": "e121223296f67dcce432abb0537551f3d03f8df268e2ee780283f8fba057e499"
+      "bytes": 57359,
+      "sha256": "50de1e94725bcee125efd9fac9c03d79e99f08ac166b39a70c7b5fcad55aca7f"
     },
     {
       "path": "renderer/subscriptions.mjs",
-      "bytes": 168562,
-      "sha256": "bc0610c4d40ed14672327a8afc5cda52d876afd65e387e077eba97258dbd1244"
+      "bytes": 174693,
+      "sha256": "b7f033535c2337c069bbbc685e652cafb63262b2f3ea8da96bfa3620e0f6b8e1"
     },
     {
       "path": "renderer/town-records-card.mjs",
@@ -787,8 +792,13 @@
     },
     {
       "path": "src/ai-subscriptions.cjs",
-      "bytes": 32662,
-      "sha256": "e1d5df4cbab8c2d6b9bd0c10131d364ec9b84df00606bd00d5648295681cdb63"
+      "bytes": 33669,
+      "sha256": "0716876c5357b9aec31291a5dae95a6e7ac54a4eaffa11821fc3561354e7835e"
+    },
+    {
+      "path": "src/ai-tokens.cjs",
+      "bytes": 46057,
+      "sha256": "24bc8cd2a95a98c65d88fe30f410b86347bcd2247dcdd6922b667d47e591e707"
     },
     {
       "path": "src/ai-usage.cjs",
@@ -947,8 +957,8 @@
     },
     {
       "path": "src/main.cjs",
-      "bytes": 53355,
-      "sha256": "c0dad0df5e2edb2081bcf204770d30aa972a9a55d5343591522cc329f49f0a01"
+      "bytes": 53624,
+      "sha256": "05c992f5fed659d2e7cc716bbce9fc5ae66d3030e878426db66e500a808ab955"
     },
     {
       "path": "src/messenger-teacher.cjs",
@@ -1012,8 +1022,8 @@
     },
     {
       "path": "src/preload.cjs",
-      "bytes": 13987,
-      "sha256": "7c02eba5caaa6ddf9aaaa0aad05139e40179c47200509cfe8e9b2fc69f18a34c"
+      "bytes": 14345,
+      "sha256": "6b7ddccbe384e18ade958c56b558ca78953839fdc05cc65b1ee77e686e820a6a"
     },
     {
       "path": "src/product-main.cjs",
