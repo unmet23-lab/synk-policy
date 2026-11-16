@@ -2,9 +2,9 @@
   "schemaVersion": 1,
   "product": "platform",
   "channel": "preview",
-  "version": "0.4.94",
-  "releaseId": "platform-preview-0.4.94",
-  "buildId": "20261116.2",
+  "version": "0.4.95",
+  "releaseId": "platform-preview-0.4.95",
+  "buildId": "20261116.3",
   "manifestUrl": "https://synk.im/desktop/releases/preview.json",
   "baselines": [
     {
@@ -63,7 +63,7 @@
     }
   ],
   "electronVersion": "44.10.0",
-  "sourceHash": "35ccad6646cc074de245bd0201bd7c471d325b05d0ea724d58198787daa02d27",
+  "sourceHash": "306a4da2e141be3e1d2d0a7082b903cfebb06a7210c3a53f0300786d151a6369",
   "sourceFiles": [
     {
       "path": "assets/launcher/benefit-care.webp",
@@ -522,8 +522,8 @@
     },
     {
       "path": "renderer/convenience.mjs",
-      "bytes": 27739,
-      "sha256": "9d436b79ad94aab9af3c9f068e5b0d0531f71bbec654d10d1cc7f3838a8b2bfe"
+      "bytes": 27995,
+      "sha256": "de35402209839541879c0d2a13eae6093a863fef88a363c28fe6271e34872752"
     },
     {
       "path": "renderer/draft-recovery.mjs",
@@ -587,8 +587,8 @@
     },
     {
       "path": "renderer/index.html",
-      "bytes": 27557,
-      "sha256": "bbe8a3645093e4d8db506be110882a8376b938a780d49b06852c22c5a7e8278f"
+      "bytes": 27360,
+      "sha256": "4aff46d6dc2cc9ebe62130f8f8a941f13d5df23b3235f2514c1b6e18c4abf152"
     },
     {
       "path": "renderer/launcher.css",
@@ -597,8 +597,8 @@
     },
     {
       "path": "renderer/launcher.mjs",
-      "bytes": 108125,
-      "sha256": "9971f214e15c1fbcb4f3d583905bbd26c1f6648e79ac4978480c30d333799892"
+      "bytes": 111023,
+      "sha256": "6fee8e4f6393195ebab0c43b5c71e9d0b08e429435c3881f8922df28e8b1c4d7"
     },
     {
       "path": "renderer/library.mjs",
@@ -656,6 +656,31 @@
       "sha256": "d2cec200e8004b7a5cc163b2183efd047f85d436c70f789e21c37ec54bdc6bbd"
     },
     {
+      "path": "renderer/orb-face-view.mjs",
+      "bytes": 35375,
+      "sha256": "a1e89fff6fce4108ea1a7ba3f087f9e9fcb0bf9c9906aee95cc5046ace20f1e9"
+    },
+    {
+      "path": "renderer/orb-face.css",
+      "bytes": 22229,
+      "sha256": "df92828406eb927fa2d92751a04b1eee25d0ad5724e6ff2122acdce911999e0a"
+    },
+    {
+      "path": "renderer/orb-face.mjs",
+      "bytes": 80070,
+      "sha256": "6fb096de6402a6db53d44f7a19e283c9fc5bb72b317cd2bf4532fe7eceadd0a4"
+    },
+    {
+      "path": "renderer/orb-signature.mjs",
+      "bytes": 8028,
+      "sha256": "98416b56cfc30c463e768d2026e7bd9b2867d37e1d58dd6018926486c1499676"
+    },
+    {
+      "path": "renderer/orb-stage.mjs",
+      "bytes": 27211,
+      "sha256": "3caf23b0323dcf3f991170d817848fd596afa068f9f0efb5901667c7c29293ec"
+    },
+    {
       "path": "renderer/personalization.mjs",
       "bytes": 6696,
       "sha256": "7c8f730ce8bab2c9ca828854fe28ebe6e41f97e809a16df1dae6a5f5a10c5868"
@@ -687,8 +712,8 @@
     },
     {
       "path": "renderer/portal-host.mjs",
-      "bytes": 84938,
-      "sha256": "6da5e4c31a526a4a0852e0f3bf5cc438d82c5aafab94903dd7c9a69c753a7bd1"
+      "bytes": 91414,
+      "sha256": "24a96c9c4ef1d957e8f924054f76f49a7bb10182adf96c4a754846d49269579b"
     },
     {
       "path": "renderer/portal-orb.mjs",
@@ -714,6 +739,11 @@
       "path": "renderer/recent-sign-in.mjs",
       "bytes": 2204,
       "sha256": "083bc969e5ad373027ace198bab18f1c4ad7155118d4fd6bfecc7350593ba4a1"
+    },
+    {
+      "path": "renderer/solio-today.mjs",
+      "bytes": 22306,
+      "sha256": "264ad8876ccc2a9c52b5312c7875dbb414beb7d2988d7a8a22854e9ad5841a34"
     },
     {
       "path": "renderer/solio.mjs",
@@ -957,8 +987,8 @@
     },
     {
       "path": "src/main.cjs",
-      "bytes": 53711,
-      "sha256": "414a4ec6de556d4b4dafea7a9551180fd72c97741e1b29a082192c657da2709c"
+      "bytes": 53774,
+      "sha256": "9619e3e7e72fd834f2ab5a43c607eeb145fdbe5dfdc75edd3105d1cad27cd61a"
     },
     {
       "path": "src/messenger-teacher.cjs",

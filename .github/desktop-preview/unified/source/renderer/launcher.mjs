@@ -19,6 +19,7 @@ import {mountAccountPage} from './account-page.mjs';
 import {createAccountLifecycle} from './account-lifecycle.mjs';
 import {rememberSignIn,recentSignIn,recentSignInText} from './recent-sign-in.mjs';
 import {mountDesktopPortalHost,parseDesktopHashRoute,formatDesktopRouteHash} from './portal-host.mjs';
+import {mountOrbFace,ORB_LOOK} from './orb-face.mjs';
 const $=id=>document.getElementById(id),bridge=globalThis.synkDesktop,asset='/assets/launcher/';
 const apps=APPS;
 const localStore={getItem:key=>localStorage.getItem(key),setItem:(key,value)=>localStorage.setItem(key,value),removeItem:key=>localStorage.removeItem(key)};
@@ -52,7 +53,8 @@ const pulseClient=mountPulseClient($('pulse-client'),{storage:localStore,getCont
 const accountPage=mountAccountPage($('view-account'),{bridge,getIdentity:()=>auth,getAppIds:()=>library.appIds,onBack:()=>showView('settings'),onSignIn:()=>openAccount(),onSignOut:signOut,onInsight:()=>showView('insight'),onWorkspace:()=>{if(allowed('messenger'))launchFromHome('messenger');else toast('이 계정에서는 작업실을 열 수 없어요.');},onAccountChanged:()=>void refreshAuth({reload:true}),toast:message=>toast(message)});
 // Signed out, a sign-in entry starts the browser sign-in at once and the dialog shows how it goes; a saved sign-in that
 // failed to load (status 'error') or one in progress keeps the dialog first, where 「저장된 로그인 다시 확인」 lives.
-function openAccount(){if(bridge&&auth.signedIn){showView('account');return;}if(!$('account-dialog').open)$('account-dialog').showModal();if(bridge&&auth.configured&&auth.status==='signed-out')void startSignIn();}
+// 새 얼굴이 보이는 동안(임시 옛 화면 포함)에는 계정 대화상자를 열지 않는다. 로그인 전이면 저장된 로그인을 다시 확인한다(대화상자의 「저장된 로그인 다시 확인」과 같다, 0.4.95 원천 후보 Fable F2)
+function openAccount(){if(bridge&&auth.signedIn){showView('account');return;}if(portalHost?.isClientShown?.()){if(bridge)void refreshAuth({reload:true});return;}if(!$('account-dialog').open)$('account-dialog').showModal();if(bridge&&auth.configured&&auth.status==='signed-out')void startSignIn();}
 const continuityRoot=document.createElement('aside');continuityRoot.setAttribute('aria-label','계정 라이브러리');$('view-home').before(continuityRoot);
 const continuityStyle=document.createElement('link');continuityStyle.rel='stylesheet';continuityStyle.href='./platform-continuity.css';document.head.append(continuityStyle);
 continuity=mountPlatformLibrary(continuityRoot,{native:true,getHost:()=>bridge,signIn:{guest:()=>!!bridge&&auth.configured===true&&!auth.signedIn&&(['signed-out','signing-in'].includes(auth.status)||auth.status==='error'&&auth.error?.retryable!==true),open:()=>openAccount()},getAppIds:()=>visibleLibraryAppIds(library),getDevice:()=>({favorites:prefs.favorites,recent:Object.entries(prefs.lastLaunch).filter(([,at])=>at).map(([id,at])=>({id,at,mode:'client'}))}),onChange:()=>{renderLibrary();renderSelected();syncBenefitPin();memberHome.render();convenience?.refresh();},onFavoritesChanged:()=>memberActivity.syncFavorites(),onOpen:id=>{if(allowed(id))launchFromHome(id);else toast('아직 설치하지 않았거나 이 계정에서 쓸 수 없는 앱이에요. 「설치·업데이트」에서 설치 상태를 봐 주세요.');},storage:localStorage});
@@ -139,7 +141,7 @@ function setAuth(snapshot,{environmentOnly=false}={}){
   // checks the new session. So a browser sign-in stays remembered from 'signing-in' until it lands signed in or ends otherwise
   // (a token refresh or the start-up restore also passes 'restoring' and says nothing).
   if(auth.status==='signing-in')signInLanding=true;
-  else if(auth.signedIn&&signInLanding){signInLanding=false;if($('account-dialog').open)$('account-dialog').close();toast(`${auth.account?.display_name||'SYNK 회원'} 님으로 로그인했어요.`);}
+  else if(auth.signedIn&&signInLanding){signInLanding=false;if($('account-dialog').open)$('account-dialog').close();if(!portalHost?.isClientShown?.())toast(`${auth.account?.display_name||'SYNK 회원'} 님으로 로그인했어요.`);}
   else if(auth.status!=='restoring'){
     // Ended without signing in while the dialog is closed (the home banner asked to wait there): say why once. A cancel is the member's own doing.
     if(signInLanding&&!auth.signedIn&&auth.error&&auth.error.code!=='AUTH_CANCELLED'&&!$('account-dialog').open&&!portalHost?.isActive?.())toast(auth.error.message||'로그인을 마치지 못했어요. 다시 해 주세요.');
@@ -236,7 +238,7 @@ function systemName(){return environment?`${({win32:'Windows',darwin:'macOS',lin
 function renderSettings(){renderPersonalization();$('density').value=prefs.density;document.documentElement.classList.toggle('compact',prefs.density==='compact');$('platform-version').textContent=environment?`v${environment.version} · ${systemName()}`:'화면 미리보기';$('diagnostics').innerHTML=`<dt>화면</dt><dd>${bridge?'PC 앱에 들어 있음':'브라우저 미리보기'}</dd><dt>SYNK ID</dt><dd>${auth.signedIn?'로그인됨':auth.configured?'로그인 안 함':'로그인 설정 없음'}</dd><dt>판</dt><dd>${environment?.mode==='release'?'정식판':'시험판(Preview)'}</dd><dt>앱 실행</dt><dd>${bridge?'앱마다 따로 열림':'PC 앱에서'}</dd>${allowed('pulse')?'<dt>PULSE 이전 초안</dt><dd><button class="text-link" data-pulse-legacy="open">이 PC에 저장한 요청 초안 보기</button></dd>':''}`;}
 function renderAuth(){
   const signedIn=auth.signedIn,signing=['signing-in','restoring','signing-out'].includes(auth.status),retryable=!!bridge&&auth.configured&&!signedIn&&!signing&&auth.status==='error'&&auth.error?.retryable===true&&typeof bridge.accountRequest==='function',name=auth.account?.display_name||'SYNK 회원';
-  $('account-button').dataset.signedIn=String(!!signedIn);$('account-button').setAttribute('aria-label',signedIn&&bridge?'내 계정 메뉴':signedIn?'내 계정':'SYNK ID 로그인');$('settings-login').textContent=signedIn?'내 계정':'로그인';
+  $('account-button').dataset.signedIn=String(!!signedIn);$('account-button').setAttribute('aria-label',signedIn&&bridge?'내 계정 메뉴':signedIn?'내 계정':'SYNK ID 로그인');$('settings-login').textContent=signedIn?'내 계정':'로그인';$('settings-login').dataset.signedIn=String(!!signedIn);
   const phase=auth.status==='signing-in'?'signing-in':auth.status==='restoring'?'restoring':auth.status==='signing-out'?'signing-out':null;
   $('account-label').textContent=signedIn?name:phase==='signing-out'?'로그아웃 중':phase==='restoring'?'로그인 확인 중':signing?'로그인 중':'로그인';
   const avatar=$('account-button').querySelector?.('.avatar'),initial=signedIn?[...name][0]||'S':'S';if(avatar&&avatar.textContent!==initial)avatar.textContent=initial;
@@ -258,8 +260,8 @@ function readRoute(){return {view,appId:view==='library'&&!libraryDetail?null:pr
 // 화면 이동. 옛 회원 혜택 경로(내 성향 · 구독 계정판)는 새 자리로 바꿔 받는다(2026-11-13). 화면을 떠나면 그 화면의 개인 글 · 다시 그리기를 끈다 —
 // 내 성향은 #insight-detail을 비우고 보이기를 끄며, AI 구독 관리는 솔리오의 그 탭이 아닐 때 보이기를 끄고 그릇을 비운다(1분 다시 그리기가 다른 화면을 덮지 않게).
 const VIEW_IDS=['home','library','solio','benefits','downloads','settings','account','insight'];
-function focusCurrentViewHeading(){if(portalHost?.isActive?.()||document.querySelector('dialog[open]'))return;if(view==='home')$('member-home-title')?.focus?.({preventScroll:true});else if(view==='library')(libraryDetail?$('hero-title'):$('main'))?.focus?.({preventScroll:true});else if(view==='benefits')$(selectedBenefit?'benefit-title':'benefits-title')?.focus?.({preventScroll:true});else if(view==='solio')$(solioTab==='subscriptions'?'benefit-title':'solio-title')?.focus?.({preventScroll:true});else if(view==='insight')$('benefit-title')?.focus?.({preventScroll:true});else if(view==='account')($('account-page-title')||$('main'))?.focus?.({preventScroll:true});else $('main')?.focus?.({preventScroll:true});}
-function showView(next,{restore=false,...route}={}){if(next==='benefits'&&Object.hasOwn(SOLIO_LEGACY_BENEFITS,route.benefitId||'')){const moved=solioMigrateRoute({view:next,...route});next=moved.view;route={...route,benefitId:null,section:moved.section};}if(!VIEW_IDS.includes(next))return;closeProfileMenu();if(convenience&&!restore){convenience.navigate({view:next,appId:next==='library'?null:prefs.selected,...route});return;}view=next;if(view==='library'){libraryDetail=allowed(route.appId);if(!libraryDetail)libraryOrigin='library';}if(view!=='benefits')$('benefit-detail').innerHTML='';if(view!=='insight'){memberInsight.setVisible(false);$('insight-detail').innerHTML='';}if(view==='solio')solioTab=solioSection(route.section);if(!(view==='solio'&&solioTab==='subscriptions')){subscriptionsBoard.setVisible(false);$('solio-subscriptions').innerHTML='';}if(allowed(route.appId))prefs.selected=route.appId;detail=route.detail||'overview';selectedBenefit=view==='benefits'&&memberBenefit(route.benefitId)?route.benefitId:null;for(const name of VIEW_IDS)$('view-'+name).hidden=name!==view;
+function focusCurrentViewHeading(){if(portalHost?.isActive?.()||['portal','app'].includes(portalHost?.clientMode?.())||document.querySelector('dialog[open]'))return;if(view==='home')$('member-home-title')?.focus?.({preventScroll:true});else if(view==='library')(libraryDetail?$('hero-title'):$('main'))?.focus?.({preventScroll:true});else if(view==='benefits')$(selectedBenefit?'benefit-title':'benefits-title')?.focus?.({preventScroll:true});else if(view==='solio')$(solioTab==='subscriptions'?'benefit-title':'solio-title')?.focus?.({preventScroll:true});else if(view==='insight')$('benefit-title')?.focus?.({preventScroll:true});else if(view==='account')($('account-page-title')||$('main'))?.focus?.({preventScroll:true});else $('main')?.focus?.({preventScroll:true});}
+function showView(next,{restore=false,...route}={}){if(next==='benefits'&&Object.hasOwn(SOLIO_LEGACY_BENEFITS,route.benefitId||'')){const moved=solioMigrateRoute({view:next,...route});next=moved.view;route={...route,benefitId:null,section:moved.section};}if(!VIEW_IDS.includes(next))return;if(portalHost?.clientMode?.()==='legacy'&&!['solio','settings','account'].includes(next))return;closeProfileMenu();if(convenience&&!restore){convenience.navigate({view:next,appId:next==='library'?null:prefs.selected,...route});return;}view=next;if(view==='library'){libraryDetail=allowed(route.appId);if(!libraryDetail)libraryOrigin='library';}if(view!=='benefits')$('benefit-detail').innerHTML='';if(view!=='insight'){memberInsight.setVisible(false);$('insight-detail').innerHTML='';}if(view==='solio')solioTab=solioSection(route.section);if(!(view==='solio'&&solioTab==='subscriptions')){subscriptionsBoard.setVisible(false);$('solio-subscriptions').innerHTML='';}if(allowed(route.appId))prefs.selected=route.appId;detail=route.detail||'overview';selectedBenefit=view==='benefits'&&memberBenefit(route.benefitId)?route.benefitId:null;for(const name of VIEW_IDS)$('view-'+name).hidden=name!==view;
   // 「내 계정」 sits under 설정, so that tab stays lit; an app intro opened from 내 홈 keeps 내 홈 lit (its 위치 줄 says 「내 홈 / …」).
   const tab=['account','insight'].includes(view)?'settings':view==='library'&&libraryDetail&&libraryOrigin==='home'?'home':view;if(view!=='account')accountPage.hide();document.querySelectorAll('[data-view]').forEach(el=>{el.classList.toggle('active',el.dataset.view===tab);if(el.dataset.view===tab)el.setAttribute('aria-current','page');else el.removeAttribute('aria-current');});if(view==='home')memberHome.render();if(view==='library'){renderLibrary();renderSelected();}if(view==='downloads')renderDownloads();if(view==='settings')renderSettings();if(view==='account')accountPage.show();if(view==='benefits')renderBenefits();if(view==='solio')renderSolio();if(view==='insight')renderInsightView();focusCurrentViewHeading();if(globalThis.location?.hash)replaceHashSilently(formatDesktopRouteHash({view,appId:view==='library'&&libraryDetail?prefs.selected:null,section:view==='solio'?solioTab:null,benefitId:view==='benefits'?selectedBenefit:null}));document.documentElement.dataset.view=view;$('main').scrollTop=route.scroll||0;globalThis.scrollTo?.(0,route.pageScroll||0);$('titlebar')?.classList.toggle('scrolled',(route.scroll||0)>4);}
 function canPreviewBenefit(id){return typeof bridge?.openProductPreview==='function'&&benefitPreviewAvailable(id,{native:!!bridge,appIds:library.appIds,productPreviewsAvailable:environment?.productPreviewsAvailable});}
@@ -375,7 +377,7 @@ for(const id of ['profile-menu','account-button']){
 }
 document.addEventListener('focusin',event=>{if(profileOpen&&!inProfileControl(event.target))closeProfileMenu();});
 async function openSignUp(){
-  if(typeof bridge?.authSignUp!=='function'||auth.signedIn||['restoring','signing-in','signing-out'].includes(auth.status)||signUpPending||accountRetryPending)return;
+  if(portalHost?.isClientShown?.()||typeof bridge?.authSignUp!=='function'||auth.signedIn||['restoring','signing-in','signing-out'].includes(auth.status)||signUpPending||accountRetryPending)return;
   if(!$('account-dialog').open)$('account-dialog').showModal();
   signUpPending=true;renderAuth();const revision=authRevision;
   // A modal dialog covers the toast (top layer), so a failure closes it first.
@@ -454,6 +456,13 @@ $('personal-form').addEventListener('submit',event=>{event.preventDefault();if(!
 $('personal-skip').addEventListener('click',()=>{$('personal-dialog').close();});
 $('personal-clear').addEventListener('click',()=>{if(!library.owner)return;try{personal.clear();sessionPurpose=null;applyPersonalization();renderLibrary();$('personal-dialog').close();toast('저장한 설정을 지웠어요. 기본 순서로 돌아왔어요.');}catch(error){$('personal-message').textContent=error.message;}});
 let windowMaximized=false,portalWindowChrome=null;
+// 검정 구 얼굴(PC 클라이언트 1단계)이 보이는 동안 트레이와 바로가기는 새 얼굴에서 바로 실행되는 앱만 연다. 가린 옛 라이브러리의 앱 소개로 가지 않는다
+function orbRunnable(id){const action=allowed(id)?getAppAction(id):null;return Boolean(bridge&&action&&!action.disabled&&action.action==='launch');}
+// 임시로 여는 옛 화면(설계 9절). 2단계에서 같은 손으로 다시 짓는다
+// 「구독 연결하기」(manage)는 옛 구독 판이 그려진 뒤 판 안의 「계정 관리」를 한 번 눌러 계정 관리 쪽으로 연다. 판 파일은 고치지 않는다
+// 단추 찾기는 앞 호출을 취소하고, 옛 화면에서 구독 판이 아직 보일 때만 누른다(0.4.95 원천 후보 카본)
+let orbManageTimer=null;
+function openOrbLegacy(kind,extra){clearTimeout(orbManageTimer);orbManageTimer=null;if(kind==='subscriptions'){pendingHashRoute=null;subscriptionsBoard.setVisible(false);showView('solio',{section:'subscriptions'});if(extra?.view==='manage'){let tries=0;const go=()=>{orbManageTimer=null;if(portalHost?.clientMode?.()!=='legacy'||document.documentElement.dataset.view!=='solio')return;const button=document.querySelector('#solio-subscriptions [data-subs="manage"]');if(button){button.click();return;}if(++tries<25)orbManageTimer=setTimeout(go,60);};go();}return;}if(kind==='account'){showView('account');return;}if(kind==='settings')showView('settings');}
 function syncMaximizeButton(button,maximized){if(!button)return;button.setAttribute('aria-label',maximized?'창 크기 복원':'최대화');button.dataset.maximized=String(Boolean(maximized));}
 function windowState(state){windowMaximized=Boolean(state?.maximized);syncMaximizeButton($('maximize'),windowMaximized);portalWindowChrome?.syncMaximize(windowMaximized);}
 function createPortalWindowChrome(portalRoot){
@@ -494,7 +503,9 @@ function createPortalWindowChrome(portalRoot){
       }
       if(bar.parentElement!==portalRoot)portalRoot.append(bar);
       syncMaximizeButton(maximizeBtn,windowMaximized);
-      const active=typeof forcedActive==='boolean'?forcedActive&&!portalRoot.hidden:!portalRoot.hidden&&portalRoot.dataset?.portalActive==='true';
+      // 새 얼굴은 들어온 뒤에도 옛 제목 줄을 가리므로 창 단추가 이 막대뿐이다
+      const orbShown=['app','legacy'].includes(portalRoot.dataset?.orbClient);
+      const active=typeof forcedActive==='boolean'?(forcedActive||orbShown)&&!portalRoot.hidden:!portalRoot.hidden&&(portalRoot.dataset?.portalActive==='true'||orbShown);
       if(!active&&document.activeElement&&bar.contains(document.activeElement))document.activeElement.blur?.();
       if(bar.hidden===active)bar.hidden=!active;
     }finally{syncing=false;}
@@ -502,7 +513,7 @@ function createPortalWindowChrome(portalRoot){
   const onPortalState=event=>{sync(typeof event?.detail?.active==='boolean'?event.detail.active:undefined);};
   portalRoot.addEventListener?.('synk:portal-state',onPortalState);
   const observer=typeof MutationObserver==='function'?new MutationObserver(()=>{sync();}):null;
-  observer?.observe(portalRoot,{childList:true,attributes:true,attributeFilter:['hidden','data-portal-active']});
+  observer?.observe(portalRoot,{childList:true,attributes:true,attributeFilter:['hidden','data-portal-active','data-orb-client']});
   const dispose=()=>{
     if(disposed)return;
     disposed=true;
@@ -518,12 +529,15 @@ function createPortalWindowChrome(portalRoot){
 // A sign-in comes back to the screen it started from and a sign-out opens the guest home, not each account's last place.
 // Each landing waits for its own side: the main process reports a plain signed-out (its discard) before 'signing-in', and
 // that guest step must not use up the sign-in's landing. A sign-in that ends without an account drops it (see setAuth).
-convenience=mountConvenience({takeLanding:owner=>{if(landing&&(owner==='anonymous-local')===landing.guest){const {route}=landing;landing=null;return route;}if(pendingHashRoute){const route=toLauncherHashRoute(pendingHashRoute);pendingHashRoute=null;return route;}return null;},isPortalBlocked:()=>Boolean(portalHost?.shouldBlockShortcuts?.()),bridge,storage:localStore,apps,getSnapshot:()=>({owner:library.owner,appIds:visibleLibraryAppIds(library),prefs:effectivePrefs(),environment,auth,clients}),readRoute,applyRoute:route=>{if(route.worldPhone){showWorldPhone();return;}showView(route.view,{...route,restore:true});},launchApp:launchFromHome,onToast:toast,onFavorite:toggleFavorite,onMoveFavorite:moveFavorite,onLibrarySearch:()=>{showView('library');openLibrarySearch();},getNotes:query=>[...(memberHome.searchRecords?.(query)||[]).map(row=>({...row,source:'device'})),...(continuity?.searchNotes?.(query)||[]).map(row=>({...row,source:'account'}))],openNote:note=>note.source==='account'?continuity?.openNote?.(note.id):memberHome.focusRecord?.(note.id),onDesktopPreferences:snapshot=>{if(environment)environment.closeToTray=snapshot.preferences?.closeToTray===true&&snapshot.capabilities?.tray===true;}});
+convenience=mountConvenience({takeLanding:owner=>{if(landing&&(owner==='anonymous-local')===landing.guest){const {route}=landing;landing=null;return route;}if(pendingHashRoute){const route=toLauncherHashRoute(pendingHashRoute);pendingHashRoute=null;return route;}return null;},isPortalBlocked:()=>Boolean(portalHost?.shouldBlockShortcuts?.()),isMenuBlocked:()=>Boolean(portalHost?.isClientShown?.()),trayFilter:list=>portalHost?.isClientShown?.()?list.filter(row=>orbRunnable(row.id)):list,bridge,storage:localStore,apps,getSnapshot:()=>({owner:library.owner,appIds:visibleLibraryAppIds(library),prefs:effectivePrefs(),environment,auth,clients}),readRoute,applyRoute:route=>{if(route.worldPhone){showWorldPhone();return;}showView(route.view,{...route,restore:true});},launchApp:id=>{if(portalHost?.isClientShown?.()&&!orbRunnable(id))return;return launchFromHome(id);},onToast:toast,onFavorite:toggleFavorite,onMoveFavorite:moveFavorite,onLibrarySearch:()=>{showView('library');openLibrarySearch();},getNotes:query=>[...(memberHome.searchRecords?.(query)||[]).map(row=>({...row,source:'device'})),...(continuity?.searchNotes?.(query)||[]).map(row=>({...row,source:'account'}))],openNote:note=>note.source==='account'?continuity?.openNote?.(note.id):memberHome.focusRecord?.(note.id),onDesktopPreferences:snapshot=>{if(environment)environment.closeToTray=snapshot.preferences?.closeToTray===true&&snapshot.capabilities?.tray===true;}});
 function applyHashNavigation(){const parsed=readHashRoute({replaceLegacy:true});if(!parsed)return false;pendingHashRoute=null;const route=toLauncherHashRoute(parsed);if(route.worldPhone)showWorldPhone();else showView(route.view,route);return true;}
 window.addEventListener('hashchange',()=>{applyHashNavigation();});
 portalWindowChrome=createPortalWindowChrome($('portal-entry'));
 portalHost=mountDesktopPortalHost({
   root:$('portal-entry'),
+  mountFace:mountOrbFace,
+  // PC 쪽 옵션(설계 4절). 검사 실행 길은 본체가 열어 준 때만 열린다(설계 11절)
+  faceOptions:{onOpenLegacy:openOrbLegacy,onSignOut:()=>signOut(),subscriptions:bridge?.subscriptions||null,allowGuestEntry:()=>environment?.qaGuestEntry===true,look:ORB_LOOK},
   hostElements:[document.querySelector('.launcher')].filter(Boolean),
   bridge,
   getAuth:()=>auth,
