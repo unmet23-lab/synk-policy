@@ -71,7 +71,8 @@ function observe(config){
       check('window visibility matches requested QA mode',!window.isVisible()||config.visible);
       if(config.mode==='platform'){
         check('startup gate checks the candidate before opening Platform',!!startupWindow&&startupStates.includes('checking')&&startupStates.includes('current')&&syntheticFeedRequests===1,{states:startupStates,syntheticFeedRequests});
-        await waitFor("location.href==='synk-desktop://platform/index.html'&&document.documentElement.dataset.ready==='true'",'local-platform');
+        // 얼굴의 단계 바뀜을 앱이 뜨자마자 적어 둔다. 느린 러너에서는 검사기가 welcome을 잡기 전에 얼굴이 묻는 화면으로 커진다(0.4.95 첫 빌드 Mac x64)
+        await waitFor("(()=>{const p=document.getElementById('portal-entry');if(!p)return false;if(!window.__orbSeen){const seen=window.__orbSeen=[p.dataset.portalState||''];const add=v=>{const s=v||'';if(seen[seen.length-1]!==s)seen.push(s);};new MutationObserver(list=>{for(const r of list){add(r.oldValue);add(r.target.getAttribute('data-portal-state'));}}).observe(p,{attributes:true,attributeOldValue:true,attributeFilter:['data-portal-state']});}return location.href==='synk-desktop://platform/index.html'&&document.documentElement.dataset.ready==='true';})()",'local-platform');
         const state=await run('(async()=>({environment:await window.synkDesktop.getEnvironment(),auth:await window.synkDesktop.authStatus(),clients:await window.synkDesktop.getClients(),node:typeof require,html:document.body.innerText.length}))()');
         check('Platform local renderer and native environment',state.environment.clientId==='platform'&&state.environment.platform===config.platform&&state.environment.arch===config.arch&&state.environment.version===config.version&&state.environment.nativeShell===true&&state.node==='undefined'&&state.html>100);
         check('Platform empty configured account stays signed out',state.auth.configured===true&&state.auth.signedIn===false);
@@ -80,9 +81,9 @@ function observe(config){
           check(name,probe?.ok===true,probe);
         };
         // 검정 구 얼굴(PC 클라이언트 1단계): 구만 보이고, 누르지 않아도 묻는 화면으로 커지고, 검사 실행 길로 솔리오까지 간다
-        await waitFor("(()=>{const p=document.getElementById('portal-entry'),l=document.querySelector('.launcher');return !!p&&!p.hidden&&p.dataset.portalActive==='true'&&p.dataset.portalState==='welcome'&&p.dataset.portalAuthStatus==='signed-out'&&p.dataset.orbClient==='portal'&&!!l&&l.inert===true;})()",'orb-welcome');
-        const welcome=await run("(()=>{const p=document.getElementById('portal-entry'),l=document.querySelector('.launcher'),c=p?.querySelector('.orb-canvas')?.getBoundingClientRect();return {portalState:p?.dataset.portalState,portalActive:p?.dataset.portalActive,orbClient:p?.dataset.orbClient,portalHidden:Boolean(p?.hidden),docPortalActive:document.documentElement.dataset.portalActive,launcherInert:Boolean(l?.inert),launcherInertAttr:Boolean(l?.hasAttribute('inert')),canvasCovers:!!c&&c.width>=innerWidth-1&&c.height>=innerHeight-1};})()");
-        check('orb starts alone at welcome with launcher inert',welcome.portalState==='welcome'&&welcome.portalActive==='true'&&welcome.orbClient==='portal'&&!welcome.portalHidden&&welcome.docPortalActive==='true'&&welcome.launcherInert&&welcome.launcherInertAttr&&welcome.canvasCovers,welcome);
+        await waitFor("(()=>{const p=document.getElementById('portal-entry'),l=document.querySelector('.launcher');return !!p&&!p.hidden&&p.dataset.portalActive==='true'&&(p.dataset.portalState==='welcome'||(window.__orbSeen||[]).includes('welcome'))&&p.dataset.portalAuthStatus==='signed-out'&&p.dataset.orbClient==='portal'&&!!l&&l.inert===true;})()",'orb-welcome');
+        const welcome=await run("(()=>{const p=document.getElementById('portal-entry'),l=document.querySelector('.launcher'),c=p?.querySelector('.orb-canvas')?.getBoundingClientRect();return {portalState:p?.dataset.portalState,seen:window.__orbSeen||[],portalActive:p?.dataset.portalActive,orbClient:p?.dataset.orbClient,portalHidden:Boolean(p?.hidden),docPortalActive:document.documentElement.dataset.portalActive,launcherInert:Boolean(l?.inert),launcherInertAttr:Boolean(l?.hasAttribute('inert')),canvasCovers:!!c&&c.width>=innerWidth-1&&c.height>=innerHeight-1};})()");
+        check('orb starts alone at welcome with launcher inert',(welcome.portalState==='welcome'||welcome.seen.includes('welcome'))&&!(welcome.seen.indexOf('welcome')<0?welcome.seen:welcome.seen.slice(0,welcome.seen.indexOf('welcome'))).some(s=>s&&s!=='welcome')&&welcome.portalActive==='true'&&welcome.orbClient==='portal'&&!welcome.portalHidden&&welcome.docPortalActive==='true'&&welcome.launcherInert&&welcome.launcherInertAttr&&welcome.canvasCovers,welcome);
         await screenshot('platform-orb-welcome');
         // 누르지 않는다. 복원 결과(로그아웃)가 나온 뒤 스스로 커지는 것까지가 검사다
         await waitFor("(()=>{const p=document.getElementById('portal-entry'),s=p?.querySelector('.orb-stage');return !!p&&p.dataset.portalState==='auth'&&s?.dataset.ui==='ask';})()",'orb-auth');
@@ -101,6 +102,8 @@ function observe(config){
           await waitFor(`window.synkDesktop.getClients().then(list=>list.find(c=>c.id===${JSON.stringify(id)}).installer.status==='ready')`,id+'-installer-ready',60000);
           const ready=await run(`window.synkDesktop.getClients().then(list=>list.find(c=>c.id===${JSON.stringify(id)}).installer)`);check(id+' real DMG bytes copied and hash verified',ready.status==='ready'&&ready.progress===100&&ready.transferredBytes===ready.totalBytes&&ready.canOpen===true,ready);
         }
+        // DMG 준비가 띄운 알림 띠(5.5~12초)가 사라진 뒤 공간 고르기로 간다. 알림 띠가 「설정」을 덮어 첫 빌드 Mac arm64가 떨어졌다
+        await waitFor("(()=>{const t=document.getElementById('toast');return !t||t.hidden||getComputedStyle(t).display==='none';})()",'toast-gone',20000);
         // 작은 구 → 공간 고르기 → 「설정」 → 옛 설정 보기(legacy). 내려받기와 보관함 보기는 새 얼굴에서 갈 길이 없어 뺀다(Windows 검사기와 같다)
         await clickVisible('#portal-entry .here-orb','orb small orb visible and unobscured');
         await waitFor("document.querySelector('#portal-entry .orb-stage')?.dataset.ui==='switch'",'orb-switch');await screenshot('platform-orb-switch');
