@@ -52,6 +52,13 @@ contextBridge.exposeInMainWorld('synkDesktop',Object.freeze({
   downloadUpdate:()=>ipcRenderer.invoke('synk:download-update'),
   installUpdate:()=>ipcRenderer.invoke('synk:install-update'),
   onUpdateChanged:callback=>subscribe('synk:update-changed',callback),
+  // 조용한 업데이트(1-가 구현 설계 2절): 본체가 쓰다 만 초안이 있는지 물으면 화면의 판단(참, 거짓)만 돌려준다. 답하지 못하면 「있음」이다
+  answerDraftCheck:callback=>{
+    if(typeof callback!=='function')throw new TypeError('A callback is required');
+    const listener=(_event,id)=>{let unsaved=true;try{unsaved=callback()!==false;}catch{unsaved=true;}if(Number.isSafeInteger(id))ipcRenderer.send('synk:draft-answer',id,unsaved);};
+    ipcRenderer.on('synk:draft-check',listener);
+    return ()=>ipcRenderer.removeListener('synk:draft-check',listener);
+  },
   getDesktopPreferences:()=>ipcRenderer.invoke('synk:desktop-preferences'),
   careNotifications:Object.freeze({
     status:()=>ipcRenderer.invoke('synk:care-notifications-status'),
@@ -80,6 +87,9 @@ contextBridge.exposeInMainWorld('synkDesktop',Object.freeze({
   openInstaller:id=>typeof id==='string'&&['world','messenger'].includes(id)?ipcRenderer.invoke('synk:open-installer',id):Promise.resolve({ok:false,code:'UNKNOWN_CLIENT'}),
   launch:id=>typeof id==='string'&&['platform','world','messenger'].includes(id)?ipcRenderer.invoke('synk:launch',id):Promise.resolve({ok:false,code:'UNKNOWN_CLIENT'}),
   getWindowState:()=>ipcRenderer.invoke('synk:window-state'),
+  // 켜짐부터 열림까지: 구가 드러나기 시작한 때와 움직임 종류를 묻고, 첫 구를 그렸다고 알린다(인자 없음)
+  orbBoot:()=>ipcRenderer.invoke('synk:orb-boot'),
+  orbFirstFrame:()=>ipcRenderer.invoke('synk:orb-first-frame'),
   windowAction:action=>['minimize','toggle-maximize','close'].includes(action)?ipcRenderer.invoke('synk:window-action',action):Promise.resolve({ok:false,code:'INVALID_WINDOW_ACTION'}),
   authStatus:()=>ipcRenderer.invoke('synk:auth-status'),
   authSignIn:()=>ipcRenderer.invoke('synk:auth-sign-in'),
@@ -118,6 +128,8 @@ contextBridge.exposeInMainWorld('synkDesktop',Object.freeze({
     tokensLive:on=>ipcRenderer.invoke('synk:subscriptions-tokens-live',on===true),
     onTokens:callback=>subscribe('synk:subscriptions-tokens-changed',callback),
   }),
+  // synk.im 방문자 분석(11-17): 요약 파일을 읽은 결과만 받는다. 넘기는 값은 없다.
+  siteVisits:Object.freeze({snapshot:()=>ipcRenderer.invoke('synk:site-visits-snapshot')}),
   onAuthChanged:callback=>{if(typeof callback!=='function')throw new TypeError('A callback is required');const listener=(_event,status)=>callback(status);ipcRenderer.on('synk:auth-changed',listener);return ()=>ipcRenderer.removeListener('synk:auth-changed',listener);},
   onClientsChanged:callback=>subscribe('synk:clients-changed',callback),
   onClientProgress:callback=>subscribe('synk:client-progress',callback),

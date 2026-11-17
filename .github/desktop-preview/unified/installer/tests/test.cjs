@@ -113,7 +113,7 @@ class TimeoutBackend { static void Main(string[] args) {
   const upgrade={...manifest,version:'0.0.2',product:'platform',shortName:'SYNK 테스트',backend:upgradeBackend,backendSHA256:sha(upgradeBackend),backendBytes:fs.statSync(upgradeBackend).size,files:upgradeFiles};
   const upgradeSpec=path.join(directory,'upgrade.json'),failedSpec=path.join(directory,'upgrade-bad.json');json(upgradeSpec,upgrade);json(failedSpec,{...upgrade,files:upgradeFiles.map(file=>file.path==='resources/app.asar'?{...file,sha256:'0'.repeat(64)}:file)});
   const framework=path.join(process.env.WINDIR,'Microsoft.NET/Framework64/v4.0.30319');
-  function wrapper(specFile,outputFile){const fonts=['SUIT-Medium.otf','SUIT-ExtraBold.otf','SUIT-Heavy.otf','InterTight-Medium.ttf','InterTight-Bold.ttf','DMMono-Medium.ttf'].map(file=>'/resource:'+path.join(installerRoot,'fonts',file)+',font.'+file);execute(csc,['/nologo','/target:winexe','/platform:x64','/out:'+outputFile,'/win32manifest:'+path.join(installerRoot,'app.manifest'),'/r:System.Core.dll','/r:System.Runtime.Serialization.dll','/r:System.Xaml.dll',...['PresentationFramework.dll','PresentationCore.dll','WindowsBase.dll'].map(file=>'/r:'+path.join(framework,'WPF',file)),'/resource:'+specFile+',install.json','/resource:'+upgradeBackend+',backend.exe','/resource:'+path.join(installerRoot,'art/poster-platform.png')+',art.poster-platform.png',...fonts,...['Program.cs','InstallerEngine.cs','AutoUpdateEngine.cs','BackendProcess.cs','InstallTransaction.cs','SignalWindow.cs'].map(file=>path.join(installerRoot,file))]);}
+  function wrapper(specFile,outputFile){const signal=require('../build-signal.cjs');const fonts=[...signal.FONTS.map(file=>'/resource:'+path.join(installerRoot,'fonts',file)+',font.'+file),'/resource:'+path.join(installerRoot,signal.SHADER)+',shader.orb.ps'];execute(csc,['/nologo','/target:winexe','/platform:x64','/out:'+outputFile,'/win32manifest:'+path.join(installerRoot,'app.manifest'),'/r:System.Core.dll','/r:System.Runtime.Serialization.dll','/r:System.Xaml.dll',...['PresentationFramework.dll','PresentationCore.dll','WindowsBase.dll'].map(file=>'/r:'+path.join(framework,'WPF',file)),'/resource:'+specFile+',install.json','/resource:'+upgradeBackend+',backend.exe','/resource:'+path.join(installerRoot,'art/poster-platform.png')+',art.poster-platform.png',...fonts,...signal.SOURCES.map(file=>path.join(installerRoot,file))]);}
   manifest.upgradeSpec=upgradeSpec;manifest.autoSuccess=path.join(directory,'SYNKAutoUpdateSuccess.exe');manifest.autoFailure=path.join(directory,'SYNKAutoUpdateFailure.exe');
   wrapper(upgradeSpec,manifest.autoSuccess);wrapper(failedSpec,manifest.autoFailure);
   json(path.join(directory,'fixture.json'),manifest);
@@ -130,8 +130,9 @@ async function main() {
   assert(fs.existsSync(engineSource), 'Production engine source missing.');
   const testExe = path.join(fixture.directory, 'SignalInstallerTests.exe');
   execute(fixture.csc, ['/nologo', '/target:exe', '/platform:x64', '/out:' + testExe,
-    '/r:System.Web.Extensions.dll', '/r:System.Core.dll', '/r:System.Runtime.Serialization.dll', engineSource, path.join(installerRoot, 'AutoUpdateEngine.cs'), path.join(installerRoot, 'BackendProcess.cs'), path.join(installerRoot, 'InstallTransaction.cs'), path.join(__dirname, 'Tests.cs')]);
-  const stdout = execute(testExe, [fixtureFile], { timeout: 180000 });
+    '/r:System.Web.Extensions.dll', '/r:System.Core.dll', '/r:System.Runtime.Serialization.dll', engineSource, path.join(installerRoot, 'AutoUpdateEngine.cs'), path.join(installerRoot, 'BackendProcess.cs'), path.join(installerRoot, 'InstallTransaction.cs'), path.join(installerRoot, 'Handoff.cs'), path.join(__dirname, 'Tests.cs')]);
+  // 자동 업데이트를 끝까지 도는 회차가 늘어(11-17 실패 주입 둘), CPU가 바쁜 PC에서 3분을 넘겼다. 검사마다 걸린 시간은 test-progress.txt에 남는다
+  const stdout = execute(testExe, [fixtureFile], { timeout: 420000 });
   fs.writeFileSync(path.join(fixture.directory, 'test-output.txt'), stdout);
   console.log(stdout.trim());
   console.log(JSON.stringify({ fixtureFile, report: path.join(fixture.directory, 'test-results.json') }));

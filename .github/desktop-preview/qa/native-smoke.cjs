@@ -23,6 +23,9 @@ function observe(config){
   // a current-version manifest; do not disable the gate or permit installer IO.
   if(config.client==='platform'){
     const updates=require(app.getAppPath()+'/src/platform-update.cjs'),original=updates.createPlatformUpdater;
+    // 첫 피드 답은 시작 창이 준비된 뒤에 돌려준다. 느린 러너에서 관문의 4초 먼저 열기가 그보다 앞서 앱 창을 열지 않게 이 실행에서만 늘린다(0.4.96 Fable F3, Windows 사본과 같다)
+    const gates=require(app.getAppPath()+'/src/platform-startup-update.cjs'),originalGate=gates.createStartupUpdateGate;
+    gates.createStartupUpdateGate=options=>originalGate({...options,earlyOpenMs:60000});
     const runtime=JSON.parse(fs.readFileSync(app.getAppPath()+'/runtime.json','utf8'));
     // 0.4.87: the candidate must pin real signing keys and refuse an unsigned feed; the QA feed is signed by a throwaway key
     // handed only to this isolated updater, never by the publisher's key.
@@ -71,8 +74,9 @@ function observe(config){
       check('window visibility matches requested QA mode',!window.isVisible()||config.visible);
       if(config.mode==='platform'){
         check('startup gate checks the candidate before opening Platform',!!startupWindow&&startupStates.includes('checking')&&startupStates.includes('current')&&syntheticFeedRequests===1,{states:startupStates,syntheticFeedRequests});
+        // 한 번에 묶여 온 바뀜은 옛 값을 차례로 적고 지금 값을 끝에 한 번만 적는다. 바뀜마다 지금 값을 끼우면 차례가 뒤집혔다(0.4.96 카본 E4, Windows 사본과 같다)
         // 얼굴의 단계 바뀜을 앱이 뜨자마자 적어 둔다. 느린 러너에서는 검사기가 welcome을 잡기 전에 얼굴이 묻는 화면으로 커진다(0.4.95 첫 빌드 Mac x64)
-        await waitFor("(()=>{const p=document.getElementById('portal-entry');if(!p)return false;if(!window.__orbSeen){const seen=window.__orbSeen=[p.dataset.portalState||''];const add=v=>{const s=v||'';if(seen[seen.length-1]!==s)seen.push(s);};new MutationObserver(list=>{for(const r of list){add(r.oldValue);add(r.target.getAttribute('data-portal-state'));}}).observe(p,{attributes:true,attributeOldValue:true,attributeFilter:['data-portal-state']});}return location.href==='synk-desktop://platform/index.html'&&document.documentElement.dataset.ready==='true';})()",'local-platform');
+        await waitFor("(()=>{const p=document.getElementById('portal-entry');if(!p)return false;if(!window.__orbSeen){const seen=window.__orbSeen=[p.dataset.portalState||''];const add=v=>{const s=v||'';if(seen[seen.length-1]!==s)seen.push(s);};new MutationObserver(list=>{for(const r of list)add(r.oldValue);add(p.getAttribute('data-portal-state'));}).observe(p,{attributes:true,attributeOldValue:true,attributeFilter:['data-portal-state']});}return location.href==='synk-desktop://platform/index.html'&&document.documentElement.dataset.ready==='true';})()",'local-platform');
         const state=await run('(async()=>({environment:await window.synkDesktop.getEnvironment(),auth:await window.synkDesktop.authStatus(),clients:await window.synkDesktop.getClients(),node:typeof require,html:document.body.innerText.length}))()');
         check('Platform local renderer and native environment',state.environment.clientId==='platform'&&state.environment.platform===config.platform&&state.environment.arch===config.arch&&state.environment.version===config.version&&state.environment.nativeShell===true&&state.node==='undefined'&&state.html>100);
         check('Platform empty configured account stays signed out',state.auth.configured===true&&state.auth.signedIn===false);
@@ -152,7 +156,7 @@ function observe(config){
   process.on('uncaughtException',error=>{errors.push('MAIN_STARTUP_EXCEPTION: '+(error.stack||error.message));void finish(false);});
   process.on('unhandledRejection',error=>{errors.push('MAIN_STARTUP_REJECTION: '+(error?.stack||error));void finish(false);});
   app.on('browser-window-created',(_event,created)=>{process.stderr.write('SYNK_QA_TRACE window-created\n');
-    if(config.client==='platform'){if(!config.visible){created.show=()=>{};created.showInactive=()=>{};}instrument(created.webContents);created.webContents.once('did-finish-load',()=>observeWindow(created));}
+    if(config.client==='platform'){if(!config.visible){created.show=()=>{};created.showInactive=()=>{};}instrument(created.webContents);/* 얼굴 단계 기록은 앱 창의 dom-ready에서 바로 심는다. did-finish-load 뒤에 심으면 본체가 넘긴 드러남 시각만큼 welcome이 짧아져, 느린 러너에서 welcome을 놓칠 수 있었다(0.4.96 공개 후보 Fable P3). 아래 기다림 식의 심기는 이미 심었으면 그냥 지나간다 */created.webContents.on('dom-ready',()=>{if(created.webContents.getURL()==='synk-desktop://platform/index.html')void created.webContents.executeJavaScript("(()=>{if(window.__orbSeenPlant)return true;window.__orbSeenPlant=true;const plant=p=>{if(window.__orbSeen)return;const seen=window.__orbSeen=[p.dataset.portalState||''];const add=v=>{const s=v||'';if(seen[seen.length-1]!==s)seen.push(s);};new MutationObserver(list=>{for(const r of list)add(r.oldValue);add(p.getAttribute('data-portal-state'));}).observe(p,{attributes:true,attributeOldValue:true,attributeFilter:['data-portal-state']});};const p=document.getElementById('portal-entry');if(p){plant(p);return true;}const o=new MutationObserver(()=>{const q=document.getElementById('portal-entry');if(q){o.disconnect();plant(q);}});o.observe(document.documentElement,{childList:true,subtree:true});return true;})()",true).catch(()=>{});});created.webContents.once('did-finish-load',()=>observeWindow(created));}
     else observeWindow(created);
   });
   return {appData:app.getPath('appData'),archive:app.getAppPath()};

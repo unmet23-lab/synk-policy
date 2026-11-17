@@ -537,7 +537,7 @@ portalHost=mountDesktopPortalHost({
   root:$('portal-entry'),
   mountFace:mountOrbFace,
   // PC 쪽 옵션(설계 4절). 검사 실행 길은 본체가 열어 준 때만 열린다(설계 11절)
-  faceOptions:{onOpenLegacy:openOrbLegacy,onSignOut:()=>signOut(),subscriptions:bridge?.subscriptions||null,allowGuestEntry:()=>environment?.qaGuestEntry===true,look:ORB_LOOK},
+  faceOptions:{orbBoot:typeof bridge?.orbBoot==='function'?()=>bridge.orbBoot():null,onFirstFrame:typeof bridge?.orbFirstFrame==='function'?()=>bridge.orbFirstFrame():null,onOpenLegacy:openOrbLegacy,onSignOut:()=>signOut(),subscriptions:bridge?.subscriptions||null,allowGuestEntry:()=>environment?.qaGuestEntry===true,look:ORB_LOOK},
   hostElements:[document.querySelector('.launcher')].filter(Boolean),
   bridge,
   getAuth:()=>auth,
@@ -692,6 +692,8 @@ async function init(){
     if(bridge.getWindowState)bridge.getWindowState().then(windowState).catch(()=>{});bridge.onWindowStateChanged?.(windowState);
     let clientEvents=0;const revision=authRevision;
     bridge.onAuthChanged?.(setAuth);
+    // 조용한 업데이트는 쓰다 만 초안과 저장 중인 즐겨찾기가 없을 때만 한다(1-가 구현 설계 2절)
+    bridge.answerDraftCheck?.(()=>!!(pendingLibraryActions||hasUnsavedDrafts()));
     const receiveClients=snapshot=>{clientEvents++;setClients(snapshot);};bridge.onClientsChanged?.(receiveClients);
     const results=await Promise.allSettled([loadEnvironment(),bridge.getClients(),bridge.authStatus()]);
     if(results[1].status==='fulfilled'&&clientEvents===0)setClients(results[1].value);

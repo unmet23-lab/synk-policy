@@ -72,6 +72,131 @@ internal static class SignalInstallerTests
             var sentinelHash = Hash(sentinel);
 
             var engine = Engine(Spec);
+            // 넘김 쪽지, 도착 쪽지, 가림막 캐시(검정 구 1-가 구현 설계 2절과 6절). 시험 폴더 안의 설치기 자리로 바꿔 끼운다
+            Check("handoff note is read only when token, app process and version all match", delegate
+            {
+                Handoff.InstallerRoot = Path.Combine(Root, "handoff-installer");
+                string token = new string('a', 64), appId = "im.synk.signal.fixture.handoff";
+                Directory.CreateDirectory(Handoff.Folder);
+                Func<string, string> note = delegate(string extra) { return "{\"schemaVersion\":1,\"token\":\"" + token + "\",\"appPid\":4242,\"version\":\"0.4.97\",\"window\":131072,\"x\":10,\"y\":20,\"width\":1440,\"height\":940,\"maximized\":false,\"visibility\":\"behind\",\"quiet\":false,\"cut\":0.5,\"curtainEvent\":\"Local\\\\SYNK.Curtain.0123456789abcdef0123456789abcdef\",\"writtenAt\":\"2026-11-17T00:00:00.000Z\"" + extra + "}"; };
+                File.WriteAllText(Handoff.HandoffFile(appId), note(""));
+                HandoffNote read = Handoff.ReadHandoff(appId, token, 4242, "0.4.97");
+                Assert(read != null && read.Behind && read.HasBounds && read.Width == 1440 && read.Window == 131072 && read.CurtainEvent.EndsWith("abcdef", StringComparison.Ordinal), "A matching handoff note was not read.");
+                Assert(Handoff.ReadHandoff(appId, token, 4242, "0.4.97") != null, "Reading a handoff note must not consume it.");
+                Assert(Handoff.ReadHandoff(appId, new string('b', 64), 4242, "0.4.97") == null, "A note for another token was read.");
+                Assert(Handoff.ReadHandoff(appId, token, 4243, "0.4.97") == null, "A note for another app process was read.");
+                Assert(Handoff.ReadHandoff(appId, token, 4242, "0.4.98") == null, "A note for another version was read.");
+                Assert(Handoff.ReadHandoff(appId, token, 0, "0.4.97") != null, "The curtain (no wait pid) could not read its note.");
+                File.WriteAllText(Handoff.HandoffFile(appId), note("").Replace("behind", "sideways"));
+                Assert(Handoff.ReadHandoff(appId, token, 4242, "0.4.97") == null, "An unknown visibility was accepted.");
+                File.WriteAllText(Handoff.HandoffFile(appId), note("").Replace("SYNK.Curtain.", "Other."));
+                Assert(Handoff.ReadHandoff(appId, token, 4242, "0.4.97") == null, "A foreign event name was accepted.");
+                File.WriteAllText(Handoff.HandoffFile(appId), "{not json");
+                Assert(Handoff.ReadHandoff(appId, token, 4242, "0.4.97") == null, "A broken note was accepted.");
+                File.WriteAllText(Handoff.HandoffFile(appId), note(",\"pad\":\"" + new string('x', 5000) + "\""));
+                Assert(Handoff.ReadHandoff(appId, token, 4242, "0.4.97") == null, "An oversized note was accepted.");
+                string curtainToken;
+                Assert(Handoff.IsCurtain(new[] { "--auto-update", "--curtain", "--wait-pid=1", "--handoff-token=" + token }, out curtainToken) && curtainToken == token, "The curtain mode did not win over other arguments.");
+                Assert(Handoff.IsCurtain(new[] { "--curtain", "--handoff-token=XYZ" }, out curtainToken) && curtainToken == null, "A malformed curtain token was accepted.");
+                Assert(!Handoff.IsCurtain(new[] { "--auto-update", "--wait-pid=1", "--handoff-token=" + token }, out curtainToken), "Automatic update was taken as the curtain.");
+            });
+            Check("arrival note is written atomically and an unwritable arrival note is swallowed", delegate
+            {
+                string appId = "im.synk.signal.fixture.handoff";
+                Assert(Handoff.WriteArrival(appId, new ArrivalNote { Kind = "updated", Version = "0.4.97", X = 1, Y = 2, Width = 1440, Height = 940, Visibility = "front", Cut = 1, Lit = 0.58 }), "Arrival note was not written.");
+                string text = File.ReadAllText(Handoff.ArrivalFile(appId));
+                Assert(text.Contains("\"kind\":\"updated\"") && text.Contains("\"installerPid\":" + Process.GetCurrentProcess().Id) && text.Contains("\"writtenAt\""), "Arrival note content: " + text);
+                Assert(Directory.GetFiles(Handoff.Folder, "*.partial").Length == 0, "Arrival note left a temporary file.");
+                File.Delete(Handoff.ArrivalFile(appId));
+                Directory.CreateDirectory(Handoff.ArrivalFile(appId));
+                try { Assert(!Handoff.WriteArrival(appId, new ArrivalNote { Kind = "updated", Version = "0.4.97", Visibility = "front" }), "An unwritable arrival note reported success."); }
+                finally { Directory.Delete(Handoff.ArrivalFile(appId)); }
+                Assert(Directory.GetFiles(Handoff.Folder, "*.partial").Length == 0, "A failed arrival note left a temporary file.");
+            });
+            Check("orphan curtain caches are removed while live owners and transaction folders stay", delegate
+            {
+                string cache = Path.Combine(Handoff.InstallerRoot, "Cache");
+                Directory.CreateDirectory(cache);
+                int dead = 999999;
+                while (true) { try { using (Process.GetProcessById(dead)) { } dead--; } catch (ArgumentException) { break; } }
+                string orphan = Path.Combine(cache, "curtain-" + dead + "-" + new string('c', 32));
+                string live = Path.Combine(cache, "curtain-" + Process.GetCurrentProcess().Id + "-" + new string('d', 32));
+                string transaction = Path.Combine(cache, System.Guid.NewGuid().ToString("N"));
+                string lookalike = Path.Combine(cache, "curtain-" + dead + "-short");
+                foreach (string directory in new[] { orphan, live, transaction, lookalike }) { Directory.CreateDirectory(directory); File.WriteAllText(Path.Combine(directory, "x"), "x"); }
+                Assert(Handoff.CleanupOrphanCurtainCaches() == 1, "Expected exactly one orphan curtain cache to be removed.");
+                Assert(!Directory.Exists(orphan) && Directory.Exists(live) && Directory.Exists(transaction) && Directory.Exists(lookalike), "Curtain cache cleanup touched the wrong folders.");
+                // 성공한 설치의 단계 시각: 최근 20회만 남기고, 쓰지 못해도 삼킨다(1-가 구현 설계 3절)
+                string timingApp = "im.synk.signal.fixture.timing";
+                for (int i = 0; i < 21; i++) Assert(Handoff.WriteStageTiming(timingApp, new StageTiming { Kind = "update", Version = "0.0." + i, TotalMs = i, Stages = { new StageMark { Stage = "BackingUp", Ms = i } } }), "Stage timing was not written.");
+                string timings = File.ReadAllText(Handoff.TimingFile(timingApp));
+                Assert(!timings.Contains("\"0.0.0\"") && timings.Contains("\"0.0.20\"") && timings.Contains("\"stage\":\"BackingUp\""), "Stage timing kept the wrong runs: " + timings);
+                File.Delete(Handoff.TimingFile(timingApp)); Directory.CreateDirectory(Handoff.TimingFile(timingApp));
+                Assert(!Handoff.WriteStageTiming(timingApp, new StageTiming { Kind = "update" }), "An unwritable stage timing reported success.");
+                Directory.Delete(Handoff.TimingFile(timingApp));
+                // 「바꾸는 중」 표시(장치 1): 자기 번호를 적고, 박동으로 시각을 고치고, 놓을 때 지운다. 남의 표시는 지우지 않는다
+                string markerApp = "im.synk.signal.fixture.marker";
+                UpdatingMarker heldMarker = UpdatingMarker.Hold(markerApp, "platform");
+                Assert(heldMarker != null && File.Exists(Handoff.MarkerFile(markerApp)) && UpdatingMarker.ReadPid(markerApp) == Process.GetCurrentProcess().Id, "Updating marker was not written with this process.");
+                File.SetLastWriteTimeUtc(Handoff.MarkerFile(markerApp), DateTime.UtcNow.AddSeconds(-30));
+                Thread.Sleep(UpdatingMarker.BeatMilliseconds + 600);
+                Assert(DateTime.UtcNow - File.GetLastWriteTimeUtc(Handoff.MarkerFile(markerApp)) < TimeSpan.FromSeconds(5), "Heartbeat did not refresh the marker time.");
+                heldMarker.Release();
+                Assert(!File.Exists(Handoff.MarkerFile(markerApp)), "Released marker was not removed.");
+                Thread.Sleep(UpdatingMarker.BeatMilliseconds + 300);
+                Assert(!File.Exists(Handoff.MarkerFile(markerApp)), "A heartbeat recreated a released marker.");
+                UpdatingMarker other = UpdatingMarker.Hold(markerApp, "platform");
+                File.WriteAllText(Handoff.MarkerFile(markerApp), "{\"pid\":1,\"product\":\"platform\"}");
+                other.Release();
+                Assert(File.Exists(Handoff.MarkerFile(markerApp)), "A marker of another installer was removed.");
+                File.Delete(Handoff.MarkerFile(markerApp));
+                // 지우지 못하면 시각을 10초보다 앞으로 고친다(앱은 낡은 표시로 본다)
+                UpdatingMarker locked = UpdatingMarker.Hold(markerApp, "platform");
+                using (new FileStream(Handoff.MarkerFile(markerApp), FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+                {
+                    var releasing = Stopwatch.StartNew(); locked.Release();
+                    Assert(releasing.ElapsedMilliseconds >= 900, "Release did not retry deleting a held marker.");
+                    Assert(DateTime.UtcNow - File.GetLastWriteTimeUtc(Handoff.MarkerFile(markerApp)) > TimeSpan.FromSeconds(10), "An undeletable marker was not made stale.");
+                }
+                File.Delete(Handoff.MarkerFile(markerApp));
+                // 창 보이기 요청: 자기 번호이거나, 번호 칸이 빈 채 자기가 시작한 뒤에 생긴 요청만 받는다
+                DateTime since = DateTime.UtcNow; int me = Process.GetCurrentProcess().Id;
+                Assert(ShowRequest.Write(markerApp, 0) && ShowRequest.Take(markerApp, me, since) && !File.Exists(ShowRequest.File(markerApp)), "An empty-number request after the start was not taken.");
+                Assert(ShowRequest.Write(markerApp, me + 1) && !ShowRequest.Take(markerApp, me, since) && File.Exists(ShowRequest.File(markerApp)), "A request for another installer was taken.");
+                Assert(ShowRequest.Write(markerApp, me) && ShowRequest.Take(markerApp, me, since), "A request for this installer was not taken.");
+                Assert(ShowRequest.Write(markerApp, 0), "Request was not written."); File.SetLastWriteTimeUtc(ShowRequest.File(markerApp), since.AddMinutes(-5));
+                Assert(!ShowRequest.Take(markerApp, me, since), "A leftover empty-number request from before the start was taken.");
+                ShowRequest.Clear(markerApp); Assert(!File.Exists(ShowRequest.File(markerApp)), "Clear left the request.");
+                string mine = Handoff.CreateCurtainCache();
+                Assert(Path.GetFileName(mine).StartsWith("curtain-" + Process.GetCurrentProcess().Id + "-", StringComparison.Ordinal), "Curtain cache name does not carry its owner: " + mine);
+                Directory.Delete(Handoff.InstallerRoot, true);
+                Handoff.InstallerRoot = null;
+            });
+            // 조용한 업데이트가 끝날 무렵 사람이 켠 앱의 요청이 사라지지 않는다(0.4.96 GPT 검수 GA1)
+            Check("a show request before the launch reveals the installer, one after the launch opens the app again at the end", delegate
+            {
+                var pending = new Queue<bool>(); int reveals = 0;
+                Func<bool> take = delegate { return pending.Count > 0 && pending.Dequeue(); };
+                var before = new ShowRequestGate(take, delegate { reveals++; });
+                pending.Enqueue(true); before.Tick();
+                Assert(reveals == 1, "A request before the launch did not reveal the installer.");
+                before.BeforeLaunch(); Assert(!before.OpenAgainAtEnd(), "A request already answered before the launch opened the app again.");
+                // 마지막 Tick과 BeforeLaunch 사이에 생긴 요청: 도착 쪽지를 쓰기 전에 받아 창을 보인다
+                reveals = 0; var edge = new ShowRequestGate(take, delegate { reveals++; });
+                pending.Enqueue(true); edge.BeforeLaunch();
+                Assert(reveals == 1 && !edge.OpenAgainAtEnd(), "A request waiting at the launch was not answered before the arrival note.");
+                // 켜기 시작한 뒤의 요청: 설치기 창만 보이면 새 앱이 숨은 채 남는다. 끝에서 앱을 한 번 더 켠다
+                reveals = 0; var after = new ShowRequestGate(take, delegate { reveals++; });
+                after.BeforeLaunch(); pending.Enqueue(true); after.Tick();
+                Assert(reveals == 0, "A request after the launch revealed only the installer window.");
+                Assert(after.OpenAgainAtEnd(), "A request after the launch was lost.");
+                // 끝나기 직전에 막 생긴 요청도 받는다
+                var late = new ShowRequestGate(take, delegate { reveals++; });
+                late.BeforeLaunch(); pending.Enqueue(true);
+                Assert(late.OpenAgainAtEnd() && pending.Count == 0, "A request at the very end was not taken.");
+                var none = new ShowRequestGate(take, delegate { reveals++; });
+                none.Tick(); none.BeforeLaunch(); Assert(!none.OpenAgainAtEnd() && reveals == 0, "No request still opened something.");
+            });
             Check("known-folder shortcut guard accepts Cloud variants but rejects symlinks, junctions and unknown reparse tags", delegate
             {
                 for(uint variant=0;variant<16;variant++)
@@ -350,6 +475,110 @@ internal static class SignalInstallerTests
                         engine.VerifyInstalled();VerifyRegistrationAndShortcuts();
                     }
                 });
+                Check("a throwing arrival note hook never changes the update outcome and hears the restored version",delegate
+                {
+                    using(Process exited=exitedParent())
+                    {
+                        int launches=0;var arriving=Engine(ReadSpec());var heard=new List<string>();
+                        arriving.BeforeLaunch=delegate(string kind,string version){heard.Add(kind+" "+version);throw new IOException("Synthetic arrival note failure");};
+                        var session=sessionFor(exited);
+                        var result=Task.Run(delegate { return arriving.InstallAutomaticUpdateCore(session,Progress,delegate(Action<InstallProgress> progress) { throw new IOException("Synthetic payload failure"); },delegate(string executable,string arguments){launches++;}); }).GetAwaiter().GetResult();
+                        Assert(result.Restored&&result.Relaunched&&launches==1,"Arrival note failure changed recovery: "+result.Message);
+                        Assert(heard.Count==1&&heard[0]=="restored "+session.Version,"Arrival hook heard: "+String.Join(",",heard));
+                        if(result.RecoveryFile!=null&&File.Exists(result.RecoveryFile))File.Delete(result.RecoveryFile);
+                        if(File.Exists(failureRecord))File.Delete(failureRecord);
+                    }
+                });
+                // 장치 2(1-가 구현 설계 2절): 백업하는 동안 사람이 앱을 켰으면 파일을 바꾸기 전에 끝낸다. 여유 시간 안에 꺼지면 그대로 간다
+                Func<string,int,Action<InstallProgress>> startDuringBackup=delegate(string name,int stopAfter)
+                {
+                    bool started=false;
+                    return delegate(InstallProgress p)
+                    {
+                        Progress(p);
+                        if(p.Stage!=InstallStage.BackingUp||started)return;started=true;
+                        holdingProcess(name).Dispose();
+                        if(stopAfter>=0){string stop=Path.Combine(Root,name,"stop");new Thread(delegate(){Thread.Sleep(stopAfter);File.WriteAllText(stop,"stop");}){IsBackground=true}.Start();}
+                    };
+                };
+                Action<string> releaseHeld=delegate(string name){string folder=Path.Combine(Root,name);if(Directory.Exists(folder))File.WriteAllText(Path.Combine(folder,"stop"),"stop");Thread.Sleep(300);};
+                Check("an app opened during backup ends the automatic update unchanged, without a rollback barrier or relaunch",delegate
+                {
+                    using(Process exited=exitedParent())
+                    {
+                        int launches=0,installs=0;var checking=Engine(ReadSpec());checking.ProcessExitGraceMilliseconds=400;
+                        try
+                        {
+                            var result=Task.Run(delegate { return checking.InstallAutomaticUpdateCore(sessionFor(exited),startDuringBackup("second-check-stay",-1),delegate(Action<InstallProgress> progress){installs++;return "";},delegate(string executable,string arguments){launches++;}); }).GetAwaiter().GetResult();
+                            Assert(result.UserAppRunning&&!result.Updated&&!result.Restored&&!result.Relaunched&&launches==0&&installs==0,"Second check did not stop before changing files: "+result.Message);
+                            string pending=Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),"SYNK","Installer","Pending",Spec.Guid+".txt");
+                            Assert(!File.Exists(pending),"Second check left a rollback barrier.");
+                            string record=File.ReadAllText(failureRecord);
+                            Assert(record.Contains("\"stage\":\"second-check\"")&&record.Contains("\"outcome\":\"unchanged\""),"Second check was not recorded as unchanged: "+record);
+                        }
+                        finally { releaseHeld("second-check-stay"); if(File.Exists(failureRecord))File.Delete(failureRecord); }
+                        engine.VerifyInstalled();VerifyRegistrationAndShortcuts();
+                    }
+                });
+                Check("an app that quits within the grace time lets the update go on",delegate
+                {
+                    using(Process exited=exitedParent())
+                    {
+                        int launches=0;var checking=Engine(ReadSpec());checking.ProcessExitGraceMilliseconds=4000;
+                        try
+                        {
+                            var result=Task.Run(delegate { return checking.InstallAutomaticUpdateCore(sessionFor(exited),startDuringBackup("second-check-leave",300),delegate(Action<InstallProgress> progress) { throw new IOException("Synthetic payload failure"); },delegate(string executable,string arguments){launches++;}); }).GetAwaiter().GetResult();
+                            Assert(!result.UserAppRunning&&result.Restored&&result.Relaunched&&launches==1&&result.RestoredStatus=="rolled-back","An app that quit in time still stopped the update: "+result.Message);
+                            if(result.RecoveryFile!=null&&File.Exists(result.RecoveryFile))File.Delete(result.RecoveryFile);
+                        }
+                        finally { releaseHeld("second-check-leave"); if(File.Exists(failureRecord))File.Delete(failureRecord); }
+                        engine.VerifyInstalled();VerifyRegistrationAndShortcuts();
+                    }
+                });
+                // 장치 3: 파일을 바꾸는 중에 켜진 앱이 스스로 끝나는 사이를 기다린 뒤 되돌린다(전에는 바로 거절해 막힌 상태가 됐다)
+                Check("restore waits for an app that quits within the grace time instead of blocking recovery",delegate
+                {
+                    using(Process exited=exitedParent())
+                    {
+                        int launches=0;var restoring=Engine(ReadSpec());restoring.ProcessExitGraceMilliseconds=4000;
+                        try
+                        {
+                            var result=Task.Run(delegate { return restoring.InstallAutomaticUpdateCore(sessionFor(exited),Progress,delegate(Action<InstallProgress> progress)
+                            {
+                                holdingProcess("restore-wait").Dispose();
+                                string stop=Path.Combine(Root,"restore-wait","stop");new Thread(delegate(){Thread.Sleep(500);File.WriteAllText(stop,"stop");}){IsBackground=true}.Start();
+                                throw new IOException("Synthetic payload failure while the app was opened");
+                            },delegate(string executable,string arguments){launches++;}); }).GetAwaiter().GetResult();
+                            Assert(result.Restored&&result.Relaunched&&launches==1,"Restore did not wait for the app: "+result.Message);
+                            if(result.RecoveryFile!=null&&File.Exists(result.RecoveryFile))File.Delete(result.RecoveryFile);
+                        }
+                        finally { releaseHeld("restore-wait"); if(File.Exists(failureRecord))File.Delete(failureRecord); }
+                        string pending=Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),"SYNK","Installer","Pending",Spec.Guid+".txt");
+                        Assert(!File.Exists(pending),"A waited restore left the recovery barrier.");
+                        engine.VerifyInstalled();VerifyRegistrationAndShortcuts();
+                    }
+                });
+                // 「쓰던 판 열기」: 되돌린 뒤 켜지 못한 쓰던 판을 옛 판 해시를 다시 맞추고 되돌림 표시를 새로 써서 켠다
+                Check("open the previous version again rewrites the recovery marker and starts the verified old executable",delegate
+                {
+                    using(Process exited=exitedParent())
+                    {
+                        var reopening=Engine(ReadSpec());var session=sessionFor(exited);var heard=new List<string>();
+                        reopening.BeforeLaunch=delegate(string kind,string version){heard.Add(kind);};
+                        var result=Task.Run(delegate { return reopening.InstallAutomaticUpdateCore(session,Progress,delegate(Action<InstallProgress> progress) { throw new IOException("Synthetic payload failure"); },delegate(string executable,string arguments){throw new IOException("Synthetic recovery launch failure");}); }).GetAwaiter().GetResult();
+                        Assert(result.Restored&&!result.Relaunched&&result.RestoredStatus=="rolled-back","Restored launch failure was not reported: "+result.Message);
+                        File.Delete(result.RecoveryFile);
+                        string launched=Path.Combine(Spec.InstallDirectory,"fixture-launched");if(File.Exists(launched))File.Delete(launched);
+                        reopening.RelaunchPrevious(session,result.RestoredStatus);
+                        for(var clock=Stopwatch.StartNew();!File.Exists(launched)&&clock.ElapsedMilliseconds<5000;Thread.Sleep(40)){}
+                        Assert(File.Exists(launched)&&File.ReadAllText(launched)=="--synk-update-recovery="+session.Nonce,"Previous version was not opened with its recovery nonce.");
+                        Assert(File.Exists(result.RecoveryFile)&&File.ReadAllText(result.RecoveryFile).Contains(session.Nonce),"Recovery marker was not written again.");
+                        Assert(heard.Count==2&&heard[1]=="restored","Arrival note hook was not called before reopening: "+String.Join(",",heard));
+                        ExpectFailure(delegate { reopening.RelaunchPrevious(session,"updated"); });
+                        File.Delete(result.RecoveryFile);File.Delete(launched);if(File.Exists(failureRecord))File.Delete(failureRecord);
+                        engine.VerifyInstalled();
+                    }
+                });
                 Check("an unwritable failure record never changes the update outcome",delegate
                 {
                     Directory.CreateDirectory(failureRecord);
@@ -375,6 +604,11 @@ internal static class SignalInstallerTests
                     using(var key=hive.CreateSubKey(AppModelKey()))
                     { key.SetValue("DisplayName","fixture previous registration");key.SetValue("FixtureInteger",42,RegistryValueKind.DWord); }
                     RunAutomaticFixture((string)Fixture["autoFailure"],false);
+                    // 조용한 업데이트: 넘김 쪽지가 「조용히」이면 창을 보이지 않고 되돌린 쓰던 앱을 켜며, 그 앱이 숨은 채 켜지도록 도착 쪽지에 숨음을 적는다
+                    RunAutomaticFixture((string)Fixture["autoFailure"],false,true);
+                    // 앱 쪽 넘김이 반쯤 깨진 두 모습: 읽을 수 없는 쪽지, 가림막이 뜨지 못한 쪽지. 설치기는 쪽지 없는 옛 길처럼 창을 보이며 끝까지 간다
+                    RunAutomaticFixture((string)Fixture["autoFailure"],false,false,"broken");
+                    RunAutomaticFixture((string)Fixture["autoFailure"],false,false,"stale-curtain");
                     engine.VerifyInstalled(); VerifyRegistrationAndShortcuts();
                     using(var hive=RegistryKey.OpenBaseKey(RegistryHive.CurrentUser,RegistryView.Registry64))
                     using(var key=hive.OpenSubKey(AppModelKey()))
@@ -453,7 +687,9 @@ internal static class SignalInstallerTests
         using (var stream = File.OpenRead(FixtureJson))
             return (InstallSpec)new DataContractJsonSerializer(typeof(InstallSpec)).ReadObject(stream);
     }
-    private static void RunAutomaticFixture(string wrapper,bool success)
+    // noteKind: null(쪽지 없음, 0.4.95 앱이 넘기는 길), "broken"(읽을 수 없는 쪽지), "stale-curtain"(가림막을 가리키지만 가림막이 뜨지 못한 쪽지).
+    // 앱 쪽 넘김이 반쯤 깨져도 설치기는 창을 보이며 끝까지 간다(맡긴 세션 11-17 조건 1의 설치기 쪽)
+    private static void RunAutomaticFixture(string wrapper,bool success,bool quiet=false,string noteKind=null)
     {
         Assert(IsInside(wrapper,Root),"Automatic wrapper escaped fixture root.");
         string nonce=System.Guid.NewGuid().ToString("N")+System.Guid.NewGuid().ToString("N"),hold=Path.Combine(Root,"auto-parent-"+nonce),launched=Path.Combine(Spec.InstallDirectory,"fixture-launched");
@@ -461,9 +697,19 @@ internal static class SignalInstallerTests
         using(var parent=Process.Start(new ProcessStartInfo(Path.Combine(Spec.InstallDirectory,Spec.ExecutableName),"--hold \""+hold+"\""){UseShellExecute=false,CreateNoWindow=true,WindowStyle=ProcessWindowStyle.Hidden}))
         {
             WaitFor(delegate{return File.Exists(Path.Combine(hold,"ready"));},"Automatic parent did not become ready.");
+            string handoffFolder=Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),"SYNK","Installer","Handoff");
+            string note=Path.Combine(handoffFolder,Spec.AppId+".handoff.json"),arrival=Path.Combine(handoffFolder,Spec.AppId+".arrival.json"),updating=Path.Combine(handoffFolder,Spec.AppId+".updating.json");
+            if(File.Exists(arrival))File.Delete(arrival);
+            if(quiet){Directory.CreateDirectory(handoffFolder);File.WriteAllText(note,"{\"schemaVersion\":1,\"token\":\""+nonce+"\",\"appPid\":"+parent.Id+",\"version\":\"0.0.2\",\"window\":0,\"x\":100,\"y\":100,\"width\":1440,\"height\":940,\"maximized\":false,\"visibility\":\"hidden\",\"quiet\":true,\"cut\":0.5,\"curtainEvent\":null,\"writtenAt\":\"2026-11-17T00:00:00.000Z\"}");}
+            else if(noteKind=="broken"){Directory.CreateDirectory(handoffFolder);File.WriteAllText(note,"{\"schemaVersion\":1,\"token\":\""+nonce+"\",\"appPid\":"+parent.Id+",\"vers");}
+            else if(noteKind=="stale-curtain"){Directory.CreateDirectory(handoffFolder);File.WriteAllText(note,"{\"schemaVersion\":1,\"token\":\""+nonce+"\",\"appPid\":"+parent.Id+",\"version\":\"0.0.2\",\"window\":0,\"watchWindow\":0,\"x\":100,\"y\":100,\"width\":1440,\"height\":940,\"maximized\":false,\"visibility\":\"front\",\"quiet\":false,\"cut\":0.5,\"curtainEvent\":\"Local\\\\SYNK.Curtain."+nonce.Substring(0,32)+"\",\"writtenAt\":\"2026-11-17T00:00:00.000Z\"}");}
+            else Assert(noteKind==null,"Unknown handoff note kind: "+noteKind);
             var start=new ProcessStartInfo(wrapper,"--auto-update --wait-pid="+parent.Id+" --handoff-token="+nonce){UseShellExecute=false,CreateNoWindow=true,WindowStyle=ProcessWindowStyle.Hidden,RedirectStandardOutput=true,RedirectStandardError=true};
             using(var child=Process.Start(start))
             {
+                bool sawWindow=false;var watching=true;
+                var watcher=new Thread(delegate(){while(watching){try{child.Refresh();if(!child.HasExited&&child.MainWindowHandle!=IntPtr.Zero)sawWindow=true;}catch(Exception){}Thread.Sleep(40);}}){IsBackground=true};
+                watcher.Start();
                 try
                 {
                     var ready=child.StandardOutput.ReadLineAsync();
@@ -473,7 +719,10 @@ internal static class SignalInstallerTests
                     Assert(parent.WaitForExit(5000),"Parent did not exit normally.");
                     string arguments=null;
                     WaitFor(delegate{try { if(!File.Exists(launched))return false;arguments=File.ReadAllText(launched);return true; }catch(IOException){return false;}},"Automatic installer did not finish its fixture launch receipt.",30000);
-                    if(success) { Assert(arguments=="","Successful update used a startup bypass.");Assert(child.WaitForExit(10000),"Successful installer did not close itself.");Assert(child.ExitCode==0,"Successful installer failed."); }
+                    if(success) { Assert(arguments=="","Successful update used a startup bypass.");Assert(child.WaitForExit(10000),"Successful installer did not close itself.");Assert(child.ExitCode==0,"Successful installer failed.");
+                        Assert(!File.Exists(updating),"The updating marker was left after the update.");
+                        if(quiet){watching=false;Assert(!sawWindow,"Quiet update showed an installer window.");string text=File.ReadAllText(arrival);Assert(text.Contains("\"visibility\":\"hidden\"")&&text.Contains("\"kind\":\"updated\"")&&text.Contains("\"x\":100"),"Quiet arrival note: "+text);}
+                        else Assert(sawWindow,"Visible update never showed its window."); }
                     else
                     {
                         Assert(arguments=="--synk-update-recovery="+nonce,"Restored app did not receive its exact one-use nonce.");
@@ -485,10 +734,15 @@ internal static class SignalInstallerTests
                         File.Delete(marker);
                         Assert(child.WaitForExit(10000),"Restored installer did not close itself and release the retry mutex.");
                         Assert(child.ExitCode==0,"Restored installer failed to close normally.");
+                        Assert(!File.Exists(updating),"The updating marker was left after the restore.");
+                        if(quiet){watching=false;Assert(!sawWindow,"Quiet restore showed an installer window.");string text=File.ReadAllText(arrival);Assert(text.Contains("\"visibility\":\"hidden\"")&&text.Contains("\"kind\":\"restored\"")&&text.Contains("\"version\":\"0.0.1\""),"Quiet restore arrival note: "+text);}
+                        else Assert(sawWindow,"Visible restore never showed its window.");
                     }
                 }
                 finally
                 {
+                    watching=false;
+                    if(File.Exists(note))File.Delete(note);if(File.Exists(arrival))File.Delete(arrival);
                     if(!parent.HasExited){File.WriteAllText(Path.Combine(hold,"stop"),"normal fixture cleanup");parent.WaitForExit(5000);}
                     if(!child.HasExited){child.CloseMainWindow();child.WaitForExit(5000);}
                 }
@@ -535,8 +789,15 @@ internal static class SignalInstallerTests
     }
     private static void Check(string name, Action action)
     {
-        try { action(); Checks.Add(new { name = name, ok = true }); }
-        catch (Exception error) { Checks.Add(new { name = name, ok = false, error = error.Message }); throw; }
+        // 검사마다 걸린 시간을 진행 파일에 적는다. 실행기가 시간 제한으로 이 시험을 끊어도 어디까지 왔는지 남는다
+        var watch = Stopwatch.StartNew();
+        try { action(); Checks.Add(new { name = name, ok = true, ms = watch.ElapsedMilliseconds }); }
+        catch (Exception error) { Checks.Add(new { name = name, ok = false, ms = watch.ElapsedMilliseconds, error = error.Message }); Progress(name, watch, "FAIL"); throw; }
+        Progress(name, watch, "ok");
+    }
+    private static void Progress(string name, Stopwatch watch, string result)
+    {
+        try { File.AppendAllText(Path.Combine(Root, "test-progress.txt"), result + "\t" + watch.ElapsedMilliseconds + "ms\t" + name + Environment.NewLine); } catch (Exception) { }
     }
     private static void WaitFor(Func<bool> ready, string error, int timeout = 7000)
     {

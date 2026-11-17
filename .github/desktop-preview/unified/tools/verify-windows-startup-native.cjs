@@ -40,6 +40,9 @@ function observe(config){
   shell.openExternal=async url=>{opened.push({kind:'external',url});};
   shell.openPath=async()=>{forbidden.push({operation:'shell.openPath'});return 'QA_INSTALLER_OPEN_FORBIDDEN';};
   const updates=require(app.getAppPath()+'/src/platform-update.cjs'),original=updates.createPlatformUpdater;
+  // 첫 피드 답은 시작 창 캡처가 끝난 뒤에 돌려준다. 느린 러너에서 관문의 4초 먼저 열기가 그보다 앞서 앱 창을 열지 않게 이 실행에서만 늘린다(0.4.96 Fable F3)
+  const gates=require(app.getAppPath()+'/src/platform-startup-update.cjs'),originalGate=gates.createStartupUpdateGate;
+  gates.createStartupUpdateGate=options=>originalGate({...options,earlyOpenMs:60000});
   const runtime=JSON.parse(fs.readFileSync(app.getAppPath()+'/runtime.json','utf8'));
   check('candidate runtime identity',runtime.update.buildId===config.buildId&&runtime.update.releaseId==='platform-preview-'+config.version);
   // The candidate must pin real signing keys and refuse an unsigned feed; the QA feed below is signed by a
@@ -75,6 +78,8 @@ function observe(config){
   app.on('browser-window-created',(_event,created)=>{process.stderr.write('SYNK_QA_TRACE window-created\n');
     created.show=()=>{};created.showInactive=()=>{};created.focus=()=>{};
     const contents=created.webContents;contents.setBackgroundThrottling(false);contents.setAudioMuted(true);blockNetwork(contents);
+    // 얼굴 단계 기록은 앱 창의 dom-ready에서 바로 심는다. did-finish-load 뒤에 심으면 본체가 넘긴 드러남 시각만큼 welcome이 짧아져, 느린 러너에서 welcome을 놓칠 수 있었다(0.4.96 공개 후보 Fable P3). 아래 기다림 식의 심기는 이미 심었으면 그냥 지나간다
+    contents.on('dom-ready',()=>{if(contents.getURL()==='synk-desktop://platform/index.html')void contents.executeJavaScript("(()=>{if(window.__orbSeenPlant)return true;window.__orbSeenPlant=true;const plant=p=>{if(window.__orbSeen)return;const seen=window.__orbSeen=[p.dataset.portalState||''];const add=v=>{const s=v||'';if(seen[seen.length-1]!==s)seen.push(s);};new MutationObserver(list=>{for(const r of list)add(r.oldValue);add(p.getAttribute('data-portal-state'));}).observe(p,{attributes:true,attributeOldValue:true,attributeFilter:['data-portal-state']});};const p=document.getElementById('portal-entry');if(p){plant(p);return true;}const o=new MutationObserver(()=>{const q=document.getElementById('portal-entry');if(q){o.disconnect();plant(q);}});o.observe(document.documentElement,{childList:true,subtree:true});return true;})()",true).catch(()=>{});});
     // Windows exposes preloadURL rather than preload in early preferences.
     // Classify only after the exact production document has finished loading.
     contents.once('did-finish-load',()=>{
@@ -82,8 +87,9 @@ function observe(config){
       startupWindow=created;startupCount++;
       (async()=>{try{
         await waitFor(contents,"document.documentElement.dataset.startupReady==='true'",'startup-renderer');
-        const state=await contents.executeJavaScript("(async()=>({status:await synkStartupUpdate.getStatus(),title:document.title,text:document.body.innerText,desktop:typeof synkDesktop,node:typeof require,keys:Object.keys(synkStartupUpdate)}))()",true);
-        check('real startup window is isolated and checking',state.status.state==='checking'&&state.title==='SYNK Platform 업데이트'&&state.text.includes('최신 버전을 확인하고 있어요')&&state.desktop==='undefined'&&state.node==='undefined'&&state.keys.sort().join(',')==='getStatus,install,onChanged,openCurrent,retry',state);
+        // 1-가 시작 창은 확인하는 동안 구만 보이고 문장 칸은 숨는다. 문장은 그 칸의 글로, 구만 보이는 것은 data-ui로, 실제로 숨었는지는 보이는 글(innerText)이 빈 것으로 본다(0.4.96 대역 빌드 검사, 공개 후보 Fable P2)
+        const state=await contents.executeJavaScript("(async()=>({status:await synkStartupUpdate.getStatus(),title:document.title,text:document.body.innerText,say:document.getElementById('startup-say')?.textContent||'',ui:document.getElementById('startup-update')?.dataset.ui||'',desktop:typeof synkDesktop,node:typeof require,keys:Object.keys(synkStartupUpdate)}))()",true);
+        check('real startup window is isolated and checking',state.status.state==='checking'&&state.title==='SYNK Platform'&&state.say==='새 판을 확인하고 있습니다.'&&state.ui==='none'&&state.text.trim()===''&&state.desktop==='undefined'&&state.node==='undefined'&&state.keys.sort().join(',')==='close,getStatus,install,minimize,onChanged,onWindowState,openCurrent,retry,toggleMaximize',state);
         check('startup window stays hidden in QA',!created.isVisible());
         await capture(created,'startup-checking');startupReadyResolve();
       }catch(error){startupReadyReject(error);errors.push(error.stack||error.message);void finish(false);}})();
@@ -95,7 +101,9 @@ function observe(config){
       check('actual packaged Windows candidate',app.isPackaged&&app.getAppPath()===config.archive&&process.platform==='win32'&&process.arch==='x64'&&app.getVersion()===config.version);
       check('profile isolated before main initialization',app.getPath('userData').startsWith(config.appData+path.sep));
       check('production gate reaches current before one main window',startupCount===1&&mainCount===1&&states.join(',')==='checking,current'&&feedRequests===1,{states:states.slice(),feedRequests});
-      await waitFor(contents,"location.href==='synk-desktop://platform/index.html'&&document.documentElement.dataset.ready==='true'",'main-renderer');
+      // 한 번에 묶여 온 바뀜은 옛 값을 차례로 적고 지금 값을 끝에 한 번만 적는다. 바뀜마다 지금 값을 끼우면 차례가 뒤집혔다(0.4.96 카본 E4)
+      // 얼굴의 단계 바뀜을 앱이 뜨자마자 적어 둔다. 느린 러너에서는 검사기가 welcome을 잡기 전에 얼굴이 묻는 화면으로 커진다(0.4.95 첫 빌드 Mac x64, Mac 사본과 같다)
+      await waitFor(contents,"(()=>{const p=document.getElementById('portal-entry');if(!p)return false;if(!window.__orbSeen){const seen=window.__orbSeen=[p.dataset.portalState||''];const add=v=>{const s=v||'';if(seen[seen.length-1]!==s)seen.push(s);};new MutationObserver(list=>{for(const r of list)add(r.oldValue);add(p.getAttribute('data-portal-state'));}).observe(p,{attributes:true,attributeOldValue:true,attributeFilter:['data-portal-state']});}return location.href==='synk-desktop://platform/index.html'&&document.documentElement.dataset.ready==='true';})()",'main-renderer');
       await waitFor(contents,"window.synkDesktop.authStatus().then(auth=>auth.status==='signed-out')",'signed-out');
       const state=await run("(async()=>({environment:await synkDesktop.getEnvironment(),auth:await synkDesktop.authStatus(),update:await synkDesktop.updateStatus(),node:typeof require,startup:typeof synkStartupUpdate,methods:['authSignUp','updateStatus','checkForUpdate','downloadUpdate','installUpdate','onUpdateChanged'].every(key=>typeof synkDesktop[key]==='function')}))()");
       check('native environment and fixed update bridges',state.environment.clientId==='platform'&&state.environment.nativeShell===true&&state.environment.version===config.version&&state.environment.platform==='win32'&&state.environment.arch==='x64'&&state.node==='undefined'&&state.startup==='undefined'&&state.methods);
@@ -108,9 +116,9 @@ function observe(config){
         check(name,probe?.ok===true,probe);
       };
       // 검정 구 얼굴(PC 클라이언트 1단계, 1단계_구현설계.md 15절): 구만 보이고, 누르지 않아도 묻는 화면으로 커지고, 검사 실행 길로 솔리오까지 간다.
-      await waitFor(contents,"(()=>{const p=document.getElementById('portal-entry'),l=document.querySelector('.launcher');return !!p&&!p.hidden&&p.dataset.portalActive==='true'&&p.dataset.portalState==='welcome'&&p.dataset.portalAuthStatus==='signed-out'&&p.dataset.orbClient==='portal'&&!!l&&l.inert===true;})()",'orb-welcome');
-      const welcome=await run("(()=>{const p=document.getElementById('portal-entry'),l=document.querySelector('.launcher'),c=p?.querySelector('.orb-canvas')?.getBoundingClientRect();return {portalState:p?.dataset.portalState,portalActive:p?.dataset.portalActive,orbClient:p?.dataset.orbClient,portalHidden:Boolean(p?.hidden),docPortalActive:document.documentElement.dataset.portalActive,launcherInert:Boolean(l?.inert),launcherInertAttr:Boolean(l?.hasAttribute('inert')),canvasCovers:!!c&&c.width>=innerWidth-1&&c.height>=innerHeight-1};})()");
-      check('orb starts alone at welcome with launcher inert',welcome.portalState==='welcome'&&welcome.portalActive==='true'&&welcome.orbClient==='portal'&&!welcome.portalHidden&&welcome.docPortalActive==='true'&&welcome.launcherInert&&welcome.launcherInertAttr&&welcome.canvasCovers,welcome);
+      await waitFor(contents,"(()=>{const p=document.getElementById('portal-entry'),l=document.querySelector('.launcher');return !!p&&!p.hidden&&p.dataset.portalActive==='true'&&(p.dataset.portalState==='welcome'||(window.__orbSeen||[]).includes('welcome'))&&p.dataset.portalAuthStatus==='signed-out'&&p.dataset.orbClient==='portal'&&!!l&&l.inert===true;})()",'orb-welcome');
+      const welcome=await run("(()=>{const p=document.getElementById('portal-entry'),l=document.querySelector('.launcher'),c=p?.querySelector('.orb-canvas')?.getBoundingClientRect();return {portalState:p?.dataset.portalState,seen:window.__orbSeen||[],portalActive:p?.dataset.portalActive,orbClient:p?.dataset.orbClient,portalHidden:Boolean(p?.hidden),docPortalActive:document.documentElement.dataset.portalActive,launcherInert:Boolean(l?.inert),launcherInertAttr:Boolean(l?.hasAttribute('inert')),canvasCovers:!!c&&c.width>=innerWidth-1&&c.height>=innerHeight-1};})()");
+      check('orb starts alone at welcome with launcher inert',(welcome.portalState==='welcome'||welcome.seen.includes('welcome'))&&!(welcome.seen.indexOf('welcome')<0?welcome.seen:welcome.seen.slice(0,welcome.seen.indexOf('welcome'))).some(s=>s&&s!=='welcome')&&welcome.portalActive==='true'&&welcome.orbClient==='portal'&&!welcome.portalHidden&&welcome.docPortalActive==='true'&&welcome.launcherInert&&welcome.launcherInertAttr&&welcome.canvasCovers,welcome);
       // 누르지 않는다. 복원 결과(로그아웃)가 나온 뒤 1.35초 기다림을 지나 스스로 커지는 것까지가 검사다
       await waitFor(contents,"(()=>{const p=document.getElementById('portal-entry'),s=p?.querySelector('.orb-stage');return !!p&&p.dataset.portalState==='auth'&&s?.dataset.ui==='ask';})()",'orb-auth');
       for(const width of [1280,1024]){
