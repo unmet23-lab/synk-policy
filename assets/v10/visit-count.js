@@ -130,13 +130,21 @@ export function targetOf(el, here) {
 }
 
 /** 누른 링크가 사이트 안으로 가는가 — 떠남 줄의 「다음」에 쓴다 */
-/** 지금 쪽과 경로 · 질의가 같고 # 뒤만 다른 링크(쪽 안 이동) */
-function samePageLink(el, here) {
-  try { const u = new URL(el.getAttribute('href'), here), h = new URL(here); return u.origin === h.origin && u.pathname === h.pathname && u.search === h.search; } catch { return false; }
-}
-
 function insideLink(el, here) {
   try { const u = new URL(el.getAttribute('href'), here); return INTERNAL.test(u.hostname.toLowerCase()) && (u.protocol === 'https:' || u.protocol === 'http:'); } catch { return false; }
+}
+
+/**
+ * 쪽 안 이동인가 — href 원문에 #이 있고, 경로 · 질의가 지금 쪽과 같은 링크. # 없는 같은 주소 링크(로고, 지금 쪽 메뉴)는
+ * 쪽을 다시 불러오므로 쪽 안 이동이 아니다. href="#"은 URL의 hash가 빈 글이라 원문으로 본다(화면 검수 11-17).
+ */
+function samePageLink(el, here) {
+  try {
+    const raw = el.getAttribute('href') || '';
+    if (!raw.includes('#')) return false;
+    const u = new URL(raw, here), h = new URL(here);
+    return u.origin === h.origin && u.pathname === h.pathname && u.search === h.search;
+  } catch { return false; }
 }
 
 /** 설문지에 보낼 값. 허용 목록 밖의 값이 있으면 null(보내지 않는다). 값은 JSON 한 줄로 「기록」 칸 하나에 담는다. */
