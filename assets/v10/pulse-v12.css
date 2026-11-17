@@ -3,7 +3,7 @@
    바닥: 11-04 크롤링 평균 — 작품이 화면 87~100%, 글자 3~4단, 단추 · 칸 · 둥글림 없음, 작은 글은 귀퉁이, 전환 0.7~1.2초 · 손 반응 0.2~0.3초.
    11-06 디자인 참고 장부 평균: 제목 자간 −0.012em 안팎(한글은 0), 한글 본문 17px, 직사각 단추, 고정폭은 숫자에만.
    검은 칸(시사실 · 작품 · 영상 제작 · AI 모델 · 만드는 사람) → 인화지 의뢰 띠 → 흰 문의 칸(site.css 그대로). */
-@font-face{font-family:'SYNK Pulse Serif';src:url('/assets/v10/serif-pulse-v12.woff2') format('woff2');font-weight:300;font-display:swap}
+@font-face{font-family:'SYNK Pulse Serif';src:url('/assets/v10/serif-pulse-v12.woff2?v=2a9614b6cc78') format('woff2');font-weight:300;font-display:swap}
 .pv-hall,.pv-dark{--ink:#f2efe9;--ink-2:rgba(242,239,233,.72);--ink-3:rgba(242,239,233,.6);--ink-4:rgba(242,239,233,.48);--line:rgba(242,239,233,.16);--line-2:rgba(242,239,233,.3);--pv-bg:#0a0a0b;background:var(--pv-bg);color:var(--ink-2);color-scheme:dark}
 .pv-dark :focus-visible,.pv-hall :focus-visible{outline-color:#f2efe9}
 .pv-serif{font-family:'SYNK Pulse Serif','Noto Serif KR','Nanum Myeongjo',serif;font-weight:300;letter-spacing:0;color:var(--ink);text-wrap:balance}
@@ -198,7 +198,8 @@
 }
 /* ①-2 세로 화면의 시사실(11-10) — 첫 화면 글은 얼굴 줄 아래에만 둔다(쇼릴 규칙 「첫 화면 글이 얼굴을 덮지 않는 프레임만」).
    폭 900 아래에서 화면이 4:5보다 길면 pulse-v12.js가 세로 쇼릴(1080×1920)을 싣는데, 그 쇼릴은 얼굴이 원본 높이의 58%까지 내려온다
-   (오미톡 2.42~2.54초 입을 크게 벌린 턱이 y 약 1,105 — 쇼릴을 바꾸면 --pv-face를 다시 잰다). 쇼릴은 화면 한 장 높이에 가운데 맞춤 cover로 깔리니
+   (11-10 c판: 오미톡 2.42~2.54초 입을 크게 벌린 턱이 y 약 1,105 — 쇼릴을 바꾸면 --pv-face를 다시 잰다. 11-17 메인 네 편 4판에는 오미톡이 없고, 가장 낮은 얼굴은
+   첨벙댕 의자 위의 개(세로 판 끝 두 컷 · 11-18에 물 찬 방과 우주를 바꿈) 상자 아래 끝 y 760(40%)이다. 사람 얼굴은 「매진 임박」 y 743(39%)까지, 서울로 띠는 y 420~662(22~34%)라 .58을 그대로 둔다). 쇼릴은 화면 한 장 높이에 가운데 맞춤 cover로 깔리니
    그 줄은 위에서 50svh + (0.58 − 0.5) × 쇼릴이 그려지는 높이(max(100svh, 폭 × 16/9)) + 12px다. 첫 행이 그 줄까지 비우고 머리글 · 제목 · 작품 줄 · 단추 ·
    번호 줄은 첫 화면 바닥에 붙는다(::before가 행 1~5를 화면 한 장 높이로 받친다). 작은 휴대폰에서 모자라면 첫 화면 아래로 이어지고, 쇼릴은 화면 한 장
    높이 그대로라 얼굴이 따라 내려오지 않는다. 바닥 그늘은 쇼릴 끝에서 아래 칸 바탕색(#0a0a0b)이 되어 아래로 이어진 글 · 「작품」과 경계 없이 이어진다.
@@ -258,8 +259,8 @@ html[lang="en"] .pv-h1{font-size:clamp(36px,5.2vw,82px);text-shadow:0 1px 10px r
    바닥에서 24px 위에 붙인다. 소개 줄은 쇼릴 바로 아래로 옮기고 번호 줄 · 작품 아래 줄은 뺀다. 제목을 줄이기보다 얼굴 아래 바닥으로 내리는 쪽이 먼저다
    (11-14 · 11-15 결정 — 두 번 다 제목을 줄이는 판 대신 이 배치를 골랐다).
    얼굴(11-17): 가로 쇼릴(높이 R = max(화면 높이, 폭 × 0.625) · 폭 1.6R · 가운데 맞춤)의 모든 프레임 얼굴 상자에 턱 여유 6%를 더한 바닥을 자리 넷으로 묶었다 —
-   a 왼쪽 배우(「매진 임박」 · 입을 가린 손 · 쇼릴 폭의 16.4~31%, 턱 51.5%), b 가운데 배우(클로즈업 끝 · 42.5%부터, 55%), c 모두의코스 셀카 뒤 군중(52.6%부터, 56.8%),
-   d 오미톡 남자(입 벌린 턱 · 55.1%부터, 60.9%). 제목 크기 한계는 자리마다 「그 줄의 글자 잉크가 턱 아래」와 「그 줄이 자리 왼쪽 끝 앞에서 끝남」 가운데 큰 값이다
+   a 왼쪽 배우(「매진 임박」 · 입을 가린 손 · 쇼릴 폭의 16.4~31%, 턱 51.5%), b 가운데 배우(클로즈업 끝 · 42.5%부터, 55%), c 첨벙댕 물 찬 방의 개(넓은 판만 · 57.3%부터, 62.3% — 11-18 쇼릴 4판), d 우주의 개(64.6%부터, 59.5%).
+   11-17 앞 3판의 c(모두의코스 셀카 뒤 군중 · 52.6%부터 56.8%)와 d(오미톡 남자 · 55.1%부터 60.9%)는 4판에 없다 — 개 얼굴은 YuNet이 잡지 못해 손으로 잰 상자다(SYNK-appsscript tools/pulse-hall-faces/data/faces-wide-20261117.json의 manual). 제목 크기 한계는 자리마다 「그 줄의 글자 잉크가 턱 아래」와 「그 줄이 자리 왼쪽 끝 앞에서 끝남」 가운데 큰 값이다
    (min(…, max(턱 아래, 비켜 감), …) — 한국어는 가장 긴 첫 줄(8.73em · 잉크 위 = 바닥 − 3.2em), 영어는 세 줄 모두(4.87 · 6.54 · 9.21em, 3.14 · 2.04 · 0.94em)).
    머리글(폭 204px 안 · 잉크 위 = 바닥 − 3.3em − 사이 − 18px)은 자리 a만 닿는다. 제목 바닥값(28px)으로도 머리글이 자리 a의 턱 위에 남는 아주 낮고 넓은 창
    (높이 320~340 언저리 · 폭 약 1450 이상 — 앞 판에서는 2000~2880 × 320에서 닿았다)에서는 바닥값을 그 한계까지 내린다(20px 아래로는 내리지 않는다). 쇼릴을 바꾸면 자리 값(--pv-z*)과 --pv-face를 함께 다시 잰다(SYNK-website site-v10/README.md 「PULSE 첫 화면의 얼굴 줄」).
@@ -267,7 +268,7 @@ html[lang="en"] .pv-h1{font-size:clamp(36px,5.2vw,82px);text-shadow:0 1px 10px r
    11-17 앞에는 폭 601~900 · 높이 760 이상(①-1)과 폭 900 초과 · 높이 1000 이상(①-4)이 앞 배치였다. 두 배치와 이 배치의 앞 판은 눈 · 입 줄만 셈해, 클로즈업 끝의
    가운데 배우 턱 · 왼쪽 배우의 손 아래 턱 · 셀카 뒤 군중 얼굴에 제목 · 머리글이 닿았다(1920×1080 34px · 2048×1000 56px · 펼친 접는 폰 690×829 영어 머리글 15px). */
 @media (min-width:540px){@media not all and (max-aspect-ratio:4/5){
-  .pv-hall{--pv-face:.479;--pv-za-x0:.164;--pv-za-x1:.31;--pv-za-chin:.515;--pv-zb-x0:.425;--pv-zb-chin:.55;--pv-zc-x0:.526;--pv-zc-chin:.568;--pv-zd-x0:.551;--pv-zd-chin:.609;
+  .pv-hall{--pv-face:.479;--pv-za-x0:.164;--pv-za-x1:.31;--pv-za-chin:.515;--pv-zb-x0:.425;--pv-zb-chin:.55;--pv-zc-x0:.573;--pv-zc-chin:.623;--pv-zd-x0:.646;--pv-zd-chin:.595;
     --pv-low-in:min(100vw - var(--gut) * 2,var(--wrap));--pv-low-side:clamp(172px,var(--pv-low-in) * .3,212px);height:auto;min-height:0;background:var(--pv-bg)}
   .pv-reel,.pv-hall::after{bottom:auto;height:100vh;height:100svh}
   /* 바닥 그늘은 쇼릴 끝에서 아래 칸 바탕색이 되어 아래로 옮긴 소개 줄과 이어지고, 오른쪽 아래 구석 그늘 한 겹이 오른쪽 칸의 작은 글을 받친다 */
@@ -310,9 +311,10 @@ html[lang="en"] .pv-h1{font-size:clamp(36px,5.2vw,82px);text-shadow:0 1px 10px r
 /* ①-3의 넓은 창 밀기(폭 1484 이상 · 높이 900 아래, 11-13 · 11-17 · 11-18): 글 칸은 1240px에서 멈추는데 쇼릴은 화면 폭을 따라 커져, 오른쪽 칸이 쇼릴 가운데 · 오른쪽
    얼굴 자리(오미톡 남자 55~72% · 셀카 남자 65~76% · 턱 59~61%)로 들어온다 — 2560×600에서 의뢰 단추가 입 위였고, 턱까지 세면 1800×500 · 1920×540 · 3840×820도 닿았다.
    오른쪽 칸을 그 얼굴들의 오른쪽 끝(쇼릴 폭의 76.4% — 이 구간은 쇼릴 폭 = 화면 폭) 밖으로 민다: 칸 왼쪽 끝이 화면 폭의 77.5%에 온다. 76.5%에 두면 모두의코스 컷 끝에
-   한국어 작품 줄이 셀카 남자의 뺨 4~7px 옆까지 붙었다(11-18). 미는 거리(27.5vw + 칸 폭 − 글 칸/2)는 폭 1484에서 0이라 그 폭부터 걸면 튀지 않는다
-   (11-13 판은 폭 2000 이상 · 높이 600 아래에만 걸었다). 높이 900부터는 칸이 그 턱보다 아래다. */
-@media (min-width:1484px) and (max-height:899.98px){.pv-side{transform:translateX(calc(27.5vw + var(--pv-low-side) - var(--pv-low-in) / 2))}}
+   한국어 작품 줄이 셀카 남자의 뺨 4~7px 옆까지 붙었다(11-18). 쇼릴 4판(11-18)에는 두 남자가 없고 이 자리의 가장 오른쪽 얼굴은 우주의 개(쇼릴 폭의 75.5%)라 77.5%가 그대로 맞다. 미는 거리(27.5vw + 칸 폭 − 글 칸/2)는 폭 1484에서 0이라 그 폭부터 걸면 튀지 않는다
+   (11-13 판은 폭 2000 이상 · 높이 600 아래에만 걸었다). 높이 900부터는 칸이 그 턱보다 아래다 — 다만 쇼릴 4판(11-18)의 물 찬 방 개(쇼릴 폭의 57~73%, 턱 62.3%)는
+   쇼릴이 화면보다 아주 높아지는 아주 넓은 창에서 내려와, 3840×900에서 한국어 작품 줄이 개 턱 여유에 3px 닿았다(셈으로는 높이 < 0.153 × 폭 + 316 — 5120 폭은 높이 1100까지). 그래서 화면이 4:1보다 넓으면 높이와 상관없이 민다. */
+@media (min-width:1484px) and (max-height:899.98px),(min-width:1484px) and (min-aspect-ratio:4/1){.pv-side{transform:translateX(calc(27.5vw + var(--pv-low-side) - var(--pv-low-in) / 2))}}
 /* 폭 1484 이상 · 높이 500 아래는 위 「높이 500 아래」가 오른쪽 칸 상자를 풀어(display:contents) 칸 밀기(transform)가 듣지 않는다(11-17 검수) —
    단추 하나를 같은 거리만큼 민다. translate 속성이라 단추의 :hover transform:none과 겹치지 않는다. */
 @media (min-width:1484px) and (max-height:499.98px){@media not all and (max-aspect-ratio:4/5){.pv-side .btn.pv-cta{translate:calc(27.5vw + var(--pv-low-side) - var(--pv-low-in) / 2) 0}}}
@@ -410,3 +412,33 @@ body[data-k="pulse"] .qa-mark{font-weight:600}
   .pv-how li{padding:10px 0}
   .pv-how li>span{font-size:var(--k1);line-height:1.55}
 }
+
+/* ── 메인 네 편(11-17) ─────────────────────────────────────────────────────────────
+   유호님 「메인을 도담이랑 최근에 서울로 단편애니메이션 수상작 첨벙댕 그리고 매진임박」 → 시안을 보시고 「시안대로 반영」. 큰 줄 차례는 도담중공업(가로) · 「다리가 기억하는 것」
+   (2000×550 아주 넓은 작품) · 첨벙댕(세로) · 「매진 임박」(가로)이다. 짧은 판의 가로 · 세로 짝(1.7778 : 0.5625)은 세로 작품이 하나라 짝이 맞지 않아, 시안대로 한 줄에 한 편씩
+   엇갈려 놓는다 — 가로 작품은 안쪽 폭의 72%(짝수 번째는 오른쪽), 아주 넓은 작품은 한 폭 전부(자르지 않는다 — 40:11 칸, 미리 보기 1600×440), 세로 작품은 칸 폭의 30%(400px까지)
+   옆에 설명을 바닥에 맞춰 둔다. 작품 구역은 쪽 길이 관문 밖이다(결정 11-15). 900px 이하는 모두 한 폭이고(세로 작품은 그림 46% 옆에 설명), 아주 넓은 작품은 좌우 여백 없이
+   화면 끝까지 쓴다(390 폭에서 그림 높이 107px — 여백을 두면 96px). 「더 많은 작품」 아홉은 원고의 셋씩 세 줄 그대로(skeleton-pages.mjs) — 넓은 화면은 줄마다 화면 비율
+   그대로 높이를 맞추고, 1000px 이하는 세 칸 정사각(두 칸이면 줄마다 한 칸이 혼자 남는다), 700px 이하는 짧은 판 그대로 옆으로 넘기는 한 줄이다. */
+.pv-works{grid-template-columns:minmax(0,1fr)}
+.pv-work{width:72%}
+.pv-work:nth-child(even){width:72%;margin-left:auto}
+.pv-work.is-pano{width:100%}
+.pv-work.is-pano .pv-frame{aspect-ratio:40/11}
+.pv-work.is-tall,.pv-work.is-tall:nth-child(even){width:auto;margin-left:0;grid-template-columns:minmax(0,min(30%,400px)) minmax(0,1fr);gap:clamp(24px,4vw,56px);align-items:end}
+.pv-work.is-tall .pv-cap{grid-template-columns:auto minmax(0,1fr);max-width:36em}
+.pv-work.is-tall .pv-cap .pv-no{display:block}
+.pv-work.is-tall .pv-meta{grid-column:2}
+.pv-work.is-tall .pv-h3{font-size:var(--k5)}
+@media (max-width:1000px){.pv-row{grid-template-columns:repeat(var(--n,3),minmax(0,1fr))}}
+@media (max-width:900px){
+  .pv-work,.pv-work:nth-child(even),.pv-work.is-pano{width:auto;margin-left:0}
+  .pv-work:not(.is-tall){grid-column:auto}
+  .pv-work.is-pano .pv-frame{margin-inline:calc(var(--gut) * -1)}
+  .pv-work.is-tall,.pv-work.is-tall:nth-child(even){grid-template-columns:minmax(0,46%) minmax(0,1fr);gap:16px}
+  .pv-work.is-tall .pv-cap{grid-template-columns:minmax(0,1fr)}
+  .pv-work.is-tall .pv-cap .pv-no{display:none}
+  .pv-work.is-tall .pv-meta{grid-column:1/-1}
+}
+/* 폭 360 아래 휴대폰(320 · 340)에서는 세로 작품 옆 설명 칸이 135~146px라 명조 22px의 영어 이름 「Cheombeong-」이 한 줄에 들지 않아 낱말 가운데서 꺾였다(11-18 검수). 이 폭에서만 이름을 한 단(19px) 줄인다. */
+@media (max-width:359.98px){.pv-work.is-tall .pv-h3{font-size:var(--k4)}}
