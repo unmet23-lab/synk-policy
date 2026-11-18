@@ -189,10 +189,10 @@ async function checkScenario(step, device, route, exercise) {
 
 // 3. 페이지
 console.log('3. 페이지');
-// 저장소의 두 단계 아래까지 있는 index.html이 페이지다. 게임(try/)은 4단계에서 따로 보고, 로그인 흐름(id/·id-rehearsal/)과
+// 저장소의 세 단계 아래까지 있는 index.html이 페이지다(11-18 — 영어 PULSE의 AI 표시 · 권리 안내 쪽 /en/pulse/ai/가 세 단계다). 게임(try/)은 4단계에서 따로 보고, 로그인 흐름(id/·id-rehearsal/)과
 // 회의 안내(brief/)는 들어오는 조건이 따로 있어 뺀다.
 const discoveredRoutes = git('ls-files', '-z').toString('utf8').split('\0')
-  .filter(f => /^(?:[^/]+\/){0,2}index\.html$/.test(f) && !/^(try|id|id-rehearsal|brief)\//.test(f))
+  .filter(f => /^(?:[^/]+\/){0,3}index\.html$/.test(f) && !/^(try|id|id-rehearsal|brief)\//.test(f))
   .map(f => '/' + f.replace(/index\.html$/, ''));
 const {pages: routes, redirects} = splitPageRoutes(discoveredRoutes);
 const redirectChecks = [];
