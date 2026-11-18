@@ -12,11 +12,19 @@ import {
   validatePortalInviteInput,
 } from './portal-entry-state.mjs';
 import { solioToday, solioTodayNeedsReread } from './solio-today.mjs';
+import { siteVisitsView, SITE_VISITS_NAME } from './site-visits-model.mjs';
 import { createOrbFaceView } from './orb-face-view.mjs';
 
 /* 구 위의 자리(places)와 점 로고(signature)를 켜고 끄는 값. 하나를 false로 바꾸면 그 모양이 빠진다(설계 12절) */
 /* eyes: 구의 점 눈(유호님 11-17 「점눈으로 하자」, 결정 표 11-16 「구에 눈을 넣는다」). 끄면 셰이더가 눈을 그리지 않는다 */
 export const ORB_LOOK = Object.freeze({ places: true, signature: true, eyes: true });
+
+/* 솔리오 안의 프로그램. 구 옆에 작은 오브제로 놓인다(시안 .rail, 결정 표 11-16). 오브제 줄은 방문자 분석을 볼 계정에게만 있다.
+ * 그 밖의 계정에게는 줄이 없고 솔리오 화면이 그대로다. 백업은 방이 생길 때 구독 다음 자리에 넣는다(맡긴 세션 11-18, 결정 표 11-16 「첫 화면에는 백업 줄을 두지 않는다」) */
+export const SOLIO_PROGRAMS = Object.freeze([
+  Object.freeze({ key: 'subs', label: '구독' }),
+  Object.freeze({ key: 'visits', label: SITE_VISITS_NAME }),
+]);
 
 /* 움직임의 길이(ms). 시안 검정구.html의 값이다 */
 export const ORB_TIMING = Object.freeze({
@@ -68,7 +76,7 @@ export function faceSentence(value) {
     .replace(/아니에요(?=$|[\s.!?,)」])/g, '아닙니다')
     .replace(/돼요(?=$|[\s.!?,)」])/g, '됩니다')
     .replace(/달라요(?=$|[\s.!?,)」])/g, '다릅니다')
-    // 「해요」는 앞 글자와 상관없이 「합니다」다(필요해요, 확인해요, 못해요). 「-어요」 화면이 섞이지 않게 한다(0.4.95 원천 후보 Fable F3)
+    // 「해요」는 앞 글자와 상관없이 「합니다」다(필요해요, 확인해요, 못해요). 「-어요」 화면이 섞이지 않게 한다(0.4.95 원천 후보 검수 F3)
     .replace(/(^|\s|[가-힣])해요(?=$|[\s.!?,)」])/g, '$1합니다');
 }
 /* 로그인 설정이 없는 판의 까닭 한 줄. 화면이 「로그인 설정을 찾지 못했습니다.」를 먼저 쓰므로 같은 뜻의 첫 문장은 뺀다 */
@@ -128,6 +136,7 @@ export function createOrbFaceController({ view, options = {}, env = {} } = {}) {
   const storage = env.storage ?? null;
   const look = { ...ORB_LOOK, ...(options.look && typeof options.look === 'object' ? options.look : {}) };
   const subs = options.subscriptions && typeof options.subscriptions.snapshot === 'function' ? options.subscriptions : null;
+  const visitsApi = options.siteVisits && typeof options.siteVisits.snapshot === 'function' ? options.siteVisits : null;
 
   const machine = createPortalStateMachine({
     status: options.initialState?.status ?? 'restoring',
@@ -135,7 +144,7 @@ export function createOrbFaceController({ view, options = {}, env = {} } = {}) {
     accountKey: options.initialState?.accountKey,
     errorMessage: options.initialState?.errorMessage,
     retryable: options.initialState?.retryable,
-    // 웹 얼굴의 bypass(바로 들어온 채 시작)는 PC 호스트가 보내지 않는다. 받아도 늘 구에서 시작해 계정 확인을 거친다(카본 A2)
+    // 웹 얼굴의 bypass(바로 들어온 채 시작)는 PC 호스트가 보내지 않는다. 받아도 늘 구에서 시작해 계정 확인을 거친다(검수 A2)
   });
 
   let disposed = false;
@@ -150,10 +159,11 @@ export function createOrbFaceController({ view, options = {}, env = {} } = {}) {
 
   // 들어온 뒤의 상태
   let space = 'solio';
+  let prog = 'subs'; // 솔리오 안에서 지금 연 프로그램(SOLIO_PROGRAMS의 key)
   let switchOpen = false;
   let legacyKind = null;
   // 들어온 순간에 계정으로 들어왔는지('signed-in') 손님으로 들어왔는지('guest'). 토큰 갱신이나 잠깐의 오류 중에 들어와도
-  // 계정이 있으면 회원으로 적는다. 들어온 뒤 로그아웃과 다른 계정을 알아보는 데 쓴다(Fable 최종)
+  // 계정이 있으면 회원으로 적는다. 들어온 뒤 로그아웃과 다른 계정을 알아보는 데 쓴다(최종 검수)
   let enteredAs = null;
   const enteredKind = snap => (snap.accountKey ? 'signed-in' : 'guest');
   let assigned = []; // 이 계정에 확인된 배정 공간('workspace', 'pulse')
@@ -179,6 +189,9 @@ export function createOrbFaceController({ view, options = {}, env = {} } = {}) {
   // 솔리오 첫 화면의 자료
   const sol = { account: undefined, snapshot: null, error: null, checking: false, rereadFailed: false, autoDone: false, busyRetried: false, authRetried: false, loading: false, rereadAfterAuth: false, authChecking: false, authChecks: 0, authTimer: null, seq: 0, run: 0, timer: null, unsubscribe: null };
   let clockTimer = null;
+  // 솔리오 「방문자 분석」의 자료. 계정마다 따로 읽고, 계정이 바뀌면 앞 계정이 받은 답을 버린다(사이트방문 설계 6절).
+  // 요약은 하루 한 번 바뀌므로 바뀜 알림 없이 솔리오에 들어올 때와 방문자 분석을 열 때 읽는다
+  const vis = { account: undefined, result: null, seq: 0, loading: false, done: false, retried: false, timer: null };
 
   function prefersReducedMotion() {
     if (hostReducedMotion) return true;
@@ -272,8 +285,8 @@ export function createOrbFaceController({ view, options = {}, env = {} } = {}) {
   }
 
   /* 「누구로 보이나」의 기준이다. 들어온 회원이 토큰을 갱신하거나 재시도할 수 있는 연결 오류를 겪는 동안에도,
-   * 같은 계정이 남아 있으면 회원으로 본다. 그렇지 않으면 솔리오 첫 화면이 손님 문장으로 바뀌고 줄이 사라진다(Fable 최종).
-   * 「지금 구독을 읽을 수 있나」는 따로 본다(solioReadable). 본체가 signed-in일 때만 읽어 주기 때문이다(Fable 다시 검수 -c) */
+   * 같은 계정이 남아 있으면 회원으로 본다. 그렇지 않으면 솔리오 첫 화면이 손님 문장으로 바뀌고 줄이 사라진다(최종 검수).
+   * 「지금 구독을 읽을 수 있나」는 따로 본다(solioReadable). 본체가 signed-in일 때만 읽어 주기 때문이다(다시 검수 -c) */
   function memberShown(state) {
     if (state.authStatus === 'signed-in') return true;
     if (enteredAs !== 'signed-in' || !state.accountKey) return false;
@@ -290,8 +303,8 @@ export function createOrbFaceController({ view, options = {}, env = {} } = {}) {
 
   function solioScene(state) {
     const signedIn = memberShown(state);
-    // 회원으로 보이지만 아직 읽을 수 없으면 기다린다. 갱신 중에는 조용히, 오류 중에는 그렇다고 말한다(Fable 다시 검수 -c).
-    // 다시 확인하는 동안(갱신 상태로 잠깐 바뀌어도) 오류 문장을 지킨다(Fable 설계 검토 3차 P2-1). 지난 확인 횟수로는 정하지 않는다.
+    // 회원으로 보이지만 아직 읽을 수 없으면 기다린다. 갱신 중에는 조용히, 오류 중에는 그렇다고 말한다(다시 검수 -c).
+    // 다시 확인하는 동안(갱신 상태로 잠깐 바뀌어도) 오류 문장을 지킨다(설계 검토 3차 P2-1). 지난 확인 횟수로는 정하지 않는다.
     // 지난 횟수가 남으면 다음 평범한 갱신에도 오류 문장이 떴다(다시 검수 -e · -f)
     const waiting = signedIn && !sol.snapshot && !solioReadable(state)
       ? (state.authStatus === 'error' || sol.authChecking ? 'error' : 'pending')
@@ -309,8 +322,24 @@ export function createOrbFaceController({ view, options = {}, env = {} } = {}) {
     return { ...today, rereading: sol.checking || Boolean(sol.snapshot?.checking) };
   }
 
+  /* 이 계정이 볼 수 있는 방문자 분석. 그 계정이 받은 답만 쓴다. 다른 계정의 답이나 회원이 아닐 때는 보이지 않는다 */
+  function visitsScene(state) {
+    if (!visitsApi || !memberShown(state) || !state.accountKey || vis.account !== state.accountKey) return { visible: false };
+    return siteVisitsView(vis.result, now());
+  }
+  /* 오브제 줄. 방문자 분석을 볼 계정에게만 있다. 볼 계정인지는 솔리오가 열릴 때 한 번 읽어 정하고, 답이 오기 전에는 줄을 두지 않는다 */
+  function programsFor(state, visits) {
+    if (!memberShown(state) || !visits.visible) return [];
+    return SOLIO_PROGRAMS.map(p => ({ ...p }));
+  }
+
   function roomScene(state) {
-    if (space === 'solio') return { space, solio: solioScene(state) };
+    if (space === 'solio') {
+      const visits = visitsScene(state);
+      const programs = programsFor(state, visits);
+      const at = programs.some(p => p.key === prog) ? prog : 'subs';
+      return { space, solio: solioScene(state), prog: at, programs, visits };
+    }
     const copy = SPACE_ROOM[space];
     return { space, say: copy.say, then: copy.then, action: typeof options.onOpenSpace === 'function' ? { action: 'reopen-space', label: '다시 열기' } : null, error: feedback.switch };
   }
@@ -318,7 +347,7 @@ export function createOrbFaceController({ view, options = {}, env = {} } = {}) {
   function placesFor(state, mode) {
     if (!look.places) return [];
     if (mode === 'portal') {
-      // 개인 공간으로 이어 갈 수 없으면 솔리오 고리를 새기지 않는다(0.4.95 원천 후보 카본 B3)
+      // 개인 공간으로 이어 갈 수 없으면 솔리오 고리를 새기지 않는다(0.4.95 원천 후보 검수 B3)
       if (state.phase === 'workspace' && state.workspace) return [...(state.workspace.canContinuePersonal !== false ? ['solio'] : []), ...state.workspace.destinations.map(d => SPACE_OF_DEST[d]).filter(Boolean)];
       return [];
     }
@@ -533,6 +562,7 @@ export function createOrbFaceController({ view, options = {}, env = {} } = {}) {
     const kind = fromSwitch || !freshSignIn ? 'quick' : 'full';
     orbTarget = 'inside';
     render();
+    if (space === 'solio') syncVisits();
     void queue(async gen => {
       await view.dive(space, kind === 'quick' ? ORB_TIMING.diveQuick : ORB_TIMING.dive);
       if (!current(gen)) return;
@@ -609,7 +639,7 @@ export function createOrbFaceController({ view, options = {}, env = {} } = {}) {
   }
 
   /* 들어간 공간을 이 계정의 배정 기억에 더한다. 「다시 확인」, 호스트의 진입 마침, 로그인한 채 받은 초대로 들어가도
-   * 공간 고르기와 「다시 열기」가 그 공간을 안다(카본 A1). 순서는 늘 Workspace, PULSE다 */
+   * 공간 고르기와 「다시 열기」가 그 공간을 안다(검수 A1). 순서는 늘 Workspace, PULSE다 */
   function mergeAssigned(destinations, accountKey) {
     if (!accountKey) return;
     const add = (Array.isArray(destinations) ? destinations : []).map(d => SPACE_OF_DEST[normalizePortalWorkspaceDestination(d)]).filter(Boolean);
@@ -792,7 +822,7 @@ export function createOrbFaceController({ view, options = {}, env = {} } = {}) {
       }
       if (result && result.action === 'purpose') {
         workspaceNeedsRetry = false;
-        // 배정 공간이 없다고 확인됐으니 앞에서 기억한 공간을 비운다(첫 진입과 같다, 0.4.95 원천 후보 카본 B5)
+        // 배정 공간이 없다고 확인됐으니 앞에서 기억한 공간을 비운다(첫 진입과 같다, 0.4.95 원천 후보 검수 B5)
         rememberAssigned([], context.accountKey);
         const mode = result.purposeMode === 'existing' ? 'existing' : 'onboarding';
         const moved = machine.workspaceToPurpose({ mode, returnToWorkspace: false });
@@ -1099,7 +1129,7 @@ export function createOrbFaceController({ view, options = {}, env = {} } = {}) {
     render();
   }
   function closeSwitch() {
-    // 다른 공간을 여는 동안에는 닫지 않는다. 닫으면 그 공간의 실패 글이 지금 방에 떴다(0.4.95 원천 후보 카본 D2)
+    // 다른 공간을 여는 동안에는 닫지 않는다. 닫으면 그 공간의 실패 글이 지금 방에 떴다(0.4.95 원천 후보 검수 D2)
     if (!switchOpen || busyAction === 'open-space') return;
     switchOpen = false;
     feedback.switch = '';
@@ -1140,7 +1170,7 @@ export function createOrbFaceController({ view, options = {}, env = {} } = {}) {
   function go(target) {
     if (disposed || busyAction !== null) return;
     if (clientMode() === 'portal') {
-      // 진입 공간 고르기의 솔리오는 「솔리오로」(개인 공간으로 이어 가기)와 같다. 배정 공간만 runSelectWorkspace로 연다(0.4.95 원천 후보 카본 B3)
+      // 진입 공간 고르기의 솔리오는 「솔리오로」(개인 공간으로 이어 가기)와 같다. 배정 공간만 runSelectWorkspace로 연다(0.4.95 원천 후보 검수 B3)
       if (target === 'solio') { if (machine.read().workspace?.canContinuePersonal !== false) void runContinuePersonal(); return; }
       if (DEST_OF_SPACE[target]) void runSelectWorkspace(DEST_OF_SPACE[target]);
       return;
@@ -1152,7 +1182,7 @@ export function createOrbFaceController({ view, options = {}, env = {} } = {}) {
 
   function openLegacy(kind, extra) {
     if (disposed || typeof options.onOpenLegacy !== 'function' || clientMode() === 'portal') return;
-    // 먼저 옛 화면 모습(legacy)으로 바꿔 옛 런처의 잠금을 푼 뒤 연다. 그래야 옛 런처가 그 보기 제목으로 초점을 옮긴다(카본 A4)
+    // 먼저 옛 화면 모습(legacy)으로 바꿔 옛 런처의 잠금을 푼 뒤 연다. 그래야 옛 런처가 그 보기 제목으로 초점을 옮긴다(검수 A4)
     const wasSwitch = switchOpen;
     switchOpen = false;
     legacyKind = kind;
@@ -1179,7 +1209,7 @@ export function createOrbFaceController({ view, options = {}, env = {} } = {}) {
 
   /* 들어온 뒤에 로그아웃되거나 계정을 바꾸면 묻는 화면으로 돌아간다(설계 10절) */
   function leaveToAsk(patch) {
-    // 넣다 만 초대 원문은 다음에 앉는 사람에게 보이지 않게 비운다(Fable 최종)
+    // 넣다 만 초대 원문은 다음에 앉는 사람에게 보이지 않게 비운다(최종 검수)
     view.setInviteValue?.('');
     resetOrbQueue();
     cancelAutoZoom();
@@ -1191,6 +1221,8 @@ export function createOrbFaceController({ view, options = {}, env = {} } = {}) {
     assigned = [];
     assignedAccount = null;
     stopSolio();
+    stopVisits();
+    prog = 'subs';
     clearFeedback();
     feedback.switch = '';
     writeStorage(storage, ORB_RETURNING_KEY, null);
@@ -1207,7 +1239,7 @@ export function createOrbFaceController({ view, options = {}, env = {} } = {}) {
     const before = machine.read();
     const status = patch.status === undefined ? before.authStatus : normalizeAuthStatus(patch.status);
 
-    // 지금 세대보다 낮은 세대의 알림은 들어온 뒤 판정보다 먼저 버린다(Fable 최종)
+    // 지금 세대보다 낮은 세대의 알림은 들어온 뒤 판정보다 먼저 버린다(최종 검수)
     if (Number.isFinite(patch.generation) && Number.isFinite(before.generation) && patch.generation < before.generation) return before;
     // 들어온 뒤의 로그아웃과 계정 바뀜은 단계 기계가 받지 않으므로(406행) 얼굴이 묻는 화면으로 되돌린다
     if (before.phase === 'entered' && enteredAs !== null) {
@@ -1238,7 +1270,7 @@ export function createOrbFaceController({ view, options = {}, env = {} } = {}) {
     const result = machine.receiveAuth(authPatch);
     if (!result.accepted) return result.state;
     if (navigationHoldActive && (result.state.phase !== 'entered' || result.accountChanged || result.bindingInvalidated || result.state.authStatus === 'signing-in')) {
-      // 들어온 채로 놓으면 붙잡아 둔 구를 도착시킨다. 그냥 끄면 구가 안쪽에 남았다(0.4.95 원천 후보 카본 B6)
+      // 들어온 채로 놓으면 붙잡아 둔 구를 도착시킨다. 그냥 끄면 구가 안쪽에 남았다(0.4.95 원천 후보 검수 B6)
       if (result.state.phase === 'entered') releaseNavigationHold();
       navigationHoldActive = false;
     }
@@ -1253,7 +1285,7 @@ export function createOrbFaceController({ view, options = {}, env = {} } = {}) {
     render();
     scheduleAutoZoom();
     if (result.shouldTriggerEnter && busyAction === null) void triggerEnter();
-    // 솔리오에 있는 동안 계정이 돌아왔는데 자료가 그 계정 것이 아니거나, 읽을 수 있게 되었는데 아직 읽지 않았으면 읽는다(Fable 다시 검수 -b · -c, 설계 검토 3차)
+    // 솔리오에 있는 동안 계정이 돌아왔는데 자료가 그 계정 것이 아니거나, 읽을 수 있게 되었는데 아직 읽지 않았으면 읽는다(다시 검수 -b · -c, 설계 검토 3차)
     const after = machine.read();
     // 조용한 다시 확인은 계정 장애 한 번에 네 번까지다. 새 장애는 signed-in이던 계정이 우리 확인 밖에서 signed-in을 벗어날 때 시작한다.
     // signed-in 알림으로는 되돌리지 않는다. 알림마다 되돌리면 두 번 거절한 기다림에서 네 번 상한이 풀렸다(다시 검수 -e · -f).
@@ -1262,6 +1294,11 @@ export function createOrbFaceController({ view, options = {}, env = {} } = {}) {
     if (after.phase === 'entered' && space === 'solio' && memberShown(after)) {
       if (sol.account !== after.accountKey || solioNeedsRead(after)) startSolio();
       else if (solioReadable(after) && sol.rereadAfterAuth && !sol.checking) { sol.rereadAfterAuth = false; void reread(); }
+      // 들어올 때 읽을 수 없었던(갱신 중) 방문자 분석은 읽을 수 있게 되면 한 번 읽는다
+      syncVisits();
+    } else if (vis.account !== undefined && vis.account !== (memberShown(after) ? after.accountKey : null)) {
+      // 솔리오 밖에서 계정이 바뀌거나 회원이 아니게 되어도 앞 계정의 답을 남기지 않는다
+      stopVisits();
     }
     return machine.read();
   }
@@ -1269,16 +1306,17 @@ export function createOrbFaceController({ view, options = {}, env = {} } = {}) {
   /* ── 솔리오 첫 화면의 자료(설계 8절) ── */
   function startSolio({ arriving = false } = {}) {
     const state = machine.read();
-    // 누구의 자료인지는 회원 판정과 같은 기준이다(Fable 다시 검수). 읽는 때는 본체의 관문을 따른다(아래)
+    // 누구의 자료인지는 회원 판정과 같은 기준이다(다시 검수). 읽는 때는 본체의 관문을 따른다(아래)
     const account = memberShown(state) ? state.accountKey : null;
     if (sol.account !== account) { stopSolio(); sol.account = account; }
+    syncVisits();
     if (!subs || !account) { render(); return; }
     if (!sol.unsubscribe && typeof subs.onChanged === 'function') {
       try {
         const off = subs.onChanged(snap => {
           if (disposed || sol.account !== machine.read().accountKey || !snap || snap.ok === false) return;
           acceptSnapshot(snap);
-          // 옛 구독 판이나 뒤의 확인으로 새 값이 들어오면 앞의 실패 표시와 기다림을 지운다(카본 A7)
+          // 옛 구독 판이나 뒤의 확인으로 새 값이 들어오면 앞의 실패 표시와 기다림을 지운다(검수 A7)
           sol.error = null;
           sol.authChecks = 0;
           if (sol.rereadFailed) {
@@ -1290,7 +1328,7 @@ export function createOrbFaceController({ view, options = {}, env = {} } = {}) {
         sol.unsubscribe = typeof off === 'function' ? off : null;
       } catch { sol.unsubscribe = null; }
     }
-    // 토큰 갱신이나 오류 중에는 읽지 않고 기다린다. 읽으면 본체가 SIGN_IN_REQUIRED로 거절하고, 그 값이 손님 문장이 됐다(Fable 다시 검수 -c).
+    // 토큰 갱신이나 오류 중에는 읽지 않고 기다린다. 읽으면 본체가 SIGN_IN_REQUIRED로 거절하고, 그 값이 손님 문장이 됐다(다시 검수 -c).
     // 솔리오에 새로 도착했으면 앞의 읽기 실패가 있어도 한 번 더 읽는다(전과 같다)
     // 갱신 중에 다시 도착해 읽기를 미루면 앞의 읽기 실패를 지운다. 남겨 두면 signed-in이 돌아와도 다시 읽지 않는다(다시 검수 -d)
     if (arriving && !solioReadable(state) && !sol.snapshot && sol.error && sol.error !== 'SIGN_IN_REQUIRED') sol.error = null;
@@ -1301,7 +1339,7 @@ export function createOrbFaceController({ view, options = {}, env = {} } = {}) {
   }
   /* 솔리오 자료를 지금 읽어야 하는가. 들어와 있고, 솔리오에 있고, 회원으로 보이고, 본체가 읽어 줄 때(signed-in)이고, 그 계정의 자료를 맡았고,
    * 자료가 없고, 읽는 중도 예약된 다시 읽기도 없고, 남은 오류가 없거나 본체의 거절뿐일 때다. 깃발을 켜고 끄지 않고 이 물음 하나를
-   * 인증 알림 끝과 솔리오 도착에서 계산한다(Fable 설계 검토 3차 권고 · P3-1) */
+   * 인증 알림 끝과 솔리오 도착에서 계산한다(설계 검토 3차 권고 · P3-1) */
   function solioNeedsRead(state, { arriving = false } = {}) {
     if (state.phase !== 'entered' || space !== 'solio' || !memberShown(state) || !solioReadable(state)) return false;
     if (!subs || sol.account !== state.accountKey || sol.snapshot || sol.loading || sol.timer !== null) return false;
@@ -1309,13 +1347,73 @@ export function createOrbFaceController({ view, options = {}, env = {} } = {}) {
   }
   function stopSolio() {
     sol.seq += 1;
-    // 솔리오 회차. 읽기마다 오르는 seq와 달리 로그아웃 · 계정 바뀜으로 솔리오를 닫을 때만 오른다(0.4.95 원천 후보 카본 D3)
+    // 솔리오 회차. 읽기마다 오르는 seq와 달리 로그아웃 · 계정 바뀜으로 솔리오를 닫을 때만 오른다(0.4.95 원천 후보 검수 D3)
     sol.run += 1;
     if (sol.timer !== null) { clearTimer(sol.timer); sol.timer = null; }
     if (sol.authTimer !== null) { clearTimer(sol.authTimer); sol.authTimer = null; }
     try { sol.unsubscribe?.(); } catch { /* 무시 */ }
     Object.assign(sol, { account: undefined, snapshot: null, error: null, checking: false, rereadFailed: false, autoDone: false, busyRetried: false, authRetried: false, loading: false, rereadAfterAuth: false, authChecking: false, authChecks: 0, unsubscribe: null });
   }
+  /* ── 솔리오 「방문자 분석」의 자료(사이트방문 설계 6절) ── */
+  function stopVisits() {
+    vis.seq += 1;
+    if (vis.timer !== null) clearTimer(vis.timer);
+    Object.assign(vis, { account: undefined, result: null, loading: false, done: false, retried: false, timer: null });
+    if (prog === 'visits') prog = 'subs';
+  }
+  /* 지금 회원의 요약을 읽는다. 솔리오를 열 때 한 번 읽고(그 계정이 대기 목록에 남는 때도 이때다), again이면 방문자 분석을 열 때 다시 읽는다.
+   * 본체는 로그인한 회원에게만 답하고, 볼 계정이 아니면 available:false로 답한다(그때 대기 목록에 이 계정을 남긴다, site-visits.cjs) */
+  function syncVisits({ again = false } = {}) {
+    const state = machine.read();
+    const account = memberShown(state) && state.accountKey ? state.accountKey : null;
+    if (vis.account !== account) { stopVisits(); vis.account = account; }
+    if (!visitsApi || !account || state.phase !== 'entered' || space !== 'solio' || !solioReadable(state) || vis.loading) return;
+    if (vis.done && !again) return;
+    const my = ++vis.seq;
+    vis.loading = true;
+    let pending;
+    try { pending = Promise.resolve(visitsApi.snapshot()); } catch { pending = Promise.resolve(null); }
+    pending.catch(() => null).then(res => {
+      if (my === vis.seq) vis.loading = false;
+      // 늦게 온 답은 그 계정이 지금도 같은 회차일 때만 받는다. 로그아웃 뒤 같은 계정으로 다시 들어와도 앞 회차의 답은 버린다
+      if (disposed || my !== vis.seq || vis.account !== account || machine.read().accountKey !== account) return;
+      vis.done = true;
+      // 갱신 중이라 본체가 거절한 답은 「볼 수 없음」이 아니다. 앞에 받은 답을 그대로 두고, 받은 답이 없으면 읽을 수 있게 된 뒤 한 번 더 읽는다.
+      // 기다리는 동안 이미 읽을 수 있게 되었으면(그때 온 알림은 읽는 중이라 막혔다) 1초쯤 뒤 한 번 더 읽는다(0.4.97 검수 A2)
+      if (res && res.ok === false && res.code === 'SIGN_IN_REQUIRED') {
+        if (!vis.result) {
+          vis.done = false;
+          if (!vis.retried && vis.timer === null && solioReadable(machine.read())) { vis.retried = true; vis.timer = setTimer(() => { vis.timer = null; syncVisits(); }, ORB_TIMING.busyRetry); }
+        }
+        render();
+        return;
+      }
+      // 읽기가 예외로 끝났으면(답 없음) 앞에 받은 답을 지우지 않는다. 줄이 떴다 사라지지 않게 한다(0.4.97 검수 A1).
+      // 받은 답이 없으면 읽은 것으로 치지 않는다. 다음 알림이나 솔리오에 다시 올 때 읽고, 1초쯤 뒤 한 번은 스스로 다시 읽는다(0.4.97 최종 검수 F3)
+      if (!res || typeof res !== 'object') {
+        if (!vis.result) {
+          vis.done = false;
+          if (!vis.retried && vis.timer === null && solioReadable(machine.read())) { vis.retried = true; vis.timer = setTimer(() => { vis.timer = null; syncVisits(); }, ORB_TIMING.busyRetry); }
+        }
+        render();
+        return;
+      }
+      vis.retried = false;
+      vis.result = res;
+      render();
+    });
+  }
+  /* 오브제를 눌렀거나 그 위에 머물렀을 때. 솔리오의 첫 화면에서 회원에게 있는 프로그램만 연다 */
+  function showProgram(name) {
+    if (space !== 'solio' || clientMode() !== 'app' || switchOpen) return false;
+    const state = machine.read();
+    const programs = programsFor(state, visitsScene(state));
+    if (!programs.some(p => p.key === name)) return false;
+    if (prog !== name) { prog = name; render(); }
+    if (name === 'visits') syncVisits({ again: true });
+    return true;
+  }
+
   function acceptSnapshot(snap) {
     if (sol.snapshot && typeof snap.seq === 'number' && typeof sol.snapshot.seq === 'number' && snap.seq < sol.snapshot.seq) return;
     sol.snapshot = snap;
@@ -1332,7 +1430,7 @@ export function createOrbFaceController({ view, options = {}, env = {} } = {}) {
     // 본체가 읽기를 받아 주었으면(거절이 아닌 답) 다음 계정 오류 때 다시 네 번 확인할 수 있다
     if (res?.code !== 'SIGN_IN_REQUIRED') sol.authChecks = 0;
     if (res?.code === 'SIGN_IN_REQUIRED') {
-      // 본체의 거절은 손님 판정이 아니다(손님 문장은 회원 판정만 정한다). 아직 못 읽은 것으로 남기고, 읽을 수 있게 되면 다시 읽는다(Fable 다시 검수 -c).
+      // 본체의 거절은 손님 판정이 아니다(손님 문장은 회원 판정만 정한다). 아직 못 읽은 것으로 남기고, 읽을 수 있게 되면 다시 읽는다(다시 검수 -c).
       // 화면은 signed-in인데 본체가 아직 아니면(알림이 엇갈린 때) 1초쯤 뒤 한 번 더 읽는다. 그래도 거절되면 기다림 문장을 보인다
       const st = machine.read();
       if (solioReadable(st) && memberShown(st) && !sol.authRetried) {
@@ -1345,7 +1443,7 @@ export function createOrbFaceController({ view, options = {}, env = {} } = {}) {
       return;
     }
     if (!res || res.ok === false) {
-      // 판 파일을 잠깐 못 읽었으면 1초쯤 뒤에 한 번 스스로 다시 읽는다(Fable 설계 검토 2차 2)
+      // 판 파일을 잠깐 못 읽었으면 1초쯤 뒤에 한 번 스스로 다시 읽는다(설계 검토 2차 2)
       if (res?.code === 'BOARD_BUSY' && !sol.busyRetried) {
         sol.busyRetried = true;
         sol.timer = setTimer(() => { sol.timer = null; void loadSolio(); }, ORB_TIMING.busyRetry);
@@ -1375,7 +1473,7 @@ export function createOrbFaceController({ view, options = {}, env = {} } = {}) {
     render();
     let res;
     try { res = await subs.check(); } catch { res = null; }
-    // 로그아웃 뒤 같은 계정으로 다시 들어온 새 회차에는 앞 회차의 늦은 답을 넣지 않는다(0.4.95 원천 후보 카본 D3)
+    // 로그아웃 뒤 같은 계정으로 다시 들어온 새 회차에는 앞 회차의 늦은 답을 넣지 않는다(0.4.95 원천 후보 검수 D3)
     if (disposed || account !== sol.account || my !== sol.run) return;
     sol.checking = false;
     if (res && res.ok !== false) {
@@ -1385,7 +1483,7 @@ export function createOrbFaceController({ view, options = {}, env = {} } = {}) {
       sol.rereadFailed = !at || now() - at > SIX_HOURS;
     } else {
       sol.rereadFailed = true;
-      // 갱신 중이라 본체가 확인을 거절했으면, 읽을 수 있게 된 뒤 한 번 더 확인한다(Fable 설계 검토 3차 시험 길 5)
+      // 갱신 중이라 본체가 확인을 거절했으면, 읽을 수 있게 된 뒤 한 번 더 확인한다(설계 검토 3차 시험 길 5)
       if (res?.code === 'SIGN_IN_REQUIRED') sol.rereadAfterAuth = true;
       if (!sol.snapshot) sol.error = res?.code || 'READ_FAILED';
     }
@@ -1393,7 +1491,7 @@ export function createOrbFaceController({ view, options = {}, env = {} } = {}) {
   }
 
   /* 회원 판정은 참인데 계정 연결 오류로 아직 읽을 수 없을 때: 30초마다 네 번까지 조용히 다시 확인한다. 단계와 바쁨 표시는 바꾸지 않는다.
-   * 「다시 확인」 단추도 같은 확인을 부른다. 호스트가 결과를 알림으로 보내면 인증 알림 끝에서 읽는다(Fable 설계 검토 3차 P2-1) */
+   * 「다시 확인」 단추도 같은 확인을 부른다. 호스트가 결과를 알림으로 보내면 인증 알림 끝에서 읽는다(설계 검토 3차 P2-1) */
   function authWaitingError(state) {
     if (state.phase !== 'entered' || space !== 'solio' || !memberShown(state) || sol.snapshot) return false;
     // 계정 연결 오류이거나, 화면은 signed-in인데 본체가 두 번 거절해 기다리는 때(다시 검수 -d P3)
@@ -1442,7 +1540,7 @@ export function createOrbFaceController({ view, options = {}, env = {} } = {}) {
         if (busyAction !== null) return true;
         clearFeedback(); machine.showAuthPanel(); render(); return true;
       case 'retry-enter': {
-        // 계정 전환처럼 다른 동작이 도는 동안에는 받지 않는다. 받으면 단계만 entering으로 넘어가고 진입은 시작되지 않았다(0.4.95 원천 후보 카본 B4)
+        // 계정 전환처럼 다른 동작이 도는 동안에는 받지 않는다. 받으면 단계만 entering으로 넘어가고 진입은 시작되지 않았다(0.4.95 원천 후보 검수 B4)
         if (busyAction !== null) return true;
         const retry = machine.retryEnter();
         render();
@@ -1460,6 +1558,7 @@ export function createOrbFaceController({ view, options = {}, env = {} } = {}) {
       case 'row': openLegacy('subscriptions', payload ? { service: payload } : undefined); return true;
       case 'connect': openLegacy('subscriptions', { view: 'manage' }); return true;
       case 'reread': void reread(); return true;
+      case 'prog': return showProgram(payload);
       case 'recheck-auth': void recheckAuth(); return true;
       case 'reopen-space': void runOpenSpace(space, { reopen: true }); return true;
       case 'legacy-back': closeLegacy(); return true;
@@ -1582,6 +1681,7 @@ export function createOrbFaceController({ view, options = {}, env = {} } = {}) {
       orbGen += 1;
       cancelAutoZoom();
       stopSolio();
+      stopVisits();
       if (clockTimer !== null) { clearTick(clockTimer); clockTimer = null; }
       if (hadBusyInvite) options.onCancelInvite?.();
       view.dispose?.();

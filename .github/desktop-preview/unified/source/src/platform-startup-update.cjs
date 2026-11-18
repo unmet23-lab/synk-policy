@@ -6,7 +6,7 @@
 // 켜짐부터 열림까지(1-가 구현 설계 2절과 5절). 확인 단계의 인터넷 실패(UPDATE_NETWORK_FAILED, UPDATE_TIMEOUT)는
 // 실패 장면 없이 지금 판을 연다. 확인이 earlyOpenMs 안에 답하지 않으면 지금 판을 먼저 열고, 확인은 뒤에서 마저 한다.
 // 숨은 채 시작(hidden)에서는 어느 단계에서 실패해도 지금 판을 숨은 채 열고, 그 실패는 unseenFailure로 남겨
-// 다음에 창을 열 때 보인다. initialError를 주면 확인하지 않고 그 실패 장면부터 보인다(되돌림, 보이지 않은 실패).
+// 다음에 창을 열 때 보인다. initialError를 주면 확인하지 않고 그 실패 장면부터 보인다(되돌림, 보이지 않은 실패). 숨은 채 시작이면 그 실패도 보이지 않은 실패로 남기고 지금 판을 숨은 채 연다(조용한 업데이트가 실패해 되돌려 켠 앱).
 const SILENT_CHECK_FAILURES=new Set(['UPDATE_NETWORK_FAILED','UPDATE_TIMEOUT']);
 const EARLY_OPEN_MS=4000;
 function createStartupUpdateGate({updater,platform=process.platform,onChange=()=>{},proceed=()=>{},recoveryCode=null,recoveryReleaseId=null,initialError=null,hidden=false,keepDeferred=false,earlyOpenMs=EARLY_OPEN_MS,setTimer=setTimeout,clearTimer=clearTimeout,onSilentFailure=()=>{}}={}){
@@ -28,7 +28,7 @@ function createStartupUpdateGate({updater,platform=process.platform,onChange=()=
     if(value.state==='checking')publish('checking');
     else if(value.state==='downloading'){stage='download';publish('downloading');}
     else if(value.state==='opening'){stage='handoff';publish('installing');}
-    // 확인 단계의 인터넷 실패는 확인 결과를 받은 attempt가 실패 장면 없이 지금 판을 연다. 업데이터가 먼저 알리는 오류 상태로 실패 장면을 띄우지 않는다(0.4.96 공개 후보 카본 D2)
+    // 확인 단계의 인터넷 실패는 확인 결과를 받은 attempt가 실패 장면 없이 지금 판을 연다. 업데이터가 먼저 알리는 오류 상태로 실패 장면을 띄우지 않는다(0.4.96 공개 후보 검수 D2)
     else if(value.state==='error'){if(stage==='check'&&SILENT_CHECK_FAILURES.has(value.code))return;fail(value.code||'UPDATE_FAILED');}
     else if(platform==='darwin'&&value.state==='ready')publish('ready',value.code);
   }
@@ -69,7 +69,8 @@ function createStartupUpdateGate({updater,platform=process.platform,onChange=()=
     stage='handoff';publish('installing');result=await updater.installUpdate({automatic:true});
     if(active&&!disposed&&(!result.ok||result.state!=='opening'))fail(result.code||'UPDATE_OPEN_FAILED');
   }
-  function start(){if(started||disposed)return operation||Promise.resolve(snapshot());started=true;if(firstError){stage=initialError?.stage||'handoff';publish('error',firstError);return Promise.resolve(snapshot());}return run(attempt);}
+  /* 숨은 채 시작한 길에 처음부터 실패가 있으면(조용한 업데이트가 실패해 되돌려 켠 앱) 실패 장면을 지금 보이지 않고 지금 판을 숨은 채 연다. 그 실패는 다음에 창을 열 때 보인다(0.4.96 검수 F2) */
+  function start(){if(started||disposed)return operation||Promise.resolve(snapshot());started=true;if(firstError){stage=initialError?.stage||'handoff';if(hidden){unseen={code:firstError,stage,releaseId:recoveryReleaseId||updater.snapshot().releaseId||null};try{onSilentFailure(unseen);}catch{}finish();return Promise.resolve(snapshot());}publish('error',firstError);return Promise.resolve(snapshot());}return run(attempt);}
   function retry(){return snapshot().canRetry?run(attempt):Promise.resolve({...snapshot(),ok:false,code:'UPDATE_BUSY'});}
   function openCurrent(){if(!snapshot().canOpenCurrent)return {...snapshot(),ok:false,code:'UPDATE_BUSY'};return finish();}
   function install(){if(!snapshot().canInstall)return Promise.resolve({...snapshot(),ok:false,code:'UPDATE_BUSY'});return run(async()=>{publish('installing');const result=await updater.installUpdate();if(result.ok)publish('ready',result.code||'UPDATE_MANUAL_INSTALL');else publish('error',result.code||'UPDATE_OPEN_FAILED');});}
@@ -79,7 +80,7 @@ function createStartupUpdateGate({updater,platform=process.platform,onChange=()=
   return {start,retry,openCurrent,install,cancelInstall,observe,snapshot,reveal,unseenFailure:()=>unseen,isBlocking:()=>active&&!disposed,dispose:()=>{disposed=true;updater.setStartupActive?.(false);}};
 }
 /* 숨은 채 시작한 길의 보이지 않은 실패가 뒤에서 풀렸는지 본다. 풀렸으면 다음에 창을 열 때 옛 실패 장면을 보이지 않는다.
-   확인 실패는 확인이 다시 되면, 받기 실패는 받기가 끝나거나 새 판이 없어지면, 넘김 실패는 새 판이 없어지면 풀린다(0.4.96 카본 D2) */
+   확인 실패는 확인이 다시 되면, 받기 실패는 받기가 끝나거나 새 판이 없어지면, 넘김 실패는 새 판이 없어지면 풀린다(0.4.96 검수 D2) */
 function unseenFailureResolved(failure,state){
   if(!failure||!state)return false;
   if(failure.stage==='check')return ['current','available','downloading','ready'].includes(state.state);
