@@ -2,9 +2,9 @@
   "schemaVersion": 1,
   "product": "platform",
   "channel": "preview",
-  "version": "0.4.99",
-  "releaseId": "platform-preview-0.4.99",
-  "buildId": "20261120.1",
+  "version": "0.4.100",
+  "releaseId": "platform-preview-0.4.100",
+  "buildId": "20261120.2",
   "manifestUrl": "https://synk.im/desktop/releases/preview.json",
   "baselines": [
     {
@@ -63,7 +63,7 @@
     }
   ],
   "electronVersion": "44.10.0",
-  "sourceHash": "bdea3a759901aa8415fca766f04912cf4ed800255fbc541e451b1901218045f3",
+  "sourceHash": "33c573c4c6a855736f20fadfbd31bafbe702797f03d23f302432f26d486e0b2e",
   "sourceFiles": [
     {
       "path": "assets/launcher/benefit-care.webp",
@@ -1021,9 +1021,14 @@
       "sha256": "c4cb224f4185f62ece125ed200642de57c7021f3b295995153087b25276696f8"
     },
     {
-      "path": "src/native/tray-memory-win-x64.exe",
-      "bytes": 229376,
-      "sha256": "1e1691978c5ff4e0cbf1e073078d99cb56125287f0a8b1eb337bb3b76068ed33"
+      "path": "src/native/tray-memory-win-x64.node",
+      "bytes": 218624,
+      "sha256": "9f8d36e9fcd24d7000fe08bdf6c566d5e095ceefceabbf5118382aa9b5fb163f"
+    },
+    {
+      "path": "src/native/tray-memory-win-x64.sha256",
+      "bytes": 65,
+      "sha256": "be874a0f83d3ba98a56b473239ef3c08bb3ed8174a323cd482050f04c4875195"
     },
     {
       "path": "src/native-content.cjs",
@@ -1057,8 +1062,8 @@
     },
     {
       "path": "src/platform-tray-memory.cjs",
-      "bytes": 2823,
-      "sha256": "e4849b04c45f5d37f3efe487f1a08252f1f21a600b4ab26db03e360ea7d89f77"
+      "bytes": 4030,
+      "sha256": "23de391a06c8d72b2a3a51c105b88e417c2e820b50bbbd61167842ed7ef5d726"
     },
     {
       "path": "src/platform-tray.cjs",
