@@ -14,6 +14,7 @@ import {mountPulseClient} from './pulse-client.mjs';
 import {mountMemberHome} from './member-home.mjs';
 import {mountPlatformLibrary} from './platform-continuity.mjs';
 import {mountConvenience} from './convenience.mjs';
+import {safeDiagnostics} from './convenience-state.mjs';
 import {mountPlatformUpdates} from './update-view.mjs';
 import {mountAccountPage} from './account-page.mjs';
 import {createAccountLifecycle} from './account-lifecycle.mjs';
@@ -51,6 +52,12 @@ const memberHome=mountMemberHome($('view-home'),{storage:localStore,getSnapshot:
 const pulseClient=mountPulseClient($('pulse-client'),{storage:localStore,getContext:()=>({owner:library.owner,status:library.status}),getFavorite:()=>effectivePrefs().favorites.includes('pulse'),onFavorite:toggleSelectedFavorite,onToast:toast,onOpenApp:()=>command('pulse-app','pulse')});
 // 「내 계정」: signed-in entry points open it; signed out they keep the sign-in dialog.
 const accountPage=mountAccountPage($('view-account'),{bridge,getIdentity:()=>auth,getAppIds:()=>library.appIds,onBack:()=>showView('settings'),onSignIn:()=>openAccount(),onSignOut:signOut,onInsight:()=>showView('insight'),onWorkspace:()=>{if(allowed('messenger'))launchFromHome('messenger');else toast('이 계정에서는 작업실을 열 수 없어요.');},onAccountChanged:()=>void refreshAuth({reload:true}),toast:message=>toast(message)});
+// 새 얼굴의 내 계정 방(2단계 둘째 조각 설계 1.3절)이 넘겨준 손잡이와, 그 방에서 「로그인과 보안」을 연 때. 옛 내 계정에서 연 때와 같이 로그인 화면의 비밀번호 안내에 쓴다
+let orbRooms=null,orbSecurityOpenedAt=0;
+const ORB_SECURITY_HINT_MS=30*60000;
+const orbSecurityRecent=()=>!!orbSecurityOpenedAt&&Date.now()-orbSecurityOpenedAt<ORB_SECURITY_HINT_MS;
+// 쓰던 글 확인 대화상자의 글은 새 얼굴 위에 뜨므로 합니다체다(2단계 둘째 조각 설계 14절 D2)
+const SIGN_OUT_DRAFT='저장하지 않은 내용은 로그아웃하면 사라집니다. 돌아가서 저장하거나, 저장 없이 로그아웃할 수 있습니다.';
 // Signed out, a sign-in entry starts the browser sign-in at once and the dialog shows how it goes; a saved sign-in that
 // failed to load (status 'error') or one in progress keeps the dialog first, where 「저장된 로그인 다시 확인」 lives.
 // 새 얼굴이 보이는 동안(임시 옛 화면 포함)에는 계정 대화상자를 열지 않는다. 로그인 전이면 저장된 로그인을 다시 확인한다(대화상자의 「저장된 로그인 다시 확인」과 같다, 0.4.95 원천 후보 검수 F2)
@@ -87,6 +94,8 @@ accountLifecycle.register('benefits',{render:()=>renderBenefits()});
 accountLifecycle.register('solio',{render:()=>renderSolio()});
 accountLifecycle.register('insight',{render:()=>renderInsightView()});
 accountLifecycle.register('convenience',{beforeOwnerChange:()=>convenience?.capture(),afterRender:()=>convenience?.refresh()});
+// 계정 · 세션이 바뀌면 새 얼굴의 내 계정 방이 보이던 자료와 오는 중인 답을 버린다(2단계 둘째 조각 설계 1.3절)
+accountLifecycle.register('orb-rooms',{onAccountChange:()=>orbRooms?.accountChanged?.()});
 function enqueueLibraryAction(id,action){
   const epoch=ownerEpoch;
   pendingLibraryActions++;
@@ -176,8 +185,8 @@ function confirmDraftExit(message){
   $('leave-dialog').returnValue='keep';
   return new Promise(resolve=>{leaveDecision=resolve;$('leave-dialog').showModal();});
 }
-async function confirmUpdateInstall(){const epoch=ownerEpoch;return await confirmDraftExit('돌아가서 저장하거나, 메모를 버리고 업데이트할 수 있어요.')&&epoch===ownerEpoch&&!hasUnsavedDrafts();}
-async function windowAction(action){if(!bridge?.windowAction)return;const epoch=ownerEpoch;if(action==='close'&&environment?.closeToTray!==true&&(!await confirmDraftExit('돌아가서 저장하거나, 메모를 버리고 창을 닫을 수 있어요.')||epoch!==ownerEpoch))return;try{await bridge.windowAction(action);}catch{toast('창을 바꾸지 못했어요.');}}
+async function confirmUpdateInstall(){const epoch=ownerEpoch;return await confirmDraftExit('돌아가서 저장하거나, 메모를 버리고 업데이트할 수 있습니다.')&&epoch===ownerEpoch&&!hasUnsavedDrafts();}
+async function windowAction(action){if(!bridge?.windowAction)return;const epoch=ownerEpoch;if(action==='close'&&environment?.closeToTray!==true&&(!await confirmDraftExit('돌아가서 저장하거나, 메모를 버리고 창을 닫을 수 있습니다.')||epoch!==ownerEpoch))return;try{await bridge.windowAction(action);}catch{toast('창을 바꾸지 못했어요.');}}
 // A longer notice stays longer (about the time to read it), and one said while the window was behind another (a sign-in
 // that timed out in the browser) starts counting only once the window is back in front.
 function toast(message){
@@ -247,7 +256,7 @@ function renderAuth(){
   let message=signedIn?'로그인돼 있어요.':!bridge?'회원가입과 로그인은 SYNK Platform PC 앱에서 해요.':!auth.configured?'로그인 설정을 찾지 못해 로그인할 수 없어요. synk.im에서 PC 앱을 다시 받아 설치해 주세요.':phase==='signing-in'?'브라우저 창에서 로그인하고 「연결하기」를 눌러 주세요. 창이 안 보이면 「로그인 취소」를 누른 뒤 다시 로그인해 주세요.':phase==='restoring'?'저장된 로그인을 확인하고 있어요.':phase==='signing-out'?'로그아웃하고 있어요.':signUpOpened?'회원가입 페이지를 열었어요. 가입을 마쳤다면 「로그인」을 눌러 주세요.':'아직 로그인하지 않았어요.';
   if(auth.error)message+='\n'+(auth.error.message||'로그인을 완료하지 못했어요. 다시 시도해 주세요.');
   // A password changed in the browser's SYNK ID ends this app's session too.
-  if(!signedIn&&auth.error?.code==='AUTH_REQUIRED'&&accountPage.securityVisitedRecently())message+='\n비밀번호를 바꿨다면 새 비밀번호로 다시 로그인해 주세요.';$('account-state').textContent=message;
+  if(!signedIn&&auth.error?.code==='AUTH_REQUIRED'&&(accountPage.securityVisitedRecently()||orbSecurityRecent()))message+='\n비밀번호를 바꿨다면 새 비밀번호로 다시 로그인해 주세요.';$('account-state').textContent=message;
   for(const id of ['signup-button','sign-up']){$(id).hidden=!!signedIn;$(id).disabled=typeof bridge?.authSignUp!=='function'||signing||signUpPending||accountRetryPending;$(id).textContent=signUpPending?'여는 중…':'회원가입';}
   $('signup-help').hidden=!!signedIn||signing||retryable;
   $('forgot-password').hidden=!!signedIn||signing||!bridge||!auth.configured;$('forgot-password').disabled=typeof bridge?.authRecover!=='function';
@@ -261,7 +270,7 @@ function readRoute(){return {view,appId:view==='library'&&!libraryDetail?null:pr
 // 내 성향은 #insight-detail을 비우고 보이기를 끄며, AI 구독 관리는 솔리오의 그 탭이 아닐 때 보이기를 끄고 그릇을 비운다(1분 다시 그리기가 다른 화면을 덮지 않게).
 const VIEW_IDS=['home','library','solio','benefits','downloads','settings','account','insight'];
 function focusCurrentViewHeading(){if(portalHost?.isActive?.()||['portal','app'].includes(portalHost?.clientMode?.())||document.querySelector('dialog[open]'))return;if(view==='home')$('member-home-title')?.focus?.({preventScroll:true});else if(view==='library')(libraryDetail?$('hero-title'):$('main'))?.focus?.({preventScroll:true});else if(view==='benefits')$(selectedBenefit?'benefit-title':'benefits-title')?.focus?.({preventScroll:true});else if(view==='solio')$(solioTab==='subscriptions'?'benefit-title':'solio-title')?.focus?.({preventScroll:true});else if(view==='insight')$('benefit-title')?.focus?.({preventScroll:true});else if(view==='account')($('account-page-title')||$('main'))?.focus?.({preventScroll:true});else $('main')?.focus?.({preventScroll:true});}
-function showView(next,{restore=false,...route}={}){if(next==='benefits'&&Object.hasOwn(SOLIO_LEGACY_BENEFITS,route.benefitId||'')){const moved=solioMigrateRoute({view:next,...route});next=moved.view;route={...route,benefitId:null,section:moved.section};}if(!VIEW_IDS.includes(next))return;if(portalHost?.clientMode?.()==='legacy'&&!['solio','settings','account'].includes(next))return;closeProfileMenu();if(convenience&&!restore){convenience.navigate({view:next,appId:next==='library'?null:prefs.selected,...route});return;}view=next;if(view==='library'){libraryDetail=allowed(route.appId);if(!libraryDetail)libraryOrigin='library';}if(view!=='benefits')$('benefit-detail').innerHTML='';if(view!=='insight'){memberInsight.setVisible(false);$('insight-detail').innerHTML='';}if(view==='solio')solioTab=solioSection(route.section);if(!(view==='solio'&&solioTab==='subscriptions')){subscriptionsBoard.setVisible(false);$('solio-subscriptions').innerHTML='';}if(allowed(route.appId))prefs.selected=route.appId;detail=route.detail||'overview';selectedBenefit=view==='benefits'&&memberBenefit(route.benefitId)?route.benefitId:null;for(const name of VIEW_IDS)$('view-'+name).hidden=name!==view;
+function showView(next,{restore=false,...route}={}){if(next==='benefits'&&Object.hasOwn(SOLIO_LEGACY_BENEFITS,route.benefitId||'')){const moved=solioMigrateRoute({view:next,...route});next=moved.view;route={...route,benefitId:null,section:moved.section};}if(!VIEW_IDS.includes(next))return;if(portalHost?.clientMode?.()==='legacy'&&next!=='account')return;closeProfileMenu();if(convenience&&!restore){convenience.navigate({view:next,appId:next==='library'?null:prefs.selected,...route});return;}view=next;if(view==='library'){libraryDetail=allowed(route.appId);if(!libraryDetail)libraryOrigin='library';}if(view!=='benefits')$('benefit-detail').innerHTML='';if(view!=='insight'){memberInsight.setVisible(false);$('insight-detail').innerHTML='';}if(view==='solio')solioTab=solioSection(route.section);if(!(view==='solio'&&solioTab==='subscriptions')){subscriptionsBoard.setVisible(false);$('solio-subscriptions').innerHTML='';}if(allowed(route.appId))prefs.selected=route.appId;detail=route.detail||'overview';selectedBenefit=view==='benefits'&&memberBenefit(route.benefitId)?route.benefitId:null;for(const name of VIEW_IDS)$('view-'+name).hidden=name!==view;
   // 「내 계정」 sits under 설정, so that tab stays lit; an app intro opened from 내 홈 keeps 내 홈 lit (its 위치 줄 says 「내 홈 / …」).
   const tab=['account','insight'].includes(view)?'settings':view==='library'&&libraryDetail&&libraryOrigin==='home'?'home':view;if(view!=='account')accountPage.hide();document.querySelectorAll('[data-view]').forEach(el=>{el.classList.toggle('active',el.dataset.view===tab);if(el.dataset.view===tab)el.setAttribute('aria-current','page');else el.removeAttribute('aria-current');});if(view==='home')memberHome.render();if(view==='library'){renderLibrary();renderSelected();}if(view==='downloads')renderDownloads();if(view==='settings')renderSettings();if(view==='account')accountPage.show();if(view==='benefits')renderBenefits();if(view==='solio')renderSolio();if(view==='insight')renderInsightView();focusCurrentViewHeading();if(globalThis.location?.hash)replaceHashSilently(formatDesktopRouteHash({view,appId:view==='library'&&libraryDetail?prefs.selected:null,section:view==='solio'?solioTab:null,benefitId:view==='benefits'?selectedBenefit:null}));document.documentElement.dataset.view=view;$('main').scrollTop=route.scroll||0;globalThis.scrollTo?.(0,route.pageScroll||0);$('titlebar')?.classList.toggle('scrolled',(route.scroll||0)>4);}
 function canPreviewBenefit(id){return typeof bridge?.openProductPreview==='function'&&benefitPreviewAvailable(id,{native:!!bridge,appIds:library.appIds,productPreviewsAvailable:environment?.productPreviewsAvailable});}
@@ -299,6 +308,8 @@ function renderSolio(){
   if(view!=='solio'){subscriptionsBoard.setVisible(false);return;}
   $('solio-tabs').innerHTML='<p class="solio-kicker">'+escape(SOLIO.name)+'</p><div class="filters solio-tab-row">'+SOLIO_SECTIONS.map(([id,label])=>'<button type="button" data-solio-section="'+id+'"'+(solioTab===id?' aria-current="page"':'')+'>'+escape(label)+'</button>').join('')+'</div>';
   const subs=solioTab==='subscriptions';$('solio-panel').hidden=subs;$('solio-subscriptions').hidden=!subs;
+  // 새 얼굴이 보이는 동안에는 옛 구독 판을 얼굴 밑에 그리지 않는다. 보인다고 여긴 옛 판이 모델별 토큰 실시간 부탁을 새 줄과 서로 뒤집는다(2단계 둘째 조각 화면 검수)
+  if(subs&&portalHost?.isClientShown?.()){subscriptionsBoard.setVisible(false);$('solio-panel').innerHTML='';$('solio-subscriptions').innerHTML='';return;}
   if(subs){$('solio-panel').innerHTML='';subscriptionsBoard.render($('solio-subscriptions'),{signedIn:!!auth.signedIn,native:!!bridge});return;}
   subscriptionsBoard.setVisible(false);$('solio-subscriptions').innerHTML='';$('solio-panel').innerHTML=solioTab==='backup'?solioBackupHtml():solioHomeHtml();
 }
@@ -406,7 +417,7 @@ async function startSignIn(){
 // disabled, and signOutPending keeps the account page from starting a second one in that window.
 async function signOut(){
   if(signOutPending||!bridge||!auth.signedIn)return;const leaveEpoch=ownerEpoch;
-  if(!await confirmDraftExit('저장하지 않은 내용은 로그아웃하면 사라져요. 돌아가서 저장하거나, 저장 없이 로그아웃할 수 있어요.')||leaveEpoch!==ownerEpoch||!auth.signedIn)return;
+  if(!await confirmDraftExit(SIGN_OUT_DRAFT)||leaveEpoch!==ownerEpoch||!auth.signedIn)return;
   signOutPending=true;$('sign-out').disabled=true;
   const signedOutGeneration=Number.isSafeInteger(auth.sessionGeneration)?auth.sessionGeneration+1:null;
   landing={route:{view:'home'},guest:true};setAuth({status:'signing-out',configured:auth.configured,signedIn:false});const revision=authRevision;
@@ -459,10 +470,36 @@ let windowMaximized=false,portalWindowChrome=null;
 // 검정 구 얼굴(PC 클라이언트 1단계)이 보이는 동안 트레이와 바로가기는 새 얼굴에서 바로 실행되는 앱만 연다. 가린 옛 라이브러리의 앱 소개로 가지 않는다
 function orbRunnable(id){const action=allowed(id)?getAppAction(id):null;return Boolean(bridge&&action&&!action.disabled&&action.action==='launch');}
 // 임시로 여는 옛 화면(설계 9절). 2단계에서 같은 손으로 다시 짓는다
-// 「구독 연결하기」(manage)는 옛 구독 판이 그려진 뒤 판 안의 「계정 관리」를 한 번 눌러 계정 관리 쪽으로 연다. 판 파일은 고치지 않는다
-// 단추 찾기는 앞 호출을 취소하고, 옛 화면에서 구독 판이 아직 보일 때만 누른다(0.4.95 원천 후보 검수)
-let orbManageTimer=null;
-function openOrbLegacy(kind,extra){clearTimeout(orbManageTimer);orbManageTimer=null;if(kind==='subscriptions'){pendingHashRoute=null;subscriptionsBoard.setVisible(false);showView('solio',{section:'subscriptions'});if(extra?.view==='manage'){let tries=0;const go=()=>{orbManageTimer=null;if(portalHost?.clientMode?.()!=='legacy'||document.documentElement.dataset.view!=='solio')return;const button=document.querySelector('#solio-subscriptions [data-subs="manage"]');if(button){button.click();return;}if(++tries<25)orbManageTimer=setTimeout(go,60);};go();}return;}if(kind==='account'){showView('account');return;}if(kind==='settings')showView('settings');}
+// 구독, 계정 관리, 내 계정, 설정은 새 얼굴의 방이 맡는다(2단계 둘째 조각 설계 9.2). 옛 구독 판과 옛 설정 화면으로 가는 갈래는 걷었다.
+// 남는 account 갈래는 내 계정 방의 마을 기록과 연습 기록 내려받기가 쓴다(설계 9.1, 설계 검토 D4). 그 화면에서는 옛 내 계정 말고 다른 보기로 가지 않는다(showView)
+function openOrbLegacy(kind){if(kind==='account'){showView('account');return;}}
+// 새 얼굴의 방이 쓰는 다리(설계 1.3절 「자료 어댑터」). 내 계정 요청은 부를 때의 계정 세대를 잡아 두고, 답이 왔을 때 세대가 바뀌었으면 버린다(옛 내 계정의 epoch 약속과 같다)
+function orbAccountCall(run){const epoch=accountLifecycle.epoch();return Promise.resolve().then(run).then(result=>epoch===accountLifecycle.epoch()?result:{ok:false,code:'changed'});}
+function orbRoomOptions(){
+  const account=typeof bridge?.accountRequest==='function'&&typeof bridge?.accountIdentity==='function'?{
+    request:(operation,params)=>orbAccountCall(()=>bridge.accountRequest(operation,params)),
+    identity:()=>orbAccountCall(()=>bridge.accountIdentity()),
+    security:section=>typeof bridge.authSecurity==='function'?bridge.authSecurity(section):{ok:false},
+    securityOpened:()=>{orbSecurityOpenedAt=Date.now();},
+    changed:()=>void refreshAuth({reload:true}),
+    signedOutAll:()=>toast('모든 SYNK 앱에서 로그아웃했습니다.'),
+    name:()=>auth.account?.display_name||'',
+  }:null;
+  // 설정 방의 다리(설계 1.3절 표, 6.4). 옛 설정 화면이 쓰던 다리를 그대로 넘긴다. 쓰던 글 되살리기는 로그인한 계정의 것만 바꾸고,
+  // 알림은 편의의 통로로 바꿔 배너 판단에 바로 쓰이게 한다. 업데이트 설치는 쓰던 글 확인(confirmUpdateInstall)을 먼저 거친다
+  const draftOwner=()=>auth.signedIn===true?library.owner:null;
+  const drafts=typeof bridge?.draftRecoveryStatus==='function'&&typeof bridge?.setDraftRecoveryEnabled==='function'?{
+    status:()=>bridge.draftRecoveryStatus(draftOwner()),
+    set:async value=>{const owner=draftOwner();if(!owner)return {ok:false,code:'AUTH_REQUIRED'};const result=await bridge.setDraftRecoveryEnabled(value===true,owner);return owner===draftOwner()?result:{ok:false,code:'AUTH_CHANGED'};},
+    onChange:fn=>bridge.onDraftRecoveryChanged?.(fn),
+  }:null;
+  const desktop=typeof bridge?.getDesktopPreferences==='function'&&typeof bridge?.updateDesktopPreferences==='function'?{get:()=>bridge.getDesktopPreferences(),update:patch=>bridge.updateDesktopPreferences(patch),onChange:fn=>bridge.onDesktopPreferences?.(fn)}:null;
+  const updates=['updateStatus','checkForUpdate','downloadUpdate','installUpdate','onUpdateChanged'].every(name=>typeof bridge?.[name]==='function')?{status:()=>bridge.updateStatus(),check:()=>bridge.checkForUpdate(),download:()=>bridge.downloadUpdate(),install:()=>bridge.installUpdate(),confirmInstall:()=>confirmUpdateInstall(),onChange:fn=>bridge.onUpdateChanged(fn)}:null;
+  const notices={get:()=>convenience?.notifications?.get?.()??null,set:patch=>convenience?.notifications?.set?.(patch)??null};
+  const copyDiagnostics=async()=>{const summary=safeDiagnostics({environment,auth,clients,view:'settings',online:navigator.onLine});try{if(bridge?.copyPlatformDiagnostics)return (await bridge.copyPlatformDiagnostics(summary))?.ok===true;await navigator.clipboard.writeText(JSON.stringify(summary,null,2));return true;}catch{return false;}};
+  // 모든 곳에서 로그아웃 전의 쓰던 글 확인은 펼침의 「로그아웃」과 같은 대화상자다(설계 8.3)
+  return {account,confirmLeave:()=>confirmDraftExit(SIGN_OUT_DRAFT),bind:api=>{orbRooms=api||null;},desktop,drafts,notices,updates,environment:()=>environment,copyDiagnostics};
+}
 function syncMaximizeButton(button,maximized){if(!button)return;button.setAttribute('aria-label',maximized?'창 크기 복원':'최대화');button.dataset.maximized=String(Boolean(maximized));}
 function windowState(state){windowMaximized=Boolean(state?.maximized);syncMaximizeButton($('maximize'),windowMaximized);portalWindowChrome?.syncMaximize(windowMaximized);}
 function createPortalWindowChrome(portalRoot){
@@ -537,7 +574,7 @@ portalHost=mountDesktopPortalHost({
   root:$('portal-entry'),
   mountFace:mountOrbFace,
   // PC 쪽 옵션(설계 4절). 검사 실행 길은 본체가 열어 준 때만 열린다(설계 11절)
-  faceOptions:{orbBoot:typeof bridge?.orbBoot==='function'?()=>bridge.orbBoot():null,onFirstFrame:typeof bridge?.orbFirstFrame==='function'?()=>bridge.orbFirstFrame():null,onOpenLegacy:openOrbLegacy,onSignOut:()=>signOut(),subscriptions:bridge?.subscriptions||null,siteVisits:bridge?.siteVisits||null,allowGuestEntry:()=>environment?.qaGuestEntry===true,look:ORB_LOOK},
+  faceOptions:{orbBoot:typeof bridge?.orbBoot==='function'?()=>bridge.orbBoot():null,onFirstFrame:typeof bridge?.orbFirstFrame==='function'?()=>bridge.orbFirstFrame():null,onOpenLegacy:openOrbLegacy,onSignOut:()=>signOut(),subscriptions:bridge?.subscriptions||null,rooms:orbRoomOptions(),siteVisits:bridge?.siteVisits||null,allowGuestEntry:()=>environment?.qaGuestEntry===true,look:ORB_LOOK},
   hostElements:[document.querySelector('.launcher')].filter(Boolean),
   bridge,
   getAuth:()=>auth,

@@ -3,7 +3,7 @@
 // 호스트(portal-host.mjs)가 이름으로 찾는 요소(#portal-invite-input, [data-portal-pane="invite"], #portal-invite-error,
 // [data-portal-auth-feedback], [data-portal-action="close-invite"], [data-portal-action="continue-personal"])를 같은 뜻으로 둔다(설계 6절).
 // 모듈 맨 위에서는 DOM을 건드리지 않는다.
-import { createOrbStage, easeIO, easeIOQ, easeOut, lerp, smooth, switchGeom, PLACE_LON } from './orb-stage.mjs';
+import { fanR, HOME_R, createOrbStage, easeIO, easeIOQ, easeOut, lerp, smooth, switchGeom, PLACE_LON } from './orb-stage.mjs';
 import { createOrbSignature } from './orb-signature.mjs';
 import { rowSpeech } from './site-visits-model.mjs';
 
@@ -20,13 +20,25 @@ const PROGRAM_ICON = Object.freeze({
   visits: '<svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="6.6" fill="none" stroke="currentColor" stroke-width="1.1"/><circle cx="14.7" cy="5.3" r="1.9" fill="currentColor"/></svg>',
 });
 /* 다가가서 잠깐 머물러야 열리고, 벗어나서 잠깐 지나야 닫힌다(시안 NEAR). pad는 오브제 줄에 다가갔다고 보는 거리(px) */
-const NEAR = Object.freeze({ row: 120, prog: 180, close: 400, pad: 64 });
+const NEAR = Object.freeze({ row: 120, prog: 180, close: 400, pad: 64, open: 150, fast: 260, orb: 18, name: 10, zone: 44 });
 /* 오브제 이름이 다 펼쳐지는 데 걸리는 시간. 이름 하나가 0.46초에 펼쳐지고 오브제마다 70ms씩 늦게 시작한다(CSS .obj-n).
  * 이름이 펼쳐지는 동안에는 그 위에 머물러도 프로그램을 열지 않는다. 셋이면 620ms(시안 railSettle), 둘이면 550ms다(사이트방문 설계 6절, 맡긴 세션 11-18) */
 export function railSettleMs(count) {
   return 460 + 70 * Math.max(0, count - 1) + 20;
 }
 const CHEVRON = '<svg viewBox="0 0 8 5" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" d="M1 1l3 3 3-3"/></svg>';
+
+/* 펼침이나 구독 방에서 여는 방(2단계 둘째 조각 설계 1.3절, 시안 data-room="manage" · "account" · "settings"). 맨 위 「돌아가기」, 결론 문장, 줄 묶음, 맨 아래 줄과 글 단추 하나다 */
+const ASIDE_NAMES = Object.freeze(['manage', 'account', 'settings']);
+const ASIDE_LABEL = Object.freeze({ manage: '연결한 계정', account: '내 계정', settings: '설정' });
+function asideMarkup(name) {
+  return `<div class="room room-top room-aside" data-room="${name}" hidden>
+      <button class="quiet up" type="button" data-orb-act="aside-back">돌아가기</button>
+      <p class="say" tabindex="-1" data-aside-say><span data-aside-text></span><span class="then" data-aside-then></span></p>
+      <div class="rows vis" role="group" aria-label="${ASIDE_LABEL[name]}" data-aside-rows></div>
+      <p class="read"><span role="status" aria-live="polite" data-aside-foot></span><button class="reread" type="button" data-room-act="" hidden></button></p>
+    </div>`;
+}
 
 function markup() {
   return `<div class="orb-stage" data-portal-stage data-ui="none" data-mode="portal">
@@ -61,25 +73,27 @@ function markup() {
   </section>
   <section class="orb-layer" data-layer="app" aria-label="솔리오">
     <div class="here">
-      <button class="here-orb" type="button" data-orb-act="open-switch" aria-label="다른 공간으로 가기"></button>
-      <button class="here-name" type="button" data-orb-act="open-switch" aria-label="다른 공간으로 가기"><span data-here-text>SOLIO</span>${CHEVRON}</button>
+      <button class="here-orb" type="button" data-orb-act="open-switch" aria-expanded="false" aria-label="다른 공간으로 가기"></button>
+      <button class="here-name" type="button" data-orb-act="open-switch" aria-expanded="false" aria-label="다른 공간으로 가기"><span data-here-text>SOLIO</span>${CHEVRON}</button>
       <nav class="rail" aria-label="이 공간의 프로그램" data-orb-rail hidden>
         <button class="obj" type="button" data-orb-prog="subs" aria-current="false" style="--k:0">${PROGRAM_ICON.subs}<span class="obj-n"></span></button>
         <button class="obj" type="button" data-orb-prog="visits" aria-current="false" style="--k:1">${PROGRAM_ICON.visits}<span class="obj-n"></span></button>
       </nav>
       <button class="quiet legacy-back" type="button" data-orb-act="legacy-back">돌아가기</button>
     </div>
-    <div class="room" data-room="solio">
+    <div class="fan" role="group" aria-label="갈 수 있는 공간과 계정" data-orb-fan><p class="fan-error" role="alert" data-fan-error></p></div>
+    <div class="room room-top" data-room="solio">
       <p class="sr" role="status" aria-live="polite" data-solio-status></p>
       <p class="say rise" style="--i:1"><span data-say></span><span class="then" data-then></span></p>
       <div class="rows rise" style="--i:3" role="group" aria-label="구독별 남은 양" data-rows></div>
-      <p class="read rise" style="--i:5"><span data-read></span><button class="reread" type="button" data-orb-act="reread">다시 읽기</button><button class="reread" type="button" data-orb-act="connect" hidden>구독 연결하기</button><button class="reread" type="button" data-orb-act="recheck-auth" hidden>다시 확인</button></p>
+      <p class="read rise" style="--i:5"><span data-read></span><button class="reread" type="button" data-orb-act="subs-manage" hidden>계정 관리</button><button class="reread" type="button" data-orb-act="reread">다시 읽기</button><button class="reread" type="button" data-orb-act="connect" hidden>구독 연결하기</button><button class="reread" type="button" data-orb-act="recheck-auth" hidden>다시 확인</button></p>
     </div>
-    <div class="room" data-room="solio-visits" hidden>
+    <div class="room room-top" data-room="solio-visits" hidden>
       <p class="say rise" style="--i:1"><span data-vis-say></span><span class="then" data-vis-then></span></p>
       <div class="rows vis rise" style="--i:3" role="group" aria-label="synk.im 방문자 분석" data-vis-rows></div>
       <p class="read rise" style="--i:5"><span data-vis-when></span><span data-vis-scope></span></p>
     </div>
+    ${ASIDE_NAMES.map(asideMarkup).join('')}
     <div class="room" data-room="space">
       <p class="say rise" style="--i:1"><span data-space-say></span><span class="then" data-space-then></span></p>
       <p class="read rise" style="--i:3"><span data-space-error role="alert"></span><button class="reread" type="button" data-orb-act="reopen-space">다시 열기</button></p>
@@ -116,11 +130,16 @@ export function createOrbFaceView(root, { options = {}, look = {}, onAction = ()
   const app = {
     orbBtn: $('.here-orb'), nameBtn: $('.here-name'), name: $('[data-here-text]'), legacyBack: $('.legacy-back'),
     solio: $('[data-room="solio"]'), say: $('[data-say]'), then: $('[data-then]'), rows: $('[data-rows]'), read: $('[data-read]'),
-    reread: $('[data-orb-act="reread"]'), connect: $('[data-orb-act="connect"]'), recheck: $('[data-orb-act="recheck-auth"]'), solioStatus: $('[data-solio-status]'),
+    reread: $('[data-orb-act="reread"]'), subsManage: $('[data-orb-act="subs-manage"]'), fan: $('[data-orb-fan]'), fanError: $('[data-fan-error]'), connect: $('[data-orb-act="connect"]'), recheck: $('[data-orb-act="recheck-auth"]'), solioStatus: $('[data-solio-status]'),
     space: $('[data-room="space"]'), spaceSay: $('[data-space-say]'), spaceThen: $('[data-space-then]'), spaceError: $('[data-space-error]'), reopen: $('[data-orb-act="reopen-space"]'),
     rail: $('[data-orb-rail]'), objs: [...root.querySelectorAll('[data-orb-prog]')],
     visits: $('[data-room="solio-visits"]'), visSay: $('[data-vis-say]'), visThen: $('[data-vis-then]'), visRows: $('[data-vis-rows]'), visWhen: $('[data-vis-when]'), visScope: $('[data-vis-scope]'),
+    asides: Object.fromEntries(ASIDE_NAMES.map(name => {
+      const r = $(`[data-room="${name}"]`);
+      return [name, { room: r, say: r.querySelector('[data-aside-say]'), text: r.querySelector('[data-aside-text]'), then: r.querySelector('[data-aside-then]'), rows: r.querySelector('[data-aside-rows]'), foot: r.querySelector('[data-aside-foot]'), act: r.querySelector('.read [data-room-act]') }];
+    })),
   };
+  const asideBoxes = Object.values(app.asides).map(a => a.rows);
 
   let disposed = false;
   // 구의 움직임 세대. 점 로고가 도는 동안 다른 움직임(로그아웃으로 묻는 화면에 돌아가기 따위)이 시작되면
@@ -137,7 +156,18 @@ export function createOrbFaceView(root, { options = {}, look = {}, onAction = ()
   let visKey = '';
   let restoringVis = false;
   const moreKeys = new WeakMap();
-  let railSince = -1e9, progTimer = 0, visTimer = 0, visLeave = 0;
+  let railSince = -1e9, progTimer = 0, visTimer = 0, visLeave = 0, subTimer = 0, subLeave = 0;
+  /* 구 곁의 펼침(2단계 첫 조각 설계 1.3절). 다가가 머무는 판정은 화면이 하고, 열고 닫는 것은 컨트롤러에 알린다 */
+  let fanKey = '', fanTimer = 0, fanLeave = 0, fanWasOpen = false, fanReturn = null;
+  /* 방(2단계 둘째 조각). asideReturn은 방을 연 자리(닫을 때 초점을 돌려줄 곳)다. applied는 컨트롤러가 보낸 요청(열 줄, 접을 줄, 초점)을 한 번씩만 따르려고 적어 둔다.
+     stale은 입력 중이거나 누르는 중이라 다시 짓기를 미룬 안쪽이다. 손을 떼거나 초점이 그 안쪽을 떠나면 마저 짓는다 */
+  let lastAside = null, asideReturn = null, pressing = false, liveSeq = 0, fldSeq = 0;
+  /* 방 안에서 옛 화면(마을 기록)을 열 때 누른 단추. 옛 화면을 닫으면 그리로 초점을 돌린다 */
+  let legacyReturn = null, lastModeSeen = null;
+  const applied = { open: {}, close: {}, focus: {} };
+  const stale = new Map();
+  const ptrPx = { x: -1e4, y: -1e4, t: 0, v: 0 };
+  const canHover = () => { try { return win.matchMedia?.('(hover: hover)')?.matches !== false; } catch { return true; } };
   const clock = () => { try { return win.performance?.now?.() ?? Date.now(); } catch { return Date.now(); } };
   // 키보드로 옮긴 초점인가. 창에 초점이 없으면 :focus-visible이 맞지 않으므로 마지막 입력이 자판이었는지도 본다
   let keyboardModality = false;
@@ -273,28 +303,119 @@ export function createOrbFaceView(root, { options = {}, look = {}, onAction = ()
     sw.names.style.top = Math.round(g.cy + g.r + (g.wide ? Math.max(40, (r.height || 1) * 0.075) : 22)) + 'px';
   }
 
+  /* 구독 줄. 줄 안쪽(2단계 첫 조각 설계 2.4절)은 방문자 분석 줄과 같은 틀이다. 1분마다 오는 장면이 펼친 줄과 고정과 초점을 지우지 않게,
+     줄의 차례가 같으면 그 자리의 글만 고쳐 쓰고, 차례가 달라 새로 지을 때는 서비스 이름으로 되살린다 */
   function renderRows(today) {
     const rows = today.rows || [];
-    const key = JSON.stringify(rows.map(r => [r.key, r.name, r.sub, r.gauge, r.val, r.when, r.urgent, r.label]));
+    renderSubRows(rows);
+    // 구독 줄 아래의 종류가 다른 줄(요금, 모델별 토큰)은 줄 열쇠(data-key)로 그린다(2단계 둘째 조각 설계 2.4절 · 3.4절).
+    // 모델별 토큰 줄은 구독이 없어도 서므로 구독 줄 수와 상관없이 그린다
+    putRows(app.rows, today.extra || [], 'solio');
+  }
+  function renderSubRows(rows) {
+    const key = JSON.stringify(rows.map(r => [r.key, r.name, r.sub, r.gauge, r.val, r.when, r.urgent, r.label, r.more]));
     if (app.rows.dataset.key === key) return;
     app.rows.dataset.key = key;
-    app.rows.replaceChildren(...rows.map(r => {
-      const b = doc.createElement('button');
-      b.type = 'button';
-      b.className = 'row' + (r.urgent ? ' now' : '');
-      b.dataset.svc = r.key;
-      b.setAttribute('aria-label', r.label);
-      const nm = doc.createElement('span'); nm.className = 'nm'; nm.textContent = r.name;
-      if (r.sub) { const small = doc.createElement('small'); small.textContent = r.sub; nm.append(small); }
-      const gauge = doc.createElement('span'); gauge.className = 'gauge'; gauge.setAttribute('aria-hidden', 'true');
-      const fill = doc.createElement('i'); fill.style.setProperty('--v', (typeof r.gauge === 'number' ? Math.max(0, Math.min(100, r.gauge)) : 0) + '%');
-      if (typeof r.gauge !== 'number') fill.hidden = true;
-      gauge.append(fill);
-      const val = doc.createElement('span'); val.className = 'val'; val.textContent = r.val || '';
-      const when = doc.createElement('span'); when.className = 'when'; when.textContent = r.when || '';
-      b.append(nm, gauge, val, when);
-      return b;
-    }));
+    clearTimeout(subTimer);
+    const old = [...app.rows.querySelectorAll('button.row[data-svc]')];
+    if (rows.length && old.length === rows.length && old.every((b, i) => b.dataset.svc === String(rows[i].key))) { rows.forEach((r, i) => fillSubRow(old[i], r)); return; }
+    const kept = new Map(rows.length ? old.filter(b => b.classList.contains('opened')).map(b => [b.dataset.svc, b.classList.contains('pin')]) : []);
+    const focused = rows.length ? old.find(b => b === doc.activeElement)?.dataset.svc : undefined;
+    // 줄 안쪽(계정 관리 단추)에 있던 초점도 줄과 동작으로 기억해 둔다(검수 A4)
+    const fa = doc.activeElement, inMore = rows.length && fa && app.rows.contains(fa) ? fa.closest?.('.more') : null;
+    // 팁 반응 단추는 방 동작(data-room-act · data-room-arg)이라 그것도 기억한다(검수 A)
+    const innerAt = inMore ? { svc: inMore.previousElementSibling?.dataset.svc, act: fa.dataset?.orbAct || '', roomAct: fa.dataset?.roomAct, roomArg: fa.dataset?.roomArg } : null;
+    // 구독 줄만 갈아 끼운다. 그 아래의 줄(data-key)은 그대로 두고 그 앞에 넣는다
+    for (const b of old) { if (b.nextElementSibling?.classList.contains('more')) b.nextElementSibling.remove(); b.remove(); }
+    const anchor = app.rows.querySelector(':scope > button.row[data-key]');
+    for (const n of rows.flatMap(subRow)) app.rows.insertBefore(n, anchor);
+    for (const b of app.rows.querySelectorAll('button.row[data-svc]')) if (kept.has(b.dataset.svc)) { setMore(b, true); if (kept.get(b.dataset.svc)) b.classList.add('pin'); }
+    const again = focused === undefined ? null : [...app.rows.querySelectorAll('button.row[data-svc]')].find(b => b.dataset.svc === focused);
+    if (again) { restoringVis = true; try { again.focus({ preventScroll: true }); } catch {} finally { restoringVis = false; } }
+    const home = innerAt ? [...app.rows.querySelectorAll('button.row[data-svc]')].find(b => b.dataset.svc === innerAt.svc) : null;
+    if (home) refocusIn(home, innerAt.act, innerAt);
+  }
+  function subRow(r) {
+    const b = el('button', 'row');
+    b.type = 'button';
+    b.dataset.svc = String(r.key);
+    b.setAttribute('aria-expanded', 'false');
+    const more = el('div', 'more');
+    more.setAttribute('aria-hidden', 'true');
+    more.inert = true;
+    more.append(el('div', 'more-in'));
+    fillSubRow(b, r, more);
+    return [b, more];
+  }
+  /* 줄 하나와 그 안쪽의 글을 쓴다. 펼침, 고정, 초점은 건드리지 않는다. 자료가 없는 줄은 자료 함수가 이미 뺐다(solio-today.mjs moreOf) */
+  function fillSubRow(b, r, more = b.nextElementSibling) {
+    b.classList.toggle('now', !!r.urgent);
+    if (b.getAttribute('aria-label') !== r.label) b.setAttribute('aria-label', r.label);
+    const nm = el('span', 'nm', r.name);
+    if (r.sub) nm.append(el('small', '', r.sub));
+    const gauge = el('span', 'gauge'); gauge.setAttribute('aria-hidden', 'true');
+    const fill = el('i'); fill.style.setProperty('--v', (typeof r.gauge === 'number' ? Math.max(0, Math.min(100, r.gauge)) : 0) + '%');
+    if (typeof r.gauge !== 'number') fill.hidden = true;
+    gauge.append(fill);
+    b.replaceChildren(nm, gauge, el('span', 'val', r.val || ''), el('span', 'when', r.when || ''));
+    const inner = more?.firstElementChild;
+    if (!inner) return;
+    const m = r.more || {}, moreKey = JSON.stringify(m);
+    if (moreKeys.get(inner) === moreKey) return;
+    moreKeys.set(inner, moreKey);
+    // 안쪽 단추에 있던 초점은 같은 동작의 새 단추로 옮긴다. 새로 지으면서 body로 풀리지 않게 한다(검수 A4)
+    const fa = doc.activeElement, keepAct = fa && inner.contains(fa) ? fa.dataset?.orbAct || '' : null, keepRoom = keepAct !== null ? { roomAct: fa.dataset?.roomAct, roomArg: fa.dataset?.roomArg } : null;
+    inner.replaceChildren();
+    let j = 0;
+    const put = n => { n.style.setProperty('--j', String(j++)); inner.append(n); };
+    if (m.say) put(el('p', 'more-say', m.say));
+    for (const f of m.fix || []) put(el('p', 'more-note more-fix', f));
+    for (const a of m.accounts || []) {
+      const row = el('div', 'row sub'), name = el('span', 'nm', a.name);
+      if (a.tag) name.append(el('small', '', a.tag));
+      row.append(name, el('span', 'mid', ''), el('span', 'val', a.val), el('span', 'when', a.when));
+      put(row);
+    }
+    if (m.week) {
+      const row = el('div', 'row sub row-plain'), week = el('span', 'week');
+      week.setAttribute('role', 'img');
+      week.setAttribute('aria-label', '지난 7일의 하루 사용량' + (m.week.avg ? ', ' + m.week.avg : ''));
+      m.week.bars.forEach((x, k) => { const i = el('i', [k === m.week.bars.length - 1 ? 'today' : '', x ? '' : 'none'].filter(Boolean).join(' ')); i.style.setProperty('--h', (x ? x.height : 0) + '%'); week.append(i); });
+      row.append(el('span', 'nm', '지난 7일'), week, el('span', 'val', m.week.avg));
+      put(row);
+    }
+    if (m.cost) {
+      const row = el('div', 'row sub');
+      row.append(el('span', 'nm', '요금'), el('span', 'mid', m.cost.note), el('span', 'val', m.cost.val), el('span', 'when', m.cost.bill));
+      put(row);
+    }
+    if (m.empty) put(el('p', 'more-note', m.empty));
+    // 팁 한 줄과 반응 단추 둘(설계 검토 D7). 반응한 뒤에는 단추 대신 알림 줄이 남는다
+    if (m.tip) {
+      put(el('p', 'more-note more-tip', m.tip.text));
+      if (!m.tip.done) {
+        const tipActs = el('p', 'more-acts');
+        for (const [text, action] of [['도움 됐습니다', 'helpful'], ['이런 팁 그만', 'stop']]) tipActs.append(actButton([text, 'tip', m.tip.key + '|' + action, m.tip.busy ? 'off' : ''], ''));
+        put(tipActs);
+      }
+      const live = el('p', 'more-note more-live', m.tip.live || '');
+      live.setAttribute('role', 'status');
+      live.setAttribute('aria-live', 'polite');
+      put(live);
+    }
+    const acts = el('p', 'more-acts');
+    // 어느 구독에서 눌렀는지 넘긴다. 계정 관리 방이 그 구독의 첫 계정 줄을 연 채 연다(2단계 둘째 조각 설계 9.3)
+    acts.append(button('reread', '계정 관리', { 'data-orb-act': 'connect', 'data-orb-arg': String(r.key) }));
+    put(acts);
+    if (keepAct !== null) refocusIn(b, keepAct, keepRoom);
+  }
+  /* 줄 안쪽에 있던 초점을 되살린다. 그 동작의 단추가 열린 안쪽에 있으면 거기로, 없으면 줄 단추로 돌린다 */
+  function refocusIn(b, act, at = null) {
+    const more = b.nextElementSibling, open = more && !more.inert;
+    const byRoom = open && at?.roomAct ? [...more.querySelectorAll('[data-room-act]')].find(x => x.dataset.roomAct === at.roomAct && (x.dataset.roomArg || '') === (at.roomArg || '')) : null;
+    const t = byRoom || (act && open ? more.querySelector(`[data-orb-act="${act}"]`) : null);
+    restoringVis = true;
+    try { (t || b).focus?.({ preventScroll: true }); } catch {} finally { restoringVis = false; }
   }
 
   function renderApp(s) {
@@ -305,21 +426,24 @@ export function createOrbFaceView(root, { options = {}, look = {}, onAction = ()
     if (app.nameBtn?.getAttribute?.('aria-label') !== nameLabel) app.nameBtn?.setAttribute?.('aria-label', nameLabel);
     app.orbBtn.setAttribute('aria-label', `지금 ${s.spaceLabel}. 다른 공간으로 가기`);
     app.legacyBack.hidden = s.mode !== 'legacy';
-    if (!room) { renderRail(s, [], null); lastProg = null; return; }
+    if (!room) { renderRail(s, [], null); lastProg = null; renderAsides(null, null); return; }
     const solio = room.space === 'solio';
     const prog = solio ? (room.prog || 'subs') : null;
-    app.solio.hidden = !solio || prog !== 'subs';
-    app.visits.hidden = prog !== 'visits';
-    app.space.hidden = solio;
+    // 방이 열려 있으면 그 방 하나만 보인다(시안 #stage[data-aside])
+    const asideName = s.aside && app.asides[s.aside] ? s.aside : null;
+    app.solio.hidden = !solio || prog !== 'subs' || !!asideName;
+    app.visits.hidden = prog !== 'visits' || !!asideName;
+    app.space.hidden = solio || !!asideName;
     renderRail(s, solio ? room.programs || [] : [], prog);
     renderVisits(solio ? room.visits : null);
     if (prog !== lastProg) {
       closeMores(true);
-      if (lastProg !== null && prog) enterRoom(prog);
+      if (lastProg !== null && prog && !asideName) enterRoom(prog);
       lastProg = prog;
     }
+    renderAsides(asideName, s.rooms);
     // 방이 가려진 동안(옛 화면, 다른 공간) 스크롤은 사건 없이 0으로 돌아온다. 그릴 때마다 위쪽 흐림 표시를 지금 스크롤에 맞춘다(0.4.97 검수 A3)
-    for (const r of [app.solio, app.visits]) if (r.classList.contains('scrolled') && !(r.scrollTop > 0)) r.classList.remove('scrolled');
+    for (const r of [app.solio, app.visits, ...Object.values(app.asides).map(a => a.room)]) if (r.classList.contains('scrolled') && !(r.scrollTop > 0)) r.classList.remove('scrolled');
     layers.app.setAttribute('aria-label', solio ? '솔리오' : room.space === 'workspace' ? 'Workspace' : 'PULSE');
     if (solio) {
       const t = room.solio;
@@ -327,9 +451,11 @@ export function createOrbFaceView(root, { options = {}, look = {}, onAction = ()
       setText(app.then, t.then);
       renderRows(t);
       app.rows.classList.toggle('dim', Boolean(t.dim));
-      app.rows.hidden = !(t.rows && t.rows.length);
+      app.rows.hidden = !((t.rows && t.rows.length) || (t.extra && t.extra.length));
       setText(app.read, t.read);
       app.reread.hidden = t.action !== 'reread';
+      // 「구독 관리 열기」는 구독 줄이 있어 「다시 읽기」가 보일 때만 그 옆에 둔다(설계 검토 2차 4)
+      app.subsManage.hidden = t.action !== 'reread' || !(t.rows && t.rows.length);
       app.connect.hidden = t.action !== 'connect';
       app.recheck.hidden = t.action !== 'recheck-auth';
       // 계정 확인을 기다리는 문장은 낭독기에도 알린다(단추가 「사용할 수 없음」으로 바뀐 것만 읽히지 않게, 다시 검수 -e)
@@ -377,7 +503,7 @@ export function createOrbFaceView(root, { options = {}, look = {}, onAction = ()
   }
   /* 다른 프로그램의 방이 뜰 때 안의 것들이 차례로 떠오른다(시안 flashRoom) */
   function enterRoom(prog) {
-    const el = prog === 'visits' ? app.visits : app.solio;
+    const el = app.asides[prog]?.room || (prog === 'visits' ? app.visits : app.solio);
     el.scrollTop = 0;
     el.classList.remove('scrolled');
     el.classList.remove('enter');
@@ -498,26 +624,36 @@ export function createOrbFaceView(root, { options = {}, look = {}, onAction = ()
       }
     }
   }
-  /* 줄 하나를 펼치거나 접는다. pin이면 눌러서 연 것이라 손이 떠나도 열려 있다 */
+  /* 줄 하나를 펼치거나 접는다. pin이면 눌러서 연 것이라 손이 떠나도 열려 있다. 접힌 안쪽의 단추는 Tab 차례에서 빠진다(inert) */
   function setMore(b, on) {
     const more = b.nextElementSibling;
     if (!more || !more.classList.contains('more')) return;
     more.classList.toggle('open', on);
+    more.inert = !on;
     if (on) more.removeAttribute('aria-hidden'); else more.setAttribute('aria-hidden', 'true');
+    const was = b.classList.contains('opened');
     b.classList.toggle('opened', on);
     b.setAttribute('aria-expanded', String(on));
     if (!on) b.classList.remove('pin');
+    // 묻고 있던 줄을 접으면 물음을 거둔다(2단계 둘째 조각 설계 8.2)
+    if (!on && more.querySelector('.quiet.warn')) disarmRow(b);
+    // 지켜보는 줄(모델별 토큰, 계정 지우기)은 열고 접을 때 컨트롤러에 알린다. 그리는 중에 다시 그리지 않게 한 박자 뒤에 알린다
+    if (was !== on && b.dataset?.watch && b.dataset.key) {
+      const room = b.closest('.room')?.dataset.room || '', key = b.dataset.key;
+      setTimeout(() => { if (!disposed) onAction('room', { room, key, act: on ? 'row-open' : 'row-fold' }); }, 0);
+    }
   }
   /* 한 줄을 펼치면 그 아래에 열려 있던 줄은 접는다. 위쪽 줄은 접지 않는다(접으면 손 밑의 줄이 위로 달아난다) */
   function openVis(b, pin = false) {
-    const rows = [...app.visRows.querySelectorAll('button.row[data-vis]')], i = rows.indexOf(b);
+    const box = b.parentElement, rows = box ? [...box.querySelectorAll(':scope > button.row')] : [], i = rows.indexOf(b);
     if (i < 0) return;
     rows.forEach((r, k) => { if (k > i && !r.classList.contains('pin')) setMore(r, false); });
     if (pin) b.classList.add('pin');
     setMore(b, true);
   }
-  function closeMores(all = false) {
-    for (const b of app.visRows.querySelectorAll('button.row[data-vis]')) if (all || !b.classList.contains('pin')) setMore(b, false);
+  /* box를 주면 그 줄 묶음만, 아니면 구독 줄, 방문자 분석 줄, 방의 줄을 모두 접는다 */
+  function closeMores(all = false, box = null) {
+    for (const c of box ? [box] : [app.visRows, app.rows, ...asideBoxes]) for (const b of c.querySelectorAll(':scope > button.row')) if (all || !b.classList.contains('pin')) setMore(b, false);
   }
   const onVisOver = event => {
     const b = event.target?.closest?.('button.row[data-vis]');
@@ -530,11 +666,158 @@ export function createOrbFaceView(root, { options = {}, look = {}, onAction = ()
     if (b && !b.contains(event.relatedTarget)) clearTimeout(visTimer);
   };
   const onVisEnter = () => { clearTimeout(visLeave); };
-  const onVisLeave = () => { clearTimeout(visTimer); clearTimeout(visLeave); visLeave = setTimeout(() => { if (!disposed) closeMores(); }, NEAR.close); };
+  const onVisLeave = () => { clearTimeout(visTimer); clearTimeout(visLeave); visLeave = setTimeout(() => { if (!disposed) closeMores(false, app.visRows); }, NEAR.close); };
   const onVisFocus = event => {
     if (restoringVis) return;
     const b = event.target?.closest?.('button.row[data-vis]');
     if (b && focusVisible(b)) openVis(b);
+  };
+  /* 구독 줄의 안쪽도 방문자 분석 줄과 같은 규칙이다: 머물면 열리고, 묶음을 벗어나 머물면 고정하지 않은 줄이 접히고, 자판 초점이 오면 열린다(설계 검토 2차 1) */
+  /* 방의 줄(data-key)도 같은 규칙이다(2단계 둘째 조각 설계 1.3절). 묶음을 벗어나면 그 묶음의 고정하지 않은 줄만 접힌다 */
+  const ROW_SEL = 'button.row[data-svc],button.row[data-key]';
+  const onSubOver = event => {
+    const b = event.target?.closest?.(ROW_SEL);
+    if (!b || event.pointerType !== 'mouse' || b.contains(event.relatedTarget) || scene?.fan?.open) return;
+    clearTimeout(subTimer);
+    subTimer = setTimeout(() => { if (!disposed && b.isConnected && !scene?.fan?.open) openVis(b); }, NEAR.row);
+  };
+  const onSubOut = event => {
+    const b = event.target?.closest?.(ROW_SEL);
+    if (b && !b.contains(event.relatedTarget)) clearTimeout(subTimer);
+  };
+  const onSubEnter = () => { clearTimeout(subLeave); };
+  const onSubLeave = event => { const box = event?.currentTarget || app.rows; clearTimeout(subTimer); clearTimeout(subLeave); subLeave = setTimeout(() => { if (!disposed) closeMores(false, box); }, NEAR.close); };
+  const onSubFocus = event => {
+    if (restoringVis) return;
+    const b = event.target?.closest?.(ROW_SEL);
+    if (b && focusVisible(b)) openVis(b);
+  };
+
+  /* ── 구 곁의 펼침(2단계 첫 조각 설계 1.3절, 시안 layoutFan · nearStep) ── */
+  const fanShown = () => stageEl.dataset.fan === '1';
+  function renderFan(s) {
+    const f = s.fan, names = f ? f.names : [], foot = f ? f.foot : [];
+    // 1분마다 오는 장면이 같은 목록이면 DOM을 그대로 둔다(초점과 가리킴이 풀리지 않게, 설계 검토 1차 14)
+    const key = JSON.stringify([names.map(n => [n.space, n.label, n.desc, n.current]), foot.map(x => [x.action, x.label])]);
+    if (key !== fanKey) {
+      fanKey = key;
+      const nodes = names.map((n, i) => {
+        const b = el('button', 'fan-go');
+        b.type = 'button';
+        b.dataset.go = n.space;
+        b.style.setProperty('--k', String(i));
+        b.setAttribute('aria-current', String(n.current));
+        b.append(el('span', 'fan-n', n.label), el('span', 'fan-d', n.desc), el('span', 'fan-now', '지금 여기'));
+        return b;
+      });
+      const p = el('p', 'fan-foot');
+      p.style.setProperty('--k', String(names.length));
+      p.append(...foot.map(x => button('quiet', x.label, { 'data-orb-act': 'foot', 'data-foot': x.action })));
+      app.fan.replaceChildren(app.fanError, ...nodes, ...(foot.length ? [p] : []));
+    }
+    setText(app.fanError, f?.error || '');
+    const open = Boolean(f?.open) && s.layer === 'app' && s.mode === 'app';
+    if (open) { if (stageEl.dataset.fan !== '1') stageEl.dataset.fan = '1'; } else if ('fan' in stageEl.dataset) delete stageEl.dataset.fan;
+    for (const b of [app.orbBtn, app.nameBtn]) if (b.getAttribute('aria-expanded') !== String(open)) b.setAttribute('aria-expanded', String(open));
+    app.fan.inert = !open;
+    // 펼친 동안 물러난 이름 단추와 오브제 줄, 흐린 방은 Tab 차례에서도 빠진다. 그 안에 있던 초점은 보이는 구 단추로 먼저 옮긴다(검수 A1)
+    const back = [app.nameBtn, app.rail, app.solio, app.visits, app.space, ...Object.values(app.asides).map(a => a.room)].filter(Boolean);
+    // 다가가 머물러 연(고정하지 않은) 펼침이면 옮기기 전 자리를 기억해 두고, 닫을 때 초점이 구에 그대로 있으면 그 자리로 돌려놓는다(최종 검수 F5)
+    if (open) { const a = doc.activeElement; if (a && back.some(x => x.contains(a))) { fanReturn = f.pin ? null : a; app.orbBtn.focus?.({ preventScroll: true }); } }
+    if (open && f.pin) fanReturn = null;
+    for (const x of back) if (x.inert !== open) x.inert = open;
+    for (const b of app.fan.querySelectorAll('button')) b.disabled = s.busy;
+    if (open && !fanWasOpen) {
+      // 펼칠 때 오브제와 줄의 머묾 타이머를 지운다. 흐린 방 위에서 걸려 있던 머묾이 펼친 뒤에 열리지 않게 한다(설계 검토 1차 4)
+      clearTimeout(fanTimer); fanTimer = 0; clearTimeout(fanLeave); fanLeave = 0;
+      clearTimeout(progTimer); clearTimeout(subTimer); clearTimeout(visTimer);
+      app.rail.classList.remove('near');
+      layoutFan();
+    }
+    if (!open && fanWasOpen) {
+      clearTimeout(fanLeave); fanLeave = 0;
+      stage.setHot(null); stage.setFace(null);
+      for (const b of app.fan.querySelectorAll('.fan-go')) b.classList.remove('hot');
+      // 접힌 펼침에 초점이 남지 않게 구 단추로 돌려놓는다(body로 빠지지 않게)
+      const a = doc.activeElement;
+      if (a && app.fan.contains(a)) app.orbBtn.focus?.({ preventScroll: true });
+      const back0 = fanReturn; fanReturn = null;
+      if (back0 && back0.isConnected && doc.activeElement === app.orbBtn && !back0.closest?.('[inert],[hidden]')) {
+        restoringVis = true;
+        try { back0.focus?.({ preventScroll: true }); } catch {} finally { restoringVis = false; }
+      }
+    }
+    fanWasOpen = open;
+  }
+  /* 끌기 띠의 끌기 칸이 왼쪽 위 묶음 뒤에서 시작하게 그 폭을 뿌리에 적는다. 오브제 이름이 펼쳐질 자리(약 260px)까지 비운다(설계 검토 1차 3나).
+     옛 화면에서는 오브제 줄이 없고 「돌아가기」까지가 그 묶음이다(OS 마우스 확인 11-19) */
+  function syncDragGap(legacy = false) {
+    const r = root.getBoundingClientRect?.(), h = root.querySelector('.here')?.getBoundingClientRect?.();
+    if (!r || !h || !r.width) return;
+    const gap = Math.max(0, Math.min(r.width - 220, Math.round(h.right - r.left + (legacy || app.rail.hidden ? 0 : 260) - 8)));
+    const v = gap + 'px';
+    if (root.style.getPropertyValue('--orb-here-w') !== v) root.style.setProperty('--orb-here-w', v);
+  }
+  /* 펼침의 자리는 앱이 실제로 그리는 작은 구(반지름 13)의 왼쪽 위에서 잡는다. 시안의 16을 옮기지 않는다(설계 검토 1차 ①) */
+  function layoutFan() {
+    const s = stageEl.getBoundingClientRect(), hp = homePoint(), W = s.width || 1, H = s.height || 1, fr = fanR(H);
+    const ox = hp.x - HOME_R, oy = hp.y - HOME_R, side = W >= 560;
+    const top = Math.round(side ? oy + 2 : oy + fr * 2 + 16);
+    app.fan.style.left = Math.round(side ? ox + fr * 2 + 26 : ox + 4) + 'px';
+    app.fan.style.top = top + 'px';
+    // 창보다 길면 펼침 안에서 내린다(시안 11-18)
+    app.fan.style.maxHeight = Math.max(72, H - top - 8) + 'px';
+  }
+  const nearBox = (r, x, y, pad) => x > r.left - pad && x < r.right + pad && y > r.top - pad && y < r.bottom + pad;
+  function nearOrb(x, y) { return nearBox(app.orbBtn.getBoundingClientRect(), x, y, NEAR.orb) || nearBox(app.nameBtn.getBoundingClientRect(), x, y, NEAR.name); }
+  /* 펼친 뒤에 머물 수 있는 넓이: 자란 구와 펼침, 그리고 둘레 */
+  function fanZone(x, y) {
+    const st = stage.state(), s = stageEl.getBoundingClientRect();
+    return Math.hypot(x - s.left - st.cx, y - s.top - (st.top + st.r)) < st.r + NEAR.zone || nearBox(app.fan.getBoundingClientRect(), x, y, NEAR.zone);
+  }
+  /* 다가가 머물면 열고(빠르게 다가오면 조금 더 기다린다), 다가가서 연 것은 구역을 벗어나 머물면 닫는다. 옛 화면이 열린 동안은 다가가서 열지 않는다(설계 검토 1차 2) */
+  /* 머묾이 다 차도 구가 아직 움직이는 중(접히며 돌아오는 중)이면 버리지 않고 움직임이 끝날 때까지 조금씩 미룬다. 손이 그대로 있는데 열리지 않는 일이 없게 한다 */
+  function armFan(ms) {
+    fanTimer = setTimeout(() => {
+      fanTimer = 0;
+      if (disposed || scene?.fan?.open || !nearOrb(ptrPx.x, ptrPx.y)) return;
+      if (stage.moving) { armFan(60); return; }
+      onAction('fan-near');
+    }, ms);
+  }
+  function fanStep(x, y) {
+    if (!scene || scene.layer !== 'app' || scene.mode !== 'app' || scene.busy || !canHover() || stageEl.classList.contains('still')) { clearTimeout(fanTimer); fanTimer = 0; return; }
+    if (!scene.fan?.open) {
+      if (!nearOrb(x, y)) { clearTimeout(fanTimer); fanTimer = 0; }
+      else if (!fanTimer) armFan(ptrPx.v > 1.4 ? NEAR.fast : NEAR.open);
+    } else if (!scene.fan.pin && fanShown()) {
+      if (fanZone(x, y)) { clearTimeout(fanLeave); fanLeave = 0; }
+      else if (!fanLeave) fanLeave = setTimeout(() => { fanLeave = 0; if (!disposed && fanShown() && !scene?.fan?.pin && !fanZone(ptrPx.x, ptrPx.y)) onAction('fan-leave'); }, NEAR.close);
+    }
+  }
+  /* 다가가기와 구역 판정은 무대가 아니라 맨 위 끌기 띠까지 덮는 뿌리에서 듣는다. 띠는 무대의 형제라, 무대에서 들으면 띠 위를 지날 때 판정이 끊긴다(설계 검토 1차 3가) */
+  const onRootMove = event => {
+    const t = clock(), dt = t - ptrPx.t;
+    // 앞 움직임과 0.2초 넘게 떨어졌으면 멈췄다 다시 움직인 것이라 속도를 0으로 둔다. 예전 값이 남아 0.26초를 기다리지 않게 한다(최종 검수 F6, 시안 nearStep)
+    ptrPx.v = ptrPx.t && dt > 0 && dt < 200 ? Math.hypot(event.clientX - ptrPx.x, event.clientY - ptrPx.y) / dt : 0;
+    ptrPx.x = event.clientX; ptrPx.y = event.clientY; ptrPx.t = t;
+    const r = stageEl.getBoundingClientRect();
+    if (r.width && r.height && !reduced() && !stageEl.contains(event.target)) stage.setPointer((event.clientX - r.left) / r.width, (event.clientY - r.top) / r.height);
+    if (event.pointerType !== 'touch') fanStep(event.clientX, event.clientY);
+  };
+  const onRootLeave = () => { ptrPx.x = ptrPx.y = -1e4; ptrPx.t = 0; fanStep(-1e4, -1e4); };
+  /* 눌러서 연 펼침은 바깥을 누르면 닫힌다. 펼친 동안 방은 눌리지 않으므로 그 자리의 줄이 같이 눌리지 않는다 */
+  const onRootDown = event => {
+    if (!fanShown() || !scene?.fan?.pin) return;
+    if (event.target?.closest?.('.here-orb,.here-name')) return;
+    if (!fanZone(event.clientX, event.clientY)) onAction('close-switch');
+  };
+  /* 이름을 가리키면 그 고리가 밝아지고 구가 돌아 그 자리가 앞에 온다(시안 pointAt) */
+  const onFanPoint = event => {
+    const b = event.target?.closest?.('.fan-go[data-go]');
+    const on = event.type === 'pointerover' || event.type === 'focusin';
+    if (b && on) { stage.setHot(b.dataset.go); stage.setFace(b.dataset.go); for (const x of app.fan.querySelectorAll('.fan-go')) x.classList.toggle('hot', x === b); }
+    else if (!on && (!b || !b.contains(event.relatedTarget))) { stage.setHot(null); stage.setFace(null); for (const x of app.fan.querySelectorAll('.fan-go')) x.classList.remove('hot'); }
   };
 
   function setUnavailable(button, off) {
@@ -542,9 +825,371 @@ export function createOrbFaceView(root, { options = {}, look = {}, onAction = ()
     if (off) button.setAttribute('aria-disabled', 'true'); else button.removeAttribute('aria-disabled');
   }
 
+  /* ── 방과 줄 안쪽(2단계 둘째 조각 설계 1.3절, 시안 putRows · nodesOf · showRow · holdBox · twice).
+     자료 함수(solio-rooms.mjs)가 [종류, …]로 적은 안쪽을 그린다. 계정 이름과 본체 글이 섞이므로 글은 모두 textContent로만 넣는다 ── */
+  const FIELD_TYPES = new Set(['password', 'date', 'time', 'email']);
+  const cellKeys = new WeakMap(), acted = new WeakMap();
+  const rowByKey = (box, key) => [...box.querySelectorAll(':scope > button.row[data-key]')].find(b => b.dataset.key === String(key)) || null;
+  const flagsOf = fl => String(fl || '').split(' ').filter(Boolean);
+  function renderAsides(name, roomsScene) {
+    for (const [key, a] of Object.entries(app.asides)) if (a.room.hidden !== (key !== name)) a.room.hidden = key !== name;
+    if (name !== lastAside) {
+      // 방을 연 자리를 적어 둔다. 닫을 때 초점을 그리로 돌린다(설계 1.3절 「보기」)
+      if (name && !lastAside) { const a = doc.activeElement; asideReturn = a && a !== doc.body && root.contains(a) ? a : null; }
+      if (name) { closeMores(true, app.asides[name].rows); enterRoom(name); }
+      else if (lastAside) { for (const b of asideBoxes) acted.delete(b); if (lastProg) enterRoom(lastProg); }
+      lastAside = name;
+    }
+    if (!name) return;
+    const a = app.asides[name], d = roomsScene?.[name];
+    if (!d) return;
+    setText(a.text, d.say);
+    setText(a.then, d.then);
+    putRows(a.rows, d.rows || [], name);
+    setText(a.foot, d.foot);
+    a.act.hidden = !d.act;
+    if (d.act) { setText(a.act, d.act[0]); a.act.dataset.roomAct = d.act[1]; setUnavailable(a.act, flagsOf(d.act[2]).includes('off')); }
+    applyRequests(a.rows, name, d);
+  }
+  /* 컨트롤러의 요청(방을 열 때 열어 둘 줄, 끝난 뒤 접을 줄, 초점을 둘 단추)은 번호마다 한 번만 따른다 */
+  function applyRequests(box, room, d) {
+    if (d.closing && applied.close[room] !== d.closing.seq) {
+      applied.close[room] = d.closing.seq;
+      const b = rowByKey(box, d.closing.key), inner = b?.nextElementSibling?.firstElementChild;
+      if (inner && stale.has(inner)) buildInner(b, inner, stale.get(inner).items);
+      if (b) setMore(b, false);
+    }
+    if (d.opening && applied.open[room] !== d.opening.seq) { applied.open[room] = d.opening.seq; const b = rowByKey(box, d.opening.key); if (b) { openVis(b, true); showRow(b); } }
+    if (d.focus && applied.focus[room] !== d.focus.seq) { applied.focus[room] = d.focus.seq; focusInRoom(box, room, d.focus); }
+  }
+  function focusInRoom(box, room, f) {
+    if (f.say) { focusEl(app.asides[room]?.say); return; }
+    const b = rowByKey(box, f.key);
+    if (!b) return;
+    if (!b.classList.contains('opened')) openVis(b, true);
+    const inner = b.nextElementSibling?.firstElementChild;
+    let t = null;
+    if (f.grp) { const g = [...(inner?.querySelectorAll('[data-grp]') || [])].find(x => x.dataset.grp === f.grp); t = g && !g.hidden ? g.querySelector('input,button') : null; }
+    else if (f.ask) t = inner?.querySelector('[data-ask-q]') || null;
+    else if (f.field) t = fieldEl(inner, f.field);
+    else if (f.act) t = actEl(inner, f.act, f.arg);
+    restoringVis = true;
+    try { (t || b).focus?.({ preventScroll: true }); } catch {} finally { restoringVis = false; }
+  }
+  const actEl = (inner, act, arg) => [...(inner?.querySelectorAll('[data-room-act]') || [])].find(x => x.dataset.roomAct === act && (arg === undefined || arg === null || (x.dataset.roomArg || '') === String(arg))) || null;
+  const fieldEl = (inner, name) => { const n = [...(inner?.querySelectorAll('[data-f]') || [])].find(x => x.dataset.f === name); return n?.matches?.('input') ? n : n?.querySelector('[aria-pressed="true"]') || n?.querySelector('button') || null; };
+  /* 줄 열쇠로 줄을 그린다. 있던 줄은 그 자리에 두고(쓰던 칸과 초점이 남게) 글만 고쳐 쓰고, 없어진 줄은 빼고, 새 줄은 차례에 맞춰 넣는다 */
+  function putRows(box, rows, room) {
+    const byKey = new Map([...box.querySelectorAll(':scope > button.row[data-key]')].map(b => [b.dataset.key, b]));
+    const fa = doc.activeElement, had = fa && box.contains(fa) ? focusInfo(fa) : null;
+    const want = new Set(rows.map(r => String(r.key)));
+    for (const [k, b] of byKey) if (!want.has(k)) { const m = b.nextElementSibling; if (m?.classList.contains('more')) { stale.delete(m.firstElementChild); m.remove(); } b.remove(); byKey.delete(k); }
+    let slot = box.querySelector(':scope > button.row[data-key]');
+    for (const r of rows) {
+      let b = byKey.get(String(r.key)), m = b?.nextElementSibling;
+      if (!b) [b, m] = keyRow(r);
+      if (b === slot) slot = m.nextElementSibling;
+      else { box.insertBefore(b, slot); box.insertBefore(m, slot); }
+      fillKeyRow(b, r, room);
+    }
+    const now = doc.activeElement;
+    if (had && (!now || now === doc.body || !box.contains(now))) restoreFocus(box, had);
+  }
+  function keyRow(r) {
+    const b = el('button', 'row');
+    b.type = 'button';
+    b.dataset.key = String(r.key);
+    b.setAttribute('aria-expanded', 'false');
+    const m = el('div', 'more'), inner = el('div', 'more-in');
+    m.setAttribute('aria-hidden', 'true');
+    m.inert = true;
+    inner.dataset.liveId = 'orb-live-' + (++liveSeq);
+    m.append(inner);
+    return [b, m];
+  }
+  function fillKeyRow(b, r, room) {
+    b.classList.toggle('now', !!r.now);
+    b.classList.toggle('unread', !!r.unread);
+    b.classList.toggle('gap', !!r.gap);
+    if (r.watch) b.dataset.watch = '1'; else delete b.dataset.watch;
+    const label = r.label || [r.nm, r.sub, r.mid, r.val, r.when].filter(Boolean).join(', ');
+    if (b.getAttribute('aria-label') !== label) b.setAttribute('aria-label', label);
+    const cells = [['nm', r.nm, r.sub], ['mid', r.mid], ['val', r.val], ['when', r.when]], ck = JSON.stringify(cells);
+    if (cellKeys.get(b) !== ck) {
+      cellKeys.set(b, ck);
+      b.replaceChildren(...cells.map(([cls, text, sub]) => { const n = el('span', cls, text || ''); if (sub) n.append(el('small', '', sub)); return n; }));
+    }
+    const inner = b.nextElementSibling?.firstElementChild;
+    if (!inner) return;
+    const items = Array.isArray(r.more) ? r.more : [];
+    if (moreKeys.get(inner) === JSON.stringify(items)) { stale.delete(inner); return; }
+    // 쓰던 칸에 초점이 있거나 그 안쪽을 누르는 중이면 지금은 다시 짓지 않는다. 1분 장면이 쓰던 글과 누르던 단추를 지우지 않게 한다(설계 1.3절).
+    // 다만 칸의 글이 방금 저장되어 새 처음 값으로 돌아왔으면 쓰던 중이 아니다. 바로 다시 지어 저장 뒤의 문장을 보인다(초점은 같은 칸으로 돌아간다)
+    const a = doc.activeElement;
+    const typing = !!a && inner.contains(a) && !!a.matches?.('input,textarea,select');
+    const def = typing && a.dataset?.f ? fieldDefault(items, a.dataset.f) : undefined;
+    const savedBack = def === null || (def !== undefined && a.value !== (a.dataset.d ?? '') && def === a.value);
+    if ((typing && !savedBack) || (pressing && pressing !== true && inner.contains(pressing))) {
+      stale.set(inner, { b, items, room });
+      // 다시 짓기를 미루는 동안에도 알림 줄의 글은 고쳐 쓴다. 칸에서 Enter로 저장해도 「저장했습니다.」가 들린다
+      const live = items.find(x => Array.isArray(x) && x[0] === 'live'), node = inner.querySelector('.more-live');
+      if (live && node) setText(node, live[1] || '');
+      return;
+    }
+    buildInner(b, inner, items);
+  }
+  const fieldValue = n => (n.matches?.('input') ? n.value : n.dataset.v ?? '');
+  /* 장면 자료에서 그 이름의 칸이 가질 처음 값. 묶음 안까지 본다 */
+  function fieldDefault(items, field) {
+    for (const x of Array.isArray(items) ? items : []) {
+      if (!Array.isArray(x)) continue;
+      if (x[0] === 'fld' && x[4] === field) return String(x[2] || '');
+      if (x[0] === 'grp') { const v = fieldDefault(x[2], field); if (v !== null) return v; }
+    }
+    return null;
+  }
+  function setPick(p, v) {
+    p.dataset.v = String(v);
+    for (const q of p.querySelectorAll('[data-pv]')) q.setAttribute('aria-pressed', String(q.dataset.pv === String(v)));
+  }
+  function buildInner(b, inner, items) {
+    // 고쳐 쓰던 칸의 값은 그 칸의 처음 값이 그대로일 때만 새 칸에 옮긴다. 저장한 뒤 새 값이 왔으면 새 값을 쓴다
+    const before = new Map([...inner.querySelectorAll('[data-f]')].map(n => [n.dataset.f, { v: fieldValue(n), d: n.dataset.d ?? '' }]));
+    const fa = doc.activeElement, had = fa && inner.contains(fa) ? focusInfo(fa) : null;
+    const liveId = inner.dataset.liveId || (inner.dataset.liveId = 'orb-live-' + (++liveSeq));
+    inner.replaceChildren();
+    let j = 0;
+    for (const n of nodesOf(items, liveId)) { n.style.setProperty('--j', String(j++)); inner.append(n); }
+    for (const n of inner.querySelectorAll('[data-f]')) {
+      const o = before.get(n.dataset.f);
+      if (!o || o.v === o.d || (n.dataset.d ?? '') !== o.d) continue;
+      if (n.matches('input')) n.value = o.v; else setPick(n, o.v);
+    }
+    moreKeys.set(inner, JSON.stringify(items));
+    stale.delete(inner);
+    const box = b.parentElement;
+    if (had && box) restoreFocus(box, had);
+    // 방금 안쪽을 누른 줄이 길어졌으면 지금 할 차례가 보이게 올린다. 그 줄이 화면에 걸쳐 있을 때만 한다(시안 putRows의 끝)
+    const room = b.closest('.room');
+    // 걸쳐 있는지는 줄 머리와 그 아래 열린 안쪽(형제 칸)을 합쳐 본다. 긴 줄을 내려 머리가 위로 지나가도 안쪽을 누른 것은 따라간다(검수 A)
+    const more = b.nextElementSibling, endAt = more?.classList?.contains('more') ? more.offsetTop + more.offsetHeight : b.offsetTop + b.offsetHeight;
+    if (box && acted.get(box) === b.dataset.key && b.classList.contains('opened') && room && b.offsetTop < room.scrollTop + room.clientHeight && endAt > room.scrollTop) {
+      // 누른 단추가 그 자리에 남아 있으면 그 단추와 알림 줄이 보이게 내린다. 줄이 방보다 길어도 지금 누를 단추가 방 안에 온다(설계 10.2절)
+      const a = doc.activeElement;
+      if (a && inner.contains(a)) keepInView(room, a, inner); else showRow(b);
+    }
+  }
+  /* 잴 때의 초점을 따른다. 그리기 뒤 초점 요청(새로 펼친 묶음, 확인 물음)이 초점을 옮겼으면 그 칸을 보이게 하고, 확인 묶음이면 묶음 끝까지 보인다(검수 A) */
+  function keepInView(room, a0, inner) {
+    setTimeout(() => {
+      const cur = doc.activeElement, a = cur && inner.contains(cur) ? cur : a0;
+      if (disposed || !a.isConnected || room.hidden) return;
+      const live = inner.querySelector('.more-live'), whole = a.closest?.('.confirm') || a;
+      const rr = room.getBoundingClientRect(), ar = a.getBoundingClientRect(), wr = whole.getBoundingClientRect(), lr = live && live.textContent ? live.getBoundingClientRect() : ar;
+      const bottom = Math.max(ar.bottom, wr.bottom, lr.bottom), over = bottom - (rr.bottom - 34), under = rr.top + 40 - ar.top;
+      const by = over > 0 ? Math.min(over, Math.max(0, -under)) : under > 0 ? -under : 0;
+      if (by) room.scrollTo?.({ top: Math.max(0, room.scrollTop + by), behavior: reduced() ? 'auto' : 'smooth' });
+    }, 60);
+  }
+  function focusInfo(a) {
+    const more = a.closest?.('.more'), row = a.matches?.('button.row[data-key]') ? a : more?.previousElementSibling;
+    return { key: row?.dataset?.key, row: a === row, act: a.dataset?.roomAct, arg: a.dataset?.roomArg, field: a.dataset?.f || (a.dataset?.pv !== undefined ? a.closest('[data-pick]')?.dataset.f : undefined), pv: a.dataset?.pv, orbAct: a.dataset?.orbAct, qa: a.dataset?.qa !== undefined ? a.textContent : null, sel: typeof a.selectionStart === 'number' ? [a.selectionStart, a.selectionEnd] : null };
+  }
+  /* 다시 지은 뒤 초점을 같은 동작의 단추, 같은 이름의 칸으로 돌린다. 찾지 못하면 그 줄 단추다 */
+  function restoreFocus(box, f) {
+    const b = f.key === undefined ? null : rowByKey(box, f.key);
+    if (!b) return;
+    const inner = b.nextElementSibling?.firstElementChild, open = b.nextElementSibling && !b.nextElementSibling.inert;
+    let t = null;
+    if (!f.row && open && inner) {
+      if (f.act) t = actEl(inner, f.act, f.pv !== undefined ? f.pv : f.arg);
+      if (!t && f.field) { const n = [...inner.querySelectorAll('[data-f]')].find(x => x.dataset.f === f.field); t = n?.matches?.('input') ? n : f.pv !== undefined ? [...(n?.querySelectorAll('[data-pv]') || [])].find(q => q.dataset.pv === f.pv) || null : null; }
+      if (!t && f.orbAct) t = [...inner.querySelectorAll('[data-orb-act]')].find(x => x.dataset.orbAct === f.orbAct) || null;
+      if (!t && f.qa) t = [...inner.querySelectorAll('button[data-qa]')].find(x => x.textContent === f.qa) || null;
+    }
+    restoringVis = true;
+    try {
+      (t || b).focus?.({ preventScroll: true });
+      if (t && f.sel && typeof t.setSelectionRange === 'function') t.setSelectionRange(...f.sel);
+    } catch {} finally { restoringVis = false; }
+  }
+  /* 눌러서 연 줄의 안쪽이 방 아래에 걸리면 그 줄이 방 위쪽에서 44px 아래에 오게 내린다. 다가가서 연 줄과 1분 장면에서는 부르지 않는다(시안 showRow) */
+  function showRow(b) {
+    const r = b.closest('.room');
+    if (!r) return;
+    setTimeout(() => {
+      if (disposed || !b.isConnected || r.hidden) return;
+      const top = b.offsetTop, end = top + b.offsetHeight + (b.nextElementSibling?.firstElementChild?.scrollHeight || 0);
+      if (top < r.scrollTop + 40 || end > r.scrollTop + r.clientHeight - 34) r.scrollTo?.({ top: Math.max(0, top - 44), behavior: reduced() ? 'auto' : 'smooth' });
+    }, 60);
+  }
+  function actButton(spec, liveId) {
+    const [text, act, arg, fl] = Array.isArray(spec) ? spec : [];
+    const f = flagsOf(fl);
+    const q = el('button', ['quiet', f.includes('far') ? 'far' : '', f.includes('warn') ? 'warn' : ''].filter(Boolean).join(' '), text);
+    q.type = 'button';
+    if (f.includes('top')) q.dataset.orbAct = act;
+    else { q.dataset.roomAct = act || ''; q.dataset.roomArg = arg == null ? '' : String(arg); }
+    if (f.includes('off')) q.setAttribute('aria-disabled', 'true');
+    if (f.includes('enter')) q.dataset.enter = '';
+    // 묶음을 여닫는 단추(grp, 확인 묶음을 펼치는 「지우기 요청」)는 펼쳤는지 낭독기에 알린다
+    if (act === 'grp' || f.includes('toggle')) q.setAttribute('aria-expanded', String(f.includes('on')));
+    // 묻는 동안 단추는 무엇이 지워지는지 쓴 알림 줄을 가리킨다(설계 8.2)
+    if (f.includes('warn')) q.setAttribute('aria-describedby', liveId);
+    return q;
+  }
+  function cellOf(cls, v, liveId) {
+    if (Array.isArray(v)) { const s = el('span', cls); s.append(actButton(v, liveId)); return s; }
+    if (v && typeof v === 'object') { const s = el('span', cls, v.text || ''); if (v.btn) { if (v.text) s.append(' '); s.append(actButton(v.btn, liveId)); } return s; }
+    return el('span', cls, v || '');
+  }
+  function nodesOf(items, liveId) {
+    const out = [];
+    for (const item of items) {
+      if (!Array.isArray(item)) continue;
+      const [kind, a, b, c, d, e, g] = item;
+      if (kind === 'say') out.push(el('p', 'more-say', a));
+      else if (kind === 'note') out.push(el('p', 'more-note', a));
+      else if (kind === 'cmd') { const p = el('p', 'more-note more-cmd'); p.append(el('code', '', a)); out.push(p); }
+      else if (kind === 'live') { const p = el('p', 'more-note more-live', a || ''); p.id = liveId; p.setAttribute('role', 'status'); p.setAttribute('aria-live', 'polite'); out.push(p); }
+      else if (kind === 'row') { const r = el('div', 'row sub' + (e ? ' now' : '')); r.append(el('span', 'nm', a), cellOf('mid', b, liveId), cellOf('val', c, liveId), cellOf('when', d, liveId)); out.push(r); }
+      else if (kind === 'gauge') {
+        // 몫을 그은 선(모델별 토큰의 모델 줄). 선은 낭독하지 않고 이름, 값, 오른쪽 칸을 읽는다
+        const r = el('div', 'row sub'), g = el('span', 'gauge'), bar = el('i');
+        g.setAttribute('aria-hidden', 'true');
+        bar.style.setProperty('--v', Math.max(0, Math.min(100, Number(b) || 0)) + '%');
+        g.append(bar);
+        r.append(el('span', 'nm', a), g, el('span', 'val', c || ''), el('span', 'when', d || ''));
+        out.push(r);
+      } else if (kind === 'tog') {
+        // 켜고 끄는 것(시안 tog). 누르면 동작만 보내고, 켜짐 표시는 답이 온 장면으로 바뀐다
+        // 켜짐 단추는 같은 안쪽의 다른 글 단추(내려받기, 열기)처럼 오른쪽 끝 칸에 선다
+        const r = el('div', 'row sub'), mid = el('span', 'mid', b || ''), s = el('span', 'when'), q = el('button', 'quiet', c ? '켜짐' : '꺼짐');
+        mid.id = liveId + '-tog' + (++fldSeq);
+        q.type = 'button';
+        q.setAttribute('role', 'switch');
+        q.setAttribute('aria-checked', String(!!c));
+        q.setAttribute('aria-label', a);
+        q.setAttribute('aria-describedby', mid.id);
+        q.dataset.roomAct = d || '';
+        // 같은 동작의 켜고 끄는 것이 여럿이면(설정 방의 칸 이름) 인자로 가른다. 다시 그린 뒤 초점도 그 인자의 단추로 돌아온다
+        q.dataset.roomArg = g == null ? '' : String(g);
+        if (flagsOf(e).includes('off')) q.setAttribute('aria-disabled', 'true');
+        s.append(q);
+        r.append(el('span', 'nm', a), mid, el('span', 'val', ''), s);
+        out.push(r);
+      } else if (kind === 'confirm') {
+        // 줄 안에서 펼치는 확인 묶음(설계 8.3). 물음 줄이 묶음의 이름이고, 펼치면 초점이 물음 줄로 온다
+        const g = el('div', 'confirm'), q = el('p', 'more-say', a), p = el('p', 'more-acts');
+        q.id = liveId + '-ask';
+        q.tabIndex = -1;
+        q.dataset.askQ = '';
+        g.setAttribute('role', 'group');
+        g.setAttribute('aria-labelledby', q.id);
+        g.append(q, ...(b || []).map(t => el('p', 'more-note', t)));
+        for (const spec of c || []) p.append(actButton(spec, liveId));
+        g.append(p);
+        out.push(g);
+      }
+      else if (kind === 'acts') { const p = el('p', 'more-acts'); if (b) p.append(el('span', 'lab', b)); for (const spec of a || []) p.append(actButton(spec, liveId)); out.push(p); }
+      else if (kind === 'pick') {
+        const p = el('p', 'more-acts');
+        p.setAttribute('role', 'group');
+        p.setAttribute('aria-label', a);
+        p.dataset.pick = '';
+        if (d) { p.dataset.f = d; p.dataset.d = String(c ?? ''); p.dataset.v = String(c ?? ''); }
+        p.append(el('span', 'lab', a));
+        for (const [t, v] of b || []) {
+          const q = el('button', 'quiet', t);
+          q.type = 'button';
+          q.dataset.pv = String(v);
+          q.setAttribute('aria-pressed', String(String(v) === String(c ?? '')));
+          if (e) { q.dataset.roomAct = e; q.dataset.roomArg = String(v); }
+          p.append(q);
+        }
+        out.push(p);
+      } else if (kind === 'fld') {
+        const f = el('div', 'fld'), id = 'orb-fld-' + (++fldSeq), l = el('label', '', a), i = el('input'), h = el('span', 'hint', c || '');
+        l.htmlFor = id;
+        i.id = id;
+        // 숫자 칸도 글 칸으로 둔다. 「290,000」처럼 쉼표를 넣어도 값이 비지 않게 한다(검사가 쉼표를 걷는다)
+        i.type = FIELD_TYPES.has(e) ? e : 'text';
+        if (e === 'number') i.inputMode = 'decimal';
+        i.value = b || '';
+        i.dataset.d = b || '';
+        i.autocomplete = 'off';
+        i.spellcheck = false;
+        if (d) i.dataset.f = d;
+        if (c) { h.id = id + '-h'; i.setAttribute('aria-describedby', h.id); }
+        f.append(l, i, h);
+        out.push(f);
+      } else if (kind === 'qa') {
+        const p = el('p', 'more-acts qa'), n = el('p', 'more-note', b), q = el('button', 'quiet', a);
+        q.type = 'button';
+        q.dataset.qa = '';
+        q.setAttribute('aria-expanded', 'false');
+        n.hidden = true;
+        p.append(q);
+        out.push(p, n);
+      } else if (kind === 'grp') { const g = el('div', 'grp'); g.dataset.grp = a; g.hidden = !!c; g.append(...nodesOf(b || [], liveId)); out.push(g); }
+    }
+    return out;
+  }
+  const fieldsOf = inner => Object.fromEntries([...(inner?.querySelectorAll('[data-f]') || [])].map(n => [n.dataset.f, fieldValue(n)]));
+  /* 방 안쪽의 단추를 누르면 그 줄의 칸 값을 모아 컨트롤러에 보낸다. 고르는 단추는 먼저 그 자리에서 고른 것을 밝힌다 */
+  function roomAct(btn) {
+    if (btn.getAttribute('aria-disabled') === 'true') return;
+    const more = btn.closest('.more'), b = more?.previousElementSibling, box = b?.parentElement;
+    const pick = btn.closest('[data-pick]');
+    if (pick && btn.dataset.pv !== undefined) setPick(pick, btn.dataset.pv);
+    if (box && b) acted.set(box, b.dataset.key);
+    // 구독 줄(data-svc)의 안쪽 단추(팁의 반응)는 「svc:서비스」를 열쇠로 보낸다. 알림 줄도 그 열쇠로 돌아온다
+    const key = b?.dataset.key || (b?.dataset.svc ? 'svc:' + b.dataset.svc : '');
+    onAction('room', { room: btn.closest('.room')?.dataset.room || '', key, act: btn.dataset.roomAct, arg: btn.dataset.roomArg || '', fields: more ? fieldsOf(more.firstElementChild) : {} });
+  }
+  /* 묻고 있던 줄에서 손이나 초점이 떠나면 물음을 거둔다. 그리는 중에 다시 그리지 않게 한 박자 뒤에 알린다 */
+  function disarmRow(b) {
+    if (!b?.dataset?.key) return;
+    const room = b.closest('.room')?.dataset.room || '', key = b.dataset.key;
+    setTimeout(() => { if (!disposed) onAction('room', { room, key, act: 'disarm' }); }, 0);
+  }
+  function flushStale() {
+    for (const [inner, rec] of [...stale]) {
+      if (!inner.isConnected) { stale.delete(inner); continue; }
+      const a = doc.activeElement;
+      if ((a && inner.contains(a) && a.matches?.('input,textarea,select')) || pressing) continue;
+      buildInner(rec.b, inner, rec.items);
+    }
+  }
+  /* 안쪽에서 무언가를 누르거나 칸에 들어가면 그 줄을 고정한다. 쓰던 칸이 저절로 접히지 않게 한다(시안 holdBox). 구독 줄(첫 조각)은 그대로 둔다 */
+  const onRowsHold = event => {
+    const m = event.target?.closest?.('.more'), b = m?.previousElementSibling;
+    if (m && m.classList.contains('open') && b?.matches?.('button.row[data-key]')) b.classList.add('pin');
+  };
+  const onRowsOut = event => {
+    const m = event.target?.closest?.('.more');
+    if (m && m.querySelector('.quiet.warn') && !(event.relatedTarget && m.contains(event.relatedTarget))) disarmRow(m.previousElementSibling);
+  };
+  const onRowsFocusOut = event => {
+    const m = event.target?.closest?.('.more');
+    if (!m || (event.relatedTarget && m.contains(event.relatedTarget))) return;
+    // 다시 짓는 동안 초점이 잠깐 풀리는 것은 떠난 것이 아니다. 한 박자 뒤에도 초점이 그 안쪽 밖에 있을 때만 거둔다
+    setTimeout(() => {
+      if (disposed) return;
+      const a = doc.activeElement;
+      if (m.isConnected && m.querySelector('.quiet.warn') && !(a && m.contains(a))) disarmRow(m.previousElementSibling);
+      if (stale.has(m.firstElementChild)) flushStale();
+    }, 0);
+  };
+  const onPressStart = event => { const t = event.target; pressing = t && t.nodeType === 1 && t.closest?.('.more') ? t : true; };
+  const onPressEnd = () => { if (!pressing) return; pressing = false; if (stale.size) setTimeout(() => { if (!disposed) flushStale(); }, 0); };
+
   function headingFor(s) {
     if (s.layer === 'ask') return s.ask.unconfigured ? '로그인 설정 확인' : '로그인 방법';
     if (s.layer === 'switch') return '공간 고르기';
+    if (s.layer === 'app' && s.aside === 'manage') return '계정 관리';
+    if (s.layer === 'app' && s.aside === 'account') return '내 계정';
+    if (s.layer === 'app' && s.aside === 'settings') return '설정';
     if (s.layer === 'app') return s.space === 'solio' ? '솔리오' : s.space === 'workspace' ? 'Workspace' : 'PULSE';
     if (s.phase === 'welcome') return 'SYNK Platform';
     return '';
@@ -554,6 +1199,9 @@ export function createOrbFaceView(root, { options = {}, look = {}, onAction = ()
     if (disposed) return;
     scene = next;
     const s = next;
+    // 옛 화면으로 바뀌는 그리기에서 지금 초점의 자리를 적어 둔다. 옛 런처가 제 제목으로 초점을 옮기기 전이다
+    if (s.mode === 'legacy' && lastModeSeen !== 'legacy') { const a = doc.activeElement; legacyReturn = a && a !== doc.body && root.contains(a) ? a : null; }
+    lastModeSeen = s.mode;
     // 뿌리에 지키는 표시(설계 4절)
     root.hidden = s.mode === 'off';
     root.dataset.portalState = s.phase;
@@ -584,12 +1232,17 @@ export function createOrbFaceView(root, { options = {}, look = {}, onAction = ()
     stage.setVisiblePlaces(s.places);
     stage.setSpace(s.space);
     stage.setGlint(s.ask?.wait === 'wait' || s.orbBusy);
-    stage.setAutoFace(layer === 'switch');
-    if (layer !== 'switch') stage.setHot(null);
+    const fanOpen = Boolean(s.fan?.open) && layer === 'app' && s.mode === 'app';
+    stage.setAutoFace(layer === 'switch' || fanOpen);
+    if (layer !== 'switch' && !fanOpen) stage.setHot(null);
+    // 손이 다가오면 작은 구가 커지는 것은 들어온 뒤 방에 있고 옛 화면과 펼침이 닫혀 있을 때만이다(설계 검토 1차 2 · 15)
+    stage.setNear(s.mode === 'app' && layer === 'app' && !fanOpen && canHover());
 
     renderAsk(s);
     renderSwitch(s);
     renderApp(s);
+    renderFan(s);
+    if ((s.mode === 'app' || s.mode === 'legacy') && layer === 'app') syncDragGap(s.mode === 'legacy');
     setText(heading, headingFor(s));
     applyFocus(s);
   }
@@ -614,8 +1267,30 @@ export function createOrbFaceView(root, { options = {}, look = {}, onAction = ()
       case 'first-name': return sw.names.querySelector('button') || sw.foot.querySelector('button');
       case 'current-name': return sw.names.querySelector('[aria-current="true"]') || sw.names.querySelector('button');
       case 'here': return app.orbBtn;
+      // 방이 열리면 그 방의 맨 위 문장에 초점을 둔다. 낭독기는 결론 문장부터 읽는다(2단계 둘째 조각 설계 1.3절)
+      case 'aside': return app.asides[scene?.aside]?.say || null;
+      case 'aside-return': return asideReturnTarget();
+      case 'legacy-return': return legacyReturnTarget();
       default: return null;
     }
+  }
+  /* 방에서 연 옛 화면(마을 기록)을 닫을 때 초점을 돌려줄 자리. 연 단추가 보이면 그 단추, 아니면 그 방의 맨 위 문장이다 */
+  function legacyReturnTarget() {
+    const a = legacyReturn;
+    legacyReturn = null;
+    if (a && a.isConnected && root.contains(a) && isVisible(a) && !a.closest('[inert],[hidden]')) return a;
+    return app.asides[scene?.aside]?.say || app.orbBtn;
+  }
+  /* 방을 닫을 때 초점을 돌려줄 자리. 연 단추가 접힌 줄 안쪽에 있으면 그 줄 단추로, 보이지 않으면 구 단추로 간다 */
+  function asideReturnTarget() {
+    const a = asideReturn;
+    asideReturn = null;
+    if (a && a.isConnected && root.contains(a)) {
+      const more = a.closest?.('.more');
+      if (more && !more.classList.contains('open')) { const b = more.previousElementSibling; if (b && isVisible(b) && !b.closest('[inert]')) return b; }
+      if (isVisible(a) && !a.closest('[inert],[hidden]')) return a;
+    }
+    return app.orbBtn;
   }
   function applyFocus(s) {
     if (s.focusSeq === appliedFocusSeq || !s.focus) return;
@@ -689,10 +1364,16 @@ export function createOrbFaceView(root, { options = {}, look = {}, onAction = ()
       stage.setSpace(scene?.mode === 'portal' ? to : (scene?.space || 'solio'));
       stage.setSpin(-PLACE_LON[to]);
       if (scene?.mode === 'portal') stage.setFace(to);
+    } else if (pose === 'fan') {
+      // 구는 지금 공간의 자리를 앞에 두고 자라고, 고리 셋이 차례로 그어진다(시안 openFan)
+      stage.setFace(null);
+      stage.setSpin(-PLACE_LON[scene?.space || 'solio']);
+      stage.sweepIn();
     } else {
       stage.setFace(null);
     }
     await stage.tween(pose, ms, EASE[ease] || easeIO);
+    if (pose === 'home') stage.sweepDone();
   }
   async function dive(space, ms = 1250) {
     if (disposed) return;
@@ -728,7 +1409,7 @@ export function createOrbFaceView(root, { options = {}, look = {}, onAction = ()
     if (disposed) return;
     const target = event.target?.nodeType === 1 ? event.target : event.target?.parentElement;
     if (!target) return;
-    const name = target.closest?.('.sw[data-go]');
+    const name = target.closest?.('.sw[data-go],.fan-go[data-go]');
     if (name && root.contains(name)) { event.preventDefault(); onAction('go', name.dataset.go); return; }
     const visRowEl = target.closest?.('button.row[data-vis]');
     if (visRowEl && root.contains(visRowEl)) {
@@ -739,13 +1420,35 @@ export function createOrbFaceView(root, { options = {}, look = {}, onAction = ()
     }
     const obj = target.closest?.('.obj[data-orb-prog]');
     if (obj && root.contains(obj)) { event.preventDefault(); clearTimeout(progTimer); onAction('prog', obj.dataset.orbProg); return; }
+    // 구독 줄을 누르면 안쪽을 고정하거나 푼다(설계 검토 1차 ③). 옛 판은 줄 안쪽의 「계정 관리」와 방 맨 아래의 「구독 관리 열기」로 연다
     const row = target.closest?.('button.row[data-svc]');
-    if (row && root.contains(row)) { event.preventDefault(); onAction('row', row.dataset.svc); return; }
+    if (row && root.contains(row)) {
+      event.preventDefault();
+      clearTimeout(subTimer);
+      if (row.classList.contains('pin')) setMore(row, false); else openVis(row, true);
+      return;
+    }
+    // 방의 줄(2단계 둘째 조각)도 누르면 고정과 풀기를 오간다. 눌러서 연 줄의 안쪽이 방 아래에 걸리면 올린다
+    const keyed = target.closest?.('button.row[data-key]');
+    if (keyed && root.contains(keyed)) {
+      event.preventDefault();
+      clearTimeout(subTimer);
+      if (keyed.classList.contains('pin')) setMore(keyed, false); else { openVis(keyed, true); showRow(keyed); }
+      return;
+    }
+    const roomBtn = target.closest?.('[data-room-act]');
+    if (roomBtn && root.contains(roomBtn)) { event.preventDefault(); roomAct(roomBtn); return; }
+    // 하나를 고르는 것은 그 자리에서 밝히고, 저장할 때 칸 값으로 보낸다
+    const pv = target.closest?.('[data-pick] [data-pv]');
+    if (pv && root.contains(pv)) { event.preventDefault(); setPick(pv.closest('[data-pick]'), pv.dataset.pv); return; }
+    // 물음을 누르면 답이 바로 아래에 나온다(시안 qa)
+    const qa = target.closest?.('button[data-qa]');
+    if (qa && root.contains(qa)) { event.preventDefault(); const n = qa.parentElement?.nextElementSibling; if (n) { n.hidden = !n.hidden; qa.setAttribute('aria-expanded', String(!n.hidden)); } return; }
     const act = target.closest?.('[data-orb-act]');
     if (act && root.contains(act)) {
       if (act.disabled || act.getAttribute('aria-disabled') === 'true') return;
       event.preventDefault();
-      onAction(act.dataset.orbAct, act.dataset.foot);
+      onAction(act.dataset.orbAct, act.dataset.foot ?? act.dataset.orbArg);
       return;
     }
     // 공간 고르기에서 빈 곳을 누르면 닫히고, 구에 새긴 고리를 누르면 그 공간으로 간다
@@ -774,7 +1477,11 @@ export function createOrbFaceView(root, { options = {}, look = {}, onAction = ()
       stage.setHot(ok ? place : null);
     }
   };
-  const onPointerLeave = () => { stage.setPointer(0.5, 0.5); app.rail.classList.remove('near'); clearTimeout(progTimer); };
+  /* 무대를 떠나 끌기 띠(뿌리 안) 위로 간 것이면 손의 자리를 가운데로 되돌리지 않는다(뿌리가 계속 듣는다) */
+  const onPointerLeave = event => {
+    if (event?.relatedTarget && root.contains(event.relatedTarget)) { app.rail.classList.remove('near'); clearTimeout(progTimer); return; }
+    stage.setPointer(0.5, 0.5); app.rail.classList.remove('near'); clearTimeout(progTimer);
+  };
   const onNameHover = event => {
     if (scene?.layer !== 'switch') return;
     const name = event.target?.closest?.('.sw[data-go]');
@@ -791,6 +1498,17 @@ export function createOrbFaceView(root, { options = {}, look = {}, onAction = ()
     if (event.key === 'Escape') {
       if (mode === 'legacy' && (dialogOutside() || typing || (t && !root.contains(t) && t.closest?.('dialog')))) return;
       if (dialogOutside()) return;
+      // 펼친 줄이 있으면 Esc가 먼저 접는다(시안). 줄 안쪽에 있던 초점은 그 줄로 돌린다
+      // 숨은 방에 남은 고정 줄은 보지 않는다. 보이는 방에 펼친 줄이 없으면 Esc는 원래 일을 한다(검수 A6)
+      if (mode === 'app' && scene?.layer === 'app' && !scene.fan?.open && [...root.querySelectorAll('.more.open')].some(m => !m.closest('[hidden]'))) {
+        const inMore = t?.closest?.('.more');
+        // 보이는 방의 줄만 접는다. 방이 열린 동안 가려진 구독 방의 고정한 줄은 그대로 두어, 방을 닫으면 연 자리로 초점이 돌아간다
+        for (const box of [app.visRows, app.rows, ...asideBoxes]) if (!box.closest('[hidden]')) closeMores(true, box);
+        setTimeout(() => { if (!disposed && stale.size) flushStale(); }, 0);
+        if (inMore) inMore.previousElementSibling?.focus?.({ preventScroll: true });
+        event.preventDefault();
+        return;
+      }
       if (onAction('escape')) { event.preventDefault(); event.stopPropagation(); }
       else if (typing && t && root.contains(t)) t.blur?.();
       return;
@@ -807,9 +1525,30 @@ export function createOrbFaceView(root, { options = {}, look = {}, onAction = ()
       else if (outside || active === last) { event.preventDefault(); first.focus?.({ preventScroll: true }); }
       return;
     }
+    // 방 안쪽의 칸에서 Enter를 누르면 그 묶음의 저장(또는 연결)을 누른다
+    if (event.key === 'Enter' && typing && mode === 'app' && t && root.contains(t) && t.closest?.('.more-in')) {
+      const scope = t.closest('.grp') || t.closest('.more-in');
+      const go = [...scope.querySelectorAll('[data-enter]')].find(x => !x.closest('.grp[hidden]'));
+      if (go) { event.preventDefault(); go.focus?.({ preventScroll: true }); go.click(); }
+      return;
+    }
     if (mode === 'legacy' || typing || event.ctrlKey || event.metaKey || event.altKey) return;
     if ((event.key === 'Enter' || event.key === ' ') && scene?.boot) { event.preventDefault(); onAction('wake'); return; }
     if (event.key === 'Enter' && scene?.layer === 'ask' && !scene.ask.wait && !(t?.closest?.('button')) && scene.ask.showSignIn) { event.preventDefault(); onAction('signin'); return; }
+    // 구 곁의 펼침: 구나 이름에서 아래 화살표를 누르면 고정해 연다. 초점만으로는 열지 않는다(설계 검토 1차 1). 열린 동안 위아래 화살표로 돈다
+    if (scene?.layer === 'app' && mode === 'app') {
+      const onOrb = t === app.orbBtn || t === app.nameBtn;
+      if (!scene.fan?.open && onOrb && event.key === 'ArrowDown') { event.preventDefault(); onAction('open-switch'); return; }
+      if (scene.fan?.open && (event.key === 'ArrowDown' || event.key === 'ArrowUp') && (onOrb || app.fan.contains(t))) {
+        const list = [...app.fan.querySelectorAll('button')].filter(b => !b.disabled);
+        if (list.length) {
+          event.preventDefault();
+          const i = list.indexOf(doc.activeElement), down = event.key === 'ArrowDown';
+          list[i < 0 ? (down ? 0 : list.length - 1) : (i + (down ? 1 : list.length - 1)) % list.length].focus?.({ preventScroll: true });
+        }
+        return;
+      }
+    }
     const obj = t?.closest?.('.obj[data-orb-prog]');
     if (obj && root.contains(obj) && scene?.layer === 'app' && ['ArrowRight', 'ArrowLeft', 'ArrowDown', 'ArrowUp', 'Home', 'End'].includes(event.key)) {
       const list = app.objs.filter(o => !o.hidden), i = list.indexOf(obj);
@@ -853,14 +1592,14 @@ export function createOrbFaceView(root, { options = {}, look = {}, onAction = ()
     else heading.focus?.({ preventScroll: true });
   };
   const onVisibility = () => {
-    if (doc.hidden) { stage.pause(); return; }
+    if (doc.hidden) { stage.pause(); onAction('hidden'); return; }
     stage.resume();
     onAction('visible');
   };
   const onPageShow = event => { onAction('pageshow', event?.persisted === true); };
   const onPageHide = () => { if (ask.input) ask.input.value = ''; stage.pause(); };
   const onQaGuest = () => { onAction('qa-guest'); };
-  const resizeObserver = typeof win.ResizeObserver === 'function' ? new win.ResizeObserver(() => { if (scene?.layer === 'switch') layoutSwitch(); }) : null;
+  const resizeObserver = typeof win.ResizeObserver === 'function' ? new win.ResizeObserver(() => { if (scene?.layer === 'switch') layoutSwitch(); if (fanShown()) layoutFan(); if (scene?.mode === 'app' || scene?.mode === 'legacy') syncDragGap(scene.mode === 'legacy'); }) : null;
 
   root.addEventListener('click', onClick);
   root.addEventListener('scroll', onRoomScroll, true);
@@ -881,8 +1620,36 @@ export function createOrbFaceView(root, { options = {}, look = {}, onAction = ()
   app.visRows.addEventListener('pointerenter', onVisEnter);
   app.visRows.addEventListener('pointerleave', onVisLeave);
   app.visRows.addEventListener('focusin', onVisFocus);
+  app.rows.addEventListener('pointerover', onSubOver);
+  app.rows.addEventListener('pointerout', onSubOut);
+  app.rows.addEventListener('pointerenter', onSubEnter);
+  app.rows.addEventListener('pointerleave', onSubLeave);
+  app.rows.addEventListener('focusin', onSubFocus);
+  for (const box of [app.rows, ...asideBoxes]) {
+    if (box !== app.rows) {
+      box.addEventListener('pointerover', onSubOver);
+      box.addEventListener('pointerout', onSubOut);
+      box.addEventListener('pointerenter', onSubEnter);
+      box.addEventListener('pointerleave', onSubLeave);
+      box.addEventListener('focusin', onSubFocus);
+    }
+    box.addEventListener('pointerdown', onRowsHold);
+    box.addEventListener('focusin', onRowsHold);
+    box.addEventListener('pointerout', onRowsOut);
+    box.addEventListener('focusout', onRowsFocusOut);
+  }
+  app.fan.addEventListener('pointerover', onFanPoint);
+  app.fan.addEventListener('pointerout', onFanPoint);
+  app.fan.addEventListener('focusin', onFanPoint);
+  app.fan.addEventListener('focusout', onFanPoint);
+  root.addEventListener('pointermove', onRootMove, { passive: true });
+  root.addEventListener('pointerleave', onRootLeave);
+  root.addEventListener('pointerdown', onRootDown, true);
   doc.addEventListener('keydown', onAnyKey, true);
   doc.addEventListener('pointerdown', onAnyPointer, true);
+  doc.addEventListener('pointerdown', onPressStart, true);
+  doc.addEventListener('pointerup', onPressEnd, true);
+  doc.addEventListener('pointercancel', onPressEnd, true);
   doc.addEventListener('keydown', onKeyDown);
   doc.addEventListener('paste', onPaste);
   doc.addEventListener('focusin', onFocusIn);
@@ -901,6 +1668,14 @@ export function createOrbFaceView(root, { options = {}, look = {}, onAction = ()
     getInviteValue: () => ask.input?.value ?? '',
     setInviteValue(value) { if (ask.input && ask.input.value !== value) ask.input.value = value; },
     isHidden: () => doc?.hidden === true,
+    /* 설치 명령과 로그인 주소 복사(옛 구독 판처럼 렌더러의 클립보드를 쓴다). 복사했으면 true */
+    copyText(text) {
+      try {
+        const c = win.navigator?.clipboard;
+        if (!text || typeof c?.writeText !== 'function') return Promise.resolve(false);
+        return c.writeText(String(text)).then(() => true, () => false);
+      } catch { return Promise.resolve(false); }
+    },
     prefersReducedMotion: reduced,
     emitState(detail) {
       if (typeof win.CustomEvent === 'function') root.dispatchEvent(new win.CustomEvent(PORTAL_STATE_EVENT, { bubbles: true, detail }));
@@ -914,7 +1689,14 @@ export function createOrbFaceView(root, { options = {}, look = {}, onAction = ()
       clearTimeout(progTimer);
       clearTimeout(visTimer);
       clearTimeout(visLeave);
+      clearTimeout(subTimer);
+      clearTimeout(subLeave);
+      clearTimeout(fanTimer);
+      clearTimeout(fanLeave);
       if (introWait) introWait();
+      root.removeEventListener('pointermove', onRootMove);
+      root.removeEventListener('pointerleave', onRootLeave);
+      root.removeEventListener('pointerdown', onRootDown, true);
       root.removeEventListener('click', onClick);
       root.removeEventListener('scroll', onRoomScroll, true);
       root.removeEventListener('submit', onSubmit);
@@ -924,6 +1706,9 @@ export function createOrbFaceView(root, { options = {}, look = {}, onAction = ()
       stageEl.removeEventListener('pointerleave', onPointerLeave);
       doc.removeEventListener('keydown', onAnyKey, true);
       doc.removeEventListener('pointerdown', onAnyPointer, true);
+      doc.removeEventListener('pointerdown', onPressStart, true);
+      doc.removeEventListener('pointerup', onPressEnd, true);
+      doc.removeEventListener('pointercancel', onPressEnd, true);
       doc.removeEventListener('keydown', onKeyDown);
       doc.removeEventListener('paste', onPaste);
       doc.removeEventListener('focusin', onFocusIn);

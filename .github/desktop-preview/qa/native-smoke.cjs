@@ -110,15 +110,16 @@ function observe(config){
         }
         // DMG 준비가 띄운 알림 띠(5.5~12초)가 사라진 뒤 공간 고르기로 간다. 알림 띠가 「설정」을 덮어 첫 빌드 Mac arm64가 떨어졌다
         await waitFor("(()=>{const t=document.getElementById('toast');return !t||t.hidden||getComputedStyle(t).display==='none';})()",'toast-gone',20000);
-        // 작은 구 → 공간 고르기 → 「설정」 → 옛 설정 보기(legacy). 내려받기와 보관함 보기는 새 얼굴에서 갈 길이 없어 뺀다(Windows 검사기와 같다)
+        // 작은 구 → 구 곁의 펼침 → 「설정」 → 새 얼굴의 설정 방(0.4.98 검정 구 2단계). 옛 설정 화면과 내려받기, 보관함 보기로 가는 길은 없다(Windows 검사기와 같다)
         await clickVisible('#portal-entry .here-orb','orb small orb visible and unobscured');
-        await waitFor("document.querySelector('#portal-entry .orb-stage')?.dataset.ui==='switch'",'orb-switch');await screenshot('platform-orb-switch');
-        await clickVisible('#portal-entry [data-foot="settings"]','orb switch settings visible and unobscured');
-        await waitFor("document.documentElement.dataset.orbClient==='legacy'&&document.documentElement.dataset.view==='settings'",'orb-legacy-settings');
-        // 임시 옛 화면에서는 옛 런처의 잠금이 풀려 눌려야 한다(Windows 검사기와 같다)
-        const unlocked=await run("(()=>{const l=document.querySelector('.launcher'),back=document.querySelector('#portal-entry .legacy-back'),r=back?.getBoundingClientRect();return {launcherInert:Boolean(l?.inert),launcherInertAttr:Boolean(l?.hasAttribute('inert')),launcherAriaHidden:l?.getAttribute('aria-hidden')??null,backVisible:!!back&&!back.hidden&&!!r&&r.width>0&&r.height>0};})()");
-        check('orb legacy view unlocks the old launcher and shows 「돌아가기」',!unlocked.launcherInert&&!unlocked.launcherInertAttr&&unlocked.launcherAriaHidden===null&&unlocked.backVisible,unlocked);
-        await screenshot('platform-legacy-settings');check('Platform boot requires no network',requests.length===0);
+        await waitFor("(()=>{const s=document.querySelector('#portal-entry .orb-stage'),f=document.querySelector('#portal-entry .fan-foot');return s?.dataset.fan==='1'&&!!f&&getComputedStyle(f).opacity==='1';})()",'orb-fan');await screenshot('platform-orb-fan');
+        await clickVisible('#portal-entry .fan [data-foot="settings"]','orb fan settings visible and unobscured');
+        // 업데이트 상태를 받기 전에는 업데이트 줄 없이 「설정을 불러오고 있습니다.」라고 쓴다. 줄이 선 뒤에 본다
+        await waitFor("(()=>{const r=document.querySelector('#portal-entry [data-room=settings]'),say=r?.querySelector('[data-aside-text]');return document.documentElement.dataset.orbClient==='app'&&!!r&&!r.hidden&&!!say&&!!r.querySelector('button.row[data-key=update]')&&getComputedStyle(say.closest('.rise')||say).opacity==='1';})()",'orb-settings-room');
+        // 설정 방은 새 얼굴 안의 방이다. 옛 런처는 잠긴 채이고 옛 설정 보기는 열리지 않는다(Windows 검사기와 같다)
+        const room=await run("(()=>{const l=document.querySelector('.launcher'),r=document.querySelector('#portal-entry [data-room=settings]');return {launcherInert:Boolean(l?.inert),orbClient:document.documentElement.dataset.orbClient,foot:(r.querySelector('[data-aside-foot]')?.textContent||'').trim(),rows:[...r.querySelectorAll('button.row[data-key]')].map(b=>b.dataset.key)};})()");
+        check('orb settings room opens in the face with the launcher still inert',room.launcherInert&&room.orbClient==='app'&&room.rows[0]==='update'&&room.foot.includes(config.version)&&room.foot.includes('시험판'),room);
+        await screenshot('platform-settings-room');check('Platform boot requires no network',requests.length===0);
       }else if(config.mode==='world-offline'){
         const entry='https://synk.im/account/client.html?product=world';
         await waitFor("location.href==='synk-desktop://status/'&&document.readyState==='complete'&&!!document.querySelector('#retry-connection')",'offline-guide');

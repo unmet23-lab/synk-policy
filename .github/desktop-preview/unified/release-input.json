@@ -2,9 +2,9 @@
   "schemaVersion": 1,
   "product": "platform",
   "channel": "preview",
-  "version": "0.4.97",
-  "releaseId": "platform-preview-0.4.97",
-  "buildId": "20261118.1",
+  "version": "0.4.98",
+  "releaseId": "platform-preview-0.4.98",
+  "buildId": "20261119.1",
   "manifestUrl": "https://synk.im/desktop/releases/preview.json",
   "baselines": [
     {
@@ -63,7 +63,7 @@
     }
   ],
   "electronVersion": "44.10.0",
-  "sourceHash": "a079809e4356834db63749e089ee1443b6e7f3df8d3db733d9b870ec505fae22",
+  "sourceHash": "38b16feeed1d54654ca699bc06910ad5f61e155c8621a499031afaea28b51221",
   "sourceFiles": [
     {
       "path": "assets/launcher/benefit-care.webp",
@@ -522,8 +522,8 @@
     },
     {
       "path": "renderer/convenience-state.mjs",
-      "bytes": 6211,
-      "sha256": "ea800dc6447f67f0c9c6d4ad327e022b7d75cd4b77f89d3d1e1bf7769c05647c"
+      "bytes": 6961,
+      "sha256": "9c5864179cadfc3dcdb517077fd831d48ef8e144f5907efde89f06339cc1eeb5"
     },
     {
       "path": "renderer/convenience.css",
@@ -532,8 +532,8 @@
     },
     {
       "path": "renderer/convenience.mjs",
-      "bytes": 27995,
-      "sha256": "de35402209839541879c0d2a13eae6093a863fef88a363c28fe6271e34872752"
+      "bytes": 28019,
+      "sha256": "8ed31ff1ad9943a9fc9b069d445e8e7eae81422e81c92f6d11a1727829bcd99a"
     },
     {
       "path": "renderer/draft-recovery.mjs",
@@ -597,8 +597,8 @@
     },
     {
       "path": "renderer/index.html",
-      "bytes": 27360,
-      "sha256": "4aff46d6dc2cc9ebe62130f8f8a941f13d5df23b3235f2514c1b6e18c4abf152"
+      "bytes": 27363,
+      "sha256": "f39440e883a47383e5f1f97544431d94de407e9ce058d5689235da43848e7fc8"
     },
     {
       "path": "renderer/launcher.css",
@@ -607,8 +607,8 @@
     },
     {
       "path": "renderer/launcher.mjs",
-      "bytes": 111430,
-      "sha256": "175c83ef52046e0ad9c518710c8ce925ebb48694216b69801943f42c4a046275"
+      "bytes": 115565,
+      "sha256": "3ba79c3f8f1304d995de36e0912d54dc9ef1d57b5525ac5a35623eb5fd2cf85f"
     },
     {
       "path": "renderer/library.mjs",
@@ -667,18 +667,23 @@
     },
     {
       "path": "renderer/orb-face-view.mjs",
-      "bytes": 55522,
-      "sha256": "3fd1be725265aa5d05c18eeec2bce933d63c4cd2a7f8b4f1eeccad6ad43b5761"
+      "bytes": 110709,
+      "sha256": "3a9972b0ec04867217c947214826b49c833672f7b8054d25f6ef664af36442ba"
     },
     {
       "path": "renderer/orb-face.css",
-      "bytes": 28725,
-      "sha256": "d94fc22295f72a61dbbe4fe1ca15a8a4407cd324fdb5cbbf8f86e82411bcd176"
+      "bytes": 40333,
+      "sha256": "27d2f0e70f8711f75797e29649c9e7067e868a0e0fe9e280327b8926cfff2880"
     },
     {
       "path": "renderer/orb-face.mjs",
-      "bytes": 87623,
-      "sha256": "1b1139895263a268d201a996dc78d1637b173c18d64a9d909a4ad6c9d1694045"
+      "bytes": 97877,
+      "sha256": "b139ad9ebb76dc674c58cc4708b5bed833949fb0b990414fe7901eabc3a546b5"
+    },
+    {
+      "path": "renderer/orb-rooms.mjs",
+      "bytes": 53215,
+      "sha256": "82fdd5a1c5ec9ddeedb4651195f3d061144c982f5cb13a578b11d294b51228c5"
     },
     {
       "path": "renderer/orb-signature.mjs",
@@ -687,8 +692,8 @@
     },
     {
       "path": "renderer/orb-stage.mjs",
-      "bytes": 39361,
-      "sha256": "3b2a9b845e1baf1e948146ff9b89a57c01215b83bb8f00d8fc3571c5c82aa3d1"
+      "bytes": 42560,
+      "sha256": "60bbbb5694bf5f637b0bb1f144b6a9986ac684144789e92604ab1816b47d62b7"
     },
     {
       "path": "renderer/personalization.mjs",
@@ -756,9 +761,14 @@
       "sha256": "b5cd39981f758a13d2a09b82467d1312f7bce3602e7f9de3981e11a544406ead"
     },
     {
+      "path": "renderer/solio-rooms.mjs",
+      "bytes": 105739,
+      "sha256": "9656b20f13e5fe569b6c7f3573374324f6bc4b5858dccc2201794934ac309d5a"
+    },
+    {
       "path": "renderer/solio-today.mjs",
-      "bytes": 22660,
-      "sha256": "7a89b655bb34b760ca7ef16a361452dd1d59ddea0eac8af63fbff2d3e8f20452"
+      "bytes": 30631,
+      "sha256": "93488e149957e2733a4381a8fe3dc9600adb57f68c3e5402aae983dfdee496fd"
     },
     {
       "path": "renderer/solio.mjs",
@@ -937,13 +947,13 @@
     },
     {
       "path": "src/connection-content.cjs",
-      "bytes": 5579,
-      "sha256": "7b3f8c6558a5512a2a05017dd745a2be8f2f6a2dba7d42feb4b978fec23166ca"
+      "bytes": 6255,
+      "sha256": "84452d33beca589eaa12552e802b8a95ba88bf47aa6d0d0d9ca5eb9bfcc51553"
     },
     {
       "path": "src/connection-recovery.cjs",
-      "bytes": 2640,
-      "sha256": "651b55ff8257a4d3f3081bbe2a712a60fd5549c643c168ae82ee8e8608d57afd"
+      "bytes": 9922,
+      "sha256": "8d5d7e29e56a9d347666719e584c6851feda1b3dd0bade147896a7f96db818c5"
     },
     {
       "path": "src/desktop-preferences.cjs",
@@ -1002,8 +1012,8 @@
     },
     {
       "path": "src/main.cjs",
-      "bytes": 78135,
-      "sha256": "9c72aa735e29bf7669299a208b9e8b040cb08bbb55976caca81de4152d28e058"
+      "bytes": 80537,
+      "sha256": "9f4938c6528b0cd7c07a802884182c3b21770235c20e47d2a0216bfe5fe220a6"
     },
     {
       "path": "src/messenger-teacher.cjs",
@@ -1137,28 +1147,28 @@
     },
     {
       "path": "src/subscription-adapters/claude.cjs",
-      "bytes": 6437,
-      "sha256": "77f20b15c47032fca0a4a8a3ad5289fbcfbb57db1ec66bb1444d223dee5c7053"
+      "bytes": 6464,
+      "sha256": "a206cc50a18cbd381ae304ab53557970f27c0c7e0d86574775166e5ef92498d0"
     },
     {
       "path": "src/subscription-adapters/gemini.cjs",
-      "bytes": 4502,
-      "sha256": "93f10610a8b962844d64a386ead7c6b9ddcd7c3abce08bff46a52b6226ff50f6"
+      "bytes": 4455,
+      "sha256": "f1a636161d15fd24f1242d8860f3151b2c4f6857b32661b19d4e93ff1f9a1fc8"
     },
     {
       "path": "src/subscription-adapters/gpt.cjs",
-      "bytes": 4571,
-      "sha256": "bc943e3ad0660d7b1ed1e4faaa6db84bbebb209b2099a2a76a31379ed9b2f109"
+      "bytes": 4586,
+      "sha256": "885c8062c394b50d7259e9abdd10fc2986fa814bbe8ca2164065053d7d540a0b"
     },
     {
       "path": "src/subscription-adapters/higgsfield.cjs",
-      "bytes": 2662,
-      "sha256": "db2dfeb59e32411c0e668667663989f452b486b804c26b981912e0ff062c5448"
+      "bytes": 2671,
+      "sha256": "7671152bd6739c7b8e22aab4747eb27883fb84cbd6160c982c00492492876ce4"
     },
     {
       "path": "src/subscription-adapters/typecast.cjs",
-      "bytes": 3033,
-      "sha256": "56473261577e5169804a4caf628b4b2c07b3897069caebbbbea8bb4910170b77"
+      "bytes": 3048,
+      "sha256": "f9275602ec178cc382a94e864af47d3a7a7106cb68dbec766c15b622be4e8ac2"
     },
     {
       "path": "src/subscription-catalog.cjs",
@@ -1172,13 +1182,13 @@
     },
     {
       "path": "src/subscription-login.cjs",
-      "bytes": 12067,
-      "sha256": "3b961a29e5014239ba6ea284638f3ebce7a00599762f1d7503c121a94d0ac23e"
+      "bytes": 12132,
+      "sha256": "dd261d2fe7a907a638a24d8ea145f81783a5eb62def14f6d687ac8d9f7864ab5"
     },
     {
       "path": "src/subscription-providers.cjs",
-      "bytes": 2824,
-      "sha256": "7dcad690f5d76779ba3befd9ac5fcf004209851a765e48504abcdc05838939a8"
+      "bytes": 2869,
+      "sha256": "3f8822e3bcf922398b5dc35ca4fb9beff1aba65f18890196ac407ad37955203c"
     },
     {
       "path": "src/subscription-runtime.cjs",
