@@ -4,6 +4,7 @@
 // [data-portal-auth-feedback], [data-portal-action="close-invite"], [data-portal-action="continue-personal"])를 같은 뜻으로 둔다(설계 6절).
 // 모듈 맨 위에서는 DOM을 건드리지 않는다.
 import { fanR, HOME_R, createOrbStage, easeIO, easeIOQ, easeOut, lerp, smooth, switchGeom, PLACE_LON } from './orb-stage.mjs';
+import { createOrbSound } from './orb-sound.mjs';
 import { createOrbSignature } from './orb-signature.mjs';
 import { rowSpeech } from './site-visits-model.mjs';
 
@@ -18,11 +19,16 @@ const MARK_SVG = '<svg class="mark rise" style="--i:0" viewBox="0 0 560 328" rol
 const PROGRAM_ICON = Object.freeze({
   subs: '<svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="6.6" fill="none" stroke="currentColor" stroke-width="1.1"/><path d="M10 10V3.4A6.6 6.6 0 0 1 16.6 10Z" fill="currentColor"/></svg>',
   visits: '<svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="6.6" fill="none" stroke="currentColor" stroke-width="1.1"/><circle cx="14.7" cy="5.3" r="1.9" fill="currentColor"/></svg>',
+  /* 백업: 둘레 안에서 되돌아오는 화살 하나(11-20 백업·복구 탭 세션) */
+  backup: '<svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="6.6" fill="none" stroke="currentColor" stroke-width="1.1"/><path d="M7 11.2A3.2 3.2 0 1 0 7.9 7.6" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/><path d="M6.6 6.2l1.5 1.6-2 .6Z" fill="currentColor"/></svg>',
+  /* 계정 건강: 맥박 한 줄(솔리오 계정건강 시안의 오브제) */
+  health: '<svg viewBox="0 0 20 20" aria-hidden="true"><path d="M2.5 10.5h3.2l1.8-4.5 3 8 2-5.5 1.2 2h3.8" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"/></svg>',
 });
 /* 다가가서 잠깐 머물러야 열리고, 벗어나서 잠깐 지나야 닫힌다(시안 NEAR). pad는 오브제 줄에 다가갔다고 보는 거리(px) */
 const NEAR = Object.freeze({ row: 120, prog: 180, close: 400, pad: 64, open: 150, fast: 260, orb: 18, name: 10, zone: 44 });
-/* 오브제 이름이 다 펼쳐지는 데 걸리는 시간. 이름 하나가 0.46초에 펼쳐지고 오브제마다 70ms씩 늦게 시작한다(CSS .obj-n).
- * 이름이 펼쳐지는 동안에는 그 위에 머물러도 프로그램을 열지 않는다. 셋이면 620ms(시안 railSettle), 둘이면 550ms다(사이트방문 설계 6절, 맡긴 세션 11-18) */
+/* 오브제 이름이 다 펼쳐지는 데 걸리는 시간. 이름 하나가 0.46초에 펼쳐지고 보이는 오브제마다 70ms씩 늦게 시작한다(CSS .obj-n의 --k는 보이는 차례다).
+ * 이름이 펼쳐지는 동안에는 그 위에 머물러도 프로그램을 열지 않는다. 셋이면 620ms(시안 railSettle), 둘이면 550ms, 넷이면 690ms다
+ * (사이트방문 설계 6절, 맡긴 세션 11-18, 계정건강 PC앱_구현설계 10절) */
 export function railSettleMs(count) {
   return 460 + 70 * Math.max(0, count - 1) + 20;
 }
@@ -77,21 +83,47 @@ function markup() {
       <button class="here-name" type="button" data-orb-act="open-switch" aria-expanded="false" aria-label="다른 공간으로 가기"><span data-here-text>SOLIO</span>${CHEVRON}</button>
       <nav class="rail" aria-label="이 공간의 프로그램" data-orb-rail hidden>
         <button class="obj" type="button" data-orb-prog="subs" aria-current="false" style="--k:0">${PROGRAM_ICON.subs}<span class="obj-n"></span></button>
-        <button class="obj" type="button" data-orb-prog="visits" aria-current="false" style="--k:1">${PROGRAM_ICON.visits}<span class="obj-n"></span></button>
+        <button class="obj" type="button" data-orb-prog="backup" aria-current="false" style="--k:1">${PROGRAM_ICON.backup}<span class="obj-n"></span></button>
+        <button class="obj" type="button" data-orb-prog="visits" aria-current="false" style="--k:2">${PROGRAM_ICON.visits}<span class="obj-n"></span></button>
+        <button class="obj" type="button" data-orb-prog="health" aria-current="false" style="--k:3">${PROGRAM_ICON.health}<span class="obj-n"></span></button>
       </nav>
       <button class="quiet legacy-back" type="button" data-orb-act="legacy-back">돌아가기</button>
     </div>
     <div class="fan" role="group" aria-label="갈 수 있는 공간과 계정" data-orb-fan><p class="fan-error" role="alert" data-fan-error></p></div>
     <div class="room room-top" data-room="solio">
       <p class="sr" role="status" aria-live="polite" data-solio-status></p>
+      <div class="dial rise" style="--i:1" data-dial hidden><svg class="dial-sweep" viewBox="-360 -360 720 720" aria-hidden="true"><defs><linearGradient id="orb-dial-sweep" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#F3F1EC" stop-opacity="0"/><stop offset=".5" stop-color="#F3F1EC" stop-opacity=".5"/><stop offset="1" stop-color="#F3F1EC" stop-opacity="0"/></linearGradient></defs><g class="d-sweep"><circle r="318" class="d-sweep-c" stroke="url(#orb-dial-sweep)"/></g></svg><svg viewBox="-360 -360 720 720" role="img" data-dial-svg></svg><span class="dial-orb" aria-hidden="true"></span><p class="dial-hero" aria-hidden="true"><b data-dial-value></b><small data-dial-unit></small><span data-dial-label></span></p></div>
       <p class="say rise" style="--i:1"><span data-say></span><span class="then" data-then></span></p>
-      <div class="rows rise" style="--i:3" role="group" aria-label="구독별 남은 양" data-rows></div>
+      <div class="brief rise" style="--i:2" data-brief hidden>
+        <ol class="soon" aria-label="다가오는 일" data-soon></ol>
+        <p class="soon-more" data-soon-more hidden></p>
+        <p class="live" role="group" data-live><span class="live-big" data-live-big></span><span class="live-unit" data-live-unit></span><span class="live-small" data-live-small></span><button class="reread" type="button" data-orb-act="tok-on" hidden>켜기</button></p>
+        <div class="diag" data-diag hidden>
+          <p class="diag-h"><span>오늘 진단</span><small data-diag-when></small></p>
+          <p class="diag-line"><b data-diag-name></b><em data-diag-word></em><span data-diag-say></span></p>
+          <p class="diag-cost" data-diag-cost></p>
+        </div>
+        <button class="details" type="button" aria-expanded="false" aria-controls="orb-details-top orb-sub-rows" data-details>상세내역</button>
+      </div>
+      <div class="details-top" id="orb-details-top" data-details-top hidden></div>
+      <div class="rows rise" id="orb-sub-rows" style="--i:3" role="group" aria-label="구독별 남은 양" data-rows></div>
       <p class="read rise" style="--i:5"><span data-read></span><button class="reread" type="button" data-orb-act="subs-manage" hidden>계정 관리</button><button class="reread" type="button" data-orb-act="reread">다시 읽기</button><button class="reread" type="button" data-orb-act="connect" hidden>구독 연결하기</button><button class="reread" type="button" data-orb-act="recheck-auth" hidden>다시 확인</button></p>
     </div>
     <div class="room room-top" data-room="solio-visits" hidden>
       <p class="say rise" style="--i:1"><span data-vis-say></span><span class="then" data-vis-then></span></p>
       <div class="rows vis rise" style="--i:3" role="group" aria-label="synk.im 방문자 분석" data-vis-rows></div>
       <p class="read rise" style="--i:5"><span data-vis-when></span><span data-vis-scope></span></p>
+    </div>
+    <div class="room room-top" data-room="solio-backup" hidden>
+      <p class="say rise" style="--i:1"><span data-bak-say></span><span class="then" data-bak-then></span></p>
+      <p class="read acts rise" style="--i:2" role="group" aria-label="백업 할 일" data-bak-acts></p>
+      <div class="rows vis rise" style="--i:3" role="group" aria-label="업무 백업 상태" data-bak-rows></div>
+      <p class="read rise" style="--i:5"><span data-bak-when></span><span data-bak-scope></span></p>
+    </div>
+    <div class="room room-top" data-room="solio-health" hidden>
+      <p class="say rise" style="--i:1"><span data-hea-say></span><span class="then" data-hea-then></span></p>
+      <div class="rows vis hea rise" style="--i:3" role="group" aria-label="SNS 계정 건강" data-hea-rows></div>
+      <p class="read rise" style="--i:5"><span data-hea-when></span><span data-hea-scope></span></p>
     </div>
     ${ASIDE_NAMES.map(asideMarkup).join('')}
     <div class="room" data-room="space">
@@ -130,16 +162,29 @@ export function createOrbFaceView(root, { options = {}, look = {}, onAction = ()
   const app = {
     orbBtn: $('.here-orb'), nameBtn: $('.here-name'), name: $('[data-here-text]'), legacyBack: $('.legacy-back'),
     solio: $('[data-room="solio"]'), say: $('[data-say]'), then: $('[data-then]'), rows: $('[data-rows]'), read: $('[data-read]'),
+    brief: $('[data-brief]'), soon: $('[data-soon]'), soonMore: $('[data-soon-more]'), live: $('[data-live]'), liveBig: $('[data-live-big]'), liveUnit: $('[data-live-unit]'), liveSmall: $('[data-live-small]'), tokOn: $('[data-orb-act="tok-on"]'),
+    dial: $('[data-dial]'), dialSvg: $('[data-dial-svg]'), dialValue: $('[data-dial-value]'), dialUnit: $('[data-dial-unit]'), dialLabel: $('[data-dial-label]'),
+    diag: $('[data-diag]'), diagWhen: $('[data-diag-when]'), diagName: $('[data-diag-name]'), diagWord: $('[data-diag-word]'), diagSay: $('[data-diag-say]'), diagCost: $('[data-diag-cost]'), details: $('[data-details]'), detailsTop: $('[data-details-top]'),
     reread: $('[data-orb-act="reread"]'), subsManage: $('[data-orb-act="subs-manage"]'), fan: $('[data-orb-fan]'), fanError: $('[data-fan-error]'), connect: $('[data-orb-act="connect"]'), recheck: $('[data-orb-act="recheck-auth"]'), solioStatus: $('[data-solio-status]'),
     space: $('[data-room="space"]'), spaceSay: $('[data-space-say]'), spaceThen: $('[data-space-then]'), spaceError: $('[data-space-error]'), reopen: $('[data-orb-act="reopen-space"]'),
     rail: $('[data-orb-rail]'), objs: [...root.querySelectorAll('[data-orb-prog]')],
     visits: $('[data-room="solio-visits"]'), visSay: $('[data-vis-say]'), visThen: $('[data-vis-then]'), visRows: $('[data-vis-rows]'), visWhen: $('[data-vis-when]'), visScope: $('[data-vis-scope]'),
+    backup: $('[data-room="solio-backup"]'), bakSay: $('[data-bak-say]'), bakThen: $('[data-bak-then]'), bakActs: $('[data-bak-acts]'), bakRows: $('[data-bak-rows]'), bakWhen: $('[data-bak-when]'), bakScope: $('[data-bak-scope]'),
+    health: $('[data-room="solio-health"]'), heaSay: $('[data-hea-say]'), heaThen: $('[data-hea-then]'), heaRows: $('[data-hea-rows]'), heaWhen: $('[data-hea-when]'), heaScope: $('[data-hea-scope]'),
     asides: Object.fromEntries(ASIDE_NAMES.map(name => {
       const r = $(`[data-room="${name}"]`);
       return [name, { room: r, say: r.querySelector('[data-aside-say]'), text: r.querySelector('[data-aside-text]'), then: r.querySelector('[data-aside-then]'), rows: r.querySelector('[data-aside-rows]'), foot: r.querySelector('[data-aside-foot]'), act: r.querySelector('.read [data-room-act]') }];
     })),
   };
   const asideBoxes = Object.values(app.asides).map(a => a.rows);
+  /* 솔리오의 읽기 프로그램 방(방문자 분석, 계정 건강). 짜임이 같다: 결론, 줄, 잰 때와 범위. key는 마지막으로 그린 글이다 */
+  const readRooms = {
+    visits: { room: app.visits, say: app.visSay, then: app.visThen, rows: app.visRows, when: app.visWhen, scope: app.visScope, key: '' },
+    health: { room: app.health, say: app.heaSay, then: app.heaThen, rows: app.heaRows, when: app.heaWhen, scope: app.heaScope, key: '' },
+    // 백업 방은 할 일 단추 줄(acts)이 더 있다. 단추는 정해진 동작과 낱말만 넘긴다(src/solio-backup.cjs가 다시 확인한다)
+    backup: { room: app.backup, say: app.bakSay, then: app.bakThen, rows: app.bakRows, when: app.bakWhen, scope: app.bakScope, acts: app.bakActs, key: '' },
+  };
+  const readBoxes = Object.values(readRooms).map(r => r.rows);
 
   let disposed = false;
   // 구의 움직임 세대. 점 로고가 도는 동안 다른 움직임(로그아웃으로 묻는 화면에 돌아가기 따위)이 시작되면
@@ -153,7 +198,6 @@ export function createOrbFaceView(root, { options = {}, look = {}, onAction = ()
   let lastLayer = 'none';
   // 솔리오 안의 프로그램과 방문자 분석의 줄. 펼침은 화면만의 상태다(컨트롤러는 어느 프로그램이 열렸는지만 안다)
   let lastProg = null;
-  let visKey = '';
   let restoringVis = false;
   const moreKeys = new WeakMap();
   let railSince = -1e9, progTimer = 0, visTimer = 0, visLeave = 0, subTimer = 0, subLeave = 0;
@@ -162,6 +206,9 @@ export function createOrbFaceView(root, { options = {}, look = {}, onAction = ()
   /* 방(2단계 둘째 조각). asideReturn은 방을 연 자리(닫을 때 초점을 돌려줄 곳)다. applied는 컨트롤러가 보낸 요청(열 줄, 접을 줄, 초점)을 한 번씩만 따르려고 적어 둔다.
      stale은 입력 중이거나 누르는 중이라 다시 짓기를 미룬 안쪽이다. 손을 떼거나 초점이 그 안쪽을 떠나면 마저 짓는다 */
   let lastAside = null, asideReturn = null, pressing = false, liveSeq = 0, fldSeq = 0;
+  // 칸에서 Enter로 누른 단추. 일이 끝났는데 칸이 남아 있으면(실패나 칸이 남는 저장) 초점을 그 칸으로 돌린다(PC 0.5.0 설계 2절)
+  // 끝났는지는 그 일이 그린 마지막 판을 보고 정한다. 한 번에 끝나는 저장도 중간에 한 번 그리므로, 판단은 그리기 묶음이 지나간 뒤로 미룬다
+  let enterBack = null, enterTimer = 0;
   /* 방 안에서 옛 화면(마을 기록)을 열 때 누른 단추. 옛 화면을 닫으면 그리로 초점을 돌린다 */
   let legacyReturn = null, lastModeSeen = null;
   const applied = { open: {}, close: {}, focus: {} };
@@ -173,7 +220,10 @@ export function createOrbFaceView(root, { options = {}, look = {}, onAction = ()
   let keyboardModality = false;
   const focusVisible = el => { if (keyboardModality) return true; try { return el.matches(':focus-visible'); } catch { return false; } };
   const onAnyKey = event => { if (event.key === 'Tab' || event.key?.startsWith?.('Arrow')) keyboardModality = true; };
-  const onAnyPointer = () => { keyboardModality = false; };
+  // 포인터를 누르면 Enter로 누른 단추의 되돌림 약속도 버린다(PC 0.5.0 설계 2.2, 검토 D10)
+  const onAnyPointer = () => { keyboardModality = false; enterBack = null; };
+  // 그 단추에서 초점이 떠나면(되돌리는 중이 아닐 때) 약속을 버린다. 그리기 없이 끝난 일 뒤에 1분 장면이 초점을 끌어오지 않는다
+  const onEnterLeave = event => { if (enterBack && !restoringVis && event.target?.dataset?.roomAct === enterBack.act && (event.target.dataset.roomArg ?? '') === enterBack.arg) enterBack = null; };
 
   const reduced = () => {
     try { if (getReducedMotion() === true) return true; } catch { /* 무시 */ }
@@ -191,6 +241,8 @@ export function createOrbFaceView(root, { options = {}, look = {}, onAction = ()
   let introPainted = false, firstFrameSent = false;
   const onRender = () => { if (!introPainted || firstFrameSent) return; firstFrameSent = true; try { void Promise.resolve(options.onFirstFrame?.()).catch(() => {}); } catch { /* 무시 */ } };
   const stage = createOrbStage($('.orb-canvas'), { getReducedMotion: reduced, getHome: homePoint, places: look.places !== false, eyes: look.eyes !== false, noWebGL, noCanvas, onRender, onEyes: m => { stageEl.dataset.eyes = m; } });
+  /* 지도의 효과음(2026-11-20 유호님). look.sound가 false면 내지 않는다 */
+  const sound = createOrbSound({ win, enabled: () => look.sound !== false && doc?.hasFocus?.() !== false });   // 앱 창이 뒤에 있을 때는 내지 않는다(Fable 최종 검수 F3)
   const sig = createOrbSignature($('.orb-sig'), { getReducedMotion: reduced, getWidth: () => stageEl.getBoundingClientRect().width || win.innerWidth || 1440 });
 
   /* ── 옛 런처 가리기(지금 얼굴의 lockHostElements와 같다) ── */
@@ -418,6 +470,168 @@ export function createOrbFaceView(root, { options = {}, look = {}, onAction = ()
     try { (t || b).focus?.({ preventScroll: true }); } catch {} finally { restoringVis = false; }
   }
 
+  /* ── 비서 판(솔리오 구독 비서 설계 3절) ── 상세내역을 펼쳤는지는 화면이 앱을 켜 둔 동안 기억한다(설계 3.5) */
+  let detailsOpen = false, liveOut = null, liveFlash = null;
+  const soonItem = i => { const li = el('li'); li.append(el('span', 'w', i.when), el('span', 't', i.text)); return li; };
+  function setDetails(open) {
+    detailsOpen = open;
+    app.details.setAttribute('aria-expanded', String(open));
+    setText(app.details, open ? '상세내역 접기' : '상세내역');
+    const fa = doc.activeElement;
+    app.rows.hidden = !open || !app.rows.children.length;
+    app.detailsTop.hidden = !open || !app.detailsTop.children.length;
+    // 접을 때 초점이 안에 있었으면 상세내역 단추로 옮긴다. body로 빠지지 않게 한다(설계 검토 D9)
+    if (!open && fa && (app.rows.contains(fa) || app.detailsTop.contains(fa))) { closeMores(true); try { app.details.focus({ preventScroll: true }); } catch {} }
+    // 펼친 내역이 방 아래쪽에서 시작하면 그 머리가 보이게 방을 내린다(넓은 창에서도 맨 위 판이 길어 줄이 창 밖에서 시작한다)
+    if (open) {
+      const r = app.solio, first = !app.detailsTop.hidden ? app.detailsTop : app.rows;
+      if (r && first && !first.hidden && first.offsetTop > r.scrollTop + r.clientHeight * 0.55) r.scrollTo?.({ top: Math.max(0, first.offsetTop - 24), behavior: reduced() ? 'auto' : 'smooth' });
+    }
+  }
+  /* ── 문자판(11-20 유호님이 고르신 A, 솔리오 구독 비서 설계 10절) ──
+     구를 가운데 둔 사흘짜리 시계판. 바깥 눈금이 지금부터 72시간, 그 위 금색 호가 지금 속도로 막히지 않는 때까지, 안쪽 고리 칸이 계정 하나씩이다.
+     자료(solio-brief.mjs briefDial)의 때는 지금부터의 거리라 여기서는 각도로만 바꾼다. 계정 이름과 일정 글은 textContent로만 넣는다 */
+  const SVG_NS = 'http://www.w3.org/2000/svg';
+  const sv = (tag, attrs, text) => { const e = doc.createElementNS(SVG_NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); if (text !== undefined) e.textContent = text; return e; };
+  function dialParts(d) {
+    const ang = off => (off / d.span) * 2 * Math.PI - Math.PI / 2, pt = (off, r) => [Math.cos(ang(off)) * r, Math.sin(ang(off)) * r];
+    const arc = (a, b, r) => { const [x0, y0] = pt(a, r), [x1, y1] = pt(b, r); return 'M' + x0.toFixed(1) + ' ' + y0.toFixed(1) + ' A' + r + ' ' + r + ' 0 ' + (b - a > d.span / 2 ? 1 : 0) + ' 1 ' + x1.toFixed(1) + ' ' + y1.toFixed(1); };
+    const parts = [];
+    const defs = sv('defs', {}); parts.push(defs);
+    parts.push(sv('circle', { r: 318, class: 'd-rim' }), sv('circle', { r: 262, class: 'd-inner' }));
+    // 바깥 눈금: 한 시간마다 짧게, 여섯 시간마다 길게, 자정은 가장 길게
+    for (const t of d.ticks) { const [x0, y0] = pt(t.off, 314), [x1, y1] = pt(t.off, t.k === 'day' ? 290 : t.k === 'six' ? 298 : 306); parts.push(sv('line', { x1: x0.toFixed(1), y1: y0.toFixed(1), x2: x1.toFixed(1), y2: y1.toFixed(1), class: 'd-t d-t-' + t.k })); }
+    for (const x of d.days) { const [tx, ty] = pt(x.off, 342); parts.push(sv('text', { x: tx.toFixed(1), y: ty.toFixed(1), class: 'd-day' + (x.off === 0 ? ' d-now' : '') }, x.label)); }
+    // 지금 속도로 막히지 않는 때까지 금색, 모두 막히는 동안은 붉게, 그 뒤는 점선. 사흘 전체는 원으로 그린다.
+    // 양 끝점이 같은 호는 SVG가 그리지 않는다(화면 검수 dial A1). 한 바퀴의 0.2%보다 짧은 구간은 점이 되어 빼다
+    for (const a of d.arcs || []) {
+      if (a.to - a.from <= d.span * 0.002) continue;
+      parts.push(a.to - a.from >= d.span * 0.998 ? sv('circle', { r: 280, class: 'd-' + a.k }) : sv('path', { d: arc(a.from, a.to, 280), class: 'd-' + a.k }));
+    }
+    const [nx, ny] = pt(0, 280); parts.push(sv('circle', { cx: nx.toFixed(1), cy: ny.toFixed(1), r: 4.5, class: 'd-nowdot' }));
+    // 다가오는 일 표식. 다가가면 글이 뜬다(title)
+    for (const e of d.events) {
+      const [x, y] = pt(e.off, 280), cx = x.toFixed(1), cy = y.toFixed(1);
+      const m = e.kind === 'bill' ? sv('rect', { x: (x - 4.5).toFixed(1), y: (y - 4.5).toFixed(1), width: 9, height: 9, transform: 'rotate(45 ' + cx + ' ' + cy + ')', class: 'd-ev d-bill' })
+        : sv('circle', { cx, cy, r: e.kind === 'other' ? 3 : 5.5, class: 'd-ev d-' + e.kind });
+      m.append(sv('title', {}, e.text));
+      parts.push(m);
+    }
+    // 안쪽 고리: 구독마다 계정 칸. 여럿이면 구독 사이를 띄우고 이름을 단다
+    const total = d.rings.reduce((n, r) => n + r.accounts.length, 0), groups = d.rings.length, gg = groups > 1 ? 9 : 0, cg = total > 40 ? 1.2 : 3.2;
+    const per = (360 - groups * gg) / Math.max(1, total), R = 214, P = deg => [Math.cos(deg * Math.PI / 180) * R, Math.sin(deg * Math.PI / 180) * R];
+    let cur = -90 + gg / 2;
+    for (const ring of d.rings) {
+      const start = cur;
+      for (const a of ring.accounts) {
+        const a0 = cur + cg / 2, a1 = cur + per - cg / 2, [x0, y0] = P(a0), [x1, y1] = P(a1);
+        const cell = sv('path', { d: 'M' + x0.toFixed(1) + ' ' + y0.toFixed(1) + ' A' + R + ' ' + R + ' 0 ' + (a1 - a0 > 180 ? 1 : 0) + ' 1 ' + x1.toFixed(1) + ' ' + y1.toFixed(1), class: 'd-cell' + (a.blocked || a.left === 0 ? ' d-cell-out' : a.left === null ? ' d-cell-unknown' : '') + (ring.focus ? '' : ' d-cell-side') });
+        if (!a.blocked && a.left > 0) cell.style.setProperty('--l', String(a.left / 100));
+        cell.append(sv('title', {}, [ring.name, a.name, a.note].filter(Boolean).join(' · ')));
+        parts.push(cell);
+        cur += per;
+      }
+      // 구독 이름은 칸 고리와 바깥 궤도 사이를 따라 굽혀 쓴다. 가로로 쓰면 3시와 9시 쪽에서 칸이나 궤도에 닿았다(Fable 최종 P2).
+      // 아래 반은 글자가 거꾸로 서지 않게 반대로 돈다
+      if (groups > 1 && ring.accounts.length) {
+        // 이름 길은 300°를 넘기지 않는다. 한 구독이 칸의 대부분이면 길이 한 바퀴를 넘어 이름이 문자판 밖으로 나갔다(다시 검수 FA3)
+        const mid = (start + cur) / 2, half = Math.min(150, (cur - start) / 2 + 26), r2 = 247, low = Math.sin(mid * Math.PI / 180) > 0;
+        const Q = deg => [(Math.cos(deg * Math.PI / 180) * r2).toFixed(1), (Math.sin(deg * Math.PI / 180) * r2).toFixed(1)];
+        const [sx, sy] = Q(low ? mid + half : mid - half), [ex, ey] = Q(low ? mid - half : mid + half), id = 'orb-dial-svc-' + parts.length;
+        defs.append(sv('path', { id, d: 'M' + sx + ' ' + sy + ' A' + r2 + ' ' + r2 + ' 0 ' + (half * 2 > 180 ? 1 : 0) + ' ' + (low ? 0 : 1) + ' ' + ex + ' ' + ey }));
+        const t = sv('text', { class: 'd-svc' + (ring.focus ? ' d-svc-focus' : '') });
+        t.append(sv('textPath', { href: '#' + id, startOffset: '50%' }, ring.name));
+        parts.push(t);
+      }
+      cur += gg;
+    }
+    return parts;
+  }
+  // 문자판의 날 이름과 구독 이름은 SVG 단위라 문자판과 함께 줄어든다. 화면에서 10px 아래로 내려가지 않게 지름에 맞춘 배율(--u)을 둔다(Fable 최종 P2)
+  if (typeof ResizeObserver === 'function') new ResizeObserver(es => { const w = es[0]?.contentRect?.width || 0; if (w > 0) app.dialSvg.style.setProperty('--u', (720 / w).toFixed(3)); }).observe(app.dial);
+  function renderDial(d, live = null) {
+    app.dial.hidden = !d;
+    app.solio.classList.toggle('dialed', Boolean(d));
+    // 지금 출력은 숫자가 있을 때(켜짐) 문자판 안 구 위에 둔다. 꺼짐 · 처음 세는 중 · 멈춤의 안내와 「켜기」는 구를 덮지 않게 비서 판의 제자리(진단 앞)에 둔다(화면 검수 dial A3)
+    const inDial = Boolean(d) && live?.state === 'on';
+    if (inDial && app.live.parentElement !== app.dial) app.dial.append(app.live);
+    else if (!inDial && app.live.parentElement !== app.brief) app.brief.insertBefore(app.live, app.diag);
+    if (!d) return;
+    const key = JSON.stringify(d);
+    if (app.dial.dataset.key === key) return;
+    app.dial.dataset.key = key;
+    setText(app.dialValue, d.hero.value); setText(app.dialUnit, d.hero.unit); setText(app.dialLabel, d.hero.label);
+    if (app.dialSvg.getAttribute('aria-label') !== d.label) app.dialSvg.setAttribute('aria-label', d.label);
+    app.dialSvg.replaceChildren(...dialParts(d));
+  }
+  function renderBrief(b, fold) {
+    app.brief.hidden = !b;
+    renderDial(b && fold ? b.dial || null : null, b?.live || null);
+    if (!b) { app.detailsTop.hidden = true; return; }
+    const soon = b.soon?.shown || [], key = JSON.stringify(soon);
+    if (app.soon.dataset.key !== key) { app.soon.dataset.key = key; app.soon.replaceChildren(...soon.map(soonItem)); }
+    app.soon.hidden = !soon.length;
+    setText(app.soonMore, b.soon?.more ? '48시간 안에 ' + b.soon.more + '개가 더 있습니다. 상세내역에 있습니다.' : '');
+    app.soonMore.hidden = !b.soon?.more;
+    // 지금 출력. 숫자가 오르면 숫자만 잠깐 밝아진다(움직임 줄이기에서는 그대로)
+    const l = b.live;
+    app.live.hidden = !l;
+    if (l) {
+      setText(app.liveBig, l.big); setText(app.liveUnit, l.unit); setText(app.liveSmall, l.small);
+      if (app.live.dataset.state !== l.state) app.live.dataset.state = l.state;
+      // 「켜기」를 누르면 단추가 사라진다. 초점이 그 단추에 있었으면 상세내역 단추(없으면 다시 읽기)로 옮긴다(화면 검수 A8)
+      const hideOn = l.state !== 'off', hadFocus = hideOn && !app.tokOn.hidden && doc.activeElement === app.tokOn;
+      app.tokOn.hidden = hideOn;
+      if (hadFocus) { const to = !app.details.hidden ? app.details : app.reread; try { to.focus({ preventScroll: true }); } catch {} }
+      const label = l.state === 'on' ? ['지금 출력', l.unit, l.big + ' 토큰', l.small].filter(Boolean).join(', ') : l.small;
+      if (app.live.getAttribute('aria-label') !== label) app.live.setAttribute('aria-label', label);
+      if (l.state === 'on' && liveOut !== null && l.out > liveOut && !reduced()) {
+        app.liveBig.classList.add('bump'); clearTimeout(liveFlash);
+        liveFlash = setTimeout(() => app.liveBig.classList.remove('bump'), 600);
+      }
+      liveOut = l.state === 'on' ? l.out : null;
+    }
+    // 오늘 진단: 첫 화면에는 가장 무거운 판정 한 줄과 구독료 한 줄(설계 검토 D11)
+    const d = b.diag, top = d?.items?.[0];
+    app.diag.hidden = !d || (!top && !d.cost && !d.manual);
+    if (d) {
+      setText(app.diagWhen, d.when || '');
+      // 판정의 할 일과 근거의 범위(「Codex 한도 기준」)까지 함께 쓴다(화면 검수 A5)
+      setText(app.diagName, top ? top.name : ''); setText(app.diagWord, top ? top.word : ''); setText(app.diagSay, top ? [top.line || top.say, top.scope ? '(' + top.scope + ')' : ''].filter(Boolean).join(' ') : '');
+      app.diagName.parentElement.hidden = !top;
+      // 자동으로 읽는 구독이 없고 직접 넣은 구독만 있으면 그 한 줄을 요금 줄 위에 둔다(화면 검수 A6)
+      setText(app.diagCost, [!top && d.manual ? d.manual : '', d.cost || ''].filter(Boolean).join(' '));
+    }
+    renderDetailsTop(b);
+    app.details.hidden = !fold;
+    if (!fold) { app.detailsTop.hidden = true; return; }
+    app.details.setAttribute('aria-expanded', String(detailsOpen));
+    setText(app.details, detailsOpen ? '상세내역 접기' : '상세내역');
+    app.detailsTop.hidden = !detailsOpen || !app.detailsTop.children.length;
+  }
+  /* 상세내역 맨 위: 다가오는 일 모두(첫 화면에 다 못 보였을 때), 진단 모두 */
+  function renderDetailsTop(b) {
+    const all = b.soon && b.soon.more ? b.soon.all : [], d = b.diag;
+    const key = JSON.stringify([all, d && d.items, d && d.manual]);
+    if (app.detailsTop.dataset.key === key) return;
+    app.detailsTop.dataset.key = key;
+    const parts = [];
+    if (all.length) {
+      parts.push(el('p', 'details-h', '다가오는 일 · 48시간'));
+      const ol = el('ol', 'soon'); ol.setAttribute('aria-label', '48시간 안에 다가오는 일 모두'); ol.append(...all.map(soonItem)); parts.push(ol);
+    }
+    if (d && d.items && d.items.length) {
+      parts.push(el('p', 'details-h', '오늘 진단 · 구독마다'));
+      for (const i of d.items) {
+        const p = el('p', 'diag-line');
+        p.append(el('b', '', i.name), el('em', '', i.word), el('span', '', [i.say, i.more, i.scope ? '(' + i.scope + ')' : ''].filter(Boolean).join(' ')));
+        parts.push(p);
+      }
+    }
+    if (d && d.manual) parts.push(el('p', 'diag-cost', d.manual));
+    app.detailsTop.replaceChildren(...parts);
+  }
+
   function renderApp(s) {
     const room = s.room;
     setText(app.name, s.spaceLabel);
@@ -432,10 +646,10 @@ export function createOrbFaceView(root, { options = {}, look = {}, onAction = ()
     // 방이 열려 있으면 그 방 하나만 보인다(시안 #stage[data-aside])
     const asideName = s.aside && app.asides[s.aside] ? s.aside : null;
     app.solio.hidden = !solio || prog !== 'subs' || !!asideName;
-    app.visits.hidden = prog !== 'visits' || !!asideName;
+    for (const [name, r] of Object.entries(readRooms)) r.room.hidden = prog !== name || !!asideName;
     app.space.hidden = solio || !!asideName;
     renderRail(s, solio ? room.programs || [] : [], prog);
-    renderVisits(solio ? room.visits : null);
+    for (const [name, r] of Object.entries(readRooms)) renderRead(r, solio ? room[name] : null);
     if (prog !== lastProg) {
       closeMores(true);
       if (lastProg !== null && prog && !asideName) enterRoom(prog);
@@ -443,7 +657,7 @@ export function createOrbFaceView(root, { options = {}, look = {}, onAction = ()
     }
     renderAsides(asideName, s.rooms);
     // 방이 가려진 동안(옛 화면, 다른 공간) 스크롤은 사건 없이 0으로 돌아온다. 그릴 때마다 위쪽 흐림 표시를 지금 스크롤에 맞춘다(0.4.97 검수 A3)
-    for (const r of [app.solio, app.visits, ...Object.values(app.asides).map(a => a.room)]) if (r.classList.contains('scrolled') && !(r.scrollTop > 0)) r.classList.remove('scrolled');
+    for (const r of [app.solio, app.backup, app.visits, app.health, ...Object.values(app.asides).map(a => a.room)]) if (r.classList.contains('scrolled') && !(r.scrollTop > 0)) r.classList.remove('scrolled');
     layers.app.setAttribute('aria-label', solio ? '솔리오' : room.space === 'workspace' ? 'Workspace' : 'PULSE');
     if (solio) {
       const t = room.solio;
@@ -451,7 +665,13 @@ export function createOrbFaceView(root, { options = {}, look = {}, onAction = ()
       setText(app.then, t.then);
       renderRows(t);
       app.rows.classList.toggle('dim', Boolean(t.dim));
-      app.rows.hidden = !((t.rows && t.rows.length) || (t.extra && t.extra.length));
+      // 비서 판(솔리오 구독 비서 설계 3절). 줄은 상세내역 안에 접혀 있다가 단추를 누르면 펼쳐진다(설계 3.5, 설계 검토 D9)
+      const hasRows = Boolean((t.rows && t.rows.length) || (t.extra && t.extra.length)), fold = Boolean(t.brief?.fold) && hasRows;
+      const fa = doc.activeElement, wasIn = fa && (app.rows.contains(fa) || app.detailsTop.contains(fa));
+      renderBrief(t.brief || null, fold);
+      app.rows.hidden = !hasRows || (fold && !detailsOpen);
+      // 상태가 바뀌어(check → ready) 줄이 접히면 줄 안의 초점은 상세내역 단추로 옮긴다(화면 검수 A8)
+      if (wasIn && app.rows.hidden && !app.details.hidden) { closeMores(true); try { app.details.focus({ preventScroll: true }); } catch {} }
       setText(app.read, t.read);
       app.reread.hidden = t.action !== 'reread';
       // 「구독 관리 열기」는 구독 줄이 있어 「다시 읽기」가 보일 때만 그 옆에 둔다(설계 검토 2차 4)
@@ -482,10 +702,14 @@ export function createOrbFaceView(root, { options = {}, look = {}, onAction = ()
     if (on && stageEl.dataset.rail !== '1') stageEl.dataset.rail = '1'; else if (!on && 'rail' in stageEl.dataset) delete stageEl.dataset.rail;
     if (prog && stageEl.dataset.prog !== prog) stageEl.dataset.prog = prog; else if (!prog && 'prog' in stageEl.dataset) delete stageEl.dataset.prog;
     if (!on) { app.rail.classList.remove('near'); clearTimeout(progTimer); }
+    let k = 0;
     for (const o of app.objs) {
       const p = programs.find(x => x.key === o.dataset.orbProg);
       o.hidden = !p;
       if (!p) continue;
+      // 이름이 펼쳐지는 늦춤(--k)은 보이는 차례로 준다. 가운데 오브제가 빠져도 펼치는 시간이 railSettleMs와 맞는다
+      const at = String(k++);
+      if (o.style.getPropertyValue('--k') !== at) o.style.setProperty('--k', at);
       const label = p.note ? `${p.label}, ${p.note}` : p.label;
       if (o.getAttribute('aria-label') !== label) {
         o.setAttribute('aria-label', label);
@@ -503,7 +727,7 @@ export function createOrbFaceView(root, { options = {}, look = {}, onAction = ()
   }
   /* 다른 프로그램의 방이 뜰 때 안의 것들이 차례로 떠오른다(시안 flashRoom) */
   function enterRoom(prog) {
-    const el = app.asides[prog]?.room || (prog === 'visits' ? app.visits : app.solio);
+    const el = app.asides[prog]?.room || readRooms[prog]?.room || app.solio;
     el.scrollTop = 0;
     el.classList.remove('scrolled');
     el.classList.remove('enter');
@@ -542,7 +766,8 @@ export function createOrbFaceView(root, { options = {}, look = {}, onAction = ()
     if (o && focusVisible(o)) onAction('prog', o.dataset.orbProg);
   };
 
-  /* ── 방문자 분석의 방(시안 buildVis). 요약에서 온 글이 섞이므로 모두 textContent로만 넣는다(사이트방문 설계 6절, 검토 P2-5) ── */
+  /* ── 방문자 분석의 방(시안 buildVis)과 계정 건강의 방(계정건강 시안 build). 요약에서 온 글이 섞이므로 모두 textContent로만 넣는다
+     (사이트방문 설계 6절, 검토 P2-5, 계정건강 PC앱_구현설계 4절) ── */
   function el(tag, cls, text) {
     const n = doc.createElement(tag);
     if (cls) n.className = cls;
@@ -551,30 +776,42 @@ export function createOrbFaceView(root, { options = {}, look = {}, onAction = ()
   }
   /* 장면은 1분마다 새로 온다(상대 시각, 다시 읽은 요약). 줄의 차례가 같으면 그 자리의 줄을 고쳐 쓰고,
      차례가 달라 새로 지을 때도 펼친 줄, 눌러 고정한 줄, 자판 초점을 줄 이름(key)으로 되살린다(0.4.97 공개 후보 검수 A2) */
-  function renderVisits(v) {
-    const key = v && v.visible ? JSON.stringify([v.say, v.then, v.when, v.scope, v.rows]) : '';
-    if (key === visKey) return;
-    visKey = key;
+  function renderRead(box, v) {
+    const key = v && v.visible ? JSON.stringify([v.say, v.then, v.when, v.scope, v.rows, v.acts || null]) : '';
+    if (key === box.key) return;
+    box.key = key;
+    if (box.acts) renderActs(box.acts, key && Array.isArray(v.acts) ? v.acts : []);
     clearTimeout(visTimer);
     if (!key) clearTimeout(visLeave);
-    setText(app.visSay, key ? v.say : '');
-    setText(app.visThen, key ? v.then : '');
-    setText(app.visWhen, key ? v.when : '');
-    setText(app.visScope, key ? v.scope : '');
+    setText(box.say, key ? v.say : '');
+    setText(box.then, key ? v.then : '');
+    setText(box.when, key ? v.when : '');
+    setText(box.scope, key ? v.scope : '');
     const rows = key && Array.isArray(v.rows) ? v.rows : [];
-    const old = [...app.visRows.querySelectorAll('button.row[data-vis]')];
+    const old = [...box.rows.querySelectorAll('button.row[data-vis]')];
     if (rows.length && old.length === rows.length && old.every((b, i) => b.dataset.vis === String(rows[i].key))) {
       rows.forEach((r, i) => fillVisRow(old[i], r));
     } else {
       const kept = new Map(rows.length ? old.filter(b => b.classList.contains('opened')).map(b => [b.dataset.vis, b.classList.contains('pin')]) : []);
       const focused = rows.length ? old.find(b => b === doc.activeElement)?.dataset.vis : undefined;
-      app.visRows.replaceChildren(...rows.flatMap(visRow));
+      box.rows.replaceChildren(...rows.flatMap(visRow));
       // 펼침을 먼저 되살린다. 초점을 옮기면 모양이 계산되어, 그 뒤에 붙인 펼침은 처음부터 다시 펼쳐진다
-      for (const b of app.visRows.querySelectorAll('button.row[data-vis]')) if (kept.has(b.dataset.vis)) { setMore(b, true); if (kept.get(b.dataset.vis)) b.classList.add('pin'); }
-      const again = focused === undefined ? null : [...app.visRows.querySelectorAll('button.row[data-vis]')].find(b => b.dataset.vis === focused);
+      for (const b of box.rows.querySelectorAll('button.row[data-vis]')) if (kept.has(b.dataset.vis)) { setMore(b, true); if (kept.get(b.dataset.vis)) b.classList.add('pin'); }
+      const again = focused === undefined ? null : [...box.rows.querySelectorAll('button.row[data-vis]')].find(b => b.dataset.vis === focused);
       if (again) { restoringVis = true; try { again.focus({ preventScroll: true }); } catch {} finally { restoringVis = false; } }
     }
-    app.visRows.hidden = !rows.length;
+    box.rows.hidden = !rows.length;
+  }
+  /* 백업 방의 할 일 단추. 다시 그려도 누르던 단추(같은 동작과 낱말)에 초점을 되돌린다 */
+  function renderActs(box, acts) {
+    const fa = doc.activeElement, had = fa && box.contains(fa) ? `${fa.dataset.orbAct}|${fa.dataset.orbArg || ''}` : null;
+    box.replaceChildren(...acts.slice(0, 4).map(a => {
+      const b = button(a.primary ? 'reread lead' : 'reread', a.label, { 'data-orb-act': a.act, 'data-orb-arg': a.arg || '' });
+      if (a.disabled) b.setAttribute('aria-disabled', 'true');
+      return b;
+    }));
+    box.hidden = !acts.length;
+    if (had) { const again = [...box.children].find(b => `${b.dataset.orbAct}|${b.dataset.orbArg || ''}` === had); try { (again || box.children[0])?.focus({ preventScroll: true }); } catch {} }
   }
   function visRow(r) {
     const b = el('button', 'row');
@@ -602,12 +839,37 @@ export function createOrbFaceView(root, { options = {}, look = {}, onAction = ()
     if (moreKeys.get(inner) === moreKey) return;
     moreKeys.set(inner, moreKey);
     inner.replaceChildren();
-    let j = 0;
+    let j = 0, firstDo = true;
     const put = n => { n.style.setProperty('--j', String(j++)); inner.append(n); };
     for (const item of Array.isArray(r.more) ? r.more : []) {
-      const [kind, a, c, val, when] = Array.isArray(item) ? item : [];
+      const [kind, a, c, val, when, mark] = Array.isArray(item) ? item : [];
       if (kind === 'say') put(el('p', 'more-say', a));
       else if (kind === 'note') put(el('p', 'more-note', a));
+      // 계정 건강(계정건강 PC앱_구현설계 10절 「그릴 것」): 구역 이름, 풀어 쓴 글, 이름과 밝은 글(잘하고 있는 것 · 다음 목표 · 할 일)
+      else if (kind === 'head') put(el('p', 'more-head', a));
+      else if (kind === 'text') put(el('p', 'more-text', a));
+      else if (kind === 'good' || kind === 'goal' || kind === 'do') {
+        // 할 일의 첫 줄 위에는 가는 줄을 긋는다(신호 줄과 틈을 둔다)
+        const row = el('div', `row sub ${kind}${kind === 'do' && firstDo ? ' first' : ''}`);
+        if (kind === 'do') firstDo = false;
+        row.append(el('span', 'nm', a), el('span', 'mid', c));
+        put(row);
+      } else if (kind === 'flow') {
+        // 조회 1,000번이 가는 길: 단계가 가로로 놓이고 새는 단계만 밝다. 맨 앞 「조회 1,000」은 모델이 세운다
+        const flow = el('div', 'flow');
+        flow.setAttribute('role', 'list');
+        for (const step of Array.isArray(a) ? a : []) {
+          if (!step || typeof step !== 'object') continue;
+          const cell = el('div', step.leak ? 'step leak' : 'step');
+          cell.setAttribute('role', 'listitem');
+          const name = el('i', '', step.name);
+          if (step.verdict) name.append(el('em', '', step.verdict));
+          cell.append(el('b', '', step.big), name, el('span', '', step.text));
+          flow.append(cell);
+        }
+        put(flow);
+        if (c) put(el('p', 'more-text', c));
+      }
       else if (kind === 'week') {
         const days = (Array.isArray(c) ? c : []).map(x => (typeof x === 'number' && Number.isFinite(x) ? Math.max(0, x) : 0));
         const top = Math.max(1, ...days);
@@ -618,7 +880,8 @@ export function createOrbFaceView(root, { options = {}, look = {}, onAction = ()
         row.append(el('span', 'nm', a), week, el('span', 'val', val));
         put(row);
       } else if (kind === 'row') {
-        const row = el('div', 'row sub');
+        // 여섯째 칸이 참이면 밝다(계정 건강의 나쁨 판정). 방문자 분석의 줄은 다섯 칸이다
+        const row = el('div', mark ? 'row sub now' : 'row sub');
         row.append(el('span', 'nm', a), el('span', 'mid', c), el('span', 'val', val), el('span', 'when', when));
         put(row);
       }
@@ -651,9 +914,9 @@ export function createOrbFaceView(root, { options = {}, look = {}, onAction = ()
     if (pin) b.classList.add('pin');
     setMore(b, true);
   }
-  /* box를 주면 그 줄 묶음만, 아니면 구독 줄, 방문자 분석 줄, 방의 줄을 모두 접는다 */
+  /* box를 주면 그 줄 묶음만, 아니면 구독 줄, 방문자 분석과 계정 건강의 줄, 방의 줄을 모두 접는다 */
   function closeMores(all = false, box = null) {
-    for (const c of box ? [box] : [app.visRows, app.rows, ...asideBoxes]) for (const b of c.querySelectorAll(':scope > button.row')) if (all || !b.classList.contains('pin')) setMore(b, false);
+    for (const c of box ? [box] : [...readBoxes, app.rows, ...asideBoxes]) for (const b of c.querySelectorAll(':scope > button.row')) if (all || !b.classList.contains('pin')) setMore(b, false);
   }
   const onVisOver = event => {
     const b = event.target?.closest?.('button.row[data-vis]');
@@ -666,7 +929,7 @@ export function createOrbFaceView(root, { options = {}, look = {}, onAction = ()
     if (b && !b.contains(event.relatedTarget)) clearTimeout(visTimer);
   };
   const onVisEnter = () => { clearTimeout(visLeave); };
-  const onVisLeave = () => { clearTimeout(visTimer); clearTimeout(visLeave); visLeave = setTimeout(() => { if (!disposed) closeMores(false, app.visRows); }, NEAR.close); };
+  const onVisLeave = event => { const box = event?.currentTarget || app.visRows; clearTimeout(visTimer); clearTimeout(visLeave); visLeave = setTimeout(() => { if (!disposed) closeMores(false, box); }, NEAR.close); };
   const onVisFocus = event => {
     if (restoringVis) return;
     const b = event.target?.closest?.('button.row[data-vis]');
@@ -721,7 +984,7 @@ export function createOrbFaceView(root, { options = {}, look = {}, onAction = ()
     for (const b of [app.orbBtn, app.nameBtn]) if (b.getAttribute('aria-expanded') !== String(open)) b.setAttribute('aria-expanded', String(open));
     app.fan.inert = !open;
     // 펼친 동안 물러난 이름 단추와 오브제 줄, 흐린 방은 Tab 차례에서도 빠진다. 그 안에 있던 초점은 보이는 구 단추로 먼저 옮긴다(검수 A1)
-    const back = [app.nameBtn, app.rail, app.solio, app.visits, app.space, ...Object.values(app.asides).map(a => a.room)].filter(Boolean);
+    const back = [app.nameBtn, app.rail, app.solio, app.backup, app.visits, app.health, app.space, ...Object.values(app.asides).map(a => a.room)].filter(Boolean);
     // 다가가 머물러 연(고정하지 않은) 펼침이면 옮기기 전 자리를 기억해 두고, 닫을 때 초점이 구에 그대로 있으면 그 자리로 돌려놓는다(최종 검수 F5)
     if (open) { const a = doc.activeElement; if (a && back.some(x => x.contains(a))) { fanReturn = f.pin ? null : a; app.orbBtn.focus?.({ preventScroll: true }); } }
     if (open && f.pin) fanReturn = null;
@@ -812,11 +1075,11 @@ export function createOrbFaceView(root, { options = {}, look = {}, onAction = ()
     if (event.target?.closest?.('.here-orb,.here-name')) return;
     if (!fanZone(event.clientX, event.clientY)) onAction('close-switch');
   };
-  /* 이름을 가리키면 그 고리가 밝아지고 구가 돌아 그 자리가 앞에 온다(시안 pointAt) */
+  /* 이름을 가리키면 그 공간의 별이 밝아지고 톡 소리가 한 번 난다(시안 pointAt) */
   const onFanPoint = event => {
     const b = event.target?.closest?.('.fan-go[data-go]');
     const on = event.type === 'pointerover' || event.type === 'focusin';
-    if (b && on) { stage.setHot(b.dataset.go); stage.setFace(b.dataset.go); for (const x of app.fan.querySelectorAll('.fan-go')) x.classList.toggle('hot', x === b); }
+    if (b && on) { if (!b.classList.contains('hot')) sound.key(); stage.setHot(b.dataset.go); stage.setFace(b.dataset.go); for (const x of app.fan.querySelectorAll('.fan-go')) x.classList.toggle('hot', x === b); }
     else if (!on && (!b || !b.contains(event.relatedTarget))) { stage.setHot(null); stage.setFace(null); for (const x of app.fan.querySelectorAll('.fan-go')) x.classList.remove('hot'); }
   };
 
@@ -922,7 +1185,8 @@ export function createOrbFaceView(root, { options = {}, look = {}, onAction = ()
     const inner = b.nextElementSibling?.firstElementChild;
     if (!inner) return;
     const items = Array.isArray(r.more) ? r.more : [];
-    if (moreKeys.get(inner) === JSON.stringify(items)) { stale.delete(inner); return; }
+    // 같은 글로 실패해 안쪽이 그대로여도 Enter로 누른 일의 끝을 본다
+    if (moreKeys.get(inner) === JSON.stringify(items)) { stale.delete(inner); queueSettle(b, inner); return; }
     // 쓰던 칸에 초점이 있거나 그 안쪽을 누르는 중이면 지금은 다시 짓지 않는다. 1분 장면이 쓰던 글과 누르던 단추를 지우지 않게 한다(설계 1.3절).
     // 다만 칸의 글이 방금 저장되어 새 처음 값으로 돌아왔으면 쓰던 중이 아니다. 바로 다시 지어 저장 뒤의 문장을 보인다(초점은 같은 칸으로 돌아간다)
     const a = doc.activeElement;
@@ -952,6 +1216,27 @@ export function createOrbFaceView(root, { options = {}, look = {}, onAction = ()
     p.dataset.v = String(v);
     for (const q of p.querySelectorAll('[data-pv]')) q.setAttribute('aria-pressed', String(q.dataset.pv === String(v)));
   }
+  /* Enter로 누른 단추의 일이 끝났는지 다시 지은 뒤에 본다. 초점이 아직 그 단추에 있고 단추가 바쁘지 않으면 끝난 것이다.
+   * 같은 이름의 칸이 보이면 그 칸의 글 끝으로 돌아간다. 묶음이 접혀 칸이 없거나 초점이 다른 곳으로 갔으면 그대로 둔다 */
+  /* 저장 도중의 그리기(바쁨 표시 전, 값만 바뀐 판)에서 끝났다고 보고 칸으로 초점을 옮기면, 바로 뒤 묶음을 닫는 그리기가 「쓰는 중」으로 미뤄져
+   * 묶음이 열린 채 남았다(흐름 시험 18-12 「Enter from the unchanged end time」). 그래서 마지막 그리기 뒤 한 번만 본다 */
+  function queueSettle(b, inner) {
+    if (!enterBack || b.dataset.key !== enterBack.key) return;
+    clearTimeout(enterTimer);
+    enterTimer = setTimeout(() => { enterTimer = 0; if (!disposed) settleEnter(b, inner); }, 0);
+  }
+  function settleEnter(b, inner) {
+    const e = enterBack;
+    if (!e || b.dataset.key !== e.key) return;
+    const go = actEl(inner, e.act, e.arg);
+    if (!go || doc.activeElement !== go) { enterBack = null; return; }
+    if (go.getAttribute('aria-disabled') === 'true') return;
+    enterBack = null;
+    const field = [...inner.querySelectorAll('input[data-f]')].find(x => x.dataset.f === e.field && !x.closest('.grp[hidden]') && !x.disabled);
+    if (!field) return;
+    restoringVis = true;
+    try { field.focus({ preventScroll: true }); const n = field.value.length; field.setSelectionRange?.(n, n); } catch {} finally { restoringVis = false; }
+  }
   function buildInner(b, inner, items) {
     // 고쳐 쓰던 칸의 값은 그 칸의 처음 값이 그대로일 때만 새 칸에 옮긴다. 저장한 뒤 새 값이 왔으면 새 값을 쓴다
     const before = new Map([...inner.querySelectorAll('[data-f]')].map(n => [n.dataset.f, { v: fieldValue(n), d: n.dataset.d ?? '' }]));
@@ -969,6 +1254,7 @@ export function createOrbFaceView(root, { options = {}, look = {}, onAction = ()
     stale.delete(inner);
     const box = b.parentElement;
     if (had && box) restoreFocus(box, had);
+    queueSettle(b, inner);
     // 방금 안쪽을 누른 줄이 길어졌으면 지금 할 차례가 보이게 올린다. 그 줄이 화면에 걸쳐 있을 때만 한다(시안 putRows의 끝)
     const room = b.closest('.room');
     // 걸쳐 있는지는 줄 머리와 그 아래 열린 안쪽(형제 칸)을 합쳐 본다. 긴 줄을 내려 머리가 위로 지나가도 안쪽을 누른 것은 따라간다(검수 A)
@@ -1358,22 +1644,24 @@ export function createOrbFaceView(root, { options = {}, look = {}, onAction = ()
     if (disposed) return;
     motionGen++;
     sig.stop();
+    const from = stage.pose;
     if (pose === 'sw') {
+      if (from !== 'sw') sound.map(false);
       const to = face || scene?.space || 'solio';
       stage.setFace(null);
       stage.setSpace(scene?.mode === 'portal' ? to : (scene?.space || 'solio'));
       stage.setSpin(-PLACE_LON[to]);
       if (scene?.mode === 'portal') stage.setFace(to);
     } else if (pose === 'fan') {
-      // 구는 지금 공간의 자리를 앞에 두고 자라고, 고리 셋이 차례로 그어진다(시안 openFan)
+      // 구가 제자리에서 자라며 눈의 점이 흩어져 별이 된다(시안 openFan)
       stage.setFace(null);
       stage.setSpin(-PLACE_LON[scene?.space || 'solio']);
-      stage.sweepIn();
+      if (from !== 'fan') sound.map(true);
     } else {
       stage.setFace(null);
+      if (pose === 'home' && (from === 'fan' || from === 'sw')) sound.unmap();
     }
     await stage.tween(pose, ms, EASE[ease] || easeIO);
-    if (pose === 'home') stage.sweepDone();
   }
   async function dive(space, ms = 1250) {
     if (disposed) return;
@@ -1418,6 +1706,8 @@ export function createOrbFaceView(root, { options = {}, look = {}, onAction = ()
       if (visRowEl.classList.contains('pin')) setMore(visRowEl, false); else openVis(visRowEl, true);
       return;
     }
+    const det = target.closest?.('[data-details]');
+    if (det && root.contains(det)) { event.preventDefault(); setDetails(!detailsOpen); return; }
     const obj = target.closest?.('.obj[data-orb-prog]');
     if (obj && root.contains(obj)) { event.preventDefault(); clearTimeout(progTimer); onAction('prog', obj.dataset.orbProg); return; }
     // 구독 줄을 누르면 안쪽을 고정하거나 푼다(설계 검토 1차 ③). 옛 판은 줄 안쪽의 「계정 관리」와 방 맨 아래의 「구독 관리 열기」로 연다
@@ -1451,7 +1741,7 @@ export function createOrbFaceView(root, { options = {}, look = {}, onAction = ()
       onAction(act.dataset.orbAct, act.dataset.foot ?? act.dataset.orbArg);
       return;
     }
-    // 공간 고르기에서 빈 곳을 누르면 닫히고, 구에 새긴 고리를 누르면 그 공간으로 간다
+    // 공간 고르기에서 빈 곳을 누르면 닫히고, 구 위의 별을 누르면 그 공간으로 간다
     if (scene?.layer === 'switch' && layers.switch.contains(target) && !target.closest('.sw,.back,.sw-foot,.sw-top')) {
       const r = stageEl.getBoundingClientRect();
       const place = stage.placeUnder(event.clientX - r.left, event.clientY - r.top);
@@ -1486,10 +1776,13 @@ export function createOrbFaceView(root, { options = {}, look = {}, onAction = ()
     if (scene?.layer !== 'switch') return;
     const name = event.target?.closest?.('.sw[data-go]');
     const on = event.type === 'pointerover' || event.type === 'focusin';
-    if (name && on) { stage.setHot(name.dataset.go); stage.setFace(name.dataset.go); for (const b of sw.names.children) b.classList.toggle('hot', b === name); }
-    else if (!on) { stage.setHot(null); stage.setFace(null); for (const b of sw.names.children) b.classList.remove('hot'); }
+    if (name && on) { if (!name.classList.contains('hot')) sound.key(); stage.setHot(name.dataset.go); stage.setFace(name.dataset.go); for (const b of sw.names.children) b.classList.toggle('hot', b === name); }
+    // 이름 단추 안의 글 사이를 지날 때도 pointerout이 올라온다. 단추를 벗어난 때만 끈다(끄면 다시 들어올 때 톡 소리가 또 난다, Fable 최종 검수 F1)
+    else if (!on && (!name || !name.contains(event.relatedTarget))) { stage.setHot(null); stage.setFace(null); for (const b of sw.names.children) b.classList.remove('hot'); }
   };
   const onKeyDown = event => {
+    // 다음 키 누름은 앞 Enter의 되돌림 약속을 버린다. 이번 키가 Enter 저장이면 아래에서 다시 적는다(검토 D10)
+    enterBack = null;
     if (disposed || event.defaultPrevented || event.isComposing) return;
     const mode = getMode();
     if (mode === 'off') return;
@@ -1503,7 +1796,7 @@ export function createOrbFaceView(root, { options = {}, look = {}, onAction = ()
       if (mode === 'app' && scene?.layer === 'app' && !scene.fan?.open && [...root.querySelectorAll('.more.open')].some(m => !m.closest('[hidden]'))) {
         const inMore = t?.closest?.('.more');
         // 보이는 방의 줄만 접는다. 방이 열린 동안 가려진 구독 방의 고정한 줄은 그대로 두어, 방을 닫으면 연 자리로 초점이 돌아간다
-        for (const box of [app.visRows, app.rows, ...asideBoxes]) if (!box.closest('[hidden]')) closeMores(true, box);
+        for (const box of [...readBoxes, app.rows, ...asideBoxes]) if (!box.closest('[hidden]')) closeMores(true, box);
         setTimeout(() => { if (!disposed && stale.size) flushStale(); }, 0);
         if (inMore) inMore.previousElementSibling?.focus?.({ preventScroll: true });
         event.preventDefault();
@@ -1529,7 +1822,13 @@ export function createOrbFaceView(root, { options = {}, look = {}, onAction = ()
     if (event.key === 'Enter' && typing && mode === 'app' && t && root.contains(t) && t.closest?.('.more-in')) {
       const scope = t.closest('.grp') || t.closest('.more-in');
       const go = [...scope.querySelectorAll('[data-enter]')].find(x => !x.closest('.grp[hidden]'));
-      if (go) { event.preventDefault(); go.focus?.({ preventScroll: true }); go.click(); }
+      if (go) {
+        event.preventDefault();
+        const key = t.closest('.more')?.previousElementSibling?.dataset?.key;
+        enterBack = key !== undefined && t.dataset?.f && go.dataset.roomAct ? { key, field: t.dataset.f, act: go.dataset.roomAct, arg: go.dataset.roomArg ?? '' } : null;
+        go.focus?.({ preventScroll: true });
+        go.click();
+      }
       return;
     }
     if (mode === 'legacy' || typing || event.ctrlKey || event.metaKey || event.altKey) return;
@@ -1615,11 +1914,13 @@ export function createOrbFaceView(root, { options = {}, look = {}, onAction = ()
   app.rail.addEventListener('pointerover', onRailOver);
   app.rail.addEventListener('pointerout', onRailOut);
   app.rail.addEventListener('focusin', onRailFocus);
-  app.visRows.addEventListener('pointerover', onVisOver);
-  app.visRows.addEventListener('pointerout', onVisOut);
-  app.visRows.addEventListener('pointerenter', onVisEnter);
-  app.visRows.addEventListener('pointerleave', onVisLeave);
-  app.visRows.addEventListener('focusin', onVisFocus);
+  for (const box of readBoxes) {
+    box.addEventListener('pointerover', onVisOver);
+    box.addEventListener('pointerout', onVisOut);
+    box.addEventListener('pointerenter', onVisEnter);
+    box.addEventListener('pointerleave', onVisLeave);
+    box.addEventListener('focusin', onVisFocus);
+  }
   app.rows.addEventListener('pointerover', onSubOver);
   app.rows.addEventListener('pointerout', onSubOut);
   app.rows.addEventListener('pointerenter', onSubEnter);
@@ -1651,6 +1952,7 @@ export function createOrbFaceView(root, { options = {}, look = {}, onAction = ()
   doc.addEventListener('pointerup', onPressEnd, true);
   doc.addEventListener('pointercancel', onPressEnd, true);
   doc.addEventListener('keydown', onKeyDown);
+  doc.addEventListener('focusout', onEnterLeave, true);
   doc.addEventListener('paste', onPaste);
   doc.addEventListener('focusin', onFocusIn);
   doc.addEventListener('visibilitychange', onVisibility);
@@ -1686,6 +1988,7 @@ export function createOrbFaceView(root, { options = {}, look = {}, onAction = ()
       if (disposed) return;
       disposed = true;
       clearTimeout(settleTimer);
+      clearTimeout(enterTimer);
       clearTimeout(progTimer);
       clearTimeout(visTimer);
       clearTimeout(visLeave);
@@ -1710,6 +2013,7 @@ export function createOrbFaceView(root, { options = {}, look = {}, onAction = ()
       doc.removeEventListener('pointerup', onPressEnd, true);
       doc.removeEventListener('pointercancel', onPressEnd, true);
       doc.removeEventListener('keydown', onKeyDown);
+      doc.removeEventListener('focusout', onEnterLeave, true);
       doc.removeEventListener('paste', onPaste);
       doc.removeEventListener('focusin', onFocusIn);
       doc.removeEventListener('visibilitychange', onVisibility);
@@ -1718,6 +2022,7 @@ export function createOrbFaceView(root, { options = {}, look = {}, onAction = ()
       resizeObserver?.disconnect();
       sig.stop();
       stage.dispose();
+      sound.dispose();
       setHostLocked(false);
       root.hidden = true;
       root.dataset.portalActive = 'false';

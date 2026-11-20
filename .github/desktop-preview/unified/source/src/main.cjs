@@ -43,6 +43,8 @@ const {launchWindowsUpdate,writeHandoffNote,removeHandoffNote,launchCurtain,cons
 const {createUpdateRecovery}=require('./platform-update-recovery.cjs');
 const {yieldToUpdatingInstaller}=require('./platform-update-marker.cjs');
 const {createSiteVisits}=require('./site-visits.cjs');
+const {createSnsHealth}=require('./sns-health.cjs');
+const {createSolioBackup}=require('./solio-backup.cjs');
 const {createMacApplicationLocationGate}=require('./mac-application-location.cjs');
 const {createAiSubscriptions}=require('./ai-subscriptions.cjs');
 const {createLocalServerGate}=require('./local-server-owner.cjs');
@@ -98,7 +100,68 @@ let startupAllowed=runtime.clientId!=='platform'||!packaged||smoke;
 let appLocationReady=process.platform!=='darwin'||!packaged||smoke;
 const appLocation=createMacApplicationLocationGate({app,dialog,platform:process.platform,packaged,smoke,productName:current.productName});
 const suiteBindingKey=authConfig?suiteKey(authConfig,runtime.mode):null;
-function publishAuthState(state){careNotifications?.syncAccount();pulseApp?.syncContext(state);syncCompanyEntry();platformTray?.setShortcuts([]);if(window&&!window.isDestroyed()&&trustedEntry(window.webContents.getURL(),entry,runtime.clientId))window.webContents.send('synk:auth-changed',state);}
+function publishAuthState(state){careNotifications?.syncAccount();pulseApp?.syncContext(state);syncCompanyEntry();scheduleHiddenAuthRetry(state);void syncTrayApps();if(window&&!window.isDestroyed()&&trustedEntry(window.webContents.getURL(),entry,runtime.clientId))window.webContents.send('synk:auth-changed',state);}
+// 설치 생명주기는 창 밖에서 만든다. 숨은 시작의 트레이 메뉴도 설치 여부를 본다(PC 0.5.0 설계 1.5)
+function ensureInstallations(){
+  if(installations)return installations;
+  const programRoot=resolveProgramRoot({platform:process.platform,env:process.env,getHome:()=>app.getPath('home')});
+  installations=createClientLifecycle({clientId:runtime.clientId,mode:runtime.mode,platform:process.platform,arch:process.arch,programRoot,packageRoot:packaged?path.join(process.resourcesPath,'clients'):path.join(app.getAppPath(),'dist'),cacheRoot:path.join(app.getPath('userData'),'Installers'),releases:runtime.releases||[],spawn,openPath:file=>shell.openPath(file),onChange:async()=>{
+    scheduleTrayApps();
+    // 창이 없으면 모든 앱의 실행 파일과 asar를 해시하는 getClients를 부르지 않는다(설계 검토 D4)
+    if(!window||window.isDestroyed())return;
+    try{const state=await installations.getClients();sendDesktop('synk:clients-changed',state);sendDesktop('synk:client-progress',state);}catch{}
+  }});
+  return installations;
+}
+// 트레이 메뉴의 앱 줄(PC 0.5.0 설계 1.3). 본체가 화면에 주는 로그인 값(accountStatus)으로 권한을 보고, 설치는 해시 없는 확인으로 본다.
+// 화면이 보내던 목록과 그 기억은 쓰지 않는다. 누르면 본체가 바로 실행하고, 못 하면 Platform 창을 연다
+const TRAY_APP='messenger';
+let trayAppsSeq=0,trayAppsTimer=null,trayAppsTick=null,trayLaunching=false;
+function trayAppAllowed(id=TRAY_APP){const state=accountStatus();return id===TRAY_APP&&state?.signedIn===true&&state.library?.status==='ready'&&Array.isArray(state.library.appIds)&&state.library.appIds.includes(id);}
+async function syncTrayApps(){
+  if(!platformTray?.isActive())return;
+  const seq=++trayAppsSeq;
+  // 로그아웃이나 권한 없음은 설치 확인을 기다리지 않고 바로 뺀다(설계 검토 D6)
+  if(quittingRequested||!trayAppAllowed()){platformTray.setApps([]);return;}
+  let installed=false;
+  try{installed=(await ensureInstallations().probe(TRAY_APP))?.installed===true;}catch{installed=false;}
+  if(seq!==trayAppsSeq||!platformTray?.isActive())return;
+  platformTray.setApps(installed&&!quittingRequested&&trayAppAllowed()?[TRAY_APP]:[]);
+}
+// 설치 파일 준비의 진행처럼 몰려 오는 알림은 0.3초 묶어 한 번 본다
+function scheduleTrayApps(){if(!platformTray?.isActive())return;clearTimeout(trayAppsTimer);trayAppsTimer=setTimeout(()=>{trayAppsTimer=null;void syncTrayApps();},300);trayAppsTimer.unref?.();}
+async function launchFromTray(id){
+  if(quittingRequested||trayLaunching)return;
+  if(!trayAppAllowed(id)){requestPlatformWindow();return;}
+  // 해시를 마치고 띄우기 바로 앞에서 계정 세대와 조건을 다시 본다(설계 검토 D6)
+  const generation=accountStatus()?.sessionGeneration;
+  const unchanged=()=>!quittingRequested&&trayAppAllowed(id)&&accountStatus()?.sessionGeneration===generation;
+  trayLaunching=true;let result=null;
+  try{result=await requireSuite(()=>ensureInstallations().launch(id,{confirm:unchanged}));}catch{result=null;}
+  finally{trayLaunching=false;}
+  void syncTrayApps();
+  if(quittingRequested)return;
+  if(result?.ok!==true)requestPlatformWindow();
+}
+// 창이 없는 동안 로그인 복원이 다시 시도할 수 있는 실패로 멈추면 본체가 다시 잇는다. 5초에서 두 배씩 5분까지 늘린다.
+// Windows 로그인 직후 망이 붙기 전에 숨은 채 켜지는 길이다. 창이 생기면 화면이 「다시 불러오기」를 맡는다(설계 검토 D1)
+let hiddenAuthRetry=null,hiddenAuthDelay=5000,hiddenAuthLoading=false;
+function scheduleHiddenAuthRetry(state){
+  const waiting=!!auth&&runtime.clientId==='platform'&&(!window||window.isDestroyed())&&!quittingRequested&&state?.status==='error'&&state.error?.retryable===true;
+  // 대기 시간은 로그인이 끝난 때(성공이나 다시 시도할 수 없는 끝)에만 처음으로 돌린다. 복원 중의 중간 상태(restoring)는 지나가는 값이다(GPT 검수 GA3)
+  const settled=state?.signedIn===true||!['restoring','signing-in','signing-out','error'].includes(state?.status);
+  if(!waiting){if(hiddenAuthRetry){clearTimeout(hiddenAuthRetry);hiddenAuthRetry=null;}if(settled)hiddenAuthDelay=5000;return;}
+  // 다시 읽는 중이면 예약하지 않는다. 읽기가 시작하며 내는 error 상태로 두 번째 읽기가 겹쳤다. 끝난 뒤 그때의 상태로 한 번만 다시 본다(GPT 검수 GA1)
+  if(hiddenAuthRetry||hiddenAuthLoading)return;
+  const delay=hiddenAuthDelay;hiddenAuthDelay=Math.min(hiddenAuthDelay*2,300000);
+  hiddenAuthRetry=setTimeout(()=>{
+    hiddenAuthRetry=null;
+    if(quittingRequested||window&&!window.isDestroyed())return;
+    hiddenAuthLoading=true;
+    void Promise.resolve().then(()=>requireSuite(()=>auth.accountRequest('load',{}))).catch(()=>{}).finally(()=>{hiddenAuthLoading=false;scheduleHiddenAuthRetry(accountStatus());});
+  },delay);
+  hiddenAuthRetry.unref?.();
+}
 // The suite can mask a verified sign-in (suite-session.cjs project). Only a verified sign-in carries the entry
 // portal's visit-purpose state (auth-service.cjs), so a masked one never shows the question pending.
 function projectAuth(state){const value=suitePublisher?suitePublisher.project(state):state;return value?.onboarding&&value.signedIn!==true?{...value,onboarding:null}:value;}
@@ -182,6 +245,16 @@ function subscriptions(){if(runtime.clientId!=='platform'||smoke)return null;if(
 // 파일이 없는 PC에서는 available:false라 화면에 나오지 않는다. 플랫폼 창에서 로그인한 회원만 묻고, 그 계정이 viewers.json에 있어야 보인다(site-visits.cjs).
 let siteVisits=null;
 function siteVisitsCall(){if(runtime.clientId!=='platform'||smoke)return {ok:false,code:'LAUNCHER_ONLY'};if(accountStatus()?.signedIn!==true)return {ok:false,code:'SIGN_IN_REQUIRED'};if(!siteVisits)siteVisits=createSiteVisits();return siteVisits.snapshot(accountStatus()?.account);}
+// 솔리오 계정 건강(11-19 유호님 「PC 앱에 옮겨」): 이 PC의 진단 도구(tools/계정건강.js --요약쓰기)가 쓴 요약 한 장만 읽는다.
+// 확인은 방문자 분석과 같다. 플랫폼 창에서 로그인한 회원만 묻고, 그 계정이 방문자 분석의 viewers.json에 있어야 보인다(sns-health.cjs).
+let snsHealth=null;
+function snsHealthCall(){if(runtime.clientId!=='platform'||smoke)return {ok:false,code:'LAUNCHER_ONLY'};if(accountStatus()?.signedIn!==true)return {ok:false,code:'SIGN_IN_REQUIRED'};if(!snsHealth)snsHealth=createSnsHealth();return snsHealth.snapshot(accountStatus()?.account);}
+// 솔리오 「백업·복구」(11-20): 업무 백업 엔진의 입구. 플랫폼 창에서 로그인한 계정만 묻고, 실제 입구는 유호님 계정에만 보인다(solio-backup.cjs).
+// 힌트는 SYNK ID에 Google 로그인이 이어져 있고 그 주소를 알 때만 엔진의 setup 요청에 넘긴다(STAGE1_DESIGN 4.13 「로그인」).
+let solioBackupService=null;
+function solioBackupCall(work){if(runtime.clientId!=='platform'||smoke)return {ok:false,code:'LAUNCHER_ONLY'};const status=accountStatus();if(status?.signedIn!==true||!status.account)return {ok:false,code:'SIGN_IN_REQUIRED'};if(!solioBackupService)solioBackupService=createSolioBackup({cacheRoot:path.join(app.getPath('userData'),'WorkBackupSetup'),openExternal:url=>shell.openExternal(url)});return work(solioBackupService,status.account);}
+// 누른 계정과 지금 로그인한 계정이 같을 때만 그 계정의 Google 주소를 준다(GPT 검수 GA2)
+async function solioBackupHint(account){const result=await auth.identity();if(!result?.ok||typeof account?.synk_user_id!=='string'||result.accountId!==account.synk_user_id)return null;const google=(result.identities||[]).find(row=>row?.provider==='google'&&typeof row.email==='string');return google?.email||null;}
 function subscriptionCall(operation){const service=subscriptions();if(!service)return {ok:false,code:'LAUNCHER_ONLY'};if(accountStatus()?.signedIn!==true)return {ok:false,code:'SIGN_IN_REQUIRED'};return operation(service);}
 // 계정판 자동 읽기(지난 7일 사용량 기록용): 로그인한 회원이 계정판을 써 본 PC에서만, 앱이 켜 있는 동안 2분마다 읽을 때인지 본다.
 // 읽을 때는 ai-subscriptions.cjs의 autoDue가 정한다(마지막 확인 6시간 뒤 · 계정마다 주간 초기화 10분 전 · 결제일 아침). 끄는 중에는 새로 읽지 않는다.
@@ -215,7 +288,7 @@ app.on('will-quit',event=>{
         endHandoffWhenShown();}}
     });return;
   }
-  startupGate?.dispose();startupWindow?.dispose();platformUpdate?.dispose();companyEntry?.dispose();companyDestinations?.dispose();pulseApp?.dispose();careNotifications?.dispose();desktopPreferences?.dispose();unbindTeacher?.();teacherService?.dispose();suiteFollower?.dispose();suitePublisher?.dispose();auth?.dispose();installations?.dispose();connectionRecovery?.dispose();
+  startupGate?.dispose();startupWindow?.dispose();platformUpdate?.dispose();companyEntry?.dispose();companyDestinations?.dispose();pulseApp?.dispose();careNotifications?.dispose();desktopPreferences?.dispose();unbindTeacher?.();teacherService?.dispose();suiteFollower?.dispose();suitePublisher?.dispose();auth?.dispose();installations?.dispose();connectionRecovery?.dispose();if(trayAppsTick)clearInterval(trayAppsTick);if(trayAppsTimer)clearTimeout(trayAppsTimer);if(hiddenAuthRetry)clearTimeout(hiddenAuthRetry);
 });
 // 장치 1(1-가 구현 설계 2절): 설치기가 이 앱을 바꾸는 중이면 창과 서비스를 만들기 전에 설치기에 창을 보이라고 청하고 끝난다. 옛 실행 파일이 켜져 바꾸기를 막지 않게 한다
 const yielded=runtime.clientId==='platform'&&packaged&&!smoke&&process.platform==='win32'&&typeof process.env.LOCALAPPDATA==='string'&&yieldToUpdatingInstaller({localAppData:process.env.LOCALAPPDATA,exit:code=>app.exit(code)});
@@ -461,6 +534,8 @@ function initializeMain(){
     desktopPreferences=createDesktopPreferences({directory:app.getPath('userData'),app,globalShortcut,getWindow:()=>window,onShow:action=>requestPlatformWindow(action),onAction:action=>sendDesktop('synk:desktop-action',action),onChange:()=>sendDesktop('synk:desktop-preferences',desktopSnapshot()),enabled:!smoke,packaged,name:current.appId});
     desktopPreferences.initialize();
     windowPlacement=windowPlacement||createWindowPlacement({directory:app.getPath('userData'),screen,enabled:!smoke});
+    // 쓰던 글을 지키던 편집기는 PC 0.5.0에서 옛 화면과 함께 거뒀다. 남은 보관은 켤 때마다 지우고, 지우지 못하면 다음에 켤 때 다시 지운다(PC 0.5.0 설계 4.5 R4)
+    try{fs.rmSync(path.join(app.getPath('userData'),'DraftRecovery'),{recursive:true,force:true});}catch{/* 다음에 켤 때 다시 지운다 */}
     draftRecovery=createDraftRecovery({directory:path.join(app.getPath('userData'),'DraftRecovery'),safeStorage,getAccount:accountStatus,configFingerprint:authConfig?.fingerprint||'unconfigured',enabled:!smoke,onChange:status=>sendDesktop('synk:draft-recovery-changed',status)});
     draftRecoveryRequests=createDraftRecoveryRequests({getAccount:accountStatus,recovery:draftRecovery});
   }
@@ -474,7 +549,9 @@ function initializeMain(){
       }});
     app.on('before-quit',trayMemory.cancel);
   }
-  platformTray=createPlatformTray({app,Tray,Menu,icon:path.join(app.getAppPath(),'assets','platform.ico'),productName:current.productName,getWindow:()=>window,createWindow,onShow:()=>requestPlatformWindow(),onCloseToTray:trayMemory?.schedule,revealForQuit:()=>!quietQuit,enabled:runtime.clientId==='platform'&&process.platform==='win32'&&!smoke,shouldHide:()=>desktopPreferences?.snapshot().preferences.closeToTray!==false,onAction:action=>requestPlatformWindow(action)});
+  platformTray=createPlatformTray({app,Tray,Menu,icon:path.join(app.getAppPath(),'assets','platform.ico'),productName:current.productName,getWindow:()=>window,createWindow,onShow:()=>requestPlatformWindow(),onCloseToTray:trayMemory?.schedule,revealForQuit:()=>!quietQuit,enabled:runtime.clientId==='platform'&&process.platform==='win32'&&!smoke,shouldHide:()=>desktopPreferences?.snapshot().preferences.closeToTray!==false,onLaunchApp:id=>void launchFromTray(id)});
+  // 숨어 있는 동안 따로 설치하거나 지운 Workspace를 늦어도 10분 안에 따라간다. 확인은 설치 표시 파일만 읽는다(설계 검토 D2)
+  if(platformTray.isActive()&&!trayAppsTick&&typeof setInterval==='function'){trayAppsTick=setInterval(()=>void syncTrayApps(),600000);trayAppsTick.unref?.();}
   if(runtime.clientId==='platform'&&platformTray.isActive()&&arrivalShow!=='minimized'){
     const preferences=desktopPreferences.snapshot().preferences;
     const hidden=arrivalShow==='hidden'?preferences.closeToTray!==false:!arrivalShow&&autostartHidden&&preferences.startHidden;
@@ -580,12 +657,15 @@ function createWindow(){
   contents.on('will-attach-webview',event=>event.preventDefault());
   contents.on('will-navigate',(event,url)=>{if(!allowedNavigation(url,entry,runtime.clientId)){event.preventDefault();external(url);}});
   contents.on('will-redirect',(event,url)=>{if(!allowedNavigation(url,entry,runtime.clientId))event.preventDefault();});
-  const programRoot=resolveProgramRoot({platform:process.platform,env:process.env,getHome:()=>app.getPath('home')});
-  if(!installations)installations=createClientLifecycle({clientId:runtime.clientId,mode:runtime.mode,platform:process.platform,arch:process.arch,programRoot,packageRoot:packaged?path.join(process.resourcesPath,'clients'):path.join(app.getAppPath(),'dist'),cacheRoot:path.join(app.getPath('userData'),'Installers'),releases:runtime.releases||[],spawn,openPath:file=>shell.openPath(file),onChange:async()=>{try{const state=await installations.getClients();send('synk:clients-changed',state);send('synk:client-progress',state);}catch{}}});
+  ensureInstallations();
+  // 창이 생기면 화면이 로그인 다시 확인을 맡는다
+  if(hiddenAuthRetry){clearTimeout(hiddenAuthRetry);hiddenAuthRetry=null;}
   // 창이 보이거나 초점을 받을 때 지금 주 프레임에 화면이 없으면 첫 화면을 싣는다. 화면 프로세스의 종료 알림을 받지 못했어도 같다(2026-11-19 설계 검토).
   // 이미 보이고 초점이 있는 창은 트레이 열기와 다시 실행이 showPlatformMain(Workspace는 second-instance)에서 본다
   window.on('show',()=>{connectionRecovery?.recoverIfGone?.();});
   window.on('focus',async()=>{connectionRecovery?.recoverIfGone?.();try{send('synk:clients-changed',await installations.getClients());}catch{}});
+  // 창이 보이거나 초점을 받으면 트레이의 앱 줄도 다시 본다. 설치 생명주기는 설치 · 삭제를 알리지 않는다(PC 0.5.0 설계 검토 D2)
+  if(isPlatform)for(const event of ['show','focus'])window.on(event,()=>void syncTrayApps());
   // 최소화한 채 되돌려 켠 앱의 미룬 실패는 사람이 작업 표시줄에서 창을 되살릴 때 보인다(0.4.97 엔진 검수 GA2)
   if(isPlatform)window.on('restore',()=>{showKeptFailure();});
   const companyRequest=createCompanyRequests({entry,clientId:runtime.clientId,session:ownSession,auth});
@@ -617,7 +697,6 @@ function createWindow(){
     'synk:install-update':()=>platformUpdate?.installUpdate()||{ok:false,state:'disabled',code:'UPDATE_UNAVAILABLE'},
     'synk:desktop-preferences-update':patch=>{if(!isPlatform)return {ok:false,code:'LAUNCHER_ONLY'};const result=desktopPreferences.update(patch);return result.ok?desktopSnapshot():result;},
     'synk:copy-platform-diagnostics':input=>isPlatform&&!smoke?copyDiagnostics({clipboard,input,environment:{platform:process.platform,arch:process.arch,version:app.getVersion(),mode:runtime.mode},account:accountStatus()}):{ok:false,code:'CLIPBOARD_UNAVAILABLE'},
-    'synk:tray-shortcuts':items=>isPlatform?platformTray.setShortcuts(items):{ok:false,code:'LAUNCHER_ONLY'},
     'synk:draft-recovery-status':owner=>isPlatform?draftRecoveryRequests.status(owner):{ok:false,code:'LAUNCHER_ONLY'},
     'synk:draft-recovery-enabled':(value,owner)=>isPlatform?draftRecoveryRequests.setEnabled(value,owner):{ok:false,code:'LAUNCHER_ONLY'},
     'synk:draft-recovery-load':(slot,owner)=>isPlatform?draftRecoveryRequests.load(slot,owner):{ok:false,code:'LAUNCHER_ONLY'},
@@ -670,6 +749,12 @@ function createWindow(){
     'synk:subscriptions-tokens-enable':on=>subscriptionCall(s=>s.tokensEnable(on===true)),
     'synk:subscriptions-tokens-live':on=>subscriptionCall(s=>s.tokensLive(on===true)),
     'synk:site-visits-snapshot':()=>siteVisitsCall(),
+    'synk:sns-health-snapshot':()=>snsHealthCall(),
+    'synk:solio-backup-snapshot':()=>solioBackupCall((service,account)=>service.snapshot(account)),
+    // 누를 때의 계정과 로그인 세대를 잡아 둔다. 같은 계정이라도 다시 로그인했으면 다른 회차로 본다(GPT 셋째 검수 GA4)
+    'synk:solio-backup-start':mode=>solioBackupCall((service,account)=>{const generation=accountStatus()?.sessionGeneration;return service.start(account,mode,{getHint:solioBackupHint,isCurrent:()=>{const now=accountStatus();return now?.signedIn===true&&now.account?.synk_user_id===account.synk_user_id&&now.sessionGeneration===generation;}});}),
+    'synk:solio-backup-open':topic=>solioBackupCall((service,account)=>service.open(account,topic)),
+    'synk:solio-backup-dismiss':()=>solioBackupCall((service,account)=>service.dismiss(account)),
   };
   for(const [channel,handler]of Object.entries(handlers)){ipcMain.removeHandler(channel);ipcMain.handle(channel,async(event,...args)=>{assertSender(event,window,entry,runtime.clientId);try{return await handler(...args);}catch(error){return {ok:false,error:publicError(error)};}});}
   unbindTeacher?.();unbindTeacher=bindMessengerTeacherIPC({ipcMain,getWindow:()=>window,service:teacherService,entry,clientId:runtime.clientId,environment:{mode:runtime.mode,platform:process.platform,arch:process.arch,version:app.getVersion()}});
@@ -695,8 +780,8 @@ function createWindow(){
         if(runtime.clientId==='platform')result.ui=packaged?{ok:true,packageBootOnly:true}:await require('../tools/native-ui-probe.cjs').probeNativeUI(contents,artifacts);
         result.packaged=packaged;result.capturePath=path.join(artifacts,runtime.clientId+'-hidden-preview.png');
         fs.writeFileSync(path.join(artifacts,runtime.clientId+'-hidden-preview.png'),(await contents.capturePage()).toPNG());
-        if(runtime.clientId==='platform'){result.nativeShell=await contents.executeJavaScript(`({url:location.href,ready:document.documentElement.dataset.ready==='true',html:document.body.innerText.length,remoteResources:performance.getEntriesByType('resource').filter(r=>/^https?:/.test(r.name)).map(r=>r.name)})`);result.nativeShell.networkBlocked=true;result.nativeShell.networkRequests=smokeNetworkRequests;result.nativeShell.consoleErrors=smokeConsoleErrors;}
-        process.stdout.write('SYNK_SMOKE '+JSON.stringify({ok:result.node==='undefined'&&result.rejected.code==='UNKNOWN_CLIENT'&&(runtime.clientId!=='world'||smokeDownload?.state==='completed')&&(runtime.clientId!=='platform'||result.ui?.ok&&result.nativeShell.ready&&result.nativeShell.url===PLATFORM_ENTRY&&result.nativeShell.html>100&&result.nativeShell.remoteResources.length===0&&smokeNetworkRequests.length===0&&smokeConsoleErrors.length===0),...result,download:smokeDownload,visible:window.isVisible(),preferences:contents.getLastWebPreferences()})+'\n');clearTimeout(timer);app.exit(0);
+        if(runtime.clientId==='platform'){result.nativeShell=await contents.executeJavaScript(`({url:location.href,ready:document.documentElement.dataset.ready==='true',face:!!document.querySelector('#portal-entry [data-portal-stage]')&&!!document.getElementById('portal-entry')?.dataset.portalState&&!document.querySelector('.host-fallback'),html:document.body.innerText.length,remoteResources:performance.getEntriesByType('resource').filter(r=>/^https?:/.test(r.name)).map(r=>r.name)})`);result.nativeShell.networkBlocked=true;result.nativeShell.networkRequests=smokeNetworkRequests;result.nativeShell.consoleErrors=smokeConsoleErrors;}
+        process.stdout.write('SYNK_SMOKE '+JSON.stringify({ok:result.node==='undefined'&&result.rejected.code==='UNKNOWN_CLIENT'&&(runtime.clientId!=='world'||smokeDownload?.state==='completed')&&(runtime.clientId!=='platform'||result.ui?.ok&&result.nativeShell.ready&&result.nativeShell.url===PLATFORM_ENTRY&&result.nativeShell.face&&result.nativeShell.remoteResources.length===0&&smokeNetworkRequests.length===0&&smokeConsoleErrors.length===0),...result,download:smokeDownload,visible:window.isVisible(),preferences:contents.getLastWebPreferences()})+'\n');clearTimeout(timer);app.exit(0);
       }catch(error){process.stdout.write('SYNK_SMOKE '+JSON.stringify({ok:false,clientId:runtime.clientId,error:error.message})+'\n');clearTimeout(timer);app.exit(1);}
     });
   }
