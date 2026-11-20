@@ -16,6 +16,7 @@ import { solioBrief } from './solio-brief.mjs';
 import { siteVisitsView, SITE_VISITS_NAME } from './site-visits-model.mjs';
 import { snsHealthView, SNS_HEALTH_NAME } from './sns-health-model.mjs';
 import { solioBackupView, backupActionNotice, SOLIO_BACKUP_NAME } from './solio-backup-model.mjs';
+import { createOfficeRoom, OFFICE_NAME, OFFICE_TIMING } from './office-room.mjs';
 import { createOrbFaceView } from './orb-face-view.mjs';
 import { createOrbRooms, ASIDE_ROOMS } from './orb-rooms.mjs';
 
@@ -32,9 +33,11 @@ export const SOLIO_PROGRAMS = Object.freeze([
   Object.freeze({ key: 'backup', label: SOLIO_BACKUP_NAME }),
   Object.freeze({ key: 'visits', label: SITE_VISITS_NAME }),
   Object.freeze({ key: 'health', label: SNS_HEALTH_NAME }),
+  // 사무실은 계정 건강 다음이다(사무실 구현설계 11.1). 본체가 볼 계정에만 available:true로 답한다
+  Object.freeze({ key: 'office', label: OFFICE_NAME }),
 ]);
 /* 이 PC의 요약 한 장을 읽어 보이는 프로그램(읽기 프로그램). 오브제 줄은 이 가운데 하나라도 보이면 선다 */
-const READ_PROGRAMS = Object.freeze(['visits', 'health', 'backup']);
+const READ_PROGRAMS = Object.freeze(['visits', 'health', 'backup', 'office']);
 const READ_VIEW = Object.freeze({ visits: siteVisitsView, health: snsHealthView, backup: solioBackupView });
 /* 백업 방이 보이는 동안 다시 읽는 간격(ms). 설치가 도는 동안은 짧게, 아니면 엔진이 상태를 쓰는 주기에 맞춘다 */
 const BACKUP_POLL = Object.freeze({ busy: 2000, idle: 15000 });
@@ -71,9 +74,12 @@ const SPACE_LABEL = Object.freeze({ solio: 'SOLIO', workspace: 'WORKSPACE', puls
 const SPACE_DESC = Object.freeze({ solio: '혼자 하는 사업의 도구', workspace: '팀이 함께 일하는 곳', pulse: '고객과 함께 만드는 곳' });
 const SPACE_ROOM = Object.freeze({
   workspace: Object.freeze({ say: 'Workspace를 열었습니다.', then: '따로 열린 Workspace 창에서 이어 가 주세요.' }),
-  pulse: Object.freeze({ say: 'PULSE를 열었습니다.', then: '따로 열린 PULSE 창에서 이어 가 주세요.' }),
+  // PULSE는 창 안에서 열린다(3단계). 열린 동안 방은 비고 뷰가 덮는다. 이 글은 PULSE가 닫혔을 때(뷰 프로세스가 사라지는 따위)의 방이다
+  pulse: Object.freeze({ say: 'PULSE가 닫혔습니다.', then: '저장하지 않은 내용은 남지 않았을 수 있습니다. 다시 열면 첫 화면부터 엽니다.' }),
 });
 const SIX_HOURS = 6 * 3600e3;
+/* 창 안의 PULSE가 열린 동안 맨 위 띠의 높이(CSS px). orb-face.css의 data-orb-band 규칙과 같은 값이다(3단계 구현 설계 4.1) */
+export const PULSE_BAND = 56;
 
 const trimmed = value => (typeof value === 'string' && value.trim() ? value.trim() : '');
 
@@ -153,8 +159,12 @@ export function createOrbFaceController({ view, options = {}, env = {} } = {}) {
   const look = { ...ORB_LOOK, ...(options.look && typeof options.look === 'object' ? options.look : {}) };
   const subs = options.subscriptions && typeof options.subscriptions.snapshot === 'function' ? options.subscriptions : null;
   const bridgeOf = v => (v && typeof v.snapshot === 'function' ? v : null);
-  const readApi = { visits: bridgeOf(options.siteVisits), health: bridgeOf(options.snsHealth), backup: bridgeOf(options.solioBackup) };
+  const readApi = { visits: bridgeOf(options.siteVisits), health: bridgeOf(options.snsHealth), backup: bridgeOf(options.solioBackup), office: bridgeOf(options.office) };
   let backupPoll = null, backupPollMs = 0, backupNotice = null;
+  /* 솔리오 「사무실」(사무실 구현설계 11절). 판은 읽기 프로그램처럼 읽고(reads.office), 방의 동작과 화면 상태는 office-room.mjs가 가진다.
+   * 방이 보이는 동안 기록 살피기를 켜고(watch), 분 글은 15초마다 다시 쓴다. 솔리오가 보이는 동안은 1분마다와 바뀜 알림 때 다시 읽어 오브제의 느낌표를 맞춘다 */
+  const office = createOfficeRoom({ api: readApi.office, snapshot: () => reads.office.result, reread: () => syncRead('office', { again: true }), changed: () => render() });
+  let officeWatching = false, officeClock = null, officePoll = null, officeChange = null, officeOff = null;
 
   const machine = createPortalStateMachine({
     status: options.initialState?.status ?? 'restoring',
@@ -217,6 +227,16 @@ export function createOrbFaceController({ view, options = {}, env = {} } = {}) {
   let aside = null;
   /* 방이 쓰는 런처 쪽 다리(설계 1.3절 「자료 어댑터」). account는 내 계정의 요청 · 신원 · 로그인과 보안, confirmLeave는 쓰던 글 확인이다.
    * bind로 런처에 손잡이를 넘겨, 계정 생명주기가 바뀔 때 내 계정 자료를 버리게 한다. 런처가 넘기지 않으면 「계정」은 옛 화면을 연다 */
+  /* 창 안의 PULSE 뷰(3단계 구현 설계 4절). 본체가 뷰를 만들고, 보일지는 이 컨트롤러가 정해 place로 알린다 */
+  const embed = options.embed && typeof options.embed.place === 'function' ? options.embed : null;
+  // guestPulse: 로그아웃한 손님이 PULSE 초대로 들어온 때다. 손님에게는 PULSE만 배정된 것으로 본다(설계 검토 R1)
+  let pulseOpen = false, pulseClosing = false, embedSent = '', embedFocusNext = false, guestPulse = false, signingOut = false;
+  const embedOff = [];
+  if (embed) {
+    try { const off = embed.onChanged?.(value => onEmbedChange(value)); if (typeof off === 'function') embedOff.push(off); } catch { /* 본체 알림 없이도 연다 */ }
+    try { const off = embed.onEvent?.(value => onEmbedEvent(value)); if (typeof off === 'function') embedOff.push(off); } catch { /* 같다 */ }
+    try { void Promise.resolve(embed.state?.()).then(value => { if (value && typeof value === 'object') onEmbedChange(value); }).catch(() => {}); } catch { /* 같다 */ }
+  }
   const roomOptions = options.rooms && typeof options.rooms === 'object' ? options.rooms : {};
   const accountAdapter = roomOptions.account && typeof roomOptions.account.request === 'function' && typeof roomOptions.account.identity === 'function' ? roomOptions.account : null;
   /* 설정 방의 PC 쪽 다리(설계 1.3절 표). 없는 칸은 그 줄을 세우지 않는다. 옛 설정 화면으로 가는 길은 이제 없다(설계 9.2) */
@@ -233,6 +253,8 @@ export function createOrbFaceController({ view, options = {}, env = {} } = {}) {
       updates: roomPart('updates', ['status', 'check', 'download', 'install']),
       environment: typeof roomOptions.environment === 'function' ? () => roomOptions.environment() : null,
       copyDiagnostics: typeof roomOptions.copyDiagnostics === 'function' ? () => roomOptions.copyDiagnostics() : null,
+      // 사무실의 「승인 물음도 보기」가 켜져 있으면 설정 방에 끄는 줄을 세운다. 볼 계정이 아니어도 된다(사무실 구현설계 11.1)
+      officeHooks: readApi.office && ['hooksStatus', 'hooksOff'].every(k => typeof readApi.office[k] === 'function') ? readApi.office : null,
     },
     now,
     setTimer,
@@ -334,11 +356,13 @@ export function createOrbFaceController({ view, options = {}, env = {} } = {}) {
   }
 
   function appSwitchScene(state) {
-    const names = ['solio', ...assignedFor(state)].map(name => ({ space: name, label: SPACE_LABEL[name], desc: SPACE_DESC[name], current: name === space }));
+    // PULSE 초대로 들어온 손님에게는 솔리오가 없다. 펼침에는 PULSE와 「로그인」만 둔다(설계 검토 R1, 옮기기 설계 「정한 것」 4)
+    const guestOnPulse = guestPulse && !state.accountKey;
+    const names = [...(guestOnPulse ? [] : ['solio']), ...assignedFor(state)].map(name => ({ space: name, label: SPACE_LABEL[name], desc: SPACE_DESC[name], current: name === space }));
     const signedIn = memberShown(state);
     const foot = signedIn
       ? [{ action: 'account', label: '계정' }, { action: 'settings', label: '설정' }, { action: 'logout', label: '로그아웃' }]
-      : [{ action: 'settings', label: '설정' }];
+      : guestOnPulse ? [{ action: 'signin', label: '로그인' }] : [{ action: 'settings', label: '설정' }];
     return { kind: 'app', names, lead: '', error: feedback.switch, actions: [], foot, showClose: true };
   }
 
@@ -356,7 +380,9 @@ export function createOrbFaceController({ view, options = {}, env = {} } = {}) {
   }
 
   function assignedFor(state) {
-    return state.accountKey && assignedAccount === state.accountKey ? assigned : [];
+    // 로그아웃한 손님은 PULSE 초대로 들어온 동안 PULSE 하나만 갈 수 있다(설계 검토 R1)
+    if (!state.accountKey) return guestPulse && embed && state.authStatus !== 'signed-in' ? ['pulse'] : [];
+    return assignedAccount === state.accountKey ? assigned : [];
   }
 
   function solioScene(state) {
@@ -410,7 +436,8 @@ export function createOrbFaceController({ view, options = {}, env = {} } = {}) {
   function readScene(key, state) {
     const r = reads[key];
     if (!readApi[key] || !memberShown(state) || !state.accountKey || r.account !== state.accountKey) return { visible: false };
-    const scene = READ_VIEW[key](r.result, now());
+    // 사무실의 장면은 방의 화면 상태(열어 둔 묶음, 알림 줄)와 구독 방의 남은 양까지 쓴다
+    const scene = key === 'office' ? office.scene(r.result, now(), sol.snapshot) : READ_VIEW[key](r.result, now());
     // 백업 방에서 누른 단추가 거절되거나 열지 못했으면 그 한 줄을 둘째 문장 앞에 10초 둔다(Fable 최종 검수 F3)
     if (key === 'backup' && scene.visible && backupNotice && now() - backupNotice.at < 10000) return { ...scene, then: `${backupNotice.text} ${scene.then || ''}`.trim() };
     return scene;
@@ -420,7 +447,7 @@ export function createOrbFaceController({ view, options = {}, env = {} } = {}) {
    * 볼 계정인지는 솔리오가 열릴 때 한 번 읽어 정하고, 답이 오기 전에는 줄을 두지 않는다 */
   function programsFor(state, scenes) {
     if (!memberShown(state) || !READ_PROGRAMS.some(key => scenes[key]?.visible)) return [];
-    return SOLIO_PROGRAMS.filter(p => p.key === 'subs' || scenes[p.key]?.visible).map(p => (p.key === 'backup' && scenes.backup?.note ? { ...p, note: scenes.backup.note } : { ...p }));
+    return SOLIO_PROGRAMS.filter(p => p.key === 'subs' || scenes[p.key]?.visible).map(p => (p.key === 'backup' && scenes.backup?.note ? { ...p, note: scenes.backup.note } : p.key === 'office' && scenes.office?.alert ? { ...p, alert: true } : { ...p }));
   }
 
   function roomScene(state) {
@@ -430,6 +457,8 @@ export function createOrbFaceController({ view, options = {}, env = {} } = {}) {
       const at = programs.some(p => p.key === prog) ? prog : 'subs';
       return { space, solio: solioScene(state), prog: at, programs, ...scenes };
     }
+    // 창 안의 PULSE가 열려 있으면 방은 비운다. 뷰가 띠 아래를 덮고, 펼침을 여는 동안에는 검정으로 남는다
+    if (space === 'pulse' && (pulseOpen || pulseClosing)) return { space, say: '', then: '', action: null, error: feedback.switch, embedded: true };
     const copy = SPACE_ROOM[space];
     return { space, say: copy.say, then: copy.then, action: typeof options.onOpenSpace === 'function' ? { action: 'reopen-space', label: '다시 열기' } : null, error: feedback.switch };
   }
@@ -496,12 +525,79 @@ export function createOrbFaceController({ view, options = {}, env = {} } = {}) {
       aside: mode === 'portal' ? null : aside,
       rooms: mode === 'portal' || !aside ? null : rooms.scene({ aside, checking: sol.checking, name: roomName(), accountKey: state.accountKey || '', member: memberShown(state) }),
       legacy: legacyKind,
+      band: bandOn() ? 'pulse' : null,
+      bandClose: bandOn() && pulseOpen && !pulseClosing && !switchOpen && !aside && typeof embed?.close === 'function',
       focus: focusKey,
       focusSeq,
     };
     return scene;
   }
 
+  /* 띠 모양은 들어온 뒤 PULSE 공간에 있는 동안이다. 구가 PULSE로 들어가는 길에서도 미리 서서, 도착한 구가 다시 옮겨 가지 않는다.
+   * PULSE가 닫혀 「다시 열기」를 보이는 동안에도 띠 자리를 지킨다. 사람이 하지 않은 일로 작은 구가 옮겨 가지 않게 한다(설계 검토 R12) */
+  function bandOn() { return !!embed && space === 'pulse' && clientMode() === 'app'; }
+  /* 뷰가 보이는 때: 띠 모양이고, 뷰가 열렸고, 구가 띠 자리에 멈췄고, 펼침과 곁방과 옛 화면이 닫혔고, 이 화면이 다른 일(로그아웃 확인 따위)을 하고 있지 않을 때.
+   * 그 밖에는 숨기고 구를 이 화면에서 움직인다(4.2, 설계 검토 R11) */
+  function embedVisible() { return bandOn() && pulseOpen && !pulseClosing && orbAt === 'home' && orbTarget === 'home' && !switchOpen && !aside && !legacyKind && busyAction === null && !signingOut && !isHidden(); }
+  function syncEmbed() {
+    if (!embed) return;
+    const next = { visible: embedVisible(), top: PULSE_BAND };
+    const key = JSON.stringify(next);
+    if (key === embedSent) return;
+    embedSent = key;
+    const focusNow = next.visible && embedFocusNext;
+    if (next.visible) embedFocusNext = false;
+    // 초점은 본체가 옮기지 않는다. 도착한 뒤와 Esc가 아닌 닫기 뒤에만 이 화면이 뷰로 보낸다(설계 검토 R3)
+    try { void Promise.resolve(embed.place(next)).then(() => { if (focusNow && !disposed && embedVisible()) return embed.focus?.(); return null; }).catch(() => { embedSent = ''; }); } catch { embedSent = ''; }
+  }
+  /* 본체의 알림. 「돌아가서 저장」을 고르면 PULSE로 데려가 쓰던 글을 보인다(3절). 사람이 하지 않은 일이라 구를 들여보내지 않고 그 자리에서 바꾼다(설계 검토 R12) */
+  function revealPulse() {
+    if (disposed || !pulseOpen) return;
+    // 옛 화면이 열려 있으면 clientMode()가 'legacy'라 먼저 닫는다(카본 A1)
+    if (legacyKind && clientMode() === 'legacy') closeLegacy({ silent: true });
+    if (clientMode() !== 'app') return;
+    if (switchOpen) { switchOpen = false; fanPin = false; }
+    if (aside) { aside = null; rooms.close(); }
+    if (space !== 'pulse') {
+      if (!assignedFor(machine.read()).includes('pulse') || orbTarget !== 'home') { render(); return; }
+      space = 'pulse';
+      feedback.switch = '';
+      view.settle?.('pulse');
+    }
+    embedFocusNext = true;
+    render();
+  }
+  function onEmbedEvent(value) {
+    if (disposed || !value || typeof value !== 'object') return;
+    if (value.type === 'focus-band' && bandOn()) { focus('here'); render(); }
+    else if (value.type === 'reveal') revealPulse();
+    // 본체가 스스로 숨겼다(화면 문서를 새로 싣기 시작했다가 그만둔 따위). 보낸 값을 잊고 지금 값을 다시 보낸다(설계 검토 R13)
+    else if (value.type === 'hidden') { embedSent = ''; render(); }
+  }
+  function onEmbedChange(value) {
+    if (disposed) return;
+    const open = value?.open === true;
+    if (open === pulseOpen) return;
+    pulseOpen = open;
+    // 뷰가 사라지면 다음 열림에서 자리를 다시 보낸다
+    if (!open) embedSent = '';
+    render();
+  }
+  /* 띠의 「PULSE 닫기」(설계 검토 R6). 쓰던 글이 있으면 본체가 묻는다. 닫히면 회원은 솔리오로, 손님은 묻는 화면으로 간다 */
+  async function closePulse() {
+    if (disposed || !bandOn() || !pulseOpen || pulseClosing || busyAction !== null || typeof embed.close !== 'function') return;
+    pulseClosing = true;
+    // 손님의 「로그인」은 펼침에서 온다. 묻는 동안 펼침을 닫아 두어야 남기면 PULSE가 곧 다시 보인다
+    if (switchOpen) { switchOpen = false; fanPin = false; feedback.switch = ''; }
+    render();
+    let outcome = 'kept';
+    try { outcome = (await embed.close())?.outcome || 'kept'; } catch { outcome = 'kept'; }
+    pulseClosing = false;
+    if (disposed) return;
+    if (outcome === 'kept' || clientMode() !== 'app' || space !== 'pulse') { if (outcome === 'kept') embedFocusNext = true; render(); return; }
+    if (guestPulse && machine.read().authStatus !== 'signed-in') { guestPulse = false; leaveToAsk({ status: 'signed-out' }); render(); return; }
+    enterSpace('solio', { fromSwitch: true });
+  }
   function render() {
     if (disposed) return;
     const state = machine.read();
@@ -521,11 +617,45 @@ export function createOrbFaceController({ view, options = {}, env = {} } = {}) {
       try { options.onActiveChange?.(scene.active, detail); } catch { /* 호스트의 일이다 */ }
       view.emitState?.(detail);
     }
+    syncEmbed();
     syncClock(scene);
     syncAuthRecheck(scene);
     // 모델별 토큰의 실시간은 구독 방이 보이는 동안 부탁한다(11-20부터 맨 위 「지금 출력」이 늘 보인다, 솔리오 구독 비서 설계 3.3)
     rooms.syncLive(scene.mode === 'app' && scene.layer === 'app' && space === 'solio' && scene.room?.prog === 'subs' && !aside && !isHidden(), Boolean(scene.room?.solio?.brief?.live));
     syncBackupPoll(scene.mode === 'app' && scene.layer === 'app' && space === 'solio' && scene.room?.prog === 'backup' && !aside && !isHidden(), Boolean(scene.room?.backup?.busy));
+    syncOffice(scene);
+  }
+  /* 사무실(구현설계 3.4의 8, 7절). 방이 보이는 동안만 본체의 기록 살피기를 켜고 15초마다 다시 그린다(분 글). 방을 떠나면 끄고 방의 화면 상태를 지운다.
+   * 솔리오가 보이고 이 계정이 사무실을 볼 수 있으면 1분마다 판을 다시 읽는다. 다른 프로그램을 보고 있어도 오브제의 느낌표가 맞는다.
+   * scene이 null이면(창이 가려짐, 끝냄) 모두 끈다 */
+  function syncOffice(scene) {
+    const api = readApi.office;
+    const app = !!scene && !disposed && scene.mode === 'app' && space === 'solio' && !isHidden();
+    const shown = app && scene.layer === 'app' && scene.room?.prog === 'office' && !aside;
+    if (api && typeof api.onChanged === 'function' && officeOff === null && !disposed) {
+      try {
+        const off = api.onChanged(() => {
+          // 바뀜 알림이 몰려 와도 한 번만 다시 읽는다
+          if (disposed || officeChange !== null) return;
+          // 사무실을 볼 수 있는 계정일 때만 다시 읽는다
+          officeChange = setTimer(() => { officeChange = null; if (!disposed && clientMode() === 'app' && space === 'solio' && !isHidden() && reads.office.result?.available === true) syncRead('office', { again: true }); }, OFFICE_TIMING.changed);
+        });
+        officeOff = typeof off === 'function' ? off : () => {};
+      } catch { officeOff = () => {}; }
+    }
+    if (shown !== officeWatching) {
+      officeWatching = shown;
+      if (!shown) office.close();
+      let pending;
+      try { pending = typeof api?.watch === 'function' ? Promise.resolve(api.watch(shown)) : null; } catch { pending = null; }
+      // 켠 뒤에는 살핀 결과를 한 번 더 읽는다(첫 살피기가 끝난 판)
+      if (shown && pending) pending.catch(() => null).then(() => { if (!disposed && officeWatching) syncRead('office', { again: true }); });
+    }
+    if (shown && officeClock === null && typeof setTick === 'function') officeClock = setTick(() => { if (!isHidden()) render(); }, OFFICE_TIMING.clock);
+    else if (!shown && officeClock !== null) { clearTick(officeClock); officeClock = null; }
+    const poll = app && reads.office.result?.available === true;
+    if (poll && officePoll === null && typeof setTick === 'function') officePoll = setTick(() => { if (!isHidden()) syncRead('office', { again: true }); }, OFFICE_TIMING.poll);
+    else if (!poll && officePoll !== null) { clearTick(officePoll); officePoll = null; }
   }
   /* 백업 방이 보이는 동안만 본체에 다시 묻는다. 설치 단계와 엔진의 상태 파일이 바뀌는 것을 보여 주려는 것이다 */
   function syncBackupPoll(on, busy) {
@@ -705,6 +835,8 @@ export function createOrbFaceController({ view, options = {}, env = {} } = {}) {
     // 계정으로 들어온 회원이면(토큰 갱신 중에 들어와도) 다음에 켤 때 빠른 길을 탄다. 회원 판정과 같은 기준이다
     if (enteredAs === 'signed-in') writeStorage(storage, ORB_RETURNING_KEY, '1');
     focus('here');
+    // PULSE에 도착하면 뷰가 보일 때 자판 초점을 뷰로 보낸다(설계 검토 R3)
+    if (space === 'pulse') embedFocusNext = true;
     render();
     if (space === 'solio') startSolio({ arriving: true });
   }
@@ -1154,6 +1286,11 @@ export function createOrbFaceController({ view, options = {}, env = {} } = {}) {
         after = () => completeEntryWith({ destination: result.destination });
         return;
       }
+      // 손님의 PULSE 초대는 창 안의 PULSE로 들어간다. 바깥 창이 없으니 들어가지 않으면 PULSE가 보이지 않는다(설계 검토 R1)
+      if (result?.keepOpen !== true && target === 'pulse' && embed) {
+        after = () => { guestPulse = true; completeEntryWith({ destination: result.destination }); };
+        return;
+      }
       // 손님의 초대가 받아지면 구 안으로 들어가지 않고 한 줄로 남는다(설계 17절 2)
       feedback.inviteStatus = '초대받은 공간을 열었습니다. 열린 창에서 이어 가 주세요.';
       focus('back');
@@ -1269,6 +1406,8 @@ export function createOrbFaceController({ view, options = {}, env = {} } = {}) {
     fanPin = false;
     feedback.switch = '';
     if (focusHere) focus('here');
+    // Esc가 아닌 닫기(바깥 누름, 다시 누름, 지금 공간 고르기)는 다시 보이는 PULSE로 초점을 보낸다. Esc는 작은 구에 남는다(2단계 규칙, 설계 검토 R3)
+    else if (bandOn()) embedFocusNext = true;
     render();
   }
 
@@ -1283,9 +1422,12 @@ export function createOrbFaceController({ view, options = {}, env = {} } = {}) {
     busyAction = 'open-space';
     feedback.switch = '';
     render();
+    // 창 안의 PULSE가 살아 있거나 손님의 PULSE면 배정을 망으로 다시 묻지 않고 본체의 PULSE 열기(있던 뷰를 다시 씀)로 간다.
+    // 겉은 이 계정의 것이다. 계정이 바뀌면 본체가 닫는다(설계 검토 R7)
+    const direct = target === 'pulse' && embed && typeof embed.open === 'function' && (pulseOpen || guestPulse);
     let result;
     try {
-      result = await options.onOpenSpace(dest, context);
+      result = direct ? await embed.open() : await options.onOpenSpace(dest, context);
     } catch {
       result = { ok: false };
     } finally {
@@ -1368,9 +1510,19 @@ export function createOrbFaceController({ view, options = {}, env = {} } = {}) {
     // 「계정」은 내 계정 방을, 「설정」은 설정 방을 연다(2단계 둘째 조각 설계 9.3). 설정 방은 손님에게도 있다
     if (action === 'account') { if (rooms.hasAccount()) openAside('account'); else openLegacy('account'); return; }
     if (action === 'settings') { openAside('settings'); return; }
+    // 손님의 「로그인」은 묻는 화면으로 돌아간다. 살아 있는 손님 PULSE는 「PULSE 닫기」와 같은 문으로 먼저 닫는다.
+    // 쓰던 글을 남기면 PULSE에 머문다. 숨은 PULSE를 묻는 화면 뒤에 남기면 「돌아가서 저장」이 돌아올 곳이 없다(카본 A1)
+    if (action === 'signin') {
+      if (!guestPulse || machine.read().accountKey) return;
+      if (pulseOpen && typeof embed?.close === 'function') { void closePulse(); return; }
+      guestPulse = false; leaveToAsk({ status: 'signed-out' }); render(); return;
+    }
     if (action === 'logout') {
+      // 로그아웃 확인(쓰던 글 물음)이 뜨는 동안에는 PULSE 뷰가 그 대화상자를 가리지 않게 숨겨 둔다(설계 검토 R11)
+      signingOut = true;
       closeSwitch();
-      try { void options.onSignOut?.(); } catch { /* 옛 런처가 알림으로 알린다 */ }
+      const done = () => { signingOut = false; if (!disposed) render(); };
+      try { void Promise.resolve(options.onSignOut?.()).then(done, done); } catch { done(); /* 옛 런처가 알림으로 알린다 */ }
     }
   }
 
@@ -1389,6 +1541,7 @@ export function createOrbFaceController({ view, options = {}, env = {} } = {}) {
     enteredAs = null;
     assigned = [];
     assignedAccount = null;
+    guestPulse = false;
     stopSolio();
     stopReads();
     prog = 'subs';
@@ -1539,6 +1692,8 @@ export function createOrbFaceController({ view, options = {}, env = {} } = {}) {
     if (r.timer !== null) clearTimer(r.timer);
     Object.assign(r, { account: undefined, result: null, loading: false, done: false, retried: false, timer: null, again: false });
     if (prog === key) prog = 'subs';
+    // 사무실 방의 화면 상태(쓰던 이름, 열어 둔 묶음, 늦게 올 답)도 앞 계정의 것을 남기지 않는다
+    if (key === 'office') office.reset();
   }
   function stopReads() { for (const key of READ_PROGRAMS) stopRead(key); }
   function syncReads(opts) { for (const key of READ_PROGRAMS) syncRead(key, opts); }
@@ -1751,6 +1906,12 @@ export function createOrbFaceController({ view, options = {}, env = {} } = {}) {
       /* 방 안쪽의 단추. 줄을 열고 접는 일은 화면 안에서 끝나고, 동작만 여기로 온다 */
       case 'room':
         if (clientMode() !== 'app' || !payload || typeof payload !== 'object') return false;
+        // 사무실 방의 줄 동작은 office-room.mjs가 받는다. 방을 떠나며 접힌 줄의 알림(row-fold)은 방을 떠난 뒤에 와도 받는다(끝냄을 본 것으로)
+        if (payload.room === 'solio-office') {
+          if (!['row-open', 'row-fold', 'disarm'].includes(payload.act) && (aside || space !== 'solio' || prog !== 'office')) return false;
+          void office.handle(payload);
+          return true;
+        }
         if (!aside && payload.room !== 'solio') return false;
         void rooms.handle(payload);
         return true;
@@ -1764,12 +1925,14 @@ export function createOrbFaceController({ view, options = {}, env = {} } = {}) {
       case 'backup-start': case 'backup-open': case 'backup-dismiss': return backupAction(action, typeof payload === 'string' ? payload : '');
       case 'recheck-auth': void recheckAuth(); return true;
       case 'reopen-space': void runOpenSpace(space, { reopen: true }); return true;
+      case 'band-f6': if (!embedVisible()) return false; void Promise.resolve(embed.focus?.()).catch(() => {}); return true;
+      case 'pulse-close': void closePulse(); return true;
       case 'legacy-back': closeLegacy(); return true;
       case 'qa-guest': void runQaGuest(); return true;
       case 'pageshow': if (payload === true) releaseNavigationHold(); return true;
       case 'visible': if (!isHidden()) render(); return true;
       // 창이 가려지면 모델별 토큰의 실시간 부탁을 거둔다(설계 3.4)
-      case 'hidden': rooms.syncLive(false); return true;
+      case 'hidden': rooms.syncLive(false); syncOffice(null); return true;
       case 'escape': return escape();
       default: return false;
     }
@@ -1891,7 +2054,16 @@ export function createOrbFaceController({ view, options = {}, env = {} } = {}) {
       aside = null;
       if (clockTimer !== null) { clearTick(clockTimer); clockTimer = null; }
       if (backupPoll !== null) { clearTick(backupPoll); backupPoll = null; backupPollMs = 0; }
+      if (officeWatching) { officeWatching = false; try { void Promise.resolve(readApi.office?.watch?.(false)).catch(() => {}); } catch { /* 본체의 일이다 */ } }
+      if (officeClock !== null) { clearTick(officeClock); officeClock = null; }
+      if (officePoll !== null) { clearTick(officePoll); officePoll = null; }
+      if (officeChange !== null) { clearTimer(officeChange); officeChange = null; }
+      try { officeOff?.(); } catch { /* 무시 */ }
+      officeOff = null;
       if (hadBusyInvite) options.onCancelInvite?.();
+      // 얼굴이 없어지면 PULSE 뷰를 숨긴다(본체도 화면 문서가 바뀌면 숨긴다). 뷰와 쓰던 글은 본체에 그대로 산다
+      if (embed) { try { void Promise.resolve(embed.place({ visible: false, top: PULSE_BAND })).catch(() => {}); } catch { /* 본체의 일이다 */ } }
+      for (const off of embedOff.splice(0)) { try { off(); } catch { /* 무시 */ } }
       view.dispose?.();
     },
   };

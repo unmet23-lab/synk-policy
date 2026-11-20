@@ -1,5 +1,5 @@
 'use strict';
-const {app,BrowserWindow,ipcMain,session,protocol,Menu,Tray,shell,dialog,safeStorage,screen,globalShortcut,clipboard,Notification,systemPreferences}=require('electron');
+const {app,BrowserWindow,WebContentsView,ipcMain,session,protocol,Menu,Tray,shell,dialog,safeStorage,screen,globalShortcut,clipboard,Notification,systemPreferences}=require('electron');
 const fs=require('node:fs'),path=require('node:path'),{spawn}=require('node:child_process');
 const {CLIENTS,DEV_URLS,PLATFORM_ENTRY,identity,sourceScope}=require('./catalog.cjs');
 const {safeEntry,assertSender,trustedEntry,worldNotificationAllowed,preferences,allowedNavigation,externalDestination,contentSecurityPolicy,nativeContentSecurityPolicy}=require('./security.cjs');
@@ -34,6 +34,7 @@ const {createDraftRecovery}=require('./draft-recovery.cjs');
 const {createDraftRecoveryRequests}=require('./draft-recovery-ipc.cjs');
 const {copyDiagnostics}=require('./diagnostics-clipboard.cjs');
 const {createPulseApp,pulseInviteRefusal}=require('./pulse-app.cjs');
+const {createPulseViewHost}=require('./pulse-view.cjs');
 const {createCompanyEntryManager,createCompanyEntryPartitions,companyAnswerFromPulse,entryRefusal,bindingFromAuth}=require('./company-entry.cjs');
 const {createCompanyEntryDestinations}=require('./company-entry-destinations.cjs');
 const {createPlatformUpdater}=require('./platform-update.cjs');
@@ -48,6 +49,8 @@ const {createSolioBackup}=require('./solio-backup.cjs');
 const {createMacApplicationLocationGate}=require('./mac-application-location.cjs');
 const {createAiSubscriptions}=require('./ai-subscriptions.cjs');
 const {createLocalServerGate}=require('./local-server-owner.cjs');
+const {createOffice,loadOfficeModel}=require('./office.cjs');
+const {createOfficeHooks}=require('./office-hooks.cjs');
 app.enableSandbox();
 protocol.registerSchemesAsPrivileged([{scheme:'synk-desktop',privileges:{standard:true,secure:true,supportFetchAPI:true}}]);
 const packaged=app.isPackaged;
@@ -77,7 +80,7 @@ app.setName(current.productName);
 app.setPath('userData',path.join(app.getPath('appData'),'SYNK Desktop',current.sessionScope+(smoke?'.smoke':'')));
 app.setPath('sessionData',path.join(app.getPath('userData'),'Session'));
 if(process.platform==='win32')app.setAppUserModelId(current.appId);
-let window,platformTray,trayMemory,desktopPreferences,careNotifications,windowPlacement,draftRecovery,draftRecoveryRequests,pulseApp,platformUpdate,protocolRegistered=false,auth,installations,connectionRecovery,suiteFollower,teacherService,unbindTeacher,pendingTeachingView=false;
+let window,platformTray,trayMemory,desktopPreferences,careNotifications,windowPlacement,draftRecovery,draftRecoveryRequests,pulseApp,pulseView,platformUpdate,protocolRegistered=false,auth,installations,connectionRecovery,suiteFollower,teacherService,unbindTeacher,pendingTeachingView=false;
 // 켜짐부터 열림까지(1-가 구현 설계 2절). orbBoot는 구가 드러나기 시작한 시각과 움직임 종류다. 본체가 정해 시작 창과 앱 창에 같은 값을 준다.
 // startupHandoff는 시작 창에서 앱 창으로 겹쳐 넘기는 동안의 상태, unseenFailure는 숨은 채 시작한 길에서 아직 보이지 않은 실패다.
 let orbBoot=null,startupHandoff=null,unseenFailure=null;
@@ -100,7 +103,7 @@ let startupAllowed=runtime.clientId!=='platform'||!packaged||smoke;
 let appLocationReady=process.platform!=='darwin'||!packaged||smoke;
 const appLocation=createMacApplicationLocationGate({app,dialog,platform:process.platform,packaged,smoke,productName:current.productName});
 const suiteBindingKey=authConfig?suiteKey(authConfig,runtime.mode):null;
-function publishAuthState(state){careNotifications?.syncAccount();pulseApp?.syncContext(state);syncCompanyEntry();scheduleHiddenAuthRetry(state);void syncTrayApps();if(window&&!window.isDestroyed()&&trustedEntry(window.webContents.getURL(),entry,runtime.clientId))window.webContents.send('synk:auth-changed',state);}
+function publishAuthState(state){careNotifications?.syncAccount();pulseApp?.syncContext(state);syncCompanyEntry();officeService?.accountChanged(officeLoginOf(state));solioBackupSweep();scheduleHiddenAuthRetry(state);void syncTrayApps();if(window&&!window.isDestroyed()&&trustedEntry(window.webContents.getURL(),entry,runtime.clientId))window.webContents.send('synk:auth-changed',state);}
 // 설치 생명주기는 창 밖에서 만든다. 숨은 시작의 트레이 메뉴도 설치 여부를 본다(PC 0.5.0 설계 1.5)
 function ensureInstallations(){
   if(installations)return installations;
@@ -252,9 +255,72 @@ function snsHealthCall(){if(runtime.clientId!=='platform'||smoke)return {ok:fals
 // 솔리오 「백업·복구」(11-20): 업무 백업 엔진의 입구. 플랫폼 창에서 로그인한 계정만 묻고, 실제 입구는 유호님 계정에만 보인다(solio-backup.cjs).
 // 힌트는 SYNK ID에 Google 로그인이 이어져 있고 그 주소를 알 때만 엔진의 setup 요청에 넘긴다(STAGE1_DESIGN 4.13 「로그인」).
 let solioBackupService=null;
-function solioBackupCall(work){if(runtime.clientId!=='platform'||smoke)return {ok:false,code:'LAUNCHER_ONLY'};const status=accountStatus();if(status?.signedIn!==true||!status.account)return {ok:false,code:'SIGN_IN_REQUIRED'};if(!solioBackupService)solioBackupService=createSolioBackup({cacheRoot:path.join(app.getPath('userData'),'WorkBackupSetup'),openExternal:url=>shell.openExternal(url)});return work(solioBackupService,status.account);}
+function solioBackup(){if(!solioBackupService)solioBackupService=createSolioBackup({packaged,cacheRoot:path.join(app.getPath('userData'),'WorkBackupSetup'),openExternal:url=>shell.openExternal(url)});return solioBackupService;}
+// 로그인 알림마다 남은 setup 요청을 치운다. 방을 아직 열지 않았어도 서비스를 만들어 치우므로, 앱을 다시 켠 뒤 첫 알림이 앞 실행의 요청을 지운다(Fable 요청 수명 확인 P2)
+function solioBackupSweep(){if(runtime.clientId!=='platform'||smoke)return;try{solioBackup().accountChanged();}catch{}}
+function solioBackupCall(work){if(runtime.clientId!=='platform'||smoke)return {ok:false,code:'LAUNCHER_ONLY'};const status=accountStatus();if(status?.signedIn!==true||!status.account)return {ok:false,code:'SIGN_IN_REQUIRED'};return work(solioBackup(),status.account);}
 // 누른 계정과 지금 로그인한 계정이 같을 때만 그 계정의 Google 주소를 준다(GPT 검수 GA2)
 async function solioBackupHint(account){const result=await auth.identity();if(!result?.ok||typeof account?.synk_user_id!=='string'||result.accountId!==account.synk_user_id)return null;const google=(result.identities||[]).find(row=>row?.provider==='google'&&typeof row.email==='string');return google?.email||null;}
+// 솔리오 「사무실」(11-20, docs/디자인/솔리오_사무실_20261119/구현설계.md 11.1 · 13절, 15절 6단계): 플랫폼 창에서 로그인한 계정만 묻는다. 볼 계정인지는 office.cjs가 채널마다 viewers.json으로 본다.
+// 처음 부를 때 office-model.mjs를 불러 한 번 만든다. 훅 서버(office-hooks.cjs)를 넘겨 판에 훅의 모습을 싣는다. 로그인이 바뀌면 publishAuthState가 accountChanged를 부른다.
+// 같은 계정의 토큰 갱신은 잠깐 restoring(계정 없음)으로 보이므로 그동안은 그 계정 그대로 본다(PULSE의 renewingAccount와 같다). 그래야 갱신마다 세션 기억과 기록 살피기가 끊기지 않는다.
+// PC 0.5.2는 사무실을 꺼 둔 채 낸다(11-20). 검수의 P1이 남아 있고 설계를 고치는 중이라서다(docs/디자인/솔리오_사무실_20261119/구현설계.md). 켜는 자리는 officeShipped 한 줄이다.
+// 꺼 둔 포장 판은 사무실 채널이 모두 NOT_AVAILABLE로 답해 오브제와 방이 서지 않는다. 훅 서버를 열지 않고 손님의 Claude Code 설정 파일에 줄을 더하지 않는다.
+// --office-unhook은 전과 같이 돌아 솔리오의 줄만 지운다. 소스 실행은 그대로 열린다
+const officeShipped=false;
+const officeOff=()=>packaged&&!officeShipped;
+let officeService=null,officeLoading=null;
+const officeAccountOf=state=>{if(state?.signedIn===true&&state.account)return state.account;const renewing=renewingAccount();return renewing?{synk_user_id:renewing}:null;};
+// 로그인 묶음(구현설계 11.1 「계정 묶기」, GPT 검수 r7 · r8 GA1): 계정에 로그인 회차(sessionGeneration)를 실어 넘긴다. 사무실은 들어온 순간의 묶음이 지금 묶음과 같을 때만 기억을 바꾸고 답한다
+const officeLoginOf=state=>{const account=officeAccountOf(state);return account?{...account,sessionGeneration:state?.sessionGeneration}:null;};
+function office(){if(officeService)return Promise.resolve(officeService);if(!officeLoading)officeLoading=loadOfficeModel().then(model=>{officeService=createOffice({userData:app.getPath('userData'),model,hooks:officeHooksService(),onChange:()=>sendDesktop('synk:office-changed')});officeService.accountChanged(officeLoginOf(accountStatus()));return officeService;}).finally(()=>{officeLoading=null;});return officeLoading;}
+// 훅 서버(구현설계.md 11.1 · 12.2 · 12.3, 15절 5단계): 손님의 Claude Code 설정 파일은 설치본(release 판)만 고친다. 미리보기 · 소스 실행 · 스모크는 SYNK_OFFICE_HOOK_DIRS로 넘겨받은 폴더만 고친다.
+// 서버는 앱을 켤 때 훅이 켜져 있으면 연다(initializeMain). 받은 소식은 볼 계정이 로그인해 있을 때만 읽어 사무실에 넘긴다. 계정이 바뀌어도 서버는 닫지 않는다.
+// 접는 계정은 받기를 허락한 그 계정이다(accepts가 돌려준 값). 몸을 받는 사이에 다른 볼 계정으로 바뀌면 사무실의 ingest가 지금 계정이 아니라며 버린다(GPT 검수 r8 GA1).
+let officeHooks=null;
+// 지우는 길(--office-unhook)은 사무실을 꺼 둔 판에서도 설치본으로 돈다. 넘겨받은 폴더(SYNK_OFFICE_HOOK_DIRS)는 소스 실행의 것이라 설치본이 지우지 않는다(GPT 검수 solio-office-off GA1).
+// 꺼 둔 판은 상태 파일에 적어 둔 폴더에서만 지운다. 이 판은 손님의 설정 파일에 줄을 쓰지 않으므로, 기본 설정 폴더(CLAUDE_CONFIG_DIR)에 있는 줄은 다른 실행의 것이다(r2 GA1)
+const officeHooksRelease=()=>packaged&&runtime.mode==='release'&&!smoke;
+const officeHooksInstalled=()=>!officeOff()&&officeHooksRelease();
+function officeHooksService(){if(!officeHooks)officeHooks=createOfficeHooks({userData:app.getPath('userData'),installed:officeHooksInstalled(),accepts:async()=>{const login=officeLoginOf(accountStatus());return login&&await (await office()).accepts(login)?login:false;},deliver:(event,account)=>{if(account&&typeof account==='object')void office().then(service=>service.ingest(event,account)).catch(()=>{});},onChange:()=>sendDesktop('synk:office-changed')});return officeHooks;}
+// 끄기는 볼 계정이 아니어도 된다(11.1, 13절). 플랫폼 창인지와 보낸 창(handlers의 assertSender)만 본다. 구 곁의 설정 방이 켜졌는지만 묻는 길도 같다. 답에 폴더 경로를 싣지 않는다
+// 사무실을 꺼 둔 판은 훅 서비스를 만들지 않고 꺼진 것으로 답한다. 설정 방에 끄는 줄이 서지 않는다
+async function officeHooksOff(){if(runtime.clientId!=='platform'||smoke)return {ok:false,code:'LAUNCHER_ONLY'};if(officeOff())return {ok:true};const result=await officeHooksService().disable();return {ok:result?.ok===true,...(typeof result?.code==='string'?{code:result.code}:{})};}
+async function officeHooksStatus(){if(runtime.clientId!=='platform'||smoke)return {ok:false,code:'LAUNCHER_ONLY'};if(officeOff())return {ok:true,on:false};const status=await officeHooksService().status([]);return {ok:true,on:status?.on===true};}
+// 부를 때의 계정과 로그인 회차(sessionGeneration)를 잡아 두고, 모델을 싣거나 일을 마친 뒤에도 같을 때만 답을 넘긴다. 로그아웃하거나 다시 로그인했으면 답을 버린다.
+// 같은 계정의 토큰 갱신은 회차가 그대로이고 officeAccountOf가 그 계정으로 보므로 같은 계정이다(GPT 검수 GA1)
+async function officeCall(work){if(officeOff())return {ok:false,code:'NOT_AVAILABLE'};if(runtime.clientId!=='platform'||smoke)return {ok:false,code:'LAUNCHER_ONLY'};const status=accountStatus();if(status?.signedIn!==true||!status.account)return {ok:false,code:'SIGN_IN_REQUIRED'};const held=status.account.synk_user_id,generation=status.sessionGeneration;const same=()=>{const now=accountStatus();return officeAccountOf(now)?.synk_user_id===held&&now?.sessionGeneration===generation;};const service=await office();if(!same())return {ok:false,code:'AUTH_CHANGED'};const result=await work(service,{...status.account,sessionGeneration:generation});return same()?result:{ok:false,code:'AUTH_CHANGED'};}
+// 폴더는 화면이 경로 글자로 보내지 않는다(13절). 고르기 창은 볼 계정에만 띄우고, 고르는 사이에 로그인이 바뀌었으면 고른 폴더를 버린다(백업 시작과 같은 확인)
+async function officeChooseFolder(service,account){
+  if(!await service.allowed(account))return {ok:false,code:'NOT_ALLOWED'};
+  if(!window||window.isDestroyed())return {ok:false,code:'CANCELLED'};
+  const generation=accountStatus()?.sessionGeneration;
+  const result=await dialog.showOpenDialog(window,{properties:['openDirectory']});
+  const folder=result&&!result.canceled&&Array.isArray(result.filePaths)&&typeof result.filePaths[0]==='string'?result.filePaths[0]:null;
+  if(!folder)return {ok:false,code:'CANCELLED'};
+  const now=accountStatus();
+  if(now?.signedIn!==true||now.account?.synk_user_id!==account.synk_user_id||now.sessionGeneration!==generation)return {ok:false,code:'AUTH_CHANGED'};
+  return {ok:true,folder};
+}
+// 부서 더하기 · 고치기. folder는 'choose'(고르기 창), {fromSession}(지금 선 세션의 작업 폴더), 없음(번호가 있는 부서의 이름만 고칠 때) 셋뿐이다.
+// 번호가 있는 부서에서 뺀 칸(폴더나 이름)은 office-store가 저장된 값으로 채운다. 판에서 읽은 값을 다시 써서 겹친 고치기를 덮지 않게 한다(GPT 검수 GA3)
+async function officeSaveDepartment(service,account,input){
+  if(!input||typeof input!=='object'||(input.id!==undefined&&typeof input.id!=='string')||(input.name!==undefined&&typeof input.name!=='string'))return {ok:false,code:'VALUE'};
+  const id=input.id??null,given=input.folder,name=input.name!==undefined?{name:input.name}:{};let folder;
+  if(given==='choose'){const chosen=await officeChooseFolder(service,account);if(!chosen.ok)return chosen;folder=chosen.folder;}
+  else if(given===undefined){if(id===null||input.name===undefined)return {ok:false,code:'VALUE'};return service.saveDepartment({id,name:input.name},account);}
+  else{
+    const snap=await service.snapshot(account);
+    if(!snap?.ok||!snap.available)return {ok:false,code:'NOT_ALLOWED'};
+    if(given&&typeof given==='object'&&typeof given.fromSession==='string'){const session=Object.hasOwn(snap.state.sessions,given.fromSession)?snap.state.sessions[given.fromSession]:null;if(typeof session?.cwd!=='string'||!path.isAbsolute(session.cwd))return {ok:false,code:'NOT_FOUND'};folder=session.cwd;}
+    else return {ok:false,code:'VALUE'};
+  }
+  return service.saveDepartment({...(id!==null?{id}:{}),...name,folder},account);
+}
+// 보는 폴더: 더하기는 고르기 창으로만, 빼기는 손님이 더한 폴더 가운데 하나일 때만이다(큰 · 작은 글자는 가리지 않는다). 폴더 하나만 넘기고,
+// 저장된 목록을 읽고 고치고 쓰는 일은 office-store가 계정마다 한 줄 차례 안에서 한다. 겹친 더하기 · 빼기가 서로 덮지 않는다(GPT 검수 GA3)
+async function officeAddRoot(service,account){const chosen=await officeChooseFolder(service,account);if(!chosen.ok)return chosen;return service.addRoot(chosen.folder,account);}
+async function officeRemoveRoot(service,account,dir){if(typeof dir!=='string')return {ok:false,code:'VALUE'};return service.removeRoot(dir,account);}
 function subscriptionCall(operation){const service=subscriptions();if(!service)return {ok:false,code:'LAUNCHER_ONLY'};if(accountStatus()?.signedIn!==true)return {ok:false,code:'SIGN_IN_REQUIRED'};return operation(service);}
 // 계정판 자동 읽기(지난 7일 사용량 기록용): 로그인한 회원이 계정판을 써 본 PC에서만, 앱이 켜 있는 동안 2분마다 읽을 때인지 본다.
 // 읽을 때는 ai-subscriptions.cjs의 autoDue가 정한다(마지막 확인 6시간 뒤 · 계정마다 주간 초기화 10분 전 · 결제일 아침). 끄는 중에는 새로 읽지 않는다.
@@ -264,6 +330,8 @@ const subscriptionBoardFile=()=>path.join(app.getPath('userData'),'AiSubscriptio
 require('node:timers').setInterval(()=>{if(quittingRequested||runtime.clientId!=='platform'||smoke||accountStatus()?.signedIn!==true||(!aiSubscriptions&&!fs.existsSync(subscriptionBoardFile())&&!fs.existsSync(path.join(app.getPath('userData'),'AiSubscriptions','token-usage.json'))))return;void Promise.resolve(subscriptions()?.autoTick()).catch(()=>{});void Promise.resolve(subscriptions()?.tokensAuto?.()).catch(()=>{});},2*60*1000).unref?.();
 app.on('before-quit',()=>{quittingRequested=true;startupWindow?.prepareForQuit();handoffCover?.prepareForQuit();});
 app.on('before-quit',()=>aiSubscriptions?.dispose());
+app.on('before-quit',()=>officeService?.close());
+app.on('before-quit',()=>void officeHooks?.close());
 app.on('will-quit',event=>{
   if(platformUpdate?.needsInstallHandoff()){
     // will-quit runs only after the normal window/draft guards accepted. Hold
@@ -291,8 +359,12 @@ app.on('will-quit',event=>{
   startupGate?.dispose();startupWindow?.dispose();platformUpdate?.dispose();companyEntry?.dispose();companyDestinations?.dispose();pulseApp?.dispose();careNotifications?.dispose();desktopPreferences?.dispose();unbindTeacher?.();teacherService?.dispose();suiteFollower?.dispose();suitePublisher?.dispose();auth?.dispose();installations?.dispose();connectionRecovery?.dispose();if(trayAppsTick)clearInterval(trayAppsTick);if(trayAppsTimer)clearTimeout(trayAppsTimer);if(hiddenAuthRetry)clearTimeout(hiddenAuthRetry);
 });
 // 장치 1(1-가 구현 설계 2절): 설치기가 이 앱을 바꾸는 중이면 창과 서비스를 만들기 전에 설치기에 창을 보이라고 청하고 끝난다. 옛 실행 파일이 켜져 바꾸기를 막지 않게 한다
-const yielded=runtime.clientId==='platform'&&packaged&&!smoke&&process.platform==='win32'&&typeof process.env.LOCALAPPDATA==='string'&&yieldToUpdatingInstaller({localAppData:process.env.LOCALAPPDATA,exit:code=>app.exit(code)});
-if(yielded){/* 설치기에 넘겼다. app.exit(0)이 끝낸다 */}
+// 솔리오 「사무실」의 훅 지우기(구현설계.md 11.1 · 12.3 「앱을 지울 때」): 지우는 프로그램이 --office-unhook으로 한 번 돌린다. 앱이 켜져 있어도 되도록 단일 실행 잠금보다 먼저,
+// 창과 서비스를 만들지 않고 적어 둔 설정 폴더(설치본은 기본 설정 폴더까지)에서 솔리오의 줄만 지운 뒤 끝난다. 켜져 있는 앱은 상태 파일이 바뀐 것을 보고 서버를 닫는다
+const officeUnhook=runtime.clientId==='platform'&&!smoke&&process.argv.includes('--office-unhook');
+if(officeUnhook)void Promise.resolve().then(()=>createOfficeHooks({userData:app.getPath('userData'),installed:officeHooksRelease(),...(officeOff()?{baseDirs:()=>[]}:{})}).unhook()).catch(()=>{}).finally(()=>app.exit(0));
+const yielded=!officeUnhook&&runtime.clientId==='platform'&&packaged&&!smoke&&process.platform==='win32'&&typeof process.env.LOCALAPPDATA==='string'&&yieldToUpdatingInstaller({localAppData:process.env.LOCALAPPDATA,exit:code=>app.exit(code)});
+if(officeUnhook||yielded){/* 훅을 지우거나 설치기에 넘겼다. app.exit(0)이 끝낸다 */}
 else if(!app.requestSingleInstanceLock())app.quit();
 else {
   app.on('second-instance',(_event,argv)=>{if(!appLocationReady)return;if(runtime.clientId==='platform'){requestPlatformWindow();return;}if(runtime.clientId==='messenger'&&Array.isArray(argv)&&argv.includes('--view=teaching'))pendingTeachingView=true;if(window&&!window.isDestroyed()){if(window.isMinimized())window.restore();window.show();window.focus();sendTeachingView();connectionRecovery?.reopen?.();}});
@@ -452,7 +524,10 @@ async function prepareUpdateHandoff({token,version,file}={}){
       // 다만 시작 창이 있는데 보이지도 최소화되지도 않았으면 사람이 켠 실행에서 아직 그려지기 전이다(숨은 채 시작한 길에는 시작 창이 없다).
       // 그때는 조용히 가지 않는다. 설치기 창과 새 앱이 앞으로 뜬다(0.4.96 공개 후보 검수 D1 2차)
       const asked=!!startupWin&&!startupWin.isMinimized();
-      const quiet=!asked&&others.length===0&&(!main||!(await draftsUnsaved(main)));
+      // 창 안의 PULSE가 살아 있으면 조용히 가지 않는다. PULSE에 쓰던 글이 있는지 미리 물을 길이 없다(3단계 구현 설계 2.3, 바깥 창일 때와 같은 결과)
+      const draftless=!asked&&others.length===0&&!pulseView?.hasSurface()&&(!main||!(await draftsUnsaved(main)));
+      // 초안을 묻는 사이(0.7초까지) PULSE가 열렸으면(최소화된 창에 초대가 온 따위) 조용히 가지 않는다(3단계 GPT 엔진 검수 GA1)
+      const quiet=draftless&&!pulseView?.hasSurface();
       const minimized=!!(main?.isMinimized()||startupWin?.isMinimized()||!main&&!startupWin&&arrivalShow==='minimized');
       if(gen!==handoffGen)return;
       // 초안을 묻는 사이(0.7초까지) 사람이 창을 열었으면 조용히 가지 않고 보이는 넘김으로 간다(0.4.96 검수 C5)
@@ -531,7 +606,9 @@ function initializeMain(){
   suiteStore=suiteDirectory?createSuiteStore({directory:suiteDirectory,key:suiteBindingKey}):null;suiteDeviceId=suiteDirectory?suiteDevice({directory:suiteDirectory}):null;
   suitePublisher=suiteStore&&runtime.clientId==='platform'?createSuitePublisher({store:suiteStore,key:suiteBindingKey,onChange:()=>{if(auth)publishAuthState(projectAuth(auth.status()));}}):null;
   if(runtime.clientId==='platform'){
-    desktopPreferences=createDesktopPreferences({directory:app.getPath('userData'),app,globalShortcut,getWindow:()=>window,onShow:action=>requestPlatformWindow(action),onAction:action=>sendDesktop('synk:desktop-action',action),onChange:()=>sendDesktop('synk:desktop-preferences',desktopSnapshot()),enabled:!smoke,packaged,name:current.appId});
+    // 「승인 물음도 보기」가 켜져 있으면 훅을 받는 서버를 연다. 저장한 포트를 다른 프로그램이 쓰면 솔리오의 줄을 지운다(구현설계.md 12.3). 사무실을 꺼 둔 판은 열지 않는다
+    if(!smoke&&!officeOff())void officeHooksService().start().catch(()=>{});
+    desktopPreferences=createDesktopPreferences({directory:app.getPath('userData'),app,globalShortcut,getWindow:()=>window,onShow:action=>requestPlatformWindow(action),onAction:action=>sendDesktop('synk:desktop-action',action),onChange:()=>{sendDesktop('synk:desktop-preferences',desktopSnapshot());pulseView?.relayout();},enabled:!smoke,packaged,name:current.appId});
     desktopPreferences.initialize();
     windowPlacement=windowPlacement||createWindowPlacement({directory:app.getPath('userData'),screen,enabled:!smoke});
     // 쓰던 글을 지키던 편집기는 PC 0.5.0에서 옛 화면과 함께 거뒀다. 남은 보관은 켤 때마다 지우고, 지우지 못하면 다음에 켤 때 다시 지운다(PC 0.5.0 설계 4.5 R4)
@@ -542,7 +619,8 @@ function initializeMain(){
   if(runtime.clientId==='platform'&&process.platform==='win32'&&process.arch==='x64'&&packaged&&!smoke){
     const reported=new Set();
     trayMemory=createTrayMemoryReclaimer({getWindows:()=>BrowserWindow.getAllWindows(),getMetrics:()=>app.getAppMetrics(),
-      busy:()=>quittingRequested||!platformTray?.isActive()||['downloading','opening'].includes(platformUpdate?.snapshot().state),
+      // 숨은 창 안의 PULSE가 소리를 내거나 캡처되는 동안에도 줄이지 않는다(3단계 구현 설계 2.3). 뷰는 창 목록에 없다
+      busy:()=>quittingRequested||!platformTray?.isActive()||['downloading','opening'].includes(platformUpdate?.snapshot().state)||!!pulseView?.busy(),
       reportError:code=>{
         if(reported.has(code))return;reported.add(code);
         void fs.promises.appendFile(path.join(app.getPath('userData'),'tray-memory.log'),new Date().toISOString()+' '+code+'\n').catch(()=>process.emitWarning(code));
@@ -568,6 +646,7 @@ function initializeAccountServices(){
   if(!auth){const store=createTokenStore({directory:app.getPath('userData'),safeStorage,scope:current.sessionScope,configFingerprint:authConfig?.fingerprint||'unconfigured'});
     const signInReturn=createSignInReturn();
     auth=createAuthService({config:authConfig,store,openExternal:url=>shell.openExternal(url),appVersion:app.getVersion(),device:suiteDeviceId,onChange:state=>{suitePublisher?.publish(state);publishAuthState(projectAuth(state));if(signInReturn(state))bringToFront(window,{app});}});
+    solioBackupSweep();
     if(suiteStore&&runtime.clientId!=='platform'){suiteFollower=createSuiteFollower({store:suiteStore,auth});void suiteFollower.start();}else if(suitePublisher)void suitePublisher.initialize(auth);else void auth.initialize();
   }
   if(runtime.clientId==='platform'&&!careNotifications){
@@ -585,9 +664,11 @@ function createWindow(){
   initializeAccountServices();
   // Keeping an unsaved PULSE draft while quitting cancels the quit and a pending
   // update install, as the platform window's own will-prevent-unload handler
-  // below does. The PULSE window is not attached to the tray, so its quit state
+  // below does. PULSE's view is not attached to the tray, so its quit state
   // is reset here; leaving the page without quitting changes nothing.
-  if(runtime.clientId==='platform'&&!pulseApp)pulseApp=createPulseApp({clientId:runtime.clientId,getAccount:accountStatus,getRenewingAccount:renewingAccount,getAccountGeneration:pulseAccountGeneration,BrowserWindow,session,dialog,openExternal:url=>shell.openExternal(url),getDownloads:()=>app.getPath('downloads'),onUnloadKept:()=>{if(!quittingRequested)return;quittingRequested=false;platformTray?.cancelQuit();startupWindow?.cancelQuit();platformUpdate?.cancelInstall();startupGate?.cancelInstall();}});
+  // PULSE는 플랫폼 창 안의 뷰로 연다(3단계 구현 설계 2절). 뷰를 보일지는 화면이 정하고, 뷰의 상태와 띠로 가는 F6은 화면에 알린다
+  if(runtime.clientId==='platform'&&!pulseView)pulseView=createPulseViewHost({WebContentsView,getWindow:()=>window,onChange:value=>sendDesktop('synk:pulse-view-changed',value),onFocusBand:()=>sendDesktop('synk:pulse-view-event',{type:'focus-band'}),onHidden:()=>sendDesktop('synk:pulse-view-event',{type:'hidden'})});
+  if(runtime.clientId==='platform'&&!pulseApp)pulseApp=createPulseApp({clientId:runtime.clientId,getAccount:accountStatus,getRenewingAccount:renewingAccount,getAccountGeneration:pulseAccountGeneration,createSurface:options=>pulseView.createSurface(options),session,dialog,openExternal:url=>shell.openExternal(url),getDownloads:()=>app.getPath('downloads'),onUnloadKept:()=>{if(!quittingRequested)return;quittingRequested=false;platformTray?.cancelQuit();startupWindow?.cancelQuit();platformUpdate?.cancelInstall();startupGate?.cancelInstall();}});
   // The company entry: one fixed company window at a time in an in-memory partition bound to the verified account and
   // its generation (company-entry.cjs), and main's own lookup of the member's company destinations
   // (company-entry-destinations.cjs). A customer invite the company receiver classified goes once to the PULSE manager
@@ -644,6 +725,10 @@ function createWindow(){
   // The Workspace page keeps unsaved drafts with beforeunload; without this prompt closing, reopening or quitting is cancelled with no word (10-22).
   if(isPlatform)installDraftExitGuard({contents,window,dialog,getRecoveryAvailable:()=>!!draftRecovery?.available()});else if(runtime.clientId==='messenger')installDraftExitGuard({contents,window,dialog,text:WORKSPACE_EXIT_TEXT});
   platformTray?.attachWindow(window);
+  // 창이 정말 닫히기 전에 창 안의 PULSE를 먼저 닫으며 쓰던 글을 묻는다. 트레이가 숨기는 닫기와 세션 끝은 지나간다(3단계 구현 설계 3절).
+  // 「돌아가서 저장」이나 PULSE가 답하지 않으면 끝내기와 업데이트 설치를 되돌리고(PULSE 관리자의 onUnloadKept와 같은 일, 답이 없을 때는 그쪽이 불리지 않는다 · 설계 검토 R4),
+  // 창을 보이고 화면을 PULSE로 데려간다. 트레이를 끈 사람의 창 닫기도 같다(설계 검토 R10). 다시 끝낼 때는 setImmediate로 미룬다
+  if(isPlatform&&pulseView)pulseView.installCloseGate(window,{quitting:()=>quittingRequested,quit:()=>setImmediate(()=>app.quit()),onKept:()=>{if(quittingRequested){quittingRequested=false;platformTray?.cancelQuit();startupWindow?.cancelQuit();platformUpdate?.cancelInstall();startupGate?.cancelInstall();}if(!window||window.isDestroyed())return;if(window.isMinimized())window.restore();window.show();window.focus();sendDesktop('synk:pulse-view-event',{type:'reveal'});}});
   // 쓰던 글을 지키려고 끝내기를 그만두면 끝내는 중 표시를 되돌린다. Workspace도 같다. 되돌리지 않으면 화면 프로세스 되살리기가 끝내는 중으로 보고 멈춘다(엔진 검수 GA1)
   contents.on('will-prevent-unload',event=>{if(!event.defaultPrevented){quittingRequested=false;if(isPlatform){startupWindow?.cancelQuit();platformUpdate?.cancelInstall();startupGate?.cancelInstall();}}});
   if(smoke)contents.on('console-message',details=>{if(details.level==='error')smokeConsoleErrors.push({message:details.message.slice(0,300),source:details.sourceId.split('?')[0],line:details.lineNumber});});
@@ -715,6 +800,12 @@ function createWindow(){
     'synk:auth-status':accountStatus,'synk:auth-sign-in':async()=>{if(suitePublisher&&!suitePublisher.beginSignIn())return accountStatus();await auth.signIn();return accountStatus();},'synk:auth-sign-up':openAccountSignUp,'synk:auth-cancel':()=>auth.cancel(),'synk:auth-sign-out':signOutAccount,
     'synk:account-request':(operation,params)=>requireSuite(()=>auth.accountRequest(operation,params)),'synk:company-request':companyRequest,
     'synk:account-identity':()=>isPlatform?requireSuite(()=>auth.identity()):{ok:false,code:'LAUNCHER_ONLY'},'synk:auth-security':section=>openAccountSecurity(section),'synk:auth-recover':openAccountRecover,
+    // 창 안의 PULSE 뷰(3단계 구현 설계 2.3). 자리와 보이기는 꼭 {visible, top}만 받는다(pulse-view.cjs pulseViewPlacement)
+    'synk:pulse-view-place':input=>isPlatform&&pulseView?pulseView.place(input):{ok:false,code:'LAUNCHER_ONLY'},
+    'synk:pulse-view-state':()=>isPlatform&&pulseView?pulseView.state():{open:false},
+    'synk:pulse-view-focus':()=>isPlatform&&pulseView?pulseView.focusView():{ok:false,code:'LAUNCHER_ONLY'},
+    // 띠의 「PULSE 닫기」. 쓰던 글이 있으면 PULSE 관리자의 쓰던 글 확인이 묻는다(설계 검토 R6)
+    'synk:pulse-view-close':()=>isPlatform&&pulseView?pulseView.closeByPerson():{ok:false,code:'LAUNCHER_ONLY'},
     'synk:pulse-app-open':()=>isPlatform&&!smoke?requireSuite(()=>pulseApp.open()):{ok:false,code:'PULSE_APP_UNAVAILABLE'},
     // A customer invite with its request, exactly {token,requestId,accountGeneration}; any other form, a lone {token}
     // included, is refused. pulse-app.cjs checks it again, binds it to auth's current generation, waits for the
@@ -752,9 +843,23 @@ function createWindow(){
     'synk:sns-health-snapshot':()=>snsHealthCall(),
     'synk:solio-backup-snapshot':()=>solioBackupCall((service,account)=>service.snapshot(account)),
     // 누를 때의 계정과 로그인 세대를 잡아 둔다. 같은 계정이라도 다시 로그인했으면 다른 회차로 본다(GPT 셋째 검수 GA4)
-    'synk:solio-backup-start':mode=>solioBackupCall((service,account)=>{const generation=accountStatus()?.sessionGeneration;return service.start(account,mode,{getHint:solioBackupHint,isCurrent:()=>{const now=accountStatus();return now?.signedIn===true&&now.account?.synk_user_id===account.synk_user_id&&now.sessionGeneration===generation;}});}),
+    'synk:solio-backup-start':mode=>solioBackupCall((service,account)=>{const generation=accountStatus()?.sessionGeneration;return service.start(account,mode,{getHint:solioBackupHint,isCurrent:()=>{const now=accountStatus();return now?.signedIn===true&&now.account?.synk_user_id===account.synk_user_id&&now.sessionGeneration===generation;},isSameLogin:()=>{const now=accountStatus();if(now?.sessionGeneration!==generation)return false;return now?.signedIn===true?now.account?.synk_user_id===account.synk_user_id:renewingAccount()===account.synk_user_id;}});}),
     'synk:solio-backup-open':topic=>solioBackupCall((service,account)=>service.open(account,topic)),
     'synk:solio-backup-dismiss':()=>solioBackupCall((service,account)=>service.dismiss(account)),
+    // 솔리오 「사무실」(구현설계.md 13절): 모두 officeCall을 거친다. 폴더는 본체가 고르기 창이나 지금 선 세션에서 받는다
+    'synk:office-snapshot':()=>officeCall((service,account)=>service.snapshot(account)),
+    'synk:office-watch':on=>officeCall((service,account)=>service.watch(on===true,account)),
+    'synk:office-department-save':input=>officeCall((service,account)=>officeSaveDepartment(service,account,input)),
+    'synk:office-department-remove':id=>officeCall((service,account)=>service.removeDepartment(id,account)),
+    'synk:office-session-assign':(sessionId,departmentId)=>officeCall((service,account)=>service.assign(sessionId,departmentId??null,account)),
+    'synk:office-settings-save':input=>officeCall((service,account)=>service.saveSettings(input,account)),
+    'synk:office-roots-add':()=>officeCall((service,account)=>officeAddRoot(service,account)),
+    'synk:office-roots-remove':dir=>officeCall((service,account)=>officeRemoveRoot(service,account,dir)),
+    'synk:office-seen':departmentId=>officeCall((service,account)=>service.seen(departmentId,account)),
+    // 「승인 물음도 보기」(12.3): 켜기는 볼 계정만, 끄기와 켜졌는지 묻기는 계정 확인 없이(11.1)
+    'synk:office-hooks-set':on=>officeCall((service,account)=>service.setHooks(on===true,account)),
+    'synk:office-hooks-off':()=>officeHooksOff(),
+    'synk:office-hooks-status':()=>officeHooksStatus(),
   };
   for(const [channel,handler]of Object.entries(handlers)){ipcMain.removeHandler(channel);ipcMain.handle(channel,async(event,...args)=>{assertSender(event,window,entry,runtime.clientId);try{return await handler(...args);}catch(error){return {ok:false,error:publicError(error)};}});}
   unbindTeacher?.();unbindTeacher=bindMessengerTeacherIPC({ipcMain,getWindow:()=>window,service:teacherService,entry,clientId:runtime.clientId,environment:{mode:runtime.mode,platform:process.platform,arch:process.arch,version:app.getVersion()}});

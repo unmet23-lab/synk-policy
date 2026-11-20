@@ -2,9 +2,9 @@
   "schemaVersion": 1,
   "product": "platform",
   "channel": "preview",
-  "version": "0.5.1",
-  "releaseId": "platform-preview-0.5.1",
-  "buildId": "20261120.4",
+  "version": "0.5.2",
+  "releaseId": "platform-preview-0.5.2",
+  "buildId": "20261120.5",
   "manifestUrl": "https://synk.im/desktop/releases/preview.json",
   "baselines": [
     {
@@ -63,7 +63,7 @@
     }
   ],
   "electronVersion": "44.10.0",
-  "sourceHash": "c4952bf90b5cbc959c95b10bb8d58a699216de79d494e3926a3c0e212389f802",
+  "sourceHash": "7df04f62cac40271debf618b17fc3e77c730331e1343251fb7989805dc62a31c",
   "sourceFiles": [
     {
       "path": "assets/launcher/button.webp",
@@ -262,8 +262,8 @@
     },
     {
       "path": "renderer/launcher.mjs",
-      "bytes": 31027,
-      "sha256": "efea89ffc3fc5a0f0a229dd3d32811754866cd8706990c45c4b598c2631a74b2"
+      "bytes": 31436,
+      "sha256": "71e0655a0229601eb08cb8ae402793b79b55e35d558483a73377ac3509c6c7e9"
     },
     {
       "path": "renderer/library.mjs",
@@ -311,24 +311,39 @@
       "sha256": "d2cec200e8004b7a5cc163b2183efd047f85d436c70f789e21c37ec54bdc6bbd"
     },
     {
+      "path": "renderer/office-floor.mjs",
+      "bytes": 19767,
+      "sha256": "3d6043f2a80ab46e2238038beef8629327e9003b88f13f7209f7f7d96c8cdfb8"
+    },
+    {
+      "path": "renderer/office-model.mjs",
+      "bytes": 20619,
+      "sha256": "08b871792b02ff6e5e7062861fc773144dce34907c13235adb53cdf5488d0e2b"
+    },
+    {
+      "path": "renderer/office-room.mjs",
+      "bytes": 39351,
+      "sha256": "eaeb8955157569c2c1da54c655c8d9445219138d722075f7d7fe4fb1d748e23d"
+    },
+    {
       "path": "renderer/orb-face-view.mjs",
-      "bytes": 137133,
-      "sha256": "a53a410c3820bade610a5f138eefb48085cdc94b0c6fc1e628f2233d31401331"
+      "bytes": 147233,
+      "sha256": "f3bbf344eaa067ab286e23155ed3c135673118373e9a3b78f1d89e0d7ff73746"
     },
     {
       "path": "renderer/orb-face.css",
-      "bytes": 59361,
-      "sha256": "7c8a204b132dcab832cd72b3440ff2b840fa10743613f802e117619c7a230725"
+      "bytes": 65596,
+      "sha256": "1c5b4ba666949572426f283c0fe848b304b1c898b64d6246736c2f74601ab168"
     },
     {
       "path": "renderer/orb-face.mjs",
-      "bytes": 104684,
-      "sha256": "f8d286c52ee35ce724078818b8a2a286e54cde346a39f85af165c0bceb60b5e4"
+      "bytes": 119365,
+      "sha256": "434e952e36d4adc87af2b53bbe1cb671fb2cd2378078d19821867b6a7ed52aef"
     },
     {
       "path": "renderer/orb-rooms.mjs",
-      "bytes": 60782,
-      "sha256": "e056abe3aabe21b637845b1b08078684855ff887e61802ccea4ac286dd43b646"
+      "bytes": 63157,
+      "sha256": "27afcea5d99fa5d37e5b93ab7b170af1f24321034e45c03ca96519d9d7539e2f"
     },
     {
       "path": "renderer/orb-signature.mjs",
@@ -337,8 +352,8 @@
     },
     {
       "path": "renderer/orb-sound.mjs",
-      "bytes": 6262,
-      "sha256": "37cd98a2e52b332acbaf8295f6084ea674a0f1e4e2f6c4a9b357a9afc1ff04ec"
+      "bytes": 7916,
+      "sha256": "69e462f76ae2274e14b3ce000b4fa5e78ea35089c127316d6e68d386f0884e1c"
     },
     {
       "path": "renderer/orb-stage.mjs",
@@ -367,8 +382,8 @@
     },
     {
       "path": "renderer/portal-host.mjs",
-      "bytes": 91691,
-      "sha256": "c7587fcd928b0cd9da65b44242ff71cfe20cf29def8073d6d076d3df76f77c14"
+      "bytes": 91747,
+      "sha256": "69ab3c830020a6e5aabd28e0829b11370f086874fa8c849e9efe01e776dfc90a"
     },
     {
       "path": "renderer/portal-orb.mjs",
@@ -392,13 +407,13 @@
     },
     {
       "path": "renderer/solio-brief.mjs",
-      "bytes": 46457,
-      "sha256": "47a939dcfa418903f496e65120c72981bd1e23b52815520fe4bcedb953440340"
+      "bytes": 49217,
+      "sha256": "c97dee22c8aa315d7d0afcc3bfc5425abbc6f78b0e8ac1ab09a6f133ea021505"
     },
     {
       "path": "renderer/solio-rooms.mjs",
-      "bytes": 120524,
-      "sha256": "92811a54b4ea7b7ad78d119d35441bf6c77629b214ea7b6e9f44e66eedf92587"
+      "bytes": 121999,
+      "sha256": "6e7dcf81b48b0faa2ad9d7d1b51861e9d1059f610bc8e9e279663ed2a17254be"
     },
     {
       "path": "renderer/solio-today.mjs",
@@ -432,8 +447,8 @@
     },
     {
       "path": "renderer/subscriptions-model.mjs",
-      "bytes": 77478,
-      "sha256": "55e1c89b559ab3138fca29151bcc657d2d98488a7c47ded802bf9571fa8ef0e6"
+      "bytes": 77724,
+      "sha256": "9eafd6d1595a7588653cb1363da03d372f6038ee2571e7a8b3fe8aa0a3dfd8f7"
     },
     {
       "path": "renderer/subscriptions-tokens.mjs",
@@ -467,8 +482,8 @@
     },
     {
       "path": "src/ai-subscriptions.cjs",
-      "bytes": 38201,
-      "sha256": "c567535ae19a52efaf90feafd58bf3cf4bcfd1c43bad41c7e5e64627fe84e3d2"
+      "bytes": 38588,
+      "sha256": "d1d3dfc80096e4d8ee94d9361626482ebfe2d80c1087cbb877f5ba8a286893aa"
     },
     {
       "path": "src/ai-tokens.cjs",
@@ -577,8 +592,8 @@
     },
     {
       "path": "src/desktop-preferences.cjs",
-      "bytes": 6678,
-      "sha256": "1eaaa9a3a5a73e0dd8f1bd367ff72c9e4590b51ad8f44741e37f904b8a118eca"
+      "bytes": 6989,
+      "sha256": "3083aaf71219e41b5c653bcbe541b0136e034c56c8e7bfd61302b6ecc618d6b2"
     },
     {
       "path": "src/diagnostics-clipboard.cjs",
@@ -632,8 +647,8 @@
     },
     {
       "path": "src/main.cjs",
-      "bytes": 90037,
-      "sha256": "688556f9a4bc7bd52676690ce91822c68f1be903c147f2de3e0c3db236eb49ee"
+      "bytes": 106018,
+      "sha256": "a0c70b626010037fc094fd6e50d8174faf58dbe6ff2f0173a7912aa2c2599ab1"
     },
     {
       "path": "src/messenger-teacher.cjs",
@@ -654,6 +669,31 @@
       "path": "src/native-content.cjs",
       "bytes": 2178,
       "sha256": "4edc4e671d9ee2f74d3e2d141c35c886620d490f314d81496c4024e3c61f13ee"
+    },
+    {
+      "path": "src/office-capacity.cjs",
+      "bytes": 2228,
+      "sha256": "d983a766414d26fe926b9be20af3fda48f5558107ff0779021b8a5fdbcd44215"
+    },
+    {
+      "path": "src/office-hooks.cjs",
+      "bytes": 32533,
+      "sha256": "149e1506de9135f2f8c058329f56176d1410c4027fc328279b0fa49560d8c5be"
+    },
+    {
+      "path": "src/office-records.cjs",
+      "bytes": 16204,
+      "sha256": "e94b50bd6283a8e984ed6a01df9456b61838fd0ee60db4193666ea4e4afc0ad5"
+    },
+    {
+      "path": "src/office-store.cjs",
+      "bytes": 19058,
+      "sha256": "3919a8cc44e187f1e6f6f601e7fa97a4307df8c6a8c4425995f1e14f4b0a5f61"
+    },
+    {
+      "path": "src/office.cjs",
+      "bytes": 23264,
+      "sha256": "652ef9d40dc510f1210c75007b07dc6a5eb125fa34bea2192b02139fc5c39e9d"
     },
     {
       "path": "src/personal-account.cjs",
@@ -717,8 +757,8 @@
     },
     {
       "path": "src/preload.cjs",
-      "bytes": 16403,
-      "sha256": "e714f88d037c0ce31065a836e873cf6cdfcac31695940f1be0e41f6b857b707c"
+      "bytes": 21057,
+      "sha256": "1bbe9fb39fe8d3abab507b3a82710a961001a489b31dbcfa33db63ab2646883d"
     },
     {
       "path": "src/product-main.cjs",
@@ -747,13 +787,18 @@
     },
     {
       "path": "src/pulse-app.cjs",
-      "bytes": 34895,
-      "sha256": "49f9b6858d091022ba4e4c7470db151aef9c53d58b9a8e400bb3269e877838fa"
+      "bytes": 35171,
+      "sha256": "9903c662df6a5bb629d86a17a7b07a5145922abc022634b10a8d7a111278a1ce"
     },
     {
       "path": "src/pulse-invite-preload.cjs",
       "bytes": 11054,
       "sha256": "eb59af99c26c8ad24e9b1f5b8413edf270170a337909c2fc5c9010e7593092ba"
+    },
+    {
+      "path": "src/pulse-view.cjs",
+      "bytes": 11083,
+      "sha256": "868ac5951be1b2225a0c18e0a56232bcac8c306acd9b13d5b73f9994c8f2119d"
     },
     {
       "path": "src/release-catalog.cjs",
@@ -782,8 +827,8 @@
     },
     {
       "path": "src/solio-backup.cjs",
-      "bytes": 43185,
-      "sha256": "30253f9a365901202abd610b112d04d82d0ac8d2a3952a00ad946bbc3629c545"
+      "bytes": 51460,
+      "sha256": "390fd3aaf3011da9c76455a89e73a65165a8d7a65f8678ed2f147578c0eb9147"
     },
     {
       "path": "src/startup-update-preload.cjs",
@@ -792,8 +837,8 @@
     },
     {
       "path": "src/subscription-adapters/claude.cjs",
-      "bytes": 6464,
-      "sha256": "a206cc50a18cbd381ae304ab53557970f27c0c7e0d86574775166e5ef92498d0"
+      "bytes": 6498,
+      "sha256": "ce18b9634ca8788e3b68549beeee9b0d87fcbb6a0f34b06f91b707634d6fc3f8"
     },
     {
       "path": "src/subscription-adapters/gemini.cjs",

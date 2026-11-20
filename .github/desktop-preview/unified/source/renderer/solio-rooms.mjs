@@ -1247,11 +1247,14 @@ function keyRow(desk, env, st) {
   return { key: 'key', nm: '어디서나 열기', mid, val: key, when: '', unread: !key, label: rowLabel(['어디서나 열기', mid, key]), more };
 }
 /* 화면. 움직임 줄이기는 저장할 길이 없어 두지 않는다(설계 검토 D6) */
+/* 화면 크기와 효과음(효과음은 2026-11-20 검정 구 지도). 효과음 칸을 모르는 본체 판이면 켜고 끄기를 세우지 않는다 */
 function viewRow(desk, st) {
   if (!desk) return null;
   const z = Number(desk.preferences?.zoomFactor) || 1, list = ZOOMS.includes(z) ? ZOOMS : [...ZOOMS, z].sort((a, b) => a - b);
-  const mid = '크기 ' + pctOf(z);
-  return { key: 'view', nm: '화면', mid, val: '', when: '', label: rowLabel(['화면', mid]), more: [['pick', '화면 크기', list.map(v => [pctOf(v), String(v)]), String(z), '', 'zoom'], ['note', 'Ctrl과 +, − 키로도 바꿀 수 있습니다.'], ['live', st.notes?.get?.('view') || '']] };
+  const sound = typeof desk.preferences?.uiSound === 'boolean' ? desk.preferences.uiSound : null;
+  const mid = '크기 ' + pctOf(z) + (sound === false ? ' · 효과음 꺼짐' : '');
+  const tog = sound === null ? [] : [['tog', '효과음', '구가 별 지도로 바뀔 때와 공간 이름을 가리킬 때 작은 소리를 냅니다', sound, 'pref', st.busy === 'view:pref' ? 'off' : '', 'uiSound']];
+  return { key: 'view', nm: '화면', mid, val: '', when: '', label: rowLabel(['화면', mid]), more: [['pick', '화면 크기', list.map(v => [pctOf(v), String(v)]), String(z), '', 'zoom'], ['note', 'Ctrl과 +, − 키로도 바꿀 수 있습니다.'], ...tog, ['live', st.notes?.get?.('view') || '']] };
 }
 /* 알림. 배너는 앱 설치 파일이 준비됐거나 실패했을 때만 뜬다(편의 31행, 설계 검토 D10). 구독 팁 켜고 끄기도 이 줄 안쪽이다(설계 검토 16절 D7) */
 function noticeRow(s, st, now) {
@@ -1273,9 +1276,14 @@ function noticeRow(s, st, now) {
   ];
   const care = careOn(s.care) && s.member === true ? s.care : null;
   if (care) {
-    const at = String(care.hour ?? 9).padStart(2, '0') + ':' + String(care.minute ?? 0).padStart(2, '0'), cap = s.desktop?.capabilities || {};
-    const desc = care.enabled === true ? '매일 ' + at + '(한국 시간)에 플레저에 저장한 일정과 챙길 일을 PC 알림으로 알려 드립니다. PC를 끄거나 SYNK를 완전히 종료한 동안에는 받을 수 없습니다'
-      : '매일 ' + at + '(한국 시간)에 플레저에 저장한 일정과 챙길 일을 알려 드립니다. 켜면 창을 닫아도 트레이에 남' + (cap.launchAtLogin ? '고, 컴퓨터를 켤 때 창 없이 함께 켜집니다' : '습니다');
+    const at = String(care.hour ?? 9).padStart(2, '0') + ':' + String(care.minute ?? 0).padStart(2, '0'), cap = s.desktop?.capabilities || {}, p = s.desktop?.preferences || {};
+    // 본체(main.cjs careNotifications.configure)는 켤 때 트레이에 남기기를 켜고, 자동 시작이 꺼져 있을 때만 자동 시작과 트레이로 시작을 함께 켠다.
+    // 끌 때는 아무것도 되돌리지 않는다. 그래서 켜기 전 글은 지금 설정으로 고르고, 켠 뒤 글에는 남는 설정을 적는다(0.5.0 최종 검수 F4)
+    // 트레이가 없는 PC(맥 등)에는 트레이 말을 하지 않는다(카본 A1)
+    const boot = [cap.tray && '켜면 창을 닫아도 트레이에 남습니다', cap.launchAtLogin && p.launchAtLogin !== true && (cap.tray ? '자동 시작도 함께 켜져, 컴퓨터를 켤 때 창 없이 트레이로 켜집니다' : '켜면 자동 시작도 함께 켜져, 컴퓨터를 켤 때 SYNK도 켜집니다')].filter(Boolean).map(x => '. ' + x).join('');
+    const kept = [cap.tray && '트레이', cap.launchAtLogin && '자동 시작'].filter(Boolean).join('와 ');
+    const desc = care.enabled === true ? '매일 ' + at + '(한국 시간)에 플레저에 저장한 일정과 챙길 일을 PC 알림으로 알려 드립니다. PC를 끄거나 SYNK를 완전히 종료한 동안에는 받을 수 없습니다' + (kept ? '. 꺼도 「켜고 닫을 때」의 ' + kept + ' 설정은 그대로 둡니다' : '')
+      : '매일 ' + at + '(한국 시간)에 플레저에 저장한 일정과 챙길 일을 알려 드립니다' + boot;
     more.push(['tog', '플레저 PC 알림', desc, care.enabled === true, 'care', st.busy === 'notice:care' ? 'off' : '']);
   }
   if (s.tipsOff === true || s.tipsOff === false) more.push(['tog', '구독 팁', '구독 줄과 요금 줄 안쪽에 아끼는 법과 막히지 않는 법을 한 줄씩 알려 드립니다', s.tipsOff === false, 'tips', st.busy === 'notice:tips' ? 'off' : '']);

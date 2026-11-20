@@ -77,7 +77,8 @@ async function refreshAuth({reload=false}={}){
 }
 function client(id){return clients.find(row=>row.id===id);}
 function getAppAction(id){const action=primaryAction(client(id),{native:!!bridge,busy:false});return busy.has(id)?{...action,disabled:true,pending:true}:action;}
-// 옛 내 계정의 「작업실 열기」. 설치된 Workspace 앱만 연다
+// 옛 내 계정의 「작업실 열기」. 설치된 Workspace 앱만 연다.
+// synk.im에는 Workspace 설치 파일을 받는 곳이 없어, 없을 때는 웹 계정 화면과 같은 말로 브라우저의 Workspace 주소를 안내한다(0.5.0 최종 검수 F5)
 async function launchWorkspace(){
   const id='messenger';
   if(!bridge||!allowed(id)){toast('이 계정에서는 Workspace를 열 수 없습니다.');return;}
@@ -85,9 +86,9 @@ async function launchWorkspace(){
   if(busy.has(id))return;
   if(client(id)?.reason==='CHECKING'){toast('Workspace 설치 상태를 확인하는 중입니다. 잠시 뒤 다시 눌러 주세요.');return;}
   const action=getAppAction(id);
-  if(action.disabled||action.action!=='launch'){toast('이 PC에 Workspace가 설치돼 있지 않습니다. synk.im에서 받아 설치해 주세요.');return;}
+  if(action.disabled||action.action!=='launch'){toast('이 PC에 Workspace 앱이 설치돼 있지 않습니다. 회사에서 안내받은 Workspace 주소로 브라우저에서 열어 주세요.');return;}
   const epoch=ownerEpoch;busy.add(id);
-  try{const result=await bridge.launch(id);if(epoch!==ownerEpoch)return;toast(result?.ok?'Workspace를 열었습니다.':'Workspace를 열지 못했습니다. 다시 눌러 보고, 계속 안 되면 다시 설치해 주세요.');}
+  try{const result=await bridge.launch(id);if(epoch!==ownerEpoch)return;toast(result?.ok?'Workspace를 열었습니다.':'Workspace를 열지 못했습니다. 다시 눌러 보고, 계속 안 되면 회사에서 안내받은 Workspace 주소로 브라우저에서 열어 주세요.');}
   catch{if(epoch===ownerEpoch)toast('Workspace를 열지 못했습니다. 잠시 뒤 다시 눌러 주세요.');}
   finally{busy.delete(id);}
 }
@@ -263,8 +264,8 @@ try{
   portalHost=mountDesktopPortalHost({
     root:$('portal-entry'),
     mountFace:mountOrbFace,
-    // PC 쪽 옵션(설계 4절). 검사 실행 길은 본체가 열어 준 때만 열린다(설계 11절)
-    faceOptions:{orbBoot:typeof bridge?.orbBoot==='function'?()=>bridge.orbBoot():null,onFirstFrame:typeof bridge?.orbFirstFrame==='function'?()=>bridge.orbFirstFrame():null,onOpenLegacy:openOrbLegacy,onCloseLegacy:()=>hideAccount(),onSignOut:()=>signOut(),subscriptions:bridge?.subscriptions||null,solioBackup:bridge?.solioBackup||null,rooms:orbRoomOptions(),siteVisits:bridge?.siteVisits||null,snsHealth:bridge?.snsHealth||null,allowGuestEntry:()=>environment?.qaGuestEntry===true,look:ORB_LOOK},
+    // PC 쪽 옵션(설계 4절). 검사 실행 길은 본체가 열어 준 때만 열린다(설계 11절). embed는 창 안의 PULSE 뷰다(3단계 구현 설계 4절)
+    faceOptions:{orbBoot:typeof bridge?.orbBoot==='function'?()=>bridge.orbBoot():null,onFirstFrame:typeof bridge?.orbFirstFrame==='function'?()=>bridge.orbFirstFrame():null,onOpenLegacy:openOrbLegacy,onCloseLegacy:()=>hideAccount(),onSignOut:()=>signOut(),subscriptions:bridge?.subscriptions||null,solioBackup:bridge?.solioBackup||null,rooms:orbRoomOptions(),siteVisits:bridge?.siteVisits||null,snsHealth:bridge?.snsHealth||null,office:bridge?.office||null,embed:bridge?.pulseView||null,allowGuestEntry:()=>environment?.qaGuestEntry===true,look:ORB_LOOK},
     hostElements:[document.querySelector('.launcher')].filter(Boolean),
     bridge,
     getAuth:()=>auth,
