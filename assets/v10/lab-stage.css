@@ -170,6 +170,7 @@
 .ls-tint.is-snow{background:radial-gradient(110% 70% at 50% 0%,rgba(244,248,253,.95),rgba(244,248,253,0) 65%),linear-gradient(180deg,#E3ECF6 35%,#D6E2EF 100%)}
 .ls[data-stage-scene="rain"] .ls-tint.is-rain,.ls[data-stage-scene="snow"] .ls-tint.is-snow{opacity:1}
 .ls-sky{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;opacity:0}
+@media (prefers-reduced-motion:reduce){.ls-sky{display:none}}
 
 /* 탁상 달력: 고리 두 개에 매단 종이가 위로 넘어간다 */
 .ls-cal{position:absolute;left:50%;top:30%;z-index:6;display:flex;flex-direction:column;align-items:center;gap:10px;margin-left:-88px;margin-top:-118px;width:176px;pointer-events:none;opacity:0}
