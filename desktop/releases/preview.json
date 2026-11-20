@@ -2,40 +2,40 @@
   "schemaVersion": 1,
   "product": "platform",
   "channel": "preview",
-  "version": "0.5.0",
-  "releaseId": "platform-preview-0.5.0",
-  "buildId": "20261120.3",
-  "publishedAt": "2026-11-20T07:41:31.607Z",
-  "sourceHash": "0e15ef61c8e8bca7182cd1f6abd70a11462782c7d7c2d7de759f8f641e85eb3f",
+  "version": "0.5.1",
+  "releaseId": "platform-preview-0.5.1",
+  "buildId": "20261120.4",
+  "publishedAt": "2026-11-20T10:22:43.410Z",
+  "sourceHash": "c4952bf90b5cbc959c95b10bb8d58a699216de79d494e3926a3c0e212389f802",
   "artifacts": [
     {
       "platform": "win32",
       "arch": "x64",
-      "url": "https://github.com/unmet23-lab/synk-policy/releases/download/platform-preview-0.5.0/SYNK-Platform-Preview-0.5.0-Signal-win-x64.exe",
-      "bytes": 392395264,
-      "sha256": "92ac6877330d27a75fee1f1cfa72fe81859d100adcd281fd6fa7f01543c94e8e",
-      "asarSHA256": "fa6038e15885d63d22f23346e1c1e418151756289bb05916a89b0e1bb14074b0"
+      "url": "https://github.com/unmet23-lab/synk-policy/releases/download/platform-preview-0.5.1/SYNK-Platform-Preview-0.5.1-Signal-win-x64.exe",
+      "bytes": 392406528,
+      "sha256": "e79cc59d097df8eebf37bc66bc007f7a59cfd70c9bfddbe114f263d8719e2246",
+      "asarSHA256": "6cfc920950a08efd8f727f0dfb8044012b1475050da88082daf58ee4d94a27e0"
     },
     {
       "platform": "darwin",
       "arch": "arm64",
-      "url": "https://github.com/unmet23-lab/synk-policy/releases/download/platform-preview-0.5.0/SYNK-Platform-Preview-0.5.0-Signal-mac-arm64.dmg",
-      "bytes": 446808708,
-      "sha256": "7393877a5dba261decbbab82deaa9efcdd392b767acbf717542eaedff87f12d2",
-      "asarSHA256": "bc2dfe9c0a98993f11aaf0fc14ab21dac2acae4571e286036b8eaf06a506864c"
+      "url": "https://github.com/unmet23-lab/synk-policy/releases/download/platform-preview-0.5.1/SYNK-Platform-Preview-0.5.1-Signal-mac-arm64.dmg",
+      "bytes": 446820143,
+      "sha256": "e827b0702a1341dd871ee642568c11cb4fe658ff02ee41b5356f4692dbe21780",
+      "asarSHA256": "1488486e065162b4e56f210295d87e7f12af841dace6eaec668f15fc4719b7f3"
     },
     {
       "platform": "darwin",
       "arch": "x64",
-      "url": "https://github.com/unmet23-lab/synk-policy/releases/download/platform-preview-0.5.0/SYNK-Platform-Preview-0.5.0-Signal-mac-x64.dmg",
-      "bytes": 463386048,
-      "sha256": "67e7b6524ba85cb738c898cc9d149e809f4d6569657460f1b555c9379e9c5a09",
-      "asarSHA256": "3ed0b5254d97baba8644bacfe9da579e8faee302af7253fb7251b42602c3b41d"
+      "url": "https://github.com/unmet23-lab/synk-policy/releases/download/platform-preview-0.5.1/SYNK-Platform-Preview-0.5.1-Signal-mac-x64.dmg",
+      "bytes": 463402666,
+      "sha256": "acd40ac7ba6babc191881fd56171246c9d0befbfe56114fffe4863ef99702909",
+      "asarSHA256": "4fd3e5e39b218b1d898547a9f7ae51f05ae443d869bdf749817a62f831e124e3"
     }
   ],
   "signature": {
     "alg": "ed25519",
     "keyId": "5880c54d9101974c",
-    "value": "m1djqnJeoXYIBwmyQ47y30iTzU+K3TZWUxsPhDl+UFA0w3Sfhoi5+GBSu5CyCL6Xl9btXxhdQr5Tr6/bB0jODw=="
+    "value": "3hROsZ8voERdcaNIvYgcKVWTWkdgITGyyg+eWgOH9Ihak57eHTnkF9rPR0pQp3Qb6WkCParjQsQ5SIGKTp2dDA=="
   }
 }
