@@ -1,7 +1,7 @@
 {
- "createdAt": "2026-11-18T09:55:23.540Z",
- "commit": "98eb151afee8619b2a24c3b9c9315cf686f0e39e",
- "run": 44277213512,
+ "createdAt": "2026-11-20T07:38:46.970Z",
+ "commit": "a71253a27f2e226a112a2d90ac34330b9bc520a7",
+ "run": 44682400253,
  "env": {
   "chromium": "151.0.7922.34",
   "os": "ubuntu24"
@@ -150,15 +150,15 @@
   "/en/lab/": {
    "desktop": {
     "file": "desktop/en~lab.jpg",
-    "sha256": "412b71b31e301e6dad761b176d0772ea0af24d7bfe88cecef7d9b80de0b81d68",
-    "cssHeight": 5589,
-    "run": 43731118070
+    "sha256": "12f2dd42dfcfe2abffdb10be798457e35257aec0afdf5677622d9be738443617",
+    "cssHeight": 5665,
+    "run": 44682400253
    },
    "mobile": {
     "file": "mobile/en~lab.jpg",
-    "sha256": "2730c84c2fef05121399ba30a152adebd0dac5d7deeea29f83ac2542631af5fc",
-    "cssHeight": 8254,
-    "run": 43731118070
+    "sha256": "e2f56de5b833d9513d2498a910e2fbf21c91848c7afc6deb4a68267a1da0675b",
+    "cssHeight": 8032,
+    "run": 44682400253
    }
   },
   "/en/path/": {
@@ -254,9 +254,9 @@
    },
    "mobile": {
     "file": "mobile/lab.jpg",
-    "sha256": "9727ae7e17ffc15f3164dd37014de6b9bba3238b1463fc75adc876545f31e7b2",
-    "cssHeight": 7685,
-    "run": 43731118070
+    "sha256": "672c5c71d0e3f7baf5901aec030d56bae07659822e118b5270c6922b8520eb5d",
+    "cssHeight": 7414,
+    "run": 44682400253
    }
   },
   "/lab/topik4/": {
