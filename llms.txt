@@ -1,6 +1,6 @@
 # SYNK
 
-> 사람마다 막히는 곳이 다릅니다. 그 한 곳부터 풀어 주는 AI를 만듭니다. 한 사람이 실제로 해 본 것을 읽고 다음 할 일을 고르는 엔진, 아틀라스를 만듭니다. SYNK는 지금 한국어 교육, 회사의 AI 수업, 광고 제작, 한국 유학 준비 네 곳에서 일합니다.
+> 사람마다 막히는 곳이 다릅니다. 그 한 곳부터 풀어 주는 AI를 만듭니다. 한 사람이 실제로 해 본 것을 읽고 다음 할 일을 고르는 엔진, 아틀라스를 만듭니다. SYNK가 지금 하는 일은 셋입니다. 한국어와 유학, AI 강의, 광고입니다.
 
 지금 쓸 수 있는 것과 준비 중인 것을 나눠 적었습니다. 홈페이지의 질문창은 공개한 안내 안에서 답을 찾아 보여 주며, 문의 접수·결제·계약 확정이나 성과 보장을 하지 않습니다.
 
@@ -117,6 +117,13 @@ K드라마 상황극의 1화 장면 체험과 SYNK WORLD의 연습·게임은 �
 ## Pages
 
 - [SYNK](https://synk.im/) · [English](https://synk.im/en/)
+- [한국어 · Korean](https://synk.im/korean/) · [English](https://synk.im/en/korean/)
+- [교실 · Classroom](https://synk.im/classroom/) · [English](https://synk.im/en/classroom/)
+- [유학 · Study in Korea](https://synk.im/study-abroad/) · [English](https://synk.im/en/study-abroad/)
+- [취업 · Jobs](https://synk.im/job/) · [English](https://synk.im/en/job/)
+- [모임 · Community](https://synk.im/community/) · [English](https://synk.im/en/community/)
+- [AI 강의 · AI lectures](https://synk.im/ai/) · [English](https://synk.im/en/ai/)
+- [광고 · Ads](https://synk.im/studio/) · [English](https://synk.im/en/studio/)
 - [SYNK LAB](https://synk.im/lab/) · [English](https://synk.im/en/lab/)
 - [SYNK SHIFT](https://synk.im/shift/) · [English](https://synk.im/en/shift/)
 - [SYNK PULSE](https://synk.im/pulse/) · [English](https://synk.im/en/pulse/)
@@ -131,7 +138,7 @@ K드라마 상황극의 1화 장면 체험과 SYNK WORLD의 연습·게임은 �
 
 ## In English
 
-Everyone gets stuck somewhere different. We build AI that starts right there. We build Atlas, an engine that reads what one person has actually done and picks what they do next. Today SYNK works in four areas: Korean education, AI classes for companies, ad production, and preparing to study in Korea.
+Everyone gets stuck somewhere different. We build AI that starts right there. We build Atlas, an engine that reads what one person has actually done and picks what they do next. Today SYNK does three things: Korean and study in Korea, AI lectures, and ads.
 
 - SYNK LAB — Say it, and the scene moves on. You are the student in a K-drama. Someone speaks first, and the next scene opens only when you answer aloud in Korean. The Episode 1 scene demo and SYNK WORLD practice and games are available now. The full speaking pilot, TOPIK Level 4 class and Synapse textbooks are in preparation.
 - SYNK SHIFT — When the AI lecture ends, you keep one thing you made. Not a tour of tool names. Each person makes one piece of work from their own job and learns to do it again alone. After the lecture, we can automate one of your company’s repetitive tasks. Hands-on AI lectures for companies and institutions, where staff practise on their own work, and AI career lectures for schools on the careers and skills the AI era calls for. We find and assign instructors who fit each request, and automate repetitive work with AI for companies that took a lecture.

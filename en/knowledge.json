@@ -6,12 +6,12 @@
       "id": "company",
       "title": "SYNK — We build AI that fits one person",
       "paragraphs": [
-        "SYNK builds Atlas, a personalization engine that reads a person’s goals and what they have actually done, then fits the next practice to them. With it we run four businesses: Korean education, AI lectures and work automation, ad videos, and preparing to study in Korea.",
+        "SYNK builds Atlas, a personalization engine that reads a person’s goals and what they have actually done, then fits the next practice to them. Three lines of work grew out of it: Korean and study in Korea, AI lectures, and ads.",
         "It began in a classroom in Ulaanbaatar, Mongolia. Every student was good at different things, got stuck in different places and had different reasons for learning. Atlas is our attempt to tailor teaching to each person with technology.",
         "SYNK LAB is making a K-drama role-play where you speak Korean as the international student in the story (pilot in preparation), runs TOPIK practice and Korean games in SYNK WORLD, and is preparing a one-year course aimed at TOPIK Level 4. SYNK SHIFT gives AI-era lectures on careers and work at schools, companies and institutions, and automates repetitive work with AI for companies that took a lecture. SYNK PULSE makes AI video ads, and grows our own music and character stories. SYNK PATH helps with travel plans and with preparing to study, work and settle in Korea.",
         "The SYNK platform is open now as a web preview and as a PC app preview for Windows and Mac. Anything still in preparation is labelled as such on each business page.",
         "Everyone gets stuck somewhere different. We want to build AI that starts right there — so that anyone, in their 20s or their 60s, gets help that matches their goal and situation when they play, study or ask for advice.",
-        "We build Atlas, an engine that reads what one person has actually done and picks what they do next. Today SYNK works in four areas: Korean education, AI classes for companies, ad production, and preparing to study in Korea.",
+        "We build Atlas, an engine that reads what one person has actually done and picks what they do next. Today SYNK does three things: Korean and study in Korea, AI lectures, and ads.",
         "LAB covers Korean-language education; SHIFT, AI lectures and work automation; PULSE, ads and model videos, music and characters; and PATH, “A day in Seoul” and preparation for studying, working and settling in Korea. All four use the Atlas engines they need.",
         "LAB — an Episode 1 scene of the K-drama role-play you can try on the LAB page now (pilot in preparation), and TOPIK practice and Korean games in SYNK WORLD, open as a preview, with the TOPIK Level 4 eight-week online class (registering interest), a one-year course and the Synapse textbooks in preparation.",
         "SHIFT — AI lectures at schools, companies and institutions (including AI career lectures for schools), instructors assigned to fit each request, and AI automation of repetitive work for companies that took a lecture. We are taking enquiries now.",
@@ -524,7 +524,7 @@
         "Tell me about SYNK’s work",
         "Where can I read about the company?"
       ],
-      "answer": "SYNK builds Atlas, a personalization engine that reads a person’s goals and what they have actually done, then fits the next practice to them. With it we run four businesses: Korean education, AI lectures and work automation, ad videos, and preparing to study in Korea.\n\nIt began in a classroom in Ulaanbaatar, Mongolia. Every student was good at different things, got stuck in different places and had different reasons for learning. Atlas is our attempt to tailor teaching to each person with technology.\n\nSYNK LAB is making a K-drama role-play where you speak Korean as the international student in the story (pilot in preparation), runs TOPIK practice and Korean games in SYNK WORLD, and is preparing a one-year course aimed at TOPIK Level 4. SYNK SHIFT gives AI-era lectures on careers and work at schools, companies and institutions, and automates repetitive work with AI for companies that took a lecture. SYNK PULSE makes AI video ads, and grows our own music and character stories. SYNK PATH helps with travel plans and with preparing to study, work and settle in Korea.\n\nThe SYNK platform is open now as a web preview and as a PC app preview for Windows and Mac. Anything still in preparation is labelled as such on each business page.",
+      "answer": "SYNK builds Atlas, a personalization engine that reads a person’s goals and what they have actually done, then fits the next practice to them. Three lines of work grew out of it: Korean and study in Korea, AI lectures, and ads.\n\nIt began in a classroom in Ulaanbaatar, Mongolia. Every student was good at different things, got stuck in different places and had different reasons for learning. Atlas is our attempt to tailor teaching to each person with technology.\n\nSYNK LAB is making a K-drama role-play where you speak Korean as the international student in the story (pilot in preparation), runs TOPIK practice and Korean games in SYNK WORLD, and is preparing a one-year course aimed at TOPIK Level 4. SYNK SHIFT gives AI-era lectures on careers and work at schools, companies and institutions, and automates repetitive work with AI for companies that took a lecture. SYNK PULSE makes AI video ads, and grows our own music and character stories. SYNK PATH helps with travel plans and with preparing to study, work and settle in Korea.\n\nThe SYNK platform is open now as a web preview and as a PC app preview for Windows and Mac. Anything still in preparation is labelled as such on each business page.",
       "sourceId": "company",
       "relatedIds": [
         "synk-vision",
@@ -533,10 +533,10 @@
         "synk-stage"
       ],
       "action": {
-        "label": "See the four businesses",
+        "label": "See the three things we do",
         "href": "/en/#business"
       },
-      "reviewedAt": "2026-11-05",
+      "reviewedAt": "2026-11-20",
       "aliases": [
         "SYNK는 어떤 회사인가요?",
         "싱크가 하는 일을 알려 주세요",
@@ -562,7 +562,7 @@
         "What future is SYNK working toward?",
         "What kind of future does SYNK imagine?"
       ],
-      "answer": "Everyone gets stuck somewhere different. We want to build AI that starts right there — so that anyone, in their 20s or their 60s, gets help that matches their goal and situation when they play, study or ask for advice.\n\nWe build Atlas, an engine that reads what one person has actually done and picks what they do next. Today SYNK works in four areas: Korean education, AI classes for companies, ad production, and preparing to study in Korea.",
+      "answer": "Everyone gets stuck somewhere different. We want to build AI that starts right there — so that anyone, in their 20s or their 60s, gets help that matches their goal and situation when they play, study or ask for advice.\n\nWe build Atlas, an engine that reads what one person has actually done and picks what they do next. Today SYNK does three things: Korean and study in Korea, AI lectures, and ads.",
       "sourceId": "company",
       "relatedIds": [
         "synk-visions",
@@ -570,10 +570,10 @@
         "synk-stage"
       ],
       "action": {
-        "label": "See the four businesses",
+        "label": "See the three things we do",
         "href": "/en/#business"
       },
-      "reviewedAt": "2026-11-12",
+      "reviewedAt": "2026-11-20",
       "aliases": [
         "SYNK의 비전은 무엇인가요?",
         "싱크가 지향하는 미래는 무엇인가요?",
@@ -607,7 +607,7 @@
         "path-vision"
       ],
       "action": {
-        "label": "See the four businesses",
+        "label": "See the three things we do",
         "href": "/en/#business"
       },
       "reviewedAt": "2026-11-12",
@@ -648,7 +648,7 @@
         "path-intro"
       ],
       "action": {
-        "label": "See the four businesses",
+        "label": "See the three things we do",
         "href": "/en/#business"
       },
       "reviewedAt": "2026-10-30",
@@ -721,7 +721,7 @@
         "path-support"
       ],
       "action": {
-        "label": "See the four businesses",
+        "label": "See the three things we do",
         "href": "/en/#business"
       },
       "reviewedAt": "2026-10-10",
@@ -1966,7 +1966,7 @@
         "path-support"
       ],
       "action": {
-        "label": "See the four businesses",
+        "label": "See the three things we do",
         "href": "/en/#business"
       },
       "answer": "Start by deciding what you need now. Learning Korean, an AI lecture or work automation, video or music, or travel and study plans each point to a different page.\n\nEach business page separates what you can do today from what is in preparation, and what you would receive and on what terms. Looking around the SYNK platform web preview first is another way in.\n\nWe do not claim proven effects or superiority over other companies based on the examples on our site. Ask through the contact form or hello@synk.im and we will tell you what is possible today.",
@@ -5311,7 +5311,7 @@
     "synk": {
       "name": "SYNK",
       "headline": "Everyone gets stuck somewhere different. We build AI that starts right there.",
-      "subtext": "We build Atlas, an engine that reads what one person has actually done and picks what they do next. Today SYNK works in four areas: Korean education, AI classes for companies, ad production, and preparing to study in Korea."
+      "subtext": "We build Atlas, an engine that reads what one person has actually done and picks what they do next. Today SYNK does three things: Korean and study in Korea, AI lectures, and ads."
     },
     "lab": {
       "name": "SYNK LAB",
