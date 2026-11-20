@@ -93,7 +93,7 @@
 .ls-pic{position:relative;margin:9px 9px 0;aspect-ratio:4/5;border-radius:9px;overflow:hidden;background:var(--tone,#DDE6EE)}
 .ls-pic video,.ls-pic img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
 .ls-pic video:not(.is-ready){opacity:0}
-.ls-cap{position:absolute;left:6%;right:6%;bottom:7%;z-index:2;padding:3px 6px 4px;border-radius:8px;background:rgba(23,23,26,.8);color:#fff;font-size:calc(var(--cw) * .07);font-weight:700;line-height:1.25;letter-spacing:.01em;text-align:center;opacity:0;pointer-events:none}
+.ls-cap{position:absolute;left:6%;right:6%;bottom:7%;z-index:2;text-wrap:balance;padding:3px 6px 4px;border-radius:8px;background:rgba(23,23,26,.8);color:#fff;font-size:calc(var(--cw) * .07);font-weight:700;line-height:1.25;letter-spacing:.01em;text-align:center;opacity:0;pointer-events:none}
 .ls-cap:empty{display:none}
 .ls-pic::after{content:"";position:absolute;inset:0;border-radius:9px;box-shadow:inset 0 0 0 1px rgba(0,0,0,.05);pointer-events:none}
 .ls-meta{position:relative;flex:1;display:flex;align-items:center;gap:10px;padding:0 14px 2px}
@@ -248,6 +248,7 @@ a.ls-btn{text-decoration:none}
   .ls-card.is-long .ls-word{font-size:calc(var(--cw) * .092)}
   .ls-mean{font-size:calc(var(--cw) * .104)}
   .ls-cap{font-size:calc(var(--cw) * .1);padding:2px 4px 3px;border-radius:6px}
+  .ls-cap.is-long{font-size:calc(var(--cw) * .084);letter-spacing:-.02em}
   .ls-card.has-mean .ls-word{font-size:calc(var(--cw) * .115)}
   .ls-card.has-mean.is-long .ls-word{font-size:calc(var(--cw) * .085)}
   .ls-back{padding:6px 8px}
@@ -318,6 +319,7 @@ a.ls-btn{text-decoration:none}
 :lang(en) .ls-seal b{font-size:calc(var(--cw) * .088);white-space:normal;text-align:center;line-height:1.08}
 .ls-after > *{transition:opacity .2s}
 .ls-after.is-tipped > :not(.ls-next){opacity:.08!important}
+.ls-ctx.is-tipped,.ls-prompt.is-tipped{opacity:.08!important}
 /* 묻는 말 + 힌트 단추 한 줄(좁으면 접힌다) */
 .ls-pline{display:flex;flex-wrap:wrap;align-items:center;column-gap:14px;min-width:0}
 .ls-pline .ls-prompt{min-width:0}
@@ -357,6 +359,8 @@ a.ls-btn{text-decoration:none}
   .ls-pline .ls-hl{margin-top:8px}
   .ls-pline .ls-hl select{height:30px;font-size:12.5px}
 }
+/* 움직임 줄이기면 움직일 일이 없으니 합성 층을 따로 만들지 않는다 — 층마다 그릴 때 화소가 조금씩 달라 배포 점검의 「흔들림」을 냈다(위 규칙들보다 뒤에 둔다) */
+@media (prefers-reduced-motion:reduce){.ls-w,.ls-card,.ls-guide,.ls-cal-page{will-change:auto}}
 
 /* 구역 머리: 정보 줄 · 장면 머리(달력 꽂이) · 문제 글 · 날 표시. */
 
