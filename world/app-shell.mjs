@@ -22,6 +22,7 @@ import {profilePhoto,welcomePhoto} from './brand-opening/tutor-photos.mjs';
 import {t,tMessage,currentLang,setLang} from './brand-opening/world-lang.mjs';
 import {restoreDisplayLanguage,commitDisplayLanguage} from './display-language-sync.mjs';
 import {createSeoulEntry,seoulText} from './seoul-entry.mjs';
+import {createFrontEntry} from './world-front-entry.mjs';
 const $=s=>document.querySelector(s);
 // pagehide closes this capability object; a restored document must reverify it.
 // 첫 await보다 먼저 듣는다: 입장(세션 복원·학습 준비·오프닝)이 끝나기 전에 떠났다가 돌아온 문서도 다시 불러야 한다(10-19).
@@ -39,7 +40,7 @@ const worldUrl=path=>new URL(connection.basePath+path,location.origin).href;
 // 자원 수명은 두 갈래다(world-session.mjs). 계정 수명 — life: 지금 주인·세대의 생활 진도 통로·진도·학습 호스트·「내 성향」 답·배우기 화면(생활·학습·알림).
 // 시트 수명 — sheet: 지금 시트 하나에 딸린 자원(내 계정의 우리 반 수업·과제·반 연결, 싱크타운 호스트). 시트를 바꾸거나 닫으면 버린다(attachSheet·releaseSheet).
 let client,sheet=null,writing=null,writingOwner=null;
-let seoul=null,entryGate=null,worldRequested=false,sessionTask=null,sessionConfirmed=false,accountActionPending=false,entryIdentity='',entryDestinationHandled=false;
+let seoul=null,front=null,entryGate=null,worldRequested=false,sessionTask=null,sessionConfirmed=false,accountActionPending=false,entryIdentity='',entryDestinationHandled=false;
 import {createDramaInvite} from './drama-invite-route.mjs';
 const dramaInvite=createDramaInvite(location.search,()=>sessionStorage);
 let inviteLoginShown=false;
@@ -224,6 +225,7 @@ function reconcileAccount(){
  }
  life.sync();
  seoul?.onIdentity();
+ if(front?.onIdentity())entryDestinationHandled=false;   // 주인이 바뀌어 앞면을 내렸으면 다음 입장에서 갈 곳을 다시 정한다(PC 앱은 로그인이 쪽을 새로 열지 않는다)
  if(!snap&&['world-play','world-retry','world-reward','world-profile','world-device-records','game','world-game-loading','world-game-error','world-game-conflict','world-speaking','world-me2'].includes(screen)){draftRun=null;answers=[];lastCompletion=null;close();}
 }
 function renderStatus(){
@@ -838,7 +840,7 @@ async function launchGame(id,{seoul:fromSeoul=false}={}){
  const listed=games[id];if(!listed)return;const game=fromSeoul?{...listed,title:seoulText('dramaTitle')}:listed;
  const owner=client.snapshot?.accountId;let launchTicket=gameLaunch,session,trialHost=null,companion,dramaHost=null;
  try{
- if(!fromSeoul&&home.ensureTutor&&!home.tutor()?.tutor)return await home.ensureTutor(()=>launchGame(id));
+ if(!fromSeoul&&!front?.free()&&home.ensureTutor&&!home.tutor()?.tutor)return await home.ensureTutor(()=>launchGame(id));
  // 손님의 한글 만나기는 계정 놀이 기록 없이 기기 진도로, 바람길·리듬은 체험이 남아 있으면 한 판 체험으로 연다(계정 호스트를 설치하지 않는다).
  const guest=operating&&!client.snapshot,trial=guest&&guestTrials.open().includes(id);
  if(operating&&!(guest&&(GUEST_GAMES.has(id)||trial))){
@@ -890,7 +892,7 @@ const commands={
  // 2단(앱을 닫아도 받기): 휴대폰 묻는 카드 · 동의 상자의 「동의하고 켜기」(누른 그 동작 안에서 world-push가 권한을 청한다) · 「괜찮아요」.
  ...Object.fromEntries(['reminder-yes','reminder-no','reminder-keep','reminder-stop','reminder-exam-start','reminder-exam-plan','reminder-push-ask','reminder-push-yes','reminder-push-no'].map(name=>[name,()=>life.reminders?.command(name)])),
  // 로그아웃: 이 뒤에 생긴 손님 기록만 다음 로그인에 옮길지 묻는다(device-records.mjs — 앞 사람의 손님 기록이 다음 사람에게 가지 않게).
- logout:async()=>{if(dramaInvite.language)finishDramaInvite();accountActionPending=true;authBoundary++;entryGate?.invalidate();const leaving=client.snapshot?.accountId;try{try{await worldPush?.logout();}catch{/* 다음 열 때 상태가 다시 정리한다 */}await client.logout();const signedOutAt=Date.now();if(leaving)noteDeviceAccount(localStorage,leaving,signedOutAt);noteDeviceSignOut(localStorage,signedOutAt);sessionConfirmed=false;close();if(home.isMaru)await entryGate.start();else welcome();}catch(e){if(e.code==='STALE_RESPONSE')return;home.toast(t('account.logoutFailed'));if(home.isMaru)showEntryRecovery();else welcome();}finally{accountActionPending=false;}},
+ logout:async()=>{if(dramaInvite.language)finishDramaInvite();accountActionPending=true;authBoundary++;entryGate?.invalidate();const leaving=client.snapshot?.accountId;try{try{await worldPush?.logout();}catch{/* 다음 열 때 상태가 다시 정리한다 */}await client.logout();const signedOutAt=Date.now();if(leaving)noteDeviceAccount(localStorage,leaving,signedOutAt);noteDeviceSignOut(localStorage,signedOutAt);sessionConfirmed=false;close();if(front?.active()){front.drop();entryDestinationHandled=false;void startOpening();}else if(home.isMaru)await entryGate.start();else welcome();}catch(e){if(e.code==='STALE_RESPONSE')return;home.toast(t('account.logoutFailed'));if(home.isMaru)showEntryRecovery();else welcome();}finally{accountActionPending=false;}},
 };
 commands.speaking=openSpeaking;
 commands.me2=openMe2;
@@ -922,7 +924,7 @@ document.addEventListener('visibilitychange',()=>{if(!document.hidden&&client.sn
 const worldPanel=$('#world-panel')||$('#panel');
 worldPanel.addEventListener('close',()=>{if(!worldPanel.open){gameLaunch++;gameRecovery=null;screen='';hangerSignature='';renderHomeHanger(client.snapshot);releaseSheet();}});
 window.__synkWorld={client,screen:()=>screen,wardrobe:()=>wardrobeStudio?.metrics(),life:()=>life.ui?.metrics()};
-home.connectHost?.({road:()=>seoul.openRoad(),profile,wardrobe,play,town,about,photo,songs,launchGame,prepareTutor,selectTutor,selectLanguage,tutorStatus,hangulReading,setHangulReading,learn:()=>openLife('next'),packs:()=>openLife('packs'),stories:()=>openLife('stories'),review:()=>openLife('review'),cafe:()=>openLife('cafe'),pack:id=>openLife('pack',id),lesson:id=>openLife('start',id),replayOpening:()=>{close();return startOpening(true);}});
+home.connectHost?.({tutorFree:()=>!!front?.free(),road:()=>seoul.openRoad(),profile,wardrobe,play,town,about,photo,songs,launchGame,prepareTutor,selectTutor,selectLanguage,tutorStatus,hangulReading,setHangulReading,learn:()=>openLife('next'),packs:()=>openLife('packs'),stories:()=>openLife('stories'),review:()=>openLife('review'),cafe:()=>openLife('cafe'),pack:id=>openLife('pack',id),lesson:id=>openLife('start',id),replayOpening:()=>{close();return startOpening(true);}});
 // 공개판 설계 §2: 로그인할 때 이 기기의 손님 한글 기록(한글 만나기 진도·첫 실행 답)을 계정으로 옮길지 한 번 묻는다(device-records.mjs).
 // 계정 생활 진도와 학습 호스트가 준비된 뒤 입장 관문이 튜터 고르기 앞에서 연다. 다른 계정의 기록에는 쓰지 않는다.
 const accountLife=()=>{const owner=client.snapshot?.accountId,ui=life.ui;if(!owner||owner!==life.owner||!ui)throw Object.assign(Error('로그인한 계정이 바뀌었어요.'),{code:'ACCOUNT_CHANGED'});return ui;};
@@ -951,12 +953,17 @@ const deviceRecords=createDeviceRecordsOffer({storage:localStorage,learningStatu
 commands['seoul-move']=button=>seoul.moveChoice(button.dataset.choice);
 commands['device-records']=button=>{const line=document.querySelector('[data-device-records-status]');return deviceRecords.choose(button.dataset.choice,{owner:client.snapshot?.accountId||'guest',
  status:(text,busy)=>{if(line)line.textContent=text;document.querySelectorAll('[data-world="device-records"]').forEach(node=>{node.disabled=busy;});}});};
-seoul=createSeoulEntry({dramaPending:()=>dramaRequested||me2Requested,restored:initialRestoreReady,operating,client:()=>client,life,home,worldUrl,launchGame,signIn,show,close,selectLanguage,tutorStatus,native:()=>operating&&account?.supportsSpeaking===false});
+seoul=createSeoulEntry({dramaPending:()=>dramaRequested||me2Requested,restored:initialRestoreReady,operating,client:()=>client,life,home,worldUrl,launchGame,signIn,show,close,selectLanguage,tutorStatus,native:()=>operating&&account?.supportsSpeaking===false,frontOn:()=>!!front?.soon()});
+// 첫날 끝 · 맞춤 앞면(1차, 결정 11-19): 서울행을 끝낸 학생은 튜터 고르기 · 펠트 동네 대신 앞면을 홈으로 쓴다. 스위치(FRONT_AUTO)를 끄면 지금 길 그대로다.
+front=createFrontEntry({client:()=>client,life,home,worldUrl,launchGame,openLife:(...v)=>openLife(...v),signIn,profile,openStory:()=>seoul.openRoad(),native:()=>operating&&account?.supportsSpeaking===false,
+ guestArrival:()=>seoul.arrival?.('guest')||null,newEngine:()=>false,bypass:()=>!!(dramaRequested||me2Requested||wardrobeRequested||examRequested),
+ openSettings:()=>{if(!home.showSettings)return false;home.showSettings();const actions=document.querySelector('#world-panel .panel-actions');if(actions){const b=document.createElement('button');b.type='button';b.className='quiet-button';b.textContent=t(client.snapshot?'account.meTitle':'account.title');b.addEventListener('click',()=>{if(client.snapshot)profile();else signIn();});actions.append(b);}return true;},blocked:()=>{try{return !!tutorStatus(client.snapshot?.accountId||'guest')?.blocked;}catch{return true;}},hangulReading:(...v)=>hangulReading(...v),setHangulReading:(...v)=>setHangulReading(...v),
+ goalConsent:()=>{let scoped=false;try{scoped=!!life.progress?.status?.()?.scoped;}catch{}return {needed:true,label:t(scoped?'goal.consent.account':'goal.consent.device'),note:t('goal.consent.note')};}});
 entryGate=createWorldEntryGate({
  restore:async()=>{await initialRestoreReady;if(sessionTask)await sessionTask;else if(!sessionConfirmed)await restoreSession();},
  prepare:prepareWorldTutor,
  offer:identity=>deviceRecords.offer(identity),
- read:()=>({owner:client.snapshot?.accountId||'guest',generation:client.generation,tutor:home.tutor?.().tutor||null}),
+ read:()=>({owner:client.snapshot?.accountId||'guest',generation:client.generation,tutor:home.tutor?.().tutor||(front?.free()&&!dramaInvite.language?'front':null)}),
  choose:then=>dramaInvite.language&&operating&&!client.snapshot?signInForDramaInvite():home.ensureTutor?.(then),
  onState:state=>{home.setEntryState?.(state);home.setSceneActive?.(state.phase==='ready');},
  onEnter:identity=>{
@@ -964,6 +971,9 @@ entryGate=createWorldEntryGate({
   if(entryDestinationHandled)return;entryDestinationHandled=true;
   queueMicrotask(()=>{
    if(entryGate.state().phase!=='ready'||identity.owner!==(client.snapshot?.accountId||'guest')||identity.generation!==client.generation)return;
+   // 앞면 학생은 앞면이 홈이다(바로가기 주소는 frontMode가 걸러 지금 길로 간다). 틀을 못 올리면(15초 · 주인 바뀜) 지금 길 그대로.
+   const same=()=>entryGate.state().phase==='ready'&&identity.owner===(client.snapshot?.accountId||'guest')&&identity.generation===client.generation;
+   if(front?.free()&&!dramaInvite.language){void front.enter().then(ok=>{if(!ok&&same())openReminderLink();},()=>{if(same())openReminderLink();});return;}
    if(wardrobeRequested){if(client.snapshot)void wardrobe();else signIn();}
    else if(new URLSearchParams(location.search).get('cafe')==='1')void openLife('cafe').catch(()=>home.toast('카페를 열지 못했어요. 우리 동네에서 카페를 다시 눌러 주세요.'));
    // ?drama=1(11-02): 드라마 말하기 1화 코호트 링크 — 다른 게임과 같은 launchGame(로그인 전이면 로그인부터).
