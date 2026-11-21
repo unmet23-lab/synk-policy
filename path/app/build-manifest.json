@@ -5,7 +5,7 @@
   "configFile": "config.json",
   "builder": {
     "file": "tools/prepare-path-app-public.mjs",
-    "sha256": "11b94442bee0bf546579f1f0d62d2f052618481847e844a56df67e3641fe09a0",
+    "sha256": "4eb9e1135ec027fa8675a3e84e3acb036480ee4926b7a3289bbd18f6979e5c37",
     "esbuildVersion": "0.28.2"
   },
   "sourceFiles": [
@@ -31,11 +31,11 @@
     },
     {
       "file": "docs/브랜드_폰트/InterTight/OFL.txt",
-      "sha256": "7bb9fbf670a56dcfbb1889314d248fa21c92acf2548ae42c08a67788ea50336c"
+      "sha256": "50240ab035cf1b6b3307940235481d515c4b6de3ab1fa843dbe59e7892cb9d58"
     },
     {
       "file": "docs/브랜드_폰트/SUIT/LICENSE_OFL.txt",
-      "sha256": "6d13f474c0732e3e2269bd2cc66df5ce0cbaba0b0e8836b0acfaf85309af72e9"
+      "sha256": "30d101ee3c35ef629d622d933d261a27b2f60223e0a3b0f36791e569c2b9daa9"
     },
     {
       "file": "docs/브랜드_폰트/SUIT/SUIT-Variable.woff2",
@@ -51,7 +51,7 @@
     },
     {
       "file": "experiences/path-app/app.mjs",
-      "sha256": "283a3e3c547177c6db3efc0c330c989204a4d9050f93a32ab150af915a8c1733"
+      "sha256": "8e4d88b4abca47d5a04e799a13172848355ceb79405374db258cee87f32a011f"
     },
     {
       "file": "experiences/path-app/content.mjs",
@@ -70,12 +70,28 @@
       "sha256": "e746aecbc94176875dde2d7965f3664ce6cf9bf476d8b253d7bca3bbf68e54b6"
     },
     {
+      "file": "experiences/path-app/match.mjs",
+      "sha256": "f6e66aa4db149874fdb1aa2d75fdee885679a97c8489fd687c8bd64b4e0923bd"
+    },
+    {
       "file": "experiences/path-app/state.mjs",
       "sha256": "7c1d5f16e6a020a63cddac0244da34ded7a78b127c08f2b817ee44eccd11f5a7"
     },
     {
+      "file": "experiences/path-app/study-data.mjs",
+      "sha256": "559c3c85501b91566ecd4aa61ea9e7a7eda0b067e8f784793558bb900735cd91"
+    },
+    {
+      "file": "experiences/path-app/study-profile.mjs",
+      "sha256": "b99f6d5afc2fc903870da228b8e931f3e3814d5f69e622986db47348abe5bb1d"
+    },
+    {
+      "file": "experiences/path-app/study-ui.mjs",
+      "sha256": "2f8321f7571351ab2ea4954fb6125441c4bcf2855530bbae1b8875918b7de77e"
+    },
+    {
       "file": "experiences/path-app/styles.css",
-      "sha256": "cbb48286ce1d7795ab826b8e9a152cb78ae76de2aaae232e6e5053b2296dae97"
+      "sha256": "8424910d4916cee9cc5f09b8a4be8121cdc7697d71336b927921e5a665cb3cd5"
     },
     {
       "file": "experiences/synk-account/src/core.mjs",
@@ -97,8 +113,8 @@
   "files": [
     {
       "name": "app.mjs",
-      "bytes": 225731,
-      "sha256": "81417627a1db7d2e1205ff55c88e8dd80a64f7948d18fdf89e9bf68b4a5fae8d"
+      "bytes": 313001,
+      "sha256": "df427e344d88d445eb12a346e97e61d78d439dae6359645a2bbe54585937c836"
     },
     {
       "name": "assets/SUIT-Variable.woff2",
@@ -112,13 +128,13 @@
     },
     {
       "name": "assets/SUIT-LICENSE.txt",
-      "bytes": 4473,
-      "sha256": "6d13f474c0732e3e2269bd2cc66df5ce0cbaba0b0e8836b0acfaf85309af72e9"
+      "bytes": 4380,
+      "sha256": "30d101ee3c35ef629d622d933d261a27b2f60223e0a3b0f36791e569c2b9daa9"
     },
     {
       "name": "assets/InterTight-LICENSE.txt",
-      "bytes": 4476,
-      "sha256": "7bb9fbf670a56dcfbb1889314d248fa21c92acf2548ae42c08a67788ea50336c"
+      "bytes": 4383,
+      "sha256": "50240ab035cf1b6b3307940235481d515c4b6de3ab1fa843dbe59e7892cb9d58"
     },
     {
       "name": "assets/InterTight-Medium.woff2",
@@ -142,8 +158,8 @@
     },
     {
       "name": "styles.css",
-      "bytes": 40072,
-      "sha256": "4a65c0a9c932eb3d66784442ba7a05f50432eb02e106288104dee016deff4ac2"
+      "bytes": 53853,
+      "sha256": "9f0ba26e6ad47b306579f92f265d1602e9cefa57145ae14369de86f5dbbc3cdb"
     },
     {
       "name": "config.json",
@@ -153,7 +169,7 @@
     {
       "name": "index.html",
       "bytes": 3578,
-      "sha256": "8ff32cc0d5f92ea6d9602db363ea936187b03c90c3484c61cade28785dc6aa94"
+      "sha256": "53a3319f18afac920b25241facf317e73fa72bdbb523591843ba29e2003bb737"
     }
   ],
   "transformations": [
