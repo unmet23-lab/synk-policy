@@ -1,0 +1,207 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>셀카 한 장을 프로필 사진으로 바꾸는 법 · SYNK 브리핑</title>
+<meta name="description" content="ChatGPT 앱 하나로 해요. 순서는 세 단계예요. 배경만, 옷만 바꾸는 명령어 여섯 개는 뒤에 있어요. 아래 명령어는 모두 저희가 직접 보내 보고 결과를 확인한 것만 적었어요.">
+<meta name="theme-color" content="#060709">
+<link rel="canonical" href="https://synk.im/brief/profile-photo/">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="SYNK 브리핑">
+<meta property="og:title" content="셀카 한 장을 프로필 사진으로 바꾸는 법">
+<meta property="og:description" content="ChatGPT 앱 하나로 해요. 순서는 세 단계예요. 배경만, 옷만 바꾸는 명령어 여섯 개는 뒤에 있어요. 아래 명령어는 모두 저희가 직접 보내 보고 결과를 확인한 것만 적었어요.">
+<meta property="og:url" content="https://synk.im/brief/profile-photo/">
+<meta property="og:image" content="https://synk.im/brief/profile-photo/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" type="image/png" href="assets/favicon-32.png">
+<link rel="preload" href="assets/SUIT-subset.woff2" as="font" type="font/woff2" crossorigin>
+<style>
+@font-face{font-family:'SUIT Variable';font-weight:100 900;font-display:swap;src:url(assets/SUIT-subset.woff2) format('woff2')}
+@font-face{font-family:'SYNK Latin';font-weight:100 450;font-display:swap;src:url(assets/InterTight-400.woff2) format('woff2');unicode-range:U+0021-007E,U+00A0-00B6,U+00B8-00FF,U+2013-2014,U+2018-201D,U+2026}
+@font-face{font-family:'SYNK Latin';font-weight:451 620;font-display:swap;src:url(assets/InterTight-500.woff2) format('woff2');unicode-range:U+0021-007E,U+00A0-00B6,U+00B8-00FF,U+2013-2014,U+2018-201D,U+2026}
+@font-face{font-family:'SYNK Latin';font-weight:621 900;font-display:swap;src:url(assets/InterTight-700.woff2) format('woff2');unicode-range:U+0021-007E,U+00A0-00B6,U+00B8-00FF,U+2013-2014,U+2018-201D,U+2026}
+@font-face{font-family:'DM Mono';font-weight:500;font-display:swap;src:url(assets/DMMono-500.woff2) format('woff2');unicode-range:U+0021-007E}
+:root{--bg:#060709;--panel:#0C0D10;--s1:#14151A;--s2:#1C1D23;--line:rgba(255,255,255,.08);--line-2:rgba(255,255,255,.16);--ink:#FAFAF9;--ink-2:rgba(250,250,249,.8);--ink-3:rgba(250,250,249,.6);--butter:#F5C445;--sans:'SYNK Latin','SUIT Variable',system-ui,-apple-system,'Apple SD Gothic Neo','Malgun Gothic',sans-serif;color-scheme:dark}
+*,*::before,*::after{box-sizing:border-box}
+html{background:var(--bg);-webkit-text-size-adjust:100%;text-size-adjust:100%;scroll-behavior:smooth;scroll-padding-top:16px}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+body{margin:0;background:var(--bg);color:var(--ink);font:450 16.5px/1.72 var(--sans);word-break:keep-all;overflow-wrap:anywhere;-webkit-font-smoothing:antialiased}
+a{color:var(--ink);text-decoration:underline;text-decoration-color:var(--ink-3);text-underline-offset:4px}
+img{display:block;max-width:100%;height:auto}
+b{font-weight:650}
+:focus-visible{outline:2px solid var(--ink);outline-offset:3px}
+.sr{position:absolute;width:1px;height:1px;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+.page{max-width:760px;margin:0 auto;padding:12px 12px 32px}
+.bar{display:flex;align-items:center;gap:14px;height:56px;margin:0 0 12px;padding:0 8px;border-radius:999px;background:var(--s1);box-shadow:inset 0 0 0 1px var(--line)}
+.brand{display:flex;align-items:center;gap:12px;min-width:0;min-height:44px;text-decoration:none}
+.bead{display:grid;place-items:center;flex:none;height:40px;padding:0 14px;border-radius:999px;background:#FAFAF9}
+.bead img{height:24px;width:auto}
+.crumb{font:500 11.5px/1 'DM Mono',var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+main{padding:30px 22px 34px;border-radius:28px;background:var(--panel);box-shadow:inset 0 0 0 1px var(--line)}
+.eyebrow{margin:0 0 14px;font-size:14px;font-weight:600;color:var(--ink-2)}
+h1{margin:0 0 14px;font-size:clamp(36px,9.6vw,58px);font-weight:800;line-height:1.14;letter-spacing:-.035em}
+h1 span{display:block}
+h1 .hl{color:var(--butter)}
+.ai-note{margin:0 0 22px;font-size:14px;color:var(--ink-3)}
+section{padding:30px 0 0;margin:30px 0 0;border-top:1px solid var(--line)}
+h2{margin:0 0 14px;font-size:24px;font-weight:750;line-height:1.35;letter-spacing:-.02em}
+h3{margin:22px 0 8px;font-size:17px;font-weight:700;line-height:1.45}
+h3 .note{font-size:14px;font-weight:450;color:var(--ink-3)}
+p{margin:0 0 12px}
+ul,ol{margin:0 0 14px;padding:0;list-style:none}
+li{position:relative;margin:0 0 8px}
+ul>li{padding-left:18px}
+ul>li::before{content:"";position:absolute;left:3px;top:.72em;width:6px;height:6px;border-radius:50%;background:var(--ink-2)}
+ol{counter-reset:n}
+ol>li{counter-increment:n;padding-left:30px}
+ol>li::before{content:counter(n);position:absolute;left:0;top:0;font-weight:700;color:var(--ink)}
+li ul{margin:8px 0 0}
+.steps a{font-weight:650}
+.cmd{margin:10px 0 16px;padding:16px 16px 14px;border-radius:18px;background:var(--s2);box-shadow:inset 0 0 0 1px var(--line-2)}
+.cmd-text{margin:0 0 12px;font-size:17px;font-weight:550;line-height:1.66;-webkit-user-select:all;user-select:all}
+.copy{display:flex;align-items:center;justify-content:center;width:100%;min-height:48px;padding:0 20px;border:0;border-radius:999px;background:var(--ink);color:#08090C;font:650 16px/1 var(--sans);cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+.copy:active{transform:scale(.98)}
+.copy.ok{background:transparent;color:var(--ink);box-shadow:inset 0 0 0 1px var(--line-2)}
+blockquote.bad{margin:10px 0 14px;padding:14px 16px;border-radius:18px;box-shadow:inset 0 0 0 1px var(--line-2)}
+blockquote.bad p{margin:0;font-size:16.5px;color:var(--ink-2)}
+.shot{margin:16px 0 18px}
+.shot img{width:100%;border-radius:14px;background:var(--s1)}
+.shot figcaption{margin:8px 2px 0;font-size:14px;line-height:1.55;color:var(--ink-3)}
+.cards{display:grid;gap:12px;margin:6px 0 14px}
+.card{padding:16px 16px 6px;border-radius:20px;background:var(--s1);box-shadow:inset 0 0 0 1px var(--line)}
+.card h3{margin:0 0 6px;font-size:18px}
+.card .cap{margin:0 0 2px;font-size:13px;font-weight:600;color:var(--ink-3)}
+.card .cmd{margin-top:6px}
+.colophon{margin:30px 0 0;padding:18px 0 0;border-top:1px solid var(--line);font-size:14px;color:var(--ink-3)}
+.colophon p{margin:0}
+footer{display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px 16px;padding:18px 10px 0;font-size:14px;color:var(--ink-3)}
+footer a{color:var(--ink-2)}
+@media(min-width:640px){main{padding:44px 48px 46px}.copy{width:auto;min-width:120px}.cmd{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:16px;align-items:end}.cmd-text{margin:0}}
+@media(max-width:380px){main{padding:26px 16px 30px}.page{padding:8px 8px 28px}}
+@media print{.bar,.copy,footer{display:none}main{box-shadow:none}}
+</style>
+</head>
+<body>
+<div class="page">
+<header class="bar">
+<a class="brand" href="https://synk.im/shift/" aria-label="SYNK SHIFT 홈 · SYNK 브리핑"><span class="bead"><img src="brand-shift-sm.webp" alt="synk SHIFT" width="88" height="24"></span><span class="crumb" aria-hidden="true">synkbrief / profile photo</span></a>
+</header>
+<main>
+<p class="eyebrow">SYNK 브리핑 · ChatGPT 앱</p>
+<h1><span class="sr">셀카 한 장을 프로필 사진으로 바꾸는 법</span><span aria-hidden="true">셀카 한 장을</span><span aria-hidden="true">프로필 사진으로</span><span aria-hidden="true" class="hl">바꾸는 법</span></h1>
+<p class="ai-note">예시 셀카는 AI로 만든 가상 인물이에요</p>
+<figure class="shot"><img src="shots/01-first-selfie.webp" width="1200" height="717" alt="왼쪽은 빨래가 널린 방에서 회색 티셔츠를 입고 찍은 셀카, 오른쪽은 밝은 회색 배경에 네이비 재킷과 흰 셔츠를 입은 프로필 사진" decoding="async" fetchpriority="high"><figcaption>왼쪽은 보낸 셀카, 오른쪽은 명령어를 한 번 보내고 받은 사진이에요.</figcaption></figure>
+<p>ChatGPT 앱 하나로 해요. 순서는 세 단계예요.</p>
+<ol class="steps"><li><a href="#step1">한 번에 바꾸기</a>: 셀카를 올리고 명령어를 한 번 보내요.</li><li><a href="#step2">얼굴 확인하기</a>: 받은 사진의 얼굴이 내 얼굴 그대로인지 세 곳을 봐요.</li><li><a href="#step3">한 줄 더 보내기</a>: 잔머리처럼 남은 곳만 고쳐요.</li></ol>
+<p><a href="#one-change">배경만, 옷만 바꾸는 명령어 여섯 개는 뒤에 있어요.</a> 아래 명령어는 모두 저희가 직접 보내 보고 결과를 확인한 것만 적었어요.</p>
+
+<section id="s1" aria-labelledby="h-s1">
+<h2 id="h-s1">준비물</h2>
+<h3>셀카 한 장</h3>
+<ul><li>얼굴이 정면으로 크게 나온 사진이면 돼요. 방 조명, 어수선한 배경, 편한 옷이어도 괜찮아요.</li><li>저희는 두 장으로 해 봤어요. 하나는 형광등 아래 빨래가 널린 방에서 찍은 셀카예요. 하나는 스탠드 불빛 아래에서 안경을 쓰고 찍은 셀카예요.</li><li>사진 속 인물은 AI로 만든 예시예요. 실제 사람의 셀카로는 해 보지 않았어요.</li></ul>
+<h3>앱</h3>
+<ul><li>ChatGPT 앱이나 컴퓨터의 chatgpt.com을 써요.</li><li>저희는 컴퓨터(chatgpt.com)에서 했어요. 휴대폰에서 누르는 순서는 OpenAI 도움말을 따라 적었어요.</li><li>제미나이 앱으로도 됐어요. 1단계 끝에 적었어요.</li></ul>
+<h3>무료로 되는 것과 아닌 것 <span class="note">(OpenAI 공식 도움말과 이용약관, 2026-11-21 읽음)</span></h3>
+<ul><li>그림 만들기는 모든 요금제에서 쓸 수 있다고 나와 있어요. 사진 올리기도 무료 요금제에서 된다고 나와 있어요.</li><li>무료 요금제는 사진 올리기와 그림 만들기에 한도가 따로 있어요. 몇 장인지는 나와 있지 않아요. 한도에 닿으면 알림이 뜨고, 풀릴 때까지 기다려야 해요.</li><li>만 13세 이상이어야 쓸 수 있어요. 만 18세 미만은 부모님이나 법정대리인의 허락이 있어야 해요.</li><li>저희는 유료 계정(ChatGPT Pro)으로 해 봤어요. 무료 계정으로는 해 보지 않았어요.</li></ul>
+</section>
+
+<section id="step1" aria-labelledby="h-step1">
+<h2 id="h-step1">1단계 · 한 번에 바꾸기</h2>
+<h3>붙여 넣는 명령어</h3>
+<div class="cmd"><p class="cmd-text" id="cmd-1">이 셀카를 사진관에서 찍은 프로필 사진으로 바꿔 줘. 얼굴 생김새와 점은 그대로 두고, 배경은 밝은 회색, 조명은 부드럽게, 옷은 네이비 재킷에 흰 셔츠, 정면에서 어깨까지 나오게.</p><button type="button" class="copy" data-copy="cmd-1" aria-describedby="cmd-1">복사</button></div>
+<p>배경 색과 옷은 원하는 것으로 바꿔 쓰세요. 저희는 위 값으로만 해 봤어요.</p>
+<h3>누르는 순서</h3>
+<ol class="steps"><li>ChatGPT 앱에서 새 채팅을 열어요. 「임시 채팅」은 쓰지 않아요.</li><li>입력창 왼쪽 「+」를 누르고 「사진 및 파일 추가」에서 셀카를 골라요.</li><li>위 명령어를 붙여 넣고 보내요.</li><li>30초쯤 기다려요. 저희는 25~46초 걸렸어요.</li><li>받은 사진을 누르고 「저장」을 골라요.</li></ol>
+<p>「사진 및 파일 추가」는 저희가 컴퓨터 화면에서 본 이름이에요. 「저장」은 도움말에 영어(Save)로 나온 이름이라 휴대폰에서는 조금 다를 수 있어요.</p>
+<h3>저희가 받은 결과 <span class="note">(2026-11-21)</span></h3>
+<p>같은 명령어를 첫째 셀카로 두 번, 둘째 셀카로 한 번 보냈어요.</p>
+<ul><li>세 번 모두 밝은 회색 배경, 네이비 재킷과 흰 셔츠, 정면 구도의 사진이 왔어요.</li><li>팔을 뻗어 찍은 셀카 자세가 사라지고 어깨가 반듯해졌어요.</li><li>얼굴은 같은 사람이었어요. 볼의 점, 홑꺼풀, 한쪽만 올라간 입꼬리가 그대로였어요.</li><li>둘째 셀카는 안경, 눈썹 위 흉터, 턱의 점, 수염 자국이 그대로였어요.</li><li>달라진 곳도 있어요. 눈 밑 그늘이 옅어지고 입술 색이 조금 붉어졌어요. 아래를 보던 눈은 정면을 봤어요.</li><li>둘째 셀카는 아래에서 올려 찍은 사진이었는데, 정면 사진이 되면서 턱이 더 갸름해 보였어요.</li><li>잔머리는 그대로 남았어요. 3단계에서 고쳐요.</li><li>사진 크기는 보낼 때마다 조금 달랐어요. 한 번은 가로 1196 · 세로 1315, 두 번은 가로 1087 · 세로 1447이었어요.</li></ul>
+<figure class="shot"><img src="shots/02-second-selfie.webp" width="1200" height="792" alt="왼쪽은 스탠드 불빛 아래 책상 앞에서 안경을 쓰고 아래에서 올려 찍은 셀카, 오른쪽은 회색 배경에 네이비 재킷을 입은 정면 프로필 사진" decoding="async" loading="lazy"><figcaption>둘째 셀카(왼쪽)와 같은 명령어로 받은 사진(오른쪽).</figcaption></figure>
+<h3>제미나이 앱으로 할 때 <span class="note">(2026-11-21, 한 번씩)</span></h3>
+<p>새 채팅에서 입력창의 「+」로 첫째 셀카를 올리고 위 명령어를 그대로 보냈어요.</p>
+<figure class="shot"><img src="shots/03-chatgpt-gemini.webp" width="1200" height="718" alt="같은 셀카로 받은 프로필 사진 두 장. 왼쪽은 잔머리가 남았고, 오른쪽은 머리가 단정하고 주근깨가 거의 없다" decoding="async" loading="lazy"><figcaption>같은 명령어로 받은 사진 — 왼쪽 ChatGPT, 오른쪽 제미나이.</figcaption></figure>
+<ul><li>회색 배경, 네이비 재킷과 흰 셔츠, 정면 사진이 왔어요. 잔머리도 정리돼 있었어요.</li><li>볼의 점, 홑꺼풀, 다문 입은 그대로였어요.</li><li>볼의 주근깨는 거의 다 지워졌어요. ChatGPT 결과와 얼굴을 같은 크기로 놓고 보니 코가 조금 넓어 보였어요.</li><li>한 번만 해 본 결과라 늘 그렇다고 할 수는 없어요. 받은 사진은 2단계로 꼭 확인하세요.</li><li>「이 사진으로 프로필 사진 만들어 줘」만 보냈을 때는 베이지색 벽 앞에서 크림색 니트를 입은 사진이 왔어요. 옷은 시키지 않았는데 바뀌었어요.</li><li>제미나이의 사진 고치기는 만 18세 이상만 쓸 수 있다고 구글 도움말에 나와 있어요. 요금제가 없어도 그림 만들기는 된다고 나와 있지만, 내 사진 고치기를 따로 적은 줄은 없어요. 하루 몇 장인지도 나와 있지 않아요(2026-11-21 읽음). 저희는 유료 계정(Google AI Ultra)으로만 해 봤어요.</li></ul>
+</section>
+
+<section id="step2" aria-labelledby="h-step2">
+<h2 id="h-step2">2단계 · 얼굴이 바뀌었는지 확인하기</h2>
+<figure class="shot"><img src="shots/04-face-check.webp" width="1200" height="595" alt="셀카의 얼굴과 받은 사진의 얼굴을 같은 크기로 나란히 놓은 사진. 볼의 점과 홑꺼풀이 같은 자리에 있다" decoding="async" loading="lazy"><figcaption>보낸 셀카(왼쪽)와 받은 사진(오른쪽)의 얼굴을 같은 크기로 놓은 모습.</figcaption></figure>
+<ol class="steps"><li>휴대폰 사진첩에서 보낸 셀카와 받은 사진을 번갈아 넘겨 봐요.</li><li>두 장 모두 두 손가락으로 얼굴을 똑같이 키워요.</li><li>세 곳만 봐요.<ul><li>점이나 흉터가 원래 자리에 있나요?</li><li>눈꺼풀이 그대로인가요? 홑꺼풀이 쌍꺼풀로 바뀌지 않았나요?</li><li>입 모양이 그대로인가요? 다물었던 입이 벌어지거나 이가 보이지 않나요?</li></ul></li><li>안경을 썼다면 안경테 모양도 봐요.</li><li>하나라도 다르면 그 사진은 쓰지 말고 새 채팅에서 다시 보내요. 결과는 보낼 때마다 달라요.</li></ol>
+</section>
+
+<section id="step3" aria-labelledby="h-step3">
+<h2 id="h-step3">3단계 · 한 줄 더 보내기</h2>
+<h3>붙여 넣는 명령어</h3>
+<div class="cmd"><p class="cmd-text" id="cmd-2">잔머리만 단정하게 정리해 줘</p><button type="button" class="copy" data-copy="cmd-2" aria-describedby="cmd-2">복사</button></div>
+<p>사진을 받은 그 대화에 이어서 보내요. 사진은 다시 올리지 않아요.</p>
+<h3>저희가 받은 결과 <span class="note">(2026-11-21, 두 번)</span></h3>
+<ul><li>두 번 모두 삐져나온 잔머리가 정리됐어요. 옆으로 내려온 머리는 귀 뒤로 넘어갔어요.</li><li>얼굴, 옷, 배경은 그대로였어요. 볼의 점도 제자리에 있었어요.</li><li>30~40초 걸렸어요.</li></ul>
+</section>
+<figure class="shot"><img src="shots/05-flyaway-hair.webp" width="1200" height="655" alt="잔머리가 삐져나온 프로필 사진과, 잔머리가 귀 뒤로 정리된 같은 사진" decoding="async" loading="lazy"><figcaption>한 줄 더 보내기 전(왼쪽)과 보낸 뒤(오른쪽).</figcaption></figure>
+<section id="one-change" aria-labelledby="h-one-change">
+<h2 id="h-one-change">하나씩만 바꾸는 명령어 여섯 개</h2>
+<p>셀카를 올리고 아래 한 줄만 보냈어요. 모두 새 채팅에서 한 번씩 해 봤어요. 「배경만」은 두 셀카로 한 번씩 해 봤어요.</p>
+<figure class="shot"><img src="shots/06-one-change.webp" width="1200" height="992" alt="같은 셀카에서 한 가지씩만 바꾼 사진 여섯 장. 회색 벽 배경, 부드러운 조명, 네이비 재킷, 정면 구도, 흑백 재킷 차림, 햇빛 드는 카페" decoding="async" loading="lazy"><figcaption>윗줄은 배경만 · 조명만 · 옷만, 아랫줄은 구도만 · 흑백으로 · 다른 장소로.</figcaption></figure>
+<div class="cards"><article class="card"><h3><span class="sr">바꿀 것: </span>배경만</h3><p class="cap">붙여 넣는 명령어</p><div class="cmd"><p class="cmd-text" id="cmd-3">얼굴과 옷은 그대로 두고, 배경만 밝은 회색 벽으로 바꿔 줘</p><button type="button" class="copy" data-copy="cmd-3" aria-describedby="cmd-3" aria-label="배경만 명령어 복사">복사</button></div><p class="cap">저희가 받은 결과</p><p>방이 회색 벽으로 바뀌었어요. 옷과 팔을 뻗은 자세는 그대로였어요</p></article><article class="card"><h3><span class="sr">바꿀 것: </span>조명만</h3><p class="cap">붙여 넣는 명령어</p><div class="cmd"><p class="cmd-text" id="cmd-4">얼굴은 그대로 두고, 창가에서 자연광을 받은 것처럼 조명만 부드럽게 바꿔 줘</p><button type="button" class="copy" data-copy="cmd-4" aria-describedby="cmd-4" aria-label="조명만 명령어 복사">복사</button></div><p class="cap">저희가 받은 결과</p><p>누런 형광등 빛이 부드러워지고 눈 밑 그늘이 옅어졌어요. 방은 그대로였어요</p></article><article class="card"><h3><span class="sr">바꿀 것: </span>옷만</h3><p class="cap">붙여 넣는 명령어</p><div class="cmd"><p class="cmd-text" id="cmd-5">얼굴과 머리는 그대로 두고, 옷만 네이비 재킷과 흰 셔츠로 바꿔 줘</p><button type="button" class="copy" data-copy="cmd-5" aria-describedby="cmd-5" aria-label="옷만 명령어 복사">복사</button></div><p class="cap">저희가 받은 결과</p><p>옷만 바뀌었어요. 방과 팔을 뻗은 자세는 그대로였어요</p></article><article class="card"><h3><span class="sr">바꿀 것: </span>구도만</h3><p class="cap">붙여 넣는 명령어</p><div class="cmd"><p class="cmd-text" id="cmd-6">얼굴은 그대로 두고, 셀카가 아니라 다른 사람이 정면에서 찍어 준 것처럼 어깨까지 나오게 바꿔 줘</p><button type="button" class="copy" data-copy="cmd-6" aria-describedby="cmd-6" aria-label="구도만 명령어 복사">복사</button></div><p class="cap">저희가 받은 결과</p><p>뻗은 팔이 사라지고 어깨가 반듯해졌어요. 방과 옷은 그대로였어요</p></article><article class="card"><h3><span class="sr">바꿀 것: </span>흑백으로</h3><p class="cap">붙여 넣는 명령어</p><div class="cmd"><p class="cmd-text" id="cmd-7">얼굴은 그대로 두고, 사진관에서 찍은 흑백 프로필 사진으로 바꿔 줘</p><button type="button" class="copy" data-copy="cmd-7" aria-describedby="cmd-7" aria-label="흑백으로 명령어 복사">복사</button></div><p class="cap">저희가 받은 결과</p><p>회색 배경의 흑백 사진이 왔어요. 시키지 않았는데 옷이 재킷으로 바뀌었어요</p></article><article class="card"><h3><span class="sr">바꿀 것: </span>다른 장소로</h3><p class="cap">붙여 넣는 명령어</p><div class="cmd"><p class="cmd-text" id="cmd-8">얼굴은 그대로 두고, 햇빛 드는 카페 창가에서 찍은 자연스러운 프로필 사진으로 바꿔 줘</p><button type="button" class="copy" data-copy="cmd-8" aria-describedby="cmd-8" aria-label="다른 장소로 명령어 복사">복사</button></div><p class="cap">저희가 받은 결과</p><p>배경이 햇빛 드는 카페로 바뀌었어요. 옷과 팔을 뻗은 자세는 그대로였어요</p></article></div>
+<p>여섯 번 모두 볼의 점과 홑꺼풀은 그대로였어요.</p>
+</section>
+
+<section id="s6" aria-labelledby="h-s6">
+<h2 id="h-s6">「얼굴 생김새와 점은 그대로 두고」를 빼면</h2>
+<p>1단계 명령어에서 이 말만 빼고 두 번 보냈어요(2026-11-21).</p>
+<ul><li>뺀 두 번도 볼의 점, 홑꺼풀, 입 모양이 그대로였어요.</li><li>넣은 두 번과 얼굴을 크게 키워 나란히 봤어요. 차이를 찾지 못했어요.</li><li>두 번씩만 해 본 것이라 「빼도 된다」고 단정할 수는 없어요. 저희는 넣고 보내요.</li></ul>
+</section>
+
+<section id="s7" aria-labelledby="h-s7">
+<h2 id="h-s7">짧게만 보내면</h2>
+<div class="cmd"><p class="cmd-text" id="cmd-9">이 셀카를 사진관에서 찍은 프로필 사진으로 바꿔 줘. 얼굴 생김새와 점은 그대로 두고.</p><button type="button" class="copy" data-copy="cmd-9" aria-describedby="cmd-9">복사</button></div>
+<p>배경, 옷, 구도를 빼고 이 두 문장만 보냈어요(2026-11-21, 첫째 셀카 두 번 · 둘째 셀카 한 번).</p>
+<ul><li>세 번 모두 회색 배경에 네이비 재킷을 입은 사진이 왔어요.</li><li>옷과 배경은 적지 않았는데 앞서 시킨 것과 같았어요. 저희 계정은 ChatGPT의 「메모리」가 켜져 있었어요. ChatGPT가 앞선 대화를 참고했을 수 있어요.</li><li>둘째 셀카는 고개를 든 각도와 아래를 보는 눈이 그대로 남았어요.</li><li>처음 해 보는 분은 1단계의 긴 명령어를 쓰세요. 바꿀 것을 다 적으면 앞선 대화와 상관없이 같은 차림이 와요.</li></ul>
+</section>
+
+<section id="dont" aria-labelledby="h-dont">
+<h2 id="h-dont">이렇게 쓰면 안 돼요</h2>
+<figure class="shot"><img src="shots/07-dont.webp" width="1200" height="474" alt="동그랗게 잘린 셀카, 잡티가 지워진 재킷 차림 사진, 이를 드러내고 활짝 웃는 사진" decoding="async" loading="lazy"><figcaption>왼쪽부터 「프로필 사진 만들어 줘」 · 「예쁘게 보정해서」 · 「활짝 웃는」으로 받은 사진.</figcaption></figure>
+<h3>1. 「프로필 사진 만들어 줘」라고만 보내기</h3>
+<blockquote class="bad"><p>이 사진으로 프로필 사진 만들어 줘</p></blockquote>
+<ul><li>맨 처음 보냈을 때는 셀카를 동그랗게 잘라 낸 사진만 왔어요. 방이 흰 벽으로 바뀌었을 뿐 옷과 빛은 그대로였어요.</li><li>실험을 여러 번 한 뒤 둘째 셀카로 다시 보냈더니 재킷 차림의 사진이 왔어요. 앞서 시킨 차림과 같았어요.</li><li>무엇을 바꿀지 적지 않으면 결과가 그때그때 달라요.</li></ul>
+<h3>2. 「예쁘게 보정해 줘」라고 보내기</h3>
+<blockquote class="bad"><p>예쁘게 보정해서 프로필 사진으로 만들어 줘</p></blockquote>
+<ul><li>볼의 붉은 기와 잡티가 거의 다 사라지고 눈썹이 진해졌어요. 점은 남았어요.</li><li>시키지 않은 재킷과 회색 배경도 함께 왔어요.</li><li>실제 얼굴보다 매끈한 얼굴이 돼요. 만나서 보면 사진과 달라 보일 수 있어요.</li></ul>
+<h3>3. 표정을 바꿔 달라고 하기</h3>
+<blockquote class="bad"><p>얼굴은 그대로 두고, 이가 보이게 활짝 웃는 프로필 사진으로 바꿔 줘</p></blockquote>
+<ul><li>이를 드러내고 웃는 사진이 왔어요. 원래 사진에는 이가 보이지 않았어요. AI가 지어낸 이예요.</li><li>눈도 웃는 눈으로 바뀌고 볼이 둥글어졌어요.</li><li>웃는 사진이 필요하면 웃으며 찍은 셀카를 올리세요.</li></ul>
+<h3>4. 「임시 채팅」에서 보내기</h3>
+<ul><li>사진 대신 「현재 임시 채팅에서는 이미지 편집 기능을 사용할 수 없어요」라는 답만 왔어요(2026-11-21).</li></ul>
+</section>
+
+<section id="s9" aria-labelledby="h-s9">
+<h2 id="h-s9">이 사진을 쓰면 안 되는 곳</h2>
+<p>받은 사진은 AI가 다시 그린 사진이에요. 본인 확인에 쓰는 사진으로는 낼 수 없어요.</p>
+<ul><li><b>여권</b>: 외교부 여권 안내의 「여권 사진」 쪽에 「사진 편집 프로그램, 사진 필터 기능 등을 사용하여 임의로 보정된 사진(AI를 활용한 편집·가공·합성·창조 제작물 포함)은 허용 불가함」이라고 적혀 있어요(2026-11-21 읽음).</li><li><b>주민등록증</b>: 행정안전부가 2023년 8월 14일에 「AI프로필 사진은 주민등록증에 사용할 수 없다」고 밝혔어요. 변형할 수 있거나 본인 확인이 어려운 사진은 보완을 요구한다고 했어요.</li><li><b>운전면허증</b>: 경찰청의 2026년 7월 15일 안내에는 여권용 규격 사진을 내야 하고 「과도한 보정」 사진과 「얼굴 식별 어려운 사진」은 안 된다고 나와 있어요. AI로 만든 사진을 따로 적은 문장은 찾지 못했어요.</li><li>이력서나 사원증처럼 받는 곳이 사진 규정을 둔 곳은 그 규정을 먼저 확인하세요.</li></ul>
+<p>메신저와 SNS 프로필, 발표 자료의 소개 사진처럼 본인 확인이 아닌 곳에 쓰세요.</p>
+</section>
+
+<section id="s10" aria-labelledby="h-s10">
+<h2 id="h-s10">지킬 것</h2>
+<ul><li>내 사진만 올리세요. 다른 사람 사진은 그 사람의 허락을 받고 올리세요.</li><li>결과는 보낼 때마다 달라요. 쓰기 전에 2단계로 얼굴을 확인하세요.</li><li>올린 사진과 대화는 내 ChatGPT 기록에 남아요. 개인 요금제의 대화는 모델 학습에 쓰일 수 있다고 도움말에 나와 있어요. 설정의 데이터 제어(Data controls)에서 「Improve the model for everyone」을 끄면 새 대화는 쓰이지 않는다고 해요(OpenAI 도움말, 2026-11-21 읽음).</li><li>ChatGPT로 만든 그림 파일에는 AI로 만들었다는 정보가 들어간다고 도움말에 나와 있어요(2026-11-21 읽음). 보정하지 않은 사진이라고 하고 내지 마세요.</li></ul>
+</section>
+<div class="colophon"><p>직접 해 본 날: 2026-11-21 · 도구: ChatGPT 웹(Pro 계정, 메모리 켜짐), 제미나이 웹 앱(Google AI Ultra 계정) · 예시 사진: AI로 만든 가상 인물 두 명</p></div>
+</main>
+<footer><span>SYNK 브리핑</span><span><a href="https://www.instagram.com/synkbrief/" rel="noopener">Instagram</a> · <a href="https://www.youtube.com/@synkbrief" rel="noopener">YouTube</a></span></footer>
+</div>
+<div id="live" class="sr" aria-live="polite"></div>
+<script>
+(function(){
+var live=document.getElementById('live');
+function show(btn,ok){btn.textContent=ok?'복사했어요':'길게 눌러 복사';btn.classList.toggle('ok',ok);live.textContent=ok?'명령어를 복사했어요':'복사가 막혀 있어요. 명령어를 길게 눌러 복사해 주세요';clearTimeout(btn._t);btn._t=setTimeout(function(){btn.textContent='복사';btn.classList.remove('ok')},2400)}
+function fallback(btn,el){var r=document.createRange();r.selectNodeContents(el);var s=window.getSelection();s.removeAllRanges();s.addRange(r);var ok=false;try{ok=document.execCommand('copy')}catch(e){ok=false}if(ok)s.removeAllRanges();show(btn,ok)}
+document.addEventListener('click',function(e){var btn=e.target.closest&&e.target.closest('[data-copy]');if(!btn)return;var el=document.getElementById(btn.getAttribute('data-copy'));var text=el.textContent;
+if(navigator.clipboard&&window.isSecureContext)navigator.clipboard.writeText(text).then(function(){show(btn,true)},function(){fallback(btn,el)});else fallback(btn,el)});
+})();
+</script>
+</body>
+</html>
