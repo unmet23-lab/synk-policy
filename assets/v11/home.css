@@ -137,9 +137,11 @@ html[data-sky="sunset"] .gate-sky::after{content:"";position:absolute;inset:0;ba
 .state::before{content:"";width:10px;height:10px;border-radius:50%;background:var(--meadow-ink)}
 .state.soon::before{background:none;border:2px solid var(--ink)}
 .w-close{top:clamp(112px,16svh,168px);max-width:none;gap:clamp(16px,3svh,30px);visibility:hidden;opacity:0}
-.w-close h3{font:700 clamp(34px,4.5vw,74px)/1.12 var(--sans);letter-spacing:-.035em;white-space:nowrap}
+.w-close h3{font:700 clamp(34px,4.5vw,62px)/1.12 var(--sans);letter-spacing:-.035em;white-space:nowrap}
 .w-close p{font:500 clamp(18px,1.6vw,24px)/1.6 var(--sans);max-width:22em}
+html[lang="en"] body:not(.flat) .w-close h3{font-size:clamp(26px,3vw,42px)}
 .loop-go{display:flex;flex-wrap:wrap;gap:16px 28px;align-items:center}
+@media (min-width:900px) and (max-width:1279px){.loop-go{flex-direction:column;align-items:flex-start;gap:14px}}
 .w-pins{position:absolute;inset:0}
 .w-pins li{position:absolute;left:var(--x);top:var(--y);transform:translate(-50%,-100%)}
 .w-pins button{position:relative;display:inline-flex;align-items:center;gap:8px;height:44px;padding:0 18px 0 8px;border-radius:999px;background:var(--paper);color:var(--ink);font:700 clamp(15px,1.3vw,19px)/1 var(--sans);box-shadow:0 10px 24px -10px rgba(60,40,20,.5);white-space:nowrap;transition:transform .2s var(--ease)}
@@ -147,6 +149,8 @@ html[data-sky="sunset"] .gate-sky::after{content:"";position:absolute;inset:0;ba
 .w-pins button:hover{transform:translateY(-4px)}
 .w-pins b{position:relative;z-index:1;display:grid;place-items:center;width:28px;height:28px;border-radius:50%;background:var(--ink);color:var(--paper);font:800 14px/1 var(--sans)}
 .w-pins span{position:relative;z-index:1}
+html[lang="en"] body.flat .w-pins li:nth-child(4){transform:translate(-65%,-100%)}
+html[lang="en"] body.flat .w-pins li:nth-child(4) button::after{left:65%}
 .w-loop{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;opacity:0;overflow:visible}
 .w-loop path{fill:none;stroke-linecap:round;stroke-linejoin:round}
 .w-loop .draw{stroke:var(--butter);stroke-width:16;stroke-dasharray:100 200;stroke-dashoffset:100.5}
