@@ -6,7 +6,7 @@ import path from 'node:path';
 import {createRequire} from 'node:module';
 import {after, before, test} from 'node:test';
 import {pathToFileURL} from 'node:url';
-import {classify, compareAxe, axeTable, shotsManifest, summaryLines, slugOf, shotFile, runVisualCheck, capturePage, replayResize, tilesOf, CHANGE_PERCENT, TILE_LIMIT, VISUAL_DEVICES} from './visual.mjs';
+import {classify, compareAxe, axeTable, shotsManifest, summaryLines, slugOf, shotFile, runVisualCheck, capturePage, replayResize, stableShot, nearShot, tilesOf, CHANGE_PERCENT, TILE_LIMIT, VISUAL_DEVICES} from './visual.mjs';
 
 const require = createRequire(import.meta.url);
 
@@ -34,6 +34,27 @@ test('odiff 결과 가르기: 아주 작은 차이는 같음, 기준 파일이 �
   assert.equal(classify({match: false, reason: 'layout-diff'}), 'layout');
   assert.equal(classify({match: false, reason: 'file-not-exists', file: 'x'}), 'missing');
   assert.equal(classify(null), 'missing');
+});
+
+test('흔들림 판정: 바이트가 같으면 안정 · 다르면 near가 참일 때만 안정(뒤 장을 남김) · near가 없거나 늘 거짓이면 흔들림', async () => {
+  const page = {waitForTimeout: async () => {}};
+  const seq = list => { let i = 0; return async () => list[Math.min(i++, list.length - 1)]; };
+  const [A, B, C] = ['a', 'b', 'c'].map(s => Buffer.from(s));
+  assert.deepEqual(await stableShot(page, seq([A, A])), {image: A, unstable: false, near: false, shots: 2});
+  const seen = [];
+  const yes = async (x, y) => { seen.push(`${x}${y}`); return true; };
+  assert.deepEqual(await stableShot(page, seq([A, B]), {near: yes}), {image: B, unstable: false, near: true, shots: 2});
+  assert.deepEqual(seen, ['ab'], 'near는 앞 장, 뒤 장 차례로 받는다');
+  seen.length = 0;
+  assert.equal((await stableShot(page, seq([A, A]), {near: yes})).near, false, '바이트가 같으면 near를 부르지 않는다');
+  assert.deepEqual(seen, []);
+  const no = async () => false;
+  assert.deepEqual(await stableShot(page, seq([A, B, C, A, B, C]), {near: no}), {image: C, unstable: true, near: false, shots: 6});
+  assert.equal((await stableShot(page, seq([A, B, C, A, B, C]))).unstable, true, 'near가 없으면 옛 판정(바이트) 그대로');
+  assert.equal((await stableShot(page, seq([[A, B], [A, B]]))).unstable, false, '나눠 찍은 조각도 바이트가 모두 같으면 안정');
+  assert.equal(nearShot(null, os.tmpdir()), null, 'odiff가 없으면 near도 없다');
+  assert.equal(await nearShot({compare: async () => ({match: true})}, os.tmpdir())([A], [A, B]), false, '조각 수가 다르면 거짓');
+  assert.equal(await nearShot({compare: async () => { throw new Error('odiff 실패'); }}, os.tmpdir())(A, B), false, '견주기가 실패하면 거짓');
 });
 
 test('axe 견주기: 기준에 없던 규칙과 곳 수가 는 규칙만 새것, 무거운 것부터', () => {
@@ -213,4 +234,30 @@ test('resize 바로잡기: 낡은 배치에서 뗀 tabindex를 쪽의 resize 처
   await page.evaluate(() => document.getElementById('x').removeAttribute('tabindex'));
   await replayResize(page);
   assert.equal(await page.evaluate(() => document.getElementById('x').getAttribute('tabindex')), '0');
+});
+
+test('거의 같음(11-21): 색값 몇만 다른 작은 칸이 계속 움직이는 쪽은 odiff로 안정, 큰 상자가 움직이는 쪽은 그대로 흔들림', async t => {
+  if (!browser || !odiff) return t.skip('플레이라이트·odiff가 없다');
+  // /faint: 회색 바탕 위 40×40 칸(바탕과 색값 6 차이)이 40ms마다 1px씩 옮겨 간다 — 줄여 그린 큰 그림의 색값 1~2 흔들림처럼 바이트는 늘 달라도 눈에는 같다.
+  // /moving: 흰 바탕 위 150×150 검은 상자가 40ms마다 3px씩 옮겨 간다 — 진짜 움직임.
+  const body = (bg, box, size, step) => `<!doctype html><html lang="ko"><meta charset="utf-8"><meta name="viewport" content="width=device-width"><link rel="icon" href="data:,"><title>흔들림</title>
+<body style="margin:0;background:${bg}"><div style="height:1200px"></div><div id="b" style="position:absolute;top:200px;left:0;width:${size}px;height:${size}px;background:${box}"></div>
+<script>let x=0;setInterval(()=>{x=(x+${step})%200;document.getElementById('b').style.left=x+'px'},40);</script></body></html>`;
+  const pages = {'/faint/': body('#808080', '#868686', 40, 1), '/moving/': body('#fff', '#000', 150, 3)};
+  const server = http.createServer((request, response) => {
+    response.setHeader('Content-Type', 'text/html; charset=utf-8');
+    response.end(pages[request.url] || '');
+  });
+  await new Promise(r => server.listen(0, '127.0.0.1', r));
+  t.after(() => new Promise(r => server.close(r)));
+  const base = `http://127.0.0.1:${server.address().port}`;
+  const shotsDir = fs.mkdtempSync(path.join(os.tmpdir(), 'site-check-near-test-'));
+  t.after(() => fs.rmSync(shotsDir, {recursive: true, force: true}));
+  const mobile = VISUAL_DEVICES.find(d => d.key === 'mobile');
+  const faint = await capturePage({browser, base, route: '/faint/', device: mobile, shotsDir, odiff});
+  assert.deepEqual([faint.unstable, faint.near], [false, true], `옅은 칸: 거의 같음으로 안정(찍은 장 ${faint.shots})`);
+  const faintBytes = await capturePage({browser, base, route: '/faint/', device: mobile, shotsDir});
+  assert.equal(faintBytes.unstable, true, 'odiff 없이(바이트만) 보면 같은 쪽이 흔들림 — 이 시험 쪽이 실제로 바이트를 흔든다');
+  const moving = await capturePage({browser, base, route: '/moving/', device: mobile, shotsDir, odiff});
+  assert.deepEqual([moving.unstable, moving.near, moving.shots], [true, false, 6], '큰 상자가 움직이면 odiff로도 흔들림');
 });

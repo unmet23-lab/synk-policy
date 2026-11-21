@@ -7,10 +7,14 @@
 // 쪽 머리로 되풀이해 찍는다. 그보다 긴 그림(휴대폰의 긴 쪽)은 고르게 나눠 PNG로 찍고 그 쪽에서 떼어 둔 캔버스로 이어 JPEG 한 장으로 만든다.
 // 흔들림: 두 번 잇달아 같은 그림이 나올 때까지(최대 6번) 찍고, 끝내 같지 않으면 견주지 않고 「흔들림」으로 남긴다
 // (10-21 두 회차 견줌에서 /world/는 한 번은 검은 화면, 한 번은 첫 그림이었다). 캔버스·iframe은 분홍 상자로 가린다.
+// 「같은 그림」은 바이트가 같거나, 바이트는 달라도 기준 견주기와 같은 잣대(odiff 같은 옵션 · CHANGE_PERCENT)로 같음인 그림이다(11-21).
+// 큰 그림을 줄여 그리는 쪽(새 홈 컴퓨터 — 마을 지도 · 장면 WebP를 0.5배로)은 찍을 때마다 화소 수백 개가 색값 1~2씩 달라
+// 바이트가 같은 두 장이 끝내 안 나왔다(새 홈 공개 뒤 일곱 회차 모두 흔들림). 그만한 차이는 기준과 견줘도 같음이라 흔들림으로 뺄 까닭이 없다.
 // 동영상은 상자째 가리지 않고 숨긴 채 찍는다(11-07) — 화면 전부를 덮는 쇼릴 위에 얹은 제목 · 단추 · 글(/pulse/ 첫 화면)이 분홍에 묻혀
 // 그림 비교의 사각이 됐다. 영상 자체(프레임 · 포스터)는 여전히 견주지 않고, 그 자리에는 영상 뒤 바탕이 찍힌다(hideVideos).
 // 새로 생긴 치명(critical) 접근성 위반만 점검을 실패시키고, 그림 차이와 나머지 위반은 보고만 한다.
 import fs from 'node:fs';
+import os from 'node:os';
 import path from 'node:path';
 import crypto from 'node:crypto';
 
@@ -24,6 +28,8 @@ export const TILE_LIMIT = 8192;
 export const JPEG_QUALITY = 70;
 // 이보다 작은 차이는 같은 것으로 본다 — 10-21 두 회차 견줌에서 흔들리지 않은 쪽의 차이는 모두 0.01% 아래(글자 가장자리 몇십 화소)였다.
 export const CHANGE_PERCENT = 0.05;
+// odiff 견주기 옵션 — 기준 견주기와 흔들림 판정이 같은 잣대를 쓴다.
+export const ODIFF_OPTIONS = {threshold: 0.1, antialiasing: true};
 export const IMPACTS = ['critical', 'serious', 'moderate', 'minor'];
 export const IMPACT_NAME = {critical: '치명', serious: '심각', moderate: '보통', minor: '가벼움'};
 const sha = b => crypto.createHash('sha256').update(b).digest('hex');
@@ -68,18 +74,48 @@ export function tilesOf(height, scale, limit = TILE_LIMIT) {
   return tiles;
 }
 
-/** 두 번 잇달아 같은 그림이 나올 때까지 찍는다. 끝내 같지 않으면 unstable. shoot은 Buffer나 Buffer 배열(나눠 찍은 조각)을 낸다. */
-export async function stableShot(page, shoot, {tries = 6, gap = 500} = {}) {
+/**
+ * 두 번 잇달아 같은 그림이 나올 때까지 찍는다. 끝내 같지 않으면 unstable. shoot은 Buffer나 Buffer 배열(나눠 찍은 조각)을 낸다.
+ * near(앞, 뒤)를 주면 바이트가 다른 두 장도 near가 참이면 같은 그림으로 친다(near: true — 뒤 장을 남긴다).
+ */
+export async function stableShot(page, shoot, {tries = 6, gap = 500, near = null} = {}) {
   const parts = x => Array.isArray(x) ? x : [x];
   const same = (a, b) => parts(a).length === parts(b).length && parts(a).every((x, i) => x.equals(parts(b)[i]));
   let last = await shoot();
   for (let i = 1; i < tries; i++) {
     await page.waitForTimeout(gap);
     const next = await shoot();
-    if (same(next, last)) return {image: next, unstable: false, shots: i + 1};
+    if (same(next, last)) return {image: next, unstable: false, near: false, shots: i + 1};
+    if (near && await near(last, next)) return {image: next, unstable: false, near: true, shots: i + 1};
     last = next;
   }
-  return {image: last, unstable: true, shots: tries};
+  return {image: last, unstable: true, near: false, shots: tries};
+}
+
+/**
+ * 흔들림 판정의 「거의 같음」(11-21): 두 캡처(Buffer나 조각 배열)를 조각마다 odiff로 기준 견주기와 같은 옵션으로 견줘
+ * 모든 조각이 classify로 same이면 참이다. 조각 수가 다르거나 크기가 다르면(layout) 거짓. 견주기가 실패해도 거짓(옛 판정 그대로).
+ * odiff가 없으면 null — stableShot은 바이트만 본다. 견줄 그림은 dir에 잠깐 쓰고 바로 지운다.
+ */
+export function nearShot(odiff, dir) {
+  if (!odiff) return null;
+  let n = 0;
+  return async (a, b) => {
+    const pa = Array.isArray(a) ? a : [a], pb = Array.isArray(b) ? b : [b];
+    if (pa.length !== pb.length) return false;
+    for (let i = 0; i < pa.length; i++) {
+      if (pa[i].equals(pb[i])) continue;
+      const ext = pa[i][0] === 0x89 ? 'png' : 'jpg', k = n++;
+      const [fa, fb, fd] = [`${k}-a.${ext}`, `${k}-b.${ext}`, `${k}-d.png`].map(f => path.join(dir, f));
+      try {
+        fs.writeFileSync(fa, pa[i]);
+        fs.writeFileSync(fb, pb[i]);
+        if (classify(await odiff.compare(fa, fb, fd, {...ODIFF_OPTIONS, noFailOnFsErrors: true})) !== 'same') return false;
+      } catch { return false; }
+      finally { for (const f of [fa, fb, fd]) fs.rmSync(f, {force: true}); }
+    }
+    return true;
+  };
 }
 
 /**
@@ -121,9 +157,10 @@ export async function runAxe(page, axeSource) {
     .map(v => ({id: v.id, impact: v.impact || 'minor', count: v.nodes.length, targets: v.nodes.slice(0, 3).map(n => String(n.target?.[0] ?? '').slice(0, 120))})));
 }
 
-/** 한 쪽·한 기기: 새 context(고정 시각·움직임 줄임)에서 열어 그림 한 장과 axe 결과를 낸다. */
-export async function capturePage({browser, base, route, device, shotsDir, axeSource}) {
+/** 한 쪽·한 기기: 새 context(고정 시각·움직임 줄임)에서 열어 그림 한 장과 axe 결과를 낸다. odiff를 주면 흔들림을 「거의 같음」까지 본다. */
+export async function capturePage({browser, base, route, device, shotsDir, axeSource, odiff = null}) {
   const context = await browser.newContext({...device.options, serviceWorkers: 'block', reducedMotion: 'reduce', locale: 'ko-KR', timezoneId: 'Asia/Seoul'});
+  const nearDir = odiff ? fs.mkdtempSync(path.join(os.tmpdir(), 'site-check-near-')) : null;
   try {
     await context.clock.setFixedTime(new Date(FIXED_TIME));
     const page = await context.newPage();
@@ -138,7 +175,7 @@ export async function capturePage({browser, base, route, device, shotsDir, axeSo
     const shoot = tiles.length === 1
       ? () => page.screenshot({type: 'jpeg', quality: JPEG_QUALITY, ...common, clip: {x: 0, y: 0, width, height: clipHeight}})
       : async () => { const parts = []; for (const t of tiles) parts.push(await page.screenshot({type: 'png', ...common, clip: {x: 0, y: t.y, width, height: t.height}})); return parts; };
-    let {image, unstable, shots} = await stableShot(page, shoot);
+    let {image, unstable, near, shots} = await stableShot(page, shoot, {near: nearShot(odiff, nearDir)});
     if (tiles.length > 1) await replayResize(page);
     let axe = null, axeError = null;
     if (axeSource) { try { axe = await runAxe(page, axeSource); } catch (error) { axeError = String(error).split('\n')[0].slice(0, 200); } }
@@ -147,8 +184,11 @@ export async function capturePage({browser, base, route, device, shotsDir, axeSo
     const file = shotFile(route, device.key);
     fs.mkdirSync(path.dirname(path.join(shotsDir, file)), {recursive: true});
     fs.writeFileSync(path.join(shotsDir, file), image);
-    return {route, device: device.key, shot: {file, sha256: sha(image), bytes: image.length, cssHeight: height, clipped: height > MAX_HEIGHT, tiles: tiles.length}, unstable, shots, axe, axeError};
-  } finally { await context.close(); }
+    return {route, device: device.key, shot: {file, sha256: sha(image), bytes: image.length, cssHeight: height, clipped: height > MAX_HEIGHT, tiles: tiles.length}, unstable, near, shots, axe, axeError};
+  } finally {
+    await context.close();
+    if (nearDir) fs.rmSync(nearDir, {recursive: true, force: true});
+  }
 }
 
 /**
@@ -238,11 +278,13 @@ export async function runVisualCheck({browser, base, routes, baselineDir, shotsD
   const baseAxe = read(path.join(baselineDir, 'axe.json'));
   const pages = [], errors = [], failed = new Set();
   for (const device of VISUAL_DEVICES) for (const route of routes) {
-    try { pages.push(await capturePage({browser, base, route, device, shotsDir, axeSource})); }
+    try { pages.push(await capturePage({browser, base, route, device, shotsDir, axeSource, odiff})); }
     catch (error) { failed.add(`${route}|${device.key}`); errors.push(`${route} ${device.name}: ${String(error).split('\n')[0].slice(0, 200)}`); }
   }
   const visual = {baseline: baseline ? {commit: baseline.commit, run: baseline.run, createdAt: baseline.createdAt} : null, run, checked: pages.length,
-    same: 0, tiny: [], changed: [], layout: [], missing: [], unstable: [], removed: [], errors, envChanged: null};
+    same: 0, tiny: [], changed: [], layout: [], missing: [], unstable: [], removed: [], errors, envChanged: null,
+    // 바이트는 끝내 같지 않았지만 거의 같음(odiff same)으로 안정한 쪽 — 견주기는 다른 쪽과 같다(11-21)
+    near: pages.filter(p => p.near).map(p => ({route: p.route, device: p.device}))};
   if (baseline && JSON.stringify(baseline.env || {}) !== JSON.stringify(env)) {
     visual.envChanged = Object.keys({...baseline.env, ...env}).filter(k => (baseline.env || {})[k] !== env[k]).map(k => `${k} ${(baseline.env || {})[k] ?? '-'}→${env[k] ?? '-'}`).join(', ');
   }
@@ -256,7 +298,7 @@ export async function runVisualCheck({browser, base, routes, baselineDir, shotsD
     fs.mkdirSync(path.dirname(diffFile), {recursive: true});
     let result;
     try {
-      result = await odiff.compare(path.join(baselineDir, want.file), path.join(shotsDir, p.shot.file), diffFile, {threshold: 0.1, antialiasing: true, captureDiffLines: true, diffOverlay: true, noFailOnFsErrors: true});
+      result = await odiff.compare(path.join(baselineDir, want.file), path.join(shotsDir, p.shot.file), diffFile, {...ODIFF_OPTIONS, captureDiffLines: true, diffOverlay: true, noFailOnFsErrors: true});
     } catch (error) { errors.push(`${p.route} ${deviceName(p.device)} 견주기: ${String(error).split('\n')[0].slice(0, 200)}`); continue; }
     const kind = classify(result);
     const scale = VISUAL_DEVICES.find(d => d.key === p.device).options.deviceScaleFactor;
@@ -286,6 +328,6 @@ export async function runVisualCheck({browser, base, routes, baselineDir, shotsD
   // 기준 갱신(공개.js 기준)이 쪽 일부만 바꿀 때 나머지를 잇도록 견준 기준도 같이 남긴다
   if (baseline) fs.writeFileSync(path.join(shotsDir, 'baseline-before.json'), JSON.stringify(baseline, null, 1) + '\n');
   if (baseAxe) fs.writeFileSync(path.join(shotsDir, 'baseline-axe-before.json'), JSON.stringify(baseAxe, null, 1) + '\n');
-  log(`  쪽 ${routes.length}개 × ${VISUAL_DEVICES.length}기기 · 찍음 ${pages.length} · 흔들림 ${visual.unstable.length} · 오류 ${errors.length}`);
+  log(`  쪽 ${routes.length}개 × ${VISUAL_DEVICES.length}기기 · 찍음 ${pages.length} · 흔들림 ${visual.unstable.length} · 거의 같음으로 안정 ${visual.near.length} · 오류 ${errors.length}`);
   return {visual, a11y};
 }
