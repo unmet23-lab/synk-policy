@@ -5,7 +5,7 @@
   "configFile": "config.json",
   "builder": {
     "file": "tools/prepare-path-app-public.mjs",
-    "sha256": "4eb9e1135ec027fa8675a3e84e3acb036480ee4926b7a3289bbd18f6979e5c37",
+    "sha256": "d3c01093d5e64f7b9d15f29d90bb1da1de612d2a318c5cc6b3a232411dee1449",
     "esbuildVersion": "0.28.2"
   },
   "sourceFiles": [
@@ -51,7 +51,15 @@
     },
     {
       "file": "experiences/path-app/app.mjs",
-      "sha256": "8e4d88b4abca47d5a04e799a13172848355ceb79405374db258cee87f32a011f"
+      "sha256": "dbb9472d440d926d6bb3527555dfea93cc8bc504fff6b97feb9f6c9425223f5e"
+    },
+    {
+      "file": "experiences/path-app/channel-data.mjs",
+      "sha256": "79c3523bc58b02ecd22b3a8cfd6d2a6830a64fdd9e0d787893f0795f32e99dd0"
+    },
+    {
+      "file": "experiences/path-app/channel-ui.mjs",
+      "sha256": "cd3162117b4d6ed517bfdb02aa4c45809dc53fb0181cd15d54f3df36ecdcb8a0"
     },
     {
       "file": "experiences/path-app/content.mjs",
@@ -83,7 +91,7 @@
     },
     {
       "file": "experiences/path-app/study-profile.mjs",
-      "sha256": "b99f6d5afc2fc903870da228b8e931f3e3814d5f69e622986db47348abe5bb1d"
+      "sha256": "bd08997cdde274b544fbe8d6f000c2c6950cc2fa38b0d5ae1bdfca325ec68154"
     },
     {
       "file": "experiences/path-app/study-ui.mjs",
@@ -91,7 +99,7 @@
     },
     {
       "file": "experiences/path-app/styles.css",
-      "sha256": "8424910d4916cee9cc5f09b8a4be8121cdc7697d71336b927921e5a665cb3cd5"
+      "sha256": "c2cd52d986f3602d8a70b149cf07768903f3da2bf7ca82bae8054180636367d5"
     },
     {
       "file": "experiences/synk-account/src/core.mjs",
@@ -113,8 +121,8 @@
   "files": [
     {
       "name": "app.mjs",
-      "bytes": 313001,
-      "sha256": "df427e344d88d445eb12a346e97e61d78d439dae6359645a2bbe54585937c836"
+      "bytes": 369584,
+      "sha256": "1bafc1c16ac4b9bd62ee6f368221ca2e635ecdcefd410f8217b17a5f90e01172"
     },
     {
       "name": "assets/SUIT-Variable.woff2",
@@ -158,8 +166,8 @@
     },
     {
       "name": "styles.css",
-      "bytes": 53853,
-      "sha256": "9f0ba26e6ad47b306579f92f265d1602e9cefa57145ae14369de86f5dbbc3cdb"
+      "bytes": 59989,
+      "sha256": "770883802664e62fdab7c1d4a1fee29331825188e2f5eccdad092b590202b825"
     },
     {
       "name": "config.json",
@@ -169,7 +177,7 @@
     {
       "name": "index.html",
       "bytes": 3578,
-      "sha256": "53a3319f18afac920b25241facf317e73fa72bdbb523591843ba29e2003bb737"
+      "sha256": "08b6433fb817638993dda9d8db1eae344d806d3e41bc700ff4ba1c54328871de"
     }
   ],
   "transformations": [

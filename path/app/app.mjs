@@ -668,17 +668,17 @@ function createProductAccount({
     if (refreshing) return refreshing;
     const old = session2;
     if (!old?.refresh_token) throw fault("AUTH_REQUIRED", "SYNK ID로 다시 로그인해 주세요.");
-    const promise2 = (async () => {
+    const promise3 = (async () => {
       const next = await core.tokenRequest(config, { grant_type: "refresh_token", client_id: config.clients[clientKey].clientId, refresh_token: old.refresh_token }, fetcher);
       guard(expected);
       saveSession({ ...next, refresh_token: next.refresh_token || old.refresh_token });
       return session2.access_token;
     })();
-    refreshing = promise2;
+    refreshing = promise3;
     try {
-      return await promise2;
+      return await promise3;
     } finally {
-      if (refreshing === promise2) refreshing = null;
+      if (refreshing === promise3) refreshing = null;
     }
   }
   function requestBody(operation, values = {}) {
@@ -746,7 +746,7 @@ function createProductAccount({
     nativeIdentity = key;
     const expected = epoch;
     emit({ configured: true, signedIn: false, status: "restoring", accountId: null, account: null, error: null });
-    const promise2 = (async () => {
+    const promise3 = (async () => {
       try {
         const data = await dispatch(operations.load, {}, expected, identity);
         guard(expected);
@@ -756,11 +756,11 @@ function createProductAccount({
         return status();
       }
     })();
-    nativeLoad = promise2;
+    nativeLoad = promise3;
     try {
-      return await promise2;
+      return await promise3;
     } finally {
-      if (nativeLoad === promise2) nativeLoad = null;
+      if (nativeLoad === promise3) nativeLoad = null;
     }
   }
   async function begin() {
@@ -3637,14 +3637,19 @@ var STUDY_VERSION = 1;
 var EDUCATION_IDS = Object.freeze(["graduated", "expected", "none"]);
 var MAX_FUNDS_WON = 2e8;
 var MAX_COMPARE = 3;
+var MAX_DATES = 30;
+var MAX_CHANNELS_OFF = 10;
 var isObj3 = (v) => v !== null && typeof v === "object" && !Array.isArray(v);
 var intIn = (v, min, max) => Number.isInteger(v) && v >= min && v <= max;
 var ID_RE3 = /^[a-z0-9][a-z0-9-]{0,63}$/;
+var DATE_ID_RE = /^[a-z0-9][a-z0-9-]{0,79}$/;
+var isDay = (v) => typeof v === "string" && /^\d{4}-\d{2}-\d{2}$/.test(v) && !Number.isNaN(Date.parse(v + "T00:00:00Z"));
+var cleanDate = (d) => isObj3(d) && typeof d.id === "string" && DATE_ID_RE.test(d.id) && isDay(d.start) && isDay(d.end) && d.end >= d.start ? { id: d.id, start: d.start, end: d.end } : null;
 var GUEST_OWNER = "guest";
 var OWNER_RE = /^[A-Za-z0-9][A-Za-z0-9_.:@-]{0,127}$/;
 var ownerOf = (v) => typeof v === "string" && OWNER_RE.test(v) ? v : null;
 function createProfile() {
-  return { v: STUDY_VERSION, topik: null, gradePct: null, fundsWon: null, education: null, compare: [] };
+  return { v: STUDY_VERSION, topik: null, gradePct: null, fundsWon: null, education: null, compare: [], dates: [], channelsOff: [] };
 }
 function normalizeProfile(raw) {
   const out = createProfile();
@@ -3655,6 +3660,13 @@ function normalizeProfile(raw) {
   if (EDUCATION_IDS.includes(raw.education)) out.education = raw.education;
   if (Array.isArray(raw.compare)) for (const id of raw.compare) {
     if (typeof id === "string" && ID_RE3.test(id) && !out.compare.includes(id) && out.compare.length < MAX_COMPARE) out.compare.push(id);
+  }
+  if (Array.isArray(raw.dates)) for (const d of raw.dates) {
+    const c = cleanDate(d);
+    if (c && !out.dates.some((x) => x.id === c.id) && out.dates.length < MAX_DATES) out.dates.push(c);
+  }
+  if (Array.isArray(raw.channelsOff)) for (const id of raw.channelsOff) {
+    if (typeof id === "string" && ID_RE3.test(id) && !out.channelsOff.includes(id) && out.channelsOff.length < MAX_CHANNELS_OFF) out.channelsOff.push(id);
   }
   return out;
 }
@@ -3683,6 +3695,37 @@ function toggleCompare(profile2, id, knownIds) {
   else if (p.compare.length < MAX_COMPARE) p.compare.push(id);
   return p;
 }
+function addDate(profile2, entry) {
+  const p = normalizeProfile(profile2), c = cleanDate(entry);
+  if (!c) throw new RangeError("date");
+  if (p.dates.some((x) => x.id === c.id)) return { profile: p, added: false, full: false };
+  if (p.dates.length >= MAX_DATES) return { profile: p, added: false, full: true };
+  p.dates.push(c);
+  return { profile: p, added: true, full: false };
+}
+function removeDate(profile2, id) {
+  const p = normalizeProfile(profile2);
+  p.dates = p.dates.filter((x) => x.id !== id);
+  return p;
+}
+function confirmDate(profile2, entry) {
+  const p = normalizeProfile(profile2), c = cleanDate(entry);
+  if (!c) throw new RangeError("date");
+  p.dates = p.dates.map((x) => x.id === c.id ? c : x);
+  return p;
+}
+function keepDates(profile2, keep) {
+  const p = normalizeProfile(profile2);
+  p.dates = p.dates.filter((x) => keep.includes(x.id));
+  return p;
+}
+function toggleChannel(profile2, id) {
+  const p = normalizeProfile(profile2);
+  if (typeof id !== "string" || !ID_RE3.test(id)) return p;
+  if (p.channelsOff.includes(id)) p.channelsOff = p.channelsOff.filter((x) => x !== id);
+  else if (p.channelsOff.length < MAX_CHANNELS_OFF) p.channelsOff.push(id);
+  return p;
+}
 function isEmptyProfile(profile2) {
   const p = normalizeProfile(profile2);
   return p.topik === null && p.gradePct === null && p.fundsWon === null && p.education === null;
@@ -3708,7 +3751,7 @@ function createProfileStore(storage) {
   } catch {
     persisted = false;
   }
-  const hasData = () => !isEmptyProfile(profile2) || profile2.compare.length > 0;
+  const hasData = () => !isEmptyProfile(profile2) || profile2.compare.length > 0 || profile2.dates.length > 0 || profile2.channelsOff.length > 0;
   const write = () => {
     try {
       const raw = JSON.stringify({ ...profile2, owner });
@@ -3747,6 +3790,294 @@ function createProfileStore(storage) {
       return persisted;
     }
   };
+}
+
+// experiences/path-app/channel-data.mjs
+var L3 = (ko, en) => Object.freeze({ ko, en });
+var DATE_KINDS = Object.freeze(["apply", "exam", "result", "deadline"]);
+var FOR_YOU = Object.freeze(["topikExam", "finance", "gksGrade", "program"]);
+var POST_STATUS = Object.freeze(["official", "announced"]);
+var CHANNEL_TONES = Object.freeze(["lapis", "meadow", "ink", "coral"]);
+var STALE_DAYS = 90;
+var NEW_DAYS = 14;
+var CHANNELS = Object.freeze([
+  { id: "topik", tone: "lapis", name: L3("TOPIK", "TOPIK"), sub: L3("시험 일정, 접수, 성적 쓰는 법", "Test dates, registration and using your score") },
+  { id: "visa", tone: "ink", name: L3("비자와 서류", "Visas and documents"), sub: L3("유학 비자, 잔고 증명, 서류 확인", "Student visas, proof of funds and document checks") },
+  { id: "scholarship", tone: "meadow", name: L3("장학금", "Scholarships"), sub: L3("정부 장학금, 대학 장학금, 모집 시기", "Government and university scholarships and when they open") },
+  { id: "scam", tone: "coral", name: L3("사기 주의", "Scam alerts"), sub: L3("가짜 유학원 가리는 법, 공식 창구", "Spotting fake agencies and finding the official desks") },
+  { id: "univ", tone: "lapis", name: L3("대학 소식", "University news"), sub: L3("공개 모집 요강의 접수 일정", "Application dates from published admissions guides") }
+].map(Object.freeze));
+var COLLECTING = Object.freeze([L3("한국 생활", "Life in Korea"), L3("취업", "Jobs"), L3("선배 이야기", "Stories from seniors"), L3("부모님 방", "For parents")]);
+var freezePost = (p) => Object.freeze({ ...p, points: Object.freeze([...p.points]), dates: Object.freeze((p.dates || []).map(Object.freeze)) });
+var KVAC_D22 = "https://www.visaforkorea.mn/ko/study-visa-d-2-1d-2-4";
+var POSTS = Object.freeze([
+  {
+    id: "topik-mn-2026-results",
+    channel: "topik",
+    status: "official",
+    title: L3("몽골에서 본 하반기 TOPIK 성적은 12월에 나와요", "Scores from the autumn TOPIK tests in Mongolia come out in December"),
+    points: [
+      L3("PBT 제108회(10월 18일 시험) 성적은 12월 10일, 제109회(11월 15일 시험) 성적은 12월 22일에 나와요.", "PBT round 108 (tested Oct 18) results come out on Dec 10, and round 109 (tested Nov 15) on Dec 22."),
+      L3("IBT 제16회는 11월 28일 몽골국립대학교에서 치르고 성적은 12월 18일에 나와요. 이 회차 접수는 끝났어요.", "IBT round 16 is held at the National University of Mongolia on Nov 28, with results on Dec 18. Registration for it has closed."),
+      L3("TOPIK 성적은 성적 발표일로부터 2년 동안 유효해요.", "TOPIK scores are valid for two years from the results date.")
+    ],
+    source: { title: L3("TOPIK 누리집 시험 일정", "TOPIK official test schedule"), url: "https://www.topik.go.kr/TWGUID/TWGUID0020.do?searchGubun=ALL" },
+    checkedAt: "2026-11-21",
+    postedAt: "2026-11-21",
+    dates: [
+      { id: "topik-ibt16-exam-mn", kind: "exam", start: "2026-11-28", label: L3("IBT 제16회 시험(몽골)", "IBT round 16 test (Mongolia)"), url: "https://topik.mn/ibt/Home/Content/3" },
+      { id: "topik-pbt108-result", kind: "result", start: "2026-12-10", label: L3("PBT 제108회 성적 발표", "PBT round 108 results") },
+      { id: "topik-ibt16-result", kind: "result", start: "2026-12-18", label: L3("IBT 제16회 성적 발표", "IBT round 16 results") },
+      { id: "topik-pbt109-result", kind: "result", start: "2026-12-22", label: L3("PBT 제109회 성적 발표", "PBT round 109 results") }
+    ],
+    forYou: "topikExam",
+    action: { label: L3("TOPIK 누리집 열기", "Open the TOPIK site"), url: "https://www.topik.go.kr/" }
+  },
+  {
+    id: "topik-2027-plan",
+    channel: "topik",
+    status: "official",
+    title: L3("2027년 TOPIK 일정이 나왔어요. 몽골 회차는 1월에 공지돼요", "2027 TOPIK dates are out. Mongolia rounds will be announced in January"),
+    points: [
+      L3("2027년에는 PBT가 제110회부터 제115회까지 여섯 번, IBT가 제17회부터 제22회까지 여섯 번 열려요(교육부 공고 제2026-419호).", "In 2027 there are six PBT rounds (110–115) and six IBT rounds (17–22), under Ministry of Education notice 2026-419."),
+      L3("몽골에서 어느 회차를 여는지와 몽골 접수 기간은 아직 공지되지 않았어요. 국외 PBT 시행 국가와 접수처는 2027년 1월 중 TOPIK 누리집에 올라와요.", "Which rounds run in Mongolia, and when registration opens there, has not been announced. Overseas PBT countries and registration offices will be posted on the TOPIK site in January 2027."),
+      L3("몽골 접수 기간은 한국 국내와 달라요. 2026년 제109회는 몽골 접수가 8월 17~21일, 국내 접수가 9월 1~7일이었어요. 몽골에서는 topik.mn에서 접수해요.", "Registration in Mongolia runs on different dates from Korea. For round 109 in 2026, Mongolia took registrations Aug 17–21 while Korea took them Sep 1–7. In Mongolia you register at topik.mn.")
+    ],
+    source: { title: L3("TOPIK 누리집 「2027년 한국어능력시험 시행계획 공고」", "TOPIK site: 2027 TOPIK administration plan"), url: "https://www.topik.go.kr/TWINFO/TWINFO0011.do?bbsId=BBSMSTR00076&nttId=140003" },
+    checkedAt: "2026-11-21",
+    postedAt: "2026-11-21",
+    dates: [],
+    forYou: null,
+    action: { label: L3("몽골 TOPIK 접수처(topik.mn)", "TOPIK registration in Mongolia (topik.mn)"), url: "https://topik.mn/" }
+  },
+  {
+    id: "visa-funds-proof",
+    channel: "visa",
+    status: "official",
+    title: L3("유학 비자 잔고 증명, 얼마를 얼마 동안", "Proof of funds for a student visa: how much, and for how long"),
+    points: [
+      L3("유학(D-2)과 어학연수(D-4) 비자를 신청할 때 은행 잔고 증명이 필요해요. 금액은 비자 종류와 대학이 수도권인지에 따라 달라요.", "Student (D-2) and language training (D-4) visas need proof of funds. The amount depends on the visa and on whether the school is in the Seoul area."),
+      L3("몽골에서 신청할 때는 예치(잔고) 증명서와 본인이나 부모의 몽골 은행 계좌 거래내역서를 내요. 언제 발급받는지와 얼마 동안 유지하는지에도 조건이 있어요.", "In Mongolia you submit a deposit (balance) certificate and the statement of your own or a parent’s Mongolian bank account. There are rules on when it is issued and how long the money is kept."),
+      L3("법무부가 TOPIK 4급이 있으면 이 증명을 면제하는 계획을 발표했지만 시행일은 정해지지 않았어요. 지금은 증명이 필요해요.", "The Ministry of Justice has announced a plan to waive this proof for TOPIK level 4, but no start date has been set. For now the proof is required.")
+    ],
+    // KVAC에서 읽은 사실은 출처 줄(법무부)과 따로 날짜와 함께 적는다.
+    note: L3("KVAC 몽골 유학(D-2) 서류 목록 7번 칸(2026-11-22 확인): 예치증명서와 본인 또는 부모의 몽골 은행 계좌 거래내역서. 같은 칸에 「우수 인증 대학은 해당되지 않음」이라고 적혀 있어요. 내 학교가 해당되는지는 아래 KVAC 서류 목록에서 확인하세요.", "KVAC Mongolia student visa (D-2) list, item 7 (checked 2026-11-22): a deposit certificate and the transaction statement of your own or a parent’s Mongolian bank account. The same item says it does not apply to top-certified universities. Check whether your school counts in the KVAC list below."),
+    source: { title: L3("법무부 2026-10-07 보도자료(별첨의 현행 기준)", "Ministry of Justice press release, 2026-10-07 (current rules in the annex)"), url: "https://www.moj.go.kr/bbs/moj/182/611170/artclView.do" },
+    checkedAt: "2026-11-21",
+    postedAt: "2026-11-21",
+    dates: [],
+    forYou: "finance",
+    action: { label: L3("KVAC 유학 비자 서류 목록", "KVAC student visa document list"), url: KVAC_D22 }
+  },
+  {
+    id: "visa-docs-mn",
+    channel: "visa",
+    status: "official",
+    title: L3("몽골에서 유학 비자를 낼 때 챙길 서류", "Documents for a student visa applied for in Mongolia"),
+    points: [
+      L3("KVAC 서류 목록에는 학력 서류를 「아포스티유 확인을 받은 서류」로 내라고 적혀 있어요. 몽골 학교 졸업자는 원본으로 되는지 문구가 분명하지 않으니 KVAC에 먼저 물어보세요.", "The KVAC list asks for academic documents “with an Apostille”. The wording on whether graduates of Mongolian schools may submit originals is unclear, so ask KVAC first."),
+      L3("결핵진단서가 필요해요. 대사관이 지정한 울란바토르 병원 아홉 곳에서 받을 수 있고, 병원 목록은 KVAC 누리집에 있어요.", "A tuberculosis certificate is required. You can get it at nine Ulaanbaatar hospitals designated by the embassy; the list is on the KVAC site."),
+      L3("몽골어 서류에는 번역본과 번역자 신분증 사본, 「번역자 확인서」를 함께 내요. 심사는 20일 걸리고, KVAC에 본인이 직접 접수할 수 있어요.", "Mongolian-language documents need a translation, a copy of the translator’s ID and a translator’s confirmation form. Review takes 20 days, and you can apply at KVAC yourself.")
+    ],
+    source: { title: L3("KVAC 몽골 「유학(D-2-1~D-2-4)」 서류 목록", "KVAC Mongolia: Study visa (D-2-1 to D-2-4) documents"), url: KVAC_D22 },
+    checkedAt: "2026-11-21",
+    postedAt: "2026-11-21",
+    dates: [],
+    forYou: null,
+    action: { label: L3("KVAC 유학 비자 서류 목록", "KVAC student visa document list"), url: KVAC_D22 }
+  },
+  {
+    id: "gks-2027-u",
+    channel: "scholarship",
+    status: "official",
+    title: L3("2027 정부초청장학생(GKS) 학부: 대사관 접수는 끝났고 1월 7일 발표", "2027 GKS undergraduate: embassy applications have closed, results on Jan 7"),
+    points: [
+      L3("2027 학부 장학생 대사관 전형은 몽골에서 4명을 뽑아요. 일반 전형 2명, 지방 대학에만 지원하는 R-GKS 전형 2명이에요. 접수는 2026년 9월 15~30일에 끝났어요.", "The 2027 undergraduate embassy track selects 4 students from Mongolia: 2 in the general track and 2 in R-GKS, which applies to regional universities only. Applications ran Sep 15–30, 2026 and have closed."),
+      L3("지원 조건은 만 25세 미만(2002년 3월 1일 이후 출생), 고등학교 졸업 또는 졸업 예정, 본인과 부모 모두 외국 국적이에요. TOPIK 3급 이상이면 가산점이 있어요.", "You must be under 25 (born on or after Mar 1, 2002), have finished or be finishing high school, and you and both parents must hold non-Korean nationality. TOPIK level 3 or higher earns extra points."),
+      L3("장학생은 한국어연수 1년과 학위 과정 동안 등록금(학기당 500만 원 한도), 왕복 항공료, 학업장려금(학위 기간 한 해 1,440만 원)을 받아요. 최종 합격 발표는 2027년 1월 7일 예정이에요.", "Scholars get one year of Korean training plus the degree, with tuition (up to ₩5,000,000 a semester), round-trip airfare and a stipend (₩14,400,000 a year during the degree). Final results are planned for Jan 7, 2027.")
+    ],
+    source: { title: L3("주몽골 한국대사관 「2027 정부초청 외국인(몽골국적) 학부 장학생 모집」", "Korean Embassy in Mongolia: 2027 GKS undergraduate call"), url: "https://overseas.mofa.go.kr/mn-ko/brd/m_373/view.do?seq=1339551" },
+    checkedAt: "2026-11-21",
+    postedAt: "2026-11-21",
+    dates: [{ id: "gks-2027-u-final", kind: "result", start: "2027-01-07", label: L3("GKS 학부 최종 합격 발표(예정)", "GKS undergraduate final results (planned)") }],
+    forYou: "gksGrade",
+    criteria: { gradePct: 80, of: L3("고등학교 전 학년 성적", "all high school years"), other: L3("또는 석차 상위 20% 안, 또는 CGPA 2.64/4.0 이상", "or the top 20% of your class, or a CGPA of 2.64/4.0 or higher") },
+    action: null
+  },
+  {
+    id: "gks-2027-g",
+    channel: "scholarship",
+    status: "official",
+    title: L3("2027 GKS 대학원 장학생은 아직 공고 전이에요", "2027 GKS graduate scholarships have not been announced yet"),
+    points: [
+      L3("2027 대학원 장학생 요강은 2026년 11월 21일 현재 Study in Korea에 올라오지 않았어요. 2026년에는 2월 2일에 요강이 올라왔어요.", "As of Nov 21, 2026 the 2027 graduate guidelines are not on Study in Korea. In 2026 they were posted on Feb 2."),
+      L3("2026년 몽골 대사관 전형은 2월 12~25일에 접수했고 일반과정 13명을 뽑았어요.", "In 2026 the Mongolia embassy track took applications Feb 12–25 and selected 13 students for the general program."),
+      L3("2026년 기준 지원 조건은 40세 미만, 학사 또는 석사 졸업, 직전 과정 평균 80% 이상이에요. 2027년 요강이 나오면 다시 확인하세요.", "The 2026 requirements were: under 40, a bachelor’s or master’s degree, and an average of 80% or higher in your last program. Check again when the 2027 guidelines come out.")
+    ],
+    source: { title: L3("Study in Korea 「정부초청 장학금」 안내", "Study in Korea: Government scholarships"), url: "https://www.studyinkorea.go.kr/ko/plan/scholarship.do" },
+    checkedAt: "2026-11-21",
+    postedAt: "2026-11-21",
+    dates: [],
+    forYou: null,
+    action: null
+  },
+  {
+    id: "scam-visa-guarantee",
+    channel: "scam",
+    status: "official",
+    title: L3("「비자를 받아 준다」는 말은 믿지 마세요", "Do not trust anyone who promises you a visa"),
+    points: [
+      L3("비자는 대사관이 심사해서 내줘요. KVAC는 어떤 개인이나 제3자도 비자 발급을 보장할 수 없다고 공지했어요(2026-01-23).", "Visas are reviewed and issued by the embassy. KVAC has announced that no individual or third party can guarantee a visa (2026-01-23)."),
+      L3("KVAC 예약은 무료이고 이메일과 전화로만 받아요. 비자 수수료와 서비스 수수료는 신청할 때 KVAC에서 내고 영수증을 받아요.", "KVAC appointments are free and taken only by email and phone. Visa and service fees are paid at KVAC when you apply, and you get a receipt."),
+      L3("대사관은 정해진 수수료보다 많은 돈을 요구하면 사기라고 경고했어요(2026-02-06 취업비자 안내). 의심스러우면 대사관이나 KVAC에 알리세요.", "The embassy has warned that asking for more than the set fee is a scam (2026-02-06, work visa notice). If something seems wrong, tell the embassy or KVAC.")
+    ],
+    source: { title: L3("KVAC 몽골 「Important Notices」", "KVAC Mongolia: Important Notices"), url: "https://www.visaforkorea.mn/important-notices" },
+    checkedAt: "2026-11-21",
+    postedAt: "2026-11-21",
+    dates: [],
+    forYou: null,
+    action: { label: L3("KVAC 공식 누리집", "KVAC official site"), url: "https://www.visaforkorea.mn/" }
+  },
+  {
+    id: "scam-check-university",
+    channel: "scam",
+    status: "official",
+    title: L3("지원하기 전에 인증 대학인지 확인하세요", "Check that the university is certified before you apply"),
+    points: [
+      L3("교육부와 법무부가 교육국제화역량을 인증한 대학은 학위과정 181곳, 어학연수과정 123곳이에요. 인증 기간은 2026년 3월부터 2030년 2월까지지만, 해마다 점검해 기준에 못 미치면 인증이 취소되니 지원할 때 명단을 다시 확인하세요.", "The Ministry of Education and the Ministry of Justice have certified 181 universities for degree programs and 123 for language programs, from Mar 2026 to Feb 2030. Certification is checked every year and can be withdrawn, so check the list again when you apply."),
+      L3("2026년 2학기부터 1년 동안 비자 발급이 제한되는 대학이 학위과정 16곳, 어학연수과정 4곳 있어요. 같은 대학도 과정마다 따로 정해지니 내가 갈 과정으로 확인하세요.", "For one year from the second semester of 2026, visas are restricted at 16 universities for degree programs and 4 for language programs. Degree and language tracks are judged separately, so check the track you plan to join."),
+      L3("KVAC도 학생비자를 신청하기 전에 Study in Korea의 인증 대학 명단에서 학교를 확인하라고 안내해요.", "KVAC also tells students to check the school against the certified list on Study in Korea before applying for a student visa.")
+    ],
+    source: { title: L3("법무부 · 교육부 「2025년 교육국제화역량 인증 결과」 보도자료(2026-02-12)", "Ministries of Justice and Education: 2025 certification results (2026-02-12)"), url: "https://www.moj.go.kr/bbs/moj/182/603491/artclView.do" },
+    checkedAt: "2026-11-21",
+    postedAt: "2026-11-21",
+    dates: [],
+    forYou: null,
+    action: { label: L3("Study in Korea 인증 대학 명단", "Study in Korea certified list"), url: "https://www.studyinkorea.go.kr/ko/plan/certifiedUniversity.do" }
+  },
+  {
+    id: "scam-agency-registration",
+    channel: "scam",
+    status: "announced",
+    title: L3("해외 유학원 등록제는 아직 계획이에요", "Registration of overseas study agencies is still only a plan"),
+    points: [
+      L3("법무부는 2026-10-07에 재외공관과 함께 요건을 갖춘 현지 유학원을 골라 공개하고 관리하는 「해외 유학원 등록제」 계획을 발표했어요.", "On 2026-10-07 the Ministry of Justice announced a plan to select, publish and manage qualified local study agencies together with embassies."),
+      L3("추진 일정은 「2027년 하반기까지」로 적혀 있고 시행일은 정해지지 않았어요. 시범 운영할 공관도 공개되지 않았어요.", "The plan says “by the second half of 2027”; no start date has been set, and the pilot embassies have not been named."),
+      L3("법무부는 도입 이유로 유학원의 과도한 수수료, 부정확한 정보, 허위 서류 작성을 들었어요. 시행 전인 지금은 대학 요강과 KVAC 안내를 직접 확인하세요.", "The ministry cited excessive agency fees, inaccurate information and false documents. Until it starts, check university guides and KVAC notices yourself.")
+    ],
+    source: { title: L3("법무부 2026-10-07 보도자료", "Ministry of Justice press release, 2026-10-07"), url: "https://www.moj.go.kr/bbs/moj/182/611170/artclView.do" },
+    checkedAt: "2026-11-21",
+    postedAt: "2026-11-21",
+    dates: [],
+    forYou: null,
+    action: null
+  }
+].map((p) => freezePost(p)));
+var MON = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+function monthDay(d, en, baseYear) {
+  const [y, m, day] = d.split("-").map(Number), yr = baseYear !== void 0 && y !== baseYear;
+  return en ? `${MON[m - 1]} ${day}${yr ? `, ${y}` : ""}` : `${yr ? `${y}년 ` : ""}${m}월 ${day}일`;
+}
+function univPosts(programs) {
+  return programs.filter((p) => !p.example && Array.isArray(p.applyRounds) && p.applyRounds.length).map((p) => {
+    const rounds = p.applyRounds, many = rounds.length > 1, base = Number(rounds[0][0].slice(0, 4));
+    const span = (r, en) => `${monthDay(r[0], en, base)} – ${monthDay(r[1], en, base)}`;
+    const roundsText = L3(
+      `접수 기간(${base}년): ${rounds.map((r, i) => `${many ? `${i + 1}차 ` : ""}${span(r, false)}`).join(", ")}.`,
+      `Application periods (${base}): ${rounds.map((r, i) => `${many ? `round ${i + 1} ` : ""}${span(r, true)}`).join(", ")}.`
+    );
+    const who = L3(`${p.name.ko}${p.level !== "language" ? " 학부" : ""}`, `${p.name.en}${p.level !== "language" ? " undergraduate" : ""}`);
+    const korean = p.requires.topik ? L3(`TOPIK ${p.requires.topik}급 이상이 필요해요. 다른 길도 있는지 요강에서 확인하세요.`, `TOPIK level ${p.requires.topik} or higher is required. Check the guide for other ways to qualify.`) : L3("한국어 성적이 없어도 지원할 수 있어요.", "You can apply without a Korean test score.");
+    const ug = p.level !== "language";
+    return freezePost({
+      id: "univ-" + p.id,
+      channel: "univ",
+      status: "official",
+      title: L3(`${p.name.ko}${ug ? " 학부" : ""}${p.term ? ` ${p.term.ko}` : ""} 원서 접수`, `${p.name.en}${ug ? " undergraduate" : ""}${p.term ? `, ${p.term.en}` : ""}: applications`),
+      points: [roundsText, korean, L3("대학이 공개한 모집 요강에서 옮겼어요. SYNK와 협약한 대학은 아니에요.", "Taken from the university’s published admissions guide. Not a SYNK partner university.")],
+      source: p.source,
+      checkedAt: p.checkedAt,
+      postedAt: p.checkedAt,
+      dates: rounds.map((r, i) => ({ id: `univ-${p.id}-${r[0]}`, kind: "apply", start: r[0], end: r[1], label: many ? L3(`${i + 1}차 원서 접수`, `Round ${i + 1} applications`) : L3("원서 접수", "Applications"), who })),
+      // 과정 자료에는 요강 주소만 있고 접수처 주소가 없다(원광대 학부는 방문 · 우편 접수). 접수처 단추를 걸지 않는다.
+      forYou: "program",
+      programId: p.id,
+      action: null
+    });
+  });
+}
+function allPosts(programs, posts = POSTS) {
+  return [...posts, ...univPosts(programs)];
+}
+var dueDay = (d) => d.kind === "apply" ? d.end : d.start;
+var endDay = (d) => d.kind === "apply" ? d.end : d.start;
+function dateStatus(d, now = /* @__PURE__ */ new Date()) {
+  if (d.cancelled) return { state: "cancelled", days: null };
+  if (d.kind === "apply") {
+    const toStart = daysUntil(d.start, now);
+    if (toStart !== null && toStart > 0) return { state: "before", days: toStart };
+    const toEnd = daysUntil(d.end, now);
+    return toEnd === null ? { state: "past", days: null } : { state: "open", days: toEnd };
+  }
+  const days = daysUntil(d.start, now);
+  return days === null ? { state: "past", days: null } : { state: "soon", days };
+}
+function findDate(posts, id) {
+  for (const post2 of posts) for (const date of post2.dates) if (date.id === id) return { post: post2, date };
+  return null;
+}
+function upcomingDates(posts, saved, now = /* @__PURE__ */ new Date()) {
+  const rows = [];
+  let missing = 0;
+  for (const s of saved) {
+    const hit = findDate(posts, s.id);
+    if (!hit) {
+      missing++;
+      continue;
+    }
+    const d = hit.date, end = endDay(d);
+    const changed = s.start !== d.start || s.end !== end ? { start: s.start, end: s.end } : null;
+    const status = dateStatus(d, now);
+    rows.push({ ...hit, due: status.state === "before" ? d.start : dueDay(d), status, changed });
+  }
+  const byDue = (a, b) => a.due < b.due ? -1 : a.due > b.due ? 1 : 0;
+  const gone = (r) => r.status.state === "past" || r.status.state === "cancelled";
+  return { upcoming: rows.filter((r) => !gone(r)).sort(byDue), past: rows.filter(gone).sort(byDue).reverse(), missing };
+}
+function daysSince(dateText, now) {
+  const t2 = now instanceof Date ? now.getTime() : new Date(now).getTime();
+  return Math.floor((t2 + 9 * 36e5) / 864e5) - Date.parse(dateText + "T00:00:00Z") / 864e5;
+}
+function isStalePost(post2, now = /* @__PURE__ */ new Date(), days = STALE_DAYS) {
+  return daysSince(post2.checkedAt, now) > days;
+}
+function isNewPost(post2, now = /* @__PURE__ */ new Date(), days = NEW_DAYS) {
+  return daysSince(post2.postedAt, now) < days;
+}
+function nextDate(post2, now = /* @__PURE__ */ new Date()) {
+  let best = null;
+  for (const d of post2.dates) {
+    const st = dateStatus(d, now);
+    if (st.state === "past" || st.state === "cancelled") continue;
+    const due = st.state === "before" ? d.start : dueDay(d);
+    if (!best || due < best.due) best = { date: d, status: st, due };
+  }
+  return best;
+}
+var newest = (a, b) => a.postedAt < b.postedAt ? 1 : a.postedAt > b.postedAt ? -1 : 0;
+function featuredPost(posts, now = /* @__PURE__ */ new Date()) {
+  let best = null;
+  for (const p of posts) {
+    const n = nextDate(p, now);
+    if (n && (!best || n.due < best.due)) best = { post: p, due: n.due };
+  }
+  return best ? best.post : [...posts].sort(newest)[0] || null;
+}
+function latestPosts(posts, channelsOff = [], n = 2) {
+  return posts.filter((p) => !channelsOff.includes(p.channel)).sort(newest).slice(0, n);
+}
+function postById(posts, id) {
+  return posts.find((p) => p.id === id) || null;
 }
 
 // experiences/path-app/match.mjs
@@ -3818,49 +4149,304 @@ function routes(profile2, programs, rules, now = /* @__PURE__ */ new Date()) {
   return { languageFirst: summarize(of("language")), direct: summarize(of("undergraduate")) };
 }
 
-// experiences/path-app/study-ui.mjs
-var STUDY_FILTERS = Object.freeze(["all", "fit", "language", "undergraduate"]);
-var GRADE_MAX = 100;
-var FUNDS_MAX_MAN = 2e4;
+// experiences/path-app/channel-ui.mjs
 var esc3 = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
 var svg = (p) => `<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">${p}</svg>`;
 var GO = svg('<path d="M4 10h11.5M11 5.5 15.5 10 11 14.5"/>');
 var BACK = svg('<path d="M12.5 4.5 7 10l5.5 5.5"/>');
 var NEXT = svg('<path d="M7.5 4.5 13 10l-5.5 5.5"/>');
+var ICON = {
+  topik: svg('<path d="M4 15.5 13.5 6l1.5 1.5L5.5 17H4z"/><path d="M12 7.5 13.5 9"/>'),
+  visa: svg('<path d="M6 3h6l3 3v11H6z"/><path d="M12 3v3h3M8.5 10h4M8.5 13h4"/>'),
+  scholarship: svg('<path d="M10 3.5l1.9 4 4.3.5-3.2 2.9.9 4.3L10 13.1l-3.9 2.1.9-4.3L3.8 8l4.3-.5z"/>'),
+  scam: svg('<path d="M10 3.5 17 16H3z"/><path d="M10 8.5v3.5M10 14.2v.1"/>'),
+  univ: svg('<path d="M2.5 8 10 4.5 17.5 8 10 11.5z"/><path d="M5.5 9.5v4c1.2 1.2 2.7 1.8 4.5 1.8s3.3-.6 4.5-1.8v-4"/>')
+};
+var ON = svg('<path d="m5 10.4 3.2 3.1L15 6.6"/>');
+var CAL = svg('<rect x="3.5" y="4.5" width="13" height="12" rx="2"/><path d="M3.5 8.5h13M7 3v3M13 3v3"/>');
+function ctx(view) {
+  const now = view.now || /* @__PURE__ */ new Date();
+  const en = view.lang === "en";
+  const L4 = (ko, e) => en ? e : ko;
+  const pick2 = (o) => o ? en ? o.en : o.ko : "";
+  const won = (n) => en ? `₩${n.toLocaleString("en-US")}` : n < 1e4 ? `${n.toLocaleString("ko-KR")}원` : n % 1e4 === 0 ? `${(n / 1e4).toLocaleString("ko-KR")}만 원` : `${Math.floor(n / 1e4).toLocaleString("ko-KR")}만 ${(n % 1e4).toLocaleString("ko-KR")}원`;
+  const thisYear = Number(new Date((now instanceof Date ? now.getTime() : new Date(now).getTime()) + 9 * 36e5).toISOString().slice(0, 4));
+  const md = (d) => monthDay(d, en, thisYear);
+  return { now, en, L: L4, pick: pick2, won, md, posts: view.posts || [], programs: view.programs || [], rules: view.rules || [], profile: view.profile, lang: en ? "en" : "ko", condOn: view.condOn !== false, persisted: view.persisted !== false, note: typeof view.note === "string" ? view.note : "" };
+}
+var channelOf = (id) => CHANNELS.find((c) => c.id === id) || null;
+var newTab = (T2) => `<span class="sr-only"> (${T2.L("새 탭에서 열림", "opens in new tab")})</span>`;
+var promise = (T2) => `<p class="sx-fine">${T2.L("이 결과는 입학이나 비자, 장학금 선발을 약속하지 않아요. 마지막 판단은 대학과 출입국, 장학 기관이 해요.", "This does not promise admission, a visa or a scholarship. The university, the immigration office and the scholarship body make the final decision.")}</p>`;
+var storeLine = (T2) => T2.persisted ? `<p class="sx-fine sx-store-line">${T2.L("넣은 날은 이 탭에만 있어요. 탭을 닫거나 로그아웃하면 사라지니 달력에도 넣어 두세요.", "Dates you add stay in this tab only. They disappear when you close the tab or sign out, so add them to your calendar too.")}</p>` : `<p class="sx-store is-warn sx-store-line">${T2.L("이 브라우저에서는 저장할 수 없어서 넣은 날을 지금 화면에서만 기억해요. 새로 고치면 사라지니 달력에 넣어 두세요.", "This browser cannot store dates, so they are remembered on this screen only and are lost on reload. Add them to your calendar.")}</p>`;
+function leftText(status, T2) {
+  const n = status.days, days = (k) => T2.L(`${k}일`, `${k} day${k === 1 ? "" : "s"}`);
+  switch (status.state) {
+    case "before":
+      return { shown: T2.L(`시작 D-${n}`, `Opens in ${days(n)}`), said: T2.L(`${n}일 뒤 접수 시작`, `Opens in ${days(n)}`) };
+    case "open":
+      return n === 0 ? { shown: T2.L("오늘 마감", "Closes today"), said: T2.L("오늘 마감", "Closes today") } : { shown: T2.L(`마감 D-${n}`, `${days(n)} left`), said: T2.L(`마감까지 ${n}일 남음`, `${days(n)} left to apply`) };
+    case "soon":
+      return n === 0 ? { shown: T2.L("오늘", "Today"), said: T2.L("오늘", "Today") } : { shown: T2.L(`D-${n}`, `${days(n)} left`), said: T2.L(`${n}일 남음`, `${days(n)} left`) };
+    case "cancelled":
+      return { shown: T2.L("취소됨", "Cancelled"), said: T2.L("취소됨", "Cancelled") };
+    default:
+      return { shown: T2.L("지남", "Past"), said: T2.L("지난 날", "Past") };
+  }
+}
+function spanText(d, T2) {
+  if (d.kind !== "apply") return T2.md(d.start);
+  const [sy, sm] = d.start.split("-"), [ey, em, ed] = d.end.split("-");
+  if (!T2.en && sy === ey && sm === em) return `${T2.md(d.start)}~${Number(ed)}일`;
+  return `${T2.md(d.start)} – ${T2.md(d.end)}`;
+}
+var near = (st) => (st.state === "open" || st.state === "soon") && st.days !== null && st.days <= 14;
+function dayBox(d, st, T2) {
+  const day = st.state === "before" ? d.start : dueDay(d);
+  const [, m, dd] = day.split("-").map(Number);
+  return `<span class="sx-day${near(st) ? " is-near" : ""}" aria-hidden="true"><small>${T2.en ? ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"][m - 1] : `${m}월`}</small><b>${dd}</b></span>`;
+}
+function forYouLines(post2, view) {
+  const T2 = view.T || ctx(view), p = T2.profile || {};
+  const enter = (what) => ({ text: T2.L(`${what.ko}을 넣으면 나란히 보여 줘요.`, `Enter ${what.en} to see it side by side.`), cond: true });
+  if (post2.forYou === "program") {
+    const prog = programById(T2.programs, post2.programId);
+    if (!prog) return [];
+    if (isEmptyProfile(p)) return [{ text: T2.L("내 조건(한국어, 성적, 학력, 준비한 돈)을 넣으면 이 과정과 맞춰 봐요.", "Enter your conditions (Korean, grades, education, funds) to compare them with this program."), cond: true }];
+    const m = matchProgram(p, prog, T2.rules);
+    return [{ text: T2.L(`내 조건 4개 중 ${m.okCount}개 맞음. 「확인 필요」는 맞음으로 세지 않아요.`, `${m.okCount} of 4 conditions met. “To check” is not counted as met.`) }];
+  }
+  if (post2.forYou === "finance") {
+    const lines = [];
+    for (const [visa, name] of [["D-4", T2.L("어학연수(D-4)", "Language training (D-4)")], ["D-2", T2.L("유학(D-2)", "Study (D-2)")]]) {
+      const parts = [["local", T2.L("지방 대학", "outside Seoul area")], ["metro", T2.L("수도권 대학", "Seoul area")]].map(([region, label]) => {
+        const r = financeRule(T2.rules, visa, region);
+        if (!r) return null;
+        const firm = r.inCurrentGuide === true && !r.stale;
+        return firm ? `${label} ${T2.won(r.won)}` : `${label} ${T2.L("금액 확인 중(비교하지 않음)", "amount being confirmed (not compared)")}`;
+      }).filter(Boolean);
+      if (parts.length) lines.push({ text: `${name}: ${parts.join(", ")}` });
+    }
+    lines.push(p.fundsWon === null || p.fundsWon === void 0 ? enter({ ko: "준비한 돈", en: "your funds" }) : { text: T2.L(`내 값: ${T2.won(p.fundsWon)}`, `Yours: ${T2.won(p.fundsWon)}`) });
+    const proof = proofRule(T2.rules, "D-2");
+    if (proof) lines.push({ text: T2.L(`잔고 증명서는 비자 신청일 기준 ${proof.issuedWithinDays}일 안에 발급받고, 그 금액을 ${proof.heldDays}일 이상 유지해야 해요.`, `The balance certificate must be issued within ${proof.issuedWithinDays} days of the visa application, and the amount kept for at least ${proof.heldDays} days.`) });
+    const waiver = announcedRules(T2.rules, "finance-waiver")[0];
+    if (waiver) lines.push({ text: T2.L(`계획 발표: TOPIK ${waiver.topik}급이 있으면 이 증명을 면제하는 계획이 ${waiver.basis}에 발표됐어요. 시행일은 정해지지 않아 대조에 쓰지 않았어요.`, `Announced plan: waiving this proof for TOPIK level ${waiver.topik} was announced on ${waiver.basis}. No start date has been set, so it is not used here.`), plan: true });
+    return lines;
+  }
+  if (post2.forYou === "gksGrade") {
+    const c = post2.criteria;
+    const rule = { text: T2.L(`기준: ${c.of ? `${c.of.ko} ` : ""}평균 ${c.gradePct}% 이상${c.other ? ` (${c.other.ko})` : ""}`, `Requirement: ${c.of ? `${c.of.en}, ` : ""}average of ${c.gradePct}% or higher${c.other ? ` (${c.other.en})` : ""}`) };
+    return [rule, p.gradePct === null || p.gradePct === void 0 ? enter({ ko: "성적 평균", en: "your grade average" }) : { text: T2.L(`내 값: 평균 ${p.gradePct}%`, `Yours: ${p.gradePct}% average`) }];
+  }
+  if (post2.forYou === "topikExam") {
+    const results = post2.dates.filter((d) => d.kind === "result" && !d.cancelled);
+    const exam = (d) => T2.pick(d.label).replace(/ 성적 발표$| results$/, "");
+    const rows = [];
+    for (const prog of T2.programs) {
+      if (prog.example || !Array.isArray(prog.applyRounds)) continue;
+      prog.applyRounds.forEach((round, i) => {
+        if (dateStatus({ kind: "apply", start: round[0], end: round[1] }, T2.now).state === "past") return;
+        const before = results.filter((r) => round[1] > r.start);
+        if (!before.length) return;
+        const name = `${T2.pick(prog.name)}${prog.level === "language" ? "" : T2.L(" 학부", " undergraduate")}${prog.applyRounds.length > 1 ? T2.L(` ${i + 1}차`, ` round ${i + 1}`) : ""}`;
+        rows.push({ end: round[1], text: T2.L(`${name}(${T2.md(round[1])} 마감): ${before.map(exam).join(", ")}`, `${name} (closes ${T2.md(round[1])}): ${before.map(exam).join(", ")}`) });
+      });
+    }
+    rows.sort((x, y) => x.end < y.end ? -1 : x.end > y.end ? 1 : 0);
+    const lines = rows.length ? [{ text: T2.L("지금 목록의 접수 가운데 마감 전에 성적이 나오는 곳이에요.", "Listed applications that close after these results come out:"), lead: true }, ...rows.map((r) => ({ text: r.text }))] : [{ text: T2.L("지금 목록에는 이 성적 발표 뒤에 마감하는 접수가 없어요.", "No listed application closes after these results.") }];
+    lines.push({ text: T2.L("성적표를 언제까지 내야 하는지는 과정마다 달라요. 요강에서 확인하세요.", "Each program sets its own deadline for score reports. Check the guide.") });
+    return lines;
+  }
+  return [];
+}
+function forYouCard(post2, T2) {
+  const lines = forYouLines(post2, { T: T2 }).filter((l) => T2.condOn || !l.cond);
+  if (!lines.length) return "";
+  const cond2 = T2.condOn && lines.some((l) => l.cond) ? `<button type="button" class="sx-link" data-action="nav" data-page="cond">${T2.L("내 조건 넣기", "Enter my conditions")}${NEXT}</button>` : "";
+  return `<section class="sx-card butter sx-foryou"><p class="sx-k">${T2.L("내게 해당되나요?", "Does this apply to me?")}</p>${lines.filter((l) => l.lead).map((l) => `<p class="sx-fy-lead">${esc3(l.text)}</p>`).join("")}<ul>${lines.filter((l) => !l.lead).map((l) => `<li${l.plan ? ' class="is-plan"' : ""}>${esc3(l.text)}</li>`).join("")}</ul>${cond2}${post2.programId ? `<button type="button" class="sx-link" data-action="univOpen" data-id="${esc3(post2.programId)}">${T2.L("과정 자세히 보기", "See program details")}${NEXT}</button>` : ""}${promise(T2)}</section>`;
+}
+function dateRow(post2, d, T2, saved) {
+  const st = dateStatus(d, T2.now), left = leftText(st, T2), on = saved.some((s) => s.id === d.id);
+  const gone = st.state === "past" || st.state === "cancelled";
+  const name = T2.pick(d.label);
+  const add = gone && !on ? "" : `<button type="button" class="sx-btn2 sm" aria-pressed="${on}" data-action="dateToggle" data-id="${esc3(d.id)}"><span class="sx-on">${ON}</span>${T2.L("내 길에 넣기", "Add to my path")}<span class="sr-only"> ${esc3(name)}</span></button>`;
+  const cal = gone ? "" : `<button type="button" class="sx-btn2 sm line" data-action="dateIcs" data-id="${esc3(d.id)}">${CAL}${T2.L("달력에 넣기", "Add to calendar")}<span class="sr-only"> ${esc3(name)}</span></button>`;
+  return `<li class="sx-dayrow${gone ? " is-gone" : ""}">${dayBox(d, st, T2)}<span class="sx-day-main"><b>${esc3(name)}</b><small>${esc3(spanText(d, T2))}</small>${d.url ? `<a class="sx-src-a" href="${esc3(d.url)}" target="_blank" rel="noopener noreferrer">${T2.L("원문", "Source")}${newTab(T2)}</a>` : ""}</span><span class="sx-dleft${near(st) ? " is-near" : ""}"><span aria-hidden="true">${esc3(left.shown)}</span><span class="sr-only">${esc3(left.said)}</span></span>${add || cal ? `<span class="sx-day-acts">${add}${cal}</span>` : ""}</li>`;
+}
+function cover(channel, T2) {
+  return `<span class="sx-cover is-${esc3(channel.tone)}" aria-hidden="true"><span>${esc3(channel.name.en.toUpperCase())}</span></span>`;
+}
+function postTag(post2, T2) {
+  const n = nextDate(post2, T2.now);
+  if (!n) return "";
+  return `${T2.pick(n.date.label)} · ${leftText(n.status, T2).shown}`;
+}
+function renderChannels(view) {
+  const T2 = ctx(view), profile2 = T2.profile || {}, off = profile2.channelsOff || [];
+  const one = view.channelId ? channelOf(view.channelId) : null;
+  if (one) {
+    const list = T2.posts.filter((p) => p.channel === one.id);
+    const rows2 = list.map((p) => {
+      const n = nextDate(p, T2.now), fresh = isNewPost(p, T2.now);
+      return `<li><button type="button" class="sx-postrow" data-action="postOpen" data-id="${esc3(p.id)}"><span class="sx-postrow-main"><b>${fresh ? `<span class="sx-tag is-ok">${T2.L("새 글", "New")}</span> ` : ""}${p.status === "announced" ? `<span class="sx-tag is-check">${T2.L("계획 발표", "Announced plan")}</span> ` : ""}${esc3(T2.pick(p.title))}</b><small>${T2.L("확인", "Checked")} ${esc3(p.checkedAt)}${n ? ` · ${esc3(T2.pick(n.date.label))} ${esc3(leftText(n.status, T2).shown)}` : ""}</small></span><span class="sx-go-s" aria-hidden="true">${NEXT}</span></button></li>`;
+    }).join("");
+    return `<div class="sx"><button type="button" class="sx-back" data-action="channelOpen" data-id="">${BACK}${T2.L("채널", "News")}</button>
+<header class="sx-head"><p class="sx-kicker"><span class="sx-ic is-${esc3(one.tone)}">${ICON[one.id]}</span>${esc3(T2.pick(one.sub))}</p><h1 class="sx-title page-title" tabindex="-1">${esc3(T2.pick(one.name))}</h1></header>
+${showButton(one, off, T2)}
+${list.length ? `<ul class="sx-postlist">${rows2}</ul>` : `<p class="sx-note">${T2.L("이 채널에는 아직 글이 없어요.", "No posts in this channel yet.")}</p>`}${promise(T2)}</div>`;
+  }
+  const feat = featuredPost(T2.posts, T2.now);
+  const featCh = feat && channelOf(feat.channel);
+  const hero = feat && featCh ? `<button type="button" class="sx-photo sx-feature" data-action="postOpen" data-id="${esc3(feat.id)}">${cover(featCh, T2)}<span class="sx-photo-body"><span class="sx-tag white">${esc3(T2.pick(featCh.name))}${postTag(feat, T2) ? ` · ${esc3(postTag(feat, T2))}` : ""}</span><b>${esc3(T2.pick(feat.title))}</b><small>${esc3(T2.pick(feat.points[0]))}</small></span></button>` : "";
+  const rows = CHANNELS.map((c) => {
+    const list = T2.posts.filter((p) => p.channel === c.id);
+    if (!list.length) return "";
+    const fresh = list.filter((p) => isNewPost(p, T2.now)).length;
+    return `<li class="sx-chrow"><button type="button" class="sx-ch" data-action="channelOpen" data-id="${esc3(c.id)}"><span class="sx-ic is-${esc3(c.tone)}">${ICON[c.id]}</span><span class="sx-ch-main"><b>${esc3(T2.pick(c.name))}</b><small>${esc3(T2.pick(c.sub))} · ${T2.L(`글 ${list.length}개`, `${list.length} post${list.length === 1 ? "" : "s"}`)}${fresh ? T2.L(` · 새 글 ${fresh}`, ` · ${fresh} new`) : ""}</small></span></button>${showButton(c, off, T2)}</li>`;
+  }).join("");
+  return `<div class="sx sx-wide"><header class="sx-head"><h1 class="sx-title page-title" tabindex="-1">${T2.L("채널", "News")}</h1><p class="sx-lead">${T2.L("한국 유학 소식을 주제별로 모았어요. 모든 글에 공식 출처와 확인한 날이 붙어 있어요.", "Study-in-Korea news by topic. Every post shows its official source and the date we checked it.")}</p></header>
+${hero}
+<h2 class="sx-h">${T2.L("채널", "Channels")}</h2><ul class="sx-chlist">${rows}</ul>
+<p class="sx-fine">${T2.L("글을 모으는 중:", "Collecting posts:")} ${COLLECTING.map((x) => esc3(T2.pick(x))).join(", ")}</p></div>`;
+}
+function showButton(c, off, T2) {
+  const on = !off.includes(c.id);
+  return `<button type="button" class="sx-btn2 sm sx-show" aria-pressed="${on}" data-action="channelShow" data-id="${esc3(c.id)}"><span class="sx-on">${ON}</span>${T2.L("오늘 화면에 보이기", "Show on Today")}<span class="sr-only"> ${esc3(T2.pick(c.name))}</span></button>`;
+}
+function renderPost(view) {
+  const T2 = ctx(view), profile2 = T2.profile || {}, p = postById(T2.posts, view.postId);
+  const back = (c2) => `<button type="button" class="sx-back" data-action="channelOpen" data-id="${c2 ? esc3(c2.id) : ""}">${BACK}${c2 ? esc3(T2.pick(c2.name)) : T2.L("채널", "News")}</button>`;
+  if (!p) return `<div class="sx">${back(null)}<h1 class="sx-title page-title" tabindex="-1">${T2.L("글을 찾지 못했어요.", "Post not found.")}</h1></div>`;
+  const c = channelOf(p.channel), saved = profile2.dates || [];
+  const stale = isStalePost(p, T2.now) ? `<p class="sx-note is-box">${T2.L("확인한 지 90일이 지났어요. 날짜는 공식 안내에서 다시 확인하세요.", "This was checked more than 90 days ago. Check the dates in the official notice.")}</p>` : "";
+  const live = p.dates.some((d) => {
+    const st = dateStatus(d, T2.now).state;
+    return st !== "past" && st !== "cancelled";
+  });
+  const dates = p.dates.length ? `<h2 class="sx-h" id="sx-dates-h" tabindex="-1">${T2.L("날짜", "Dates")}</h2>${T2.note ? `<p class="sx-store is-warn sx-date-note">${esc3(T2.note)}</p>` : ""}${live ? storeLine(T2) : ""}<ul class="sx-days">${p.dates.map((d) => dateRow(p, d, T2, saved)).join("")}</ul>` : "";
+  const action = p.action ? `<a class="sx-cta" href="${esc3(p.action.url)}" target="_blank" rel="noopener noreferrer">${esc3(T2.pick(p.action.label))}${newTab(T2)} ${GO}</a><p class="sx-fine">${T2.L("공식 쪽으로 연결해요. 접수와 신청은 본인이 직접 해요.", "This opens the official site. You apply yourself.")}</p>` : "";
+  const tag2 = postTag(p, T2);
+  return `<div class="sx">${back(c)}
+<div class="sx-photo is-hero sx-post-hero">${cover(c, T2)}${tag2 ? `<span class="sx-photo-body"><span class="sx-tag white">${esc3(tag2)}</span></span>` : ""}</div>
+<p class="sx-kicker">${esc3(T2.pick(c.name))} · ${T2.L("올린 날", "Posted")} ${esc3(p.postedAt)}${p.status === "announced" ? ` <span class="sx-tag is-check">${T2.L("계획 발표 · 시행일 미정", "Announced plan · no start date")}</span>` : ""}</p>
+<h1 class="sx-title page-title" tabindex="-1">${esc3(T2.pick(p.title))}</h1>${stale}
+<ol class="sx-points">${p.points.map((x) => `<li>${esc3(T2.pick(x))}</li>`).join("")}</ol>
+${p.note ? `<p class="sx-note is-box">${esc3(T2.pick(p.note))}</p>` : ""}
+<p class="sx-src"><b>${T2.L("출처", "Source")}</b> <a href="${esc3(p.source.url)}" target="_blank" rel="noopener noreferrer">${esc3(T2.pick(p.source.title))}${newTab(T2)}</a> · ${T2.L("확인", "checked")} ${esc3(p.checkedAt)}</p>
+${forYouCard(p, T2)}${dates}${action}</div>`;
+}
+function renderUpcoming(view) {
+  const T2 = ctx(view), saved = T2.profile && T2.profile.dates || [];
+  if (!saved.length) return "";
+  const { upcoming, past, missing } = upcomingDates(T2.posts, saved, T2.now);
+  const row = (r) => {
+    const left = leftText(r.status, T2);
+    const changed = r.changed ? `<span class="sx-changed">${T2.L(`날짜가 바뀌었어요(전에 본 날 ${spanText({ kind: r.date.kind, start: r.changed.start, end: r.changed.end }, T2)})`, `Date changed (you saw ${spanText({ kind: r.date.kind, start: r.changed.start, end: r.changed.end }, T2)})`)} <button type="button" class="sx-link sm" data-action="dateConfirm" data-id="${esc3(r.date.id)}">${T2.L("확인했어요", "Got it")}<span class="sr-only"> ${esc3(T2.pick(r.date.label))}</span></button></span>` : "";
+    return `<li class="sx-dayrow${r.status.state === "past" || r.status.state === "cancelled" ? " is-gone" : ""}"><button type="button" class="sx-dayrow-btn" data-action="postOpen" data-id="${esc3(r.post.id)}" data-date="${esc3(r.date.id)}">${dayBox(r.date, r.status, T2)}<span class="sx-day-main"><b>${esc3(T2.pick(r.date.label))}</b><small>${esc3(spanText(r.date, T2))} · ${esc3(T2.pick(r.post.title))}</small></span><span class="sx-dleft${near(r.status) ? " is-near" : ""}"><span aria-hidden="true">${esc3(left.shown)}</span><span class="sr-only">${esc3(left.said)}</span></span></button>${changed}</li>`;
+  };
+  const gone = missing ? `<p class="sx-note">${T2.L(`글에서 빠지거나 바뀐 날이 ${missing}개 있어요.`, `${missing} saved date${missing === 1 ? " was" : "s were"} removed or changed in the posts.`)} <button type="button" class="sx-link sm" data-action="datesClean">${T2.L("목록에서 지우기", "Remove from list")}</button></p>` : "";
+  const pastList = past.length ? `<details class="sx-past"><summary>${T2.L(`지난 날 ${past.length}개`, `${past.length} past date${past.length === 1 ? "" : "s"}`)}</summary><ul class="sx-days">${past.map(row).join("")}</ul></details>` : "";
+  return `<section class="sx sx-today" aria-labelledby="sx-up-h"><h2 class="sx-h" id="sx-up-h" tabindex="-1">${T2.L("다가오는 날", "Coming up")}</h2>${storeLine(T2)}
+${upcoming.length ? `<ul class="sx-days">${upcoming.map(row).join("")}</ul>` : `<p class="sx-note">${T2.L("다가오는 날이 없어요.", "Nothing coming up.")}</p>`}${gone}${pastList}</section>`;
+}
+function renderNews(view) {
+  const T2 = ctx(view), off = T2.profile && T2.profile.channelsOff || [];
+  const list = latestPosts(T2.posts, off, 2);
+  if (!list.length) return "";
+  return `<section class="sx sx-today" aria-labelledby="sx-news-h"><div class="sx-h-row"><h2 class="sx-h" id="sx-news-h">${T2.L("새 소식", "Latest news")}</h2><button type="button" class="sx-link" data-action="nav" data-page="channels">${T2.L("채널 모두 보기", "All news")}${NEXT}</button></div>
+<div class="sx-news">${list.map((p) => {
+    const c = channelOf(p.channel);
+    return `<button type="button" class="sx-newsbtn" data-action="postOpen" data-id="${esc3(p.id)}"><span class="sx-ic is-${esc3(c.tone)}">${ICON[c.id]}</span><small>${esc3(T2.pick(c.name))}</small><b>${esc3(T2.pick(p.title))}</b></button>`;
+  }).join("")}</div></section>`;
+}
+var icsEscape = (s) => String(s).replace(/\\/g, "\\\\").replace(/;/g, "\\;").replace(/,/g, "\\,").replace(/\r?\n/g, "\\n");
+function fold(line) {
+  const enc = new TextEncoder(), out = [];
+  let cur = "", bytes = 0;
+  for (const ch of line) {
+    const b = enc.encode(ch).length, limit = out.length ? 74 : 75;
+    if (bytes + b > limit) {
+      out.push(cur);
+      cur = "";
+      bytes = 0;
+    }
+    cur += ch;
+    bytes += b;
+  }
+  out.push(cur);
+  return out.join("\r\n ");
+}
+var nextDay = (d) => new Date(Date.parse(d + "T00:00:00Z") + 864e5).toISOString().slice(0, 10);
+function icsText(post2, date, lang, stamp = /* @__PURE__ */ new Date()) {
+  const en = lang === "en", pick2 = (o) => en ? o.en : o.ko;
+  const day = endDay(date), compact = (d) => d.replace(/-/g, "");
+  const dt = (stamp instanceof Date ? stamp : new Date(stamp)).toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, "");
+  const name = date.who ? en ? `${pick2(date.label)} (${pick2(date.who)})` : `${pick2(date.who)} ${pick2(date.label)}` : pick2(date.label);
+  const what = date.kind === "apply" ? en ? `Deadline: ${name}` : `${name} 마감` : name;
+  const desc = `${pick2(post2.title)}
+${en ? "Source" : "출처"}: ${post2.source.url}
+${en ? "Check the official notice before you act." : "움직이기 전에 공식 안내를 다시 확인하세요."}`;
+  return [
+    "BEGIN:VCALENDAR",
+    "VERSION:2.0",
+    "PRODID:-//SYNK//PATH study//" + (en ? "EN" : "KO"),
+    "CALSCALE:GREGORIAN",
+    "BEGIN:VEVENT",
+    `UID:${date.id}@path.synk.im`,
+    `DTSTAMP:${dt}`,
+    `DTSTART;VALUE=DATE:${compact(day)}`,
+    `DTEND;VALUE=DATE:${compact(nextDay(day))}`,
+    `SUMMARY:${icsEscape(what)}`,
+    `DESCRIPTION:${icsEscape(desc)}`,
+    `URL:${post2.source.url}`,
+    "END:VEVENT",
+    "END:VCALENDAR"
+  ].map(fold).join("\r\n") + "\r\n";
+}
+
+// experiences/path-app/study-ui.mjs
+var STUDY_FILTERS = Object.freeze(["all", "fit", "language", "undergraduate"]);
+var GRADE_MAX = 100;
+var FUNDS_MAX_MAN = 2e4;
+var esc4 = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+var svg2 = (p) => `<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">${p}</svg>`;
+var GO2 = svg2('<path d="M4 10h11.5M11 5.5 15.5 10 11 14.5"/>');
+var BACK2 = svg2('<path d="M12.5 4.5 7 10l5.5 5.5"/>');
+var NEXT2 = svg2('<path d="M7.5 4.5 13 10l-5.5 5.5"/>');
 var STATUS = { ok: ["맞음", "Met"], lack: ["부족", "Short"], check: ["확인 필요", "To check"] };
 var KEY_NAME = { education: ["학력", "Education"], grade: ["성적", "Grades"], topik: ["한국어", "Korean"], finance: ["재정", "Funds"] };
 var EDU = { graduated: ["고등학교 졸업", "Finished high school"], expected: ["졸업 예정", "Graduating soon"], none: ["아직 아님", "Not yet"] };
 var LEVEL = { language: ["어학 과정", "Language program"], undergraduate: ["학부", "Undergraduate"] };
-function ctx(view) {
+function ctx2(view) {
   const now = view.now || /* @__PURE__ */ new Date();
   const en = view.lang === "en";
-  const L3 = (ko, e) => en ? e : ko;
+  const L4 = (ko, e) => en ? e : ko;
   const pick2 = (o) => o ? en ? o.en : o.ko : "";
   const pair = (a) => en ? a[1] : a[0];
   const won = (n) => en ? `₩${n.toLocaleString("en-US")}` : n < 1e4 ? `${n.toLocaleString("ko-KR")}원` : n % 1e4 === 0 ? `${(n / 1e4).toLocaleString("ko-KR")}만 원` : `${Math.floor(n / 1e4).toLocaleString("ko-KR")}만 ${(n % 1e4).toLocaleString("ko-KR")}원`;
-  const topik = (n) => n === null || n === void 0 ? L3("아직 안 넣음", "Not entered") : n === 0 ? L3("성적 없음", "No score yet") : L3(`TOPIK ${n}급`, `TOPIK level ${n}`);
+  const topik = (n) => n === null || n === void 0 ? L4("아직 안 넣음", "Not entered") : n === 0 ? L4("성적 없음", "No score yet") : L4(`TOPIK ${n}급`, `TOPIK level ${n}`);
   const programs = view.programs || PROGRAMS;
   const rules = view.rules || rulesAt(RULES, now);
   const profile2 = view.profile;
   const allExample = programs.length > 0 && programs.every((p) => p.example);
   const anyPartner = programs.some((p) => p.partner === true);
-  const fitText = (n) => allExample ? L3(`개의 예시 과정이 지금 조건에 맞아요 (예시 ${programs.length}개 중)`, `of ${programs.length} example programs fit your conditions`) : L3("개 과정이 지금 조건에 맞아요", n === 1 ? "program fits your conditions" : "programs fit your conditions");
+  const fitText = (n) => allExample ? L4(`개의 예시 과정이 지금 조건에 맞아요 (예시 ${programs.length}개 중)`, `of ${programs.length} example programs fit your conditions`) : L4("개 과정이 지금 조건에 맞아요", n === 1 ? "program fits your conditions" : "programs fit your conditions");
   const needs = countNeeds(programs);
-  const needWord = needs.length === 2 ? L3("성적과 한국어를", "your grades and Korean level") : needs[0] === "gradePct" ? L3("성적을", "your grades") : L3("한국어 급수를", "your Korean level");
-  const MON = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  const needWord = needs.length === 2 ? L4("성적과 한국어를", "your grades and Korean level") : needs[0] === "gradePct" ? L4("성적을", "your grades") : L4("한국어 급수를", "your Korean level");
+  const MON2 = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
   const md = (d) => {
     const [, m, day] = d.split("-").map(Number);
-    return L3(`${m}월 ${day}일`, `${MON[m - 1]} ${day}`);
+    return L4(`${m}월 ${day}일`, `${MON2[m - 1]} ${day}`);
   };
-  return { now, en, L: L3, pick: pick2, pair, won, topik, programs, rules, profile: profile2, allExample, anyPartner, fitText, needs, needWord, md };
+  return { now, en, L: L4, pick: pick2, pair, won, topik, programs, rules, profile: profile2, allExample, anyPartner, fitText, needs, needWord, md };
 }
 var tag = (status, T2) => `<span class="sx-tag is-${status}">${T2.pair(STATUS[status])}</span>`;
-var meter = (match, T2) => `<span class="sx-meter" role="img" aria-label="${esc3(match.items.map((i) => `${T2.pair(KEY_NAME[i.key])} ${T2.pair(STATUS[i.status])}`).join(", "))}">${match.items.map((i) => `<i class="is-${i.status}"></i>`).join("")}</span>`;
+var meter = (match, T2) => `<span class="sx-meter" role="img" aria-label="${esc4(match.items.map((i) => `${T2.pair(KEY_NAME[i.key])} ${T2.pair(STATUS[i.status])}`).join(", "))}">${match.items.map((i) => `<i class="is-${i.status}"></i>`).join("")}</span>`;
 var exampleTag = (p, T2) => p.example ? `<span class="sx-tag wait">${T2.L("예시", "Example")}</span>` : "";
-var image = (p) => p.image ? `<img class="sx-img" src="./assets/${esc3(p.image)}.webp" alt="" width="960" height="640">` : `<span class="sx-cover is-${esc3(p.tone || "lapis")}" aria-hidden="true"><span>${esc3(p.place.en.split(",")[0].toUpperCase())}</span></span>`;
-var newTab = (T2) => `<span class="sr-only"> (${T2.L("새 탭에서 열림", "opens in new tab")})</span>`;
-var sourceLine = (rule, T2) => `<p class="sx-src"><b>${T2.L("출처", "Source")}</b> <a href="${esc3(rule.source.url)}" target="_blank" rel="noopener noreferrer">${esc3(T2.pick(rule.source.title))}${newTab(T2)}</a> · ${T2.L(`${rule.basis} 시행 · 확인 ${rule.checkedAt}`, `in force from ${rule.basis} · checked ${rule.checkedAt}`)}</p>`;
-var promise = (T2) => `<p class="sx-fine">${T2.L("이 결과는 입학이나 비자를 약속하지 않아요. 마지막 판단은 대학과 출입국이 해요.", "This comparison does not promise admission or a visa. The university and immigration office make the final decision.")}</p>`;
+var image = (p) => p.image ? `<img class="sx-img" src="./assets/${esc4(p.image)}.webp" alt="" width="960" height="640">` : `<span class="sx-cover is-${esc4(p.tone || "lapis")}" aria-hidden="true"><span>${esc4(p.place.en.split(",")[0].toUpperCase())}</span></span>`;
+var newTab2 = (T2) => `<span class="sr-only"> (${T2.L("새 탭에서 열림", "opens in new tab")})</span>`;
+var sourceLine = (rule, T2) => `<p class="sx-src"><b>${T2.L("출처", "Source")}</b> <a href="${esc4(rule.source.url)}" target="_blank" rel="noopener noreferrer">${esc4(T2.pick(rule.source.title))}${newTab2(T2)}</a> · ${T2.L(`${rule.basis} 시행 · 확인 ${rule.checkedAt}`, `in force from ${rule.basis} · checked ${rule.checkedAt}`)}</p>`;
+var promise2 = (T2) => `<p class="sx-fine">${T2.L("이 결과는 입학이나 비자를 약속하지 않아요. 마지막 판단은 대학과 출입국이 해요.", "This comparison does not promise admission or a visa. The university and immigration office make the final decision.")}</p>`;
 var inRound = (w, T2) => (ko, en) => w.round ? T2.L(`${w.round}차 ${ko}`, `Round ${w.round} ${en[0].toLowerCase()}${en.slice(1)}`) : T2.L(ko, en);
 var opens = (p, T2) => {
   const w = applyWindow(p, T2.now), R = inRound(w, T2);
@@ -3908,28 +4494,28 @@ function filterPrograms(profile2, filter, programs = PROGRAMS, rules = RULES) {
   return programs.filter((p) => filter === "all" || p.level === filter);
 }
 function studyCountSay(view) {
-  const T2 = ctx(view), n = countFit(T2.profile, T2.programs, T2.rules);
+  const T2 = ctx2(view), n = countFit(T2.profile, T2.programs, T2.rules);
   return n === null ? T2.L(`${T2.needWord} 넣으면 맞는 과정을 세어 줘요.`, `Enter ${T2.needWord} to count the programs that fit.`) : T2.L(`지금 조건에 맞는 과정 ${n}개`, `${n} program${n === 1 ? " fits" : "s fit"} your conditions`);
 }
 function renderStudyEntry(view) {
-  const T2 = ctx(view), empty = isEmptyProfile(T2.profile), n = countFit(T2.profile, T2.programs, T2.rules);
+  const T2 = ctx2(view), empty = isEmptyProfile(T2.profile), n = countFit(T2.profile, T2.programs, T2.rules);
   const title = T2.allExample ? T2.L("예시 과정으로 내 조건 맞춰 보기", "Try your conditions on example programs") : n === null ? T2.L("내 조건으로 갈 수 있는 대학을 알아봐요", "See which schools fit your conditions") : T2.L(`지금 조건에 맞는 과정 ${n}개`, `${n} program${n === 1 ? " fits" : "s fit"} your conditions`);
   const sub = T2.allExample ? T2.L("협력 대학은 준비 중이에요. 한국어, 성적, 준비한 돈을 넣어 미리 맞춰 볼 수 있어요.", "Partner universities are being prepared. Enter your Korean level, grades and funds to try it in advance.") : n === null ? T2.L("한국어, 성적, 준비한 돈을 넣으면 맞는 과정과 모자란 것을 알려 줘요.", "Enter your Korean level, grades and funds to see what fits and what is missing.") : uncheckedNote(T2) || T2.L("조건을 바꾸면 바로 다시 계산해요.", "Change a condition and it recalculates right away.");
-  return `<section class="sx sx-entry" aria-label="${T2.L("대학", "Schools")}"><button type="button" class="sx-entry-btn" data-action="nav" data-page="${empty ? "cond" : "univ"}"><span><b>${esc3(title)}</b><small>${esc3(sub)}</small></span><span class="sx-go" aria-hidden="true">${GO}</span></button></section>`;
+  return `<section class="sx sx-entry" aria-label="${T2.L("대학", "Schools")}"><button type="button" class="sx-entry-btn" data-action="nav" data-page="${empty ? "cond" : "univ"}"><span><b>${esc4(title)}</b><small>${esc4(sub)}</small></span><span class="sx-go" aria-hidden="true">${GO2}</span></button></section>`;
 }
 function countCard(T2) {
   const n = countFit(T2.profile, T2.programs, T2.rules);
   if (n === null) {
-    return `<section class="sx-card lapis"><h2>${T2.L(`${T2.needWord} 넣으면 맞는 과정을 세어 줘요.`, `Enter ${T2.needWord} to count the programs that fit.`)}</h2><p>${T2.L("학력과 준비한 돈도 넣으면 그 조건이 모자란 과정은 빼고 세요.", "If you also enter your education and funds, programs where those fall short are left out.")}</p><button type="button" class="sx-cta" data-action="nav" data-page="cond">${T2.L("내 조건 넣기", "Enter my conditions")} ${GO}</button></section>`;
+    return `<section class="sx-card lapis"><h2>${T2.L(`${T2.needWord} 넣으면 맞는 과정을 세어 줘요.`, `Enter ${T2.needWord} to count the programs that fit.`)}</h2><p>${T2.L("학력과 준비한 돈도 넣으면 그 조건이 모자란 과정은 빼고 세요.", "If you also enter your education and funds, programs where those fall short are left out.")}</p><button type="button" class="sx-cta" data-action="nav" data-page="cond">${T2.L("내 조건 넣기", "Enter my conditions")} ${GO2}</button></section>`;
   }
-  return `<section class="sx-card lapis"><p class="sx-k">${T2.L("지금 조건으로", "With your conditions now")}</p><p class="sx-big"><b>${n}</b><span>${esc3(T2.fitText(n))}</span></p><p>${T2.L("넣은 조건 가운데 모자란 것이 없는 과정을 셌어요.", "Counted programs where none of the conditions you entered fall short.")}${uncheckedNote(T2) ? ` ${esc3(uncheckedNote(T2))}` : ""}</p><button type="button" class="sx-btn2" data-action="nav" data-page="cond">${T2.L("내 조건 바꿔 보기", "Change my conditions")}</button></section>`;
+  return `<section class="sx-card lapis"><p class="sx-k">${T2.L("지금 조건으로", "With your conditions now")}</p><p class="sx-big"><b>${n}</b><span>${esc4(T2.fitText(n))}</span></p><p>${T2.L("넣은 조건 가운데 모자란 것이 없는 과정을 셌어요.", "Counted programs where none of the conditions you entered fall short.")}${uncheckedNote(T2) ? ` ${esc4(uncheckedNote(T2))}` : ""}</p><button type="button" class="sx-btn2" data-action="nav" data-page="cond">${T2.L("내 조건 바꿔 보기", "Change my conditions")}</button></section>`;
 }
 function renderUniv(view) {
-  const T2 = ctx(view), profile2 = T2.profile, empty = isEmptyProfile(profile2);
+  const T2 = ctx2(view), profile2 = T2.profile, empty = isEmptyProfile(profile2);
   const f = STUDY_FILTERS.includes(view.filter) ? view.filter : "all";
   const rank = { open: 0, before: 1, unknown: 2, closed: 3 };
   const list = filterPrograms(profile2, f, T2.programs, T2.rules).map((p, i) => [rank[applyWindow(p, T2.now).state], i, p]).sort((x, y) => x[0] - y[0] || x[1] - y[1]).map((x) => x[2]);
-  const chip = (id, label) => `<button type="button" class="sx-chip" aria-pressed="${f === id}" data-action="studyFilter" data-id="${id}">${esc3(label)}</button>`;
+  const chip = (id, label) => `<button type="button" class="sx-chip" aria-pressed="${f === id}" data-action="studyFilter" data-id="${id}">${esc4(label)}</button>`;
   const openGuide = !T2.allExample && !T2.anyPartner && T2.programs.length > 0;
   const kicker = openGuide ? `${T2.L("대학 공개 모집 요강", "Published admissions guides")} <span class="sx-tag wait">${T2.L("협력 대학 준비 중", "Partners coming soon")}</span>` : T2.anyPartner ? T2.L("협력 대학", "Partner universities") : `${T2.L("협력 대학", "Partner universities")} <span class="sx-tag wait">${T2.L("준비 중", "Coming soon")}</span>`;
   const leadText = T2.allExample ? T2.L("협력 대학은 준비 중이에요. 지금 보이는 과정은 화면을 미리 보이려고 넣은 예시이고, 실제 대학이 아니에요.", "Partner universities are being prepared. The programs below are examples to preview the screen, not real universities.") : openGuide ? T2.L("대학이 공개한 모집 요강에서 옮긴 정보예요. SYNK와 협약한 대학은 아직 없어요. 지원하기 전에 대학 원문을 꼭 확인하세요.", "This information is taken from each university’s published admissions guide. SYNK has no partner universities yet. Always check the university’s original guide before applying.") : "";
@@ -3937,92 +4523,92 @@ function renderUniv(view) {
   if (!T2.programs.length) return `<div class="sx sx-wide">${head2}<section class="sx-card"><h2>${T2.L("협력 대학을 준비하고 있어요.", "Partner universities are being prepared.")}</h2><p>${T2.L("준비되면 여기에서 조건과 비용을 맞춰 볼 수 있어요.", "Once ready, you can compare conditions and costs here.")}</p></section></div>`;
   const cards = list.map((p) => {
     const m = matchProgram(profile2, p, T2.rules), on = profile2.compare.includes(p.id), full = profile2.compare.length >= MAX_COMPARE && !on;
-    return `<li class="sx-ucard"><div class="sx-ucard-top"><button type="button" class="sx-photo" data-action="univOpen" data-id="${esc3(p.id)}">${image(p)}<span class="sx-photo-body"><small>${esc3(T2.pick(p.place))} · ${T2.pair(LEVEL[p.level])}${p.term ? ` · ${esc3(T2.pick(p.term))}` : ""}</small><b>${esc3(T2.pick(p.name))}</b></span></button><button type="button" class="sx-pick" aria-pressed="${on}" data-action="studyCompare" data-id="${esc3(p.id)}"${full ? " disabled" : ""}>${on ? T2.L("비교에 담음", "In compare") : T2.L("비교", "Compare")}<span class="sr-only"> ${esc3(T2.pick(p.name))}</span></button></div>
-<dl class="sx-facts"><div><dt>${p.level === "language" ? T2.L("한 해 수업료", "Tuition per year") : T2.L("한 해 등록금", "Tuition per year")}</dt><dd>${T2.won(p.costs.tuition)}</dd></div><div><dt>${T2.L("필요한 한국어", "Korean needed")}</dt><dd>${needKorean(p, T2)}</dd></div><div><dt>${T2.L("원서 접수", "Applications")}</dt><dd>${esc3(opens(p, T2))}</dd></div></dl>
+    return `<li class="sx-ucard"><div class="sx-ucard-top"><button type="button" class="sx-photo" data-action="univOpen" data-id="${esc4(p.id)}">${image(p)}<span class="sx-photo-body"><small>${esc4(T2.pick(p.place))} · ${T2.pair(LEVEL[p.level])}${p.term ? ` · ${esc4(T2.pick(p.term))}` : ""}</small><b>${esc4(T2.pick(p.name))}</b></span></button><button type="button" class="sx-pick" aria-pressed="${on}" data-action="studyCompare" data-id="${esc4(p.id)}"${full ? " disabled" : ""}>${on ? T2.L("비교에 담음", "In compare") : T2.L("비교", "Compare")}<span class="sr-only"> ${esc4(T2.pick(p.name))}</span></button></div>
+<dl class="sx-facts"><div><dt>${p.level === "language" ? T2.L("한 해 수업료", "Tuition per year") : T2.L("한 해 등록금", "Tuition per year")}</dt><dd>${T2.won(p.costs.tuition)}</dd></div><div><dt>${T2.L("필요한 한국어", "Korean needed")}</dt><dd>${needKorean(p, T2)}</dd></div><div><dt>${T2.L("원서 접수", "Applications")}</dt><dd>${esc4(opens(p, T2))}</dd></div></dl>
 <p class="sx-fitline"><span>${exampleTag(p, T2)} ${empty ? T2.L("내 조건을 넣으면 맞춰 봐요", "Enter your conditions to compare") : T2.L(`내 조건 4개 중 ${m.okCount}개 맞음`, `${m.okCount} of 4 conditions met`)}</span>${empty ? "" : meter(m, T2)}</p></li>`;
   }).join("");
   const none = list.length ? "" : `<section class="sx-card"><h2>${f === "fit" && !readyToCount(profile2, T2.programs) ? T2.L(`${T2.needWord} 넣으면 맞는 과정만 골라 볼 수 있어요.`, `Enter ${T2.needWord} to filter by fit.`) : f === "fit" ? T2.L("지금 조건에 맞는 과정이 아직 없어요.", "Nothing fits your conditions yet.") : T2.L("이 갈래의 과정은 아직 없어요.", "No programs in this category yet.")}</h2><p>${T2.L("전체 목록에서 과정을 열면 무엇이 모자란지 볼 수 있어요.", "Open a program in the full list to see what is missing.")}</p><div class="sx-row2"><button type="button" class="sx-btn2" data-action="nav" data-page="cond">${T2.L("내 조건 보기", "My conditions")}</button><button type="button" class="sx-btn2" data-action="studyFilter" data-id="all">${T2.L("전체 보기", "Show all")}</button></div></section>`;
-  const bar = profile2.compare.length >= 2 ? `<div class="sx-cmpbar"><button type="button" class="sx-cta butter" data-action="nav" data-page="univCompare">${T2.L(`${profile2.compare.length}곳 나란히 보기`, `Compare ${profile2.compare.length} side by side`)} ${GO}</button></div>` : profile2.compare.length === 1 ? `<p class="sx-fine">${T2.L("한 곳을 더 담으면 나란히 볼 수 있어요.", "Add one more to compare side by side.")}</p>` : "";
+  const bar = profile2.compare.length >= 2 ? `<div class="sx-cmpbar"><button type="button" class="sx-cta butter" data-action="nav" data-page="univCompare">${T2.L(`${profile2.compare.length}곳 나란히 보기`, `Compare ${profile2.compare.length} side by side`)} ${GO2}</button></div>` : profile2.compare.length === 1 ? `<p class="sx-fine">${T2.L("한 곳을 더 담으면 나란히 볼 수 있어요.", "Add one more to compare side by side.")}</p>` : "";
   return `<div class="sx sx-wide">${head2}
 ${countCard(T2)}
 <div class="sx-chips" role="group" aria-label="${T2.L("거르기", "Filter")}">${chip("all", T2.L(`전체 ${T2.programs.length}`, `All ${T2.programs.length}`))}${chip("fit", T2.L("조건이 맞는 과정", "Fits me"))}${chip("language", T2.pair(LEVEL.language))}${chip("undergraduate", T2.pair(LEVEL.undergraduate))}</div>
-${list.length ? `<ul class="sx-ulist">${cards}</ul>` : none}${bar}${promise(T2)}</div>`;
+${list.length ? `<ul class="sx-ulist">${cards}</ul>` : none}${bar}${promise2(T2)}</div>`;
 }
 function financeMore(i, T2, visa) {
   const waiver = announcedRules(T2.rules, "finance-waiver")[0];
-  const enter = i.mine === null ? `<button type="button" class="sx-link" data-action="nav" data-page="cond">${T2.L("준비한 돈 넣기", "Enter my funds")}${NEXT}</button>` : "";
+  const enter = i.mine === null ? `<button type="button" class="sx-link" data-action="nav" data-page="cond">${T2.L("준비한 돈 넣기", "Enter my funds")}${NEXT2}</button>` : "";
   let note = "";
   if (i.rule && !i.firm) {
     note = `<p class="sx-note">${i.rule.stale ? T2.L("이 금액을 확인한 지 오래돼 다시 확인하고 있어요. 그래서 맞는지 판정하지 않았어요.", "This amount was checked a while ago and is being re-checked, so it is not judged here.") : T2.L(`이 금액은 ${i.rule.basis}에 시행된 기준이에요. 지금 쓰는 안내에서도 같은지 확인하고 있어서 맞는지 판정하지 않았어요.`, `This amount took effect on ${i.rule.basis}. We are confirming it against the current guide, so it is not judged here.`)}${i.mine !== null && i.gap > 0 ? ` ${T2.L(`이 기준으로는 ${T2.won(i.gap)}이 더 필요해요.`, `By this figure, ${T2.won(i.gap)} more would be needed.`)}` : ""}</p>`;
   } else if (i.status === "lack") note = `<p class="sx-note">${T2.L(`${T2.won(i.gap)}이 더 필요해요.`, `${T2.won(i.gap)} more is needed.`)}</p>`;
-  const plan = waiver ? `<p class="sx-note plan"><b>${T2.L("계획 발표", "Announced plan")}</b> ${T2.L(`TOPIK ${waiver.topik}급이 있으면 이 증명을 면제하는 계획이 ${waiver.basis}에 발표됐어요. 시작하는 날은 아직 정해지지 않았어요.`, `A plan to waive this proof for TOPIK level ${waiver.topik} was announced on ${waiver.basis}. No start date has been set.`)} <a href="${esc3(waiver.source.url)}" target="_blank" rel="noopener noreferrer">${esc3(T2.pick(waiver.source.title))}${newTab(T2)}</a></p>` : "";
+  const plan = waiver ? `<p class="sx-note plan"><b>${T2.L("계획 발표", "Announced plan")}</b> ${T2.L(`TOPIK ${waiver.topik}급이 있으면 이 증명을 면제하는 계획이 ${waiver.basis}에 발표됐어요. 시작하는 날은 아직 정해지지 않았어요.`, `A plan to waive this proof for TOPIK level ${waiver.topik} was announced on ${waiver.basis}. No start date has been set.`)} <a href="${esc4(waiver.source.url)}" target="_blank" rel="noopener noreferrer">${esc4(T2.pick(waiver.source.title))}${newTab2(T2)}</a></p>` : "";
   const proof = proofRule(T2.rules, visa);
-  const how = proof ? `<p class="sx-note">${T2.L(`몽골에서 신청할 때는 본인이나 부모의 몽골 은행 잔고 증명서를 비자 신청일 기준 ${proof.issuedWithinDays}일 안에 발급받아 내고, 이 금액을 ${proof.heldDays}일 이상 유지해야 해요.`, `When applying in Mongolia, submit a balance certificate from your own or a parent’s Mongolian bank account issued within ${proof.issuedWithinDays} days of the visa application, and keep this amount for at least ${proof.heldDays} days.`)} <a href="${esc3(proof.source.url)}" target="_blank" rel="noopener noreferrer">${esc3(T2.pick(proof.source.title))}${newTab(T2)}</a></p>` : "";
+  const how = proof ? `<p class="sx-note">${T2.L(`몽골에서 신청할 때는 본인이나 부모의 몽골 은행 잔고 증명서를 비자 신청일 기준 ${proof.issuedWithinDays}일 안에 발급받아 내고, 이 금액을 ${proof.heldDays}일 이상 유지해야 해요.`, `When applying in Mongolia, submit a balance certificate from your own or a parent’s Mongolian bank account issued within ${proof.issuedWithinDays} days of the visa application, and keep this amount for at least ${proof.heldDays} days.`)} <a href="${esc4(proof.source.url)}" target="_blank" rel="noopener noreferrer">${esc4(T2.pick(proof.source.title))}${newTab2(T2)}</a></p>` : "";
   return enter + note + (i.rule ? sourceLine(i.rule, T2) : "") + how + plan;
 }
 function renderUnivDetail(view) {
-  const T2 = ctx(view), profile2 = T2.profile, p = programById(T2.programs, view.programId);
-  const back = `<button type="button" class="sx-back" data-action="nav" data-page="univ">${BACK}${T2.L("대학", "Schools")}</button>`;
+  const T2 = ctx2(view), profile2 = T2.profile, p = programById(T2.programs, view.programId);
+  const back = `<button type="button" class="sx-back" data-action="nav" data-page="univ">${BACK2}${T2.L("대학", "Schools")}</button>`;
   if (!p) return `<div class="sx">${back}<h1 class="sx-title page-title" tabindex="-1">${T2.L("과정을 찾지 못했어요.", "Program not found.")}</h1></div>`;
   const m = matchProgram(profile2, p, T2.rules), c = programCost(profile2, p), on = profile2.compare.includes(p.id), full = profile2.compare.length >= MAX_COMPARE && !on;
   const items = m.items.map((i) => {
     let more = "";
     if (i.key === "finance") more = financeMore(i, T2, p.visa);
-    else if (i.status === "check") more = `<button type="button" class="sx-link" data-action="nav" data-page="cond">${T2.L("내 조건에 넣기", "Enter it in my conditions")}${NEXT}</button>`;
+    else if (i.status === "check") more = `<button type="button" class="sx-link" data-action="nav" data-page="cond">${T2.L("내 조건에 넣기", "Enter it in my conditions")}${NEXT2}</button>`;
     else if (i.key === "topik" && i.status === "lack") more = `<p class="sx-note">${T2.L(`${i.gap}급을 더 올리면 맞아요.`, `${i.gap} more level${i.gap === 1 ? "" : "s"} to meet this.`)}</p>`;
     else if (i.key === "grade" && i.status === "lack") more = `<p class="sx-note">${T2.L(`${i.gap}%가 모자라요.`, `${i.gap}% short.`)}</p>`;
-    return `<li><div class="sx-match-top"><b>${T2.pair(KEY_NAME[i.key])}</b>${tag(i.status, T2)}</div><dl class="sx-match-grid"><div><dt>${T2.L("필요한 것", "Needed")}</dt><dd>${esc3(needText(i, T2))}</dd></div><div><dt>${T2.L("내 것", "Mine")}</dt><dd>${esc3(mineText(i, T2))}</dd></div></dl>${more}</li>`;
+    return `<li><div class="sx-match-top"><b>${T2.pair(KEY_NAME[i.key])}</b>${tag(i.status, T2)}</div><dl class="sx-match-grid"><div><dt>${T2.L("필요한 것", "Needed")}</dt><dd>${esc4(needText(i, T2))}</dd></div><div><dt>${T2.L("내 것", "Mine")}</dt><dd>${esc4(mineText(i, T2))}</dd></div></dl>${more}</li>`;
   }).join("");
   const pct = Math.round(c.rate * 100);
   const schNote = c.scholarship ? c.stepTopik === 0 ? T2.L(`신입생 모두에게 주는 장학금 ${T2.won(c.scholarship)}을 뺀 값이에요.`, `After the ${T2.won(c.scholarship)} scholarship every freshman receives.`) : c.rate === null ? T2.L(`한국어 ${c.stepTopik}급 장학금 ${T2.won(c.scholarship)}을 뺀 값이에요.`, `After the ${T2.won(c.scholarship)} scholarship for TOPIK level ${c.stepTopik}.`) : T2.L(`한국어 ${c.stepTopik}급 장학금 ${pct}%를 뺀 값이에요.`, `After the ${pct}% scholarship for TOPIK level ${c.stepTopik}.`) : !p.scholarship.length ? T2.L("이 과정은 한국어 급수 장학금이 없어요.", "This program has no Korean-level scholarship.") : profile2.topik === null ? T2.L("한국어 급수를 넣으면 장학금을 빼서 보여 줘요.", "Enter your Korean level to subtract the scholarship.") : p.scholarshipNote ? T2.L("지금 급수로 정해진 장학금은 없어요. 아래 장학금 안내를 확인하세요.", "No fixed scholarship at your current level. See the scholarship note below.") : T2.L("지금 급수로는 장학금이 없어요.", "No scholarship at your current level.");
   const next = c.nextLevel ? `<section class="sx-card meadow"><p class="sx-k">${T2.L("급수를 올리면", "If you raise your level")}</p><h2>${T2.L(`${c.nextLevel.topik}급이면 ${c.missing.length ? "확인된 비용의 합이" : "내가 낼 돈이"} ${T2.won(c.nextLevel.total)}으로 줄어요.`, `At level ${c.nextLevel.topik}, ${c.missing.length ? "the confirmed costs drop" : "what you pay drops"} to ${T2.won(c.nextLevel.total)}.`)}</h2></section>` : "";
   const unknownCost = (key) => key === "dorm" ? T2.L("합계에 없음 · 아래 안내", "Not in total · see note") : T2.L("대학이 안내하지 않음", "Not stated by the university");
-  const note = (o) => o ? `<p class="sx-note">${esc3(T2.pick(o))}</p>` : "";
-  const small = (o) => o ? `<p class="sx-note is-small">${esc3(T2.pick(o))}</p>` : "";
+  const note = (o) => o ? `<p class="sx-note">${esc4(T2.pick(o))}</p>` : "";
+  const small = (o) => o ? `<p class="sx-note is-small">${esc4(T2.pick(o))}</p>` : "";
   const missingNote = c.missing.length ? `<p class="sx-note">${T2.L(`합계에는 ${c.missing.length === 2 ? "기숙사비와 생활비가" : c.missing[0] === "dorm" ? "기숙사비가" : "생활비가"} 빠져 있어요.`, `The total does not include ${c.missing.map((k) => k === "dorm" ? "dormitory fees" : "living costs").join(" or ")}.`)}</p>` : "";
-  const realSource = !p.example && p.source ? `<p class="sx-src"><b>${T2.L("출처", "Source")}</b> <a href="${esc3(p.source.url)}" target="_blank" rel="noopener noreferrer">${esc3(T2.pick(p.source.title))}${newTab(T2)}</a> · ${T2.L("확인", "checked")} ${esc3(p.checkedAt)}</p>` : "";
+  const realSource = !p.example && p.source ? `<p class="sx-src"><b>${T2.L("출처", "Source")}</b> <a href="${esc4(p.source.url)}" target="_blank" rel="noopener noreferrer">${esc4(T2.pick(p.source.title))}${newTab2(T2)}</a> · ${T2.L("확인", "checked")} ${esc4(p.checkedAt)}</p>` : "";
   return `<div class="sx">${back}
-<div class="sx-photo is-hero">${image(p)}<span class="sx-photo-top">${exampleTag(p, T2)}<span class="sx-tag white">${esc3(opensLong(p, T2))}</span></span><span class="sx-photo-body"><small>${esc3(T2.pick(p.place))} · ${T2.pair(LEVEL[p.level])} · ${esc3(T2.pick(p.majors))}${p.term ? ` · ${esc3(T2.pick(p.term))}` : ""}</small></span></div>
-<h1 class="sx-title page-title" tabindex="-1">${esc3(T2.pick(p.name))}</h1>
+<div class="sx-photo is-hero">${image(p)}<span class="sx-photo-top">${exampleTag(p, T2)}<span class="sx-tag white">${esc4(opensLong(p, T2))}</span></span><span class="sx-photo-body"><small>${esc4(T2.pick(p.place))} · ${T2.pair(LEVEL[p.level])} · ${esc4(T2.pick(p.majors))}${p.term ? ` · ${esc4(T2.pick(p.term))}` : ""}</small></span></div>
+<h1 class="sx-title page-title" tabindex="-1">${esc4(T2.pick(p.name))}</h1>
 ${p.example ? `<p class="sx-lead">${T2.L("화면을 미리 보이려고 넣은 예시 과정이에요. 금액, 일정, 입학 조건은 실제 대학의 것이 아니에요.", "An example program to preview the screen. The amounts, dates and admission conditions are not from a real university.")}</p>` : `${p.partner ? "" : `<p class="sx-lead">${T2.L("대학이 공개한 모집 요강에서 옮긴 정보예요. SYNK와 협약한 대학은 아니에요. 지원하기 전에 원문을 꼭 확인하세요.", "Taken from the university’s published admissions guide. This is not a SYNK partner university. Check the original before applying.")}</p>`}${realSource}`}
-${p.applyNote ? `<p class="sx-note is-box"><b>${T2.L("원서 접수", "Applications")}</b> ${esc3(T2.pick(p.applyNote))}</p>` : ""}
+${p.applyNote ? `<p class="sx-note is-box"><b>${T2.L("원서 접수", "Applications")}</b> ${esc4(T2.pick(p.applyNote))}</p>` : ""}
 <h2 class="sx-h">${T2.L("내 조건과 맞춰 보기", "Compare with my conditions")} ${meter(m, T2)}</h2><ul class="sx-match">${items}</ul>${note(p.requiresNote)}
 <h2 class="sx-h">${T2.L("한 해에 드는 돈", "Cost for one year")} ${exampleTag(p, T2)}</h2>
-<div class="sx-hero-num"><small>${costLabel(c, T2)}</small><b>${T2.won(c.total)}</b><small>${esc3(schNote)}</small></div>
-<ul class="sx-money"><li><span>${p.level === "language" ? T2.L("수업료", "Tuition") : T2.L("등록금", "Tuition")}</span><span>${T2.won(c.tuition)}</span></li><li${c.dorm === null ? ' class="is-unknown"' : ""}><span>${T2.L("기숙사", "Dormitory")}${p.dormLabel && c.dorm !== null ? `<small>${esc3(T2.pick(p.dormLabel))}</small>` : ""}</span><span>${c.dorm === null ? unknownCost("dorm") : T2.won(c.dorm)}</span></li><li${c.living === null ? ' class="is-unknown"' : ""}><span>${T2.L("생활비", "Living costs")}</span><span>${c.living === null ? unknownCost("living") : T2.won(c.living)}</span></li>${c.scholarship ? `<li class="minus"><span>${T2.L("장학금", "Scholarship")}</span><span>− ${T2.won(c.scholarship)}</span></li>` : ""}</ul>${missingNote}${small(p.costsNote)}${small(p.scholarshipNote)}${next}
-<div class="sx-row2"><button type="button" class="sx-btn2" data-action="nav" data-page="cond">${T2.L("내 조건 바꿔 보기", "Change my conditions")}</button><button type="button" class="sx-btn2" aria-pressed="${on}" data-action="studyCompare" data-id="${esc3(p.id)}"${full ? " disabled" : ""}>${on ? T2.L("비교에 담음", "In compare") : T2.L("비교에 담기", "Add to compare")}</button></div>
-${profile2.compare.length >= 2 ? `<button type="button" class="sx-cta butter" data-action="nav" data-page="univCompare">${T2.L(`${profile2.compare.length}곳 나란히 보기`, `Compare ${profile2.compare.length} side by side`)} ${GO}</button>` : ""}${promise(T2)}</div>`;
+<div class="sx-hero-num"><small>${costLabel(c, T2)}</small><b>${T2.won(c.total)}</b><small>${esc4(schNote)}</small></div>
+<ul class="sx-money"><li><span>${p.level === "language" ? T2.L("수업료", "Tuition") : T2.L("등록금", "Tuition")}</span><span>${T2.won(c.tuition)}</span></li><li${c.dorm === null ? ' class="is-unknown"' : ""}><span>${T2.L("기숙사", "Dormitory")}${p.dormLabel && c.dorm !== null ? `<small>${esc4(T2.pick(p.dormLabel))}</small>` : ""}</span><span>${c.dorm === null ? unknownCost("dorm") : T2.won(c.dorm)}</span></li><li${c.living === null ? ' class="is-unknown"' : ""}><span>${T2.L("생활비", "Living costs")}</span><span>${c.living === null ? unknownCost("living") : T2.won(c.living)}</span></li>${c.scholarship ? `<li class="minus"><span>${T2.L("장학금", "Scholarship")}</span><span>− ${T2.won(c.scholarship)}</span></li>` : ""}</ul>${missingNote}${small(p.costsNote)}${small(p.scholarshipNote)}${next}
+<div class="sx-row2"><button type="button" class="sx-btn2" data-action="nav" data-page="cond">${T2.L("내 조건 바꿔 보기", "Change my conditions")}</button><button type="button" class="sx-btn2" aria-pressed="${on}" data-action="studyCompare" data-id="${esc4(p.id)}"${full ? " disabled" : ""}>${on ? T2.L("비교에 담음", "In compare") : T2.L("비교에 담기", "Add to compare")}</button></div>
+${profile2.compare.length >= 2 ? `<button type="button" class="sx-cta butter" data-action="nav" data-page="univCompare">${T2.L(`${profile2.compare.length}곳 나란히 보기`, `Compare ${profile2.compare.length} side by side`)} ${GO2}</button>` : ""}${promise2(T2)}</div>`;
 }
 function renderUnivCompare(view) {
-  const T2 = ctx(view), profile2 = T2.profile, list = profile2.compare.map((id) => programById(T2.programs, id)).filter(Boolean);
-  const back = `<button type="button" class="sx-back" data-action="nav" data-page="univ">${BACK}${T2.L("대학", "Schools")}</button>`;
+  const T2 = ctx2(view), profile2 = T2.profile, list = profile2.compare.map((id) => programById(T2.programs, id)).filter(Boolean);
+  const back = `<button type="button" class="sx-back" data-action="nav" data-page="univ">${BACK2}${T2.L("대학", "Schools")}</button>`;
   const title = `<h1 class="sx-title page-title" tabindex="-1">${T2.L("나란히 보기", "Side by side")}</h1>`;
-  if (list.length < 2) return `<div class="sx">${back}${title}<section class="sx-card"><h2>${T2.L("두 곳 이상 담으면 나란히 볼 수 있어요.", "Add at least two programs to compare.")}</h2><button type="button" class="sx-cta" data-action="nav" data-page="univ">${T2.L("대학 보기", "Browse schools")} ${GO}</button></section></div>`;
+  if (list.length < 2) return `<div class="sx">${back}${title}<section class="sx-card"><h2>${T2.L("두 곳 이상 담으면 나란히 볼 수 있어요.", "Add at least two programs to compare.")}</h2><button type="button" class="sx-cta" data-action="nav" data-page="univ">${T2.L("대학 보기", "Browse schools")} ${GO2}</button></section></div>`;
   const row = (h, fn) => `<tr><th scope="row">${h}</th>${list.map((p) => `<td>${fn(p)}</td>`).join("")}</tr>`;
   const anyMissing = list.some((p) => programCost(profile2, p).missing.length);
   const costsWord = anyMissing ? T2.L("확인된 비용의 합", "Confirmed costs") : T2.L("내가 낼 돈", "What you pay");
   return `<div class="sx sx-wide">${back}${title}
-<div class="sx-cmp-wrap" role="region" tabindex="0" aria-label="${T2.L("나란히 보기 표", "Comparison table")}"><table class="sx-cmp" data-cols="${list.length}"><thead><tr><td></td>${list.map((p) => `<th scope="col"><button type="button" class="sx-cmp-head" data-action="univOpen" data-id="${esc3(p.id)}">${image(p)}<span>${esc3(T2.pick(p.name))}</span></button></th>`).join("")}</tr></thead><tbody>
-${row(T2.L("지역", "Region"), (p) => esc3(T2.pick(p.place)))}${row(T2.L("과정", "Program"), (p) => T2.pair(LEVEL[p.level]))}${row(T2.L("한 해 등록금 · 수업료", "Tuition per year"), (p) => T2.won(p.costs.tuition))}
-${row(T2.L("한 해 기숙사", "Dormitory per year"), (p) => p.costs.dorm === null ? `<span class="sx-cmp-miss">${T2.L("합계에 없음", "Not in total")}</span>` : `${T2.won(p.costs.dorm)}${p.dormLabel ? `<small>${esc3(T2.pick(p.dormLabel))}</small>` : ""}`)}
+<div class="sx-cmp-wrap" role="region" tabindex="0" aria-label="${T2.L("나란히 보기 표", "Comparison table")}"><table class="sx-cmp" data-cols="${list.length}"><thead><tr><td></td>${list.map((p) => `<th scope="col"><button type="button" class="sx-cmp-head" data-action="univOpen" data-id="${esc4(p.id)}">${image(p)}<span>${esc4(T2.pick(p.name))}</span></button></th>`).join("")}</tr></thead><tbody>
+${row(T2.L("지역", "Region"), (p) => esc4(T2.pick(p.place)))}${row(T2.L("과정", "Program"), (p) => T2.pair(LEVEL[p.level]))}${row(T2.L("한 해 등록금 · 수업료", "Tuition per year"), (p) => T2.won(p.costs.tuition))}
+${row(T2.L("한 해 기숙사", "Dormitory per year"), (p) => p.costs.dorm === null ? `<span class="sx-cmp-miss">${T2.L("합계에 없음", "Not in total")}</span>` : `${T2.won(p.costs.dorm)}${p.dormLabel ? `<small>${esc4(T2.pick(p.dormLabel))}</small>` : ""}`)}
 ${row(T2.L("지금 급수 장학금", "Scholarship at your level"), (p) => {
     const c = programCost(profile2, p);
     return c.scholarship ? `− ${T2.won(c.scholarship)}` : T2.L("없음", "None");
   })}
 ${row(costsWord, (p) => {
     const c = programCost(profile2, p);
-    return `<b>${T2.won(c.total)}</b>${c.missing.length ? `<small>${esc3(T2.L(`${c.missing.length === 2 ? "기숙사 · 생활비" : c.missing[0] === "dorm" ? "기숙사비" : "생활비"} 빠짐`, `excludes ${c.missing.map((k) => k === "dorm" ? "dormitory" : "living costs").join(" and ")}`))}</small>` : ""}`;
+    return `<b>${T2.won(c.total)}</b>${c.missing.length ? `<small>${esc4(T2.L(`${c.missing.length === 2 ? "기숙사 · 생활비" : c.missing[0] === "dorm" ? "기숙사비" : "생활비"} 빠짐`, `excludes ${c.missing.map((k) => k === "dorm" ? "dormitory" : "living costs").join(" and ")}`))}</small>` : ""}`;
   })}${row(T2.L("필요한 한국어", "Korean needed"), (p) => needKorean(p, T2))}
 ${row(T2.L("필요한 성적", "Grades needed"), (p) => p.requires.gradePct ? `${p.requires.gradePct}%` : T2.L("조건 없음", "None"))}${row(T2.L("잔고 증명", "Proof of funds"), (p) => {
     const i = matchProgram(profile2, p, T2.rules).items[3];
     return i.need === null ? T2.L("확인 필요", "To check") : T2.won(i.need);
   })}
-${row(T2.L("원서 접수", "Applications"), (p) => esc3(opens(p, T2)))}${row(T2.L("내 조건", "My conditions"), (p) => {
+${row(T2.L("원서 접수", "Applications"), (p) => esc4(opens(p, T2)))}${row(T2.L("내 조건", "My conditions"), (p) => {
     const m = matchProgram(profile2, p, T2.rules);
     return `${m.okCount} / 4${meter(m, T2)}`;
   })}
-${row(`<span class="sr-only">${T2.L("비교에서 빼기", "Remove from compare")}</span>`, (p) => `<button type="button" class="sx-link" data-action="studyCompare" data-id="${esc3(p.id)}">${T2.L("빼기", "Remove")}<span class="sr-only"> ${esc3(T2.pick(p.name))}</span></button>`)}</tbody></table></div>
-<p class="sx-fine">${anyMissing ? T2.L("「확인된 비용의 합」은 한 해 금액을 알 수 있는 비용만 더하고 지금 급수의 장학금을 뺀 값이에요. 빠진 비용이 과정마다 달라서, 합계만 보지 말고 칸마다 견주어 보세요.", "“Confirmed costs” adds only the yearly costs that are known and subtracts the scholarship at your current level. Missing costs differ by program, so compare row by row rather than by the total alone.") : T2.L("「내가 낼 돈」은 지금 내 한국어 급수의 장학금을 뺀 값이에요.", "“What you pay” subtracts the scholarship for your current Korean level.")}${list.some((p) => p.example) ? ` ${T2.L("예시 과정의 금액은 실제 대학의 것이 아니에요.", "Amounts for example programs are not from a real university.")}` : ""}</p>${promise(T2)}</div>`;
+${row(`<span class="sr-only">${T2.L("비교에서 빼기", "Remove from compare")}</span>`, (p) => `<button type="button" class="sx-link" data-action="studyCompare" data-id="${esc4(p.id)}">${T2.L("빼기", "Remove")}<span class="sr-only"> ${esc4(T2.pick(p.name))}</span></button>`)}</tbody></table></div>
+<p class="sx-fine">${anyMissing ? T2.L("「확인된 비용의 합」은 한 해 금액을 알 수 있는 비용만 더하고 지금 급수의 장학금을 뺀 값이에요. 빠진 비용이 과정마다 달라서, 합계만 보지 말고 칸마다 견주어 보세요.", "“Confirmed costs” adds only the yearly costs that are known and subtracts the scholarship at your current level. Missing costs differ by program, so compare row by row rather than by the total alone.") : T2.L("「내가 낼 돈」은 지금 내 한국어 급수의 장학금을 뺀 값이에요.", "“What you pay” subtracts the scholarship for your current Korean level.")}${list.some((p) => p.example) ? ` ${T2.L("예시 과정의 금액은 실제 대학의 것이 아니에요.", "Amounts for example programs are not from a real university.")}` : ""}</p>${promise2(T2)}</div>`;
 }
 function condHint(lang, key, error) {
   const en = lang === "en", max = key === "gradePct" ? GRADE_MAX : FUNDS_MAX_MAN;
@@ -4031,7 +4617,7 @@ function condHint(lang, key, error) {
   return en ? "Money you can show as a bank balance, in units of ₩10,000. Example: 1600" : "잔고 증명에 쓸 수 있는 돈을 만 원 단위로 적어요. 예: 1600";
 }
 function renderCondResult(view) {
-  const T2 = ctx(view), profile2 = T2.profile;
+  const T2 = ctx2(view), profile2 = T2.profile;
   const n = countFit(profile2, T2.programs, T2.rules), r = routes(profile2, T2.programs, T2.rules, T2.now);
   let up = null;
   if (n !== null) for (let t2 = profile2.topik + 1; t2 <= 6 && !up; t2++) {
@@ -4039,10 +4625,10 @@ function renderCondResult(view) {
     if (k > n) up = { t: t2, k };
   }
   const lead = n === null ? "" : up ? T2.allExample ? T2.L(`${up.t}급이면 예시 과정 ${up.k}개가 맞아요.`, `With level ${up.t}, ${up.k} example programs fit.`) : T2.L(`${up.t}급을 따면 ${up.k}개 과정으로 늘어요.`, `With level ${up.t} it becomes ${up.k} programs.`) : n === 0 ? T2.L("모자란 조건은 과정마다 달라요. 대학을 열어 무엇이 모자란지 확인하세요.", "What is missing differs by program. Open a school to see it.") : T2.L("과정을 열면 조건 넷을 하나씩 맞춰 볼 수 있어요.", "Open a program to check all four conditions one by one.");
-  const top = n === null ? `<section class="sx-card lapis"><h2>${T2.L(`${T2.needWord} 넣으면 맞는 과정을 세어 줘요.`, `Enter ${T2.needWord} to count the programs that fit.`)}</h2>${T2.needs.length === 2 ? `<p>${T2.L("둘 중 하나라도 비어 있으면 세지 않아요.", "Nothing is counted while either one is empty.")}</p>` : ""}<button type="button" class="sx-cta" data-action="nav" data-page="univ">${T2.L("대학 보기", "Browse schools")} ${GO}</button></section>` : `<section class="sx-card lapis"><p class="sx-k">${T2.L("지금 조건으로", "With your conditions now")}</p><p class="sx-big"><b>${n}</b><span>${esc3(T2.fitText(n))}</span></p>${uncheckedNote(T2) ? `<p>${esc3(uncheckedNote(T2))}</p>` : ""}<p>${esc3(lead)}</p><button type="button" class="sx-cta" data-action="nav" data-page="univ">${T2.L("대학 보기", "Browse schools")} ${GO}</button></section>`;
+  const top = n === null ? `<section class="sx-card lapis"><h2>${T2.L(`${T2.needWord} 넣으면 맞는 과정을 세어 줘요.`, `Enter ${T2.needWord} to count the programs that fit.`)}</h2>${T2.needs.length === 2 ? `<p>${T2.L("둘 중 하나라도 비어 있으면 세지 않아요.", "Nothing is counted while either one is empty.")}</p>` : ""}<button type="button" class="sx-cta" data-action="nav" data-page="univ">${T2.L("대학 보기", "Browse schools")} ${GO2}</button></section>` : `<section class="sx-card lapis"><p class="sx-k">${T2.L("지금 조건으로", "With your conditions now")}</p><p class="sx-big"><b>${n}</b><span>${esc4(T2.fitText(n))}</span></p>${uncheckedNote(T2) ? `<p>${esc4(uncheckedNote(T2))}</p>` : ""}<p>${esc4(lead)}</p><button type="button" class="sx-cta" data-action="nav" data-page="univ">${T2.L("대학 보기", "Browse schools")} ${GO2}</button></section>`;
   const route = (title, x, visa, body) => {
     const st = x.status === "none" ? "" : x.status === "ok" ? `<span class="sx-tag is-ok">${T2.L("조건 맞음", "Fits")}</span>` : tag(x.status, T2);
-    return `<section class="sx-card line"><div class="sx-match-top"><h3>${esc3(title)}</h3>${st}</div><p>${esc3(body)}</p><p class="sx-src"><b>${T2.L("비자", "Visa")}</b> ${esc3(visa)}</p></section>`;
+    return `<section class="sx-card line"><div class="sx-match-top"><h3>${esc4(title)}</h3>${st}</div><p>${esc4(body)}</p><p class="sx-src"><b>${T2.L("비자", "Visa")}</b> ${esc4(visa)}</p></section>`;
   };
   const unit = (c) => T2.allExample ? T2.L(`${c}개(예시)`, `${c} example program${c === 1 ? "" : "s"}`) : T2.L(`${c}개`, `${c} program${c === 1 ? "" : "s"}`);
   const none = T2.L("준비된 과정이 아직 없어요.", "No programs are ready yet.");
@@ -4058,21 +4644,21 @@ ${route(T2.L("바로 학부 입학", "Straight into undergraduate"), r.direct, T
 ${isEmptyProfile(profile2) ? "" : `<p class="sx-fine"><button type="button" class="sx-link" data-action="studyClear">${T2.L("조건 모두 지우기", "Clear all conditions")}</button></p>`}`;
 }
 function renderCond(view) {
-  const T2 = ctx(view), profile2 = T2.profile, { persisted = true, text: text2 = {}, errors = {} } = view;
-  const seg = (key, options, label) => `<div class="sx-seg${options.length > 4 ? " is-many" : ""}" role="group" aria-label="${esc3(label)}">${options.map(([v, l]) => `<button type="button" aria-pressed="${profile2[key] === v}" data-action="studySet" data-key="${key}" data-id="${esc3(v)}">${esc3(l)}</button>`).join("")}</div>`;
-  const field = (id, key, label, unit, value) => `<div class="sx-field"><label for="${id}">${esc3(label)}</label><div class="sx-input"><input id="${id}" type="text" inputmode="numeric" autocomplete="off" maxlength="7" data-action="studyInput" data-key="${key}" value="${esc3(value)}" aria-describedby="${id}-hint"${errors[key] ? ' aria-invalid="true"' : ""}><span aria-hidden="true">${esc3(unit)}</span></div><p class="sx-hint${errors[key] ? " is-error" : ""}" id="${id}-hint">${esc3(condHint(view.lang, key, !!errors[key]))}</p></div>`;
+  const T2 = ctx2(view), profile2 = T2.profile, { persisted = true, text: text2 = {}, errors = {} } = view;
+  const seg = (key, options, label) => `<div class="sx-seg${options.length > 4 ? " is-many" : ""}" role="group" aria-label="${esc4(label)}">${options.map(([v, l]) => `<button type="button" aria-pressed="${profile2[key] === v}" data-action="studySet" data-key="${key}" data-id="${esc4(v)}">${esc4(l)}</button>`).join("")}</div>`;
+  const field = (id, key, label, unit, value) => `<div class="sx-field"><label for="${id}">${esc4(label)}</label><div class="sx-input"><input id="${id}" type="text" inputmode="numeric" autocomplete="off" maxlength="7" data-action="studyInput" data-key="${key}" value="${esc4(value)}" aria-describedby="${id}-hint"${errors[key] ? ' aria-invalid="true"' : ""}><span aria-hidden="true">${esc4(unit)}</span></div><p class="sx-hint${errors[key] ? " is-error" : ""}" id="${id}-hint">${esc4(condHint(view.lang, key, !!errors[key]))}</p></div>`;
   const gradeText = text2.gradePct ?? (profile2.gradePct === null ? "" : String(profile2.gradePct));
   const fundsText = text2.fundsWon ?? (profile2.fundsWon === null ? "" : String(Math.round(profile2.fundsWon / 1e4)));
-  return `<div class="sx"><button type="button" class="sx-back" data-action="nav" data-page="univ">${BACK}${T2.L("대학", "Schools")}</button>
+  return `<div class="sx"><button type="button" class="sx-back" data-action="nav" data-page="univ">${BACK2}${T2.L("대학", "Schools")}</button>
 <header class="sx-head"><h1 class="sx-title page-title" tabindex="-1">${T2.L("내 조건", "My conditions")}</h1><p class="sx-lead">${T2.L("넣거나 바꾸면 갈 수 있는 길과 맞는 과정이 바로 따라 바뀌어요.", "Enter or change a value and the routes and matches update right away.")}</p></header>
 <p class="sx-store${persisted ? "" : " is-warn"}" role="status">${persisted ? T2.L("이 조건은 이 탭에만 저장돼요. 계정에는 저장되지 않고, 탭을 닫거나 로그아웃하면 사라져요.", "These conditions are kept in this tab only. They are not saved to your account and disappear when you close the tab or sign out.") : T2.L("이 브라우저에서는 저장할 수 없어서 지금 화면에서만 기억해요. 새로 고치면 사라져요.", "This browser cannot store them, so they are remembered on this screen only and are lost on reload.")}</p>
-<div class="sx-field"><span class="sx-label">${T2.L("한국어", "Korean")} <b>${esc3(T2.topik(profile2.topik))}</b></span>${seg("topik", [[0, T2.L("없음", "None")], ...[1, 2, 3, 4, 5, 6].map((v) => [v, T2.L(`${v}급`, `L${v}`)])], T2.L("한국어 급수(TOPIK)", "Korean level (TOPIK)"))}</div>
-<div class="sx-field"><span class="sx-label">${T2.L("학력", "Education")} <b>${esc3(profile2.education ? T2.pair(EDU[profile2.education]) : T2.L("아직 안 넣음", "Not entered"))}</b></span>${seg("education", Object.keys(EDU).map((k) => [k, T2.pair(EDU[k])]), T2.L("학력", "Education"))}</div>
+<div class="sx-field"><span class="sx-label">${T2.L("한국어", "Korean")} <b>${esc4(T2.topik(profile2.topik))}</b></span>${seg("topik", [[0, T2.L("없음", "None")], ...[1, 2, 3, 4, 5, 6].map((v) => [v, T2.L(`${v}급`, `L${v}`)])], T2.L("한국어 급수(TOPIK)", "Korean level (TOPIK)"))}</div>
+<div class="sx-field"><span class="sx-label">${T2.L("학력", "Education")} <b>${esc4(profile2.education ? T2.pair(EDU[profile2.education]) : T2.L("아직 안 넣음", "Not entered"))}</b></span>${seg("education", Object.keys(EDU).map((k) => [k, T2.pair(EDU[k])]), T2.L("학력", "Education"))}</div>
 ${field("sx-grade", "gradePct", T2.L("고등학교 성적 평균", "High school grade average"), "%", gradeText)}
 ${field("sx-funds", "fundsWon", T2.L("준비한 돈", "Funds prepared"), T2.L("만 원", "× ₩10,000"), fundsText)}
 <p class="sx-fine">${T2.L("누른 칸을 한 번 더 누르면 「아직 안 넣음」으로 돌아가요.", "Press a selected option again to clear it.")}</p>
 <div id="sx-cond-result">${renderCondResult(view)}</div>
-${promise(T2)}</div>`;
+${promise2(T2)}</div>`;
 }
 
 // experiences/path-app/app.mjs
@@ -4082,6 +4668,7 @@ var DICT = {
   langLabel: ["언어", "Language"],
   navLabel: ["주요 메뉴", "Main menu"],
   today: ["오늘", "Today"],
+  channels: ["채널", "News"],
   univ: ["대학", "Schools"],
   explore: ["찾기", "Explore"],
   prepare: ["준비", "Prepare"],
@@ -4220,12 +4807,13 @@ var DICT = {
   resetAsk: ["읽을 수 없는 저장 데이터를 지우고 새로 시작할까요?", "Delete unreadable saved data and start fresh?"],
   storeFail: ["이 탭에 저장하지 못했어요. 작성 내용은 화면에 남아 있어요.", "Could not save in this tab. Your text stays on screen."],
   pageAnn: ["페이지", "page"],
-  studyStore: ["「내 조건」(한국어 · 성적 · 준비한 돈)은 계정에 저장되지 않고 이 탭에만 있어요. 내 조건 화면에서 지울 수 있고, 탭을 닫거나 로그아웃하면 사라져요.", "“My conditions” (Korean level, grades, funds) are not saved to your account; they stay in this tab only. You can clear them on the My conditions screen, and they disappear when you close the tab or sign out."],
+  datesStore: ["「다가오는 날」은 계정에 저장되지 않고 이 탭에만 있어요. 탭을 닫거나 로그아웃하면 사라져요.", "“Coming up” dates are not saved to your account; they stay in this tab only and disappear when you close the tab or sign out."],
+  studyStore: ["「내 조건」(한국어 · 성적 · 준비한 돈)과 「다가오는 날」은 계정에 저장되지 않고 이 탭에만 있어요. 탭을 닫거나 로그아웃하면 사라져요.", "“My conditions” (Korean level, grades, funds) and “Coming up” dates are not saved to your account; they stay in this tab only and disappear when you close the tab or sign out."],
   toolsLead: ["공식 안내와 별개인 SYNK 페이지예요. 새 탭에서 열리고 PATH 저장 내용과 분리돼요.", "Separate SYNK pages, not official sources. They open in a new tab, apart from PATH data."]
 };
 var t = (k) => (DICT[k] || [k, k])[state.lang === "en" ? 1 : 0];
 var pick = (o) => o ? o[state.lang] ?? o.ko : "";
-var esc4 = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+var esc5 = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
 var goalById = (id) => GOALS.find((g) => g.id === id);
 var oppById = (id) => {
   const demo = OPPORTUNITIES.find((o) => o.id === id);
@@ -4324,6 +4912,8 @@ var PUBLIC_WEB = (() => {
 var STUDY_PROGRAMS = programsFor(PROGRAMS, PUBLIC_WEB);
 var STUDY_ON = STUDY_PROGRAMS.length > 0;
 var STUDY_IDS = STUDY_PROGRAMS.map((p) => p.id);
+var CHANNEL_POSTS = allPosts(STUDY_PROGRAMS);
+var CHANNEL_ON = POSTS.length > 0;
 var study = createProfileStore((() => {
   try {
     return sessionStorage;
@@ -4379,7 +4969,7 @@ var session = createPathSession({
 });
 state = session.document()?.state || createInitialState("ko");
 hadDoc = !!session.document()?.state;
-var S = { page: state.onboarded ? "today" : "onboard", step: 1, draft: null, filter: state.primaryGoal || "all", compare: [], oppId: null, taskId: null, help: state.primaryGoal || "study", flash: null, copyMsg: null, error: null, drop: MOTION, practiceOpen: false, univId: null, univFilter: "all", studyText: {}, studyErrors: {} };
+var S = { page: state.onboarded ? "today" : "onboard", step: 1, draft: null, filter: state.primaryGoal || "all", compare: [], oppId: null, taskId: null, help: state.primaryGoal || "study", flash: null, copyMsg: null, error: null, drop: MOTION, practiceOpen: false, univId: null, univFilter: "all", studyText: {}, studyErrors: {}, channelId: null, postId: null, dateNote: null };
 activeOwner = ownerKey();
 wasOnboarded = !!state.onboarded;
 function commit(next) {
@@ -4387,7 +4977,7 @@ function commit(next) {
   if (!session.status().canEdit) {
     const err = session.status().error;
     const m = err ? getAccountErrorMessage(err, state.lang) : state.lang === "en" ? "You can't change data right now. Please check the save status in Profile." : "현재는 자료를 바꿀 수 없어요. 내 정보에서 저장 상태를 확인해 주세요.";
-    S.flash = esc4(m);
+    S.flash = esc5(m);
     say(m);
     return false;
   }
@@ -4399,7 +4989,7 @@ function commit(next) {
   } catch (e) {
     state = session.document()?.state || state;
     const m = getAccountErrorMessage(e, state.lang);
-    S.flash = esc4(m);
+    S.flash = esc5(m);
     say(m);
     return false;
   } finally {
@@ -4409,25 +4999,26 @@ function commit(next) {
 function newDraft() {
   return { primaryGoal: state.primaryGoal, interests: [...state.interests || []], secondaryGoals: [...state.secondaryGoals || []], location: state.location || "unknown" };
 }
-var svg2 = (box, sw, p) => `<svg viewBox="0 0 ${box} ${box}" fill="none" stroke="currentColor" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">${p}</svg>`;
-var ICON = {
-  arrow: svg2(20, 1.7, '<path d="M4 10h11.5M11 5.5 15.5 10 11 14.5"/>'),
-  back: svg2(20, 1.7, '<path d="M16 10H4.5M9 5.5 4.5 10 9 14.5"/>'),
-  out: svg2(20, 1.7, '<path d="M6 14 14 6M7.5 6H14v6.5"/>'),
-  check: svg2(20, 2.4, '<path d="m5 10.4 3.2 3.1L15 6.6"/>')
+var svg3 = (box, sw, p) => `<svg viewBox="0 0 ${box} ${box}" fill="none" stroke="currentColor" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">${p}</svg>`;
+var ICON2 = {
+  arrow: svg3(20, 1.7, '<path d="M4 10h11.5M11 5.5 15.5 10 11 14.5"/>'),
+  back: svg3(20, 1.7, '<path d="M16 10H4.5M9 5.5 4.5 10 9 14.5"/>'),
+  out: svg3(20, 1.7, '<path d="M6 14 14 6M7.5 6H14v6.5"/>'),
+  check: svg3(20, 2.4, '<path d="m5 10.4 3.2 3.1L15 6.6"/>')
 };
 var TAB_ICON = {
-  today: svg2(24, 1.6, '<rect x="4" y="5.5" width="16" height="14.5" rx="2.5"/><path d="M4 10.2h16M8.5 3.5v4M15.5 3.5v4"/><path d="M11.9 14.9h.2" stroke-width="2.6"/>'),
-  explore: svg2(24, 1.6, '<circle cx="10.5" cy="10.5" r="6"/><path d="m15 15 5 5"/>'),
-  prepare: svg2(24, 1.6, '<path d="M4 20h4L19 9l-4-4L4 16z"/><path d="m13.5 6.5 4 4"/>'),
-  univ: svg2(24, 1.6, '<path d="M3.5 9.6 12 4.6l8.5 5"/><path d="M6 11v7.5M10 11v7.5M14 11v7.5M18 11v7.5M3.5 19.5h17"/>'),
-  help: svg2(24, 1.6, '<path d="M4.5 5.5h15v10h-8l-4 3.5v-3.5h-3z"/><path d="M10.4 8.9a1.7 1.7 0 1 1 2.3 1.6c-.5.2-.7.6-.7 1.1M12 13.4v.1"/>'),
-  profile: svg2(24, 1.6, '<circle cx="12" cy="8.5" r="3.6"/><path d="M5 20c1.2-3.6 4-5.4 7-5.4s5.8 1.8 7 5.4"/>')
+  today: svg3(24, 1.6, '<rect x="4" y="5.5" width="16" height="14.5" rx="2.5"/><path d="M4 10.2h16M8.5 3.5v4M15.5 3.5v4"/><path d="M11.9 14.9h.2" stroke-width="2.6"/>'),
+  explore: svg3(24, 1.6, '<circle cx="10.5" cy="10.5" r="6"/><path d="m15 15 5 5"/>'),
+  prepare: svg3(24, 1.6, '<path d="M4 20h4L19 9l-4-4L4 16z"/><path d="m13.5 6.5 4 4"/>'),
+  channels: svg3(24, 1.6, '<rect x="4" y="5" width="13" height="14.5" rx="2"/><path d="M17 9h3v8.5a2 2 0 0 1-2 2H6"/><path d="M7.5 9h6M7.5 12.5h6M7.5 16h4"/>'),
+  univ: svg3(24, 1.6, '<path d="M3.5 9.6 12 4.6l8.5 5"/><path d="M6 11v7.5M10 11v7.5M14 11v7.5M18 11v7.5M3.5 19.5h17"/>'),
+  help: svg3(24, 1.6, '<path d="M4.5 5.5h15v10h-8l-4 3.5v-3.5h-3z"/><path d="M10.4 8.9a1.7 1.7 0 1 1 2.3 1.6c-.5.2-.7.6-.7 1.1M12 13.4v.1"/>'),
+  profile: svg3(24, 1.6, '<circle cx="12" cy="8.5" r="3.6"/><path d="M5 20c1.2-3.6 4-5.4 7-5.4s5.8 1.8 7 5.4"/>')
 };
 var SYMBOL = {
-  study: svg2(48, 1.6, '<rect x="11" y="3.5" width="26" height="41" rx="13"/><rect x="15.5" y="8" width="17" height="32" rx="8.5"/><path d="M15.6 16.8h16.8"/><path d="M24 16.8v2.6"/><path d="M16 32.4c4.6-3 11.2-4.6 16.2-2.9"/><circle cx="27.6" cy="24.2" r="1.7"/>'),
-  student: svg2(48, 1.6, '<path d="M24 14.2c-4.7-3.3-11.1-4-17.2-2.7v24.4c6.1-1.3 12.5-.6 17.2 2.7 4.7-3.3 11.1-4 17.2-2.7V11.5c-6.1-1.3-12.5-.6-17.2 2.7z"/><path d="M24 14.2v24.4"/><path d="M11.2 18.6c3-.4 6.1 0 8.6 1M11.2 23.6c3-.4 6.1 0 8.6 1M28.2 19.6c2.5-1 5.6-1.4 8.6-1"/>'),
-  job: svg2(48, 1.6, '<rect x="6.5" y="15.5" width="35" height="25" rx="3.6"/><path d="M18 15.5v-3.4a2.6 2.6 0 0 1 2.6-2.6h6.8a2.6 2.6 0 0 1 2.6 2.6v3.4"/><path d="M6.5 26.5h13.5M28 26.5h13.5"/><rect x="20" y="23.6" width="8" height="6" rx="1.4"/>')
+  study: svg3(48, 1.6, '<rect x="11" y="3.5" width="26" height="41" rx="13"/><rect x="15.5" y="8" width="17" height="32" rx="8.5"/><path d="M15.6 16.8h16.8"/><path d="M24 16.8v2.6"/><path d="M16 32.4c4.6-3 11.2-4.6 16.2-2.9"/><circle cx="27.6" cy="24.2" r="1.7"/>'),
+  student: svg3(48, 1.6, '<path d="M24 14.2c-4.7-3.3-11.1-4-17.2-2.7v24.4c6.1-1.3 12.5-.6 17.2 2.7 4.7-3.3 11.1-4 17.2-2.7V11.5c-6.1-1.3-12.5-.6-17.2 2.7z"/><path d="M24 14.2v24.4"/><path d="M11.2 18.6c3-.4 6.1 0 8.6 1M11.2 23.6c3-.4 6.1 0 8.6 1M28.2 19.6c2.5-1 5.6-1.4 8.6-1"/>'),
+  job: svg3(48, 1.6, '<rect x="6.5" y="15.5" width="35" height="25" rx="3.6"/><path d="M18 15.5v-3.4a2.6 2.6 0 0 1 2.6-2.6h6.8a2.6 2.6 0 0 1 2.6 2.6v3.4"/><path d="M6.5 26.5h13.5M28 26.5h13.5"/><rect x="20" y="23.6" width="8" height="6" rx="1.4"/>')
 };
 var CARD_NO = { study: "01", student: "02", job: "03" };
 var CLIP = '<svg class="clip" viewBox="0 0 22 38" aria-hidden="true" focusable="false"><path d="M5.5 0h11v6.6a2 2 0 0 1-2 2h-7a2 2 0 0 1-2-2z" fill="url(#metal)"/><path d="M7.4 2.2h7.2" stroke="rgba(0,0,0,.18)" stroke-width=".8"/><circle cx="11" cy="12.6" r="3.8" fill="none" stroke="url(#metal)" stroke-width="2"/><rect x="9" y="16.1" width="4" height="4.6" rx="1.2" fill="url(#metal)"/><path d="M11 20.6v6.1a4.6 4.6 0 1 0 4.6-4.6" fill="none" stroke="url(#metal)" stroke-width="2.2" stroke-linecap="round"/></svg>';
@@ -4438,9 +5029,9 @@ function seal(n = 0) {
 function hang(goal, { i = 0, slot = "mid", radio = false, on = false, action = "", kicker = "", name = "", desc = null, mode = "goal" } = {}) {
   const g = goalById(goal);
   const nm = name || pick(g.label), ds = desc ?? pick(g.description);
-  const bottom = `${kicker ? `<span class="pass-kicker">${esc4(kicker)}</span>` : ""}<span class="pass-name">${esc4(nm)}</span>${ds ? `<span class="pass-desc">${esc4(ds)}</span>` : ""}`;
-  const face = `<span class="pass-band" aria-hidden="true"></span><span class="pass-face" aria-hidden="true"><span class="pass-top"><span class="pass-brand">PATH</span><span class="pass-no">No.${CARD_NO[goal]}</span></span><span class="pass-symbol">${SYMBOL[goal]}</span><span class="pass-bottom">${bottom}</span></span><span class="pick-mark" aria-hidden="true">${ICON.check}</span>`;
-  const card2 = radio ? `<button type="button" class="pass goal-choice" role="radio" aria-checked="${on}" tabindex="${on || !S.draft?.primaryGoal && i === 0 ? 0 : -1}" data-action="pickGoal" data-id="${goal}" data-mode="${mode}" aria-label="${esc4(`${pick(g.label)} — ${pick(g.description)}`)}">${face}</button>` : action ? `<button type="button" class="pass" data-action="${action}" data-id="${goal}" data-mode="${mode}" aria-label="${esc4(ds ? `${nm} — ${ds}` : nm)}">${face}</button>` : `<div class="pass" data-mode="${mode}" role="img" aria-label="${esc4(ds ? `${nm} — ${ds}` : nm)}">${face}</div>`;
+  const bottom = `${kicker ? `<span class="pass-kicker">${esc5(kicker)}</span>` : ""}<span class="pass-name">${esc5(nm)}</span>${ds ? `<span class="pass-desc">${esc5(ds)}</span>` : ""}`;
+  const face = `<span class="pass-band" aria-hidden="true"></span><span class="pass-face" aria-hidden="true"><span class="pass-top"><span class="pass-brand">PATH</span><span class="pass-no">No.${CARD_NO[goal]}</span></span><span class="pass-symbol">${SYMBOL[goal]}</span><span class="pass-bottom">${bottom}</span></span><span class="pick-mark" aria-hidden="true">${ICON2.check}</span>`;
+  const card2 = radio ? `<button type="button" class="pass goal-choice" role="radio" aria-checked="${on}" tabindex="${on || !S.draft?.primaryGoal && i === 0 ? 0 : -1}" data-action="pickGoal" data-id="${goal}" data-mode="${mode}" aria-label="${esc5(`${pick(g.label)} — ${pick(g.description)}`)}">${face}</button>` : action ? `<button type="button" class="pass" data-action="${action}" data-id="${goal}" data-mode="${mode}" aria-label="${esc5(ds ? `${nm} — ${ds}` : nm)}">${face}</button>` : `<div class="pass" data-mode="${mode}" role="img" aria-label="${esc5(ds ? `${nm} — ${ds}` : nm)}">${face}</div>`;
   return `<div class="hang${S.drop ? " is-drop" : ""}${on ? " is-on" : ""}" data-goal="${goal}" data-i="${i}" data-slot="${slot}"><div class="strap" aria-hidden="true"><span class="strap-print">PATH PATH PATH PATH PATH PATH PATH PATH</span></div>${CLIP}<div class="card-wrap"><span class="card-shadow" aria-hidden="true"></span>${card2}</div></div>`;
 }
 var sec = (title, sub, body, cls = "") => `<section class="sec${cls ? ` ${cls}` : ""}"><div class="sec-h"><h2>${title}</h2>${sub ? `<span>${sub}</span>` : ""}</div>${body}</section>`;
@@ -4449,10 +5040,10 @@ function demoBadge(o) {
   if (o?.source === "live") return `<span class="badge">${state.lang === "en" ? "Official job posting" : "공식 채용 공고"}</span>`;
   return `<span class="badge">${t("demo")}</span>`;
 }
-var liveLink = (o) => o?.source === "live" && o.url ? `<p><a href="${esc4(o.url)}" target="_blank" rel="noopener noreferrer">${state.lang === "en" ? "View original posting (opens in new tab)" : "원문 공고 보기 (새 탭)"}</a></p>` : "";
+var liveLink = (o) => o?.source === "live" && o.url ? `<p><a href="${esc5(o.url)}" target="_blank" rel="noopener noreferrer">${state.lang === "en" ? "View original posting (opens in new tab)" : "원문 공고 보기 (새 탭)"}</a></p>` : "";
 var findJobEntry = (id) => (jobsFeed.snapshot().jobs || []).find((j) => j.id === id) || (session.document()?.savedJobs || []).find((j) => j.id === id);
-var oppRow = (o) => `<li><button type="button" class="row" data-action="detail" data-id="${esc4(o.id)}"><span><b>${demoBadge(o)}${esc4(pick(o.title))}</b><small>${esc4(pick(o.summary))}</small></span><span class="row-go" aria-hidden="true">${ICON.arrow}</span></button></li>`;
-var TABS = ["today", "univ", "explore", "prepare", "help", "profile"].filter((p) => p !== "univ" || STUDY_ON);
+var oppRow = (o) => `<li><button type="button" class="row" data-action="detail" data-id="${esc5(o.id)}"><span><b>${demoBadge(o)}${esc5(pick(o.title))}</b><small>${esc5(pick(o.summary))}</small></span><span class="row-go" aria-hidden="true">${ICON2.arrow}</span></button></li>`;
+var TABS = ["today", "channels", "univ", "explore", "prepare", "help", "profile"].filter((p) => (p !== "univ" || STUDY_ON) && (p !== "channels" || CHANNEL_ON));
 var UNIV_PAGES = ["cond", "univDetail", "univCompare"];
 function shell(main) {
   const nav = state.onboarded && S.page !== "onboard";
@@ -4468,7 +5059,7 @@ ${nav ? `<nav class="tabs" aria-label="${t("navLabel")}">${tabs}</nav>` : ""}<di
 ${main}${nav ? `<nav class="tabbar" aria-label="${t("navLabel")}">${bar}</nav>` : ""}</div>`;
 }
 function navActive(p) {
-  return S.page === p || p === "explore" && S.page === "detail" || p === "prepare" && S.page === "editor" || p === "univ" && UNIV_PAGES.includes(S.page);
+  return S.page === p || p === "explore" && S.page === "detail" || p === "prepare" && S.page === "editor" || p === "univ" && UNIV_PAGES.includes(S.page) || p === "channels" && S.page === "post";
 }
 function notices(quiet = false, noFlash = false) {
   const accSt = session.status();
@@ -4488,23 +5079,23 @@ function onboard() {
     const cards = GOALS.map((g3, i) => hang(g3.id, { i, slot: ["left", "mid", "right"][i], radio: true, on: d.primaryGoal === g3.id })).join("");
     const g2 = goalById(d.primaryGoal);
     return `<main class="ob" id="main"><div class="ob-title">${notices(true)}<h1 class="title page-title" id="q1" tabindex="-1"><span>${t("obT1")}</span> <span class="title-2">${t("obT2")}</span></h1></div>
-<div class="ob-lead"><p class="lead" id="ob-lead" aria-live="polite">${g2 ? `<b class="lead-pick">${esc4(pick(g2.label))}</b>${esc4(pick(g2.note))}` : t("obLead")}</p></div>
+<div class="ob-lead"><p class="lead" id="ob-lead" aria-live="polite">${g2 ? `<b class="lead-pick">${esc5(pick(g2.label))}</b>${esc5(pick(g2.note))}` : t("obLead")}</p></div>
 <div class="stage ob-stage${d.primaryGoal ? " has-pick" : ""}" role="radiogroup" aria-label="${t("q1")}"><div class="rod" aria-hidden="true"></div>${cards}</div>
-<div class="ob-actions"><button type="button" class="btn" data-action="finish"${d.primaryGoal ? "" : " disabled"}>${t("startCard")} ${ICON.arrow}</button><button type="button" class="link" data-action="skip">${t("browse")}</button>${state.onboarded ? `<button type="button" class="link" data-action="cancelOnboard">${t("cancel")}</button>` : ""}</div>
+<div class="ob-actions"><button type="button" class="btn" data-action="finish"${d.primaryGoal ? "" : " disabled"}>${t("startCard")} ${ICON2.arrow}</button><button type="button" class="link" data-action="skip">${t("browse")}</button>${state.onboarded ? `<button type="button" class="link" data-action="cancelOnboard">${t("cancel")}</button>` : ""}</div>
 <p class="fine ob-fine">${t("obFine")}${d.primaryGoal ? ` <button type="button" class="link link-sm" data-action="step2">${t("fineTune")}</button>` : ""}</p></main>`;
   }
   const g = goalById(d.primaryGoal);
-  const chips = (list, key) => list.map((x) => `<button type="button" class="chip" aria-pressed="${d[key].includes(x.id)}" data-action="toggle" data-key="${key}" data-id="${x.id}">${esc4(pick(x.label))}</button>`).join("");
+  const chips = (list, key) => list.map((x) => `<button type="button" class="chip" aria-pressed="${d[key].includes(x.id)}" data-action="toggle" data-key="${key}" data-id="${x.id}">${esc5(pick(x.label))}</button>`).join("");
   const locs = ["abroad", "korea", "unknown"].map((l) => `<option value="${l}"${d.location === l ? " selected" : ""}>${t(l)}</option>`).join("");
   return `<main class="ob2" id="main"><div class="ob2-card">${hang(g.id, { slot: "mid" })}</div><div class="ob2-main">${notices(true)}<p class="eyebrow">${t("step2")}</p><h1 class="title page-title" tabindex="-1"><span>${t("q2")}</span> <span class="title-2">${t("q2lead")}</span></h1>
 <fieldset class="field"><legend>${t("interests")}</legend><div class="chips">${chips(g.interests, "interests")}</div></fieldset>
 <fieldset class="field"><legend>${t("secondary")}</legend><div class="chips">${chips(GOALS.filter((x) => x.id !== g.id), "secondaryGoals")}</div></fieldset>
 <div class="field"><label for="loc">${t("location")}</label><span class="hint" id="loc-hint">${t("locHint")}</span><select id="loc" class="select" aria-describedby="loc-hint" data-action="loc">${locs}</select></div>
-<div class="actions"><button type="button" class="btn" data-action="finish">${t("start")} ${ICON.arrow}</button><button type="button" class="link" data-action="step1">${t("back")}</button>${state.onboarded ? `<button type="button" class="link" data-action="cancelOnboard">${t("cancel")}</button>` : ""}</div></div></main>`;
+<div class="actions"><button type="button" class="btn" data-action="finish">${t("start")} ${ICON2.arrow}</button><button type="button" class="link" data-action="step1">${t("back")}</button>${state.onboarded ? `<button type="button" class="link" data-action="cancelOnboard">${t("cancel")}</button>` : ""}</div></div></main>`;
 }
 function stamps(states, descs) {
   const names = ["j1", "j2", "j3"];
-  return `<ol class="stamps" aria-label="${t("stampsLabel")}">${states.map((s, i) => `<li class="stamp is-${s}"${s === "now" ? ' aria-current="step"' : ""}><span class="slot" aria-hidden="true">${s === "done" ? seal(i) : s === "now" ? t("sNow") : `<span class="slot-num">${i + 1}</span>`}</span><h3>${t(names[i])} <span class="stamp-state">${t(s === "done" ? "sDone" : s === "now" ? "sNow" : "sNext")}</span></h3><p>${esc4(descs[i])}</p></li>`).join("")}</ol>`;
+  return `<ol class="stamps" aria-label="${t("stampsLabel")}">${states.map((s, i) => `<li class="stamp is-${s}"${s === "now" ? ' aria-current="step"' : ""}><span class="slot" aria-hidden="true">${s === "done" ? seal(i) : s === "now" ? t("sNow") : `<span class="slot-num">${i + 1}</span>`}</span><h3>${t(names[i])} <span class="stamp-state">${t(s === "done" ? "sDone" : s === "now" ? "sNow" : "sNext")}</span></h3><p>${esc5(descs[i])}</p></li>`).join("")}</ol>`;
 }
 function today() {
   const g = goalById(state.primaryGoal);
@@ -4512,8 +5103,8 @@ function today() {
     const cards = GOALS.map((x, i) => hang(x.id, { i, slot: ["left", "mid", "right"][i], action: "exploreGoal" })).join("");
     return `<main class="home" id="main"><aside class="stage home-stage is-three" aria-label="${t("pickCard")}"><div class="rod" aria-hidden="true"></div>${cards}<div class="home-cap"><span></span><button type="button" class="link" data-action="changeGoal">${t("pickCard")}</button></div></aside>
 <div class="home-main">${notices()}<p class="eyebrow">${t("today")}</p><h1 class="title page-title" tabindex="-1"><span>${t("nT1")}</span> <span class="title-2">${t("nT2")}</span></h1>
-<ul class="goal-list">${GOALS.map((x) => `<li><button type="button" class="goal-row" data-action="exploreGoal" data-id="${x.id}"><span class="goal-sym" data-goal="${x.id}">${SYMBOL[x.id]}</span><span class="goal-txt"><b>${esc4(pick(x.label))}</b><small>${esc4(pick(x.description))}</small></span><span class="row-go" aria-hidden="true">${ICON.arrow}</span></button></li>`).join("")}</ul>
-<div class="home-grid">${sec(t("official"), t("offSub"), officialList("all"))}${sec(t("tools"), "", toolRows())}</div></div></main>`;
+<ul class="goal-list">${GOALS.map((x) => `<li><button type="button" class="goal-row" data-action="exploreGoal" data-id="${x.id}"><span class="goal-sym" data-goal="${x.id}">${SYMBOL[x.id]}</span><span class="goal-txt"><b>${esc5(pick(x.label))}</b><small>${esc5(pick(x.description))}</small></span><span class="row-go" aria-hidden="true">${ICON2.arrow}</span></button></li>`).join("")}</ul>
+${upcomingHtml()}${newsHtml()}<div class="home-grid">${sec(t("official"), t("offSub"), officialList("all"))}${sec(t("tools"), "", toolRows())}</div></div></main>`;
   }
   const mine = state.tasks.filter((x) => x.goal === g.id);
   const nt = getNextTask(state);
@@ -4524,27 +5115,27 @@ function today() {
   let card2;
   if (task) {
     const so = oppById(task.sourceId);
-    card2 = `<section class="resume" aria-label="${t("resume")}"><div><span class="resume-k">${t("resume")}</span><span class="resume-t">${so ? `${demoBadge(so)}${esc4(pick(so.title))}` : t("missing")}</span><span class="resume-s"><i aria-hidden="true"></i>${t("resumeS")}</span></div><button type="button" class="btn" data-action="openTask" data-id="${esc4(task.id)}">${t("resume")} ${ICON.arrow}</button></section>`;
+    card2 = `<section class="resume" aria-label="${t("resume")}"><div><span class="resume-k">${t("resume")}</span><span class="resume-t">${so ? `${demoBadge(so)}${esc5(pick(so.title))}` : t("missing")}</span><span class="resume-s"><i aria-hidden="true"></i>${t("resumeS")}</span></div><button type="button" class="btn" data-action="openTask" data-id="${esc5(task.id)}">${t("resume")} ${ICON2.arrow}</button></section>`;
   } else if (allDone) {
-    card2 = `<section class="resume is-done"><div><span class="resume-k">${t("nextStep")}</span><span class="resume-t">${t("doneNext")}</span></div><div class="resume-acts"><button type="button" class="btn" data-action="exploreGoal" data-id="${g.id}">${t("exploreMore")} ${ICON.arrow}</button><button type="button" class="link" data-action="nav" data-page="prepare">${t("viewPrep")}</button></div></section>`;
+    card2 = `<section class="resume is-done"><div><span class="resume-k">${t("nextStep")}</span><span class="resume-t">${t("doneNext")}</span></div><div class="resume-acts"><button type="button" class="btn" data-action="exploreGoal" data-id="${g.id}">${t("exploreMore")} ${ICON2.arrow}</button><button type="button" class="link" data-action="nav" data-page="prepare">${t("viewPrep")}</button></div></section>`;
   } else {
-    card2 = `<section class="resume is-start"><div><span class="resume-k">${t("nextStep")}</span><span class="resume-t">${esc4(pick(g.homeTitle))}</span><span class="resume-s">${esc4(pick(g.steps[0]))}</span></div><button type="button" class="btn" data-action="exploreGoal" data-id="${g.id}">${esc4(pick(g.homeAction))} ${ICON.arrow}</button></section>`;
+    card2 = `<section class="resume is-start"><div><span class="resume-k">${t("nextStep")}</span><span class="resume-t">${esc5(pick(g.homeTitle))}</span><span class="resume-s">${esc5(pick(g.steps[0]))}</span></div><button type="button" class="btn" data-action="exploreGoal" data-id="${g.id}">${esc5(pick(g.homeAction))} ${ICON2.arrow}</button></section>`;
   }
   const opps = OPPORTUNITIES.filter((o) => o.goal === g.id).slice(0, 2);
   const off = g.id === "job" && jobsFeed.snapshot().status === "disabled" ? `<p class="off"><i aria-hidden="true"></i>${t("jobsOff")}</p>` : "";
   return `<main class="home" id="main"><aside class="stage home-stage" aria-label="${t("myCard")}"><div class="rod" aria-hidden="true"></div>${hang(g.id, { kicker: t("myCard"), mode: "next" })}<div class="home-cap"><span></span><button type="button" class="link" data-action="changeGoal">${t("changeCard")}</button></div></aside>
 <div class="home-main">${notices()}<p class="eyebrow">${t("today")}</p><h1 class="title page-title" tabindex="-1"><span>${h1a}</span> <span class="title-2">${h1b}</span></h1>
-${stamps(st, g.steps.map(pick))}${card2}${g.id === "study" && STUDY_ON ? renderStudyEntry(studyView()) : ""}
+${stamps(st, g.steps.map(pick))}${card2}${g.id === "study" && STUDY_ON ? renderStudyEntry(studyView()) : ""}${upcomingHtml()}${newsHtml()}
 <div class="home-grid">${sec(t("homeOpps"), t("demoSub"), `<ul class="rows">${opps.map(oppRow).join("")}</ul>`)}${sec(t("official"), t("offSub"), officialList(g.id) + off)}</div></div></main>`;
 }
 function officialList(goal) {
   const list = OFFICIAL_LINKS.filter((l) => goal === "all" || l.goal === goal || l.goal === null);
-  return `<ul class="rows">${list.map((l) => `<li><a class="row" href="${esc4(l.url)}" target="_blank" rel="noopener noreferrer"><span><b><span class="badge official">${t("officialBadge")}</span>${esc4(pick(l.title))}</b><small>${esc4(pick(l.summary))} · ${t("checked")} ${esc4(l.checkedAt)}</small></span><span class="row-go" aria-hidden="true">${ICON.out}</span><span class="sr-only"> (${t("openNew")})</span></a></li>`).join("")}</ul>`;
+  return `<ul class="rows">${list.map((l) => `<li><a class="row" href="${esc5(l.url)}" target="_blank" rel="noopener noreferrer"><span><b><span class="badge official">${t("officialBadge")}</span>${esc5(pick(l.title))}</b><small>${esc5(pick(l.summary))} · ${t("checked")} ${esc5(l.checkedAt)}</small></span><span class="row-go" aria-hidden="true">${ICON2.out}</span><span class="sr-only"> (${t("openNew")})</span></a></li>`).join("")}</ul>`;
 }
-var toolRows = () => `<ul class="rows">${EXISTING_TOOLS.map((x) => `<li><a class="row" href="${esc4(x.url)}" target="_blank" rel="noopener noreferrer"><span><b>${esc4(pick(x.title))}</b><small>${esc4(pick(x.summary))}</small></span><span class="row-go" aria-hidden="true">${ICON.out}</span><span class="sr-only"> (${t("openNew")})</span></a></li>`).join("")}</ul>`;
+var toolRows = () => `<ul class="rows">${EXISTING_TOOLS.map((x) => `<li><a class="row" href="${esc5(x.url)}" target="_blank" rel="noopener noreferrer"><span><b>${esc5(pick(x.title))}</b><small>${esc5(pick(x.summary))}</small></span><span class="row-go" aria-hidden="true">${ICON2.out}</span><span class="sr-only"> (${t("openNew")})</span></a></li>`).join("")}</ul>`;
 function explore() {
   const f = S.filter;
-  const filt = ["all", ...GOALS.map((g) => g.id)].map((id) => `<button type="button" class="chip" aria-pressed="${f === id}" data-action="filter" data-id="${id}">${id === "all" ? t("all") : esc4(pick(goalById(id).description))}</button>`).join("");
+  const filt = ["all", ...GOALS.map((g) => g.id)].map((id) => `<button type="button" class="chip" aria-pressed="${f === id}" data-action="filter" data-id="${id}">${id === "all" ? t("all") : esc5(pick(goalById(id).description))}</button>`).join("");
   const list = OPPORTUNITIES.filter((o) => f === "all" || o.goal === f);
   const full = S.compare.length >= 3;
   let h = head(t("exploreTitle"), t("explore"), "", t("exploreT2"));
@@ -4553,11 +5144,11 @@ function explore() {
   h += `<details class="practice"${S.practiceOpen ? " open" : ""}><summary><span>${t("practice")}</span><small>${t("demoSub")}</small></summary><p class="meta">${t("demoNote")}</p>`;
   h += `<ul class="rows opp-rows">${list.map((o) => {
     const on = S.compare.includes(o.id);
-    return `<li class="opp"><div class="opp-text"><b>${demoBadge(o)}${esc4(pick(o.title))}</b><small>${esc4(pick(o.summary))}</small></div><div class="opp-acts"><button type="button" class="btn-line" data-action="detail" data-id="${o.id}">${t("details")}</button><button type="button" class="chip" aria-pressed="${on}" data-action="compare" data-id="${o.id}"${full && !on ? " disabled" : ""}>${on ? t("compareOn") : t("compareAdd")}</button></div></li>`;
+    return `<li class="opp"><div class="opp-text"><b>${demoBadge(o)}${esc5(pick(o.title))}</b><small>${esc5(pick(o.summary))}</small></div><div class="opp-acts"><button type="button" class="btn-line" data-action="detail" data-id="${o.id}">${t("details")}</button><button type="button" class="chip" aria-pressed="${on}" data-action="compare" data-id="${o.id}"${full && !on ? " disabled" : ""}>${on ? t("compareOn") : t("compareAdd")}</button></div></li>`;
   }).join("")}</ul>`;
   if (full) h += `<p class="meta">${t("compareMax")}</p>`;
   if (S.compare.length) {
-    h += `<div class="sec-h compare-h"><h2>${t("compareTitle")} (${S.compare.length}/3)</h2><button type="button" class="text-button" data-action="clearCompare">${t("clearCompare")}</button></div><div class="compare-grid">${S.compare.map(oppById).map((o) => `<div class="compare-item">${demoBadge(o)}<h3>${esc4(pick(o.title))}</h3><ol class="reqs">${o.requirements.map((r, i) => `<li><b>${i + 1}</b>${esc4(pick(r))}</li>`).join("")}</ol></div>`).join("")}</div>`;
+    h += `<div class="sec-h compare-h"><h2>${t("compareTitle")} (${S.compare.length}/3)</h2><button type="button" class="text-button" data-action="clearCompare">${t("clearCompare")}</button></div><div class="compare-grid">${S.compare.map(oppById).map((o) => `<div class="compare-item">${demoBadge(o)}<h3>${esc5(pick(o.title))}</h3><ol class="reqs">${o.requirements.map((r, i) => `<li><b>${i + 1}</b>${esc5(pick(r))}</li>`).join("")}</ol></div>`).join("")}</div>`;
   }
   h += "</details>";
   h += sec(t("official"), t("offSub"), officialList(f));
@@ -4566,21 +5157,21 @@ function explore() {
 function detail() {
   const o = oppById(S.oppId);
   if (!o) return head(t("missing")) + `<button type="button" class="btn-line" data-action="nav" data-page="explore">${t("backList")}</button>`;
-  return `<article class="detail"><button type="button" class="back" data-action="nav" data-page="explore">${ICON.back}${t("backList")}</button><p class="eyebrow">${demoBadge(o)} ${esc4(pick(goalById(o.goal)?.label))}</p><h1 class="title page-title" tabindex="-1"><span>${esc4(pick(o.title))}</span></h1><p class="lead">${esc4(pick(o.summary))}</p>${liveLink(o)}
-<h2 class="h2">${t("requirements")}</h2><ol class="reqs">${o.requirements.map((r, i) => `<li><b>${i + 1}</b>${esc4(pick(r))}</li>`).join("")}</ol>
-<div class="actions"><button type="button" class="btn" data-action="${o.source === "live" ? "prepareJob" : "prepareThis"}" data-id="${esc4(o.id)}">${t("prepareThis")} ${ICON.arrow}</button></div></article>
+  return `<article class="detail"><button type="button" class="back" data-action="nav" data-page="explore">${ICON2.back}${t("backList")}</button><p class="eyebrow">${demoBadge(o)} ${esc5(pick(goalById(o.goal)?.label))}</p><h1 class="title page-title" tabindex="-1"><span>${esc5(pick(o.title))}</span></h1><p class="lead">${esc5(pick(o.summary))}</p>${liveLink(o)}
+<h2 class="h2">${t("requirements")}</h2><ol class="reqs">${o.requirements.map((r, i) => `<li><b>${i + 1}</b>${esc5(pick(r))}</li>`).join("")}</ol>
+<div class="actions"><button type="button" class="btn" data-action="${o.source === "live" ? "prepareJob" : "prepareThis"}" data-id="${esc5(o.id)}">${t("prepareThis")} ${ICON2.arrow}</button></div></article>
 ${sec(t("official"), t("offSub"), officialList(o.goal))}`;
 }
 var statusHtml = (task) => `<span class="status" data-state="${task.confirmedAt ? "done" : "draft"}">${task.confirmedAt ? t("done") : t("draft")}</span>`;
 function prepare() {
   let h = head(t("prepareTitle"), t("prepare"), "", t("prepareT2"));
-  if (!state.tasks.length) return h + `<p class="empty">${t("noTasks")}</p><div class="actions"><button type="button" class="btn" data-action="nav" data-page="explore">${t("exploreTitle")} ${ICON.arrow}</button></div>`;
+  if (!state.tasks.length) return h + `<p class="empty">${t("noTasks")}</p><div class="actions"><button type="button" class="btn" data-action="nav" data-page="explore">${t("exploreTitle")} ${ICON2.arrow}</button></div>`;
   for (const g of GOALS) {
     const ts = state.tasks.filter((x) => x.goal === g.id);
     if (!ts.length) continue;
-    h += sec(esc4(pick(g.label)), "", `<ul class="rows">${ts.map((x) => {
+    h += sec(esc5(pick(g.label)), "", `<ul class="rows">${ts.map((x) => {
       const so = oppById(x.sourceId);
-      return `<li><button type="button" class="row" data-action="openTask" data-id="${esc4(x.id)}"><span><b>${demoBadge(so)}${so ? esc4(pick(so.title)) : t("missing")}</b><small>${statusHtml(x)}</small></span><span class="row-go" aria-hidden="true">${ICON.arrow}</span></button></li>`;
+      return `<li><button type="button" class="row" data-action="openTask" data-id="${esc5(x.id)}"><span><b>${demoBadge(so)}${so ? esc5(pick(so.title)) : t("missing")}</b><small>${statusHtml(x)}</small></span><span class="row-go" aria-hidden="true">${ICON2.arrow}</span></button></li>`;
     }).join("")}</ul>`);
   }
   return h;
@@ -4594,22 +5185,22 @@ function editor() {
   const st = session.status(), signed = st.signedIn;
   const savedOk = st.canEdit && !st.error;
   let h = `<main class="ed" id="main"><aside class="stage ed-stage" aria-label="${t("source")}"><div class="rod" aria-hidden="true"></div>${hang(goal, { kicker: t("srcK"), name: pick(o.title), desc: "", mode: "source" })}
-<div class="ed-src"><b>${t("source")}</b><p>${demoBadge(o)}<span>${esc4(pick(o.title))}</span></p><small>${o.source === "live" ? t("liveNote") : t("srcNote")}</small>${liveLink(o)}<button type="button" class="link" data-action="detail" data-id="${esc4(o.id)}">${t("reopen")}</button></div></aside>
-<div class="ed-main">${notices(false, true)}<button type="button" class="back" data-action="nav" data-page="prepare">${ICON.back}${t("backPrep")}</button>
-<p class="eyebrow">${t("edEyebrow")}</p><h1 class="title page-title" tabindex="-1"><span>${esc4(pick(o.prompt))}</span></h1>
-<ol class="reqs" aria-label="${t("requirements")}">${o.requirements.map((r, i) => `<li><b>${i + 1}</b>${esc4(pick(r))}</li>`).join("")}</ol>
+<div class="ed-src"><b>${t("source")}</b><p>${demoBadge(o)}<span>${esc5(pick(o.title))}</span></p><small>${o.source === "live" ? t("liveNote") : t("srcNote")}</small>${liveLink(o)}<button type="button" class="link" data-action="detail" data-id="${esc5(o.id)}">${t("reopen")}</button></div></aside>
+<div class="ed-main">${notices(false, true)}<button type="button" class="back" data-action="nav" data-page="prepare">${ICON2.back}${t("backPrep")}</button>
+<p class="eyebrow">${t("edEyebrow")}</p><h1 class="title page-title" tabindex="-1"><span>${esc5(pick(o.prompt))}</span></h1>
+<ol class="reqs" aria-label="${t("requirements")}">${o.requirements.map((r, i) => `<li><b>${i + 1}</b>${esc5(pick(r))}</li>`).join("")}</ol>
 <section class="editor"><div class="field"><label for="body" class="field-label">${t("body")}</label>
-<textarea id="body" maxlength="6000" aria-describedby="body-hint edit-err" data-action="body"${S.error === "needBody" ? ' aria-invalid="true"' : ""}>${esc4(task.body)}</textarea>
-<div class="field-meta" id="body-hint"><span class="count" id="count">${countText(task.body)}</span>${savedOk ? `<span class="saved">${ICON.check}${signed ? t("savedAccount") : t("savedGuest")}</span>` : ""}</div></div>
+<textarea id="body" maxlength="6000" aria-describedby="body-hint edit-err" data-action="body"${S.error === "needBody" ? ' aria-invalid="true"' : ""}>${esc5(task.body)}</textarea>
+<div class="field-meta" id="body-hint"><span class="count" id="count">${countText(task.body)}</span>${savedOk ? `<span class="saved">${ICON2.check}${signed ? t("savedAccount") : t("savedGuest")}</span>` : ""}</div></div>
 <p id="task-status" class="task-status">${statusHtml(task)}</p>
-<label class="check"><input type="checkbox" id="ack"${task.confirmedAt ? " checked" : ""}><span class="box" aria-hidden="true">${ICON.check}</span><span>${t("confirmCheck")}</span></label>
+<label class="check"><input type="checkbox" id="ack"${task.confirmedAt ? " checked" : ""}><span class="box" aria-hidden="true">${ICON2.check}</span><span>${t("confirmCheck")}</span></label>
 <p id="edit-err" class="err" role="alert">${S.error ? t(S.error) : ""}</p>
 <div class="confirm-row"><button type="button" class="btn" data-action="confirm">${t("confirm")}</button><span class="slot slot-sm${task.confirmedAt ? " is-sealed" : ""}" id="seal-slot" aria-hidden="true">${task.confirmedAt ? seal() : t("sealSlot")}</span></div>
 ${S.flash ? `<div id="flash" class="notice flash-inline" role="status">${S.flash}</div>` : ""}<p class="fine">${t("confirmNote")}</p></section>`;
   if (task.confirmedAt) {
     const nx = getNextTask(state);
-    h += `<div id="confirmed-result" class="result"><div class="sec-h"><h2>${t("result")}</h2>${demoBadge(o)}</div><div class="result-body">${esc4(task.body)}</div>
-<div class="actions">${nx && nx.id !== task.id && !nx.confirmedAt ? `<button type="button" class="btn" data-action="openTask" data-id="${esc4(nx.id)}">${t("nextAction")} ${ICON.arrow}</button>` : ""}<button type="button" class="btn-line" data-action="exploreGoal" data-id="${task.goal}">${t("exploreMore")}</button></div></div>`;
+    h += `<div id="confirmed-result" class="result"><div class="sec-h"><h2>${t("result")}</h2>${demoBadge(o)}</div><div class="result-body">${esc5(task.body)}</div>
+<div class="actions">${nx && nx.id !== task.id && !nx.confirmedAt ? `<button type="button" class="btn" data-action="openTask" data-id="${esc5(nx.id)}">${t("nextAction")} ${ICON2.arrow}</button>` : ""}<button type="button" class="btn-line" data-action="exploreGoal" data-id="${task.goal}">${t("exploreMore")}</button></div></div>`;
   }
   return h + "</div></main>";
 }
@@ -4635,10 +5226,10 @@ Thank you.` : `안녕하세요.
 감사합니다.`;
 }
 function help() {
-  const opts = [...GOALS.map((g) => [g.id, pick(g.label)]), ["general", t("general")]].map(([id, l]) => `<option value="${id}"${S.help === id ? " selected" : ""}>${esc4(l)}</option>`).join("");
+  const opts = [...GOALS.map((g) => [g.id, pick(g.label)]), ["general", t("general")]].map(([id, l]) => `<option value="${id}"${S.help === id ? " selected" : ""}>${esc5(l)}</option>`).join("");
   return head(t("helpTitle"), t("help"), t("helpLead"), t("helpT2")) + `<div class="field field-inline"><label for="topic" class="field-label">${t("topic")}</label><select id="topic" class="select" data-action="topic">${opts}</select></div>
 <section class="sec"><div class="sec-h"><h2>${t("template")}</h2><button type="button" class="btn-line" data-action="copy">${t("copy")}</button></div>
-${S.copyMsg ? `<p class="notice${S.copyMsg === "copyFail" ? " error" : ""}" role="status">${t(S.copyMsg)}</p>` : ""}<pre class="result-body" id="tpl">${esc4(helpTemplate(S.help))}</pre></section>
+${S.copyMsg ? `<p class="notice${S.copyMsg === "copyFail" ? " error" : ""}" role="status">${t(S.copyMsg)}</p>` : ""}<pre class="result-body" id="tpl">${esc5(helpTemplate(S.help))}</pre></section>
 ${sec(t("official"), t("offSub"), officialList(S.help === "general" ? "none" : S.help))}
 ${sec(t("tools"), t("offSub"), `<p class="meta">${t("toolsLead")}</p>${toolRows()}`)}`;
 }
@@ -4646,18 +5237,28 @@ function profile() {
   const g = goalById(state.primaryGoal);
   const accSt = session.status();
   return head(t("profileTitle"), t("profile"), "", t("profileT2")) + renderAccountPanel(accSt, state.lang, { pendingBackup: !!pendingBackup && !!accSt.canConfirmBackup && pendingBackup.owner === ownerKey(), useRemote: !!pendingBackup?.useRemote }) + `<div class="settings">
-<section class="settings-group"><h2>${t("goal")}</h2><p>${g ? esc4(pick(g.label)) : t("none")}</p><button type="button" class="btn-line" data-action="changeGoal">${t("changeGoal")}</button></section>
+<section class="settings-group"><h2>${t("goal")}</h2><p>${g ? esc5(pick(g.label)) : t("none")}</p><button type="button" class="btn-line" data-action="changeGoal">${t("changeGoal")}</button></section>
 <section class="settings-group"><h2>${t("location")}</h2><p>${t(state.location || "unknown")}</p></section>
 <section class="settings-group"><h2>${t("lang")}</h2><p>${state.lang === "en" ? "English" : "한국어"}</p></section>
-<section class="settings-group"><h2>${t("storage")}</h2>${accSt.signedIn ? `<p>${state.lang === "en" ? "Syncs to your account. Please check the save status above." : "계정에 동기화합니다. 위의 저장 상태를 확인해 주세요."}</p>` : `<p>${t("storageText")}</p><button type="button" class="btn-line danger" data-action="clear">${t("clear")}</button>`}${STUDY_ON ? `<p>${t("studyStore")}</p>` : ""}</section></div>`;
+<section class="settings-group"><h2>${t("storage")}</h2>${accSt.signedIn ? `<p>${state.lang === "en" ? "Syncs to your account. Please check the save status above." : "계정에 동기화합니다. 위의 저장 상태를 확인해 주세요."}</p>` : `<p>${t("storageText")}</p><button type="button" class="btn-line danger" data-action="clear">${t("clear")}</button>`}${STUDY_ON ? `<p>${t("studyStore")}</p>` : CHANNEL_ON ? `<p>${t("datesStore")}</p>` : ""}</section></div>`;
 }
 var studyView = () => ({ lang: state.lang, profile: studyProfile(), programs: STUDY_PROGRAMS, rules: rulesAt(RULES, /* @__PURE__ */ new Date()), now: /* @__PURE__ */ new Date() });
 var condView = () => ({ ...studyView(), persisted: study.persisted(), text: S.studyText, errors: S.studyErrors });
+var DATE_NOTES = {
+  full: ["다가오는 날이 서른 개라 더 넣을 수 없어요. 다가오는 날에서 하나를 뺀 뒤 넣어 주세요.", "Coming up already has 30 dates. Remove one first."],
+  ics: ["이 브라우저에서는 달력 파일을 만들 수 없어요. 날짜를 직접 적어 두세요.", "This browser cannot create the calendar file. Please note the date yourself."]
+};
+var dateNoteText = () => DATE_NOTES[S.dateNote] ? accL(...DATE_NOTES[S.dateNote]) : "";
+var channelView = () => ({ ...studyView(), posts: CHANNEL_POSTS, condOn: STUDY_ON, persisted: study.persisted(), note: dateNoteText() });
+var channels = () => renderChannels({ ...channelView(), channelId: S.channelId });
+var post = () => renderPost({ ...channelView(), postId: S.postId });
+var upcomingHtml = () => CHANNEL_ON ? renderUpcoming(channelView()) : "";
+var newsHtml = () => CHANNEL_ON ? renderNews(channelView()) : "";
 var univ = () => renderUniv({ ...studyView(), filter: S.univFilter });
 var univDetail = () => renderUnivDetail({ ...studyView(), programId: S.univId });
 var univCompare = () => renderUnivCompare(studyView());
 var cond = () => renderCond(condView());
-var PAGES = { today, univ, univDetail, univCompare, cond, explore, detail, prepare, editor, help, profile };
+var PAGES = { today, channels, post, univ, univDetail, univCompare, cond, explore, detail, prepare, editor, help, profile };
 var LOCKED_ACTIONS = ["pickGoal", "step2", "toggle", "finish", "skip", "prepareThis", "confirm", "body", "loc", "setLang", "changeGoal", "prepareJob", "saveJob", "removeJob"];
 function render(focus = true) {
   if (composingEl && root.contains(composingEl) && document.activeElement === composingEl) {
@@ -4668,6 +5269,7 @@ function render(focus = true) {
   composingEl = null;
   syncStudyOwner();
   if (!STUDY_ON && (S.page === "univ" || UNIV_PAGES.includes(S.page))) S.page = "today";
+  if (!CHANNEL_ON && (S.page === "channels" || S.page === "post")) S.page = "today";
   const accSt = session.status();
   const ae = document.activeElement;
   const keepId = !focus && ae && root.contains(ae) ? ae.id : "";
@@ -4727,6 +5329,7 @@ function go(page) {
   S.drop = MOTION && page !== S.page && (page === "onboard" || page === "today");
   S.page = page;
   S.flash = null;
+  S.dateNote = null;
   S.error = null;
   S.copyMsg = null;
   S.studyText = {};
@@ -4803,10 +5406,101 @@ var ACT = {
     S.taskId = id;
     go("editor");
   },
-  nav: (el) => go(el.dataset.page),
+  nav: (el) => {
+    if (el.dataset.page === "channels") S.channelId = null;
+    go(el.dataset.page);
+  },
   univOpen(el) {
     S.univId = el.dataset.id;
     go("univDetail");
+  },
+  channelOpen(el) {
+    S.channelId = el.dataset.id || null;
+    go("channels");
+  },
+  postOpen(el) {
+    S.postId = el.dataset.id;
+    go("post");
+  },
+  channelShow(el) {
+    const id = el.dataset.id, next = studyWrite(toggleChannel(studyProfile(), id));
+    render(false);
+    root.querySelector(`[data-action="channelShow"][data-id="${id}"]`)?.focus();
+    say(next.channelsOff.includes(id) ? accL("오늘 화면의 새 소식에서 뺐어요.", "Removed from Latest news on Today.") : accL("오늘 화면의 새 소식에 보여요.", "Shown in Latest news on Today."));
+  },
+  dateToggle(el) {
+    const id = el.dataset.id, hit = findDate(CHANNEL_POSTS, id);
+    if (!hit) return;
+    const cur = studyProfile(), now = /* @__PURE__ */ new Date();
+    let msg;
+    if (cur.dates.some((x) => x.id === id)) {
+      studyWrite(removeDate(cur, id));
+      S.dateNote = null;
+      msg = accL("다가오는 날에서 뺐어요.", "Removed from Coming up.");
+    } else {
+      const st = dateStatus(hit.date, now).state;
+      if (st === "past" || st === "cancelled") return;
+      let base = cur;
+      if (base.dates.length >= MAX_DATES) base = keepDates(base, base.dates.filter((x) => {
+        const h = findDate(CHANNEL_POSTS, x.id);
+        const s2 = h && dateStatus(h.date, now).state;
+        return h && s2 !== "past" && s2 !== "cancelled";
+      }).map((x) => x.id));
+      const r = addDate(base, { id, start: hit.date.start, end: endDay(hit.date) });
+      if (r.full) {
+        S.dateNote = "full";
+        msg = dateNoteText();
+      } else {
+        S.dateNote = null;
+        studyWrite(r.profile);
+        msg = study.persisted() ? accL("이 탭의 다가오는 날에 넣었어요.", "Added to Coming up in this tab.") : accL("이 브라우저에서는 저장할 수 없어 지금 화면에서만 기억해요.", "This browser cannot store it, so it is kept on this screen only.");
+      }
+    }
+    render(false);
+    (root.querySelector(`[data-action="dateToggle"][data-id="${id}"]`) || root.querySelector("#sx-dates-h") || root.querySelector(".page-title"))?.focus();
+    say(msg);
+  },
+  dateConfirm(el) {
+    const hit = findDate(CHANNEL_POSTS, el.dataset.id);
+    if (!hit) return;
+    studyWrite(confirmDate(studyProfile(), { id: hit.date.id, start: hit.date.start, end: endDay(hit.date) }));
+    render(false);
+    const row = root.querySelector(`.sx-dayrow-btn[data-date="${hit.date.id}"]`), fold2 = row && row.closest("details");
+    if (fold2) fold2.open = true;
+    (row || root.querySelector("#sx-up-h"))?.focus();
+    say(accL("바뀐 날짜를 확인했어요.", "Changed date confirmed."));
+  },
+  datesClean() {
+    const cur = studyProfile();
+    studyWrite(keepDates(cur, cur.dates.filter((x) => findDate(CHANNEL_POSTS, x.id)).map((x) => x.id)));
+    render(false);
+    (root.querySelector("#sx-up-h") || root.querySelector(".page-title"))?.focus();
+    say(accL("글에서 빠진 날을 목록에서 지웠어요.", "Removed dates that are no longer in the posts."));
+  },
+  dateIcs(el) {
+    const hit = findDate(CHANNEL_POSTS, el.dataset.id);
+    if (!hit) return;
+    try {
+      const url = URL.createObjectURL(new Blob([icsText(hit.post, hit.date, state.lang)], { type: "text/calendar;charset=utf-8" }));
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `${hit.date.id}.ics`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 3e4);
+      if (S.dateNote) {
+        S.dateNote = null;
+        render(false);
+        root.querySelector(`[data-action="dateIcs"][data-id="${hit.date.id}"]`)?.focus();
+      }
+      say(accL("달력 파일을 내려받았어요. 파일을 열어 달력에 넣으세요.", "Calendar file downloaded. Open it to add the date to your calendar."));
+    } catch {
+      S.dateNote = "ics";
+      render(false);
+      root.querySelector(`[data-action="dateIcs"][data-id="${hit.date.id}"]`)?.focus();
+      say(dateNoteText());
+    }
   },
   studyFilter(el) {
     S.univFilter = STUDY_FILTERS.includes(el.dataset.id) ? el.dataset.id : "all";
@@ -4823,8 +5517,8 @@ var ACT = {
     sayStudyCount();
   },
   studyClear() {
-    const kept = studyProfile().compare;
-    studyWrite({ ...createProfile(), compare: kept });
+    const cur = studyProfile();
+    studyWrite({ ...createProfile(), compare: cur.compare, dates: cur.dates, channelsOff: cur.channelsOff });
     S.studyText = {};
     S.studyErrors = {};
     render(false);
@@ -5241,7 +5935,7 @@ root.addEventListener("click", (e) => {
   if (!el || el.disabled || !ACT[el.dataset.action]) return;
   const fail4 = (err) => {
     const m = getAccountErrorMessage(err, state.lang);
-    S.flash = esc4(m);
+    S.flash = esc5(m);
     render(false);
     say(m);
   };
@@ -5298,7 +5992,7 @@ root.addEventListener("input", (e) => {
       studyInput(e.target);
     } catch (err) {
       const m = getAccountErrorMessage(err, state.lang);
-      S.flash = esc4(m);
+      S.flash = esc5(m);
       render(false);
       say(m);
     }
@@ -5384,7 +6078,7 @@ S.draft = newDraft();
 render(false);
 void session.init().catch((err) => {
   const m = getAccountErrorMessage(err, state.lang);
-  S.flash = esc4(m);
+  S.flash = esc5(m);
   render(false);
   say(m);
 }).finally(() => {
