@@ -17,7 +17,7 @@
 <script>(()=>{const a=document.documentElement.lang==='en'?'/en':'',m={'#atlas':a+'/atlas/','#principles':a+'/atlas/','#philosophy':a+'/atlas/','#drama':a+'/lab/#drama','#founder':a+'/founder/','#founder-quote':a+'/founder/'},go=()=>{const t=m[location.hash];if(t)location.replace(t)};go();addEventListener('hashchange',go);let moved=0;for(const e of ['wheel','touchstart','keydown','pointerdown'])addEventListener(e,()=>{moved=1},{passive:true,once:true});const settle=()=>{if(moved||!location.hash)return;let id;try{id=decodeURIComponent(location.hash.slice(1))}catch(e){return}const el=document.getElementById(id);if(el)el.scrollIntoView({block:'start',behavior:'instant'})};addEventListener('load',()=>{for(const ms of [0,400,1000,1800,2800])setTimeout(settle,ms)})})()</script>
 <script type="module" src="/assets/v10/site.js?v=cb64453758c6"></script>
 
-<link rel="stylesheet" href="/assets/v11/home-en.css?v=7ab1339bca03">
+<link rel="stylesheet" href="/assets/v11/home-en.css?v=b221428e25f5">
 <link rel="stylesheet" href="/assets/v11/en-fix.css?v=f6b218aa8dd1">
 </head>
 <body data-tone="dark">
@@ -331,6 +331,7 @@
     body.classList.toggle('flat', flat);
     if (flat) [mapIn, wOpen, wClose, pins, loop, rail, ...scenes, ...says, ...scenes.map(s => s.firstElementChild)].forEach(el => el.removeAttribute('style'));
     if (flat && !was) { stopWalk(); if (reduce) loopDraw.style.strokeDashoffset = 0; }
+    fitPins();
   }
   function road() {
     if (flat) return;
@@ -414,9 +415,29 @@
     pinLis.forEach((li, i) => li.classList.toggle('here', !idle && i === st.pin));
     newbie.classList.toggle('on', !idle && st.newbie);
     occs.forEach((o, i) => { const c = WALK.occ[i]; o.classList.toggle('over', p.y < c.base && p.x > c.x[0] && p.x < c.x[1]); });
-    me.style.opacity = 1 - Math.max(...HIDE.map(([x0, y0, x1, y1]) => clamp((p.x - x0) / 18) * clamp((x1 - p.x) / 18) * clamp((p.y - y0) / 18) * clamp((y1 - p.y) / 18)));
+    const op = 1 - Math.max(...HIDE.map(([x0, y0, x1, y1]) => clamp((p.x - x0) / 18) * clamp((x1 - p.x) / 18) * clamp((p.y - y0) / 18) * clamp((y1 - p.y) / 18)));
+    me.style.opacity = op;
+    const r = idle || op < .3 ? null : me.getBoundingClientRect(), cx = r && (r.left + r.right) / 2, hw = r && r.width / 4;
+    pinLis.forEach((li, i) => {
+      const q = r && li.getBoundingClientRect(), hit = !!r && q.left < cx + hw && q.right > cx - hw && q.top < r.bottom && q.bottom > r.top + r.height * .08;
+      const here = !idle && i === st.pin, up = hit && here ? (q.bottom - (r.top + r.height * .08) + 3) * li.offsetWidth / (q.width || 1) : 0;
+      li.classList.toggle('yield', hit && !here);
+      if (up) li.style.setProperty('--ly', up.toFixed(1) + 'px'); else li.style.removeProperty('--ly');
+    });
   }
-  const HIDE = [[690, 478, 800, 678], [1195, 530, 1380, 706]];
+  const HIDE = [[690, 548, 800, 678], [1205, 592, 1380, 706]];
+  function fitPins() {
+    const W = document.documentElement.clientWidth, M = 8, was = mapIn.style.transform;
+    if (!flat) mapIn.style.transform = 'translate(-50%,-50%) scale(1)';
+    pinLis.forEach(li => {
+      li.style.removeProperty('--nx'); li.style.removeProperty('--tx');
+      const bt = li.firstElementChild, b = bt.getBoundingClientRect(), k = b.width / (bt.offsetWidth || b.width || 1);
+      const d = b.right > W - M ? b.right - (W - M) : b.left < M ? b.left - M : 0, lim = b.width / 2 - 18 * k;
+      if (d) { li.style.setProperty('--nx', d / k + 'px'); li.style.setProperty('--tx', Math.max(-lim, Math.min(lim, d)) / k + 'px'); }
+    });
+    if (!flat) mapIn.style.transform = was;
+  }
+  document.fonts.ready.then(fitPins);
   [me, newbie].forEach(el => {
     el.style.width = 94 / WALK.body * WALK.ar / 15.36 + '%'; el.style.aspectRatio = WALK.ar;
     el.style.transformOrigin = `50% ${(1 - WALK.pad) * 100}%`;
