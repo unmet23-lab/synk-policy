@@ -1,7 +1,7 @@
 {
- "createdAt": "2026-11-21T06:07:04.459Z",
- "commit": "edfa526bec7de563c5a651310ad191af21e4d255",
- "run": 44872214436,
+ "createdAt": "2026-11-21T09:09:34.922Z",
+ "commit": "c5784017a1c0832c3ea37a40d08b6c8b17f45200",
+ "run": 44886470063,
  "env": {
   "chromium": "151.0.7922.34",
   "os": "ubuntu24"
@@ -10,15 +10,15 @@
   "/": {
    "desktop": {
     "file": "desktop/home.jpg",
-    "sha256": "ba38161e117181071d3da394568734bcc9749726a29a7c2021e2b04dc620c1af",
-    "cssHeight": 5354,
-    "run": 43731118070
+    "sha256": "87be94de171654fd8338beda1ea74e531da1a96ecde1d4d3068414bfe9ce5203",
+    "cssHeight": 20360,
+    "run": 44886470063
    },
    "mobile": {
     "file": "mobile/home.jpg",
-    "sha256": "3860b2d34d5ae9be608d2c9985a26849fb8115667dbb3d11f4912524fce5c05d",
+    "sha256": "a15ebce45194354d9a55253f16704e1457e85301089d63440674dd4c80581403",
     "cssHeight": 14642,
-    "run": 44872214436
+    "run": 44886470063
    }
   },
   "/ai/": {
@@ -150,15 +150,15 @@
   "/en/": {
    "desktop": {
     "file": "desktop/en.jpg",
-    "sha256": "69ff1467c0013875bda92adbc8f1f3b678486e70c439a4972f7fd4406998164d",
-    "cssHeight": 5354,
-    "run": 43731118070
+    "sha256": "04df7001486279dab9141b6ebb647385eb1941aabf843f961499ec47d6aa061b",
+    "cssHeight": 20569,
+    "run": 44886470063
    },
    "mobile": {
     "file": "mobile/en.jpg",
-    "sha256": "c3d2738219d6e2deeebe57f144fedc396c022381d87defe6e96be56f2f34a3ab",
+    "sha256": "32e5b4e13026da874c3fd1746946a596d634d79dc6bfc26f85b8aa42f0022374",
     "cssHeight": 15472,
-    "run": 44872214436
+    "run": 44886470063
    }
   },
   "/en/ai/": {
