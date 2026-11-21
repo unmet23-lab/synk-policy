@@ -149,9 +149,19 @@ html[data-sky="sunset"] .gate-sky::after{content:"";position:absolute;inset:0;ba
 .w-pins span{position:relative;z-index:1}
 .w-loop{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;opacity:0;overflow:visible}
 .w-loop path{fill:none;stroke-linecap:round;stroke-linejoin:round}
-.w-loop .draw{stroke:var(--butter);stroke-width:16;stroke-dasharray:100;stroke-dashoffset:100}
-.w-loop .run{stroke:var(--ink);stroke-width:5;stroke-dasharray:5 95;animation:run 9s linear infinite}
-@keyframes run{to{stroke-dashoffset:-100}}
+.w-loop .draw{stroke:var(--butter);stroke-width:16;stroke-dasharray:100 200;stroke-dashoffset:100.5}
+.w-fig{position:absolute;left:0;top:0;pointer-events:none}
+.w-fig i{position:absolute;inset:0;background:url(/assets/v11/walk.webp) 0 0 no-repeat}
+.w-fig i+i{opacity:0}
+.w-fig::before{content:"";position:absolute;left:30%;width:56%;bottom:-2%;height:6%;border-radius:50%;background:radial-gradient(closest-side,rgba(84,60,32,.32),rgba(84,60,32,0))}
+.w-new{opacity:0;transition:opacity .8s var(--ease)}
+.w-new.on{opacity:1}
+.w-occ{position:absolute;pointer-events:none}
+.w-occ.over{z-index:1}
+.w-pins{z-index:2}
+.w-pins button,.w-pins button::after,.w-pins b{transition:transform .2s var(--ease),background-color .35s,color .35s}
+.w-pins .here button,.w-pins .here button::after{background:var(--ink);color:var(--paper)}
+.w-pins .here b{background:var(--butter);color:var(--ink)}
 .rail{position:absolute;z-index:5;left:var(--gut);top:88px;width:min(46vw,560px);opacity:0}
 .rail ol{display:grid;grid-template-columns:repeat(5,1fr);position:relative}
 .rail ol::before{content:"";position:absolute;left:10%;right:10%;top:13px;height:1.5px;background:rgba(0,0,0,.25)}
@@ -370,7 +380,6 @@ body[data-tone="dark"] .nav.solid{background:rgba(0,0,0,.4);box-shadow:0 1px 0 r
 .w-open h2{font-size:clamp(32px,4.2vw,62px)}
 .w-open p:not(.tag):not(.w-key){max-width:20em}
 p{text-wrap:pretty}
-.w-loop .run{stroke-width:11;stroke-dasharray:.01 99.99}
 .why{padding:var(--S) var(--gut) 0;display:grid;gap:clamp(40px,5vw,72px)}
 .why-head{display:grid;gap:clamp(14px,1.4vw,20px)}
 .why-head h2{font:700 clamp(30px,3.9vw,56px)/1.18 var(--sans);letter-spacing:-.035em}
