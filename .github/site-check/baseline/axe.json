@@ -1,4 +1,6 @@
 {
+ "/ai/|desktop": {},
+ "/ai/|mobile": {},
  "/atlas/|desktop": {},
  "/atlas/|mobile": {},
  "/builds/manual/|desktop": {},
@@ -9,12 +11,59 @@
  "/builds/|mobile": {},
  "/care/|desktop": {},
  "/care/|mobile": {},
+ "/classroom/|desktop": {
+  "color-contrast": {
+   "impact": "serious",
+   "count": 1,
+   "targets": [
+    ".hot > i"
+   ]
+  }
+ },
+ "/classroom/|mobile": {
+  "color-contrast": {
+   "impact": "serious",
+   "count": 1,
+   "targets": [
+    ".hot > i"
+   ]
+  }
+ },
+ "/community/|desktop": {},
+ "/community/|mobile": {},
  "/data-deletion/|desktop": {},
  "/data-deletion/|mobile": {},
+ "/en/ai/|desktop": {},
+ "/en/ai/|mobile": {},
  "/en/atlas/|desktop": {},
  "/en/atlas/|mobile": {},
+ "/en/classroom/|desktop": {
+  "color-contrast": {
+   "impact": "serious",
+   "count": 1,
+   "targets": [
+    ".hot > i"
+   ]
+  }
+ },
+ "/en/classroom/|mobile": {
+  "color-contrast": {
+   "impact": "serious",
+   "count": 2,
+   "targets": [
+    ".hot > b > small",
+    ".hot > i"
+   ]
+  }
+ },
+ "/en/community/|desktop": {},
+ "/en/community/|mobile": {},
  "/en/founder/|desktop": {},
  "/en/founder/|mobile": {},
+ "/en/job/|desktop": {},
+ "/en/job/|mobile": {},
+ "/en/korean/|desktop": {},
+ "/en/korean/|mobile": {},
  "/en/lab/|desktop": {},
  "/en/lab/|mobile": {},
  "/en/path/|desktop": {},
@@ -25,12 +74,20 @@
  "/en/pulse/|mobile": {},
  "/en/shift/|desktop": {},
  "/en/shift/|mobile": {},
+ "/en/studio/|desktop": {},
+ "/en/studio/|mobile": {},
+ "/en/study-abroad/|desktop": {},
+ "/en/study-abroad/|mobile": {},
  "/en/|desktop": {},
  "/en/|mobile": {},
  "/fortune/|desktop": {},
  "/fortune/|mobile": {},
  "/founder/|desktop": {},
  "/founder/|mobile": {},
+ "/job/|desktop": {},
+ "/job/|mobile": {},
+ "/korean/|desktop": {},
+ "/korean/|mobile": {},
  "/lab/topik4/|desktop": {},
  "/lab/topik4/|mobile": {},
  "/lab/|desktop": {},
@@ -63,6 +120,10 @@
  "/rl/|mobile": {},
  "/shift/|desktop": {},
  "/shift/|mobile": {},
+ "/studio/|desktop": {},
+ "/studio/|mobile": {},
+ "/study-abroad/|desktop": {},
+ "/study-abroad/|mobile": {},
  "/terms/|desktop": {},
  "/terms/|mobile": {},
  "/ub/|desktop": {},
