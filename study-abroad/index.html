@@ -15,7 +15,7 @@
 <script type="module" src="/assets/v10/visit-count.js?v=37cff7e301e4"></script>
 <script type="module" src="/social-conversion.js?v=07c3d1bb5c11"></script>
 
-<link rel="stylesheet" href="/assets/v11/detail.css?v=b0d41a9e8b61">
+<link rel="stylesheet" href="/assets/v11/detail.css?v=4388ce1eb4fd">
 </head>
 <body data-tone="light">
 <nav class="nav" aria-label="주 메뉴">
@@ -37,7 +37,7 @@
   </header>
 
   <section class="edge" data-tone="light">
-    <ul class="arms" aria-label="이 쪽의 무기 셋">
+    <ul class="arms" aria-label="핵심 세 가지">
       <li><b>면접관 셋</b><span>집에서 먼저 만납니다</span></li>
       <li><b>도장 세 칸</b><span>차면 준비가 끝납니다</span></li>
       <li><b>서울 하루</b><span>떠나기 전에 짜 봅니다</span></li>
@@ -192,8 +192,8 @@
     };
     const show = (k, byHand) => {
       if (k === cur) return; const was = cur, now = performance.now(); cur = k; const p = P[k];
-      rows.forEach((r, i) => { r.classList.toggle('on', i === k); r.setAttribute('aria-current', String(i === k)); });
-      P.forEach((q2, i) => { q2.pane.classList.toggle('on', i === k); q2.pane.classList.remove('out'); q2.pane.setAttribute('aria-hidden', String(i !== k)); if (i === k && !still) q2.anims.forEach(a => { if (!a.dataset.on) { a.dataset.on = '1'; a.src = a.dataset.anim; } }); });
+      rows.forEach((r, i) => { r.classList.toggle('on', i === k); r.setAttribute('aria-current', String(i === k)); r.tabIndex = i === k ? 0 : -1; });
+      P.forEach((q2, i) => { q2.pane.classList.toggle('on', i === k); q2.pane.classList.remove('out'); q2.pane.setAttribute('aria-hidden', String(i !== k)); q2.pane.inert = i !== k; if (i === k && !still) q2.anims.forEach(a => { if (!a.dataset.on) { a.dataset.on = '1'; a.src = a.dataset.anim; } }); });
       stage.style.setProperty('--k', k); gust = now + 4600; prev = -1;
       p.scroll.scrollLeft = 0; layout(p);
       if (still) { p.cards.forEach(c => { c.dip = p.W < 560 ? 6 : 9; c.hung = true; c.off = 0; c.op = 1; c.th = c.rest; c.ps = c.fx = 0; c.el.classList.add('is-hung'); }); paint(p); }
@@ -208,7 +208,7 @@
     rows.forEach((r, i) => {
       r.addEventListener('pointerenter', e => { if (e.pointerType === 'mouse') { clearTimeout(intent); intent = setTimeout(() => show(i), 90); } });
       r.addEventListener('pointerleave', () => clearTimeout(intent));
-      r.addEventListener('focus', () => show(i)); r.addEventListener('click', () => { clearTimeout(intent); show(i, true); });
+      r.addEventListener('keydown', e => { const d = e.key === 'ArrowDown' || e.key === 'ArrowRight' ? 1 : e.key === 'ArrowUp' || e.key === 'ArrowLeft' ? -1 : 0; if (!d) return; e.preventDefault(); const n = (i + d + rows.length) % rows.length; show(n); rows[n].focus(); }); r.addEventListener('click', () => { clearTimeout(intent); show(i, true); });
       r.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); show(i, true); } });
     });
     P.forEach(p => p.cards.forEach(c => {

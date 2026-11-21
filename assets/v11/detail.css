@@ -645,3 +645,6 @@ a.hc-bot:hover .hc-go{transform:translateX(2px)}
 .pill:focus-visible,.ask-form button:focus-visible{outline-offset:-6px}
 .p-shelf button:focus-visible{opacity:1;outline-color:var(--ink)}
 .ask-form:has(textarea:focus-visible){outline:2px solid #1d1d1f;outline-offset:3px}
+.gal-tabs button[aria-pressed="true"]:focus-visible,.door:focus-visible{outline-offset:-6px}
+.ask-links>.ask-out{margin:0;font:600 16px/1.5 var(--sans)}
+.ask-links>.ask-out:empty{position:absolute}

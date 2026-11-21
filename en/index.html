@@ -14,10 +14,10 @@
 <script type="module" src="/assets/v10/visit-count.js?v=37cff7e301e4"></script>
 <script type="module" src="/social-conversion.js?v=07c3d1bb5c11"></script>
 <script>(()=>{const h=new Date().getHours()+new Date().getMinutes()/60;document.documentElement.dataset.sky=new URLSearchParams(location.search).get('sky')||(h>=6&&h<17?'day':(h>=17&&h<19.5)||(h>=5&&h<6)?'sunset':'night')})()</script>
-<script>(()=>{const a=document.documentElement.lang==='en'?'/en':'',m={'#atlas':a+'/atlas/','#principles':a+'/atlas/','#philosophy':a+'/atlas/','#drama':a+'/lab/#drama','#founder':a+'/founder/','#founder-quote':a+'/founder/'},go=()=>{const t=m[location.hash];if(t)location.replace(t)};go();addEventListener('hashchange',go);let moved=0;for(const e of ['wheel','touchstart','keydown','pointerdown'])addEventListener(e,()=>{moved=1},{passive:true,once:true});const settle=()=>{if(moved||!location.hash)return;const el=document.getElementById(decodeURIComponent(location.hash.slice(1)));if(el)el.scrollIntoView({block:'start',behavior:'instant'})};addEventListener('load',()=>{for(const ms of [0,400,1000,1800,2800])setTimeout(settle,ms)})})()</script>
+<script>(()=>{const a=document.documentElement.lang==='en'?'/en':'',m={'#atlas':a+'/atlas/','#principles':a+'/atlas/','#philosophy':a+'/atlas/','#drama':a+'/lab/#drama','#founder':a+'/founder/','#founder-quote':a+'/founder/'},go=()=>{const t=m[location.hash];if(t)location.replace(t)};go();addEventListener('hashchange',go);let moved=0;for(const e of ['wheel','touchstart','keydown','pointerdown'])addEventListener(e,()=>{moved=1},{passive:true,once:true});const settle=()=>{if(moved||!location.hash)return;let id;try{id=decodeURIComponent(location.hash.slice(1))}catch(e){return}const el=document.getElementById(id);if(el)el.scrollIntoView({block:'start',behavior:'instant'})};addEventListener('load',()=>{for(const ms of [0,400,1000,1800,2800])setTimeout(settle,ms)})})()</script>
 <script type="module" src="/assets/v10/site.js?v=cb64453758c6"></script>
 
-<link rel="stylesheet" href="/assets/v11/home-en.css?v=1449736e9c3a">
+<link rel="stylesheet" href="/assets/v11/home-en.css?v=7bf7344ab620">
 <link rel="stylesheet" href="/assets/v11/en-fix.css?v=f6b218aa8dd1">
 </head>
 <body data-tone="dark">
@@ -43,7 +43,7 @@
     <div class="gate-say">
       <div>
         <h1 class="gate-claim">Everyone gets stuck somewhere different<br><b>We build AI that starts&nbsp;there</b></h1>
-        <p class="gate-three" aria-label="The three things SYNK does"><a href="#road">Korean &amp; study</a><a href="#shift">AI lectures</a><a href="#pulse">Ads</a></p>
+        <p class="gate-three" role="group" aria-label="The three things SYNK does"><a href="#road">Korean &amp; study</a><a href="#shift">AI lectures</a><a href="#pulse">Ads</a></p>
       </div>
       <a class="gate-down" href="#glance">Step inside <span class="arr" aria-hidden="true">↓</span></a>
     </div>
@@ -167,7 +167,7 @@
 <div id="shift" data-tone="dark">
   <section class="film" aria-labelledby="shift-t">
     <img class="film-bg hall" src="/assets/v11/hall.webp" alt="A dark lecture hall. A lecturer standing in front of a large screen and an audience with laptops open, seen from behind." loading="lazy">
-    <div class="on-screen proof" id="proof" aria-label="SYNK is running without a person right now"><span>Seoul now</span><b id="clock">00:00</b><span>Right now, about 30 of SYNK’s jobs<br>are running without a person</span></div>
+    <div class="on-screen proof" id="proof" role="group" aria-label="SYNK is running without a person right now"><span>Seoul now</span><b id="clock">00:00</b><span>Right now, about 30 of SYNK’s jobs<br>are running without a person</span></div>
     <div class="film-say">
       <div class="film-txt">
         <p class="tag">AI lectures</p>
@@ -237,6 +237,7 @@
       <div class="ask-links">
         <a href="mailto:hello@synk.im">hello@synk.im <span class="arr" aria-hidden="true">→</span></a>
         <button type="button" id="ask-copy" data-measure="문의 메일 주소 복사">Copy address</button>
+        <p class="ask-out" id="ask-out" role="status"></p>
         <a href="https://docs.google.com/forms/d/e/1FAIpQLSc4Z1BdhPxMi0bWP7enSganI4xCIsTcCxRJ8EpxiWRxyVfsIg/viewform" target="_blank" rel="noopener">Contact form <span class="arr" aria-hidden="true">↗</span></a>
         <a href="/privacy/#website-questions">Privacy when you contact us <span class="arr" aria-hidden="true">→</span></a>
       </div>
@@ -253,7 +254,6 @@
       </ul>
       <div id="messages" aria-live="polite"></div>
       <form class="ask-form" id="question-form" autocomplete="off"><label class="sr" for="question">Your question</label><textarea id="question" name="question" rows="1" maxlength="500" placeholder="Type another question"></textarea><button id="send" type="submit" disabled>Ask <span class="arr" aria-hidden="true">→</span></button></form>
-      <p class="ask-out" id="ask-out" role="status" hidden></p>
       <p class="ask-note">We do not save the conversation. Please do not include personal information.</p>
     </div>
   </div>
@@ -265,8 +265,8 @@
   const nav = $('.nav');
   const solid = () => nav.classList.toggle('solid', scrollY > 40);
   addEventListener('scroll', solid, { passive: true }); solid();
-  const menuBtn = $('.menu-btn'); const menu = on => { nav.classList.toggle('open', on); menuBtn.setAttribute('aria-expanded', String(on)); };
-  menuBtn.addEventListener('click', () => menu(!nav.classList.contains('open'))); document.querySelectorAll('.nav ul a').forEach(a => a.addEventListener('click', () => menu(false)));
+  const menuBtn = $('.menu-btn'); const menu = (on, keys) => { nav.classList.toggle('open', on); menuBtn.setAttribute('aria-expanded', String(on)); if (keys) (on ? $('.nav ul a') : menuBtn)?.focus(); }; addEventListener('keydown', e => { if (e.key === 'Escape' && nav.classList.contains('open')) menu(false, true); }); $('.nav .logo')?.addEventListener('click', () => menu(false));
+  menuBtn.addEventListener('click', e => menu(!nav.classList.contains('open'), e.detail === 0)); document.querySelectorAll('.nav ul a').forEach(a => a.addEventListener('click', () => menu(false)));
 })();
 </script>
 
@@ -302,8 +302,8 @@
   const root = document.documentElement, body = document.body;
   const h = new Date().getHours() + new Date().getMinutes() / 60;
   root.dataset.sky = new URLSearchParams(location.search).get('sky') || (h >= 6 && h < 17 ? 'day' : (h >= 17 && h < 19.5) || (h >= 5 && h < 6) ? 'sunset' : 'night');
-  const tones = $$('[data-tone]');
-  function tone() { const y = 36; let t = 'light'; for (const el of tones) { const b = el.getBoundingClientRect(); if (b.top <= y && b.bottom > y) t = el.dataset.tone; } body.dataset.tone = t; }
+  const tones = $$('[data-tone]').filter(el => el !== body);
+  function tone() { const y = 36; let t = scrollY <= 0 && tones[0] ? tones[0].dataset.tone : 'light'; for (const el of tones) { const b = el.getBoundingClientRect(); if (b.top <= y && b.bottom > y) t = el.dataset.tone; } body.dataset.tone = t; }
   const gateWrap = $('.gate-wrap'), sky = $('.gate-sky'), roof = $('.gate-roof'), type = $('.gate-type'), say = $('.gate-say');
   let gateP = 0, gateRect = gateWrap.getBoundingClientRect();
   function gate() {
@@ -321,7 +321,7 @@
   const N = 7;
   const FIRST = '48.2% 59.6%';
   let flat = false;
-  const show = (el, o, t) => { el.style.opacity = o; el.style.visibility = o < .02 ? 'hidden' : 'visible'; if (t !== undefined) el.style.transform = t; };
+  const keep = new Set([...says, wClose]); const show = (el, o, t) => { el.style.opacity = o; if (keep.has(el)) { el.style.visibility = 'visible'; el.style.pointerEvents = o < .02 ? 'none' : ''; } else el.style.visibility = o < .02 ? 'hidden' : 'visible'; if (t !== undefined) el.style.transform = t; };
   function layoutRoad() {
     flat = reduce || innerWidth < 900 || innerHeight < 560;
     body.classList.toggle('flat', flat);
@@ -353,6 +353,7 @@
     railLis.forEach((li, i) => { const done = k >= i + .5; li.classList.toggle('done', done); li.classList.toggle('now', !done && Math.round(clamp(k, 0, 4)) === i); });
     railBar.style.width = clamp(k / 4) * 80 + '%';
   }
+  says.forEach((t, i) => t.addEventListener('focusin', () => { if (!flat) goto(i + 1.12); })); wClose.addEventListener('focusin', () => { if (!flat) goto(N - 1); });
   const goto = x => { const b = wrap.getBoundingClientRect(); scrollTo({ top: scrollY + b.top + (x / (N - 1)) * (b.height - innerHeight), behavior: reduce ? 'auto' : 'smooth' }); };
   $('#w-go').addEventListener('click', () => { if (flat) scenes[0].scrollIntoView({ behavior: reduce ? 'auto' : 'smooth' }); else goto(1); });
   $$('button', pins).forEach((bt, i) => bt.addEventListener('click', () => { if (flat) scenes[i].scrollIntoView({ behavior: reduce ? 'auto' : 'smooth' }); else goto(i + 1); }));
@@ -414,7 +415,7 @@
   player.addEventListener('close', () => { pv.pause(); });
   paint();
   const navA = $$('.nav ul a').filter(a => a.getAttribute('href').startsWith('#'));
-  function here() { const y = innerHeight * .4; let id = ''; for (const a of navA) { const el = $(a.getAttribute('href')); const b = el.getBoundingClientRect(); if (b.top <= y && b.bottom > y) id = a.getAttribute('href'); } navA.forEach(a => a.setAttribute('aria-current', String(a.getAttribute('href') === id))); }
+  function here() { const y = innerHeight * .4; let id = ''; for (const a of navA) { const h = a.getAttribute('href'); for (const el of (h === '#road' ? [$('#why'), $(h)] : [$(h)])) { if (!el) continue; const b = el.getBoundingClientRect(); if (b.top <= y && b.bottom > y) id = h; } } navA.forEach(a => a.setAttribute('aria-current', String(a.getAttribute('href') === id))); }
   let raf = 0;
   function frame() { raf = 0; gate(); road(); tone(); here(); }
   const ask = () => { if (!raf) raf = requestAnimationFrame(frame); };
