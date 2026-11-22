@@ -4025,7 +4025,7 @@ function createStudyAccount({ request, storage = globalThis.sessionStorage, onCh
     return sync;
   }
   async function recoverConflict() {
-    const my = epoch;
+    const my = epoch, pendingOp = lastOp;
     reapplying = true;
     try {
       if (preferLocal) {
@@ -4036,7 +4036,7 @@ function createStudyAccount({ request, storage = globalThis.sessionStorage, onCh
       if (!await sync.resolveRemote() || my !== epoch) return;
       if (!doc2?.consent) {
         deletedElsewhere = true;
-        orphan = lastOp;
+        orphan = lastOp || pendingOp;
         lastOp = null;
         preferLocal = false;
         try {
@@ -4063,12 +4063,12 @@ function createStudyAccount({ request, storage = globalThis.sessionStorage, onCh
     }
   }
   async function recoverStale() {
-    const my = epoch;
+    const my = epoch, pendingOp = lastOp;
     try {
       if (!await sync.resolveRemote() || my !== epoch) return;
       if (!doc2?.consent) {
         deletedElsewhere = true;
-        orphan = lastOp;
+        orphan = lastOp || pendingOp;
         lastOp = null;
         try {
           sync.clearLocalRecords?.();
