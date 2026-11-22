@@ -3933,6 +3933,7 @@ function createStudyAccount({ request, storage = globalThis.sessionStorage, onCh
   let sync = null, accountId = null, epoch = 0;
   let doc2 = null, phase = "closed", status = { status: "closed", pending: false, error: null, localDrafts: [] };
   let lastOp = null, deletedElsewhere = false, reapplying = false, preferLocal = false, cleanAfterSave = false, sendFailed = false;
+  let orphan = null;
   const SELF_HEALING = /* @__PURE__ */ new Set(["REVISION_CONFLICT", "PATH_STUDY_CONSENT_STALE"]);
   const emit = () => {
     try {
@@ -4035,6 +4036,7 @@ function createStudyAccount({ request, storage = globalThis.sessionStorage, onCh
       if (!await sync.resolveRemote() || my !== epoch) return;
       if (!doc2?.consent) {
         deletedElsewhere = true;
+        orphan = lastOp;
         lastOp = null;
         preferLocal = false;
         try {
@@ -4066,6 +4068,7 @@ function createStudyAccount({ request, storage = globalThis.sessionStorage, onCh
       if (!await sync.resolveRemote() || my !== epoch) return;
       if (!doc2?.consent) {
         deletedElsewhere = true;
+        orphan = lastOp;
         lastOp = null;
         try {
           sync.clearLocalRecords?.();
@@ -4083,6 +4086,7 @@ function createStudyAccount({ request, storage = globalThis.sessionStorage, onCh
     epoch++;
     deletedElsewhere = false;
     lastOp = null;
+    orphan = null;
     doc2 = null;
     phase = "loading";
     emit();
@@ -4112,6 +4116,7 @@ function createStudyAccount({ request, storage = globalThis.sessionStorage, onCh
     accountId = null;
     doc2 = null;
     lastOp = null;
+    orphan = null;
     preferLocal = false;
     cleanAfterSave = false;
     sendFailed = false;
@@ -4145,6 +4150,7 @@ function createStudyAccount({ request, storage = globalThis.sessionStorage, onCh
     const consent = { v: CONSENT_VERSION, at: stamp(now()), minor: minor === true, guardian: minor === true, lang, base: status.revision };
     const next = createStudyDocument(profile2, consent);
     deletedElsewhere = false;
+    orphan = null;
     const id = accountId, my = epoch;
     sync.change(next);
     doc2 = next;
@@ -4222,13 +4228,18 @@ function createStudyAccount({ request, storage = globalThis.sessionStorage, onCh
     deletedElsewhere = false;
     emit();
   };
+  const takeOrphan = () => {
+    const op = orphan;
+    orphan = null;
+    return op;
+  };
   const discardLocal = (id = accountId) => {
     if (!id) return;
     if (accountId === id) close();
     wipe(id);
     emit();
   };
-  return Object.freeze({ open, close, snapshot, write, give, remove, pickDraft, useAccount, retry, clearNotice, discardLocal });
+  return Object.freeze({ open, close, snapshot, write, give, remove, pickDraft, useAccount, retry, clearNotice, discardLocal, takeOrphan });
 }
 
 // experiences/path-app/consent-ui.mjs
@@ -5894,8 +5905,28 @@ var refusedSet = (id) => {
 };
 var studyAcctId = null;
 var studyCompared = null;
+var studyGone = false;
 var studyAcct = createStudyAccount({ request: (op, v) => session.studyRequest(op, v), storage: tabStorage(), onChange: (sn) => {
   if (!studyAcctId) return;
+  if (sn?.deletedElsewhere && !studyGone) {
+    S.flash = null;
+    S.consentAsk = false;
+    S.consentRefused = true;
+    refusedSet(studyAcctId);
+    const op = studyAcct.takeOrphan();
+    if (op && session.status().accountId === studyAcctId) {
+      const base = tabStudyProfile();
+      if (study.owner() !== studyAcctId) {
+        study.clear();
+        study.setOwner(studyAcctId);
+      }
+      try {
+        study.set(op(base));
+      } catch {
+      }
+    }
+  }
+  studyGone = !!sn?.deletedElsewhere;
   if (sn?.phase === "none") {
     if (seenGet() === studyAcctId) seenSet(null);
     studyCompared = null;
@@ -6987,6 +7018,7 @@ Object.assign(ACT, {
       refusedSet(studyAcctId);
       S.studyChoice = false;
       studyCompared = null;
+      studyAcct.clearNotice();
     }
     S.flash = ok ? accL("계정의 유학 준비 자료를 지웠어요. 이제 넣는 조건은 이 탭에만 남아요.", "Deleted your study data from the account. Conditions you add now stay in this tab only.") : accL("지우지 못했어요. 잠시 뒤 다시 시도해 주세요.", "Could not delete. Please try again later.");
     render(false);

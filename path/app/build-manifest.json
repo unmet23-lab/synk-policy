@@ -5,7 +5,7 @@
   "configFile": "config.json",
   "builder": {
     "file": "tools/prepare-path-app-public.mjs",
-    "sha256": "db37f09bc8f0c5a80fd9516f161b96e75af29342496c4a8d2624c607688df63b",
+    "sha256": "38a85ee4b64b58b3d93054d14b7d94211d617fbfce2a92ab9e43de11b95f2e17",
     "esbuildVersion": "0.28.2"
   },
   "sourceFiles": [
@@ -43,7 +43,7 @@
     },
     {
       "file": "experiences/path-app/account-ui.mjs",
-      "sha256": "5689faabbf9a9ed31086ac28d2274a448136afe5a01dd516cc56008f2f4a718e"
+      "sha256": "1fdcb67358f3c57a7d9d1c32a0d27752c4adc7ccd894bf5ef3cab7a6cb24c38b"
     },
     {
       "file": "experiences/path-app/account.mjs",
@@ -51,11 +51,11 @@
     },
     {
       "file": "experiences/path-app/app.mjs",
-      "sha256": "045564e0b2972343e33e7425ed6d987eaf8fa79e7d1023c5ab762744d8ec3df4"
+      "sha256": "4f60589295e13c6c2f5c8cdb2314c386c48e741f2905c04c515fbca311881725"
     },
     {
       "file": "experiences/path-app/channel-data.mjs",
-      "sha256": "50c7b8090fb2fc453654adfbb7095e89d2fa4baf76460af7f9cf188975b5d50e"
+      "sha256": "8997a573a49d8155df6c91b5526ec0869df57b8ecbd71f21d3eaf3c3e40f409b"
     },
     {
       "file": "experiences/path-app/channel-ui.mjs",
@@ -67,27 +67,27 @@
     },
     {
       "file": "experiences/path-app/content.mjs",
-      "sha256": "695818031ec1b21f4248720d5be0cf11eccb1d6676982912069993e0f3ffa295"
+      "sha256": "f947def287564e4f34fa06cf3c265e26b0bbd407d78ad5edd3651932d749d614"
     },
     {
       "file": "experiences/path-app/docs-data.mjs",
-      "sha256": "9a35096705f01a9d048e9c7d4acf61607ab6a18373b9e2b2741ef30aef626d28"
+      "sha256": "e2f580fe28ef758c9a40d030ff9b1033b78f734781e9ec0af3ad0b017a6025ff"
     },
     {
       "file": "experiences/path-app/document.mjs",
-      "sha256": "2fe10316bbfe549fb0cfa408c9135610d982cf213106193eb873b894bc4de16d"
+      "sha256": "224241afa4ada2ceb5030e396751b2f2fcaf5fe25e30f7a3ddf81cbd5f5061d6"
     },
     {
       "file": "experiences/path-app/index.html",
-      "sha256": "40bcfdb9376b9c9250ded22caae7f50e80fd324870af9d2ba7f6ccc357b85fe8"
+      "sha256": "c39cd611c7159fa8fddd82ec70287b29e4ffe098f8382ef1074f08dc70c3c95a"
     },
     {
       "file": "experiences/path-app/jobs-ui.mjs",
-      "sha256": "e746aecbc94176875dde2d7965f3664ce6cf9bf476d8b253d7bca3bbf68e54b6"
+      "sha256": "f7b662aa17a229f28e8fe18d76106834a4276299816c03a45ddb6df4c9970128"
     },
     {
       "file": "experiences/path-app/match.mjs",
-      "sha256": "f6e66aa4db149874fdb1aa2d75fdee885679a97c8489fd687c8bd64b4e0923bd"
+      "sha256": "db29ec07b095a6512294e7e6a3026d975f991f18a97d99de2e7ca6629425c01f"
     },
     {
       "file": "experiences/path-app/path-ui.mjs",
@@ -95,19 +95,19 @@
     },
     {
       "file": "experiences/path-app/state.mjs",
-      "sha256": "7c1d5f16e6a020a63cddac0244da34ded7a78b127c08f2b817ee44eccd11f5a7"
+      "sha256": "38899f3af262cf7c7ef323a05031855d43c10e78aea3159a254127c2f1242b68"
     },
     {
       "file": "experiences/path-app/study-account.mjs",
-      "sha256": "40387ccb74136c8625e7a2c7b781e2627e41b363210181110aa2b50d252c378e"
+      "sha256": "0eaced013a0978dfdd36a5170e93f4beae58231ed25f371c5f24c61f8e12e8e7"
     },
     {
       "file": "experiences/path-app/study-data.mjs",
-      "sha256": "9bcd366a53c8ad356985a7d26efb8baf2faecdb20911bdca3e7d16b98d2619ae"
+      "sha256": "6a4f5128d7501ee641b56697cbbf07ec0326520aa22f661f7469171f11c31498"
     },
     {
       "file": "experiences/path-app/study-profile.mjs",
-      "sha256": "ffd43ed3afbbaa9e3b32600aa899b1a9542e7d7dd65a0e2facadf8f811a45692"
+      "sha256": "2f874bf196e86732c0e0f28166504be40a3523926fd004751925c174b8932460"
     },
     {
       "file": "experiences/path-app/study-shape.mjs",
@@ -123,15 +123,15 @@
     },
     {
       "file": "experiences/synk-account/src/core.mjs",
-      "sha256": "fa34a9fb4c8715282f481c17c33428ae0d8bfe12ecb9d6d7d0a8d725c7a094b8"
+      "sha256": "1c5a21fdac47d349a8d8b2ca8f67cd9b87944aadd5d9b845fbd1eba61cc926c7"
     },
     {
       "file": "experiences/synk-account/src/document-sync.mjs",
-      "sha256": "0da24831486febacd16b89b59c27df7d2b4f5ccb42f62d854f0344aba52407fb"
+      "sha256": "5f8e840240dd0dea3bff8de31a8dabc05a480a7c96d9dc66ff0c5ddc93bb681c"
     },
     {
       "file": "experiences/synk-account/src/platform-entry.mjs",
-      "sha256": "48f39e2c57949005c5abe197b546e3518b8f3421e11b2b7b8786033b2e2712ac"
+      "sha256": "c4497682d26c4f31607a38278a009521ed42bfac10fdf84f70c6887fe67b90ff"
     },
     {
       "file": "experiences/synk-account/src/product-account.mjs",
@@ -141,8 +141,8 @@
   "files": [
     {
       "name": "app.mjs",
-      "bytes": 472773,
-      "sha256": "7e23fc3970b1dbb8d0e37fa6b6b4976e12f8496e65eef1f9d6f698254b3670f0"
+      "bytes": 473567,
+      "sha256": "0ae606817a4d6a9b10ff9aecdf554873bbe9792e3922698c9c65f94a70ef8235"
     },
     {
       "name": "assets/SUIT-Variable.woff2",
@@ -196,8 +196,8 @@
     },
     {
       "name": "index.html",
-      "bytes": 3578,
-      "sha256": "5be6943fdb070806c17866213eb89c53bb6a8d3b8988de3f7db7d1339f76a5ae"
+      "bytes": 3553,
+      "sha256": "759987fabff10abb469f22ecc781816b2ff75b12c4f5197cd2756ee2ecb04c72"
     }
   ],
   "transformations": [
