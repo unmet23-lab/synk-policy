@@ -40,6 +40,10 @@ const REQUEST_NAME = /^[0-9]{13}-[a-z0-9]{8,32}\.json$/;
 /* 요청 · 임시 파일 이름에 넣는 실행 표(8자). 실행마다 새로 만든다. 프로세스 번호는 Windows가 금방 다시 써서 쓰지 않는다(Opus 대체 설계 검토, 11-20) */
 const runTag = () => crypto.randomBytes(4).toString('hex');
 const SETUP_AGE = 30 * 60000;
+/* 취소 표식(계약 README 「취소 표식」). 요청 이름에 .cancel을 붙인 것이고, 그 요청이 만료된 뒤 이름이 requests와 claimed에 없을 때만 지운다.
+   요청이 사라진 뒤에는 종류를 알 수 없으므로 모든 표식에 긴 쪽 기한(다른 종류의 24시간 5분)을 쓴다(GPT 취소 표식 검수 GA4) */
+const MARK_NAME = /^([0-9]{13})-[a-z0-9]{8,32}\.json\.cancel$/;
+const MARK_AGE = 24 * 3600000 + 5 * 60000;
 /* 남과 나누지 않고 여는 깃발(libuv UV_FS_O_EXLOCK). 쥔 동안 다른 실행은 그 파일을 지우지 못한다 */
 const EXLOCK = process.platform === 'win32' ? (fs.constants.UV_FS_O_EXLOCK ?? 0x10000000) : 0;
 
@@ -509,8 +513,12 @@ function createSolioBackup({
      치우기(sweepRequests)는 requests 폴더를 그때마다 읽어, live가 아닌 setup 요청과 남은 임시 파일을 모두 지운다.
      지우기가 실패해도 기억할 것이 없다. 다음 치우기가 폴더를 다시 읽어 같은 파일을 또 찾는다.
      치우는 때: 로그인 알림마다(main publishAuthState, 동기) · 방 표시 · 누르기 · 열기 · 누름이 끝날 때, 지우지 못한 파일이 있으면 1초 뒤 다시.
-     그래서 앱을 다시 켠 뒤의 첫 표시도 앞 실행이 남긴 요청을 치운다. setup 요청은 솔리오만 쓰므로(계약 README) 다른 종류의 요청은 건드리지 않는다 */
+     그래서 앱을 다시 켠 뒤의 첫 표시도 앞 실행이 남긴 요청을 치운다. setup 요청은 솔리오만 쓰므로(계약 README) 다른 종류의 요청은 건드리지 않는다.
+     거두는 요청에는 지우기 전에 취소 표식을 만든다. 지우지 못해도, 엔진이 먼저 claimed로 옮겼어도 엔진이 처리 전에 보고 거절한다(계약 「취소 표식」) */
   let live = null, retrying = null, failures = 0;
+  /* 이 실행이 쓴 요청 이름과 표식을 세웠는지. 이름은 이 실행만 아는 사실이라 폴더를 읽지 못해도 표식을 만들 수 있다.
+     표식을 세우고 그 이름이 requests와 claimed에서 사라지면 잊는다(GPT 취소 표식 다시 검수 GA1 · GA3) */
+  const written = new Map();
   const me = tag;
   let ownerFd = null;
   const ownerFile = t => path.join(paths.requests, `.owner-${t}`);
@@ -533,11 +541,15 @@ function createSolioBackup({
   }
   /* 요청 폴더와 두 조상이 연결점(정션 · 링크)이 아닌 진짜 폴더인가. 아니면 치우지 않는다. 연결점을 따라가 다른 폴더의 파일을 지우지 않게 한다(GPT 열째 GA2).
      쓰기(writeSetupRequest)도 같은 셋을 본다 */
-  function realFolders() {
-    try {
-      for (const dir of [paths.root, paths.solio, paths.requests]) { const stat = fsImpl.lstatSync(dir); if (!stat.isDirectory() || stat.isSymbolicLink()) return false; }
-      return true;
-    } catch { return false; }
+  function realFolders() { return folderState() === 'real'; }
+  /* 'real' · 'none'(아직 없음) · 'link'(연결점이나 폴더가 아님) · 'unknown'(확인하지 못함) */
+  function folderState() {
+    for (const dir of [paths.root, paths.solio, paths.requests]) {
+      let stat;
+      try { stat = fsImpl.lstatSync(dir); } catch (error) { return error?.code === 'ENOENT' ? 'none' : 'unknown'; }
+      if (!stat.isDirectory() || stat.isSymbolicLink()) return 'link';
+    }
+    return 'real';
   }
   /* 이름의 실행 표로 다른 실행이 아직 쓰고 있는 요청인지 본다. 'yes' · 'no' · 'unknown'.
      그 실행의 표 파일을 지워 본다. 지워지면(또는 없으면) 끝난 실행이고, 쥐고 있어 못 지우면 살아 있다.
@@ -550,27 +562,87 @@ function createSolioBackup({
     try { fsImpl.unlinkSync(ownerFile(tag)); return 'no'; }
     catch (error) { return error?.code === 'ENOENT' ? 'no' : ['EBUSY', 'EPERM', 'EACCES'].includes(error?.code) ? 'yes' : 'unknown'; }
   }
+  /* 요청 이름의 취소 표식을 만든다. 이미 있으면 된 것이다. 엔진은 그 이름에 무엇이든 있으면 거둔 요청으로 본다 */
+  function markCancel(name) {
+    try { fsImpl.writeFileSync(path.join(paths.requests, `${name}.cancel`), '', { flag: 'wx' }); return true; }
+    catch (error) { return error?.code === 'EEXIST'; }
+  }
+  const claimedDir = () => path.join(paths.requests, 'claimed');
+  /* 'dir' · 'none'(없음) · 'link'(연결점이나 폴더가 아님) · 'unknown'(확인하지 못함) */
+  function claimedState() {
+    try { const stat = fsImpl.lstatSync(claimedDir()); return stat.isDirectory() && !stat.isSymbolicLink() ? 'dir' : 'link'; }
+    catch (error) { return error?.code === 'ENOENT' ? 'none' : 'unknown'; }
+  }
+  /* 거둘 setup 요청인가: live가 아니고, 살아 있는 다른 실행의 것이 아니고, setup인 요청. 'yes' · 'no' · 'unknown' */
+  function toWithdraw(dir, name) {
+    const file = path.join(dir, name);
+    if (live && path.basename(live.file) === name) return 'no';
+    // 이 실행이 쓴 이름이면 본문을 읽지 않고 거둔다. 표만 같은 남의 요청은 본문으로 가린다(GPT 취소 표식 검수 GA1, 다시 검수 GA1)
+    if (written.has(name)) return 'yes';
+    const others = othersLive(name);
+    if (others !== 'no') return others === 'yes' ? 'no' : 'unknown';
+    return setupKind(file);
+  }
   function sweepRequests() {
     if (platform !== 'win32' || !paths) return;
+    let names, failed = false, listed = true;
     if (live) { let keep = false; try { keep = live.same() === true; } catch { keep = false; } if (!keep) live = null; }
-    let names, failed = false;
-    try { names = fsImpl.readdirSync(paths.requests); } catch (error) { names = []; if (error?.code !== 'ENOENT') failed = true; }
-    if (names.length && !realFolders()) names = [];
+    // 이 실행이 쓴 요청 가운데 live가 아닌 것에는 표식부터 만든다. 폴더를 읽거나 본문을 읽지 못해도, 앞 시도가 실패했어도
+    // 이름을 잊지 않으므로 다음 치우기가 다시 만든다(GPT 취소 표식 검수 GA1, 다시 검수 GA3)
+    for (const [name, marked] of written) {
+      if (marked || (live && path.basename(live.file) === name)) continue;
+      if (realFolders() && markCancel(name)) written.set(name, true); else failed = true;
+    }
+    try { names = fsImpl.readdirSync(paths.requests); } catch (error) { names = []; listed = false; if (error?.code !== 'ENOENT') failed = true; }
+    if (names.length && !realFolders()) { names = []; listed = false; }
+    const marks = [];
     for (const name of names) {
       const file = path.join(paths.requests, name);
       if (live && samePath(file, live.file)) continue;
+      if (MARK_NAME.test(name)) { marks.push(name); continue; }
       const owner = name.match(/^\.owner-([0-9a-z]{8})$/)?.[1];
       if (owner) { if (owner !== me) { try { fsImpl.unlinkSync(file); } catch {} } continue; }
       if (!TEMP_NAME.test(name)) {
         if (!REQUEST_NAME.test(name)) continue;
-        const others = othersLive(name);
-        if (others === 'unknown') { failed = true; continue; }
-        if (others === 'yes') continue;
-        const kind = setupKind(file);
-        if (kind === 'unknown') { failed = true; continue; }
-        if (kind === 'no') continue;
+        const withdraw = toWithdraw(paths.requests, name);
+        if (withdraw === 'unknown') { failed = true; continue; }
+        if (withdraw === 'no') continue;
+        // 표식을 먼저 만들고 지운다(계약 「취소 표식」 1). 지우기에 성공해도 표식은 둔다. 엔진이 그 사이 이미 claimed로 옮겼어도
+        // 처리 전에 표식을 보고 거절한다. 표식을 만들지 못해도 지우기는 하고 곧 다시 본다. 그때는 claimed 쪽에서 다시 만든다
+        if (!markCancel(name)) failed = true;
       } else { const others = othersLive(name); if (others === 'unknown') { failed = true; continue; } if (others === 'yes') continue; }
       try { fsImpl.unlinkSync(file); } catch (error) { if (error?.code !== 'ENOENT') failed = true; }
+    }
+    // 엔진이 이미 claimed로 옮겼지만 아직 처리하지 않은 요청에도 표식을 둔다. requests를 먼저 읽었으므로, 그 사이 옮겨진 요청은
+    // 앞에서 이름으로 표식을 받았거나 여기서 보인다. claimed의 파일은 엔진의 것이어서 지우지 않는다
+    let claimed = [];
+    // requests 목록을 읽지 못했어도 claimed는 따로 본다(GPT solio-backup-be-20261121 GA2). 폴더가 없거나 연결점이면 보지 않는다
+    // 폴더 확인이 그 순간 실패하면 claimed를 읽은 것으로 치지 않는다(GPT solio-backup-be-20261121-r2 GA1)
+    const folders = folderState();
+    const where = folders === 'real' ? claimedState() : folders;
+    if (where === 'link') listed = false;
+    // 확인하지 못했으면 곧 다시 본다(GPT 취소 표식 다시 검수 GA2). 연결점은 바뀌지 않으므로 다시 서두르지 않는다
+    if (where === 'unknown') { listed = false; failed = true; }
+    if (where === 'dir') {
+      try { claimed = fsImpl.readdirSync(claimedDir()); } catch (error) { if (error?.code !== 'ENOENT') { failed = true; listed = false; } }
+    }
+    for (const name of claimed) {
+      if (!REQUEST_NAME.test(name)) continue;
+      const withdraw = toWithdraw(claimedDir(), name);
+      if (withdraw === 'unknown') { failed = true; continue; }
+      if (withdraw === 'yes' && !markCancel(name)) failed = true;
+    }
+    // 표식은 그 요청이 만료되고(위 MARK_AGE) requests와 claimed에 그 이름이 더는 없을 때만 지운다(계약 4). 두 폴더를 모두 읽었을 때만
+    // 「없다」고 본다(GPT 취소 표식 검수 GA3). 시계가 거꾸로 가 요청 시각이 앞이면 만료가 아니다. 보통 파일만 지우고, 지우지 못해도
+    // 다시 서두르지 않는다(급한 것은 만들기 쪽이다)
+    const present = new Set([...names, ...claimed]);
+    // 두 폴더를 모두 읽어 그 이름이 어디에도 없으면 잊는다. 요청이 사라진 뒤에는 엔진이 가져갈 것이 없으므로 표식을 세우지 못했어도
+    // 다시 시도하지 않는다(GPT 취소 표식 r3 GA1). 요청은 requests → claimed로만 옮겨지고, 앞을 먼저 읽으므로 옮기는 중에도 놓치지 않는다
+    if (listed) for (const name of written.keys()) if (!present.has(name) && !(live && path.basename(live.file) === name)) written.delete(name);
+    for (const mark of listed ? marks : []) {
+      const request = mark.slice(0, -'.cancel'.length);
+      if (present.has(request) || !(now() - Number(mark.slice(0, 13)) >= MARK_AGE)) continue;
+      try { if (fsImpl.lstatSync(path.join(paths.requests, mark)).isFile()) fsImpl.unlinkSync(path.join(paths.requests, mark)); } catch {}
     }
     // 지우거나 읽지 못한 파일이 있으면 곧 다시 치운다. 엔진 창은 2초마다 요청을 보므로, 처음 5초는 0.1초 간격으로 다시 본다.
     // 그 뒤로는 1초마다(GPT 열째 GA7). 잠금이 풀린 뒤 엔진보다 먼저 지울 가능성을 높인다
@@ -579,13 +651,13 @@ function createSolioBackup({
   }
   const accountChanged = sweepRequests;
   /* 요청을 쓰는 같은 동기 구간에서 live로 적는다. 이름 바꾸기와 live 사이에 치우기가 끼지 못한다 */
-  async function writeRequest(mode, hint) {
+  async function writeRequest(mode) {
     const same = sameLogin;
     try { await fsImpl.promises.mkdir(paths.requests, { recursive: true }); } catch {}
     // 폴더가 연결점이 아닌지 먼저 보고 표 파일을 연다(GPT 열한째 GA1). 표 파일을 쥐지 못하면 요청을 쓰지 않는다.
     // 쥐지 않은 요청은 다른 실행이 끝난 실행의 것으로 보고 지운다(GPT 열한째 GA4)
     if (!realFolders() || !holdOwner()) throw fault('STORAGE');
-    return writeSetupRequest({ paths, mode, hint, now: now(), owner: me, fsImpl: fsImpl.promises, fsSync: fsImpl, stillCurrent, onPlaced: file => { live = { file, same }; } });
+    return writeSetupRequest({ paths, mode, now: now(), owner: me, fsImpl: fsImpl.promises, fsSync: fsImpl, stillCurrent, onPlaced: file => { written.set(path.basename(file), false); live = { file, same }; } });
   }
   /* 이번 요청을 내려놓고 그 자리에서 치운다 */
   function dropRequest(name) {
@@ -594,11 +666,11 @@ function createSolioBackup({
   }
 
   /* 엔진이 이미 있는 길: setup 요청만 쓰고 엔진 창을 연다 */
-  async function openSetup(mode, hint) {
+  async function openSetup(mode) {
     setInstall('opening');
     let name;
     if (!stillCurrent()) throw fault('ACCOUNT_CHANGED');
-    try { name = await writeRequest(mode, hint); } catch (error) { throw error?.backupCode === 'ACCOUNT_CHANGED' ? error : fault('REQUEST_FAILED'); }
+    try { name = await writeRequest(mode); } catch (error) { throw error?.backupCode === 'ACCOUNT_CHANGED' ? error : fault('REQUEST_FAILED'); }
     if (!stillCurrent()) { dropRequest(name); throw fault('ACCOUNT_CHANGED'); }
     try { await openExternal(`synk-workbackup:open?topic=${mode === 'move' ? 'move' : 'status'}`); }
     catch {
@@ -611,7 +683,7 @@ function createSolioBackup({
 
   /* 엔진이 이미 있으면 그 자리에서 갈래를 다시 정해 엔진 창을 연다. 엔진이 없거나 확인이 실패하면 false.
      받기 전 · 받다 실패한 뒤 · 설치기를 띄우기 직전에 같은 함수를 쓴다(GPT 여섯째 · 일곱째 검수 GA1 · GA3) */
-  async function openIfInstalled(mode, hint, beforeOpen = async () => {}) {
+  async function openIfInstalled(mode, beforeOpen = async () => {}) {
     const fresh = await engineFresh();
     if (fresh.error) throw fault('ENGINE_UNKNOWN');
     if (!fresh.installed) return false;
@@ -619,15 +691,15 @@ function createSolioBackup({
     const { view } = await state(fresh);
     if (view !== 'needs-setup') throw fault('NOT_NEEDED');
     await beforeOpen();
-    await openSetup(mode, hint);
+    await openSetup(mode);
     return true;
   }
 
-  async function installEngine(mode, hint) {
+  async function installEngine(mode) {
     setInstall('feed');
     const feed = await refreshFeed(true);
     // 피드를 받지 못했어도 그사이 엔진이 깔렸으면 엔진 창을 연다(GPT 여섯째 검수 GA2)
-    if (!feed && await openIfInstalled(mode, hint)) return;
+    if (!feed && await openIfInstalled(mode)) return;
     if (!feed) throw fault(feedState.state === 'missing' ? 'FEED_MISSING' : feedState.state === 'invalid' ? 'FEED_INVALID' : 'NETWORK');
     if (typeof cacheRoot !== 'string' || !path.isAbsolute(cacheRoot)) throw fault('STORAGE');
     await fsImpl.promises.mkdir(cacheRoot, { recursive: true });
@@ -659,7 +731,7 @@ function createSolioBackup({
         // 로그인이 바뀌었거나 엔진 확인이 실패하면 처음 오류를 그대로 낸다
         if (error?.backupCode !== 'ACCOUNT_CHANGED' && stillCurrent()) {
           let opened = false;
-          try { opened = await openIfInstalled(mode, hint, releaseHolder); } catch (other) { if (other?.backupCode !== 'ENGINE_UNKNOWN') throw other; }
+          try { opened = await openIfInstalled(mode, releaseHolder); } catch (other) { if (other?.backupCode !== 'ENGINE_UNKNOWN') throw other; }
           if (opened) return;
         }
         throw error;
@@ -669,9 +741,9 @@ function createSolioBackup({
       // 받는 동안 다른 길로 엔진이 깔렸으면 설치기를 다시 띄우지 않고 엔진 창을 연다(GPT 검수 GA4).
       // 엔진 확인은 요청을 쓰기 전에 한다. 요청이 놓인 뒤에는 기다리는 일 없이 바로 설치기를 띄운다(GPT 일곱째 검수 GA5).
       // 지금 확인이 실패하면 깔렸는지 모르므로 띄우지 않는다(GPT 다시 검수 GA5)
-      if (await openIfInstalled(mode, hint, releaseHolder)) return;
+      if (await openIfInstalled(mode, releaseHolder)) return;
       // 요청 쓰기는 로그인 확인과 함께 동기로 한다. 쓴 뒤 로그인이 바뀌면 치우기(sweepRequests)가 그 자리에서 지운다
-      requestName = await writeRequest(mode, hint);
+      requestName = await writeRequest(mode);
       if (!stillCurrent()) throw fault('ACCOUNT_CHANGED');
       setInstall('admin');
       let started = false;
@@ -701,7 +773,7 @@ function createSolioBackup({
   let stillCurrent = () => true, sameLogin = () => true;
   /* isCurrent: 누른 계정 · 로그인 세대로 지금 로그인되어 있는가(쓰기 · 띄우기 직전에 본다).
      isSameLogin: 누른 때와 같은 로그인인가. 같은 세대의 토큰 갱신 중이면 참이다(남은 요청을 지울지 볼 때 쓴다) */
-  async function start(account, asked, { getHint = async () => null, isCurrent = () => true, isSameLogin = isCurrent } = {}) {
+  async function start(account, asked, { isCurrent = () => true, isSameLogin = isCurrent } = {}) {
     if (!allowed(account)) return { ok: false, code: 'NOT_AVAILABLE' };
     if (!MODES.includes(asked)) return { ok: false, code: 'INVALID' };
     sweepRequests();
@@ -720,11 +792,10 @@ function createSolioBackup({
     stillCurrent = () => { try { return isCurrent() === true; } catch { return false; } };
     sameLogin = () => isSameLogin() === true;
     busy = (async () => {
-      let hint = null;
-      // 힌트는 누른 계정의 것만 받는다. 그사이 다른 계정으로 바뀌었으면 getHint가 null을 준다(GPT 검수 GA2, main.cjs)
-      try { hint = await getHint(account); } catch { hint = null; }
-      if (view === 'needs-setup') { await openSetup(mode, hint); return; }
-      await installEngine(mode, hint);
+      // 요청에 Google 주소(hint)를 넣지 않는다. 엔진이 표식을 본 뒤 창에 넘기는 사이나 창이 30분 들고 있는 동안 로그인이 바뀌면
+      // 앞 로그인의 주소가 남는다. 앱 쪽 고침으로 닫히지 않는 틈이라 주소 자체를 보내지 않는다(GPT solio-backup-be-20261121 GA1, 11-21)
+      if (view === 'needs-setup') { await openSetup(mode); return; }
+      await installEngine(mode);
     })().catch(error => { setInstall('error', { code: error?.backupCode || (['ENOSPC', 'EACCES', 'EPERM', 'EROFS', 'EIO'].includes(error?.code) ? 'STORAGE' : 'NETWORK') }); })
       .finally(() => { busy = null; release(); sweepRequests(); });
     return { ok: true };

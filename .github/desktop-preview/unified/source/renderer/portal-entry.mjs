@@ -822,7 +822,7 @@ export function mountPortalEntry(root, options = {}) {
     setOrbStatus(phase === 'checking'
       ? '저장된 로그인 정보를 확인하고 있어요.'
       : phase === 'entering'
-        ? '계정에 연결된 작업 공간을 불러오고 있어요.'
+        ? '계정을 확인하고 들어가고 있어요.'
         : holdingExitOrb
           ? '작업 공간을 여는 중이에요.'
           : '');
@@ -957,16 +957,16 @@ export function mountPortalEntry(root, options = {}) {
         headingEl.textContent = '로그인 확인 중';
         statusTextEl.textContent = '저장된 로그인 정보를 확인하고 있어요.';
       } else if (phase === 'entering') {
-        headingEl.textContent = '작업 공간 연결 중';
-        statusTextEl.textContent = '계정에 연결된 작업 공간을 불러오고 있어요.';
+        headingEl.textContent = 'SYNK에 입장 중';
+        statusTextEl.textContent = '계정을 확인하고 들어가고 있어요.';
       } else if (phase === 'signing-in') {
         headingEl.textContent = '로그인 진행 중';
         statusTextEl.textContent = typeof options.signingInMessage === 'string' && options.signingInMessage.trim()
           ? options.signingInMessage.trim()
           : '열린 SYNK ID 화면에서 로그인을 마쳐 주세요.';
       } else if (phase === 'enter-error') {
-        headingEl.textContent = '작업 공간 연결 실패';
-        statusTextEl.textContent = errorMessage || '배정된 작업 공간을 불러오지 못했어요. 다시 시도해 주세요.';
+        headingEl.textContent = 'SYNK 입장 실패';
+        statusTextEl.textContent = errorMessage || 'SYNK에 들어가지 못했어요. 다시 시도해 주세요.';
       } else {
         headingEl.textContent = '연결을 확인해 주세요';
         statusTextEl.textContent = errorMessage || '계정 연결 상태를 확인하지 못했어요. 잠시 뒤 다시 확인해 주세요.';

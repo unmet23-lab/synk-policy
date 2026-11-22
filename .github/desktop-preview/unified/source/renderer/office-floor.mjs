@@ -56,9 +56,13 @@ export function floorLayout(scene) {
     const need = bottom.map(z => Math.max(2, Math.min(8, z.staff.length)) * STEP + 0.8);
     const half = Math.max(gridHalf, (need.reduce((a, b) => a + b, 0) + GAP * (bottom.length - 1)) / 2);
     const z0 = rows ? (rows * ZD + (rows - 1) * GAP) / 2 + 0.65 : -STRIP / 2;
-    const width = (2 * half - GAP * (bottom.length - 1)) / bottom.length;
+    // 남는 폭은 구역마다 필요한 폭에 비례해 나눈다. 고르게 나누면 직원이 많은 구역의 구슬이 좌대 밖으로 나간다(0.5.2 공개 검수 A5)
+    const total = need.reduce((a, b) => a + b, 0), spare = Math.max(0, 2 * half - GAP * (bottom.length - 1) - total);
+    let x = -half;
     bottom.forEach((z, i) => {
-      const x0 = -half + i * (width + GAP), x1 = x0 + width, mid = (x0 + x1) / 2, n = Math.min(8, z.staff.length);
+      const width = need[i] + spare * (need[i] / total);
+      const x0 = x, x1 = x0 + width, mid = (x0 + x1) / 2, n = Math.min(8, z.staff.length);
+      x = x1 + GAP;
       const spots = Array.from({ length: n }, (_, k) => ({ x: mid + (k - (n - 1) / 2) * STEP, z: z0 + STRIP / 2 - 0.05 }));
       out.push({ ...z, rect: { x0, x1, z0, z1: z0 + STRIP }, spots });
     });
@@ -67,7 +71,7 @@ export function floorLayout(scene) {
 }
 
 /* canvas: 그림을 그릴 캔버스(자리 요소 안에 꽉 찬다). reduced(): 움직임 줄이기. isOpen(key): 그 부서 줄이 열려 있는가.
-   onHover(zone, staff): 손이 가리키는 부서 열쇠와 직원 번호(바뀔 때만). onPress(zone): 눌린 부서 열쇠(빈 곳이면 null) */
+   onHover(zone, staff): 손이 가리키는 부서 열쇠와 직원 번호(바뀔 때만). onPress(zone, staff): 눌린 부서와 직원(빈 곳이면 null) */
 export function createOfficeFloor(canvas, { win = globalThis, reduced = () => false, isOpen = () => false, onHover = () => {}, onPress = () => {} } = {}) {
   const ctx = canvas?.getContext?.('2d') || null;
   const raf = fn => (typeof win.requestAnimationFrame === 'function' ? win.requestAnimationFrame(fn) : setTimeout(() => fn(Date.now()), M.frameMs));
@@ -252,7 +256,8 @@ export function createOfficeFloor(canvas, { win = globalThis, reduced = () => fa
     let st = null;
     for (const s of staffOnScreen) if (Math.hypot(x - s.x, y - s.y) < s.r + 6) st = s;
     let zone = st ? st.zone : null;
-    if (!zone) for (const q of zonesOnScreen) if (inside(q.pts, x, y)) zone = q.key;
+    // 「그 밖」 구역은 줄이 따로 없어 누를 곳이 아니다. 그 안의 직원은 제 부서로 간다(카본 A4)
+    if (!zone) for (const q of zonesOnScreen) if (q.key !== 'other' && inside(q.pts, x, y)) zone = q.key;
     return { zone, staff: st ? st.id : null };
   }
   const at = e => { const r = canvas.getBoundingClientRect(); return { x: e.clientX - r.left, y: e.clientY - r.top }; };
@@ -263,7 +268,7 @@ export function createOfficeFloor(canvas, { win = globalThis, reduced = () => fa
     if (h.zone !== over.zone || h.staff !== over.staff) { over = h; if (reduced()) draw(); onHover(h.zone, h.staff, e); }
   };
   const onLeave = e => { ptr = { x: -1e4, y: -1e4 }; canvas.style.cursor = ''; if (over.zone || over.staff) { over = { zone: null, staff: null }; if (reduced()) draw(); onHover(null, null, e); } };
-  const onClick = e => { const p = at(e), h = hit(p.x, p.y); onPress(h.zone); };
+  const onClick = e => { const p = at(e), h = hit(p.x, p.y); onPress(h.zone, h.staff); };
   canvas?.addEventListener?.('pointermove', onMove);
   canvas?.addEventListener?.('pointerleave', onLeave);
   canvas?.addEventListener?.('click', onClick);

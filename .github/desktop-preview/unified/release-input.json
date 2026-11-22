@@ -2,9 +2,9 @@
   "schemaVersion": 1,
   "product": "platform",
   "channel": "preview",
-  "version": "0.5.3",
-  "releaseId": "platform-preview-0.5.3",
-  "buildId": "20261121.1",
+  "version": "0.5.4",
+  "releaseId": "platform-preview-0.5.4",
+  "buildId": "20261122.1",
   "manifestUrl": "https://synk.im/desktop/releases/preview.json",
   "baselines": [
     {
@@ -63,7 +63,7 @@
     }
   ],
   "electronVersion": "44.10.0",
-  "sourceHash": "f7640f43b3244655f9dda64f477970bf8a9277918ceb37a99869b62e0ef9afc4",
+  "sourceHash": "d10621be99303d625c9dbcac406e6d21a73a3a85a90e42dad73df1dccdaff3b4",
   "sourceFiles": [
     {
       "path": "assets/launcher/button.webp",
@@ -312,38 +312,48 @@
     },
     {
       "path": "renderer/office-floor.mjs",
-      "bytes": 19767,
-      "sha256": "3d6043f2a80ab46e2238038beef8629327e9003b88f13f7209f7f7d96c8cdfb8"
+      "bytes": 20233,
+      "sha256": "725f5ba78eaffeafdf503bb5cf5528373559c12186dd5ace90e680ca5282539e"
     },
     {
       "path": "renderer/office-model.mjs",
-      "bytes": 20619,
-      "sha256": "08b871792b02ff6e5e7062861fc773144dce34907c13235adb53cdf5488d0e2b"
+      "bytes": 26426,
+      "sha256": "f68c363f3fe7b199b55b5f097ca868493fd4a73eea208e4f3beecc2059fc2cfc"
     },
     {
       "path": "renderer/office-room.mjs",
-      "bytes": 39351,
-      "sha256": "eaeb8955157569c2c1da54c655c8d9445219138d722075f7d7fe4fb1d748e23d"
+      "bytes": 34207,
+      "sha256": "ba8901fd7927ae0b2c25cb03a8388d19c65a3876940c019ee95580427bde15aa"
+    },
+    {
+      "path": "renderer/office-task-room.mjs",
+      "bytes": 18307,
+      "sha256": "c82026de9bbd561ed4c20b39ad5f2d92b8baf6409c7f443ffccfb9a9326d766e"
+    },
+    {
+      "path": "renderer/office-task-view.mjs",
+      "bytes": 38135,
+      "sha256": "6e7fab728594274ba0316feef5c220041a9db32e623e1f990f01441aa0d78136"
     },
     {
       "path": "renderer/orb-face-view.mjs",
-      "bytes": 147233,
-      "sha256": "f3bbf344eaa067ab286e23155ed3c135673118373e9a3b78f1d89e0d7ff73746"
+      "bytes": 149222,
+      "sha256": "d52b839e0995922c383bdde75594d2245515c65f92a3c6a57e3d30be47fedac5"
     },
     {
       "path": "renderer/orb-face.css",
-      "bytes": 65596,
-      "sha256": "1c5b4ba666949572426f283c0fe848b304b1c898b64d6246736c2f74601ab168"
+      "bytes": 70028,
+      "sha256": "0d60630795193549d338ddb723e23b3b8f091bfb4c0a10b071f5aaeeb0a8337f"
     },
     {
       "path": "renderer/orb-face.mjs",
-      "bytes": 119365,
-      "sha256": "434e952e36d4adc87af2b53bbe1cb671fb2cd2378078d19821867b6a7ed52aef"
+      "bytes": 122621,
+      "sha256": "9e8162281b98fc17b78d835dd3a834e34381a5e4f3ef147806c7e69d23530347"
     },
     {
       "path": "renderer/orb-rooms.mjs",
-      "bytes": 63464,
-      "sha256": "43ee5e9402e44d7b71951838dd664780cadb936a93619d02539e7e9df3f9e621"
+      "bytes": 61127,
+      "sha256": "d0971109f9953cbd1d92e45b965ff77721baf536736f83590da958621460092f"
     },
     {
       "path": "renderer/orb-signature.mjs",
@@ -377,13 +387,13 @@
     },
     {
       "path": "renderer/portal-entry.mjs",
-      "bytes": 88749,
-      "sha256": "f0786ce227732168e6b2a544aa4f35d055632be208f446de56bbd6179da5089e"
+      "bytes": 88687,
+      "sha256": "288ca2d046d759e6549d89c613090c0f5d19dccb16dab4241d230e9768f3cc76"
     },
     {
       "path": "renderer/portal-host.mjs",
-      "bytes": 91747,
-      "sha256": "69ab3c830020a6e5aabd28e0829b11370f086874fa8c849e9efe01e776dfc90a"
+      "bytes": 94399,
+      "sha256": "1e3714a06cef9bac6c75a0b2b9749581e057edbf9f58c1d6ed208e4f36558b05"
     },
     {
       "path": "renderer/portal-orb.mjs",
@@ -647,8 +657,8 @@
     },
     {
       "path": "src/main.cjs",
-      "bytes": 106018,
-      "sha256": "a0c70b626010037fc094fd6e50d8174faf58dbe6ff2f0173a7912aa2c2599ab1"
+      "bytes": 103841,
+      "sha256": "67879e9e3f13c49b9e6a8e5c37245ed3e862b8b1903a52bfc06710194716845f"
     },
     {
       "path": "src/messenger-teacher.cjs",
@@ -672,28 +682,58 @@
     },
     {
       "path": "src/office-capacity.cjs",
-      "bytes": 2228,
-      "sha256": "d983a766414d26fe926b9be20af3fda48f5558107ff0779021b8a5fdbcd44215"
-    },
-    {
-      "path": "src/office-hooks.cjs",
-      "bytes": 32533,
-      "sha256": "149e1506de9135f2f8c058329f56176d1410c4027fc328279b0fa49560d8c5be"
+      "bytes": 2309,
+      "sha256": "f9c209b9a083ac7e612cdfaa9e646a217387b0e73ecf7912dd106eae85f69fe3"
     },
     {
       "path": "src/office-records.cjs",
-      "bytes": 16204,
-      "sha256": "e94b50bd6283a8e984ed6a01df9456b61838fd0ee60db4193666ea4e4afc0ad5"
+      "bytes": 23014,
+      "sha256": "1d608469b373c75699eb8e20c8d248b7569cc0f9f4f23e62901424ee37638d61"
     },
     {
       "path": "src/office-store.cjs",
-      "bytes": 19058,
-      "sha256": "3919a8cc44e187f1e6f6f601e7fa97a4307df8c6a8c4425995f1e14f4b0a5f61"
+      "bytes": 26755,
+      "sha256": "63848af98c37a35cf4fe8d23ff9ac042f1e3fbb6c919e2525876bb24b4a94467"
+    },
+    {
+      "path": "src/office-task-claude-hook.cjs",
+      "bytes": 10583,
+      "sha256": "9ebcf585c80e1b4bdc0537e99dedb44eb8885ff7d2a02880ea118f390209571f"
+    },
+    {
+      "path": "src/office-task-claude.cjs",
+      "bytes": 19799,
+      "sha256": "555c55d18575f6c203e9d6d3cd8b55e1cd252ef3408b196efce6632e02759287"
+    },
+    {
+      "path": "src/office-task-codex.cjs",
+      "bytes": 16417,
+      "sha256": "d7bd1495d13d897232e48e8f136bc6cf43f8cd344d2ce0b2d4ac7559e76d57f6"
+    },
+    {
+      "path": "src/office-task-console.cjs",
+      "bytes": 4599,
+      "sha256": "9f5efbf6e363e9fad20b0425c0111e0716e118e846e26620c3f967994316c41b"
+    },
+    {
+      "path": "src/office-task-runtime.cjs",
+      "bytes": 8271,
+      "sha256": "d21ff84bfe69fe2a7fbb670f3b8f9abce1f3927e59758cfc7c7412ff5e85a46f"
+    },
+    {
+      "path": "src/office-task-store.cjs",
+      "bytes": 12569,
+      "sha256": "24c53a0c6da8b42e732ceae8459a8bbca3dafba761f849093d879ef9054051a2"
+    },
+    {
+      "path": "src/office-tasks.cjs",
+      "bytes": 16521,
+      "sha256": "632d84daee0faff6f23e14430db290683a1e159aabff7287f96561d9a3185fc5"
     },
     {
       "path": "src/office.cjs",
-      "bytes": 23264,
-      "sha256": "652ef9d40dc510f1210c75007b07dc6a5eb125fa34bea2192b02139fc5c39e9d"
+      "bytes": 27785,
+      "sha256": "b97bf2085c4f991f888c4fe511a9534cb0325d0c655a7da77ae9bbcc795304d8"
     },
     {
       "path": "src/personal-account.cjs",
@@ -757,8 +797,8 @@
     },
     {
       "path": "src/preload.cjs",
-      "bytes": 21026,
-      "sha256": "a3586e062ce84168203d5eabbafc3739b566e1993ba967326807706c29554e7e"
+      "bytes": 21739,
+      "sha256": "f750e0a11d9b6c98ac10863442efa4f8171ccbf9f38f51d37e7ac31e8f41c821"
     },
     {
       "path": "src/product-main.cjs",
@@ -827,8 +867,8 @@
     },
     {
       "path": "src/solio-backup.cjs",
-      "bytes": 51460,
-      "sha256": "390fd3aaf3011da9c76455a89e73a65165a8d7a65f8678ed2f147578c0eb9147"
+      "bytes": 57833,
+      "sha256": "1934859d3f7d994b30b08138654f363704db35262bc6859a486475a3a36fac0d"
     },
     {
       "path": "src/startup-update-preload.cjs",

@@ -381,6 +381,13 @@ function desktopOpenDestinationErrorMessage(code) {
   }
 }
 
+// 로그인 때 배정 조회가 끝내 다 확인되지 않았으면(추가 로그인 · 다른 계정 · 확인 불가 · 일부만) 그 까닭만 펼침에 넘긴다.
+// 펼침이 「회사 공간을 확인하지 못했어요」와 「다시 확인」을 둔다(PC 검수 F1). 다 확인됐으면 null이다
+function assignmentCheckOf(workspace) {
+  const status = typeof workspace?.status === 'string' && workspace.status ? workspace.status : 'unavailable';
+  return status === 'resolved' ? null : { status };
+}
+
 function mapDesktopResolveErrorToWorkspace(code) {
   if (
     code === 'LOGIN_REQUIRED'
@@ -1495,7 +1502,8 @@ export function mountDesktopPortalHost({
     };
   }
 
-  async function executeDesktopAssignmentFlow({ accountKey, generation, openSingle = true }) {
+  // quiet: 들어온 뒤 펼침의 「다시 확인」처럼 배정만 다시 읽을 때는 첫 화면 경로(onApplyHashRoute)를 건드리지 않는다
+  async function executeDesktopAssignmentFlow({ accountKey, generation, openSingle = true, quiet = false }) {
     const liveAuth = await readLiveAuth();
     if (hasAccountDiverged(liveAuth, accountKey)) {
       return {
@@ -1581,7 +1589,7 @@ export function mountDesktopPortalHost({
     // 기존 테스트용 customBoundaries 반환 형태도 함께 지원한다.
     if (hasCustomResolver && assigned && assigned.kind === 'none') {
       const purposeMode = resolveDesktopEnteringPurposeMode(postResolveAuth, accountKey);
-      if (purposeMode === 'onboarding') {
+      if (purposeMode === 'onboarding' && !quiet) {
         onApplyHashRoute?.();
       }
       return { ok: true, action: 'purpose', purposeMode };
@@ -1672,7 +1680,7 @@ export function mountDesktopPortalHost({
     if (parsedResult.status === 'resolved' && parsedResult.unavailable.length === 0) {
       if (parsedResult.destinations.length === 0) {
         const purposeMode = resolveDesktopEnteringPurposeMode(postResolveAuth, accountKey);
-        if (purposeMode === 'onboarding') {
+        if (purposeMode === 'onboarding' && !quiet) {
           onApplyHashRoute?.();
         }
         return { ok: true, action: 'purpose', purposeMode };
@@ -1715,6 +1723,45 @@ export function mountDesktopPortalHost({
       action: 'workspace',
       workspace: mapAssignmentResultToWorkspace(parsedResult),
     };
+  }
+
+  // 배정을 확인한 뒤 회사 공간을 열지 않고 솔리오로 갈 때의 계정 확인과 온보딩 판정. 로그인 뒤 진입과 「솔리오로 계속」이 함께 쓴다
+  async function enterPersonalAfterAssignment(accountKey, generation) {
+    const liveAuth = await readLiveAuth();
+    const fence = buildAuthFence(liveAuth, accountKey, generation);
+    if (
+      !fence
+      || !matchesAuthFence(liveAuth, fence, {
+        requireAccountGeneration: Boolean(fence.accountGeneration),
+      })
+    ) {
+      verifiedAssignmentRecord = null;
+      return {
+        ok: false,
+        code: 'ACCOUNT_CHANGED',
+        message: '계정 연결이 바뀌었어요. 다시 확인해 주세요.',
+      };
+    }
+
+    const purposeMode = resolveDesktopEnteringPurposeMode(liveAuth, accountKey);
+    if (purposeMode === 'existing') {
+      if (
+        verifiedAssignmentRecord
+        && (
+          verifiedAssignmentRecord.fence?.accountKey !== accountKey
+          || !matchesAuthFence(liveAuth, verifiedAssignmentRecord.fence, {
+            requireAccountGeneration: true,
+          })
+        )
+      ) {
+        verifiedAssignmentRecord = null;
+      }
+    } else {
+      verifiedAssignmentRecord = null;
+      onApplyHashRoute?.();
+    }
+
+    return { ok: true, action: 'purpose', purposeMode };
   }
 
   portal = mountFace(root, {
@@ -1802,8 +1849,27 @@ export function mountDesktopPortalHost({
       return { ok: true, action: 'purpose' };
     },
 
+    // 로그인 뒤에는 고르기 화면 없이 늘 솔리오로 간다. 배정된 Workspace · PULSE는 열지 않고 목록만 넘겨 구 곁 펼침에서 옮겨 가게 한다.
+    // 처음 오는 사람은 초대코드로만 Workspace · PULSE에 들어온다(유호님 11-21)
     async onEnter({ accountKey, generation }) {
-      return executeDesktopAssignmentFlow({ accountKey, generation });
+      const result = await executeDesktopAssignmentFlow({ accountKey, generation, openSingle: false });
+      if (!isPlainObject(result) || result.ok === false || result.action !== 'workspace') return result;
+      const destinations = Array.isArray(result.workspace?.destinations) ? [...result.workspace.destinations] : [];
+      const assignmentCheck = assignmentCheckOf(result.workspace);
+      const personal = await enterPersonalAfterAssignment(accountKey, generation);
+      if (personal.ok === false) return personal;
+      return { ...personal, destinations, ...(assignmentCheck ? { assignmentCheck } : {}) };
+    },
+
+    // 펼침의 「다시 확인」: 들어온 채로 배정만 다시 읽는다. 회사 공간을 열지 않고 첫 화면 경로도 건드리지 않는다(PC 검수 F1, 유호님 11-21 「다 고쳐야지」)
+    async onRecheckSpaces({ accountKey, generation } = {}) {
+      const result = await executeDesktopAssignmentFlow({ accountKey, generation, openSingle: false, quiet: true });
+      if (!isPlainObject(result)) return { ok: false, code: 'UNAVAILABLE', message: '' };
+      if (result.ok === false) return result;
+      if (result.action !== 'workspace') return { ok: true, destinations: [] };
+      const destinations = Array.isArray(result.workspace?.destinations) ? [...result.workspace.destinations] : [];
+      const assignmentCheck = assignmentCheckOf(result.workspace);
+      return { ok: true, destinations, ...(assignmentCheck ? { assignmentCheck } : {}) };
     },
 
     async onRetryWorkspace(context) {
@@ -1898,44 +1964,8 @@ export function mountDesktopPortalHost({
     },
 
     async onContinuePersonal(context) {
-      const accountKey = context?.accountKey;
       cancelActiveResolve();
-
-      const liveAuth = await readLiveAuth();
-      const fence = buildAuthFence(liveAuth, accountKey, context?.generation);
-      if (
-        !fence
-        || !matchesAuthFence(liveAuth, fence, {
-          requireAccountGeneration: Boolean(fence.accountGeneration),
-        })
-      ) {
-        verifiedAssignmentRecord = null;
-        return {
-          ok: false,
-          code: 'ACCOUNT_CHANGED',
-          message: '계정 연결이 바뀌었어요. 다시 확인해 주세요.',
-        };
-      }
-
-      const purposeMode = resolveDesktopEnteringPurposeMode(liveAuth, accountKey);
-      if (purposeMode === 'existing') {
-        if (
-          verifiedAssignmentRecord
-          && (
-            verifiedAssignmentRecord.fence?.accountKey !== accountKey
-            || !matchesAuthFence(liveAuth, verifiedAssignmentRecord.fence, {
-              requireAccountGeneration: true,
-            })
-          )
-        ) {
-          verifiedAssignmentRecord = null;
-        }
-      } else {
-        verifiedAssignmentRecord = null;
-        onApplyHashRoute?.();
-      }
-
-      return { ok: true, action: 'purpose', purposeMode };
+      return enterPersonalAfterAssignment(context?.accountKey, context?.generation);
     },
 
     onCancelInvite() {

@@ -713,6 +713,8 @@ internal static class SignalInstallerTests
                 WaitFor(delegate { using (var hive = RegistryKey.OpenBaseKey(RegistryHive.CurrentUser, RegistryView.Registry64)) return hive.OpenSubKey(UninstallKey()) == null; }, "Fixture uninstall registration remains.");
                 Assert(Hash(sentinel) == sentinelHash, "Uninstall changed external synthetic data.");
                 Assert(!File.Exists(StartMenuShortcut()) && !File.Exists(DesktopShortcut()), "Fixture shortcuts remain after uninstall.");
+                // 지우는 프로그램은 설치 폴더 지우기의 실패를 따로 알리지 않는다. 실행 파일이 실제로 사라졌는지 본다(GPT 검수 solio-office-be5 GA3)
+                WaitFor(delegate { return !File.Exists(Path.Combine(Spec.InstallDirectory, Spec.ExecutableName)); }, "The app executable remains after the uninstall.");
             });
             Check("real SYNK Platform registration remains unchanged", delegate
             {
