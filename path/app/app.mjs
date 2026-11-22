@@ -545,6 +545,8 @@ function createProductAccount({
   scope,
   validateState,
   resource = null,
+  // PATH 앱만: 같은 로그인 세션으로 여는 둘째 자원(유학 준비 문서 path-study)과 그 검사기. 요청마다 request(op, values, { resource })로 고른다.
+  extraResources = null,
   operations = { load: "careLoad", save: "careSave", delete: "careDelete" },
   onStatus = () => {
   },
@@ -561,6 +563,9 @@ function createProductAccount({
 } = {}) {
   const pathApp = clientKey === "path-app" || endpoint === "synk-path";
   if (typeof validateState !== "function" || (pathApp ? clientKey !== "path-app" || endpoint !== "synk-path" || scope !== "synk-path" || resource !== "path-app" : !["care", "path", "path-travel"].includes(clientKey) || !["synk-care", "synk-personal"].includes(endpoint))) throw new TypeError("앱 계정 설정 형식이 맞지 않아요.");
+  const EXTRA = extraResources === null ? {} : extraResources;
+  if (extraResources !== null && (!pathApp || typeof extraResources !== "object" || Array.isArray(extraResources) || Object.keys(EXTRA).join(",") !== "path-study" || typeof EXTRA["path-study"] !== "function")) throw new TypeError("PATH 둘째 자원은 path-study 하나만 받아요.");
+  const validatorFor = (name) => name === resource ? validateState : Object.hasOwn(EXTRA, name) ? EXTRA[name] : null;
   const LIMIT = 4 * 1024 * 1024 + 32768;
   const SESSION_KEY2 = `synk.oauth.session.${clientKey}`;
   const OPERATIONS2 = new Set(Object.values(operations));
@@ -681,7 +686,7 @@ function createProductAccount({
       if (refreshing === promise3) refreshing = null;
     }
   }
-  function requestBody(operation, values = {}) {
+  function requestBody(operation, values = {}, validate = validateState) {
     if (!OPERATIONS2.has(operation) || !values || typeof values !== "object" || Array.isArray(values)) throw fault("INVALID_REQUEST", "제품 계정 요청을 확인해 주세요.");
     const careLibrarySave = clientKey === "care" && endpoint === "synk-care" && resource === null && operation === operations.save;
     const allowed = operation === operations.load ? [] : operation === operations.save ? ["expected_revision", "state", ...careLibrarySave ? ["messageLibraryVersion", "checkinPreferenceVersion"] : []] : ["expected_revision"];
@@ -690,18 +695,21 @@ function createProductAccount({
     if (Object.hasOwn(values, "checkinPreferenceVersion") && (!careLibrarySave || values.checkinPreferenceVersion !== 1)) throw fault("INVALID_REQUEST", "안부 설정 자료 형식이 맞지 않아요.");
     if (operation === operations.load) return void 0;
     if (!Number.isSafeInteger(values.expected_revision) || values.expected_revision < 0) throw fault("INVALID_REQUEST", "저장할 자료의 버전을 확인해 주세요.");
-    return { action: operation === operations.save ? "save" : "delete", expected_revision: values.expected_revision, ...operation === operations.save ? { state: validateState(values.state) } : {}, ...Object.hasOwn(values, "messageLibraryVersion") ? { messageLibraryVersion: 1 } : {}, ...Object.hasOwn(values, "checkinPreferenceVersion") ? { checkinPreferenceVersion: 1 } : {} };
+    return { action: operation === operations.save ? "save" : "delete", expected_revision: values.expected_revision, ...operation === operations.save ? { state: validate(values.state) } : {}, ...Object.hasOwn(values, "messageLibraryVersion") ? { messageLibraryVersion: 1 } : {}, ...Object.hasOwn(values, "checkinPreferenceVersion") ? { checkinPreferenceVersion: 1 } : {} };
   }
-  function validateResponse(data, ownerId) {
+  function validateResponse(data, ownerId, res = resource, validate = validateState) {
     if (data?.ok !== true) throw fault(data?.error?.code || "ACCOUNT_UNAVAILABLE", data?.error?.message || "계정 자료를 확인하지 못했어요.", { retryable: data?.error?.retryable === true, status: data?.error?.status, revision: data?.revision, ...missingAsset(data?.error) });
-    if (data.scope !== scope || resource && data.resource !== resource || typeof data.accountId !== "string" || !data.accountId || data.accountId.length > 100 || !Number.isSafeInteger(data.revision) || data.revision < 0 || !Object.hasOwn(data, "state")) throw fault("INVALID_RESPONSE", "계정 자료의 형식을 확인하지 못했어요. 현재 자료를 유지해 주세요.");
+    if (data.scope !== scope || res && data.resource !== res || typeof data.accountId !== "string" || !data.accountId || data.accountId.length > 100 || !Number.isSafeInteger(data.revision) || data.revision < 0 || !Object.hasOwn(data, "state")) throw fault("INVALID_RESPONSE", "계정 자료의 형식을 확인하지 못했어요. 현재 자료를 유지해 주세요.");
     if (ownerId && data.accountId !== ownerId) throw fault("ACCOUNT_CHANGED", "다른 계정의 응답이 도착해 자료를 적용하지 않았어요.");
-    return { ok: true, scope, ...resource ? { resource } : {}, accountId: data.accountId, revision: data.revision, updatedAt: typeof data.updatedAt === "string" ? data.updatedAt : null, state: data.state === null ? null : validateState(data.state) };
+    return { ok: true, scope, ...res ? { resource: res } : {}, accountId: data.accountId, revision: data.revision, updatedAt: typeof data.updatedAt === "string" ? data.updatedAt : null, state: data.state === null ? null : validate(data.state) };
   }
-  async function dispatch(operation, values, expected, ownerId) {
-    const body = requestBody(operation, values);
+  async function dispatch(operation, values, expected, ownerId, res = resource) {
+    const validate = validatorFor(res);
+    if (!validate) throw fault("INVALID_REQUEST", "제품 계정 요청을 확인해 주세요.");
+    const body = requestBody(operation, values, validate);
     guard(expected);
     let data;
+    if (native && res !== resource) throw fault("INVALID_REQUEST", "이 자료는 웹에서만 열 수 있어요.");
     if (native) {
       const params = operation === operations.load ? {} : operation === operations.save ? { expected_revision: body.expected_revision, state: body.state, ...Object.hasOwn(body, "messageLibraryVersion") ? { messageLibraryVersion: body.messageLibraryVersion } : {}, ...Object.hasOwn(body, "checkinPreferenceVersion") ? { checkinPreferenceVersion: body.checkinPreferenceVersion } : {} } : { expected_revision: body.expected_revision };
       data = await bridgeRequest.call(bridge, operation, params);
@@ -711,13 +719,13 @@ function createProductAccount({
       let token = session2.access_token;
       if (session2.expires_at <= now() + 3e4) token = await refresh(expected);
       guard(expected);
-      const url = `${config.accountApiUrl.replace(/\/$/, "")}/functions/v1/${endpoint}${resource && body === void 0 ? `?resource=${encodeURIComponent(resource)}` : ""}`;
-      let result = await send(url, token, body === void 0 || !resource ? body : { ...body, resource });
+      const url = `${config.accountApiUrl.replace(/\/$/, "")}/functions/v1/${endpoint}${res && body === void 0 ? `?resource=${encodeURIComponent(res)}` : ""}`;
+      let result = await send(url, token, body === void 0 || !res ? body : { ...body, resource: res });
       guard(expected);
       if (result.response.status === 401 && session2?.refresh_token) {
         token = session2.access_token !== token ? session2.access_token : await refresh(expected);
         guard(expected);
-        result = await send(url, token, body === void 0 || !resource ? body : { ...body, resource });
+        result = await send(url, token, body === void 0 || !res ? body : { ...body, resource: res });
         guard(expected);
       }
       if (!result.response.ok || result.data?.ok !== true) {
@@ -727,7 +735,7 @@ function createProductAccount({
       data = result.data;
     }
     guard(expected);
-    return validateResponse(data, ownerId);
+    return validateResponse(data, ownerId, res, validate);
   }
   async function nativeStatus(source) {
     if (disposed) return status();
@@ -973,11 +981,12 @@ function createProductAccount({
     }
     return { ok: !snapshot.error, status: status(), serverRevoked: serverSessionRevoked && refreshRevoked, serverSessionRevoked, refreshRevoked };
   }
-  async function request(operation, values = {}) {
+  async function request(operation, values = {}, { resource: res = resource } = {}) {
     if (!snapshot.signedIn || !snapshot.accountId) throw fault("AUTH_REQUIRED", "SYNK ID로 로그인한 뒤 계정 자료를 확인해 주세요.");
+    if (!validatorFor(res)) throw fault("INVALID_REQUEST", "제품 계정 요청을 확인해 주세요.");
     const expected = epoch, ownerId = snapshot.accountId;
     try {
-      return await dispatch(operation, values, expected, ownerId);
+      return await dispatch(operation, values, expected, ownerId, res);
     } catch (error) {
       if (expected === epoch && (AUTH_ERRORS.has(error.code) || error.code === "ACCOUNT_CHANGED")) clearSession(error);
       throw error;
@@ -1069,7 +1078,7 @@ function createDocumentSync({ transport, storage, onState = () => {
 }, onRemoved = () => {
 }, validateState, emptyState, requiresConflictReview = () => false, preferRemoteOnOpen = false, scope, resource = null, cachePrefix, operations = { load: "careLoad", save: "careSave", delete: "careDelete" } }) {
   if (typeof validateState !== "function" || typeof emptyState !== "function" || typeof requiresConflictReview !== "function" || !scope || !cachePrefix) throw new TypeError("제품 기록 계약이 필요해요.");
-  const clone2 = (value) => validateState(value);
+  const clone3 = (value) => validateState(value);
   const PREFIX = cachePrefix;
   if (typeof transport !== "function") throw new TypeError("계정 저장 통로가 필요해요.");
   let active = null, generation = 0, localError = null;
@@ -1100,7 +1109,7 @@ function createDocumentSync({ transport, storage, onState = () => {
       const base = PREFIX + encodeURIComponent(cached?.accountId);
       const draft = typeof cached?.draftId === "string" && UUID.test(cached.draftId);
       if (cached?.version !== 1 || typeof cached.accountId !== "string" || !(draft ? key === base + ":draft:" + cached.draftId : cached.draftId === void 0 && key === base) || draft && (typeof cached.createdAt !== "string" || !Number.isFinite(Date.parse(cached.createdAt))) || typeof cached.pending !== "boolean" || cached.baseRevision !== null && !validRevision(cached.baseRevision)) throw failure("INVALID_LOCAL_CACHE");
-      const state2 = clone2(cached.state);
+      const state2 = clone3(cached.state);
       return { accountId, pending: cached.pending, corrupt: false, cached: { ...cached, state: state2 } };
     } catch {
       return { accountId, pending: false, corrupt: true };
@@ -1192,7 +1201,7 @@ function createDocumentSync({ transport, storage, onState = () => {
   localRecords();
   const isCurrent = (context) => active === context && context.generation === generation;
   const emitState = (context) => {
-    if (isCurrent(context)) onState(clone2(context.state));
+    if (isCurrent(context)) onState(clone3(context.state));
   };
   function draftGroups(context, all = false) {
     localRecords();
@@ -1345,7 +1354,7 @@ function createDocumentSync({ transport, storage, onState = () => {
     if (reply.accountId !== context.accountId) throw failure("CARE_ACCOUNT_MISMATCH");
     let state2;
     try {
-      state2 = reply.state === null ? emptyState() : clone2(reply.state);
+      state2 = reply.state === null ? emptyState() : clone3(reply.state);
     } catch {
       throw failure("INVALID_CARE_RESPONSE");
     }
@@ -1421,12 +1430,12 @@ function createDocumentSync({ transport, storage, onState = () => {
     if (!context.known && !await load(context)) return false;
     if (!isCurrent(context) || context.conflict || context.deleting) return false;
     while (context.pending && isCurrent(context) && !context.conflict && !context.deleting) {
-      const sequence = context.sequence, sent = clone2(context.state), expected = context.baseRevision;
+      const sequence = context.sequence, sent = clone3(context.state), expected = context.baseRevision;
       const acknowledged = new Map([...context.recovery, ...context.owned]);
       emit(context, "saving");
       const remote = await request(context, operations.save, { expected_revision: expected, state: sent });
       if (remote.revision !== expected + 1 || remote.empty) throw failure("INVALID_CARE_RESPONSE");
-      onSaved(clone2(remote.state));
+      onSaved(clone3(remote.state));
       context.revision = remote.revision;
       context.baseRevision = remote.revision;
       if (context.sequence === sequence) {
@@ -1506,7 +1515,7 @@ function createDocumentSync({ transport, storage, onState = () => {
       emit(context, "local-conflict");
       if (context.localChoice) throw failure("LOCAL_DRAFT_CONFLICT");
     }
-    const normalized = clone2(state2);
+    const normalized = clone3(state2);
     if (JSON.stringify(normalized) === JSON.stringify(context.state)) return false;
     context.state = normalized;
     context.pending = true;
@@ -1565,7 +1574,7 @@ function createDocumentSync({ transport, storage, onState = () => {
       }
       detachDraft(context);
       context.recovery = new Map(selected.entries);
-      context.state = clone2(selected.state);
+      context.state = clone3(selected.state);
       context.baseRevision = selected.baseRevision;
       context.pending = true;
       context.known = false;
@@ -1910,6 +1919,92 @@ function removeSavedJob(raw, id) {
   if (doc2.state.tasks.some((task) => task.sourceId === id)) fail("JOB_IN_USE");
   doc2.savedJobs = doc2.savedJobs.filter((job) => job.id !== id);
   return doc2;
+}
+
+// experiences/path-app/study-shape.mjs
+var MAX_TOPIK = 6;
+var EDUCATION_IDS = Object.freeze(["graduated", "expected", "none"]);
+var MAX_FUNDS_WON = 2e8;
+var MAX_COMPARE = 3;
+var MAX_DATES = 30;
+var MAX_CHANNELS_OFF = 10;
+var MAX_DOCS = 60;
+var ID_RE2 = /^[a-z0-9][a-z0-9-]{0,63}$/;
+var DATE_ID_RE = /^[a-z0-9][a-z0-9-]{0,79}$/;
+var STUDY_SCHEMA = "synk.path-study";
+var STUDY_DOCUMENT_VERSION = 1;
+var STUDY_RESOURCE = "path-study";
+var CONSENT_VERSION = 1;
+var MIN_CONSENT_VERSION = 1;
+var CONSENT_LANGS = Object.freeze(["ko", "en", "mn"]);
+var MAX_STUDY_DOCUMENT_BYTES = 64 * 1024;
+var isObj2 = (v) => v !== null && typeof v === "object" && !Array.isArray(v);
+var exact2 = (v, keys) => isObj2(v) && Object.keys(v).length === keys.length && keys.every((k) => Object.hasOwn(v, k));
+var intIn = (v, min, max) => Number.isInteger(v) && v >= min && v <= max;
+var isDay = (v) => typeof v === "string" && /^\d{4}-\d{2}-\d{2}$/.test(v) && !Number.isNaN(Date.parse(v + "T00:00:00Z")) && (/* @__PURE__ */ new Date(v + "T00:00:00Z")).toISOString().slice(0, 10) === v;
+var isStamp = (v) => typeof v === "string" && /^\d{4}-\d{2}-\d{2}T(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d{1,3})?Z$/.test(v) && isDay(v.slice(0, 10)) && Number.isFinite(Date.parse(v));
+var fail2 = (code = "INVALID_PATH_STUDY") => {
+  throw Object.assign(new TypeError(code), { code });
+};
+var PROFILE_KEYS = ["topik", "gradePct", "fundsWon", "education", "compare", "dates", "channelsOff", "target", "docs"];
+var uniqueBy = (list, max, valid, key = (x) => x) => Array.isArray(list) && list.length <= max && list.every(valid) && new Set(list.map(key)).size === list.length;
+function emptyStudyDocument() {
+  return {
+    schema: STUDY_SCHEMA,
+    version: STUDY_DOCUMENT_VERSION,
+    consent: null,
+    profile: { topik: null, gradePct: null, fundsWon: null, education: null, compare: [], dates: [], channelsOff: [], target: null, docs: [] }
+  };
+}
+function validateStudyDocument(raw, { allowEmpty = false } = {}) {
+  let bytes;
+  try {
+    bytes = new TextEncoder().encode(JSON.stringify(raw)).byteLength;
+  } catch {
+    fail2();
+  }
+  if (bytes > MAX_STUDY_DOCUMENT_BYTES) fail2("PATH_STUDY_TOO_LARGE");
+  if (!exact2(raw, ["schema", "version", "consent", "profile"]) || raw.schema !== STUDY_SCHEMA || raw.version !== STUDY_DOCUMENT_VERSION) fail2();
+  const c = raw.consent, p = raw.profile;
+  if (c === null) {
+    if (!allowEmpty || JSON.stringify(p) !== JSON.stringify(emptyStudyDocument().profile)) fail2();
+    return emptyStudyDocument();
+  }
+  if (!exact2(c, ["v", "at", "minor", "guardian", "lang", "base"]) || !intIn(c.v, MIN_CONSENT_VERSION, CONSENT_VERSION) || !isStamp(c.at) || typeof c.minor !== "boolean" || c.guardian !== c.minor || !CONSENT_LANGS.includes(c.lang) || !intIn(c.base, 0, 2147483647)) fail2();
+  if (!exact2(p, PROFILE_KEYS)) fail2();
+  const nullOr = (v, ok) => v === null || ok(v);
+  if (!nullOr(p.topik, (v) => intIn(v, 0, MAX_TOPIK)) || !nullOr(p.gradePct, (v) => intIn(v, 0, 100)) || !nullOr(p.fundsWon, (v) => intIn(v, 0, MAX_FUNDS_WON)) || !nullOr(p.education, (v) => EDUCATION_IDS.includes(v)) || !nullOr(p.target, (v) => typeof v === "string" && ID_RE2.test(v))) fail2();
+  const isId = (v) => typeof v === "string" && ID_RE2.test(v);
+  if (!uniqueBy(p.compare, MAX_COMPARE, isId) || !uniqueBy(p.channelsOff, MAX_CHANNELS_OFF, isId)) fail2();
+  const okDate = (d) => exact2(d, ["id", "start", "end"]) && typeof d.id === "string" && DATE_ID_RE.test(d.id) && isDay(d.start) && isDay(d.end) && d.end >= d.start;
+  if (!uniqueBy(p.dates, MAX_DATES, okDate, (d) => d.id)) fail2();
+  const okDoc = (d) => exact2(d, ["id", "doneAt"]) && isId(d.id) && isStamp(d.doneAt);
+  if (!uniqueBy(p.docs, MAX_DOCS, okDoc, (d) => d.id)) fail2();
+  return {
+    schema: STUDY_SCHEMA,
+    version: STUDY_DOCUMENT_VERSION,
+    consent: { v: c.v, at: c.at, minor: c.minor, guardian: c.guardian, lang: c.lang, base: c.base },
+    profile: {
+      topik: p.topik,
+      gradePct: p.gradePct,
+      fundsWon: p.fundsWon,
+      education: p.education,
+      compare: [...p.compare],
+      dates: p.dates.map((d) => ({ id: d.id, start: d.start, end: d.end })),
+      channelsOff: [...p.channelsOff],
+      target: p.target,
+      docs: p.docs.map((d) => ({ id: d.id, doneAt: d.doneAt }))
+    }
+  };
+}
+function createStudyDocument(profile2, consent) {
+  const p = isObj2(profile2) ? profile2 : {};
+  return validateStudyDocument({
+    schema: STUDY_SCHEMA,
+    version: STUDY_DOCUMENT_VERSION,
+    consent: { v: consent?.v, at: consent?.at, minor: consent?.minor, guardian: consent?.guardian, lang: consent?.lang, base: consent?.base },
+    profile: Object.fromEntries(PROFILE_KEYS.map((k) => [k, p[k]]))
+  });
 }
 
 // experiences/path-app/account.mjs
@@ -2275,6 +2370,8 @@ function createPathSession(options = {}) {
         resource: "path-app",
         operations: OPERATIONS,
         validateState: (raw) => raw == null ? null : validateDoc(raw),
+        // 같은 로그인 세션으로 여는 유학 준비 문서. 앱 검사기는 동기화 엔진의 빈 상태(동의 없음)도 받는다.
+        extraResources: { [STUDY_RESOURCE]: (raw) => raw == null ? null : validateStudyDocument(raw, { allowEmpty: true }) },
         onStatus: handleAccountStatus,
         fetcher,
         storage,
@@ -2593,6 +2690,12 @@ function createPathSession(options = {}) {
     } catch {
     }
   }
+  async function studyRequest(operation, values = {}) {
+    if (disposed) throw fault2("PATH_SESSION_DISPOSED", "disposed");
+    const acc = account || await startAccount();
+    if (!acc) throw fault2("ACCOUNT_UNAVAILABLE", "계정 연결을 확인하지 못했어요.");
+    return acc.request(operation, values, { resource: STUDY_RESOURCE });
+  }
   return Object.freeze({
     document: () => clone(currentDoc()),
     status: snapshot,
@@ -2603,6 +2706,7 @@ function createPathSession(options = {}) {
     saveJob,
     removeJob,
     importGuest,
+    studyRequest,
     exportGuest,
     exportCurrent,
     confirmBackup,
@@ -2842,18 +2946,18 @@ var TIMEOUT_MS = 12e3;
 var PAGE_SIZE = 12;
 var BOARDS2 = ["moloco", "coupang"];
 var SOURCE_STATUS = ["fresh", "stale", "error"];
-var ID_RE2 = /^greenhouse-(moloco|coupang)-(\d{1,20})$/;
-var fail2 = (code) => Object.assign(new Error(code), { code });
+var ID_RE3 = /^greenhouse-(moloco|coupang)-(\d{1,20})$/;
+var fail3 = (code) => Object.assign(new Error(code), { code });
 async function boundedFetch(fetcher, url, init, signal) {
   const ctl = new AbortController();
   const onAbort = () => ctl.abort();
   if (signal) signal.aborted ? ctl.abort() : signal.addEventListener("abort", onAbort, { once: true });
-  const timer = setTimeout(() => ctl.abort(fail2("timeout")), TIMEOUT_MS);
+  const timer = setTimeout(() => ctl.abort(fail3("timeout")), TIMEOUT_MS);
   try {
     const res = await fetcher(url, { ...init, credentials: "omit", redirect: "error", signal: ctl.signal });
-    if (!res || !res.ok) throw fail2("http");
+    if (!res || !res.ok) throw fail3("http");
     const len = Number(res.headers?.get?.("content-length"));
-    if (Number.isFinite(len) && len > MAX_BYTES) throw fail2("too_large");
+    if (Number.isFinite(len) && len > MAX_BYTES) throw fail3("too_large");
     let text2 = "";
     if (res.body && typeof res.body.getReader === "function") {
       const reader = res.body.getReader();
@@ -2868,24 +2972,24 @@ async function boundedFetch(fetcher, url, init, signal) {
             await reader.cancel();
           } catch {
           }
-          throw fail2("too_large");
+          throw fail3("too_large");
         }
         text2 += dec.decode(value, { stream: true });
       }
       text2 += dec.decode();
     } else {
       text2 = await res.text();
-      if (new TextEncoder().encode(text2).byteLength > MAX_BYTES) throw fail2("too_large");
+      if (new TextEncoder().encode(text2).byteLength > MAX_BYTES) throw fail3("too_large");
     }
     try {
       return JSON.parse(text2);
     } catch {
-      throw fail2("invalid");
+      throw fail3("invalid");
     }
   } catch (e) {
-    if (signal?.aborted) throw fail2("aborted");
-    if (ctl.signal.aborted) throw fail2("timeout");
-    throw e?.code ? e : fail2("network");
+    if (signal?.aborted) throw fail3("aborted");
+    if (ctl.signal.aborted) throw fail3("timeout");
+    throw e?.code ? e : fail3("network");
   } finally {
     clearTimeout(timer);
     signal?.removeEventListener?.("abort", onAbort);
@@ -2896,11 +3000,11 @@ var optStr = (v, max) => v === null || str(v, max);
 var isDate = (v) => str(v, 64) && !Number.isNaN(Date.parse(v));
 var optDate = (v) => v === null || isDate(v);
 function normalizeJob(j) {
-  if (!j || typeof j !== "object") throw fail2("invalid");
-  const m = ID_RE2.exec(j.id);
-  if (!m || j.provider !== "greenhouse" || j.board !== m[1] || j.jobId !== m[2]) throw fail2("invalid");
-  if (![j.company, j.title, j.location, j.url].every((s) => str(s)) || !optStr(j.employmentType, 200) || !isDate(j.observedAt)) throw fail2("invalid");
-  if (j.updatedAt !== void 0 && !optDate(j.updatedAt)) throw fail2("invalid");
+  if (!j || typeof j !== "object") throw fail3("invalid");
+  const m = ID_RE3.exec(j.id);
+  if (!m || j.provider !== "greenhouse" || j.board !== m[1] || j.jobId !== m[2]) throw fail3("invalid");
+  if (![j.company, j.title, j.location, j.url].every((s) => str(s)) || !optStr(j.employmentType, 200) || !isDate(j.observedAt)) throw fail3("invalid");
+  if (j.updatedAt !== void 0 && !optDate(j.updatedAt)) throw fail3("invalid");
   const saved = validateSavedJob({
     id: j.id,
     provider: j.provider,
@@ -2915,23 +3019,23 @@ var ERROR_CODE_RE = /^[a-z0-9_.-]{1,64}$/i;
 function sourceError(e) {
   if (e === null || e === void 0) return null;
   if (typeof e === "string") {
-    if (e.length > 200) throw fail2("invalid");
+    if (e.length > 200) throw fail3("invalid");
     return ERROR_CODE_RE.test(e) ? e : "unknown";
   }
   if (typeof e === "object" && !Array.isArray(e)) {
     const hs = e.httpStatus;
-    if (hs !== void 0 && hs !== null && !(Number.isInteger(hs) && hs >= 100 && hs <= 599)) throw fail2("invalid");
+    if (hs !== void 0 && hs !== null && !(Number.isInteger(hs) && hs >= 100 && hs <= 599)) throw fail3("invalid");
     return typeof e.code === "string" && ERROR_CODE_RE.test(e.code) ? e.code : "unknown";
   }
-  throw fail2("invalid");
+  throw fail3("invalid");
 }
 function normalizeSource(s) {
-  if (!s || typeof s !== "object" || s.provider !== "greenhouse" || !BOARDS2.includes(s.board)) throw fail2("invalid");
-  if (!str(s.company, 200) || !SOURCE_STATUS.includes(s.status) || typeof s.complete !== "boolean") throw fail2("invalid");
-  if (!optDate(s.observedAt) || !optDate(s.attemptedAt) || !optDate(s.retryAfter)) throw fail2("invalid");
+  if (!s || typeof s !== "object" || s.provider !== "greenhouse" || !BOARDS2.includes(s.board)) throw fail3("invalid");
+  if (!str(s.company, 200) || !SOURCE_STATUS.includes(s.status) || typeof s.complete !== "boolean") throw fail3("invalid");
+  if (!optDate(s.observedAt) || !optDate(s.attemptedAt) || !optDate(s.retryAfter)) throw fail3("invalid");
   const error = sourceError(s.error);
   const ev = s.evidence;
-  if (!ev || !str(ev.careerUrl) || !str(ev.documentationUrl) || !isDate(ev.verifiedAt)) throw fail2("invalid");
+  if (!ev || !str(ev.careerUrl) || !str(ev.documentationUrl) || !isDate(ev.verifiedAt)) throw fail3("invalid");
   const safeUrl = (u) => {
     try {
       const x = new URL(u);
@@ -2954,17 +3058,17 @@ function normalizeSource(s) {
   };
 }
 function parsePayload(p) {
-  if (!p || p.ok !== true || p.scope !== "synk-path-jobs" || !Array.isArray(p.jobs) || !Array.isArray(p.sources)) throw fail2("invalid");
-  if (p.availability !== void 0 && p.availability !== "disabled") throw fail2("invalid");
+  if (!p || p.ok !== true || p.scope !== "synk-path-jobs" || !Array.isArray(p.jobs) || !Array.isArray(p.sources)) throw fail3("invalid");
+  if (p.availability !== void 0 && p.availability !== "disabled") throw fail3("invalid");
   if (p.availability === "disabled") {
-    if (p.jobs.length || p.sources.length) throw fail2("invalid");
+    if (p.jobs.length || p.sources.length) throw fail3("invalid");
     return { disabled: true, jobs: [], sources: [] };
   }
-  if (p.jobs.length > 3e3 || p.sources.length > 2) throw fail2("invalid");
+  if (p.jobs.length > 3e3 || p.sources.length > 2) throw fail3("invalid");
   const sources = p.sources.map(normalizeSource);
-  if (new Set(sources.map((s) => s.board)).size !== sources.length) throw fail2("invalid");
+  if (new Set(sources.map((s) => s.board)).size !== sources.length) throw fail3("invalid");
   const jobs = p.jobs.map(normalizeJob);
-  if (new Set(jobs.map((j) => j.id)).size !== jobs.length) throw fail2("invalid");
+  if (new Set(jobs.map((j) => j.id)).size !== jobs.length) throw fail3("invalid");
   return { jobs, sources };
 }
 function createJobsFeed({ fetcher = fetch, configUrl = "./config.json", onChange = () => {
@@ -3230,7 +3334,6 @@ var REGIONS = Object.freeze(["local", "metro"]);
 var VISAS = Object.freeze(["D-2", "D-4"]);
 var IMAGE_IDS = Object.freeze(["univ-a", "univ-b", "univ-c"]);
 var TONES = Object.freeze(["lapis", "meadow", "ink", "coral"]);
-var MAX_TOPIK = 6;
 var MOJ_2026 = Object.freeze({
   title: Object.freeze({ ko: "법무부 2026-10-07 보도자료", en: "Ministry of Justice press release, 2026-10-07" }),
   url: "https://www.moj.go.kr/bbs/moj/182/611170/artclView.do"
@@ -3490,12 +3593,12 @@ var PROGRAMS = Object.freeze([
     source: { title: L2("2027학년도 전주대학교 전기 외국인 신 · 편입학 특별전형 모집요강", "Jeonju University, Spring 2027 international admissions guide"), url: "https://www.jj.ac.kr/global/admission/guidelines.do" }
   }
 ].map((p) => Object.freeze({ ...p, requires: Object.freeze(p.requires), costs: Object.freeze(p.costs), scholarship: Object.freeze(p.scholarship.map(Object.freeze)) })));
-var isObj2 = (v) => v !== null && typeof v === "object" && !Array.isArray(v);
+var isObj3 = (v) => v !== null && typeof v === "object" && !Array.isArray(v);
 var isDate2 = (v) => typeof v === "string" && /^\d{4}-\d{2}-\d{2}$/.test(v) && !Number.isNaN(Date.parse(v + "T00:00:00Z"));
 var isText = (v) => typeof v === "string" && v.trim().length > 0 && v.length <= 200;
-var isPair = (v) => isObj2(v) && isText(v.ko) && isText(v.en);
+var isPair = (v) => isObj3(v) && isText(v.ko) && isText(v.en);
 var isLong = (v) => typeof v === "string" && v.trim().length > 0 && v.length <= 600;
-var isNote = (v) => isObj2(v) && isLong(v.ko) && isLong(v.en);
+var isNote = (v) => isObj3(v) && isLong(v.ko) && isLong(v.en);
 var isWon = (v) => Number.isSafeInteger(v) && v >= 0 && v <= 1e9;
 var isLevel = (v) => Number.isInteger(v) && v >= 0 && v <= MAX_TOPIK;
 var isHttps = (v) => {
@@ -3506,8 +3609,8 @@ var isHttps = (v) => {
     return false;
   }
 };
-var isSource = (v) => isObj2(v) && isPair(v.title) && isHttps(v.url);
-var fail3 = (m) => {
+var isSource = (v) => isObj3(v) && isPair(v.title) && isHttps(v.url);
+var fail4 = (m) => {
   throw new TypeError("Invalid study data: " + m);
 };
 function financeRule(rules, visa, region) {
@@ -3527,68 +3630,68 @@ function programById(programs, id) {
   return programs.find((p) => p.id === id) || null;
 }
 function validateStudyData(rules, programs) {
-  if (!Array.isArray(rules) || !Array.isArray(programs)) fail3("lists");
+  if (!Array.isArray(rules) || !Array.isArray(programs)) fail4("lists");
   const ruleIds = /* @__PURE__ */ new Set();
   for (const r of rules) {
-    if (!isObj2(r) || !/^[a-z0-9][a-z0-9-]{0,63}$/.test(r.id) || ruleIds.has(r.id)) fail3("rule id");
+    if (!isObj3(r) || !/^[a-z0-9][a-z0-9-]{0,63}$/.test(r.id) || ruleIds.has(r.id)) fail4("rule id");
     ruleIds.add(r.id);
-    if (!RULE_STATUS.includes(r.status) || !isDate2(r.basis) || !isDate2(r.checkedAt) || !isSource(r.source)) fail3("rule source " + r.id);
+    if (!RULE_STATUS.includes(r.status) || !isDate2(r.basis) || !isDate2(r.checkedAt) || !isSource(r.source)) fail4("rule source " + r.id);
     if (r.kind === "finance") {
-      if (!VISAS.includes(r.visa) || !REGIONS.includes(r.region) || !isWon(r.won) || typeof r.inCurrentGuide !== "boolean") fail3("finance rule " + r.id);
+      if (!VISAS.includes(r.visa) || !REGIONS.includes(r.region) || !isWon(r.won) || typeof r.inCurrentGuide !== "boolean") fail4("finance rule " + r.id);
     } else if (r.kind === "finance-waiver") {
-      if (!isLevel(r.topik)) fail3("waiver rule " + r.id);
+      if (!isLevel(r.topik)) fail4("waiver rule " + r.id);
     } else if (r.kind === "finance-proof") {
-      if (!VISAS.includes(r.visa) || ![r.issuedWithinDays, r.heldDays].every((d) => Number.isInteger(d) && d > 0 && d <= 366)) fail3("proof rule " + r.id);
-    } else fail3("rule kind " + r.id);
+      if (!VISAS.includes(r.visa) || ![r.issuedWithinDays, r.heldDays].every((d) => Number.isInteger(d) && d > 0 && d <= 366)) fail4("proof rule " + r.id);
+    } else fail4("rule kind " + r.id);
   }
   const seenFinance = /* @__PURE__ */ new Set();
   for (const r of rules) if (r.kind === "finance" && r.status === "in-force") {
     const key = r.visa + "/" + r.region;
-    if (seenFinance.has(key)) fail3("duplicate finance rule " + key);
+    if (seenFinance.has(key)) fail4("duplicate finance rule " + key);
     seenFinance.add(key);
   }
   const ids = /* @__PURE__ */ new Set();
   for (const p of programs) {
-    if (!isObj2(p) || !/^[a-z0-9][a-z0-9-]{0,63}$/.test(p.id) || ids.has(p.id)) fail3("program id");
+    if (!isObj3(p) || !/^[a-z0-9][a-z0-9-]{0,63}$/.test(p.id) || ids.has(p.id)) fail4("program id");
     ids.add(p.id);
-    if (typeof p.example !== "boolean" || !isPair(p.name) || !isPair(p.place) || !isPair(p.majors)) fail3("program text " + p.id);
-    if (!REGIONS.includes(p.region) || !LEVELS.includes(p.level) || !VISAS.includes(p.visa)) fail3("program kind " + p.id);
-    if (p.example ? !IMAGE_IDS.includes(p.image) : !(p.image === null || IMAGE_IDS.includes(p.image))) fail3("program image " + p.id);
-    if (!(p.tone === void 0 || TONES.includes(p.tone))) fail3("program tone " + p.id);
-    for (const key of ["term", "requiresNote", "costsNote", "scholarshipNote", "applyNote", "dormLabel"]) if (!(p[key] === void 0 || p[key] === null || isNote(p[key]))) fail3("program " + key + " " + p.id);
-    if (!(p.partner === void 0 || typeof p.partner === "boolean") || p.example && p.partner) fail3("program partner " + p.id);
-    if (!(p.scholarshipTerms === void 0 || p.scholarshipTerms === 1 || p.scholarshipTerms === 2)) fail3("program scholarship terms " + p.id);
-    if (p.level === "language" !== (p.visa === "D-4")) fail3("program visa " + p.id);
+    if (typeof p.example !== "boolean" || !isPair(p.name) || !isPair(p.place) || !isPair(p.majors)) fail4("program text " + p.id);
+    if (!REGIONS.includes(p.region) || !LEVELS.includes(p.level) || !VISAS.includes(p.visa)) fail4("program kind " + p.id);
+    if (p.example ? !IMAGE_IDS.includes(p.image) : !(p.image === null || IMAGE_IDS.includes(p.image))) fail4("program image " + p.id);
+    if (!(p.tone === void 0 || TONES.includes(p.tone))) fail4("program tone " + p.id);
+    for (const key of ["term", "requiresNote", "costsNote", "scholarshipNote", "applyNote", "dormLabel"]) if (!(p[key] === void 0 || p[key] === null || isNote(p[key]))) fail4("program " + key + " " + p.id);
+    if (!(p.partner === void 0 || typeof p.partner === "boolean") || p.example && p.partner) fail4("program partner " + p.id);
+    if (!(p.scholarshipTerms === void 0 || p.scholarshipTerms === 1 || p.scholarshipTerms === 2)) fail4("program scholarship terms " + p.id);
+    if (p.level === "language" !== (p.visa === "D-4")) fail4("program visa " + p.id);
     const q = p.requires;
-    if (!isObj2(q) || q.education !== "highschool" || !Number.isInteger(q.gradePct) || q.gradePct < 0 || q.gradePct > 100 || !isLevel(q.topik)) fail3("program requires " + p.id);
+    if (!isObj3(q) || q.education !== "highschool" || !Number.isInteger(q.gradePct) || q.gradePct < 0 || q.gradePct > 100 || !isLevel(q.topik)) fail4("program requires " + p.id);
     const c = p.costs;
     const known = (v) => isWon(v) || !p.example && v === null;
-    if (!isObj2(c) || !isWon(c.tuition) || !known(c.dorm) || !known(c.living)) fail3("program costs " + p.id);
-    if (!Array.isArray(p.scholarship)) fail3("program scholarship " + p.id);
+    if (!isObj3(c) || !isWon(c.tuition) || !known(c.dorm) || !known(c.living)) fail4("program costs " + p.id);
+    if (!Array.isArray(p.scholarship)) fail4("program scholarship " + p.id);
     let last = -1, lastAmount = 0;
     for (const s of p.scholarship) {
       const byRate = typeof s.tuitionRate === "number" && s.tuitionRate > 0 && s.tuitionRate <= 1 && s.won === void 0;
       const byWon = isWon(s.won) && s.won > 0 && s.won <= c.tuition && s.tuitionRate === void 0;
-      if (!isObj2(s) || !isLevel(s.topik) || s.topik <= last || s.topik !== 0 && s.topik < q.topik || !(byRate || byWon)) fail3("scholarship steps " + p.id);
+      if (!isObj3(s) || !isLevel(s.topik) || s.topik <= last || s.topik !== 0 && s.topik < q.topik || !(byRate || byWon)) fail4("scholarship steps " + p.id);
       const amount = scholarshipAmount(p, s);
-      if (!(amount > lastAmount)) fail3("scholarship steps " + p.id);
+      if (!(amount > lastAmount)) fail4("scholarship steps " + p.id);
       last = s.topik;
       lastAmount = amount;
     }
-    if (!(p.applyOpens === null || isDate2(p.applyOpens)) || typeof p.certified !== "boolean") fail3("program dates " + p.id);
-    if (!(p.applyCloses === void 0 || p.applyCloses === null || isDate2(p.applyCloses) && (!p.applyOpens || p.applyCloses >= p.applyOpens))) fail3("program close date " + p.id);
+    if (!(p.applyOpens === null || isDate2(p.applyOpens)) || typeof p.certified !== "boolean") fail4("program dates " + p.id);
+    if (!(p.applyCloses === void 0 || p.applyCloses === null || isDate2(p.applyCloses) && (!p.applyOpens || p.applyCloses >= p.applyOpens))) fail4("program close date " + p.id);
     if (p.applyRounds !== void 0) {
       let prev = "";
-      if (!Array.isArray(p.applyRounds) || !p.applyRounds.length || p.applyOpens !== null) fail3("program rounds " + p.id);
+      if (!Array.isArray(p.applyRounds) || !p.applyRounds.length || p.applyOpens !== null) fail4("program rounds " + p.id);
       for (const r of p.applyRounds) {
-        if (!Array.isArray(r) || r.length !== 2 || !isDate2(r[0]) || !isDate2(r[1]) || r[1] < r[0] || r[0] <= prev) fail3("program rounds " + p.id);
+        if (!Array.isArray(r) || r.length !== 2 || !isDate2(r[0]) || !isDate2(r[1]) || r[1] < r[0] || r[0] <= prev) fail4("program rounds " + p.id);
         prev = r[1];
       }
     }
     if (p.example) {
-      if (p.certified) fail3("example cannot be certified " + p.id);
-    } else if (!isSource(p.source) || !isDate2(p.checkedAt)) fail3("real program needs a source " + p.id);
-    if (!seenFinance.has(p.visa + "/" + p.region)) fail3("no finance rule for " + p.id);
+      if (p.certified) fail4("example cannot be certified " + p.id);
+    } else if (!isSource(p.source) || !isDate2(p.checkedAt)) fail4("real program needs a source " + p.id);
+    if (!seenFinance.has(p.visa + "/" + p.region)) fail4("no finance rule for " + p.id);
   }
   return true;
 }
@@ -3634,20 +3737,10 @@ validateStudyData(RULES, PROGRAMS);
 // experiences/path-app/study-profile.mjs
 var STUDY_KEY = "synk-path-study-v1";
 var STUDY_VERSION = 1;
-var EDUCATION_IDS = Object.freeze(["graduated", "expected", "none"]);
-var MAX_FUNDS_WON = 2e8;
-var MAX_COMPARE = 3;
-var MAX_DATES = 30;
-var MAX_CHANNELS_OFF = 10;
-var MAX_DOCS = 60;
-var isObj3 = (v) => v !== null && typeof v === "object" && !Array.isArray(v);
-var intIn = (v, min, max) => Number.isInteger(v) && v >= min && v <= max;
-var ID_RE3 = /^[a-z0-9][a-z0-9-]{0,63}$/;
-var DATE_ID_RE = /^[a-z0-9][a-z0-9-]{0,79}$/;
-var isDay = (v) => typeof v === "string" && /^\d{4}-\d{2}-\d{2}$/.test(v) && !Number.isNaN(Date.parse(v + "T00:00:00Z"));
-var isStamp = (v) => typeof v === "string" && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,3})?Z$/.test(v) && Number.isFinite(Date.parse(v));
-var cleanDoc = (d) => isObj3(d) && typeof d.id === "string" && ID_RE3.test(d.id) && isStamp(d.doneAt) ? { id: d.id, doneAt: d.doneAt } : null;
-var cleanDate = (d) => isObj3(d) && typeof d.id === "string" && DATE_ID_RE.test(d.id) && isDay(d.start) && isDay(d.end) && d.end >= d.start ? { id: d.id, start: d.start, end: d.end } : null;
+var isObj4 = (v) => v !== null && typeof v === "object" && !Array.isArray(v);
+var intIn2 = (v, min, max) => Number.isInteger(v) && v >= min && v <= max;
+var cleanDoc = (d) => isObj4(d) && typeof d.id === "string" && ID_RE2.test(d.id) && isStamp(d.doneAt) ? { id: d.id, doneAt: d.doneAt } : null;
+var cleanDate = (d) => isObj4(d) && typeof d.id === "string" && DATE_ID_RE.test(d.id) && isDay(d.start) && isDay(d.end) && d.end >= d.start ? { id: d.id, start: d.start, end: d.end } : null;
 var GUEST_OWNER = "guest";
 var OWNER_RE = /^[A-Za-z0-9][A-Za-z0-9_.:@-]{0,127}$/;
 var ownerOf = (v) => typeof v === "string" && OWNER_RE.test(v) ? v : null;
@@ -3656,22 +3749,22 @@ function createProfile() {
 }
 function normalizeProfile(raw) {
   const out = createProfile();
-  if (!isObj3(raw) || raw.v !== STUDY_VERSION) return out;
-  if (intIn(raw.topik, 0, MAX_TOPIK)) out.topik = raw.topik;
-  if (intIn(raw.gradePct, 0, 100)) out.gradePct = raw.gradePct;
-  if (intIn(raw.fundsWon, 0, MAX_FUNDS_WON)) out.fundsWon = raw.fundsWon;
+  if (!isObj4(raw) || raw.v !== STUDY_VERSION) return out;
+  if (intIn2(raw.topik, 0, MAX_TOPIK)) out.topik = raw.topik;
+  if (intIn2(raw.gradePct, 0, 100)) out.gradePct = raw.gradePct;
+  if (intIn2(raw.fundsWon, 0, MAX_FUNDS_WON)) out.fundsWon = raw.fundsWon;
   if (EDUCATION_IDS.includes(raw.education)) out.education = raw.education;
   if (Array.isArray(raw.compare)) for (const id of raw.compare) {
-    if (typeof id === "string" && ID_RE3.test(id) && !out.compare.includes(id) && out.compare.length < MAX_COMPARE) out.compare.push(id);
+    if (typeof id === "string" && ID_RE2.test(id) && !out.compare.includes(id) && out.compare.length < MAX_COMPARE) out.compare.push(id);
   }
   if (Array.isArray(raw.dates)) for (const d of raw.dates) {
     const c = cleanDate(d);
     if (c && !out.dates.some((x) => x.id === c.id) && out.dates.length < MAX_DATES) out.dates.push(c);
   }
   if (Array.isArray(raw.channelsOff)) for (const id of raw.channelsOff) {
-    if (typeof id === "string" && ID_RE3.test(id) && !out.channelsOff.includes(id) && out.channelsOff.length < MAX_CHANNELS_OFF) out.channelsOff.push(id);
+    if (typeof id === "string" && ID_RE2.test(id) && !out.channelsOff.includes(id) && out.channelsOff.length < MAX_CHANNELS_OFF) out.channelsOff.push(id);
   }
-  if (typeof raw.target === "string" && ID_RE3.test(raw.target)) out.target = raw.target;
+  if (typeof raw.target === "string" && ID_RE2.test(raw.target)) out.target = raw.target;
   if (Array.isArray(raw.docs)) for (const d of raw.docs) {
     const c = cleanDoc(d);
     if (c && !out.docs.some((x) => x.id === c.id) && out.docs.length < MAX_DOCS) out.docs.push(c);
@@ -3681,13 +3774,13 @@ function normalizeProfile(raw) {
 function setField(profile2, key, value) {
   const p = normalizeProfile(profile2);
   if (key === "topik") {
-    if (!(value === null || intIn(value, 0, MAX_TOPIK))) throw new RangeError("topik");
+    if (!(value === null || intIn2(value, 0, MAX_TOPIK))) throw new RangeError("topik");
     p.topik = value;
   } else if (key === "gradePct") {
-    if (!(value === null || intIn(value, 0, 100))) throw new RangeError("gradePct");
+    if (!(value === null || intIn2(value, 0, 100))) throw new RangeError("gradePct");
     p.gradePct = value;
   } else if (key === "fundsWon") {
-    if (!(value === null || intIn(value, 0, MAX_FUNDS_WON))) throw new RangeError("fundsWon");
+    if (!(value === null || intIn2(value, 0, MAX_FUNDS_WON))) throw new RangeError("fundsWon");
     p.fundsWon = value;
   } else if (key === "education") {
     if (!(value === null || EDUCATION_IDS.includes(value))) throw new RangeError("education");
@@ -3697,7 +3790,7 @@ function setField(profile2, key, value) {
 }
 function toggleCompare(profile2, id, knownIds) {
   const p = normalizeProfile(profile2);
-  if (typeof id !== "string" || !ID_RE3.test(id) || knownIds && !knownIds.includes(id)) return p;
+  if (typeof id !== "string" || !ID_RE2.test(id) || knownIds && !knownIds.includes(id)) return p;
   const i = p.compare.indexOf(id);
   if (i >= 0) p.compare.splice(i, 1);
   else if (p.compare.length < MAX_COMPARE) p.compare.push(id);
@@ -3729,7 +3822,7 @@ function keepDates(profile2, keep) {
 }
 function toggleChannel(profile2, id) {
   const p = normalizeProfile(profile2);
-  if (typeof id !== "string" || !ID_RE3.test(id)) return p;
+  if (typeof id !== "string" || !ID_RE2.test(id)) return p;
   if (p.channelsOff.includes(id)) p.channelsOff = p.channelsOff.filter((x) => x !== id);
   else if (p.channelsOff.length < MAX_CHANNELS_OFF) p.channelsOff.push(id);
   return p;
@@ -3740,7 +3833,7 @@ function setTarget(profile2, id, keep = null) {
     p.target = null;
     return { profile: p, dropped: 0 };
   }
-  if (typeof id !== "string" || !ID_RE3.test(id)) throw new RangeError("target");
+  if (typeof id !== "string" || !ID_RE2.test(id)) throw new RangeError("target");
   let dropped = 0;
   if (p.target !== id && Array.isArray(keep)) {
     const before = p.docs.length;
@@ -3752,7 +3845,7 @@ function setTarget(profile2, id, keep = null) {
 }
 function toggleDoc(profile2, id, now = /* @__PURE__ */ new Date()) {
   const p = normalizeProfile(profile2);
-  if (typeof id !== "string" || !ID_RE3.test(id)) throw new RangeError("doc");
+  if (typeof id !== "string" || !ID_RE2.test(id)) throw new RangeError("doc");
   if (p.docs.some((d) => d.id === id)) {
     p.docs = p.docs.filter((d) => d.id !== id);
     return { profile: p, on: false, full: false };
@@ -3826,6 +3919,428 @@ function createProfileStore(storage) {
       return persisted;
     }
   };
+}
+
+// experiences/path-app/study-account.mjs
+var STUDY_OPERATIONS = Object.freeze({ load: "pathLoad", save: "pathSave", delete: "pathDelete" });
+var STUDY_CACHE_PREFIX = "synk-path-study-account:";
+var PAUSE_CODES = /* @__PURE__ */ new Set(["PATH_STUDY_UNAVAILABLE", "INVALID_ACTION", "INVALID_QUERY", "NETWORK", "ACCOUNT_UNAVAILABLE", "OFFLINE"]);
+var clone2 = (v) => v == null ? null : JSON.parse(JSON.stringify(v));
+var stamp = (d) => (d instanceof Date ? d : new Date(d)).toISOString();
+function createStudyAccount({ request, storage = globalThis.sessionStorage, onChange = () => {
+}, syncFactory = createDocumentSync, now = () => /* @__PURE__ */ new Date() } = {}) {
+  if (typeof request !== "function") throw new TypeError("PATH study request required");
+  let sync = null, accountId = null, epoch = 0;
+  let doc2 = null, phase = "closed", status = { status: "closed", pending: false, error: null, localDrafts: [] };
+  let lastOp = null, deletedElsewhere = false, reapplying = false, preferLocal = false, cleanAfterSave = false, sendFailed = false;
+  const SELF_HEALING = /* @__PURE__ */ new Set(["REVISION_CONFLICT", "PATH_STUDY_CONSENT_STALE"]);
+  const emit = () => {
+    try {
+      onChange(snapshot());
+    } catch {
+    }
+  };
+  function snapshot() {
+    return Object.freeze({
+      phase,
+      profile: phase === "consented" && doc2?.consent ? clone2(doc2.profile) : null,
+      consent: doc2?.consent ? clone2(doc2.consent) : null,
+      pending: status.pending === true,
+      error: status.error ? { code: status.error.code || "PATH_STUDY_ERROR" } : null,
+      localDrafts: Array.isArray(status.localDrafts) ? clone2(status.localDrafts) : [],
+      deletedElsewhere,
+      // 한 번 보내지 못했으면 그 변경이 계정에 닿을 때까지 켜 둔다(끊긴 채 이어 눌러도 알림이 깜빡이지 않게).
+      sendFailed: sendFailed && status.pending === true
+    });
+  }
+  const phaseFor = () => {
+    const st = status.status, code = status.error?.code;
+    if (!accountId) return "closed";
+    if (st === "local-conflict") return "choose";
+    if (doc2?.consent) return "consented";
+    if (code && PAUSE_CODES.has(code)) return "paused";
+    if (["error", "storage-error"].includes(st) || code && !Number.isSafeInteger(status.revision)) return "error";
+    if (!Number.isSafeInteger(status.revision)) return "loading";
+    return "none";
+  };
+  const transport = (operation, values) => request(operation, values || {});
+  function wipe(id) {
+    if (!id || !storage) return;
+    const head2 = STUDY_CACHE_PREFIX + encodeURIComponent(id), keys = [];
+    try {
+      for (let i = 0; i < storage.length; i++) {
+        const k = storage.key(i);
+        if (k === head2 || typeof k === "string" && k.startsWith(head2 + ":")) keys.push(k);
+      }
+      for (const k of keys) storage.removeItem(k);
+    } catch {
+    }
+  }
+  function ensureSync() {
+    if (sync) return sync;
+    sync = syncFactory({
+      transport,
+      storage,
+      onState: (state2) => {
+        doc2 = state2 ? clone2(state2) : null;
+        phase = phaseFor();
+        emit();
+      },
+      onStatus: (next) => {
+        if (!next) return;
+        status = { status: next.status || "idle", revision: Number.isSafeInteger(next.revision) ? next.revision : null, pending: next.pending === true, error: next.error || null, localDrafts: next.localDrafts || [] };
+        const code = next.error?.code;
+        if (next.pending !== true) sendFailed = false;
+        else if (code && !SELF_HEALING.has(code)) sendFailed = true;
+        if (next.status === "synced" && next.pending !== true && !reapplying) lastOp = null;
+        if (cleanAfterSave && next.status === "synced" && next.pending !== true) {
+          cleanAfterSave = false;
+          const my = epoch;
+          setTimeout(() => {
+            if (my === epoch && !status.pending) {
+              try {
+                sync.clearLocalRecords?.();
+              } catch {
+              }
+            }
+          }, 0);
+        }
+        if (next.status === "conflict" && !reapplying) void recoverConflict();
+        else if (code === "PATH_STUDY_CONSENT_STALE") void recoverStale();
+        phase = phaseFor();
+        emit();
+      },
+      onSaved: () => {
+      },
+      onRemoved: () => {
+      },
+      validateState: (raw) => validateStudyDocument(raw, { allowEmpty: true }),
+      emptyState: () => emptyStudyDocument(),
+      scope: "synk-path",
+      resource: STUDY_RESOURCE,
+      cachePrefix: STUDY_CACHE_PREFIX,
+      operations: STUDY_OPERATIONS
+    });
+    return sync;
+  }
+  async function recoverConflict() {
+    const my = epoch;
+    reapplying = true;
+    try {
+      if (preferLocal) {
+        preferLocal = false;
+        if (await sync.resolveLocal()) cleanAfterSave = true;
+        return;
+      }
+      if (!await sync.resolveRemote() || my !== epoch) return;
+      if (!doc2?.consent) {
+        deletedElsewhere = true;
+        lastOp = null;
+        preferLocal = false;
+        try {
+          sync.clearLocalRecords?.();
+        } catch {
+        }
+        phase = phaseFor();
+        emit();
+        return;
+      }
+      if (lastOp) {
+        const op = lastOp;
+        lastOp = null;
+        const next = createStudyDocument(op(clone2(doc2.profile)), doc2.consent);
+        if (sync.change(next)) {
+          doc2 = next;
+          cleanAfterSave = true;
+          emit();
+        }
+      }
+    } catch {
+    } finally {
+      reapplying = false;
+    }
+  }
+  async function recoverStale() {
+    const my = epoch;
+    try {
+      if (!await sync.resolveRemote() || my !== epoch) return;
+      if (!doc2?.consent) {
+        deletedElsewhere = true;
+        lastOp = null;
+        try {
+          sync.clearLocalRecords?.();
+        } catch {
+        }
+      }
+      phase = phaseFor();
+      emit();
+    } catch {
+    }
+  }
+  async function open(id) {
+    close();
+    accountId = id;
+    epoch++;
+    deletedElsewhere = false;
+    lastOp = null;
+    doc2 = null;
+    phase = "loading";
+    emit();
+    const my = epoch;
+    try {
+      await ensureSync().open(id);
+      if (my !== epoch) return false;
+      const drafts = status.localDrafts || [];
+      if (status.status === "local-conflict" && drafts.length === 1 && drafts[0]?.baseRevision != null && drafts[0].baseRevision === status.revision) await sync.selectLocalDraft(drafts[0].id);
+    } catch (error) {
+      if (my === epoch) {
+        status = { ...status, error: { code: error?.code || "NETWORK" } };
+      }
+    }
+    if (my === epoch) {
+      phase = phaseFor();
+      emit();
+    }
+    return phase === "consented" || phase === "none";
+  }
+  function close() {
+    epoch++;
+    try {
+      sync?.close();
+    } catch {
+    }
+    accountId = null;
+    doc2 = null;
+    lastOp = null;
+    preferLocal = false;
+    cleanAfterSave = false;
+    sendFailed = false;
+    phase = "closed";
+    status = { status: "closed", revision: null, pending: false, error: null, localDrafts: [] };
+  }
+  function write(nextProfile, op = null) {
+    if (phase !== "consented" || !sync) throw Object.assign(new Error("PATH_STUDY_NOT_CONSENTED"), { code: "PATH_STUDY_NOT_CONSENTED" });
+    const next = createStudyDocument(nextProfile, doc2.consent);
+    const prev = lastOp;
+    lastOp = typeof op === "function" ? prev && status.pending ? (p) => op(prev(p)) : op : null;
+    const changed = sync.change(next);
+    if (changed) {
+      doc2 = next;
+      emit();
+    }
+    return changed;
+  }
+  async function give({ profile: profile2, minor, lang }) {
+    if (!sync || !accountId) return false;
+    if (phase !== "none" || !Number.isSafeInteger(status.revision)) {
+      try {
+        await sync.refresh();
+      } catch {
+      }
+      phase = phaseFor();
+      emit();
+      if (phase === "consented") return "exists";
+      if (phase !== "none" || !Number.isSafeInteger(status.revision)) return false;
+    }
+    const consent = { v: CONSENT_VERSION, at: stamp(now()), minor: minor === true, guardian: minor === true, lang, base: status.revision };
+    const next = createStudyDocument(profile2, consent);
+    deletedElsewhere = false;
+    const id = accountId, my = epoch;
+    sync.change(next);
+    doc2 = next;
+    phase = phaseFor();
+    emit();
+    let ok = false;
+    try {
+      ok = await sync.flush() === true && !status.pending;
+    } catch {
+      ok = false;
+    }
+    if (my !== epoch) return false;
+    if (!ok) {
+      close();
+      wipe(id);
+      await open(id);
+      return accountId === id && phase === "consented" ? "exists" : false;
+    }
+    phase = phaseFor();
+    emit();
+    return true;
+  }
+  async function remove() {
+    if (!sync || !accountId) return false;
+    const my = epoch, id = accountId, same2 = () => my === epoch && accountId === id;
+    let ok = false;
+    try {
+      ok = await sync.remove();
+    } catch {
+      ok = false;
+    }
+    if (!same2()) return false;
+    if (!ok) {
+      try {
+        ok = await sync.resolveRemote() === true && same2() && Number.isSafeInteger(status.revision) && !doc2?.consent;
+      } catch {
+        ok = false;
+      }
+    }
+    if (!same2()) return false;
+    if (ok) {
+      lastOp = null;
+      try {
+        sync.clearLocalRecords?.();
+      } catch {
+      }
+    }
+    phase = phaseFor();
+    emit();
+    return ok;
+  }
+  const pickDraft = async (id) => {
+    if (!sync) return false;
+    preferLocal = true;
+    const ok = await sync.selectLocalDraft(id);
+    if (!ok) preferLocal = false;
+    return ok;
+  };
+  const useAccount = async () => {
+    preferLocal = false;
+    if (!sync) return false;
+    const my = epoch, ok = await sync.resolveRemote();
+    if (ok === true && my === epoch) setTimeout(() => {
+      if (my === epoch && !status.pending) {
+        try {
+          sync.clearLocalRecords?.();
+        } catch {
+        }
+      }
+    }, 0);
+    return ok;
+  };
+  const retry = () => sync && accountId ? status.pending ? sync.flush() : sync.refresh() : Promise.resolve(false);
+  const clearNotice = () => {
+    deletedElsewhere = false;
+    emit();
+  };
+  const discardLocal = (id = accountId) => {
+    if (!id) return;
+    if (accountId === id) close();
+    wipe(id);
+    emit();
+  };
+  return Object.freeze({ open, close, snapshot, write, give, remove, pickDraft, useAccount, retry, clearNotice, discardLocal });
+}
+
+// experiences/path-app/consent-ui.mjs
+var esc3 = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+var svg = (p) => `<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">${p}</svg>`;
+var ON = svg('<path d="m5 10.4 3.2 3.1L15 6.6"/>');
+var BACK = svg('<path d="M12.5 4.5 7 10l5.5 5.5"/>');
+var PRIVACY_URL = "https://synk.im/privacy/#synk-id";
+var ITEMS = [
+  [
+    "what",
+    "저장하는 것",
+    "What is saved",
+    "Хадгалах зүйл",
+    "한국어 급수, 고등학교 성적(백분위), 준비한 돈, 학력, 비교에 담은 과정, 내 길에 넣은 날, 끈 채널, 고른 과정, 「준비했어요」 표시",
+    "Korean level, high school grades (percentile), money you have prepared, education, programs in compare, dates added to My path, channels you turned off, the program you picked, and your “Ready” marks",
+    "Солонгос хэлний түвшин, ахлах сургуулийн дүн (хувиар), бэлтгэсэн мөнгө, боловсрол, харьцуулахаар нэмсэн хөтөлбөр, «Миний зам»-д нэмсэн өдрүүд, унтраасан суваг, сонгосон хөтөлбөр, «Бэлэн болсон» тэмдэг"
+  ],
+  [
+    "why",
+    "쓰는 곳",
+    "What it is for",
+    "Хэрэглэх зорилго",
+    "내 길과 대학 맞춤을 다른 기기에서도 이어서 보여 줘요. 나만 봐요. 지금은 담당자가 보지 않아요.",
+    "To show My path and school matches on your other devices too. Only you can see it. No staff member sees it for now.",
+    "«Миний зам» болон их сургуулийн тохируулгыг өөр төхөөрөмж дээр ч үргэлжлүүлэн харуулна. Зөвхөн та харна. Одоогоор ажилтан харахгүй."
+  ],
+  [
+    "where",
+    "저장하는 곳",
+    "Where it is stored",
+    "Хадгалах газар",
+    "SYNK 계정 데이터베이스(Supabase, Inc.)의 싱가포르 서버예요. 정보가 몽골 밖으로 옮겨져요. 바꿀 때마다 암호화된 연결로 보내요.",
+    "Servers in Singapore for the SYNK account database (Supabase, Inc.). Your information leaves Mongolia. Each change is sent over an encrypted connection.",
+    "SYNK бүртгэлийн мэдээллийн сангийн (Supabase, Inc.) Сингапур дахь сервер. Мэдээллийг Монголоос гадагш дамжуулна. Өөрчлөх бүрд шифрлэгдсэн холболтоор илгээнэ."
+  ],
+  [
+    "keep",
+    "보관",
+    "How long",
+    "Хадгалах хугацаа",
+    "내가 지우거나 계정을 삭제할 때까지 보관해요. 내 정보에서 언제든 지울 수 있고, 지우면 동의를 거두는 것이에요.",
+    "Until you delete it or delete your account. You can delete it at any time on the Profile page, and deleting it withdraws your consent.",
+    "Та өөрөө устгах эсвэл бүртгэлээ устгах хүртэл хадгална. «Миний мэдээлэл» хэсгээс хүссэн үедээ устгаж болно. Устгавал зөвшөөрлөө цуцалсан гэсэн үг."
+  ],
+  [
+    "no",
+    "거부",
+    "Saying no",
+    "Татгалзах",
+    "저장하지 않아도 돼요. 그러면 지금처럼 이 탭에만 두고, 탭을 닫으면 사라져요.",
+    "You do not have to save it. Then it stays in this tab only, as now, and disappears when you close the tab.",
+    "Хадгалахгүй байж болно. Тэгвэл одоогийнх шиг зөвхөн энэ табд үлдэж, табыг хаахад устна."
+  ],
+  ["ask", "문의", "Questions", "Холбоо барих", "SYNK · hello@synk.im", "SYNK · hello@synk.im", "SYNK · hello@synk.im"]
+];
+var MINOR_NOTE = [
+  "만 18세 미만이면 보호자가 이 내용을 함께 읽고 동의해야 해요. SYNK는 보호자를 따로 확인하지 않아요.",
+  "If you are under 18, a parent or guardian must read this with you and agree. SYNK does not check this separately.",
+  "Хэрэв 18 нас хүрээгүй бол асран хамгаалагч тань энэ мэдээллийг хамт уншиж, зөвшөөрөх ёстой. SYNK асран хамгаалагчийг тусад нь шалгахгүй."
+];
+function renderStudyConsent(view) {
+  const en = view.lang === "en", L5 = (ko, e) => en ? e : ko;
+  const minor = view.minor === true || view.minor === false ? view.minor : null, guardian = view.guardian === true;
+  const ready = minor === false || minor === true && guardian;
+  const rows = ITEMS.map(([id, hk, he, , tk, te]) => `<div class="sx-consent-row"><dt>${esc3(en ? he : hk)}</dt><dd>${esc3(en ? te : tk)}${id === "ask" ? ` · <a href="${PRIVACY_URL}" target="_blank" rel="noopener noreferrer">${L5("개인정보처리방침", "Privacy policy")}<span class="sr-only"> (${L5("새 탭에서 열림", "opens in new tab")})</span></a>` : ""}</dd></div>`).join("");
+  const mn = `<details class="sx-past sx-consent-mn" lang="mn" data-fold="consent-mn"><summary>Монгол хэлээр унших</summary><h2 class="sx-h">Миний нөхцөлийг бүртгэлдээ хадгалах уу?</h2><dl class="sx-consent">${ITEMS.map(([, , , hm, , , tm]) => `<div class="sx-consent-row"><dt>${esc3(hm)}</dt><dd>${esc3(tm)}</dd></div>`).join("")}</dl><p class="sx-fine">${esc3(MINOR_NOTE[2])}</p></details>`;
+  const age = (id, ko, e, mnText) => `<button type="button" class="sx-btn2 sx-consent-age" aria-pressed="${id === "minor" === minor && minor !== null}" data-action="consentAge" data-id="${id}"><span class="sx-consent-main"><span class="sx-on">${ON}</span>${esc3(L5(ko, e))}</span><small lang="mn">${esc3(mnText)}</small></button>`;
+  const guardianBox = minor === true ? `<button type="button" class="sx-consent-guardian" role="checkbox" aria-checked="${guardian}" data-action="consentGuardian"><span class="sx-consent-box">${ON}</span><span class="sx-consent-text"><span>${esc3(L5("보호자가 이 내용을 함께 읽고 동의했어요", "A parent or guardian read this with me and agreed"))}</span><small lang="mn">Асран хамгаалагч маань энэ мэдээллийг хамт уншиж, зөвшөөрсөн</small></span></button>` : "";
+  const error = view.error ? `<p class="sx-store is-warn" role="alert">${esc3(view.error)}</p>` : "";
+  const why = minor === null ? [L5("나이를 고르면 저장할 수 있어요.", "Choose your age to save."), "Насаа сонговол хадгалах боломжтой."] : minor === true && !guardian ? [L5("보호자 확인을 누르면 저장할 수 있어요.", "Tick the guardian check to save."), "Асран хамгаалагчийн зөвшөөрлийн нүдийг чагталбал хадгалах боломжтой."] : null;
+  const whyLine = why ? `<p class="sx-fine sx-consent-why" id="sx-consent-why">${esc3(why[0])} <span lang="mn">${esc3(why[1])}</span></p>` : "";
+  return `<div class="sx">
+<button type="button" class="sx-back" data-action="consentRefuse">${BACK}${L5("돌아가기", "Back")}</button>
+<header class="sx-head"><p class="sx-kicker">${L5("계정에 저장", "Save to account")}</p><h1 class="sx-title page-title" tabindex="-1">${L5("내 조건을 계정에 저장할까요?", "Save your conditions to your account?")}</h1></header>
+<dl class="sx-consent">${rows}</dl>
+${mn}
+<fieldset class="sx-consent-ages"><legend class="sx-h">${L5("나이", "Age")}</legend><p class="sx-fine">${esc3(L5(MINOR_NOTE[0], MINOR_NOTE[1]))}</p><div class="sx-row2">${age("adult", "만 18세 이상이에요", "I am 18 or older", "Би 18 нас хүрсэн")}${age("minor", "만 18세 미만이에요", "I am under 18", "Би 18 нас хүрээгүй")}</div>${guardianBox}</fieldset>
+${error}
+${whyLine}
+<div class="sx-row2 sx-consent-actions"><button type="button" class="sx-cta" data-action="consentSave"${why ? ' aria-describedby="sx-consent-why"' : ""}${ready && !view.busy ? "" : ' disabled aria-disabled="true"'}><span class="sx-consent-main">${view.busy ? L5("저장하는 중…", "Saving…") : L5("계정에 저장", "Save to account")}</span><small lang="mn">Бүртгэлдээ хадгалах</small></button><button type="button" class="sx-btn2 line" data-action="consentRefuse"><span class="sx-consent-main">${L5("이 탭에만 두기", "Keep in this tab only")}</span><small lang="mn">Зөвхөн энэ табд үлдээх</small></button></div>
+</div>`;
+}
+function renderStudyNotices(view) {
+  const en = view.lang === "en", L5 = (ko, e) => en ? e : ko;
+  const out = [];
+  if (view.blocked) out.push(`<div class="notice error" role="alert"><p>${L5("계정에 저장한 조건을 지금 불러오지 못했어요. 연결을 확인하고 「다시 시도」를 눌러 주세요. 그동안은 조건을 고칠 수 없어요.", "Your saved conditions could not be loaded right now. Check your connection and press Retry. Until then, conditions cannot be changed.")}</p><div class="actions"><button type="button" class="secondary" data-action="studyAccountRetry">${L5("다시 시도", "Retry")}</button></div></div>`);
+  if (view.drafts) out.push(`<div class="notice" role="status"><p>${L5("이 탭에 계정에 올라가지 않은 조건 변경이 남아 있는데, 그사이 계정 쪽도 바뀌었어요. 어느 쪽을 쓸까요?", "This tab has condition changes that never reached your account, and your account changed in the meantime. Which should we use?")}</p><div class="actions"><button type="button" class="secondary" data-action="studyDraftAccount">${L5("계정 것 쓰기", "Use the account")}</button><button type="button" class="secondary" data-action="studyDraftPick">${L5("남은 변경 쓰기", "Use the unsent changes")}</button></div></div>`);
+  if (view.choice) out.push(`<div class="notice" role="status"><p>${L5("이 탭에서 넣은 조건이 계정에 저장된 것과 달라요. 어느 쪽을 쓸까요?", "The conditions in this tab differ from the ones saved to your account. Which should we use?")}</p><div class="actions"><button type="button" class="secondary" data-action="studyUseAccount">${L5("계정 것 쓰기", "Use the account")}</button><button type="button" class="secondary" data-action="studyUseTab">${L5("이 탭 것으로 바꾸기", "Replace with this tab")}</button></div></div>`);
+  if (view.deleted) out.push(`<div class="notice" role="status"><p>${L5("계정의 유학 준비 자료가 다른 곳에서 지워졌어요. 이제 넣는 조건은 이 탭에만 남아요.", "Your study data was deleted from your account elsewhere. Conditions you add now stay in this tab only.")}</p><div class="actions"><button type="button" class="secondary" data-action="studyNoticeClose">${L5("알겠어요", "OK")}</button></div></div>`);
+  if (view.ask) out.push(`<div class="notice" role="status"><p>${L5("이 조건을 계정에 저장하면 다른 기기에서도 이어서 볼 수 있어요. 저장하기 전에 무엇을 어디에 두는지 읽어 주세요.", "If you save these conditions to your account, you can continue on other devices. Before saving, please read what is stored and where.")}</p><div class="actions"><button type="button" class="secondary" data-action="studyConsentOpen">${L5("읽고 정하기", "Read and decide")}</button><button type="button" class="secondary" data-action="consentRefuse">${L5("이 탭에만 두기", "Keep in this tab only")}</button></div></div>`);
+  if (view.pending) out.push(`<div class="notice" role="status"><p>${L5("아직 계정에 올라가지 않은 변경이 있어요. 연결이 돌아오면 다시 보내요.", "Some changes are not in your account yet. They are sent again when your connection is back.")}</p><div class="actions"><button type="button" class="secondary" data-action="studyAccountRetry">${L5("지금 다시 보내기", "Send again now")}</button></div></div>`);
+  return out.join("");
+}
+var NETWORK_CODES = /* @__PURE__ */ new Set(["NETWORK", "OFFLINE", "ACCOUNT_UNAVAILABLE"]);
+function renderStudyAccountSettings(view) {
+  const en = view.lang === "en", L5 = (ko, e) => en ? e : ko;
+  const box = (body) => `<section class="settings-group"><h2>${L5("유학 준비 자료", "Study data")}</h2>${body}</section>`;
+  const retry = `<button type="button" class="btn-line" data-action="studyAccountRetry">${L5("다시 시도", "Retry")}</button>`;
+  if (view.phase === "consented") {
+    const when = view.consent?.at ? new Date(view.consent.at) : null;
+    const at = when && !Number.isNaN(when.getTime()) ? `${when.getFullYear()}-${String(when.getMonth() + 1).padStart(2, "0")}-${String(when.getDate()).padStart(2, "0")}` : "";
+    return box(`<p>${L5(`「내 조건」 · 「다가오는 날」 · 고른 과정 · 서류 표시를 계정에 저장하고 있어요(동의 ${esc3(at)}). 다른 기기에서도 보여요.`, `Your conditions, upcoming dates, the program you picked and your marks are saved to your account (consent ${esc3(at)}). They show on your other devices too.`)}</p><button type="button" class="btn-line danger" data-action="studyAccountDelete">${L5("계정의 유학 준비 자료 지우기", "Delete study data from account")}</button>`);
+  }
+  if (view.phase === "choose") return box(`<p>${L5("이 탭에 계정에 올라가지 않은 조건 변경이 남아 있어요. 고르기 전에는 조건을 고칠 수 없어요.", "This tab has condition changes that never reached your account. You cannot change conditions until you choose.")}</p><div class="actions"><button type="button" class="btn-line" data-action="studyDraftAccount">${L5("계정 것 쓰기", "Use the account")}</button><button type="button" class="btn-line" data-action="studyDraftPick">${L5("남은 변경 쓰기", "Use the unsent changes")}</button></div>`);
+  if (view.store === "wait") return box(`<p class="meta">${L5("계정에 저장한 조건을 불러오는 중이에요.", "Loading the conditions saved to your account.")}</p>`);
+  if (view.store === "blocked") return box(`<p>${L5("계정에 저장한 조건을 지금 불러오지 못했어요. 그동안은 조건을 고칠 수 없어요.", "Your saved conditions could not be loaded right now. Until then, conditions cannot be changed.")}</p>${retry}`);
+  if (view.phase === "none") return box(`<p>${L5("계정에 저장하면 다른 기기에서도 이어서 볼 수 있어요.", "Save them to your account to continue on other devices.")}</p><button type="button" class="btn-line" data-action="studyConsentOpen">${L5("계정에 저장하기", "Save to account")}</button>`);
+  if (view.phase === "paused" && NETWORK_CODES.has(view.errorCode)) return box(`<p>${L5("계정에 연결하지 못했어요. 연결을 확인하고 다시 시도해 주세요.", "Could not reach your account. Check your connection and try again.")}</p>${retry}`);
+  if (view.phase === "paused") return "";
+  if (view.phase === "error") return box(`<p>${L5("계정 상태를 확인하지 못했어요.", "Could not check your account.")}</p>${retry}`);
+  return "";
 }
 
 // experiences/path-app/docs-data.mjs
@@ -4420,20 +4935,20 @@ function routes(profile2, programs, rules, now = /* @__PURE__ */ new Date()) {
 }
 
 // experiences/path-app/channel-ui.mjs
-var esc3 = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
-var svg = (p) => `<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">${p}</svg>`;
-var GO = svg('<path d="M4 10h11.5M11 5.5 15.5 10 11 14.5"/>');
-var BACK = svg('<path d="M12.5 4.5 7 10l5.5 5.5"/>');
-var NEXT = svg('<path d="M7.5 4.5 13 10l-5.5 5.5"/>');
+var esc4 = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+var svg2 = (p) => `<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">${p}</svg>`;
+var GO = svg2('<path d="M4 10h11.5M11 5.5 15.5 10 11 14.5"/>');
+var BACK2 = svg2('<path d="M12.5 4.5 7 10l5.5 5.5"/>');
+var NEXT = svg2('<path d="M7.5 4.5 13 10l-5.5 5.5"/>');
 var ICON = {
-  topik: svg('<path d="M4 15.5 13.5 6l1.5 1.5L5.5 17H4z"/><path d="M12 7.5 13.5 9"/>'),
-  visa: svg('<path d="M6 3h6l3 3v11H6z"/><path d="M12 3v3h3M8.5 10h4M8.5 13h4"/>'),
-  scholarship: svg('<path d="M10 3.5l1.9 4 4.3.5-3.2 2.9.9 4.3L10 13.1l-3.9 2.1.9-4.3L3.8 8l4.3-.5z"/>'),
-  scam: svg('<path d="M10 3.5 17 16H3z"/><path d="M10 8.5v3.5M10 14.2v.1"/>'),
-  univ: svg('<path d="M2.5 8 10 4.5 17.5 8 10 11.5z"/><path d="M5.5 9.5v4c1.2 1.2 2.7 1.8 4.5 1.8s3.3-.6 4.5-1.8v-4"/>')
+  topik: svg2('<path d="M4 15.5 13.5 6l1.5 1.5L5.5 17H4z"/><path d="M12 7.5 13.5 9"/>'),
+  visa: svg2('<path d="M6 3h6l3 3v11H6z"/><path d="M12 3v3h3M8.5 10h4M8.5 13h4"/>'),
+  scholarship: svg2('<path d="M10 3.5l1.9 4 4.3.5-3.2 2.9.9 4.3L10 13.1l-3.9 2.1.9-4.3L3.8 8l4.3-.5z"/>'),
+  scam: svg2('<path d="M10 3.5 17 16H3z"/><path d="M10 8.5v3.5M10 14.2v.1"/>'),
+  univ: svg2('<path d="M2.5 8 10 4.5 17.5 8 10 11.5z"/><path d="M5.5 9.5v4c1.2 1.2 2.7 1.8 4.5 1.8s3.3-.6 4.5-1.8v-4"/>')
 };
-var ON = svg('<path d="m5 10.4 3.2 3.1L15 6.6"/>');
-var CAL = svg('<rect x="3.5" y="4.5" width="13" height="12" rx="2"/><path d="M3.5 8.5h13M7 3v3M13 3v3"/>');
+var ON2 = svg2('<path d="m5 10.4 3.2 3.1L15 6.6"/>');
+var CAL = svg2('<rect x="3.5" y="4.5" width="13" height="12" rx="2"/><path d="M3.5 8.5h13M7 3v3M13 3v3"/>');
 function ctx(view) {
   const now = view.now || /* @__PURE__ */ new Date();
   const en = view.lang === "en";
@@ -4442,12 +4957,12 @@ function ctx(view) {
   const won = (n) => en ? `₩${n.toLocaleString("en-US")}` : n < 1e4 ? `${n.toLocaleString("ko-KR")}원` : n % 1e4 === 0 ? `${(n / 1e4).toLocaleString("ko-KR")}만 원` : `${Math.floor(n / 1e4).toLocaleString("ko-KR")}만 ${(n % 1e4).toLocaleString("ko-KR")}원`;
   const thisYear = Number(new Date((now instanceof Date ? now.getTime() : new Date(now).getTime()) + 9 * 36e5).toISOString().slice(0, 4));
   const md = (d) => monthDay(d, en, thisYear);
-  return { now, en, L: L5, pick: pick2, won, md, posts: view.posts || [], programs: view.programs || [], rules: view.rules || [], profile: view.profile, lang: en ? "en" : "ko", condOn: view.condOn !== false, persisted: view.persisted !== false, note: typeof view.note === "string" ? view.note : "" };
+  return { now, en, L: L5, pick: pick2, won, md, posts: view.posts || [], programs: view.programs || [], rules: view.rules || [], profile: view.profile, lang: en ? "en" : "ko", condOn: view.condOn !== false, store: ["account", "blocked", "wait"].includes(view.store) ? view.store : "tab", storeNote: String(view.storeNote || ""), persisted: view.persisted !== false, note: typeof view.note === "string" ? view.note : "" };
 }
 var channelOf = (id) => CHANNELS.find((c) => c.id === id) || null;
 var newTab = (T2) => `<span class="sr-only"> (${T2.L("새 탭에서 열림", "opens in new tab")})</span>`;
 var promise = (T2) => `<p class="sx-fine">${T2.L("이 결과는 입학이나 비자, 장학금 선발을 약속하지 않아요. 마지막 판단은 대학과 출입국, 장학 기관이 해요.", "This does not promise admission, a visa or a scholarship. The university, the immigration office and the scholarship body make the final decision.")}</p>`;
-var storeLine = (T2) => T2.persisted ? `<p class="sx-fine sx-store-line">${T2.L("넣은 날은 이 탭에만 있어요. 탭을 닫거나 로그아웃하면 사라지니 달력에도 넣어 두세요.", "Dates you add stay in this tab only. They disappear when you close the tab or sign out, so add them to your calendar too.")}</p>` : `<p class="sx-store is-warn sx-store-line">${T2.L("이 브라우저에서는 저장할 수 없어서 넣은 날을 지금 화면에서만 기억해요. 새로 고치면 사라지니 달력에 넣어 두세요.", "This browser cannot store dates, so they are remembered on this screen only and are lost on reload. Add them to your calendar.")}</p>`;
+var storeLine = (T2) => (T2.store === "blocked" || T2.store === "wait") && T2.storeNote ? `<p class="sx-fine sx-store-line">${esc4(T2.storeNote)}</p>` : T2.store === "account" ? `<p class="sx-fine sx-store-line">${T2.L("넣은 날은 계정에 저장돼요. 달력에도 넣어 두면 잊지 않아요.", "Dates you add are saved to your account. Add them to your calendar too.")}</p>` : T2.persisted ? `<p class="sx-fine sx-store-line">${T2.L("넣은 날은 이 탭에만 있어요. 탭을 닫거나 로그아웃하면 사라지니 달력에도 넣어 두세요.", "Dates you add stay in this tab only. They disappear when you close the tab or sign out, so add them to your calendar too.")}</p>` : `<p class="sx-store is-warn sx-store-line">${T2.L("이 브라우저에서는 저장할 수 없어서 넣은 날을 지금 화면에서만 기억해요. 새로 고치면 사라지니 달력에 넣어 두세요.", "This browser cannot store dates, so they are remembered on this screen only and are lost on reload. Add them to your calendar.")}</p>`;
 function leftText(status, T2) {
   const n = status.days, days = (k) => T2.L(`${k}일`, `${k} day${k === 1 ? "" : "s"}`);
   switch (status.state) {
@@ -4533,18 +5048,18 @@ function forYouCard(post2, T2) {
   const lines = forYouLines(post2, { T: T2 }).filter((l) => T2.condOn || !l.cond);
   if (!lines.length) return "";
   const cond2 = T2.condOn && lines.some((l) => l.cond) ? `<button type="button" class="sx-link" data-action="nav" data-page="cond">${T2.L("내 조건 넣기", "Enter my conditions")}${NEXT}</button>` : "";
-  return `<section class="sx-card butter sx-foryou"><p class="sx-k">${T2.L("내게 해당되나요?", "Does this apply to me?")}</p>${lines.filter((l) => l.lead).map((l) => `<p class="sx-fy-lead">${esc3(l.text)}</p>`).join("")}<ul>${lines.filter((l) => !l.lead).map((l) => `<li${l.plan ? ' class="is-plan"' : ""}>${esc3(l.text)}</li>`).join("")}</ul>${cond2}${post2.programId ? `<button type="button" class="sx-link" data-action="univOpen" data-id="${esc3(post2.programId)}">${T2.L("과정 자세히 보기", "See program details")}${NEXT}</button>` : ""}${promise(T2)}</section>`;
+  return `<section class="sx-card butter sx-foryou"><p class="sx-k">${T2.L("내게 해당되나요?", "Does this apply to me?")}</p>${lines.filter((l) => l.lead).map((l) => `<p class="sx-fy-lead">${esc4(l.text)}</p>`).join("")}<ul>${lines.filter((l) => !l.lead).map((l) => `<li${l.plan ? ' class="is-plan"' : ""}>${esc4(l.text)}</li>`).join("")}</ul>${cond2}${post2.programId ? `<button type="button" class="sx-link" data-action="univOpen" data-id="${esc4(post2.programId)}">${T2.L("과정 자세히 보기", "See program details")}${NEXT}</button>` : ""}${promise(T2)}</section>`;
 }
 function dateRow(post2, d, T2, saved) {
   const st = dateStatus(d, T2.now), left = leftText(st, T2), on = saved.some((s) => s.id === d.id);
   const gone = st.state === "past" || st.state === "cancelled";
   const name = T2.pick(d.label);
-  const add = gone && !on ? "" : `<button type="button" class="sx-btn2 sm" aria-pressed="${on}" data-action="dateToggle" data-id="${esc3(d.id)}"><span class="sx-on">${ON}</span>${T2.L("내 길에 넣기", "Add to my path")}<span class="sr-only"> ${esc3(name)}</span></button>`;
-  const cal = gone ? "" : `<button type="button" class="sx-btn2 sm line" data-action="dateIcs" data-id="${esc3(d.id)}">${CAL}${T2.L("달력에 넣기", "Add to calendar")}<span class="sr-only"> ${esc3(name)}</span></button>`;
-  return `<li class="sx-dayrow${gone ? " is-gone" : ""}">${dayBox(d, st, T2)}<span class="sx-day-main"><b>${esc3(name)}</b><small>${esc3(spanText(d, T2))}</small>${d.url ? `<a class="sx-src-a" href="${esc3(d.url)}" target="_blank" rel="noopener noreferrer">${T2.L("원문", "Source")}${newTab(T2)}</a>` : ""}</span><span class="sx-dleft${near(st) ? " is-near" : ""}"><span aria-hidden="true">${esc3(left.shown)}</span><span class="sr-only">${esc3(left.said)}</span></span>${add || cal ? `<span class="sx-day-acts">${add}${cal}</span>` : ""}</li>`;
+  const add = gone && !on ? "" : `<button type="button" class="sx-btn2 sm" aria-pressed="${on}" data-action="dateToggle" data-id="${esc4(d.id)}"><span class="sx-on">${ON2}</span>${T2.L("내 길에 넣기", "Add to my path")}<span class="sr-only"> ${esc4(name)}</span></button>`;
+  const cal = gone ? "" : `<button type="button" class="sx-btn2 sm line" data-action="dateIcs" data-id="${esc4(d.id)}">${CAL}${T2.L("달력에 넣기", "Add to calendar")}<span class="sr-only"> ${esc4(name)}</span></button>`;
+  return `<li class="sx-dayrow${gone ? " is-gone" : ""}">${dayBox(d, st, T2)}<span class="sx-day-main"><b>${esc4(name)}</b><small>${esc4(spanText(d, T2))}</small>${d.url ? `<a class="sx-src-a" href="${esc4(d.url)}" target="_blank" rel="noopener noreferrer">${T2.L("원문", "Source")}${newTab(T2)}</a>` : ""}</span><span class="sx-dleft${near(st) ? " is-near" : ""}"><span aria-hidden="true">${esc4(left.shown)}</span><span class="sr-only">${esc4(left.said)}</span></span>${add || cal ? `<span class="sx-day-acts">${add}${cal}</span>` : ""}</li>`;
 }
 function cover(channel, T2) {
-  return `<span class="sx-cover is-${esc3(channel.tone)}" aria-hidden="true"><span>${esc3(channel.name.en.toUpperCase())}</span></span>`;
+  return `<span class="sx-cover is-${esc4(channel.tone)}" aria-hidden="true"><span>${esc4(channel.name.en.toUpperCase())}</span></span>`;
 }
 function postTag(post2, T2) {
   const n = nextDate(post2, T2.now);
@@ -4558,30 +5073,30 @@ function renderChannels(view) {
     const list = T2.posts.filter((p) => p.channel === one.id);
     const rows2 = list.map((p) => {
       const n = nextDate(p, T2.now), fresh = isNewPost(p, T2.now);
-      return `<li><button type="button" class="sx-postrow" data-action="postOpen" data-id="${esc3(p.id)}"><span class="sx-postrow-main"><b>${fresh ? `<span class="sx-tag is-ok">${T2.L("새 글", "New")}</span> ` : ""}${p.status === "announced" ? `<span class="sx-tag is-check">${T2.L("계획 발표", "Announced plan")}</span> ` : ""}${esc3(T2.pick(p.title))}</b><small>${T2.L("확인", "Checked")} ${esc3(p.checkedAt)}${n ? ` · ${esc3(T2.pick(n.date.label))} ${esc3(leftText(n.status, T2).shown)}` : ""}</small></span><span class="sx-go-s" aria-hidden="true">${NEXT}</span></button></li>`;
+      return `<li><button type="button" class="sx-postrow" data-action="postOpen" data-id="${esc4(p.id)}"><span class="sx-postrow-main"><b>${fresh ? `<span class="sx-tag is-ok">${T2.L("새 글", "New")}</span> ` : ""}${p.status === "announced" ? `<span class="sx-tag is-check">${T2.L("계획 발표", "Announced plan")}</span> ` : ""}${esc4(T2.pick(p.title))}</b><small>${T2.L("확인", "Checked")} ${esc4(p.checkedAt)}${n ? ` · ${esc4(T2.pick(n.date.label))} ${esc4(leftText(n.status, T2).shown)}` : ""}</small></span><span class="sx-go-s" aria-hidden="true">${NEXT}</span></button></li>`;
     }).join("");
-    return `<div class="sx"><button type="button" class="sx-back" data-action="channelOpen" data-id="">${BACK}${T2.L("채널", "News")}</button>
-<header class="sx-head"><p class="sx-kicker"><span class="sx-ic is-${esc3(one.tone)}">${ICON[one.id]}</span>${esc3(T2.pick(one.sub))}</p><h1 class="sx-title page-title" tabindex="-1">${esc3(T2.pick(one.name))}</h1></header>
+    return `<div class="sx"><button type="button" class="sx-back" data-action="channelOpen" data-id="">${BACK2}${T2.L("채널", "News")}</button>
+<header class="sx-head"><p class="sx-kicker"><span class="sx-ic is-${esc4(one.tone)}">${ICON[one.id]}</span>${esc4(T2.pick(one.sub))}</p><h1 class="sx-title page-title" tabindex="-1">${esc4(T2.pick(one.name))}</h1></header>
 ${showButton(one, off, T2)}
 ${list.length ? `<ul class="sx-postlist">${rows2}</ul>` : `<p class="sx-note">${T2.L("이 채널에는 아직 글이 없어요.", "No posts in this channel yet.")}</p>`}${promise(T2)}</div>`;
   }
   const feat = featuredPost(T2.posts, T2.now);
   const featCh = feat && channelOf(feat.channel);
-  const hero = feat && featCh ? `<button type="button" class="sx-photo sx-feature" data-action="postOpen" data-id="${esc3(feat.id)}">${cover(featCh, T2)}<span class="sx-photo-body"><span class="sx-tag white">${esc3(T2.pick(featCh.name))}${postTag(feat, T2) ? ` · ${esc3(postTag(feat, T2))}` : ""}</span><b>${esc3(T2.pick(feat.title))}</b><small>${esc3(T2.pick(feat.points[0]))}</small></span></button>` : "";
+  const hero = feat && featCh ? `<button type="button" class="sx-photo sx-feature" data-action="postOpen" data-id="${esc4(feat.id)}">${cover(featCh, T2)}<span class="sx-photo-body"><span class="sx-tag white">${esc4(T2.pick(featCh.name))}${postTag(feat, T2) ? ` · ${esc4(postTag(feat, T2))}` : ""}</span><b>${esc4(T2.pick(feat.title))}</b><small>${esc4(T2.pick(feat.points[0]))}</small></span></button>` : "";
   const rows = CHANNELS.map((c) => {
     const list = T2.posts.filter((p) => p.channel === c.id);
     if (!list.length) return "";
     const fresh = list.filter((p) => isNewPost(p, T2.now)).length;
-    return `<li class="sx-chrow"><button type="button" class="sx-ch" data-action="channelOpen" data-id="${esc3(c.id)}"><span class="sx-ic is-${esc3(c.tone)}">${ICON[c.id]}</span><span class="sx-ch-main"><b>${esc3(T2.pick(c.name))}</b><small>${esc3(T2.pick(c.sub))} · ${T2.L(`글 ${list.length}개`, `${list.length} post${list.length === 1 ? "" : "s"}`)}${fresh ? T2.L(` · 새 글 ${fresh}`, ` · ${fresh} new`) : ""}</small></span></button>${showButton(c, off, T2)}</li>`;
+    return `<li class="sx-chrow"><button type="button" class="sx-ch" data-action="channelOpen" data-id="${esc4(c.id)}"><span class="sx-ic is-${esc4(c.tone)}">${ICON[c.id]}</span><span class="sx-ch-main"><b>${esc4(T2.pick(c.name))}</b><small>${esc4(T2.pick(c.sub))} · ${T2.L(`글 ${list.length}개`, `${list.length} post${list.length === 1 ? "" : "s"}`)}${fresh ? T2.L(` · 새 글 ${fresh}`, ` · ${fresh} new`) : ""}</small></span></button>${showButton(c, off, T2)}</li>`;
   }).join("");
   return `<div class="sx sx-wide"><header class="sx-head"><h1 class="sx-title page-title" tabindex="-1">${T2.L("채널", "News")}</h1><p class="sx-lead">${T2.L("한국 유학 소식을 주제별로 모았어요. 모든 글에 공식 출처와 확인한 날이 붙어 있어요.", "Study-in-Korea news by topic. Every post shows its official source and the date we checked it.")}</p></header>
 ${hero}
 <h2 class="sx-h">${T2.L("채널", "Channels")}</h2><ul class="sx-chlist">${rows}</ul>
-<p class="sx-fine">${T2.L("글을 모으는 중:", "Collecting posts:")} ${COLLECTING.map((x) => esc3(T2.pick(x))).join(", ")}</p></div>`;
+<p class="sx-fine">${T2.L("글을 모으는 중:", "Collecting posts:")} ${COLLECTING.map((x) => esc4(T2.pick(x))).join(", ")}</p></div>`;
 }
 function showButton(c, off, T2) {
   const on = !off.includes(c.id);
-  return `<button type="button" class="sx-btn2 sm sx-show" aria-pressed="${on}" data-action="channelShow" data-id="${esc3(c.id)}"><span class="sx-on">${ON}</span>${T2.L("오늘 화면에 보이기", "Show on Today")}<span class="sr-only"> ${esc3(T2.pick(c.name))}</span></button>`;
+  return `<button type="button" class="sx-btn2 sm sx-show" aria-pressed="${on}" data-action="channelShow" data-id="${esc4(c.id)}"><span class="sx-on">${ON2}</span>${T2.L("오늘 화면에 보이기", "Show on Today")}<span class="sr-only"> ${esc4(T2.pick(c.name))}</span></button>`;
 }
 function datesBlock(p, T2, saved, title) {
   if (!p.dates.length) return "";
@@ -4589,7 +5104,7 @@ function datesBlock(p, T2, saved, title) {
     const st = dateStatus(d, T2.now).state;
     return st !== "past" && st !== "cancelled";
   });
-  return `<h2 class="sx-h" id="sx-dates-h" tabindex="-1">${title || T2.L("날짜", "Dates")}</h2>${T2.note ? `<p class="sx-store is-warn sx-date-note">${esc3(T2.note)}</p>` : ""}${live ? storeLine(T2) : ""}<ul class="sx-days">${p.dates.map((d) => dateRow(p, d, T2, saved)).join("")}</ul>`;
+  return `<h2 class="sx-h" id="sx-dates-h" tabindex="-1">${title || T2.L("날짜", "Dates")}</h2>${T2.note ? `<p class="sx-store is-warn sx-date-note">${esc4(T2.note)}</p>` : ""}${live ? storeLine(T2) : ""}<ul class="sx-days">${p.dates.map((d) => dateRow(p, d, T2, saved)).join("")}</ul>`;
 }
 function renderDates(view, post2, title) {
   const T2 = ctx(view);
@@ -4597,20 +5112,20 @@ function renderDates(view, post2, title) {
 }
 function renderPost(view) {
   const T2 = ctx(view), profile2 = T2.profile || {}, p = postById(T2.posts, view.postId);
-  const back = (c2) => `<button type="button" class="sx-back" data-action="channelOpen" data-id="${c2 ? esc3(c2.id) : ""}">${BACK}${c2 ? esc3(T2.pick(c2.name)) : T2.L("채널", "News")}</button>`;
+  const back = (c2) => `<button type="button" class="sx-back" data-action="channelOpen" data-id="${c2 ? esc4(c2.id) : ""}">${BACK2}${c2 ? esc4(T2.pick(c2.name)) : T2.L("채널", "News")}</button>`;
   if (!p) return `<div class="sx">${back(null)}<h1 class="sx-title page-title" tabindex="-1">${T2.L("글을 찾지 못했어요.", "Post not found.")}</h1></div>`;
   const c = channelOf(p.channel), saved = profile2.dates || [];
   const stale = isStalePost(p, T2.now) ? `<p class="sx-note is-box">${T2.L("확인한 지 90일이 지났어요. 날짜는 공식 안내에서 다시 확인하세요.", "This was checked more than 90 days ago. Check the dates in the official notice.")}</p>` : "";
   const dates = datesBlock(p, T2, saved);
-  const action = p.action ? `<a class="sx-cta" href="${esc3(p.action.url)}" target="_blank" rel="noopener noreferrer">${esc3(T2.pick(p.action.label))}${newTab(T2)} ${GO}</a><p class="sx-fine">${T2.L("공식 쪽으로 연결해요. 접수와 신청은 본인이 직접 해요.", "This opens the official site. You apply yourself.")}</p>` : "";
+  const action = p.action ? `<a class="sx-cta" href="${esc4(p.action.url)}" target="_blank" rel="noopener noreferrer">${esc4(T2.pick(p.action.label))}${newTab(T2)} ${GO}</a><p class="sx-fine">${T2.L("공식 쪽으로 연결해요. 접수와 신청은 본인이 직접 해요.", "This opens the official site. You apply yourself.")}</p>` : "";
   const tag2 = postTag(p, T2);
   return `<div class="sx">${back(c)}
-<div class="sx-photo is-hero sx-post-hero">${cover(c, T2)}${tag2 ? `<span class="sx-photo-body"><span class="sx-tag white">${esc3(tag2)}</span></span>` : ""}</div>
-<p class="sx-kicker">${esc3(T2.pick(c.name))} · ${T2.L("올린 날", "Posted")} ${esc3(p.postedAt)}${p.status === "announced" ? ` <span class="sx-tag is-check">${T2.L("계획 발표 · 시행일 미정", "Announced plan · no start date")}</span>` : ""}</p>
-<h1 class="sx-title page-title" tabindex="-1">${esc3(T2.pick(p.title))}</h1>${stale}
-<ol class="sx-points">${p.points.map((x) => `<li>${esc3(T2.pick(x))}</li>`).join("")}</ol>
-${p.note ? `<p class="sx-note is-box">${esc3(T2.pick(p.note))}</p>` : ""}
-<p class="sx-src"><b>${T2.L("출처", "Source")}</b> <a href="${esc3(p.source.url)}" target="_blank" rel="noopener noreferrer">${esc3(T2.pick(p.source.title))}${newTab(T2)}</a> · ${T2.L("확인", "checked")} ${esc3(p.checkedAt)}</p>
+<div class="sx-photo is-hero sx-post-hero">${cover(c, T2)}${tag2 ? `<span class="sx-photo-body"><span class="sx-tag white">${esc4(tag2)}</span></span>` : ""}</div>
+<p class="sx-kicker">${esc4(T2.pick(c.name))} · ${T2.L("올린 날", "Posted")} ${esc4(p.postedAt)}${p.status === "announced" ? ` <span class="sx-tag is-check">${T2.L("계획 발표 · 시행일 미정", "Announced plan · no start date")}</span>` : ""}</p>
+<h1 class="sx-title page-title" tabindex="-1">${esc4(T2.pick(p.title))}</h1>${stale}
+<ol class="sx-points">${p.points.map((x) => `<li>${esc4(T2.pick(x))}</li>`).join("")}</ol>
+${p.note ? `<p class="sx-note is-box">${esc4(T2.pick(p.note))}</p>` : ""}
+<p class="sx-src"><b>${T2.L("출처", "Source")}</b> <a href="${esc4(p.source.url)}" target="_blank" rel="noopener noreferrer">${esc4(T2.pick(p.source.title))}${newTab(T2)}</a> · ${T2.L("확인", "checked")} ${esc4(p.checkedAt)}</p>
 ${forYouCard(p, T2)}${dates}${action}</div>`;
 }
 function renderUpcoming(view) {
@@ -4619,8 +5134,8 @@ function renderUpcoming(view) {
   const { upcoming, past, missing } = upcomingDates(T2.posts, saved, T2.now);
   const row = (r) => {
     const left = leftText(r.status, T2);
-    const changed = r.changed ? `<span class="sx-changed">${T2.L(`날짜가 바뀌었어요(전에 본 날 ${spanText({ kind: r.date.kind, start: r.changed.start, end: r.changed.end }, T2)})`, `Date changed (you saw ${spanText({ kind: r.date.kind, start: r.changed.start, end: r.changed.end }, T2)})`)} <button type="button" class="sx-link sm" data-action="dateConfirm" data-id="${esc3(r.date.id)}">${T2.L("확인했어요", "Got it")}<span class="sr-only"> ${esc3(T2.pick(r.date.label))}</span></button></span>` : "";
-    return `<li class="sx-dayrow${r.status.state === "past" || r.status.state === "cancelled" ? " is-gone" : ""}"><button type="button" class="sx-dayrow-btn" data-action="postOpen" data-id="${esc3(r.post.id)}" data-date="${esc3(r.date.id)}">${dayBox(r.date, r.status, T2)}<span class="sx-day-main"><b>${esc3(T2.pick(r.date.label))}</b><small>${esc3(spanText(r.date, T2))} · ${esc3(T2.pick(r.post.title))}</small></span><span class="sx-dleft${near(r.status) ? " is-near" : ""}"><span aria-hidden="true">${esc3(left.shown)}</span><span class="sr-only">${esc3(left.said)}</span></span></button>${changed}</li>`;
+    const changed = r.changed ? `<span class="sx-changed">${T2.L(`날짜가 바뀌었어요(전에 본 날 ${spanText({ kind: r.date.kind, start: r.changed.start, end: r.changed.end }, T2)})`, `Date changed (you saw ${spanText({ kind: r.date.kind, start: r.changed.start, end: r.changed.end }, T2)})`)} <button type="button" class="sx-link sm" data-action="dateConfirm" data-id="${esc4(r.date.id)}">${T2.L("확인했어요", "Got it")}<span class="sr-only"> ${esc4(T2.pick(r.date.label))}</span></button></span>` : "";
+    return `<li class="sx-dayrow${r.status.state === "past" || r.status.state === "cancelled" ? " is-gone" : ""}"><button type="button" class="sx-dayrow-btn" data-action="postOpen" data-id="${esc4(r.post.id)}" data-date="${esc4(r.date.id)}">${dayBox(r.date, r.status, T2)}<span class="sx-day-main"><b>${esc4(T2.pick(r.date.label))}</b><small>${esc4(spanText(r.date, T2))} · ${esc4(T2.pick(r.post.title))}</small></span><span class="sx-dleft${near(r.status) ? " is-near" : ""}"><span aria-hidden="true">${esc4(left.shown)}</span><span class="sr-only">${esc4(left.said)}</span></span></button>${changed}</li>`;
   };
   const gone = missing ? `<p class="sx-note">${T2.L(`글에서 빠지거나 바뀐 날이 ${missing}개 있어요.`, `${missing} saved date${missing === 1 ? " was" : "s were"} removed or changed in the posts.`)} <button type="button" class="sx-link sm" data-action="datesClean">${T2.L("목록에서 지우기", "Remove from list")}</button></p>` : "";
   const pastList = past.length ? `<details class="sx-past"><summary>${T2.L(`지난 날 ${past.length}개`, `${past.length} past date${past.length === 1 ? "" : "s"}`)}</summary><ul class="sx-days">${past.map(row).join("")}</ul></details>` : "";
@@ -4634,7 +5149,7 @@ function renderNews(view) {
   return `<section class="sx sx-today" aria-labelledby="sx-news-h"><div class="sx-h-row"><h2 class="sx-h" id="sx-news-h">${T2.L("새 소식", "Latest news")}</h2><button type="button" class="sx-link" data-action="nav" data-page="channels">${T2.L("채널 모두 보기", "All news")}${NEXT}</button></div>
 <div class="sx-news">${list.map((p) => {
     const c = channelOf(p.channel);
-    return `<button type="button" class="sx-newsbtn" data-action="postOpen" data-id="${esc3(p.id)}"><span class="sx-ic is-${esc3(c.tone)}">${ICON[c.id]}</span><small>${esc3(T2.pick(c.name))}</small><b>${esc3(T2.pick(p.title))}</b></button>`;
+    return `<button type="button" class="sx-newsbtn" data-action="postOpen" data-id="${esc4(p.id)}"><span class="sx-ic is-${esc4(c.tone)}">${ICON[c.id]}</span><small>${esc4(T2.pick(c.name))}</small><b>${esc4(T2.pick(p.title))}</b></button>`;
   }).join("")}</div></section>`;
 }
 var icsEscape = (s) => String(s).replace(/\\/g, "\\\\").replace(/;/g, "\\;").replace(/,/g, "\\,").replace(/\r?\n/g, "\\n");
@@ -4655,10 +5170,10 @@ function fold(line) {
   return out.join("\r\n ");
 }
 var nextDay = (d) => new Date(Date.parse(d + "T00:00:00Z") + 864e5).toISOString().slice(0, 10);
-function icsText(post2, date, lang, stamp = /* @__PURE__ */ new Date()) {
+function icsText(post2, date, lang, stamp2 = /* @__PURE__ */ new Date()) {
   const en = lang === "en", pick2 = (o) => en ? o.en : o.ko;
   const day = endDay(date), compact = (d) => d.replace(/-/g, "");
-  const dt = (stamp instanceof Date ? stamp : new Date(stamp)).toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, "");
+  const dt = (stamp2 instanceof Date ? stamp2 : new Date(stamp2)).toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, "");
   const name = date.who ? en ? `${pick2(date.label)} (${pick2(date.who)})` : `${pick2(date.who)} ${pick2(date.label)}` : pick2(date.label);
   const what = date.kind === "apply" ? en ? `Deadline: ${name}` : `${name} 마감` : name;
   const desc = `${pick2(post2.title)}
@@ -4686,11 +5201,11 @@ ${en ? "Check the official notice before you act." : "움직이기 전에 공식
 var STUDY_FILTERS = Object.freeze(["all", "fit", "language", "undergraduate"]);
 var GRADE_MAX = 100;
 var FUNDS_MAX_MAN = 2e4;
-var esc4 = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
-var svg2 = (p) => `<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">${p}</svg>`;
-var GO2 = svg2('<path d="M4 10h11.5M11 5.5 15.5 10 11 14.5"/>');
-var BACK2 = svg2('<path d="M12.5 4.5 7 10l5.5 5.5"/>');
-var NEXT2 = svg2('<path d="M7.5 4.5 13 10l-5.5 5.5"/>');
+var esc5 = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+var svg3 = (p) => `<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">${p}</svg>`;
+var GO2 = svg3('<path d="M4 10h11.5M11 5.5 15.5 10 11 14.5"/>');
+var BACK3 = svg3('<path d="M12.5 4.5 7 10l5.5 5.5"/>');
+var NEXT2 = svg3('<path d="M7.5 4.5 13 10l-5.5 5.5"/>');
 var STATUS = { ok: ["맞음", "Met"], lack: ["부족", "Short"], check: ["확인 필요", "To check"] };
 var KEY_NAME = { education: ["학력", "Education"], grade: ["성적", "Grades"], topik: ["한국어", "Korean"], finance: ["재정", "Funds"] };
 var EDU = { graduated: ["고등학교 졸업", "Finished high school"], expected: ["졸업 예정", "Graduating soon"], none: ["아직 아님", "Not yet"] };
@@ -4719,12 +5234,12 @@ function ctx2(view) {
   return { now, en, L: L5, pick: pick2, pair, won, topik, programs, rules, profile: profile2, allExample, anyPartner, fitText, needs, needWord, md };
 }
 var tag = (status, T2) => `<span class="sx-tag is-${status}">${T2.pair(STATUS[status])}</span>`;
-var meter = (match, T2) => `<span class="sx-meter" role="img" aria-label="${esc4(match.items.map((i) => `${T2.pair(KEY_NAME[i.key])} ${T2.pair(STATUS[i.status])}`).join(", "))}">${match.items.map((i) => `<i class="is-${i.status}"></i>`).join("")}</span>`;
+var meter = (match, T2) => `<span class="sx-meter" role="img" aria-label="${esc5(match.items.map((i) => `${T2.pair(KEY_NAME[i.key])} ${T2.pair(STATUS[i.status])}`).join(", "))}">${match.items.map((i) => `<i class="is-${i.status}"></i>`).join("")}</span>`;
 var exampleTag = (p, T2) => p.example ? `<span class="sx-tag wait">${T2.L("예시", "Example")}</span>` : "";
 var programImage = (p) => image(p);
-var image = (p) => p.image ? `<img class="sx-img" src="./assets/${esc4(p.image)}.webp" alt="" width="960" height="640">` : `<span class="sx-cover is-${esc4(p.tone || "lapis")}" aria-hidden="true"><span>${esc4(p.place.en.split(",")[0].toUpperCase())}</span></span>`;
+var image = (p) => p.image ? `<img class="sx-img" src="./assets/${esc5(p.image)}.webp" alt="" width="960" height="640">` : `<span class="sx-cover is-${esc5(p.tone || "lapis")}" aria-hidden="true"><span>${esc5(p.place.en.split(",")[0].toUpperCase())}</span></span>`;
 var newTab2 = (T2) => `<span class="sr-only"> (${T2.L("새 탭에서 열림", "opens in new tab")})</span>`;
-var sourceLine = (rule, T2) => `<p class="sx-src"><b>${T2.L("출처", "Source")}</b> <a href="${esc4(rule.source.url)}" target="_blank" rel="noopener noreferrer">${esc4(T2.pick(rule.source.title))}${newTab2(T2)}</a> · ${T2.L(`${rule.basis} 시행 · 확인 ${rule.checkedAt}`, `in force from ${rule.basis} · checked ${rule.checkedAt}`)}</p>`;
+var sourceLine = (rule, T2) => `<p class="sx-src"><b>${T2.L("출처", "Source")}</b> <a href="${esc5(rule.source.url)}" target="_blank" rel="noopener noreferrer">${esc5(T2.pick(rule.source.title))}${newTab2(T2)}</a> · ${T2.L(`${rule.basis} 시행 · 확인 ${rule.checkedAt}`, `in force from ${rule.basis} · checked ${rule.checkedAt}`)}</p>`;
 var promise2 = (T2) => `<p class="sx-fine">${T2.L("이 결과는 입학이나 비자를 약속하지 않아요. 마지막 판단은 대학과 출입국이 해요.", "This comparison does not promise admission or a visa. The university and immigration office make the final decision.")}</p>`;
 var inRound = (w, T2) => (ko, en) => w.round ? T2.L(`${w.round}차 ${ko}`, `Round ${w.round} ${en[0].toLowerCase()}${en.slice(1)}`) : T2.L(ko, en);
 var opens = (p, T2) => {
@@ -4780,21 +5295,21 @@ function renderStudyEntry(view) {
   const T2 = ctx2(view), empty = isEmptyProfile(T2.profile), n = countFit(T2.profile, T2.programs, T2.rules);
   const title = T2.allExample ? T2.L("예시 과정으로 내 조건 맞춰 보기", "Try your conditions on example programs") : n === null ? T2.L("내 조건으로 갈 수 있는 대학을 알아봐요", "See which schools fit your conditions") : T2.L(`지금 조건에 맞는 과정 ${n}개`, `${n} program${n === 1 ? " fits" : "s fit"} your conditions`);
   const sub = T2.allExample ? T2.L("협력 대학은 준비 중이에요. 한국어, 성적, 준비한 돈을 넣어 미리 맞춰 볼 수 있어요.", "Partner universities are being prepared. Enter your Korean level, grades and funds to try it in advance.") : n === null ? T2.L("한국어, 성적, 준비한 돈을 넣으면 맞는 과정과 모자란 것을 알려 줘요.", "Enter your Korean level, grades and funds to see what fits and what is missing.") : uncheckedNote(T2) || T2.L("조건을 바꾸면 바로 다시 계산해요.", "Change a condition and it recalculates right away.");
-  return `<section class="sx sx-entry" aria-label="${T2.L("대학", "Schools")}"><button type="button" class="sx-entry-btn" data-action="nav" data-page="${empty ? "cond" : "univ"}"><span><b>${esc4(title)}</b><small>${esc4(sub)}</small></span><span class="sx-go" aria-hidden="true">${GO2}</span></button></section>`;
+  return `<section class="sx sx-entry" aria-label="${T2.L("대학", "Schools")}"><button type="button" class="sx-entry-btn" data-action="nav" data-page="${empty ? "cond" : "univ"}"><span><b>${esc5(title)}</b><small>${esc5(sub)}</small></span><span class="sx-go" aria-hidden="true">${GO2}</span></button></section>`;
 }
 function countCard(T2) {
   const n = countFit(T2.profile, T2.programs, T2.rules);
   if (n === null) {
     return `<section class="sx-card lapis"><h2>${T2.L(`${T2.needWord} 넣으면 맞는 과정을 세어 줘요.`, `Enter ${T2.needWord} to count the programs that fit.`)}</h2><p>${T2.L("학력과 준비한 돈도 넣으면 그 조건이 모자란 과정은 빼고 세요.", "If you also enter your education and funds, programs where those fall short are left out.")}</p><button type="button" class="sx-cta" data-action="nav" data-page="cond">${T2.L("내 조건 넣기", "Enter my conditions")} ${GO2}</button></section>`;
   }
-  return `<section class="sx-card lapis"><p class="sx-k">${T2.L("지금 조건으로", "With your conditions now")}</p><p class="sx-big"><b>${n}</b><span>${esc4(T2.fitText(n))}</span></p><p>${T2.L("넣은 조건 가운데 모자란 것이 없는 과정을 셌어요.", "Counted programs where none of the conditions you entered fall short.")}${uncheckedNote(T2) ? ` ${esc4(uncheckedNote(T2))}` : ""}</p><button type="button" class="sx-btn2" data-action="nav" data-page="cond">${T2.L("내 조건 바꿔 보기", "Change my conditions")}</button></section>`;
+  return `<section class="sx-card lapis"><p class="sx-k">${T2.L("지금 조건으로", "With your conditions now")}</p><p class="sx-big"><b>${n}</b><span>${esc5(T2.fitText(n))}</span></p><p>${T2.L("넣은 조건 가운데 모자란 것이 없는 과정을 셌어요.", "Counted programs where none of the conditions you entered fall short.")}${uncheckedNote(T2) ? ` ${esc5(uncheckedNote(T2))}` : ""}</p><button type="button" class="sx-btn2" data-action="nav" data-page="cond">${T2.L("내 조건 바꿔 보기", "Change my conditions")}</button></section>`;
 }
 function renderUniv(view) {
   const T2 = ctx2(view), profile2 = T2.profile, empty = isEmptyProfile(profile2);
   const f = STUDY_FILTERS.includes(view.filter) ? view.filter : "all";
   const rank = { open: 0, before: 1, unknown: 2, closed: 3 };
   const list = filterPrograms(profile2, f, T2.programs, T2.rules).map((p, i) => [rank[applyWindow(p, T2.now).state], i, p]).sort((x, y) => x[0] - y[0] || x[1] - y[1]).map((x) => x[2]);
-  const chip = (id, label) => `<button type="button" class="sx-chip" aria-pressed="${f === id}" data-action="studyFilter" data-id="${id}">${esc4(label)}</button>`;
+  const chip = (id, label) => `<button type="button" class="sx-chip" aria-pressed="${f === id}" data-action="studyFilter" data-id="${id}">${esc5(label)}</button>`;
   const openGuide = !T2.allExample && !T2.anyPartner && T2.programs.length > 0;
   const kicker = openGuide ? `${T2.L("대학 공개 모집 요강", "Published admissions guides")} <span class="sx-tag wait">${T2.L("협력 대학 준비 중", "Partners coming soon")}</span>` : T2.anyPartner ? T2.L("협력 대학", "Partner universities") : `${T2.L("협력 대학", "Partner universities")} <span class="sx-tag wait">${T2.L("준비 중", "Coming soon")}</span>`;
   const leadText = T2.allExample ? T2.L("협력 대학은 준비 중이에요. 지금 보이는 과정은 화면을 미리 보이려고 넣은 예시이고, 실제 대학이 아니에요.", "Partner universities are being prepared. The programs below are examples to preview the screen, not real universities.") : openGuide ? T2.L("대학이 공개한 모집 요강에서 옮긴 정보예요. SYNK와 협약한 대학은 아직 없어요. 지원하기 전에 대학 원문을 꼭 확인하세요.", "This information is taken from each university’s published admissions guide. SYNK has no partner universities yet. Always check the university’s original guide before applying.") : "";
@@ -4802,8 +5317,8 @@ function renderUniv(view) {
   if (!T2.programs.length) return `<div class="sx sx-wide">${head2}<section class="sx-card"><h2>${T2.L("협력 대학을 준비하고 있어요.", "Partner universities are being prepared.")}</h2><p>${T2.L("준비되면 여기에서 조건과 비용을 맞춰 볼 수 있어요.", "Once ready, you can compare conditions and costs here.")}</p></section></div>`;
   const cards = list.map((p) => {
     const m = matchProgram(profile2, p, T2.rules), on = profile2.compare.includes(p.id), full = profile2.compare.length >= MAX_COMPARE && !on;
-    return `<li class="sx-ucard"><div class="sx-ucard-top"><button type="button" class="sx-photo" data-action="univOpen" data-id="${esc4(p.id)}">${image(p)}<span class="sx-photo-body"><small>${esc4(T2.pick(p.place))} · ${T2.pair(LEVEL[p.level])}${p.term ? ` · ${esc4(T2.pick(p.term))}` : ""}</small><b>${esc4(T2.pick(p.name))}</b></span></button><button type="button" class="sx-pick" aria-pressed="${on}" data-action="studyCompare" data-id="${esc4(p.id)}"${full ? " disabled" : ""}>${on ? T2.L("비교에 담음", "In compare") : T2.L("비교", "Compare")}<span class="sr-only"> ${esc4(T2.pick(p.name))}</span></button></div>
-<dl class="sx-facts"><div><dt>${p.level === "language" ? T2.L("한 해 수업료", "Tuition per year") : T2.L("한 해 등록금", "Tuition per year")}</dt><dd>${T2.won(p.costs.tuition)}</dd></div><div><dt>${T2.L("필요한 한국어", "Korean needed")}</dt><dd>${needKorean(p, T2)}</dd></div><div><dt>${T2.L("원서 접수", "Applications")}</dt><dd>${esc4(opens(p, T2))}</dd></div></dl>
+    return `<li class="sx-ucard"><div class="sx-ucard-top"><button type="button" class="sx-photo" data-action="univOpen" data-id="${esc5(p.id)}">${image(p)}<span class="sx-photo-body"><small>${esc5(T2.pick(p.place))} · ${T2.pair(LEVEL[p.level])}${p.term ? ` · ${esc5(T2.pick(p.term))}` : ""}</small><b>${esc5(T2.pick(p.name))}</b></span></button><button type="button" class="sx-pick" aria-pressed="${on}" data-action="studyCompare" data-id="${esc5(p.id)}"${full ? " disabled" : ""}>${on ? T2.L("비교에 담음", "In compare") : T2.L("비교", "Compare")}<span class="sr-only"> ${esc5(T2.pick(p.name))}</span></button></div>
+<dl class="sx-facts"><div><dt>${p.level === "language" ? T2.L("한 해 수업료", "Tuition per year") : T2.L("한 해 등록금", "Tuition per year")}</dt><dd>${T2.won(p.costs.tuition)}</dd></div><div><dt>${T2.L("필요한 한국어", "Korean needed")}</dt><dd>${needKorean(p, T2)}</dd></div><div><dt>${T2.L("원서 접수", "Applications")}</dt><dd>${esc5(opens(p, T2))}</dd></div></dl>
 <p class="sx-fitline"><span>${exampleTag(p, T2)} ${empty ? T2.L("내 조건을 넣으면 맞춰 봐요", "Enter your conditions to compare") : T2.L(`내 조건 4개 중 ${m.okCount}개 맞음`, `${m.okCount} of 4 conditions met`)}</span>${empty ? "" : meter(m, T2)}</p></li>`;
   }).join("");
   const none = list.length ? "" : `<section class="sx-card"><h2>${f === "fit" && !readyToCount(profile2, T2.programs) ? T2.L(`${T2.needWord} 넣으면 맞는 과정만 골라 볼 수 있어요.`, `Enter ${T2.needWord} to filter by fit.`) : f === "fit" ? T2.L("지금 조건에 맞는 과정이 아직 없어요.", "Nothing fits your conditions yet.") : T2.L("이 갈래의 과정은 아직 없어요.", "No programs in this category yet.")}</h2><p>${T2.L("전체 목록에서 과정을 열면 무엇이 모자란지 볼 수 있어요.", "Open a program in the full list to see what is missing.")}</p><div class="sx-row2"><button type="button" class="sx-btn2" data-action="nav" data-page="cond">${T2.L("내 조건 보기", "My conditions")}</button><button type="button" class="sx-btn2" data-action="studyFilter" data-id="all">${T2.L("전체 보기", "Show all")}</button></div></section>`;
@@ -4820,14 +5335,14 @@ function financeMore(i, T2, visa) {
   if (i.rule && !i.firm) {
     note = `<p class="sx-note">${i.rule.stale ? T2.L("이 금액을 확인한 지 오래돼 다시 확인하고 있어요. 그래서 맞는지 판정하지 않았어요.", "This amount was checked a while ago and is being re-checked, so it is not judged here.") : T2.L(`이 금액은 ${i.rule.basis}에 시행된 기준이에요. 지금 쓰는 안내에서도 같은지 확인하고 있어서 맞는지 판정하지 않았어요.`, `This amount took effect on ${i.rule.basis}. We are confirming it against the current guide, so it is not judged here.`)}${i.mine !== null && i.gap > 0 ? ` ${T2.L(`이 기준으로는 ${T2.won(i.gap)}이 더 필요해요.`, `By this figure, ${T2.won(i.gap)} more would be needed.`)}` : ""}</p>`;
   } else if (i.status === "lack") note = `<p class="sx-note">${T2.L(`${T2.won(i.gap)}이 더 필요해요.`, `${T2.won(i.gap)} more is needed.`)}</p>`;
-  const plan = waiver ? `<p class="sx-note plan"><b>${T2.L("계획 발표", "Announced plan")}</b> ${T2.L(`TOPIK ${waiver.topik}급이 있으면 이 증명을 면제하는 계획이 ${waiver.basis}에 발표됐어요. 시작하는 날은 아직 정해지지 않았어요.`, `A plan to waive this proof for TOPIK level ${waiver.topik} was announced on ${waiver.basis}. No start date has been set.`)} <a href="${esc4(waiver.source.url)}" target="_blank" rel="noopener noreferrer">${esc4(T2.pick(waiver.source.title))}${newTab2(T2)}</a></p>` : "";
+  const plan = waiver ? `<p class="sx-note plan"><b>${T2.L("계획 발표", "Announced plan")}</b> ${T2.L(`TOPIK ${waiver.topik}급이 있으면 이 증명을 면제하는 계획이 ${waiver.basis}에 발표됐어요. 시작하는 날은 아직 정해지지 않았어요.`, `A plan to waive this proof for TOPIK level ${waiver.topik} was announced on ${waiver.basis}. No start date has been set.`)} <a href="${esc5(waiver.source.url)}" target="_blank" rel="noopener noreferrer">${esc5(T2.pick(waiver.source.title))}${newTab2(T2)}</a></p>` : "";
   const proof = proofRule(T2.rules, visa);
-  const how = proof ? `<p class="sx-note">${T2.L(`몽골에서 신청할 때는 본인이나 부모의 몽골 은행 잔고 증명서를 비자 신청일 기준 ${proof.issuedWithinDays}일 안에 발급받아 내고, 이 금액을 ${proof.heldDays}일 이상 유지해야 해요.`, `When applying in Mongolia, submit a balance certificate from your own or a parent’s Mongolian bank account issued within ${proof.issuedWithinDays} days of the visa application, and keep this amount for at least ${proof.heldDays} days.`)} <a href="${esc4(proof.source.url)}" target="_blank" rel="noopener noreferrer">${esc4(T2.pick(proof.source.title))}${newTab2(T2)}</a></p>` : "";
+  const how = proof ? `<p class="sx-note">${T2.L(`몽골에서 신청할 때는 본인이나 부모의 몽골 은행 잔고 증명서를 비자 신청일 기준 ${proof.issuedWithinDays}일 안에 발급받아 내고, 이 금액을 ${proof.heldDays}일 이상 유지해야 해요.`, `When applying in Mongolia, submit a balance certificate from your own or a parent’s Mongolian bank account issued within ${proof.issuedWithinDays} days of the visa application, and keep this amount for at least ${proof.heldDays} days.`)} <a href="${esc5(proof.source.url)}" target="_blank" rel="noopener noreferrer">${esc5(T2.pick(proof.source.title))}${newTab2(T2)}</a></p>` : "";
   return enter + note + (i.rule ? sourceLine(i.rule, T2) : "") + how + plan;
 }
 function renderUnivDetail(view) {
   const T2 = ctx2(view), profile2 = T2.profile, p = programById(T2.programs, view.programId);
-  const back = `<button type="button" class="sx-back" data-action="nav" data-page="univ">${BACK2}${T2.L("대학", "Schools")}</button>`;
+  const back = `<button type="button" class="sx-back" data-action="nav" data-page="univ">${BACK3}${T2.L("대학", "Schools")}</button>`;
   if (!p) return `<div class="sx">${back}<h1 class="sx-title page-title" tabindex="-1">${T2.L("과정을 찾지 못했어요.", "Program not found.")}</h1></div>`;
   const m = matchProgram(profile2, p, T2.rules), c = programCost(profile2, p), on = profile2.compare.includes(p.id), full = profile2.compare.length >= MAX_COMPARE && !on;
   const items = m.items.map((i) => {
@@ -4836,57 +5351,57 @@ function renderUnivDetail(view) {
     else if (i.status === "check") more = `<button type="button" class="sx-link" data-action="nav" data-page="cond">${T2.L("내 조건에 넣기", "Enter it in my conditions")}${NEXT2}</button>`;
     else if (i.key === "topik" && i.status === "lack") more = `<p class="sx-note">${T2.L(`${i.gap}급을 더 올리면 맞아요.`, `${i.gap} more level${i.gap === 1 ? "" : "s"} to meet this.`)}</p>`;
     else if (i.key === "grade" && i.status === "lack") more = `<p class="sx-note">${T2.L(`${i.gap}%가 모자라요.`, `${i.gap}% short.`)}</p>`;
-    return `<li><div class="sx-match-top"><b>${T2.pair(KEY_NAME[i.key])}</b>${tag(i.status, T2)}</div><dl class="sx-match-grid"><div><dt>${T2.L("필요한 것", "Needed")}</dt><dd>${esc4(needText(i, T2))}</dd></div><div><dt>${T2.L("내 것", "Mine")}</dt><dd>${esc4(mineText(i, T2))}</dd></div></dl>${more}</li>`;
+    return `<li><div class="sx-match-top"><b>${T2.pair(KEY_NAME[i.key])}</b>${tag(i.status, T2)}</div><dl class="sx-match-grid"><div><dt>${T2.L("필요한 것", "Needed")}</dt><dd>${esc5(needText(i, T2))}</dd></div><div><dt>${T2.L("내 것", "Mine")}</dt><dd>${esc5(mineText(i, T2))}</dd></div></dl>${more}</li>`;
   }).join("");
   const pct = Math.round(c.rate * 100);
   const schNote = c.scholarship ? c.stepTopik === 0 ? T2.L(`신입생 모두에게 주는 장학금 ${T2.won(c.scholarship)}을 뺀 값이에요.`, `After the ${T2.won(c.scholarship)} scholarship every freshman receives.`) : c.rate === null ? T2.L(`한국어 ${c.stepTopik}급 장학금 ${T2.won(c.scholarship)}을 뺀 값이에요.`, `After the ${T2.won(c.scholarship)} scholarship for TOPIK level ${c.stepTopik}.`) : T2.L(`한국어 ${c.stepTopik}급 장학금 ${pct}%를 뺀 값이에요.`, `After the ${pct}% scholarship for TOPIK level ${c.stepTopik}.`) : !p.scholarship.length ? T2.L("이 과정은 한국어 급수 장학금이 없어요.", "This program has no Korean-level scholarship.") : profile2.topik === null ? T2.L("한국어 급수를 넣으면 장학금을 빼서 보여 줘요.", "Enter your Korean level to subtract the scholarship.") : p.scholarshipNote ? T2.L("지금 급수로 정해진 장학금은 없어요. 아래 장학금 안내를 확인하세요.", "No fixed scholarship at your current level. See the scholarship note below.") : T2.L("지금 급수로는 장학금이 없어요.", "No scholarship at your current level.");
   const next = c.nextLevel ? `<section class="sx-card meadow"><p class="sx-k">${T2.L("급수를 올리면", "If you raise your level")}</p><h2>${T2.L(`${c.nextLevel.topik}급이면 ${c.missing.length ? "확인된 비용의 합이" : "내가 낼 돈이"} ${T2.won(c.nextLevel.total)}으로 줄어요.`, `At level ${c.nextLevel.topik}, ${c.missing.length ? "the confirmed costs drop" : "what you pay drops"} to ${T2.won(c.nextLevel.total)}.`)}</h2></section>` : "";
   const unknownCost = (key) => key === "dorm" ? T2.L("합계에 없음 · 아래 안내", "Not in total · see note") : T2.L("대학이 안내하지 않음", "Not stated by the university");
-  const note = (o) => o ? `<p class="sx-note">${esc4(T2.pick(o))}</p>` : "";
-  const small = (o) => o ? `<p class="sx-note is-small">${esc4(T2.pick(o))}</p>` : "";
+  const note = (o) => o ? `<p class="sx-note">${esc5(T2.pick(o))}</p>` : "";
+  const small = (o) => o ? `<p class="sx-note is-small">${esc5(T2.pick(o))}</p>` : "";
   const missingNote = c.missing.length ? `<p class="sx-note">${T2.L(`합계에는 ${c.missing.length === 2 ? "기숙사비와 생활비가" : c.missing[0] === "dorm" ? "기숙사비가" : "생활비가"} 빠져 있어요.`, `The total does not include ${c.missing.map((k) => k === "dorm" ? "dormitory fees" : "living costs").join(" or ")}.`)}</p>` : "";
-  const realSource = !p.example && p.source ? `<p class="sx-src"><b>${T2.L("출처", "Source")}</b> <a href="${esc4(p.source.url)}" target="_blank" rel="noopener noreferrer">${esc4(T2.pick(p.source.title))}${newTab2(T2)}</a> · ${T2.L("확인", "checked")} ${esc4(p.checkedAt)}</p>` : "";
+  const realSource = !p.example && p.source ? `<p class="sx-src"><b>${T2.L("출처", "Source")}</b> <a href="${esc5(p.source.url)}" target="_blank" rel="noopener noreferrer">${esc5(T2.pick(p.source.title))}${newTab2(T2)}</a> · ${T2.L("확인", "checked")} ${esc5(p.checkedAt)}</p>` : "";
   return `<div class="sx">${back}
-<div class="sx-photo is-hero">${image(p)}<span class="sx-photo-top">${exampleTag(p, T2)}<span class="sx-tag white">${esc4(opensLong(p, T2))}</span></span><span class="sx-photo-body"><small>${esc4(T2.pick(p.place))} · ${T2.pair(LEVEL[p.level])} · ${esc4(T2.pick(p.majors))}${p.term ? ` · ${esc4(T2.pick(p.term))}` : ""}</small></span></div>
-<h1 class="sx-title page-title" tabindex="-1">${esc4(T2.pick(p.name))}</h1>
+<div class="sx-photo is-hero">${image(p)}<span class="sx-photo-top">${exampleTag(p, T2)}<span class="sx-tag white">${esc5(opensLong(p, T2))}</span></span><span class="sx-photo-body"><small>${esc5(T2.pick(p.place))} · ${T2.pair(LEVEL[p.level])} · ${esc5(T2.pick(p.majors))}${p.term ? ` · ${esc5(T2.pick(p.term))}` : ""}</small></span></div>
+<h1 class="sx-title page-title" tabindex="-1">${esc5(T2.pick(p.name))}</h1>
 ${p.example ? `<p class="sx-lead">${T2.L("화면을 미리 보이려고 넣은 예시 과정이에요. 금액, 일정, 입학 조건은 실제 대학의 것이 아니에요.", "An example program to preview the screen. The amounts, dates and admission conditions are not from a real university.")}</p>` : `${p.partner ? "" : `<p class="sx-lead">${T2.L("대학이 공개한 모집 요강에서 옮긴 정보예요. SYNK와 협약한 대학은 아니에요. 지원하기 전에 원문을 꼭 확인하세요.", "Taken from the university’s published admissions guide. This is not a SYNK partner university. Check the original before applying.")}</p>`}${realSource}`}
-${p.applyNote ? `<p class="sx-note is-box"><b>${T2.L("원서 접수", "Applications")}</b> ${esc4(T2.pick(p.applyNote))}</p>` : ""}${view.pathPick || ""}
+${p.applyNote ? `<p class="sx-note is-box"><b>${T2.L("원서 접수", "Applications")}</b> ${esc5(T2.pick(p.applyNote))}</p>` : ""}${view.pathPick || ""}
 <h2 class="sx-h">${T2.L("내 조건과 맞춰 보기", "Compare with my conditions")} ${meter(m, T2)}</h2><ul class="sx-match">${items}</ul>${note(p.requiresNote)}
 <h2 class="sx-h">${T2.L("한 해에 드는 돈", "Cost for one year")} ${exampleTag(p, T2)}</h2>
-<div class="sx-hero-num"><small>${costLabel(c, T2)}</small><b>${T2.won(c.total)}</b><small>${esc4(schNote)}</small></div>
-<ul class="sx-money"><li><span>${p.level === "language" ? T2.L("수업료", "Tuition") : T2.L("등록금", "Tuition")}</span><span>${T2.won(c.tuition)}</span></li><li${c.dorm === null ? ' class="is-unknown"' : ""}><span>${T2.L("기숙사", "Dormitory")}${p.dormLabel && c.dorm !== null ? `<small>${esc4(T2.pick(p.dormLabel))}</small>` : ""}</span><span>${c.dorm === null ? unknownCost("dorm") : T2.won(c.dorm)}</span></li><li${c.living === null ? ' class="is-unknown"' : ""}><span>${T2.L("생활비", "Living costs")}</span><span>${c.living === null ? unknownCost("living") : T2.won(c.living)}</span></li>${c.scholarship ? `<li class="minus"><span>${T2.L("장학금", "Scholarship")}</span><span>− ${T2.won(c.scholarship)}</span></li>` : ""}</ul>${missingNote}${small(p.costsNote)}${small(p.scholarshipNote)}${next}
-<div class="sx-row2"><button type="button" class="sx-btn2" data-action="nav" data-page="cond">${T2.L("내 조건 바꿔 보기", "Change my conditions")}</button><button type="button" class="sx-btn2" aria-pressed="${on}" data-action="studyCompare" data-id="${esc4(p.id)}"${full ? " disabled" : ""}>${on ? T2.L("비교에 담음", "In compare") : T2.L("비교에 담기", "Add to compare")}</button></div>
+<div class="sx-hero-num"><small>${costLabel(c, T2)}</small><b>${T2.won(c.total)}</b><small>${esc5(schNote)}</small></div>
+<ul class="sx-money"><li><span>${p.level === "language" ? T2.L("수업료", "Tuition") : T2.L("등록금", "Tuition")}</span><span>${T2.won(c.tuition)}</span></li><li${c.dorm === null ? ' class="is-unknown"' : ""}><span>${T2.L("기숙사", "Dormitory")}${p.dormLabel && c.dorm !== null ? `<small>${esc5(T2.pick(p.dormLabel))}</small>` : ""}</span><span>${c.dorm === null ? unknownCost("dorm") : T2.won(c.dorm)}</span></li><li${c.living === null ? ' class="is-unknown"' : ""}><span>${T2.L("생활비", "Living costs")}</span><span>${c.living === null ? unknownCost("living") : T2.won(c.living)}</span></li>${c.scholarship ? `<li class="minus"><span>${T2.L("장학금", "Scholarship")}</span><span>− ${T2.won(c.scholarship)}</span></li>` : ""}</ul>${missingNote}${small(p.costsNote)}${small(p.scholarshipNote)}${next}
+<div class="sx-row2"><button type="button" class="sx-btn2" data-action="nav" data-page="cond">${T2.L("내 조건 바꿔 보기", "Change my conditions")}</button><button type="button" class="sx-btn2" aria-pressed="${on}" data-action="studyCompare" data-id="${esc5(p.id)}"${full ? " disabled" : ""}>${on ? T2.L("비교에 담음", "In compare") : T2.L("비교에 담기", "Add to compare")}</button></div>
 ${profile2.compare.length >= 2 ? `<button type="button" class="sx-cta butter" data-action="nav" data-page="univCompare">${T2.L(`${profile2.compare.length}곳 나란히 보기`, `Compare ${profile2.compare.length} side by side`)} ${GO2}</button>` : ""}${promise2(T2)}</div>`;
 }
 function renderUnivCompare(view) {
   const T2 = ctx2(view), profile2 = T2.profile, list = profile2.compare.map((id) => programById(T2.programs, id)).filter(Boolean);
-  const back = `<button type="button" class="sx-back" data-action="nav" data-page="univ">${BACK2}${T2.L("대학", "Schools")}</button>`;
+  const back = `<button type="button" class="sx-back" data-action="nav" data-page="univ">${BACK3}${T2.L("대학", "Schools")}</button>`;
   const title = `<h1 class="sx-title page-title" tabindex="-1">${T2.L("나란히 보기", "Side by side")}</h1>`;
   if (list.length < 2) return `<div class="sx">${back}${title}<section class="sx-card"><h2>${T2.L("두 곳 이상 담으면 나란히 볼 수 있어요.", "Add at least two programs to compare.")}</h2><button type="button" class="sx-cta" data-action="nav" data-page="univ">${T2.L("대학 보기", "Browse schools")} ${GO2}</button></section></div>`;
   const row = (h, fn) => `<tr><th scope="row">${h}</th>${list.map((p) => `<td>${fn(p)}</td>`).join("")}</tr>`;
   const anyMissing = list.some((p) => programCost(profile2, p).missing.length);
   const costsWord = anyMissing ? T2.L("확인된 비용의 합", "Confirmed costs") : T2.L("내가 낼 돈", "What you pay");
   return `<div class="sx sx-wide">${back}${title}
-<div class="sx-cmp-wrap" role="region" tabindex="0" aria-label="${T2.L("나란히 보기 표", "Comparison table")}"><table class="sx-cmp" data-cols="${list.length}"><thead><tr><td></td>${list.map((p) => `<th scope="col"><button type="button" class="sx-cmp-head" data-action="univOpen" data-id="${esc4(p.id)}">${image(p)}<span>${esc4(T2.pick(p.name))}</span></button></th>`).join("")}</tr></thead><tbody>
-${row(T2.L("지역", "Region"), (p) => esc4(T2.pick(p.place)))}${row(T2.L("과정", "Program"), (p) => T2.pair(LEVEL[p.level]))}${row(T2.L("한 해 등록금 · 수업료", "Tuition per year"), (p) => T2.won(p.costs.tuition))}
-${row(T2.L("한 해 기숙사", "Dormitory per year"), (p) => p.costs.dorm === null ? `<span class="sx-cmp-miss">${T2.L("합계에 없음", "Not in total")}</span>` : `${T2.won(p.costs.dorm)}${p.dormLabel ? `<small>${esc4(T2.pick(p.dormLabel))}</small>` : ""}`)}
+<div class="sx-cmp-wrap" role="region" tabindex="0" aria-label="${T2.L("나란히 보기 표", "Comparison table")}"><table class="sx-cmp" data-cols="${list.length}"><thead><tr><td></td>${list.map((p) => `<th scope="col"><button type="button" class="sx-cmp-head" data-action="univOpen" data-id="${esc5(p.id)}">${image(p)}<span>${esc5(T2.pick(p.name))}</span></button></th>`).join("")}</tr></thead><tbody>
+${row(T2.L("지역", "Region"), (p) => esc5(T2.pick(p.place)))}${row(T2.L("과정", "Program"), (p) => T2.pair(LEVEL[p.level]))}${row(T2.L("한 해 등록금 · 수업료", "Tuition per year"), (p) => T2.won(p.costs.tuition))}
+${row(T2.L("한 해 기숙사", "Dormitory per year"), (p) => p.costs.dorm === null ? `<span class="sx-cmp-miss">${T2.L("합계에 없음", "Not in total")}</span>` : `${T2.won(p.costs.dorm)}${p.dormLabel ? `<small>${esc5(T2.pick(p.dormLabel))}</small>` : ""}`)}
 ${row(T2.L("지금 급수 장학금", "Scholarship at your level"), (p) => {
     const c = programCost(profile2, p);
     return c.scholarship ? `− ${T2.won(c.scholarship)}` : T2.L("없음", "None");
   })}
 ${row(costsWord, (p) => {
     const c = programCost(profile2, p);
-    return `<b>${T2.won(c.total)}</b>${c.missing.length ? `<small>${esc4(T2.L(`${c.missing.length === 2 ? "기숙사 · 생활비" : c.missing[0] === "dorm" ? "기숙사비" : "생활비"} 빠짐`, `excludes ${c.missing.map((k) => k === "dorm" ? "dormitory" : "living costs").join(" and ")}`))}</small>` : ""}`;
+    return `<b>${T2.won(c.total)}</b>${c.missing.length ? `<small>${esc5(T2.L(`${c.missing.length === 2 ? "기숙사 · 생활비" : c.missing[0] === "dorm" ? "기숙사비" : "생활비"} 빠짐`, `excludes ${c.missing.map((k) => k === "dorm" ? "dormitory" : "living costs").join(" and ")}`))}</small>` : ""}`;
   })}${row(T2.L("필요한 한국어", "Korean needed"), (p) => needKorean(p, T2))}
 ${row(T2.L("필요한 성적", "Grades needed"), (p) => p.requires.gradePct ? `${p.requires.gradePct}%` : T2.L("조건 없음", "None"))}${row(T2.L("잔고 증명", "Proof of funds"), (p) => {
     const i = matchProgram(profile2, p, T2.rules).items[3];
     return i.need === null ? T2.L("확인 필요", "To check") : T2.won(i.need);
   })}
-${row(T2.L("원서 접수", "Applications"), (p) => esc4(opens(p, T2)))}${row(T2.L("내 조건", "My conditions"), (p) => {
+${row(T2.L("원서 접수", "Applications"), (p) => esc5(opens(p, T2)))}${row(T2.L("내 조건", "My conditions"), (p) => {
     const m = matchProgram(profile2, p, T2.rules);
     return `${m.okCount} / 4${meter(m, T2)}`;
   })}
-${row(`<span class="sr-only">${T2.L("비교에서 빼기", "Remove from compare")}</span>`, (p) => `<button type="button" class="sx-link" data-action="studyCompare" data-id="${esc4(p.id)}">${T2.L("빼기", "Remove")}<span class="sr-only"> ${esc4(T2.pick(p.name))}</span></button>`)}</tbody></table></div>
+${row(`<span class="sr-only">${T2.L("비교에서 빼기", "Remove from compare")}</span>`, (p) => `<button type="button" class="sx-link" data-action="studyCompare" data-id="${esc5(p.id)}">${T2.L("빼기", "Remove")}<span class="sr-only"> ${esc5(T2.pick(p.name))}</span></button>`)}</tbody></table></div>
 <p class="sx-fine">${anyMissing ? T2.L("「확인된 비용의 합」은 한 해 금액을 알 수 있는 비용만 더하고 지금 급수의 장학금을 뺀 값이에요. 빠진 비용이 과정마다 달라서, 합계만 보지 말고 칸마다 견주어 보세요.", "“Confirmed costs” adds only the yearly costs that are known and subtracts the scholarship at your current level. Missing costs differ by program, so compare row by row rather than by the total alone.") : T2.L("「내가 낼 돈」은 지금 내 한국어 급수의 장학금을 뺀 값이에요.", "“What you pay” subtracts the scholarship for your current Korean level.")}${list.some((p) => p.example) ? ` ${T2.L("예시 과정의 금액은 실제 대학의 것이 아니에요.", "Amounts for example programs are not from a real university.")}` : ""}</p>${promise2(T2)}</div>`;
 }
 function condHint(lang, key, error) {
@@ -4904,10 +5419,10 @@ function renderCondResult(view) {
     if (k > n) up = { t: t2, k };
   }
   const lead = n === null ? "" : up ? T2.allExample ? T2.L(`${up.t}급이면 예시 과정 ${up.k}개가 맞아요.`, `With level ${up.t}, ${up.k} example programs fit.`) : T2.L(`${up.t}급을 따면 ${up.k}개 과정으로 늘어요.`, `With level ${up.t} it becomes ${up.k} programs.`) : n === 0 ? T2.L("모자란 조건은 과정마다 달라요. 대학을 열어 무엇이 모자란지 확인하세요.", "What is missing differs by program. Open a school to see it.") : T2.L("과정을 열면 조건 넷을 하나씩 맞춰 볼 수 있어요.", "Open a program to check all four conditions one by one.");
-  const top = n === null ? `<section class="sx-card lapis"><h2>${T2.L(`${T2.needWord} 넣으면 맞는 과정을 세어 줘요.`, `Enter ${T2.needWord} to count the programs that fit.`)}</h2>${T2.needs.length === 2 ? `<p>${T2.L("둘 중 하나라도 비어 있으면 세지 않아요.", "Nothing is counted while either one is empty.")}</p>` : ""}<button type="button" class="sx-cta" data-action="nav" data-page="univ">${T2.L("대학 보기", "Browse schools")} ${GO2}</button></section>` : `<section class="sx-card lapis"><p class="sx-k">${T2.L("지금 조건으로", "With your conditions now")}</p><p class="sx-big"><b>${n}</b><span>${esc4(T2.fitText(n))}</span></p>${uncheckedNote(T2) ? `<p>${esc4(uncheckedNote(T2))}</p>` : ""}<p>${esc4(lead)}</p><button type="button" class="sx-cta" data-action="nav" data-page="univ">${T2.L("대학 보기", "Browse schools")} ${GO2}</button></section>`;
+  const top = n === null ? `<section class="sx-card lapis"><h2>${T2.L(`${T2.needWord} 넣으면 맞는 과정을 세어 줘요.`, `Enter ${T2.needWord} to count the programs that fit.`)}</h2>${T2.needs.length === 2 ? `<p>${T2.L("둘 중 하나라도 비어 있으면 세지 않아요.", "Nothing is counted while either one is empty.")}</p>` : ""}<button type="button" class="sx-cta" data-action="nav" data-page="univ">${T2.L("대학 보기", "Browse schools")} ${GO2}</button></section>` : `<section class="sx-card lapis"><p class="sx-k">${T2.L("지금 조건으로", "With your conditions now")}</p><p class="sx-big"><b>${n}</b><span>${esc5(T2.fitText(n))}</span></p>${uncheckedNote(T2) ? `<p>${esc5(uncheckedNote(T2))}</p>` : ""}<p>${esc5(lead)}</p><button type="button" class="sx-cta" data-action="nav" data-page="univ">${T2.L("대학 보기", "Browse schools")} ${GO2}</button></section>`;
   const route = (title, x, visa, body) => {
     const st = x.status === "none" ? "" : x.status === "ok" ? `<span class="sx-tag is-ok">${T2.L("조건 맞음", "Fits")}</span>` : tag(x.status, T2);
-    return `<section class="sx-card line"><div class="sx-match-top"><h3>${esc4(title)}</h3>${st}</div><p>${esc4(body)}</p><p class="sx-src"><b>${T2.L("비자", "Visa")}</b> ${esc4(visa)}</p></section>`;
+    return `<section class="sx-card line"><div class="sx-match-top"><h3>${esc5(title)}</h3>${st}</div><p>${esc5(body)}</p><p class="sx-src"><b>${T2.L("비자", "Visa")}</b> ${esc5(visa)}</p></section>`;
   };
   const unit = (c) => T2.allExample ? T2.L(`${c}개(예시)`, `${c} example program${c === 1 ? "" : "s"}`) : T2.L(`${c}개`, `${c} program${c === 1 ? "" : "s"}`);
   const none = T2.L("준비된 과정이 아직 없어요.", "No programs are ready yet.");
@@ -4923,16 +5438,16 @@ ${route(T2.L("바로 학부 입학", "Straight into undergraduate"), r.direct, T
 ${isEmptyProfile(profile2) ? "" : `<p class="sx-fine"><button type="button" class="sx-link" data-action="studyClear">${T2.L("조건 모두 지우기", "Clear all conditions")}</button></p>`}`;
 }
 function renderCond(view) {
-  const T2 = ctx2(view), profile2 = T2.profile, { persisted = true, text: text2 = {}, errors = {} } = view;
-  const seg = (key, options, label) => `<div class="sx-seg${options.length > 4 ? " is-many" : ""}" role="group" aria-label="${esc4(label)}">${options.map(([v, l]) => `<button type="button" aria-pressed="${profile2[key] === v}" data-action="studySet" data-key="${key}" data-id="${esc4(v)}">${esc4(l)}</button>`).join("")}</div>`;
-  const field = (id, key, label, unit, value) => `<div class="sx-field"><label for="${id}">${esc4(label)}</label><div class="sx-input"><input id="${id}" type="text" inputmode="numeric" autocomplete="off" maxlength="7" data-action="studyInput" data-key="${key}" value="${esc4(value)}" aria-describedby="${id}-hint"${errors[key] ? ' aria-invalid="true"' : ""}><span aria-hidden="true">${esc4(unit)}</span></div><p class="sx-hint${errors[key] ? " is-error" : ""}" id="${id}-hint">${esc4(condHint(view.lang, key, !!errors[key]))}</p></div>`;
+  const T2 = ctx2(view), profile2 = T2.profile, { persisted = true, text: text2 = {}, errors = {}, store = "tab", storeNote: storeNote2 = "" } = view;
+  const seg = (key, options, label) => `<div class="sx-seg${options.length > 4 ? " is-many" : ""}" role="group" aria-label="${esc5(label)}">${options.map(([v, l]) => `<button type="button" aria-pressed="${profile2[key] === v}" data-action="studySet" data-key="${key}" data-id="${esc5(v)}">${esc5(l)}</button>`).join("")}</div>`;
+  const field = (id, key, label, unit, value) => `<div class="sx-field"><label for="${id}">${esc5(label)}</label><div class="sx-input"><input id="${id}" type="text" inputmode="numeric" autocomplete="off" maxlength="7" data-action="studyInput" data-key="${key}" value="${esc5(value)}" aria-describedby="${id}-hint"${errors[key] ? ' aria-invalid="true"' : ""}><span aria-hidden="true">${esc5(unit)}</span></div><p class="sx-hint${errors[key] ? " is-error" : ""}" id="${id}-hint">${esc5(condHint(view.lang, key, !!errors[key]))}</p></div>`;
   const gradeText = text2.gradePct ?? (profile2.gradePct === null ? "" : String(profile2.gradePct));
   const fundsText = text2.fundsWon ?? (profile2.fundsWon === null ? "" : String(Math.round(profile2.fundsWon / 1e4)));
-  return `<div class="sx"><button type="button" class="sx-back" data-action="nav" data-page="univ">${BACK2}${T2.L("대학", "Schools")}</button>
+  return `<div class="sx"><button type="button" class="sx-back" data-action="nav" data-page="univ">${BACK3}${T2.L("대학", "Schools")}</button>
 <header class="sx-head"><h1 class="sx-title page-title" tabindex="-1">${T2.L("내 조건", "My conditions")}</h1><p class="sx-lead">${T2.L("넣거나 바꾸면 갈 수 있는 길과 맞는 과정이 바로 따라 바뀌어요.", "Enter or change a value and the routes and matches update right away.")}</p></header>
-<p class="sx-store${persisted ? "" : " is-warn"}" role="status">${persisted ? T2.L("이 조건은 이 탭에만 저장돼요. 계정에는 저장되지 않고, 탭을 닫거나 로그아웃하면 사라져요.", "These conditions are kept in this tab only. They are not saved to your account and disappear when you close the tab or sign out.") : T2.L("이 브라우저에서는 저장할 수 없어서 지금 화면에서만 기억해요. 새로 고치면 사라져요.", "This browser cannot store them, so they are remembered on this screen only and are lost on reload.")}</p>
-<div class="sx-field"><span class="sx-label">${T2.L("한국어", "Korean")} <b>${esc4(T2.topik(profile2.topik))}</b></span>${seg("topik", [[0, T2.L("없음", "None")], ...[1, 2, 3, 4, 5, 6].map((v) => [v, T2.L(`${v}급`, `L${v}`)])], T2.L("한국어 급수(TOPIK)", "Korean level (TOPIK)"))}</div>
-<div class="sx-field"><span class="sx-label">${T2.L("학력", "Education")} <b>${esc4(profile2.education ? T2.pair(EDU[profile2.education]) : T2.L("아직 안 넣음", "Not entered"))}</b></span>${seg("education", Object.keys(EDU).map((k) => [k, T2.pair(EDU[k])]), T2.L("학력", "Education"))}</div>
+${(store === "blocked" || store === "wait") && storeNote2 ? `<p class="sx-store is-warn" role="status">${esc5(storeNote2)}</p>` : store === "account" ? `<p class="sx-store" role="status">${T2.L("이 조건은 계정에 저장돼요. 다른 기기에서도 보이고, 내 정보에서 지울 수 있어요.", "These conditions are saved to your account. You can see them on other devices and delete them on the Profile page.")}</p>` : `<p class="sx-store${persisted ? "" : " is-warn"}" role="status">${persisted ? T2.L("이 조건은 이 탭에만 저장돼요. 계정에는 저장되지 않고, 탭을 닫거나 로그아웃하면 사라져요.", "These conditions are kept in this tab only. They are not saved to your account and disappear when you close the tab or sign out.") : T2.L("이 브라우저에서는 저장할 수 없어서 지금 화면에서만 기억해요. 새로 고치면 사라져요.", "This browser cannot store them, so they are remembered on this screen only and are lost on reload.")}</p>`}
+<div class="sx-field"><span class="sx-label">${T2.L("한국어", "Korean")} <b>${esc5(T2.topik(profile2.topik))}</b></span>${seg("topik", [[0, T2.L("없음", "None")], ...[1, 2, 3, 4, 5, 6].map((v) => [v, T2.L(`${v}급`, `L${v}`)])], T2.L("한국어 급수(TOPIK)", "Korean level (TOPIK)"))}</div>
+<div class="sx-field"><span class="sx-label">${T2.L("학력", "Education")} <b>${esc5(profile2.education ? T2.pair(EDU[profile2.education]) : T2.L("아직 안 넣음", "Not entered"))}</b></span>${seg("education", Object.keys(EDU).map((k) => [k, T2.pair(EDU[k])]), T2.L("학력", "Education"))}</div>
 ${field("sx-grade", "gradePct", T2.L("고등학교 성적 평균", "High school grade average"), "%", gradeText)}
 ${field("sx-funds", "fundsWon", T2.L("준비한 돈", "Funds prepared"), T2.L("만 원", "× ₩10,000"), fundsText)}
 <p class="sx-fine">${T2.L("누른 칸을 한 번 더 누르면 「아직 안 넣음」으로 돌아가요.", "Press a selected option again to clear it.")}</p>
@@ -4941,18 +5456,18 @@ ${promise2(T2)}</div>`;
 }
 
 // experiences/path-app/path-ui.mjs
-var esc5 = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
-var svg3 = (p) => `<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">${p}</svg>`;
-var GO3 = svg3('<path d="M4 10h11.5M11 5.5 15.5 10 11 14.5"/>');
-var BACK3 = svg3('<path d="M12.5 4.5 7 10l5.5 5.5"/>');
-var ON2 = svg3('<path d="m5 10.4 3.2 3.1L15 6.6"/>');
+var esc6 = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+var svg4 = (p) => `<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">${p}</svg>`;
+var GO3 = svg4('<path d="M4 10h11.5M11 5.5 15.5 10 11 14.5"/>');
+var BACK4 = svg4('<path d="M12.5 4.5 7 10l5.5 5.5"/>');
+var ON3 = svg4('<path d="m5 10.4 3.2 3.1L15 6.6"/>');
 function ctx3(view) {
   const now = view.now || /* @__PURE__ */ new Date();
   const en = view.lang === "en";
   const L5 = (ko, e) => en ? e : ko;
   const pick2 = (o) => o ? en ? o.en : o.ko : "";
   const thisYear = Number(new Date((now instanceof Date ? now.getTime() : new Date(now).getTime()) + 9 * 36e5).toISOString().slice(0, 4));
-  return { now, en, L: L5, pick: pick2, md: (d) => monthDay(d, en, thisYear), profile: view.profile || {}, programs: view.programs || [], posts: view.posts || [], persisted: view.persisted !== false, note: typeof view.note === "string" ? view.note : "" };
+  return { now, en, L: L5, pick: pick2, md: (d) => monthDay(d, en, thisYear), profile: view.profile || {}, programs: view.programs || [], posts: view.posts || [], persisted: view.persisted !== false, store: ["account", "blocked", "wait"].includes(view.store) ? view.store : "tab", storeNote: String(view.storeNote || ""), note: typeof view.note === "string" ? view.note : "" };
 }
 var newTab3 = (T2) => `<span class="sr-only"> (${T2.L("새 탭에서 열림", "opens in new tab")})</span>`;
 var STAGE = {
@@ -4988,10 +5503,10 @@ function stageCounts(set, profile2) {
 }
 function docRow(d, T2, done) {
   const on = done.has(d.id);
-  const line = (label, o) => o ? `<p class="sx-doc-line"><b>${label}</b> ${esc5(T2.pick(o))}</p>` : "";
+  const line = (label, o) => o ? `<p class="sx-doc-line"><b>${label}</b> ${esc6(T2.pick(o))}</p>` : "";
   const visa = d.stage === "visa";
-  const unclear = !d.unclear ? "" : visa ? `<div class="sx-unclear"><p><b>${T2.L("KVAC에 확인할 것", "Check with KVAC")}</b> ${esc5(T2.pick(d.unclear))}</p></div>` : `<div class="sx-unclear"><p><b>${T2.L("요강에서 두 가지로 읽혀요", "The guide can be read two ways")}</b> ${esc5(T2.pick(d.unclear))}</p><p>${T2.L("대학에 먼저 물어보세요.", "Ask the university first.")}</p></div>`;
-  return `<li class="sx-docrow"><div class="sx-doc-main"><b class="sx-doc-name">${esc5(T2.pick(d.name))}</b>${T2.en ? `<small class="sx-doc-ko" lang="ko">${esc5(d.name.ko)}</small>` : ""}${d.only ? `<p class="sx-doc-line"><b>${T2.L("해당자", "Who")}</b> ${esc5(T2.pick(d.only.cond))}</p>` : ""}${line(T2.L("구하는 곳", "Where to get it"), d.from)}${line(T2.L("날짜 조건", "Date rule"), d.when)}${d.note ? `<p class="sx-doc-note">${esc5(T2.pick(d.note))}</p>` : ""}${unclear}</div><button type="button" class="sx-btn2 sm sx-docbtn" aria-pressed="${on}" data-action="docToggle" data-id="${esc5(d.id)}"><span class="sx-on">${ON2}</span>${T2.L("준비했어요", "Ready")}<span class="sr-only"> ${esc5(T2.pick(d.name))}</span></button></li>`;
+  const unclear = !d.unclear ? "" : visa ? `<div class="sx-unclear"><p><b>${T2.L("KVAC에 확인할 것", "Check with KVAC")}</b> ${esc6(T2.pick(d.unclear))}</p></div>` : `<div class="sx-unclear"><p><b>${T2.L("요강에서 두 가지로 읽혀요", "The guide can be read two ways")}</b> ${esc6(T2.pick(d.unclear))}</p><p>${T2.L("대학에 먼저 물어보세요.", "Ask the university first.")}</p></div>`;
+  return `<li class="sx-docrow"><div class="sx-doc-main"><b class="sx-doc-name">${esc6(T2.pick(d.name))}</b>${T2.en ? `<small class="sx-doc-ko" lang="ko">${esc6(d.name.ko)}</small>` : ""}${d.only ? `<p class="sx-doc-line"><b>${T2.L("해당자", "Who")}</b> ${esc6(T2.pick(d.only.cond))}</p>` : ""}${line(T2.L("구하는 곳", "Where to get it"), d.from)}${line(T2.L("날짜 조건", "Date rule"), d.when)}${d.note ? `<p class="sx-doc-note">${esc6(T2.pick(d.note))}</p>` : ""}${unclear}</div><button type="button" class="sx-btn2 sm sx-docbtn" aria-pressed="${on}" data-action="docToggle" data-id="${esc6(d.id)}"><span class="sx-on">${ON3}</span>${T2.L("준비했어요", "Ready")}<span class="sr-only"> ${esc6(T2.pick(d.name))}</span></button></li>`;
 }
 function stageBlock(stage, t2, T2, done, counts) {
   const docs = t2.set.mine.filter((d) => d.stage === stage), folds = t2.set.notMine.filter((d) => d.stage === stage);
@@ -4999,27 +5514,29 @@ function stageBlock(stage, t2, T2, done, counts) {
   const src = stage === "visa" ? t2.set.visa : t2.set.program;
   const c = counts[stage];
   const label = stage === "visa" ? `${T2.pick(STAGE.visa)} · ${T2.pick(t2.set.visa.name)}` : T2.pick(STAGE[stage]);
-  const head2 = `<div class="sx-stage-head"><h2 class="sx-h" id="sx-stage-${stage}">${esc5(label)}</h2><span class="sx-stage-who">${T2.pick(STAGE[stage].who)}</span></div>`;
-  const meta = `<p class="sx-src"><b>${T2.L("출처", "Source")}</b> <a href="${esc5(src.source.url)}" target="_blank" rel="noopener noreferrer">${esc5(T2.pick(src.source.title))}${newTab3(T2)}</a> · ${T2.L("확인", "checked")} ${esc5(src.checkedAt)}${stage !== "visa" && t2.set.program.term ? ` · ${esc5(T2.pick(t2.set.program.term))}` : ""}</p>`;
+  const head2 = `<div class="sx-stage-head"><h2 class="sx-h" id="sx-stage-${stage}">${esc6(label)}</h2><span class="sx-stage-who">${T2.pick(STAGE[stage].who)}</span></div>`;
+  const meta = `<p class="sx-src"><b>${T2.L("출처", "Source")}</b> <a href="${esc6(src.source.url)}" target="_blank" rel="noopener noreferrer">${esc6(T2.pick(src.source.title))}${newTab3(T2)}</a> · ${T2.L("확인", "checked")} ${esc6(src.checkedAt)}${stage !== "visa" && t2.set.program.term ? ` · ${esc6(T2.pick(t2.set.program.term))}` : ""}</p>`;
   const stale = isStalePost({ checkedAt: src.checkedAt }, T2.now) ? `<p class="sx-note is-box">${T2.L("확인한 지 90일이 지났어요. 서류는 원문에서 다시 확인하세요.", "This was checked more than 90 days ago. Check the documents in the original.")}</p>` : "";
-  const rules = stage !== "admitted" && ((src.rules || []).length || (src.unclear || []).length) ? `<ul class="sx-rules">${(src.rules || []).map((r) => `<li>${esc5(T2.pick(r))}</li>`).join("")}${(src.unclear || []).map((r) => `<li class="is-unclear"><b>${T2.L("요강에서 두 가지로 읽혀요", "The guide can be read two ways")}</b> ${esc5(T2.pick(r))}</li>`).join("")}</ul>` : "";
+  const rules = stage !== "admitted" && ((src.rules || []).length || (src.unclear || []).length) ? `<ul class="sx-rules">${(src.rules || []).map((r) => `<li>${esc6(T2.pick(r))}</li>`).join("")}${(src.unclear || []).map((r) => `<li class="is-unclear"><b>${T2.L("요강에서 두 가지로 읽혀요", "The guide can be read two ways")}</b> ${esc6(T2.pick(r))}</li>`).join("")}</ul>` : "";
   const progress = `<div class="sx-prog-row"><progress class="sx-prog" value="${c.n}" max="${c.total}" aria-labelledby="sx-stage-${stage} sx-prog-${stage}"></progress><span class="sx-prog-text" id="sx-prog-${stage}">${T2.L(`${c.n}/${c.total} 표시`, `${c.n} of ${c.total} marked`)}</span></div>`;
   let doneMsg = "";
   if (stage === "apply" && c.total > 0 && c.n === c.total) {
     const folded = folds.length, unclear = docs.filter((d) => d.unclear).length + (t2.set.program.unclear || []).length;
     const extra = [folded ? T2.L(`해당하는 사람만 내는 서류 ${folded}개`, `${folded} document${folded === 1 ? "" : "s"} only some applicants submit`) : "", unclear ? T2.L(`요강이 두 가지로 읽히는 곳 ${unclear}개`, `${unclear} place${unclear === 1 ? "" : "s"} where the guide reads two ways`) : ""].filter(Boolean);
-    doneMsg = `<p class="sx-note is-box sx-done">${T2.L("원서 서류를 다 표시했어요.", "You have marked all application documents.")}${extra.length ? ` ${T2.L(`${extra.join(", ")}는 따로 확인하세요.`, `Check separately: ${extra.join("; ")}.`)}` : ""} ${T2.L("접수 방법은 요강에서 확인하세요.", "Check how to apply in the guide.")} <a href="${esc5(t2.set.program.source.url)}" target="_blank" rel="noopener noreferrer">${T2.L("요강 보기", "Open the guide")}${newTab3(T2)}</a></p>`;
+    doneMsg = `<p class="sx-note is-box sx-done">${T2.L("원서 서류를 다 표시했어요.", "You have marked all application documents.")}${extra.length ? ` ${T2.L(`${extra.join(", ")}는 따로 확인하세요.`, `Check separately: ${extra.join("; ")}.`)}` : ""} ${T2.L("접수 방법은 요강에서 확인하세요.", "Check how to apply in the guide.")} <a href="${esc6(t2.set.program.source.url)}" target="_blank" rel="noopener noreferrer">${T2.L("요강 보기", "Open the guide")}${newTab3(T2)}</a></p>`;
   }
   const marked = folds.filter((d) => done.has(d.id)).length;
   const foldedList = folds.length ? `<details class="sx-past sx-folded" data-fold="docs-${stage}"><summary>${T2.L(`해당하는 사람만 내는 서류 ${folds.length}개`, `${folds.length} document${folds.length === 1 ? "" : "s"} only some applicants submit`)}${marked ? T2.L(` · ${marked}개 표시`, ` · ${marked} marked`) : ""}</summary><ul class="sx-docs">${folds.map((d) => docRow(d, T2, done)).join("")}</ul></details>` : "";
   return `<section class="sx-stage" aria-labelledby="sx-stage-${stage}">${head2}${meta}${stale}${docs.length ? progress : ""}${rules}${docs.length ? `<ul class="sx-docs">${docs.map((d) => docRow(d, T2, done)).join("")}</ul>` : ""}${foldedList}${doneMsg}</section>`;
 }
 function storeNote(T2) {
+  if ((T2.store === "blocked" || T2.store === "wait") && T2.storeNote) return `<p class="sx-fine">${esc6(T2.storeNote)}</p>`;
+  if (T2.store === "account") return `<p class="sx-fine">${T2.L("표시는 계정에 저장돼요. 내 정보에서 지울 수 있어요.", "Marks are saved to your account. You can delete them on the Profile page.")}</p>`;
   return T2.persisted ? `<p class="sx-fine">${T2.L("표시는 이 탭에만 있어요. 탭을 닫거나 로그아웃하면 사라져요.", "Marks stay in this tab only. They disappear when you close the tab or sign out.")}</p>` : `<p class="sx-store is-warn">${T2.L("이 브라우저에서는 저장할 수 없어서 표시를 지금 화면에서만 기억해요. 새로 고치면 사라져요.", "This browser cannot store marks, so they are remembered on this screen only and are lost on reload.")}</p>`;
 }
 function renderPath(view) {
   const T2 = ctx3(view), t2 = pathTarget(view);
-  const back = `<button type="button" class="sx-back" data-action="nav" data-page="today">${BACK3}${T2.L("오늘", "Today")}</button>`;
+  const back = `<button type="button" class="sx-back" data-action="nav" data-page="today">${BACK4}${T2.L("오늘", "Today")}</button>`;
   if (!t2) {
     return `<div class="sx">${back}<header class="sx-head"><p class="sx-kicker">${T2.L("내 길", "My path")}</p><h1 class="sx-title page-title" tabindex="-1">${T2.L("준비할 과정을 골라 주세요", "Pick a program to prepare for")}</h1><p class="sx-lead">${T2.L("대학 탭에서 과정을 열고 「이 과정으로 준비하기」를 누르면, 그 과정에 내는 서류와 기한을 여기에 모아 보여 줘요.", "Open a program in the Schools tab and press “Prepare for this program”. Its documents and deadlines will be gathered here.")}</p></header><button type="button" class="sx-cta" data-action="nav" data-page="univ">${T2.L("대학 보기", "Browse schools")} ${GO3}</button></div>`;
   }
@@ -5027,19 +5544,19 @@ function renderPath(view) {
   const post2 = postById(T2.posts, "univ-" + program.id);
   const n = nextInfo(post2, T2);
   const tag2 = !n.closed ? n.text : T2.L("이번 원서 접수 끝남", "Applications closed");
-  const closed = n.closed ? `<p class="sx-note is-box">${n.docs ? T2.L(`이번 원서 접수는 끝났어요. 이미 원서를 냈다면 남은 기한은 ${esc5(n.docs)}이에요. 아니면 다음 요강을 기다려요.`, `Applications for this intake have closed. If you already applied, your remaining deadline is ${esc5(n.docs)}. Otherwise, wait for the next guide.`) : T2.L("이번 원서 접수는 끝났어요. 다음 요강을 기다려요.", "Applications for this intake have closed. Wait for the next guide.")}</p>` : "";
-  const status = set.program.status ? `<p class="sx-note is-box">${esc5(T2.pick(set.program.status))}</p>` : "";
-  const ask = set.program.ask ? `<p class="sx-fine"><b>${T2.L("물을 곳", "Ask")}</b> ${esc5(T2.pick(set.program.ask))}</p>` : "";
+  const closed = n.closed ? `<p class="sx-note is-box">${n.docs ? T2.L(`이번 원서 접수는 끝났어요. 이미 원서를 냈다면 남은 기한은 ${esc6(n.docs)}이에요. 아니면 다음 요강을 기다려요.`, `Applications for this intake have closed. If you already applied, your remaining deadline is ${esc6(n.docs)}. Otherwise, wait for the next guide.`) : T2.L("이번 원서 접수는 끝났어요. 다음 요강을 기다려요.", "Applications for this intake have closed. Wait for the next guide.")}</p>` : "";
+  const status = set.program.status ? `<p class="sx-note is-box">${esc6(T2.pick(set.program.status))}</p>` : "";
+  const ask = set.program.ask ? `<p class="sx-fine"><b>${T2.L("물을 곳", "Ask")}</b> ${esc6(T2.pick(set.program.ask))}</p>` : "";
   return `<div class="sx">${back}
-<div class="sx-photo is-hero sx-post-hero">${programImage(program)}<span class="sx-photo-body"><span class="sx-tag white">${esc5(tag2)}</span></span></div>
-<p class="sx-kicker">${T2.L("준비 중인 과정", "Preparing for")} · ${esc5(T2.pick(program.place))}</p>
-<h1 class="sx-title page-title" tabindex="-1">${esc5(T2.pick(program.name))}${program.level !== "language" ? T2.L(" 학부", " undergraduate") : ""}</h1>
-<p class="sx-lead">${esc5(T2.pick(set.program.how))}</p>${closed}${status}${ask}
+<div class="sx-photo is-hero sx-post-hero">${programImage(program)}<span class="sx-photo-body"><span class="sx-tag white">${esc6(tag2)}</span></span></div>
+<p class="sx-kicker">${T2.L("준비 중인 과정", "Preparing for")} · ${esc6(T2.pick(program.place))}</p>
+<h1 class="sx-title page-title" tabindex="-1">${esc6(T2.pick(program.name))}${program.level !== "language" ? T2.L(" 학부", " undergraduate") : ""}</h1>
+<p class="sx-lead">${esc6(T2.pick(set.program.how))}</p>${closed}${status}${ask}
 <p class="sx-note">${T2.L("「준비했어요」는 내가 표시한 것이에요. 대학이나 비자신청센터(KVAC)가 확인한 것이 아니에요.", "“Ready” is your own mark. It is not a check by the university or the visa center (KVAC).")}</p>
 ${storeNote(T2)}${view.docFull ? `<p class="sx-store is-warn">${T2.L("표시가 예순 개라 더 넣을 수 없어요. 다른 과정의 표시를 뺀 뒤 넣어 주세요.", "You already have 60 marks. Remove some from another program first.")}</p>` : ""}
 ${renderDates(view, post2, T2.L("이 과정의 날짜", "Dates for this program"))}
 ${["apply", "admitted", "visa"].map((s) => stageBlock(s, t2, T2, done, counts)).join("")}
-<div class="sx-row2"><button type="button" class="sx-btn2" data-action="univOpen" data-id="${esc5(program.id)}">${T2.L("과정 자세히 보기", "Program details")}</button><button type="button" class="sx-btn2 line" data-action="pathPick" data-id="${esc5(program.id)}">${T2.L("준비 그만하기", "Stop preparing")}</button></div>
+<div class="sx-row2"><button type="button" class="sx-btn2" data-action="univOpen" data-id="${esc6(program.id)}">${T2.L("과정 자세히 보기", "Program details")}</button><button type="button" class="sx-btn2 line" data-action="pathPick" data-id="${esc6(program.id)}">${T2.L("준비 그만하기", "Stop preparing")}</button></div>
 <p class="sx-fine">${T2.L("이 목록은 입학이나 비자를 약속하지 않아요. 마지막 판단은 대학과 출입국이 해요.", "This list does not promise admission or a visa. The university and immigration office make the final decision.")}</p></div>`;
 }
 function renderPathCard(view) {
@@ -5048,7 +5565,7 @@ function renderPathCard(view) {
   const c = stageCounts(t2.set, T2.profile).apply;
   const n = nextInfo(postById(T2.posts, "univ-" + t2.program.id), T2);
   const next = !n.closed ? T2.L(`다음: ${n.text}`, `Next: ${n.text}`) : n.docs ? T2.L(`이번 원서 접수는 끝났어요 · 이미 냈다면 ${n.docs}`, `Applications closed · if you applied: ${n.docs}`) : T2.L("이번 원서 접수는 끝났어요", "Applications closed");
-  return `<section class="sx sx-today" aria-labelledby="sx-path-h"><h2 class="sx-h" id="sx-path-h">${T2.L("내 길", "My path")}</h2><button type="button" class="sx-pathcard" data-action="nav" data-page="path"><span class="sx-pathcard-main"><small>${T2.L("준비 중인 과정", "Preparing for")}</small><b>${esc5(T2.pick(t2.program.name))}${t2.program.level !== "language" ? T2.L(" 학부", " undergraduate") : ""}</b><span class="sx-prog-row"><progress class="sx-prog" value="${c.n}" max="${c.total}" aria-hidden="true"></progress><span>${T2.L(`원서 서류 ${c.n}/${c.total} 표시`, `Application documents ${c.n} of ${c.total} marked`)}</span></span><small>${esc5(next)}</small></span><span class="sx-go" aria-hidden="true">${GO3}</span></button></section>`;
+  return `<section class="sx sx-today" aria-labelledby="sx-path-h"><h2 class="sx-h" id="sx-path-h">${T2.L("내 길", "My path")}</h2><button type="button" class="sx-pathcard" data-action="nav" data-page="path"><span class="sx-pathcard-main"><small>${T2.L("준비 중인 과정", "Preparing for")}</small><b>${esc6(T2.pick(t2.program.name))}${t2.program.level !== "language" ? T2.L(" 학부", " undergraduate") : ""}</b><span class="sx-prog-row"><progress class="sx-prog" value="${c.n}" max="${c.total}" aria-hidden="true"></progress><span>${T2.L(`원서 서류 ${c.n}/${c.total} 표시`, `Application documents ${c.n} of ${c.total} marked`)}</span></span><small>${esc6(next)}</small></span><span class="sx-go" aria-hidden="true">${GO3}</span></button></section>`;
 }
 function renderPathPick(view, program) {
   const T2 = ctx3(view);
@@ -5057,7 +5574,7 @@ function renderPathPick(view, program) {
   if (!set) return "";
   const on = T2.profile.target === program.id;
   const visa = visaFor(program) === "D-2" ? T2.L("유학(D-2)", "student (D-2)") : T2.L("어학연수(D-4-1)", "language trainee (D-4-1)");
-  return `<section class="sx-card butter sx-pathpick"><p class="sx-k">${T2.L("내 길", "My path")}</p><h2>${T2.L(`이 과정의 원서 · 합격 뒤 서류와 ${visa} 비자 서류를 한곳에서 챙겨요.`, `Keep this program’s application and post-admission documents and the ${visa} visa documents in one place.`)}</h2><div class="sx-row2"><button type="button" class="sx-btn2" aria-pressed="${on}" data-action="pathPick" data-id="${esc5(program.id)}"><span class="sx-on">${ON2}</span>${T2.L("이 과정으로 준비하기", "Prepare for this program")}</button>${on ? `<button type="button" class="sx-link" data-action="nav" data-page="path">${T2.L("내 길 열기", "Open my path")}${GO3}</button>` : ""}</div></section>`;
+  return `<section class="sx-card butter sx-pathpick"><p class="sx-k">${T2.L("내 길", "My path")}</p><h2>${T2.L(`이 과정의 원서 · 합격 뒤 서류와 ${visa} 비자 서류를 한곳에서 챙겨요.`, `Keep this program’s application and post-admission documents and the ${visa} visa documents in one place.`)}</h2><div class="sx-row2"><button type="button" class="sx-btn2" aria-pressed="${on}" data-action="pathPick" data-id="${esc6(program.id)}"><span class="sx-on">${ON3}</span>${T2.L("이 과정으로 준비하기", "Prepare for this program")}</button>${on ? `<button type="button" class="sx-link" data-action="nav" data-page="path">${T2.L("내 길 열기", "Open my path")}${GO3}</button>` : ""}</div></section>`;
 }
 
 // experiences/path-app/app.mjs
@@ -5212,7 +5729,7 @@ var DICT = {
 };
 var t = (k) => (DICT[k] || [k, k])[state.lang === "en" ? 1 : 0];
 var pick = (o) => o ? o[state.lang] ?? o.ko : "";
-var esc6 = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+var esc7 = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
 var goalById = (id) => GOALS.find((g) => g.id === id);
 var oppById = (id) => {
   const demo = OPPORTUNITIES.find((o) => o.id === id);
@@ -5338,17 +5855,170 @@ function syncStudyOwner() {
   S.univFilter = "all";
   return true;
 }
+var CONSENT_SEEN_KEY = "synk-path-study-consent-seen";
+var tabStorage = () => {
+  try {
+    return sessionStorage;
+  } catch {
+    return null;
+  }
+};
+var seenGet = () => {
+  try {
+    return tabStorage()?.getItem(CONSENT_SEEN_KEY) || null;
+  } catch {
+    return null;
+  }
+};
+var seenSet = (id) => {
+  try {
+    if (id) tabStorage()?.setItem(CONSENT_SEEN_KEY, id);
+    else tabStorage()?.removeItem(CONSENT_SEEN_KEY);
+  } catch {
+  }
+};
+var CONSENT_REFUSED_KEY = "synk-path-study-consent-refused";
+var refusedGet = () => {
+  try {
+    return tabStorage()?.getItem(CONSENT_REFUSED_KEY) || null;
+  } catch {
+    return null;
+  }
+};
+var refusedSet = (id) => {
+  try {
+    if (id) tabStorage()?.setItem(CONSENT_REFUSED_KEY, id);
+    else tabStorage()?.removeItem(CONSENT_REFUSED_KEY);
+  } catch {
+  }
+};
+var studyAcctId = null;
+var studyCompared = null;
+var studyAcct = createStudyAccount({ request: (op, v) => session.studyRequest(op, v), storage: tabStorage(), onChange: (sn) => {
+  if (!studyAcctId) return;
+  if (sn?.phase === "none") {
+    if (seenGet() === studyAcctId) seenSet(null);
+    studyCompared = null;
+    S.studyChoice = false;
+  }
+  if (sn?.phase === "choose") seenSet(studyAcctId);
+  if (sn?.phase === "consented" && studyCompared !== studyAcctId && !S.consentBusy) settleStudy(sn);
+  render(false);
+} });
+function settleStudy(sn) {
+  studyCompared = studyAcctId;
+  seenSet(studyAcctId);
+  const tabP = tabStudyProfile();
+  if (hasStudyData(tabP)) {
+    if (sameStudy(tabP, sn.profile)) {
+      study.clear();
+      study.setOwner(studyAcctId);
+    } else S.studyChoice = true;
+  }
+}
+try {
+  globalThis.addEventListener?.("online", () => {
+    if (studyAcctId && studyAcct.snapshot().pending) void studyAcct.retry();
+  });
+} catch {
+}
+var STUDY_SCALARS = ["topik", "gradePct", "fundsWon", "education", "target"];
+var STUDY_LISTS = { compare: (x) => x, channelsOff: (x) => x, dates: (x) => x.id, docs: (x) => x.id };
+var hasStudyData = (p) => STUDY_SCALARS.some((k) => p[k] !== null && p[k] !== void 0) || Object.keys(STUDY_LISTS).some((k) => (p[k] || []).length > 0);
+var sameStudy = (a, b) => JSON.stringify(normalizeProfile({ ...a, v: 1 })) === JSON.stringify(normalizeProfile({ ...b, v: 1 }));
+function studyDiff(before, after) {
+  return (base) => {
+    const out = { ...base };
+    for (const k of STUDY_SCALARS) if (before[k] !== after[k]) out[k] = after[k];
+    for (const [k, id] of Object.entries(STUDY_LISTS)) {
+      const b = new Map((before[k] || []).map((x) => [id(x), x])), a = new Map((after[k] || []).map((x) => [id(x), x]));
+      let list = (base[k] || []).filter((x) => !(b.has(id(x)) && !a.has(id(x))));
+      for (const [key, v] of a) if (!b.has(key) || JSON.stringify(b.get(key)) !== JSON.stringify(v)) {
+        const i = list.findIndex((y) => id(y) === key);
+        if (i >= 0) list[i] = v;
+        else list.push(v);
+      }
+      out[k] = list;
+    }
+    return normalizeProfile({ ...out, v: 1 });
+  };
+}
+function tabStudyProfile() {
+  const o = study.owner();
+  return o === GUEST_OWNER || o === studyOwnerNow() ? study.get() : createProfile();
+}
+function studyStore() {
+  if (!studyAcctId) return "tab";
+  const phase = studyAcct.snapshot().phase;
+  if (phase === "consented") return "account";
+  if (phase === "choose") return "blocked";
+  if (seenGet() === studyAcctId && phase === "loading") return "wait";
+  if (seenGet() === studyAcctId && ["paused", "error"].includes(phase)) return "blocked";
+  return "tab";
+}
+var studyLocked = () => ["blocked", "wait"].includes(studyStore());
+var STUDY_WRITE_ACTS = /* @__PURE__ */ new Set(["channelShow", "dateToggle", "dateConfirm", "datesClean", "studySet", "studyClear", "pathPick", "docToggle", "studyCompare"]);
+function studyStoreNote() {
+  const where = studyStore();
+  if (where === "wait") return accL("계정에 저장한 조건을 불러오는 중이에요.", "Loading the conditions saved to your account.");
+  if (where === "blocked") return studyAcct.snapshot().phase === "choose" ? accL("계정에 올라가지 않은 변경이 남아 있어요. 위에서 어느 쪽을 쓸지 고르면 조건을 고칠 수 있어요.", "Some changes never reached your account. Choose which to use above, then you can change conditions.") : accL("계정에 저장한 조건을 지금 불러오지 못해 고칠 수 없어요. 위의 「다시 시도」를 눌러 주세요.", "Your saved conditions could not be loaded, so they cannot be changed right now. Press Retry above.");
+  return "";
+}
+function syncStudyAccount() {
+  const id = session.status().accountId || null;
+  if (id === studyAcctId) return;
+  studyAcctId = id;
+  studyCompared = null;
+  S.consentAsk = false;
+  S.studyChoice = false;
+  if (refusedGet() && refusedGet() !== id) refusedSet(null);
+  S.consentRefused = !!id && refusedGet() === id;
+  if (!id) {
+    studyAcct.close();
+    seenSet(null);
+    refusedSet(null);
+    return;
+  }
+  void studyAcct.open(id).then(() => {
+    if (studyAcctId === id) render(false);
+  });
+}
 function studyWrite(next) {
+  const where = studyStore();
+  if (where === "blocked" || where === "wait") return studyProfile();
+  if (where === "account") {
+    if (S.studyChoice) {
+      study.clear();
+      study.setOwner(studyAcctId);
+      S.studyChoice = false;
+    }
+    const before = studyProfile(), after = normalizeProfile({ ...next, v: 1 });
+    try {
+      studyAcct.write(after, studyDiff(before, after));
+    } catch {
+    }
+    return after;
+  }
   if (study.owner() !== studyOwnerNow()) {
     study.clear();
     study.setOwner(studyOwnerNow());
   }
-  return study.set(next);
+  const out = study.set(next);
+  if (studyAcctId && studyAcct.snapshot().phase === "none" && !S.consentRefused && hasStudyData(out)) S.consentAsk = true;
+  return out;
 }
 function studyProfile() {
-  if (study.owner() !== studyOwnerNow()) return createProfile();
-  const p = study.get();
+  const where = studyStore();
+  if (where === "blocked" || where === "wait") return createProfile();
+  const p = where === "account" ? normalizeProfile({ ...studyAcct.snapshot().profile, v: 1 }) : study.owner() !== studyOwnerNow() ? null : study.get();
+  if (!p) return createProfile();
   return { ...p, compare: p.compare.filter((id) => STUDY_IDS.includes(id)) };
+}
+var STUDY_PAGES = ["today", "path", "univ", "univDetail", "univCompare", "cond", "channels", "post"];
+function studyNoticesHtml() {
+  if (!STUDY_ON || !studyAcctId || !STUDY_PAGES.includes(S.page)) return "";
+  const sn = studyAcct.snapshot();
+  return renderStudyNotices({ lang: state.lang, ask: S.consentAsk && sn.phase === "none", choice: S.studyChoice && sn.phase === "consented", drafts: sn.phase === "choose", deleted: sn.deletedElsewhere, blocked: studyStore() === "blocked" && sn.phase !== "choose", pending: sn.phase === "consented" && sn.sendFailed });
 }
 var session = createPathSession({
   configUrl: "./config.json",
@@ -5368,7 +6038,7 @@ var session = createPathSession({
 });
 state = session.document()?.state || createInitialState("ko");
 hadDoc = !!session.document()?.state;
-var S = { page: state.onboarded ? "today" : "onboard", step: 1, draft: null, filter: state.primaryGoal || "all", compare: [], oppId: null, taskId: null, help: state.primaryGoal || "study", flash: null, copyMsg: null, error: null, drop: MOTION, practiceOpen: false, univId: null, univFilter: "all", studyText: {}, studyErrors: {}, channelId: null, postId: null, dateNote: null, docFull: false };
+var S = { consentAsk: false, consentRefused: false, consentMinor: null, consentGuardian: false, consentBusy: false, consentError: "", consentReturn: null, studyChoice: false, page: state.onboarded ? "today" : "onboard", step: 1, draft: null, filter: state.primaryGoal || "all", compare: [], oppId: null, taskId: null, help: state.primaryGoal || "study", flash: null, copyMsg: null, error: null, drop: MOTION, practiceOpen: false, univId: null, univFilter: "all", studyText: {}, studyErrors: {}, channelId: null, postId: null, dateNote: null, docFull: false };
 activeOwner = ownerKey();
 wasOnboarded = !!state.onboarded;
 function commit(next) {
@@ -5376,7 +6046,7 @@ function commit(next) {
   if (!session.status().canEdit) {
     const err = session.status().error;
     const m = err ? getAccountErrorMessage(err, state.lang) : state.lang === "en" ? "You can't change data right now. Please check the save status in Profile." : "현재는 자료를 바꿀 수 없어요. 내 정보에서 저장 상태를 확인해 주세요.";
-    S.flash = esc6(m);
+    S.flash = esc7(m);
     say(m);
     return false;
   }
@@ -5388,7 +6058,7 @@ function commit(next) {
   } catch (e) {
     state = session.document()?.state || state;
     const m = getAccountErrorMessage(e, state.lang);
-    S.flash = esc6(m);
+    S.flash = esc7(m);
     say(m);
     return false;
   } finally {
@@ -5398,26 +6068,26 @@ function commit(next) {
 function newDraft() {
   return { primaryGoal: state.primaryGoal, interests: [...state.interests || []], secondaryGoals: [...state.secondaryGoals || []], location: state.location || "unknown" };
 }
-var svg4 = (box, sw, p) => `<svg viewBox="0 0 ${box} ${box}" fill="none" stroke="currentColor" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">${p}</svg>`;
+var svg5 = (box, sw, p) => `<svg viewBox="0 0 ${box} ${box}" fill="none" stroke="currentColor" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">${p}</svg>`;
 var ICON2 = {
-  arrow: svg4(20, 1.7, '<path d="M4 10h11.5M11 5.5 15.5 10 11 14.5"/>'),
-  back: svg4(20, 1.7, '<path d="M16 10H4.5M9 5.5 4.5 10 9 14.5"/>'),
-  out: svg4(20, 1.7, '<path d="M6 14 14 6M7.5 6H14v6.5"/>'),
-  check: svg4(20, 2.4, '<path d="m5 10.4 3.2 3.1L15 6.6"/>')
+  arrow: svg5(20, 1.7, '<path d="M4 10h11.5M11 5.5 15.5 10 11 14.5"/>'),
+  back: svg5(20, 1.7, '<path d="M16 10H4.5M9 5.5 4.5 10 9 14.5"/>'),
+  out: svg5(20, 1.7, '<path d="M6 14 14 6M7.5 6H14v6.5"/>'),
+  check: svg5(20, 2.4, '<path d="m5 10.4 3.2 3.1L15 6.6"/>')
 };
 var TAB_ICON = {
-  today: svg4(24, 1.6, '<rect x="4" y="5.5" width="16" height="14.5" rx="2.5"/><path d="M4 10.2h16M8.5 3.5v4M15.5 3.5v4"/><path d="M11.9 14.9h.2" stroke-width="2.6"/>'),
-  explore: svg4(24, 1.6, '<circle cx="10.5" cy="10.5" r="6"/><path d="m15 15 5 5"/>'),
-  prepare: svg4(24, 1.6, '<path d="M4 20h4L19 9l-4-4L4 16z"/><path d="m13.5 6.5 4 4"/>'),
-  channels: svg4(24, 1.6, '<rect x="4" y="5" width="13" height="14.5" rx="2"/><path d="M17 9h3v8.5a2 2 0 0 1-2 2H6"/><path d="M7.5 9h6M7.5 12.5h6M7.5 16h4"/>'),
-  univ: svg4(24, 1.6, '<path d="M3.5 9.6 12 4.6l8.5 5"/><path d="M6 11v7.5M10 11v7.5M14 11v7.5M18 11v7.5M3.5 19.5h17"/>'),
-  help: svg4(24, 1.6, '<path d="M4.5 5.5h15v10h-8l-4 3.5v-3.5h-3z"/><path d="M10.4 8.9a1.7 1.7 0 1 1 2.3 1.6c-.5.2-.7.6-.7 1.1M12 13.4v.1"/>'),
-  profile: svg4(24, 1.6, '<circle cx="12" cy="8.5" r="3.6"/><path d="M5 20c1.2-3.6 4-5.4 7-5.4s5.8 1.8 7 5.4"/>')
+  today: svg5(24, 1.6, '<rect x="4" y="5.5" width="16" height="14.5" rx="2.5"/><path d="M4 10.2h16M8.5 3.5v4M15.5 3.5v4"/><path d="M11.9 14.9h.2" stroke-width="2.6"/>'),
+  explore: svg5(24, 1.6, '<circle cx="10.5" cy="10.5" r="6"/><path d="m15 15 5 5"/>'),
+  prepare: svg5(24, 1.6, '<path d="M4 20h4L19 9l-4-4L4 16z"/><path d="m13.5 6.5 4 4"/>'),
+  channels: svg5(24, 1.6, '<rect x="4" y="5" width="13" height="14.5" rx="2"/><path d="M17 9h3v8.5a2 2 0 0 1-2 2H6"/><path d="M7.5 9h6M7.5 12.5h6M7.5 16h4"/>'),
+  univ: svg5(24, 1.6, '<path d="M3.5 9.6 12 4.6l8.5 5"/><path d="M6 11v7.5M10 11v7.5M14 11v7.5M18 11v7.5M3.5 19.5h17"/>'),
+  help: svg5(24, 1.6, '<path d="M4.5 5.5h15v10h-8l-4 3.5v-3.5h-3z"/><path d="M10.4 8.9a1.7 1.7 0 1 1 2.3 1.6c-.5.2-.7.6-.7 1.1M12 13.4v.1"/>'),
+  profile: svg5(24, 1.6, '<circle cx="12" cy="8.5" r="3.6"/><path d="M5 20c1.2-3.6 4-5.4 7-5.4s5.8 1.8 7 5.4"/>')
 };
 var SYMBOL = {
-  study: svg4(48, 1.6, '<rect x="11" y="3.5" width="26" height="41" rx="13"/><rect x="15.5" y="8" width="17" height="32" rx="8.5"/><path d="M15.6 16.8h16.8"/><path d="M24 16.8v2.6"/><path d="M16 32.4c4.6-3 11.2-4.6 16.2-2.9"/><circle cx="27.6" cy="24.2" r="1.7"/>'),
-  student: svg4(48, 1.6, '<path d="M24 14.2c-4.7-3.3-11.1-4-17.2-2.7v24.4c6.1-1.3 12.5-.6 17.2 2.7 4.7-3.3 11.1-4 17.2-2.7V11.5c-6.1-1.3-12.5-.6-17.2 2.7z"/><path d="M24 14.2v24.4"/><path d="M11.2 18.6c3-.4 6.1 0 8.6 1M11.2 23.6c3-.4 6.1 0 8.6 1M28.2 19.6c2.5-1 5.6-1.4 8.6-1"/>'),
-  job: svg4(48, 1.6, '<rect x="6.5" y="15.5" width="35" height="25" rx="3.6"/><path d="M18 15.5v-3.4a2.6 2.6 0 0 1 2.6-2.6h6.8a2.6 2.6 0 0 1 2.6 2.6v3.4"/><path d="M6.5 26.5h13.5M28 26.5h13.5"/><rect x="20" y="23.6" width="8" height="6" rx="1.4"/>')
+  study: svg5(48, 1.6, '<rect x="11" y="3.5" width="26" height="41" rx="13"/><rect x="15.5" y="8" width="17" height="32" rx="8.5"/><path d="M15.6 16.8h16.8"/><path d="M24 16.8v2.6"/><path d="M16 32.4c4.6-3 11.2-4.6 16.2-2.9"/><circle cx="27.6" cy="24.2" r="1.7"/>'),
+  student: svg5(48, 1.6, '<path d="M24 14.2c-4.7-3.3-11.1-4-17.2-2.7v24.4c6.1-1.3 12.5-.6 17.2 2.7 4.7-3.3 11.1-4 17.2-2.7V11.5c-6.1-1.3-12.5-.6-17.2 2.7z"/><path d="M24 14.2v24.4"/><path d="M11.2 18.6c3-.4 6.1 0 8.6 1M11.2 23.6c3-.4 6.1 0 8.6 1M28.2 19.6c2.5-1 5.6-1.4 8.6-1"/>'),
+  job: svg5(48, 1.6, '<rect x="6.5" y="15.5" width="35" height="25" rx="3.6"/><path d="M18 15.5v-3.4a2.6 2.6 0 0 1 2.6-2.6h6.8a2.6 2.6 0 0 1 2.6 2.6v3.4"/><path d="M6.5 26.5h13.5M28 26.5h13.5"/><rect x="20" y="23.6" width="8" height="6" rx="1.4"/>')
 };
 var CARD_NO = { study: "01", student: "02", job: "03" };
 var CLIP = '<svg class="clip" viewBox="0 0 22 38" aria-hidden="true" focusable="false"><path d="M5.5 0h11v6.6a2 2 0 0 1-2 2h-7a2 2 0 0 1-2-2z" fill="url(#metal)"/><path d="M7.4 2.2h7.2" stroke="rgba(0,0,0,.18)" stroke-width=".8"/><circle cx="11" cy="12.6" r="3.8" fill="none" stroke="url(#metal)" stroke-width="2"/><rect x="9" y="16.1" width="4" height="4.6" rx="1.2" fill="url(#metal)"/><path d="M11 20.6v6.1a4.6 4.6 0 1 0 4.6-4.6" fill="none" stroke="url(#metal)" stroke-width="2.2" stroke-linecap="round"/></svg>';
@@ -5428,9 +6098,9 @@ function seal(n = 0) {
 function hang(goal, { i = 0, slot = "mid", radio = false, on = false, action = "", kicker = "", name = "", desc = null, mode = "goal" } = {}) {
   const g = goalById(goal);
   const nm = name || pick(g.label), ds = desc ?? pick(g.description);
-  const bottom = `${kicker ? `<span class="pass-kicker">${esc6(kicker)}</span>` : ""}<span class="pass-name">${esc6(nm)}</span>${ds ? `<span class="pass-desc">${esc6(ds)}</span>` : ""}`;
+  const bottom = `${kicker ? `<span class="pass-kicker">${esc7(kicker)}</span>` : ""}<span class="pass-name">${esc7(nm)}</span>${ds ? `<span class="pass-desc">${esc7(ds)}</span>` : ""}`;
   const face = `<span class="pass-band" aria-hidden="true"></span><span class="pass-face" aria-hidden="true"><span class="pass-top"><span class="pass-brand">PATH</span><span class="pass-no">No.${CARD_NO[goal]}</span></span><span class="pass-symbol">${SYMBOL[goal]}</span><span class="pass-bottom">${bottom}</span></span><span class="pick-mark" aria-hidden="true">${ICON2.check}</span>`;
-  const card2 = radio ? `<button type="button" class="pass goal-choice" role="radio" aria-checked="${on}" tabindex="${on || !S.draft?.primaryGoal && i === 0 ? 0 : -1}" data-action="pickGoal" data-id="${goal}" data-mode="${mode}" aria-label="${esc6(`${pick(g.label)} — ${pick(g.description)}`)}">${face}</button>` : action ? `<button type="button" class="pass" data-action="${action}" data-id="${goal}" data-mode="${mode}" aria-label="${esc6(ds ? `${nm} — ${ds}` : nm)}">${face}</button>` : `<div class="pass" data-mode="${mode}" role="img" aria-label="${esc6(ds ? `${nm} — ${ds}` : nm)}">${face}</div>`;
+  const card2 = radio ? `<button type="button" class="pass goal-choice" role="radio" aria-checked="${on}" tabindex="${on || !S.draft?.primaryGoal && i === 0 ? 0 : -1}" data-action="pickGoal" data-id="${goal}" data-mode="${mode}" aria-label="${esc7(`${pick(g.label)} — ${pick(g.description)}`)}">${face}</button>` : action ? `<button type="button" class="pass" data-action="${action}" data-id="${goal}" data-mode="${mode}" aria-label="${esc7(ds ? `${nm} — ${ds}` : nm)}">${face}</button>` : `<div class="pass" data-mode="${mode}" role="img" aria-label="${esc7(ds ? `${nm} — ${ds}` : nm)}">${face}</div>`;
   return `<div class="hang${S.drop ? " is-drop" : ""}${on ? " is-on" : ""}" data-goal="${goal}" data-i="${i}" data-slot="${slot}"><div class="strap" aria-hidden="true"><span class="strap-print">PATH PATH PATH PATH PATH PATH PATH PATH</span></div>${CLIP}<div class="card-wrap"><span class="card-shadow" aria-hidden="true"></span>${card2}</div></div>`;
 }
 var sec = (title, sub, body, cls = "") => `<section class="sec${cls ? ` ${cls}` : ""}"><div class="sec-h"><h2>${title}</h2>${sub ? `<span>${sub}</span>` : ""}</div>${body}</section>`;
@@ -5439,9 +6109,9 @@ function demoBadge(o) {
   if (o?.source === "live") return `<span class="badge">${state.lang === "en" ? "Official job posting" : "공식 채용 공고"}</span>`;
   return `<span class="badge">${t("demo")}</span>`;
 }
-var liveLink = (o) => o?.source === "live" && o.url ? `<p><a href="${esc6(o.url)}" target="_blank" rel="noopener noreferrer">${state.lang === "en" ? "View original posting (opens in new tab)" : "원문 공고 보기 (새 탭)"}</a></p>` : "";
+var liveLink = (o) => o?.source === "live" && o.url ? `<p><a href="${esc7(o.url)}" target="_blank" rel="noopener noreferrer">${state.lang === "en" ? "View original posting (opens in new tab)" : "원문 공고 보기 (새 탭)"}</a></p>` : "";
 var findJobEntry = (id) => (jobsFeed.snapshot().jobs || []).find((j) => j.id === id) || (session.document()?.savedJobs || []).find((j) => j.id === id);
-var oppRow = (o) => `<li><button type="button" class="row" data-action="detail" data-id="${esc6(o.id)}"><span><b>${demoBadge(o)}${esc6(pick(o.title))}</b><small>${esc6(pick(o.summary))}</small></span><span class="row-go" aria-hidden="true">${ICON2.arrow}</span></button></li>`;
+var oppRow = (o) => `<li><button type="button" class="row" data-action="detail" data-id="${esc7(o.id)}"><span><b>${demoBadge(o)}${esc7(pick(o.title))}</b><small>${esc7(pick(o.summary))}</small></span><span class="row-go" aria-hidden="true">${ICON2.arrow}</span></button></li>`;
 var TABS = ["today", "channels", "univ", "explore", "prepare", "help", "profile"].filter((p) => (p !== "univ" || STUDY_ON) && (p !== "channels" || CHANNEL_ON));
 var UNIV_PAGES = ["cond", "univDetail", "univCompare"];
 function shell(main) {
@@ -5467,8 +6137,10 @@ function notices(quiet = false, noFlash = false) {
   const guestStore = storageError && !accSt.signedIn;
   const plainGuest = !accSt.signedIn && !accSt.error;
   let h = guestStore || quiet && plainGuest ? "" : renderAccountNotice(accSt, state.lang) || "";
+  if (S.page === "studyConsent" && h.includes('data-state="saved"')) h = "";
   if (blocked) h += `<div class="notice error" role="alert"><p>${t("blocked")}</p><div class="actions"><button type="button" class="secondary" data-action="reset">${t("reset")}</button></div></div>`;
   h += `<div id="store-note" class="notice error" role="status"${storageError ? "" : " hidden"}><span>${t("storeFail")}</span>${guestStore ? ` <button type="button" class="text-button" data-action="accountRetry">${accL("다시 시도", "Retry")}</button>` : ""}</div>`;
+  h += studyNoticesHtml();
   if (S.flash && !noFlash) h += `<div id="flash" class="notice" role="status">${S.flash}</div>`;
   return `<div class="notices">${h}</div>`;
 }
@@ -5478,13 +6150,13 @@ function onboard() {
     const cards = GOALS.map((g3, i) => hang(g3.id, { i, slot: ["left", "mid", "right"][i], radio: true, on: d.primaryGoal === g3.id })).join("");
     const g2 = goalById(d.primaryGoal);
     return `<main class="ob" id="main"><div class="ob-title">${notices(true)}<h1 class="title page-title" id="q1" tabindex="-1"><span>${t("obT1")}</span> <span class="title-2">${t("obT2")}</span></h1></div>
-<div class="ob-lead"><p class="lead" id="ob-lead" aria-live="polite">${g2 ? `<b class="lead-pick">${esc6(pick(g2.label))}</b>${esc6(pick(g2.note))}` : t("obLead")}</p></div>
+<div class="ob-lead"><p class="lead" id="ob-lead" aria-live="polite">${g2 ? `<b class="lead-pick">${esc7(pick(g2.label))}</b>${esc7(pick(g2.note))}` : t("obLead")}</p></div>
 <div class="stage ob-stage${d.primaryGoal ? " has-pick" : ""}" role="radiogroup" aria-label="${t("q1")}"><div class="rod" aria-hidden="true"></div>${cards}</div>
 <div class="ob-actions"><button type="button" class="btn" data-action="finish"${d.primaryGoal ? "" : " disabled"}>${t("startCard")} ${ICON2.arrow}</button><button type="button" class="link" data-action="skip">${t("browse")}</button>${state.onboarded ? `<button type="button" class="link" data-action="cancelOnboard">${t("cancel")}</button>` : ""}</div>
 <p class="fine ob-fine">${t("obFine")}${d.primaryGoal ? ` <button type="button" class="link link-sm" data-action="step2">${t("fineTune")}</button>` : ""}</p></main>`;
   }
   const g = goalById(d.primaryGoal);
-  const chips = (list, key) => list.map((x) => `<button type="button" class="chip" aria-pressed="${d[key].includes(x.id)}" data-action="toggle" data-key="${key}" data-id="${x.id}">${esc6(pick(x.label))}</button>`).join("");
+  const chips = (list, key) => list.map((x) => `<button type="button" class="chip" aria-pressed="${d[key].includes(x.id)}" data-action="toggle" data-key="${key}" data-id="${x.id}">${esc7(pick(x.label))}</button>`).join("");
   const locs = ["abroad", "korea", "unknown"].map((l) => `<option value="${l}"${d.location === l ? " selected" : ""}>${t(l)}</option>`).join("");
   return `<main class="ob2" id="main"><div class="ob2-card">${hang(g.id, { slot: "mid" })}</div><div class="ob2-main">${notices(true)}<p class="eyebrow">${t("step2")}</p><h1 class="title page-title" tabindex="-1"><span>${t("q2")}</span> <span class="title-2">${t("q2lead")}</span></h1>
 <fieldset class="field"><legend>${t("interests")}</legend><div class="chips">${chips(g.interests, "interests")}</div></fieldset>
@@ -5494,7 +6166,7 @@ function onboard() {
 }
 function stamps(states, descs) {
   const names = ["j1", "j2", "j3"];
-  return `<ol class="stamps" aria-label="${t("stampsLabel")}">${states.map((s, i) => `<li class="stamp is-${s}"${s === "now" ? ' aria-current="step"' : ""}><span class="slot" aria-hidden="true">${s === "done" ? seal(i) : s === "now" ? t("sNow") : `<span class="slot-num">${i + 1}</span>`}</span><h3>${t(names[i])} <span class="stamp-state">${t(s === "done" ? "sDone" : s === "now" ? "sNow" : "sNext")}</span></h3><p>${esc6(descs[i])}</p></li>`).join("")}</ol>`;
+  return `<ol class="stamps" aria-label="${t("stampsLabel")}">${states.map((s, i) => `<li class="stamp is-${s}"${s === "now" ? ' aria-current="step"' : ""}><span class="slot" aria-hidden="true">${s === "done" ? seal(i) : s === "now" ? t("sNow") : `<span class="slot-num">${i + 1}</span>`}</span><h3>${t(names[i])} <span class="stamp-state">${t(s === "done" ? "sDone" : s === "now" ? "sNow" : "sNext")}</span></h3><p>${esc7(descs[i])}</p></li>`).join("")}</ol>`;
 }
 function today() {
   const g = goalById(state.primaryGoal);
@@ -5502,7 +6174,7 @@ function today() {
     const cards = GOALS.map((x, i) => hang(x.id, { i, slot: ["left", "mid", "right"][i], action: "exploreGoal" })).join("");
     return `<main class="home" id="main"><aside class="stage home-stage is-three" aria-label="${t("pickCard")}"><div class="rod" aria-hidden="true"></div>${cards}<div class="home-cap"><span></span><button type="button" class="link" data-action="changeGoal">${t("pickCard")}</button></div></aside>
 <div class="home-main">${notices()}<p class="eyebrow">${t("today")}</p><h1 class="title page-title" tabindex="-1"><span>${t("nT1")}</span> <span class="title-2">${t("nT2")}</span></h1>
-<ul class="goal-list">${GOALS.map((x) => `<li><button type="button" class="goal-row" data-action="exploreGoal" data-id="${x.id}"><span class="goal-sym" data-goal="${x.id}">${SYMBOL[x.id]}</span><span class="goal-txt"><b>${esc6(pick(x.label))}</b><small>${esc6(pick(x.description))}</small></span><span class="row-go" aria-hidden="true">${ICON2.arrow}</span></button></li>`).join("")}</ul>
+<ul class="goal-list">${GOALS.map((x) => `<li><button type="button" class="goal-row" data-action="exploreGoal" data-id="${x.id}"><span class="goal-sym" data-goal="${x.id}">${SYMBOL[x.id]}</span><span class="goal-txt"><b>${esc7(pick(x.label))}</b><small>${esc7(pick(x.description))}</small></span><span class="row-go" aria-hidden="true">${ICON2.arrow}</span></button></li>`).join("")}</ul>
 ${pathHtml()}${upcomingHtml()}${newsHtml()}<div class="home-grid">${sec(t("official"), t("offSub"), officialList("all"))}${sec(t("tools"), "", toolRows())}</div></div></main>`;
   }
   const mine = state.tasks.filter((x) => x.goal === g.id);
@@ -5514,11 +6186,11 @@ ${pathHtml()}${upcomingHtml()}${newsHtml()}<div class="home-grid">${sec(t("offic
   let card2;
   if (task) {
     const so = oppById(task.sourceId);
-    card2 = `<section class="resume" aria-label="${t("resume")}"><div><span class="resume-k">${t("resume")}</span><span class="resume-t">${so ? `${demoBadge(so)}${esc6(pick(so.title))}` : t("missing")}</span><span class="resume-s"><i aria-hidden="true"></i>${t("resumeS")}</span></div><button type="button" class="btn" data-action="openTask" data-id="${esc6(task.id)}">${t("resume")} ${ICON2.arrow}</button></section>`;
+    card2 = `<section class="resume" aria-label="${t("resume")}"><div><span class="resume-k">${t("resume")}</span><span class="resume-t">${so ? `${demoBadge(so)}${esc7(pick(so.title))}` : t("missing")}</span><span class="resume-s"><i aria-hidden="true"></i>${t("resumeS")}</span></div><button type="button" class="btn" data-action="openTask" data-id="${esc7(task.id)}">${t("resume")} ${ICON2.arrow}</button></section>`;
   } else if (allDone) {
     card2 = `<section class="resume is-done"><div><span class="resume-k">${t("nextStep")}</span><span class="resume-t">${t("doneNext")}</span></div><div class="resume-acts"><button type="button" class="btn" data-action="exploreGoal" data-id="${g.id}">${t("exploreMore")} ${ICON2.arrow}</button><button type="button" class="link" data-action="nav" data-page="prepare">${t("viewPrep")}</button></div></section>`;
   } else {
-    card2 = `<section class="resume is-start"><div><span class="resume-k">${t("nextStep")}</span><span class="resume-t">${esc6(pick(g.homeTitle))}</span><span class="resume-s">${esc6(pick(g.steps[0]))}</span></div><button type="button" class="btn" data-action="exploreGoal" data-id="${g.id}">${esc6(pick(g.homeAction))} ${ICON2.arrow}</button></section>`;
+    card2 = `<section class="resume is-start"><div><span class="resume-k">${t("nextStep")}</span><span class="resume-t">${esc7(pick(g.homeTitle))}</span><span class="resume-s">${esc7(pick(g.steps[0]))}</span></div><button type="button" class="btn" data-action="exploreGoal" data-id="${g.id}">${esc7(pick(g.homeAction))} ${ICON2.arrow}</button></section>`;
   }
   const opps = OPPORTUNITIES.filter((o) => o.goal === g.id).slice(0, 2);
   const off = g.id === "job" && jobsFeed.snapshot().status === "disabled" ? `<p class="off"><i aria-hidden="true"></i>${t("jobsOff")}</p>` : "";
@@ -5529,12 +6201,12 @@ ${stamps(st, g.steps.map(pick))}${card2}${g.id === "study" && STUDY_ON ? renderS
 }
 function officialList(goal) {
   const list = OFFICIAL_LINKS.filter((l) => goal === "all" || l.goal === goal || l.goal === null);
-  return `<ul class="rows">${list.map((l) => `<li><a class="row" href="${esc6(l.url)}" target="_blank" rel="noopener noreferrer"><span><b><span class="badge official">${t("officialBadge")}</span>${esc6(pick(l.title))}</b><small>${esc6(pick(l.summary))} · ${t("checked")} ${esc6(l.checkedAt)}</small></span><span class="row-go" aria-hidden="true">${ICON2.out}</span><span class="sr-only"> (${t("openNew")})</span></a></li>`).join("")}</ul>`;
+  return `<ul class="rows">${list.map((l) => `<li><a class="row" href="${esc7(l.url)}" target="_blank" rel="noopener noreferrer"><span><b><span class="badge official">${t("officialBadge")}</span>${esc7(pick(l.title))}</b><small>${esc7(pick(l.summary))} · ${t("checked")} ${esc7(l.checkedAt)}</small></span><span class="row-go" aria-hidden="true">${ICON2.out}</span><span class="sr-only"> (${t("openNew")})</span></a></li>`).join("")}</ul>`;
 }
-var toolRows = () => `<ul class="rows">${EXISTING_TOOLS.map((x) => `<li><a class="row" href="${esc6(x.url)}" target="_blank" rel="noopener noreferrer"><span><b>${esc6(pick(x.title))}</b><small>${esc6(pick(x.summary))}</small></span><span class="row-go" aria-hidden="true">${ICON2.out}</span><span class="sr-only"> (${t("openNew")})</span></a></li>`).join("")}</ul>`;
+var toolRows = () => `<ul class="rows">${EXISTING_TOOLS.map((x) => `<li><a class="row" href="${esc7(x.url)}" target="_blank" rel="noopener noreferrer"><span><b>${esc7(pick(x.title))}</b><small>${esc7(pick(x.summary))}</small></span><span class="row-go" aria-hidden="true">${ICON2.out}</span><span class="sr-only"> (${t("openNew")})</span></a></li>`).join("")}</ul>`;
 function explore() {
   const f = S.filter;
-  const filt = ["all", ...GOALS.map((g) => g.id)].map((id) => `<button type="button" class="chip" aria-pressed="${f === id}" data-action="filter" data-id="${id}">${id === "all" ? t("all") : esc6(pick(goalById(id).description))}</button>`).join("");
+  const filt = ["all", ...GOALS.map((g) => g.id)].map((id) => `<button type="button" class="chip" aria-pressed="${f === id}" data-action="filter" data-id="${id}">${id === "all" ? t("all") : esc7(pick(goalById(id).description))}</button>`).join("");
   const list = OPPORTUNITIES.filter((o) => f === "all" || o.goal === f);
   const full = S.compare.length >= 3;
   let h = head(t("exploreTitle"), t("explore"), "", t("exploreT2"));
@@ -5543,11 +6215,11 @@ function explore() {
   h += `<details class="practice"${S.practiceOpen ? " open" : ""}><summary><span>${t("practice")}</span><small>${t("demoSub")}</small></summary><p class="meta">${t("demoNote")}</p>`;
   h += `<ul class="rows opp-rows">${list.map((o) => {
     const on = S.compare.includes(o.id);
-    return `<li class="opp"><div class="opp-text"><b>${demoBadge(o)}${esc6(pick(o.title))}</b><small>${esc6(pick(o.summary))}</small></div><div class="opp-acts"><button type="button" class="btn-line" data-action="detail" data-id="${o.id}">${t("details")}</button><button type="button" class="chip" aria-pressed="${on}" data-action="compare" data-id="${o.id}"${full && !on ? " disabled" : ""}>${on ? t("compareOn") : t("compareAdd")}</button></div></li>`;
+    return `<li class="opp"><div class="opp-text"><b>${demoBadge(o)}${esc7(pick(o.title))}</b><small>${esc7(pick(o.summary))}</small></div><div class="opp-acts"><button type="button" class="btn-line" data-action="detail" data-id="${o.id}">${t("details")}</button><button type="button" class="chip" aria-pressed="${on}" data-action="compare" data-id="${o.id}"${full && !on ? " disabled" : ""}>${on ? t("compareOn") : t("compareAdd")}</button></div></li>`;
   }).join("")}</ul>`;
   if (full) h += `<p class="meta">${t("compareMax")}</p>`;
   if (S.compare.length) {
-    h += `<div class="sec-h compare-h"><h2>${t("compareTitle")} (${S.compare.length}/3)</h2><button type="button" class="text-button" data-action="clearCompare">${t("clearCompare")}</button></div><div class="compare-grid">${S.compare.map(oppById).map((o) => `<div class="compare-item">${demoBadge(o)}<h3>${esc6(pick(o.title))}</h3><ol class="reqs">${o.requirements.map((r, i) => `<li><b>${i + 1}</b>${esc6(pick(r))}</li>`).join("")}</ol></div>`).join("")}</div>`;
+    h += `<div class="sec-h compare-h"><h2>${t("compareTitle")} (${S.compare.length}/3)</h2><button type="button" class="text-button" data-action="clearCompare">${t("clearCompare")}</button></div><div class="compare-grid">${S.compare.map(oppById).map((o) => `<div class="compare-item">${demoBadge(o)}<h3>${esc7(pick(o.title))}</h3><ol class="reqs">${o.requirements.map((r, i) => `<li><b>${i + 1}</b>${esc7(pick(r))}</li>`).join("")}</ol></div>`).join("")}</div>`;
   }
   h += "</details>";
   h += sec(t("official"), t("offSub"), officialList(f));
@@ -5556,9 +6228,9 @@ function explore() {
 function detail() {
   const o = oppById(S.oppId);
   if (!o) return head(t("missing")) + `<button type="button" class="btn-line" data-action="nav" data-page="explore">${t("backList")}</button>`;
-  return `<article class="detail"><button type="button" class="back" data-action="nav" data-page="explore">${ICON2.back}${t("backList")}</button><p class="eyebrow">${demoBadge(o)} ${esc6(pick(goalById(o.goal)?.label))}</p><h1 class="title page-title" tabindex="-1"><span>${esc6(pick(o.title))}</span></h1><p class="lead">${esc6(pick(o.summary))}</p>${liveLink(o)}
-<h2 class="h2">${t("requirements")}</h2><ol class="reqs">${o.requirements.map((r, i) => `<li><b>${i + 1}</b>${esc6(pick(r))}</li>`).join("")}</ol>
-<div class="actions"><button type="button" class="btn" data-action="${o.source === "live" ? "prepareJob" : "prepareThis"}" data-id="${esc6(o.id)}">${t("prepareThis")} ${ICON2.arrow}</button></div></article>
+  return `<article class="detail"><button type="button" class="back" data-action="nav" data-page="explore">${ICON2.back}${t("backList")}</button><p class="eyebrow">${demoBadge(o)} ${esc7(pick(goalById(o.goal)?.label))}</p><h1 class="title page-title" tabindex="-1"><span>${esc7(pick(o.title))}</span></h1><p class="lead">${esc7(pick(o.summary))}</p>${liveLink(o)}
+<h2 class="h2">${t("requirements")}</h2><ol class="reqs">${o.requirements.map((r, i) => `<li><b>${i + 1}</b>${esc7(pick(r))}</li>`).join("")}</ol>
+<div class="actions"><button type="button" class="btn" data-action="${o.source === "live" ? "prepareJob" : "prepareThis"}" data-id="${esc7(o.id)}">${t("prepareThis")} ${ICON2.arrow}</button></div></article>
 ${sec(t("official"), t("offSub"), officialList(o.goal))}`;
 }
 var statusHtml = (task) => `<span class="status" data-state="${task.confirmedAt ? "done" : "draft"}">${task.confirmedAt ? t("done") : t("draft")}</span>`;
@@ -5568,9 +6240,9 @@ function prepare() {
   for (const g of GOALS) {
     const ts = state.tasks.filter((x) => x.goal === g.id);
     if (!ts.length) continue;
-    h += sec(esc6(pick(g.label)), "", `<ul class="rows">${ts.map((x) => {
+    h += sec(esc7(pick(g.label)), "", `<ul class="rows">${ts.map((x) => {
       const so = oppById(x.sourceId);
-      return `<li><button type="button" class="row" data-action="openTask" data-id="${esc6(x.id)}"><span><b>${demoBadge(so)}${so ? esc6(pick(so.title)) : t("missing")}</b><small>${statusHtml(x)}</small></span><span class="row-go" aria-hidden="true">${ICON2.arrow}</span></button></li>`;
+      return `<li><button type="button" class="row" data-action="openTask" data-id="${esc7(x.id)}"><span><b>${demoBadge(so)}${so ? esc7(pick(so.title)) : t("missing")}</b><small>${statusHtml(x)}</small></span><span class="row-go" aria-hidden="true">${ICON2.arrow}</span></button></li>`;
     }).join("")}</ul>`);
   }
   return h;
@@ -5584,12 +6256,12 @@ function editor() {
   const st = session.status(), signed = st.signedIn;
   const savedOk = st.canEdit && !st.error;
   let h = `<main class="ed" id="main"><aside class="stage ed-stage" aria-label="${t("source")}"><div class="rod" aria-hidden="true"></div>${hang(goal, { kicker: t("srcK"), name: pick(o.title), desc: "", mode: "source" })}
-<div class="ed-src"><b>${t("source")}</b><p>${demoBadge(o)}<span>${esc6(pick(o.title))}</span></p><small>${o.source === "live" ? t("liveNote") : t("srcNote")}</small>${liveLink(o)}<button type="button" class="link" data-action="detail" data-id="${esc6(o.id)}">${t("reopen")}</button></div></aside>
+<div class="ed-src"><b>${t("source")}</b><p>${demoBadge(o)}<span>${esc7(pick(o.title))}</span></p><small>${o.source === "live" ? t("liveNote") : t("srcNote")}</small>${liveLink(o)}<button type="button" class="link" data-action="detail" data-id="${esc7(o.id)}">${t("reopen")}</button></div></aside>
 <div class="ed-main">${notices(false, true)}<button type="button" class="back" data-action="nav" data-page="prepare">${ICON2.back}${t("backPrep")}</button>
-<p class="eyebrow">${t("edEyebrow")}</p><h1 class="title page-title" tabindex="-1"><span>${esc6(pick(o.prompt))}</span></h1>
-<ol class="reqs" aria-label="${t("requirements")}">${o.requirements.map((r, i) => `<li><b>${i + 1}</b>${esc6(pick(r))}</li>`).join("")}</ol>
+<p class="eyebrow">${t("edEyebrow")}</p><h1 class="title page-title" tabindex="-1"><span>${esc7(pick(o.prompt))}</span></h1>
+<ol class="reqs" aria-label="${t("requirements")}">${o.requirements.map((r, i) => `<li><b>${i + 1}</b>${esc7(pick(r))}</li>`).join("")}</ol>
 <section class="editor"><div class="field"><label for="body" class="field-label">${t("body")}</label>
-<textarea id="body" maxlength="6000" aria-describedby="body-hint edit-err" data-action="body"${S.error === "needBody" ? ' aria-invalid="true"' : ""}>${esc6(task.body)}</textarea>
+<textarea id="body" maxlength="6000" aria-describedby="body-hint edit-err" data-action="body"${S.error === "needBody" ? ' aria-invalid="true"' : ""}>${esc7(task.body)}</textarea>
 <div class="field-meta" id="body-hint"><span class="count" id="count">${countText(task.body)}</span>${savedOk ? `<span class="saved">${ICON2.check}${signed ? t("savedAccount") : t("savedGuest")}</span>` : ""}</div></div>
 <p id="task-status" class="task-status">${statusHtml(task)}</p>
 <label class="check"><input type="checkbox" id="ack"${task.confirmedAt ? " checked" : ""}><span class="box" aria-hidden="true">${ICON2.check}</span><span>${t("confirmCheck")}</span></label>
@@ -5598,8 +6270,8 @@ function editor() {
 ${S.flash ? `<div id="flash" class="notice flash-inline" role="status">${S.flash}</div>` : ""}<p class="fine">${t("confirmNote")}</p></section>`;
   if (task.confirmedAt) {
     const nx = getNextTask(state);
-    h += `<div id="confirmed-result" class="result"><div class="sec-h"><h2>${t("result")}</h2>${demoBadge(o)}</div><div class="result-body">${esc6(task.body)}</div>
-<div class="actions">${nx && nx.id !== task.id && !nx.confirmedAt ? `<button type="button" class="btn" data-action="openTask" data-id="${esc6(nx.id)}">${t("nextAction")} ${ICON2.arrow}</button>` : ""}<button type="button" class="btn-line" data-action="exploreGoal" data-id="${task.goal}">${t("exploreMore")}</button></div></div>`;
+    h += `<div id="confirmed-result" class="result"><div class="sec-h"><h2>${t("result")}</h2>${demoBadge(o)}</div><div class="result-body">${esc7(task.body)}</div>
+<div class="actions">${nx && nx.id !== task.id && !nx.confirmedAt ? `<button type="button" class="btn" data-action="openTask" data-id="${esc7(nx.id)}">${t("nextAction")} ${ICON2.arrow}</button>` : ""}<button type="button" class="btn-line" data-action="exploreGoal" data-id="${task.goal}">${t("exploreMore")}</button></div></div>`;
   }
   return h + "</div></main>";
 }
@@ -5625,10 +6297,10 @@ Thank you.` : `안녕하세요.
 감사합니다.`;
 }
 function help() {
-  const opts = [...GOALS.map((g) => [g.id, pick(g.label)]), ["general", t("general")]].map(([id, l]) => `<option value="${id}"${S.help === id ? " selected" : ""}>${esc6(l)}</option>`).join("");
+  const opts = [...GOALS.map((g) => [g.id, pick(g.label)]), ["general", t("general")]].map(([id, l]) => `<option value="${id}"${S.help === id ? " selected" : ""}>${esc7(l)}</option>`).join("");
   return head(t("helpTitle"), t("help"), t("helpLead"), t("helpT2")) + `<div class="field field-inline"><label for="topic" class="field-label">${t("topic")}</label><select id="topic" class="select" data-action="topic">${opts}</select></div>
 <section class="sec"><div class="sec-h"><h2>${t("template")}</h2><button type="button" class="btn-line" data-action="copy">${t("copy")}</button></div>
-${S.copyMsg ? `<p class="notice${S.copyMsg === "copyFail" ? " error" : ""}" role="status">${t(S.copyMsg)}</p>` : ""}<pre class="result-body" id="tpl">${esc6(helpTemplate(S.help))}</pre></section>
+${S.copyMsg ? `<p class="notice${S.copyMsg === "copyFail" ? " error" : ""}" role="status">${t(S.copyMsg)}</p>` : ""}<pre class="result-body" id="tpl">${esc7(helpTemplate(S.help))}</pre></section>
 ${sec(t("official"), t("offSub"), officialList(S.help === "general" ? "none" : S.help))}
 ${sec(t("tools"), t("offSub"), `<p class="meta">${t("toolsLead")}</p>${toolRows()}`)}`;
 }
@@ -5636,12 +6308,12 @@ function profile() {
   const g = goalById(state.primaryGoal);
   const accSt = session.status();
   return head(t("profileTitle"), t("profile"), "", t("profileT2")) + renderAccountPanel(accSt, state.lang, { pendingBackup: !!pendingBackup && !!accSt.canConfirmBackup && pendingBackup.owner === ownerKey(), useRemote: !!pendingBackup?.useRemote }) + `<div class="settings">
-<section class="settings-group"><h2>${t("goal")}</h2><p>${g ? esc6(pick(g.label)) : t("none")}</p><button type="button" class="btn-line" data-action="changeGoal">${t("changeGoal")}</button></section>
+<section class="settings-group"><h2>${t("goal")}</h2><p>${g ? esc7(pick(g.label)) : t("none")}</p><button type="button" class="btn-line" data-action="changeGoal">${t("changeGoal")}</button></section>
 <section class="settings-group"><h2>${t("location")}</h2><p>${t(state.location || "unknown")}</p></section>
 <section class="settings-group"><h2>${t("lang")}</h2><p>${state.lang === "en" ? "English" : "한국어"}</p></section>
-<section class="settings-group"><h2>${t("storage")}</h2>${accSt.signedIn ? `<p>${state.lang === "en" ? "Syncs to your account. Please check the save status above." : "계정에 동기화합니다. 위의 저장 상태를 확인해 주세요."}</p>` : `<p>${t("storageText")}</p><button type="button" class="btn-line danger" data-action="clear">${t("clear")}</button>`}${STUDY_ON ? `<p>${t("studyStore")}</p>` : CHANNEL_ON ? `<p>${t("datesStore")}</p>` : ""}</section></div>`;
+<section class="settings-group"><h2>${t("storage")}</h2>${accSt.signedIn ? `<p>${state.lang === "en" ? "Syncs to your account. Please check the save status above." : "계정에 동기화합니다. 위의 저장 상태를 확인해 주세요."}</p>` : `<p>${t("storageText")}</p><button type="button" class="btn-line danger" data-action="clear">${t("clear")}</button>`}${STUDY_ON ? studyStore() === "tab" ? `<p>${t("studyStore")}</p>` : "" : CHANNEL_ON ? `<p>${t("datesStore")}</p>` : ""}</section>${STUDY_ON && accSt.signedIn ? renderStudyAccountSettings({ lang: state.lang, phase: studyAcct.snapshot().phase, consent: studyAcct.snapshot().consent, store: studyStore(), errorCode: studyAcct.snapshot().error?.code || null }) : ""}</div>`;
 }
-var studyView = () => ({ lang: state.lang, profile: studyProfile(), programs: STUDY_PROGRAMS, rules: rulesAt(RULES, /* @__PURE__ */ new Date()), now: /* @__PURE__ */ new Date() });
+var studyView = () => ({ lang: state.lang, profile: studyProfile(), programs: STUDY_PROGRAMS, rules: rulesAt(RULES, /* @__PURE__ */ new Date()), now: /* @__PURE__ */ new Date(), store: studyStore(), storeNote: studyStoreNote() });
 var condView = () => ({ ...studyView(), persisted: study.persisted(), text: S.studyText, errors: S.studyErrors });
 var DATE_NOTES = {
   full: ["다가오는 날이 서른 개라 더 넣을 수 없어요. 다가오는 날에서 하나를 뺀 뒤 넣어 주세요.", "Coming up already has 30 dates. Remove one first."],
@@ -5662,7 +6334,8 @@ var path = () => renderPath({ ...channelView(), docFull: S.docFull });
 var pathHtml = () => STUDY_ON ? renderPathCard(channelView()) : "";
 var univCompare = () => renderUnivCompare(studyView());
 var cond = () => renderCond(condView());
-var PAGES = { today, path, channels, post, univ, univDetail, univCompare, cond, explore, detail, prepare, editor, help, profile };
+var studyConsent = () => renderStudyConsent({ lang: state.lang, minor: S.consentMinor, guardian: S.consentGuardian, busy: S.consentBusy, error: S.consentError });
+var PAGES = { today, path, channels, post, univ, univDetail, univCompare, cond, explore, detail, prepare, editor, help, profile, studyConsent };
 var LOCKED_ACTIONS = ["pickGoal", "step2", "toggle", "finish", "skip", "prepareThis", "confirm", "body", "loc", "setLang", "changeGoal", "prepareJob", "saveJob", "removeJob"];
 function render(focus = true) {
   if (composingEl && root.contains(composingEl) && document.activeElement === composingEl) {
@@ -5672,6 +6345,7 @@ function render(focus = true) {
   }
   composingEl = null;
   syncStudyOwner();
+  syncStudyAccount();
   if (!STUDY_ON && (S.page === "univ" || UNIV_PAGES.includes(S.page))) S.page = "today";
   if (!CHANNEL_ON && (S.page === "channels" || S.page === "post")) S.page = "today";
   const accSt = session.status();
@@ -5863,7 +6537,7 @@ var ACT = {
       } else {
         S.dateNote = null;
         studyWrite(r.profile);
-        msg = study.persisted() ? accL("이 탭의 다가오는 날에 넣었어요.", "Added to Coming up in this tab.") : accL("이 브라우저에서는 저장할 수 없어 지금 화면에서만 기억해요.", "This browser cannot store it, so it is kept on this screen only.");
+        msg = studyStore() === "account" ? accL("다가오는 날에 넣었어요. 계정에 저장돼요.", "Added to Coming up. Saved to your account.") : study.persisted() ? accL("이 탭의 다가오는 날에 넣었어요.", "Added to Coming up in this tab.") : accL("이 브라우저에서는 저장할 수 없어 지금 화면에서만 기억해요.", "This browser cannot store it, so it is kept on this screen only.");
       }
     }
     render(false);
@@ -6159,7 +6833,7 @@ function studyInput(el) {
   else {
     const { [key]: _gone, ...rest } = S.studyErrors;
     S.studyErrors = rest;
-    studyWrite(setField(studyProfile(), key, v === null ? null : key === "fundsWon" ? v * 1e4 : v));
+    if (!studyLocked()) studyWrite(setField(studyProfile(), key, v === null ? null : key === "fundsWon" ? v * 1e4 : v));
   }
   const bad = !!S.studyErrors[key];
   if (bad) el.setAttribute("aria-invalid", "true");
@@ -6236,15 +6910,154 @@ var accL = (ko, en) => state.lang === "en" ? en : ko;
 var accOk = (r) => r !== false && r?.ok !== false;
 var accStamp = () => (/* @__PURE__ */ new Date()).toISOString().slice(0, 10);
 Object.assign(ACT, {
+  studyConsentOpen() {
+    S.consentReturn = S.page === "studyConsent" ? S.consentReturn : S.page;
+    S.consentMinor = null;
+    S.consentGuardian = false;
+    S.consentError = "";
+    go("studyConsent");
+  },
+  consentAge(el) {
+    if (S.consentBusy) return;
+    S.consentMinor = el.dataset.id === "minor";
+    if (!S.consentMinor) S.consentGuardian = false;
+    S.consentError = "";
+    render(false);
+    root.querySelector(`[data-action="consentAge"][data-id="${el.dataset.id}"]`)?.focus();
+  },
+  consentGuardian() {
+    if (S.consentBusy) return;
+    S.consentGuardian = !S.consentGuardian;
+    render(false);
+    root.querySelector('[data-action="consentGuardian"]')?.focus();
+  },
+  async consentSave() {
+    if (S.consentBusy || S.consentMinor === null || S.consentMinor && !S.consentGuardian) return;
+    S.consentBusy = true;
+    S.consentError = "";
+    render(false);
+    const id = studyAcctId, ok = await studyAcct.give({ profile: tabStudyProfile(), minor: S.consentMinor, lang: state.lang === "en" ? "en" : "ko" });
+    S.consentBusy = false;
+    if (ok === "exists" && id === studyAcctId) {
+      S.consentAsk = false;
+      studyCompared = null;
+      settleStudy(studyAcct.snapshot());
+      go(STUDY_PAGES.includes(S.consentReturn) || S.consentReturn === "profile" ? S.consentReturn : "today");
+      S.flash = accL("이 계정에는 이미 계정에 저장한 조건이 있어요. 그 조건을 이어서 써요.", "This account already has saved conditions. Continuing with them.");
+      render(false);
+      say(S.flash);
+      return;
+    }
+    if (ok !== true || id !== studyAcctId) {
+      S.consentError = accL("계정에 저장하지 못했어요. 조건은 이 탭에 그대로 있어요. 잠시 뒤 다시 시도해 주세요.", "Could not save to your account. Your conditions are still in this tab. Please try again later.");
+      render(false);
+      say(S.consentError);
+      return;
+    }
+    seenSet(id);
+    refusedSet(null);
+    S.consentRefused = false;
+    studyCompared = id;
+    study.clear();
+    study.setOwner(id);
+    S.consentAsk = false;
+    S.studyChoice = false;
+    const back = STUDY_PAGES.includes(S.consentReturn) || S.consentReturn === "profile" ? S.consentReturn : "today";
+    go(back);
+    S.flash = accL("계정에 저장했어요. 다른 기기에서도 이어서 볼 수 있어요.", "Saved to your account. You can continue on other devices.");
+    render(false);
+    say(S.flash);
+  },
+  consentRefuse() {
+    if (S.consentBusy) return;
+    S.consentRefused = true;
+    refusedSet(studyAcctId);
+    S.consentAsk = false;
+    if (S.page === "studyConsent") go(STUDY_PAGES.includes(S.consentReturn) || S.consentReturn === "profile" ? S.consentReturn : "today");
+    S.flash = accL("이 탭에만 둘게요. 내 정보에서 언제든 계정에 저장할 수 있어요.", "Kept in this tab only. You can save to your account any time on the Profile page.");
+    render(false);
+    say(S.flash);
+  },
+  async studyAccountDelete() {
+    if (!confirm(accL("계정에 저장한 「내 조건」 · 「다가오는 날」 · 고른 과정 · 서류 표시를 지우고 동의를 거둬요. 지울까요?", "Delete the conditions, upcoming dates, program and marks saved to your account and withdraw your consent?"))) return;
+    const ok = await studyAcct.remove();
+    if (ok) {
+      seenSet(null);
+      S.consentRefused = true;
+      refusedSet(studyAcctId);
+      S.studyChoice = false;
+      studyCompared = null;
+    }
+    S.flash = ok ? accL("계정의 유학 준비 자료를 지웠어요. 이제 넣는 조건은 이 탭에만 남아요.", "Deleted your study data from the account. Conditions you add now stay in this tab only.") : accL("지우지 못했어요. 잠시 뒤 다시 시도해 주세요.", "Could not delete. Please try again later.");
+    render(false);
+    say(S.flash);
+  },
+  async studyAccountRetry() {
+    await studyAcct.retry();
+    render(false);
+  },
+  studyUseAccount() {
+    study.clear();
+    if (studyAcctId) study.setOwner(studyAcctId);
+    S.studyChoice = false;
+    S.flash = accL("계정에 저장된 조건을 써요.", "Using the conditions saved to your account.");
+    render(false);
+    say(S.flash);
+  },
+  studyUseTab() {
+    const tabP = tabStudyProfile();
+    if (!hasStudyData(tabP)) {
+      ACT.studyUseAccount();
+      return;
+    }
+    const next = normalizeProfile({ ...tabP, v: 1 });
+    try {
+      studyAcct.write(next, () => next);
+    } catch {
+      return;
+    }
+    study.clear();
+    if (studyAcctId) study.setOwner(studyAcctId);
+    S.studyChoice = false;
+    S.flash = accL("이 탭의 조건으로 계정을 바꿨어요.", "Replaced your account conditions with this tab.");
+    render(false);
+    say(S.flash);
+  },
+  studyNoticeClose() {
+    studyAcct.clearNotice();
+    render(false);
+  },
+  async studyDraftAccount() {
+    await studyAcct.useAccount();
+    S.flash = accL("계정에 저장된 조건을 써요.", "Using the conditions saved to your account.");
+    render(false);
+    say(S.flash);
+  },
+  async studyDraftPick() {
+    const d = studyAcct.snapshot().localDrafts[0];
+    if (!d) return;
+    const ok = await studyAcct.pickDraft(d.id);
+    S.flash = ok ? accL("남은 변경을 계정에 올려요.", "Sending the unsent changes to your account.") : accL("남은 변경을 찾지 못했어요. 계정 것을 써요.", "Could not find the unsent changes. Using the account.");
+    render(false);
+    say(S.flash);
+  },
   accountSignIn: async () => {
     await session.signIn();
   },
   accountSignOut: async () => {
+    if (studyAcct.snapshot().pending) {
+      await studyAcct.retry();
+      if (studyAcct.snapshot().pending) {
+        if (!confirm(accL("계정에 아직 올라가지 않은 조건 변경이 있어요. 로그아웃하면 이 변경은 지워져요. 로그아웃할까요?", "Some condition changes are not in your account yet. Signing out deletes them. Sign out?"))) return;
+      }
+    }
+    const studyId = studyAcctId;
     const r = await session.signOut();
     if (!accOk(r)) {
       render(false);
       return;
     }
+    studyAcct.discardLocal(studyId);
     S.flash = accL("로그아웃했습니다.", "Signed out.");
     render(false);
     say(S.flash);
@@ -6380,16 +7193,23 @@ Object.assign(ACT, {
 root.addEventListener("click", (e) => {
   const el = e.target.closest("button[data-action]");
   if (!el || el.disabled || !ACT[el.dataset.action]) return;
-  const fail4 = (err) => {
+  if (STUDY_WRITE_ACTS.has(el.dataset.action) && studyLocked()) {
+    const m = studyStoreNote();
+    S.flash = esc7(m);
+    render(false);
+    say(m);
+    return;
+  }
+  const fail5 = (err) => {
     const m = getAccountErrorMessage(err, state.lang);
-    S.flash = esc6(m);
+    S.flash = esc7(m);
     render(false);
     say(m);
   };
   try {
-    Promise.resolve(ACT[el.dataset.action](el)).catch(fail4);
+    Promise.resolve(ACT[el.dataset.action](el)).catch(fail5);
   } catch (err) {
-    fail4(err);
+    fail5(err);
   }
 });
 root.addEventListener("toggle", (e) => {
@@ -6439,7 +7259,7 @@ root.addEventListener("input", (e) => {
       studyInput(e.target);
     } catch (err) {
       const m = getAccountErrorMessage(err, state.lang);
-      S.flash = esc6(m);
+      S.flash = esc7(m);
       render(false);
       say(m);
     }
@@ -6525,7 +7345,7 @@ S.draft = newDraft();
 render(false);
 void session.init().catch((err) => {
   const m = getAccountErrorMessage(err, state.lang);
-  S.flash = esc6(m);
+  S.flash = esc7(m);
   render(false);
   say(m);
 }).finally(() => {
