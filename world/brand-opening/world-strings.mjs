@@ -137,6 +137,14 @@ export default {
  'home.short.reviewLabel':{ko:'나의 복습 일정 보기',en:'See my review schedule',mn:'Давтлагын хуваариа харах'},
  'home.short.schedule':{ko:'일정',en:'Schedule',mn:'Хуваарь'},
  'home.short.count':{ko:'{n}개',en:'{n}',mn:'{n}'},
+ // 새 길 홈의 세 줄(Atlas 재설계 단계 4-3 — 단계4_계획 §20-8): 부품 이름, 칸 이름(복습은 home.short.review), 연 칸 표시, 빈 줄 문장, 확인 중
+ // (잠근 단추 · 빈 줄 · 알림이 같은 말). 영어 · 몽골어는 세 겹 대조(현지어대조 · 몽골어대조 · 원문을 안 본 직역)를 지난 판이다.
+ 'home.today.label':{ko:'오늘 할 공부',en:'Today’s study plan',mn:'Өнөөдрийн хичээл'},
+ 'home.today.kind.new':{ko:'오늘 공부',en:'Learn',mn:'Суралцах'},
+ 'home.today.kind.check':{ko:'점검',en:'Skill check',mn:'Шалгах'},
+ 'home.today.opened':{ko:'오늘 열었어요',en:'Opened today',mn:'Өнөөдөр нээсэн'},
+ 'home.today.empty.done':{ko:'생활 팩의 레슨을 모두 만났어요. 다시 가고 싶은 곳을 골라요.',en:'You’ve done every lesson in the daily-life packs. Pick a place you’d like to go back to.',mn:'Өдөр тутмын багцын бүх хичээлийг хийлээ. Дахин очмоор газраа сонгоорой.'},
+ 'home.today.checking':{ko:'오늘 할 공부를 확인하고 있어요',en:'Loading today’s study plan',mn:'Өнөөдрийн хичээлийг шалгаж байна'},
  'home.short.stories':{ko:'이야기',en:'Stories',mn:'Түүх'},
  'home.short.storiesLabel':{ko:'까몽 몽글 마린 이야기 모아 보기',en:'See the stories of Kkamong, Mongle and Marin',mn:'Камон, Монгль, Марин нарын түүхийг харах'},
  'home.memory.recovery':{ko:'학습 기록 저장 확인하기',en:'Check saved learning records',mn:'Сургалтын мэдээллийн хадгалалтыг шалгах'},
@@ -222,6 +230,8 @@ export default {
  'plan.resume':{ko:'{title} · 이어 하기',en:'{title} · continue',mn:'{title} · үргэлжлүүлэх'},
  'plan.review':{ko:'{title} · 새 상황 복습',en:'{title} · review in a new situation',mn:'{title} · шинэ нөхцөл байдалд давтах'},
  'plan.resumeReview':{ko:'하던 새 상황 복습 · 이어 하기',en:'Continue your review',mn:'Эхэлсэн давтлагаа үргэлжлүүлэх'},
+ // 새 길 홈의 생활 복습 하나가 여러 레슨의 복습을 묶을 때의 이름(4-3 — 레슨이 하나면 plan.review 「제목 · 새 상황 복습」).
+ 'plan.reviewLife':{ko:'새 상황 복습',en:'Review in new situations',mn:'Шинэ нөхцөл байдалд давтах'},
  'plan.practice':{ko:'읽기 짧은 연습 · {skill}',en:'Short reading practice · {skill}',mn:'Уншлагын богино дасгал · {skill}'},
  'plan.check':{ko:'짧은 진단 · 다시 확인',en:'Quick check · check again',mn:'Богино шалгалт · дахин шалгах'},
 
@@ -680,6 +690,38 @@ export default {
  'practice.misses':{ko:'틀린 문항 다시 보기',en:'Look again at the ones you missed',mn:'Алдсан асуултаа дахин харах'},
  'practice.again':{ko:'새 문항 {n}개 더 하기',en:{one:'Try 1 more new question',other:'Try {n} more new questions'},mn:'Дахиад {n} шинэ асуулт хийх'},
  'practice.shortage':{ko:'이 항목의 새 문항은 여기까지예요. 다른 항목을 연습하거나, 새 문항이 생기면 다시 열려요.',en:'That’s all the new questions for this skill for now. Practice another skill, or come back when new ones arrive.',mn:'Энэ чадварын шинэ асуулт одоогоор ингээд дууслаа. Өөр чадвараа давтаж болно, шинэ асуулт нэмэгдвэл дахин нээгдэнэ.'},
+ // 짧은 연습의 새 판(Atlas 재설계 단계 4-1, 기능 atlasNext — 리허설에서만 켠다). 이유 한 줄 · 끝난 까닭은 엔진 문장 표(Vellum)가 내고, 여기는 화면의 조작 글만.
+ // 몽골어는 11-12 검문(tools/몽골어대조.js --구독 — 문법 정상 · 맞춤법 의심 0 · 두 직역이 원문 뜻과 같음)을 거쳤다.
+ // Vellum 몽골어와 같이 이름에는 격 어미를 붙이지 않고 「…: «이름».」 꼴, 「말」은 「үг хэллэг」로 맞췄다. 마지막 겹(교정)은 4-1 화면 검수.
+ 'practice.unknown':{ko:'모르겠어요',en:'I don’t know',mn:'Мэдэхгүй байна'},
+ // 끈질긴 단위 힌트 — 읽기 꼴과 듣기 꼴(듣기 문항은 듣기 전 화면에 찾아볼 글이 없다, 11-12 화면 최종 F2). 이름(한국어 학습 대상)은
+ // 한국어 화면만 낫표, 영어 ‘…’ · 몽골어 «…» — 홈 추천 이유 등 표의 이웃 줄과 같은 꼴(F5). 영어 「new expressions」는 B4.
+ 'practice.next.cue':{ko:'자꾸 놓치는 말 「{name}」 — 문제 속에서 먼저 찾아보세요.',en:'You keep missing ‘{name}’ — look for it in this question first.',mn:'Байнга алддаг үг хэллэг: «{name}». Эхлээд асуулт дотроос хайж олоорой.'},
+ 'practice.next.cue.listen':{ko:'자꾸 놓치는 말 「{name}」 — 들으면서 먼저 찾아보세요.',en:'You keep missing ‘{name}’ — listen out for it first.',mn:'Байнга алддаг үг хэллэг: «{name}». Анхааралтай сонсож олоорой.'},
+ 'practice.next.limited':{ko:'이번 판의 새 말은 여기까지예요.',en:'That’s all the new expressions for this round.',mn:'Энэ удаагийн шинэ үг хэллэг үүгээр дууслаа.'},
+ // 연습 도중 학습 기록의 판을 다시 정해(동의를 끄고 켬 · 다른 기기에서 비움 · 새 길을 잠시 닫음) 연습을 닫을 때(단계 4 계정 길 — 단계4_계획 §18-5-5).
+ // 몽골어 11-13 검문(tools/몽골어대조.js --구독 — 문법 정상 · 맞춤법 의심 0 · 직역 「학습 등록 설정이 변경되어 이 연습을 닫았다」가 원문 뜻과 같음).
+ 'practice.next.changed':{ko:'학습 기록 설정이 바뀌어서 이번 연습을 닫았어요. 다시 시작해 주세요.',en:'Your learning record settings changed, so this practice was closed. Please start again.',mn:'Таны сургалтын бүртгэлийн тохиргоо өөрчлөгдсөн тул энэ дасгалыг хаалаа. Дахин эхлүүлнэ үү.'},
+ // 새 길 생활 화면(4-2 — 단계4_계획 §19-1 ①): 판이 바뀌어 생활 코치가 닫히면 열린 레슨 · 복습 화면을 이 한 줄과 함께 닫는다(진도는 남아 다시 열면 이어진다).
+ 'life.next.changed':{ko:'학습 기록 설정이 바뀌어서 이 화면을 닫았어요. 하던 자리는 그대로 남아요.',en:'Your learning record settings changed, so this screen was closed. Your place is saved.',mn:'Таны сургалтын бүртгэлийн тохиргоо өөрчлөгдсөн тул энэ дэлгэцийг хаалаа. Зогссон хэсэг тань хадгалагдсан.'},
+ 'practice.next.more':{ko:'새 말 더 배우기',en:'Learn more new expressions',mn:'Шинэ үг хэллэг нэмж сурах'},
+ // 다음 판 단추 — n은 다음 판의 길이(「최대」, 문항 화면의 진행 글과 같은 수). 다음 판은 처음 보는 문항 말고도 놓친 말의 「다시」와 채우기를
+ // 내므로 남은 처음 보는 문항 수로 약속하지 않는다(4-1 화면 다시 FA3).
+ 'practice.next.again':{ko:'최대 {n}문항 더 하기',en:{one:'Practice up to 1 more',other:'Practice up to {n} more'},mn:'Дахиад ихдээ {n} асуултад хариулах'},
+ // idle로 끝난 판(돌아온 것을 냈고 처음 보는 문항도 다 씀) — 엔진의 idle 문장(「가볍게 이어가요」) 대신(A1). 몽골어는 검문을 지난 두 문장
+ // (Vellum idle 첫 문장 · practice.shortage 첫 문장)을 이었다.
+ 'practice.next.idle':{ko:'오늘 돌아온 말은 다 만났어요. 이 항목의 새 문항도 지금은 여기까지예요.',en:'You’ve covered everything due for review today, and that’s all the new questions for this skill for now.',mn:'Өнөөдөр давтах ёстой бүхнээ давтлаа. Энэ чадварын шинэ асуулт одоогоор ингээд дууслаа.'},
+ // 새 판 판 끝의 답 칸 넷 — 내 위치 근거가 되는 「새 문항 혼자 맞힘」과 그 밖의 맞힘(「다시」로 돌아온 문항 · 힌트 · 다시 듣기 · 같은 지문 둘째
+ // 문항을 맞힘), 틀림, 건너뜀(A7 · B1 — 처음 이름 「혼자 맞힘 · 다시 만나 맞힘」은 새 문항 조건과 도움을 가리지 못했다). 이 기기에 저장하지 못한 답 한 줄.
+ // 이름과 수 사이는 줄 바꾸지 않는 빈칸(U+00A0) — 좁은 화면에서 수가 다음 칸 이름 앞으로 떨어지지 않게(4-1 화면 최종 F3).
+ // 구분점 앞 빈칸도 U+00A0 — 「·」는 앞 칸에 붙고 줄은 「·」 뒤에서만 바뀐다(다시 FA4: 마지막 칸이 한 낱말이 되자 text-wrap:pretty가
+ // 외톨이를 피하려고 앞 구분점까지 끌어내려 둘째 줄이 「·」로 시작했다).
+ 'practice.next.summary':{ko:'새 문항 혼자 맞힘 {right} · 그 밖의 맞힘 {again} · 틀림 {wrong} · 건너뜀 {skipped}',en:'New, right on my own {right} · other right answers {again} · wrong {wrong} · skipped {skipped}',mn:'Шинэ асуултад өөрөө зөв хариулсан {right} · бусад зөв хариулт {again} · буруу {wrong} · алгассан {skipped}'},
+ // 문항 0으로 끝난 판(none · 엔진 문장이 없는 하루 상한 · 끈질긴 몫)의 사실 한 줄 — 빈 화면으로 두지 않는다(4-1 화면 최종 P1 ③).
+ 'practice.next.none':{ko:'지금은 이 항목에서 낼 문항이 없어요. 내 위치에서 다른 항목을 골라 보세요.',en:'There’s nothing to practice in this skill right now. Pick another skill from Where I stand.',mn:'Энэ чадварт одоогоор хариулах асуулт алга. «Миний ахиц» хэсгээс өөр чадвар сонгоорой.'},
+ // 진행 글 — 판 길이는 「최대」다(엔진이 낼 것이 없으면 먼저 끝난다, F4). 몽골어 검문 정상.
+ 'practice.next.progress':{ko:'{index}번째 문항 · 최대 {total}문항',en:'Question {index} · up to {total}',mn:'{index}-р асуулт · ихдээ {total} асуулт'},
+ 'practice.next.unsaved':{ko:'답 {n}개는 이 기기에 저장하지 못해 내 위치에 반영되지 않아요.',en:{one:'1 answer couldn’t be saved on this device, so it won’t count toward Where I stand.',other:'{n} answers couldn’t be saved on this device, so they won’t count toward Where I stand.'},mn:'{n} хариултыг энэ төхөөрөмжид хадгалж чадаагүй тул «Миний ахиц»-д тооцогдохгүй.'},
  'practice.home':{ko:'홈으로',en:'Back home',mn:'Нүүр хуудас руу'},
  // ── 10-22 연습 한 판의 응답(WORLD 학습자 응답 설계 §3): 끝 화면의 묻기 줄 · 「내 계정」의 「내가 남긴 응답」 ──
  // 응답 이름 넷의 영어는 처리방침 #synk-id 문장(Good / Not for me / Too much / I want more)과 같아야 한다.
@@ -894,6 +936,10 @@ export default {
  'life.when.minutes':{ko:'{n}분 뒤',en:{one:'in 1 min',other:'in {n} min'},mn:'{n} минутын дараа'},
  'life.when.today':{ko:'오늘 {time}',en:'today at {time}',mn:'өнөөдөр {time}'},
  'life.when.tomorrow':{ko:'내일 {time}',en:'tomorrow at {time}',mn:'маргааш {time}'},
+ // 새 길(4-2 — §19-1 ⑤ F)의 「다음 돌아올 때」는 엔진의 예상이라 날까지만, 예상으로 — 위 두 문장의 {date} 자리에 들어간다(분 · 시각은 말하지 않는다).
+ 'life.when.todayDay':{ko:'오늘 중',en:'later today',mn:'өнөөдөртөө'},
+ 'life.when.tomorrowDay':{ko:'내일쯤',en:'tomorrow',mn:'маргааш'},
+ 'life.when.aroundDay':{ko:'{date}쯤',en:'around {date}',mn:'{date} орчим'},
  'life.comingBack':{ko:'곧 돌아올 표현',en:'Coming back soon',mn:'Удахгүй дахин гарах хэллэгүүд'},
  'life.ago.days':{ko:'{n}일 전',en:{one:'1 day ago',other:'{n} days ago'},mn:'{n} өдрийн өмнө'},
  'life.rest':{ko:'한 시간 넘게 했어요. 잠깐 쉬어도 돼요. 하던 자리는 그대로 남아요.',en:'You’ve been at it for over an hour. It’s fine to take a break. Your place is saved.',mn:'Та нэг цаг гаруй хичээллэлээ. Түр амарч болно. Зогссон хэсэг тань хэвээр үлдэнэ.'},
@@ -988,6 +1034,8 @@ export default {
  'life.reviewSubFirst':{ko:'먼저 새 장면 {n}개에서 다시 골라요.',en:{one:'First, you choose again in a new situation.',other:'First, you choose again in {n} new situations.'},mn:'Эхлээд {n} шинэ нөхцөл байдалд тохирох хэллэгээ дахин сонгоно.'},
  'life.reviewSubOpens':{ko:'{date}에 열려요.',en:'Opens {date}.',mn:'Нээгдэх хугацаа: {date}.'},
  'life.reviewSubNone':{ko:'레슨을 하나 마치면 복습할 표현이 생겨요.',en:'Finish a lesson and you’ll have expressions to review.',mn:'Нэг хичээл дуусгавал давтах хэллэгтэй болно.'},
+ // 새 길(4-2 — §19-1 ⑤ M7): 판정을 넣었는데 아직 확인 중(생활 코치를 여는 중 · 이 기기에 요약이 아직 없음) — 수 · 날짜를 그리지 않는 동안의 글.
+ 'life.reviewChecking':{ko:'복습할 표현을 확인하고 있어요.',en:'Checking which expressions to review.',mn:'Давтах хэллэгүүдийг шалгаж байна.'},
  'life.reviewStart':{ko:'복습 시작하기',en:'Start review',mn:'Давтлага эхлэх'},
  'life.doNextLesson':{ko:'다음 레슨 하기',en:'Do the next lesson',mn:'Дараагийн хичээлийг хийх'},
  'life.reviewResultTitle':{ko:'복습 결과',en:'Review results',mn:'Давтлагын үр дүн'},
@@ -998,6 +1046,8 @@ export default {
  'life.reviewRemembered':{ko:'잘 기억했어요',en:'Well remembered',mn:'Сайн санажээ'},
  'life.reviewSpacing':{ko:'잘 기억한 표현은 더 오래 있다가 돌아와요.',en:'Expressions you remember well come back after a longer break.',mn:'Сайн санасан хэллэг илүү удаан хугацааны дараа дахин гарч ирнэ.'},
  'life.reviewSoon':{ko:'조금 뒤 다시 나와요',en:'Back soon',mn:'Удахгүй дахин гарч ирнэ'},
+ // 새 길(4-2 — §19-1 ④ M4): 혼자 맞혔어도 그 표현이 하루 안에 다시 돌아오면(같은 자리에서 놓친 적이 있는 등) 「잘 기억했어요」 대신 이 글.
+ 'life.reviewAgainSoon':{ko:'하루 안에 한 번 더 만나요',en:'Once more within a day',mn:'Нэг өдрийн дотор дахин давтана'},
  'life.reviewHeader':{ko:'{pack} · 새 장면 복습',en:'{pack} · review in a new situation',mn:'{pack} · шинэ нөхцөл байдалд давтах'},
  'life.reviewOrigin':{ko:'{origin} 배운 표현',en:'Learned {origin}',mn:'{origin} сурсан хэллэг'},
  'life.everydayKorean':{ko:'생활 한국어',en:'Everyday Korean',mn:'Өдөр тутмын солонгос хэл'},
@@ -1551,3 +1601,43 @@ export default {
  'speaking.rp.selfNow':{ko:'지금은 자동 대답을 쓸 수 없어요. 예시 문장과 견줘 보고 다음 말로 가요.',en:'Automatic replies aren’t available right now. Compare with the sample sentence, then go to the next line.',mn:'Одоогоор автомат хариулт ашиглах боломжгүй. Жишээ өгүүлбэртэй харьцуулаад ажилтны дараагийн үгийг сонсоорой.'},
  'speaking.rp.textHelp':{ko:'글로 본 차례는 「도움을 받아」로 남아요.',en:'Turns where you showed the text are saved as “with help”.',mn:'Бичвэрээр харсан ээлжийг «тусламжтайгаар» гэж хадгална.'}
 };
+// 생활 상황 이름(Atlas 재설계 단계 4-4b — docs/_ops/qa/atlas-redesign-20261110/단계4_계획.md §21-6): 「내 성향」에서 관심을 고른 학생의 레슨 이유
+// (goal.match — 「더 배우고 싶다고 알려 준 「주문」이에요」)가 이 이름을 쓴다. 한국어는 Strata 지도의 label_ko를 옮긴 것이다(같은지 시험이 본다 —
+// qa/atlas-next-plan.test.mjs). 영어 · 몽골어는 그 문장이 화면에 나갈 때 현지어 세 겹 대조를 거쳐 들인다(리디자인 화면 글 묶음 — §21-12). 그전까지
+// 이름 함수는 한국어 화면에서만 이 이름을 준다(Vellum은 언어를 물러서지 않으므로 영어 · 몽골어에서는 관심 문장을 짓지 않는다). 그래서 세 언어가
+// 다 있어야 하는 1판 표(위의 기본 내보내기) 밖에 둔다.
+export const SITUATIONS_KO=Object.freeze({
+ 'sit-people-greeting':'안부',
+ 'sit-travel-order':'주문',
+ 'sit-travel-shopping':'쇼핑',
+ 'sit-travel-directions':'길 묻기',
+ 'sit-travel-transport':'교통',
+ 'sit-people-messenger':'영상통화·메신저',
+ 'sit-career-schedule':'일정 조율',
+});
+// 「나」 칸(Atlas 재설계 단계 4-5 — docs/_ops/qa/atlas-redesign-20261110/단계4_계획.md §22-6)의 화면 글. 「내 계정」 시트의 「내가 남긴 응답」 뒤에 붙는다.
+// 새 길 홈 코치가 엔진 판일 때만 서고, 스위치(atlasNext)가 꺼져 있는 동안은 아무 학생에게도 보이지 않는다. 글은 화면 검수에서 정하고(§22-4 「글은
+// 화면 검수에서 정한다」), 영어 · 몽골어는 켜기 전(4-8)에 현지어 세 겹 대조를 거쳐 들인다. 그전까지 meText(world-lang.mjs)는 한국어 화면에서만
+// 이 글을 주고, 셸은 글이 없으면 칸을 그리지 않는다. 그래서 세 언어가 다 있어야 하는 1판 표(위의 기본 내보내기) 밖에 둔다.
+export const ME_KO=Object.freeze({
+ 'me.title':'나의 말',
+ 'me.note':'연습에서 만난 말을 지금 상태로 나눠 보여 줘요. 이름이 없는 말은 세지 않아요.',
+ 'me.shaky':'흔들리는 말 {n}개',
+ 'me.clear':'또렷한 말 {n}개',
+ 'me.said':'내가 안다고 한 말 {n}개',
+ 'me.empty':'아직 나눠 보여 줄 말이 없어요.',
+ 'me.known':'이미 알아요',
+ 'me.knownLabel':'「{label}」 이미 알아요',
+ 'me.relearn':'다시 배울래요',
+ 'me.relearnLabel':'「{label}」 다시 배울래요',
+ 'me.undo':'되돌리기',
+ 'me.undoLabel':'「{label}」 다시 배우기를 되돌리기',
+ 'me.toldFailed':'지금은 적지 못했어요. 잠시 뒤 다시 해 주세요.',
+ 'me.clearButton':'연습 기록 비우기',
+ 'me.clearAsk':'연습 기록을 비울까요? 지금까지의 연습 기록이 지워지고 처음부터 다시 시작해요. 학습 목표, 레슨 진도, 한글 진도와 화면 설정은 그대로예요. 선생님께 낸 숙제, 수업에서 한 연습, 첫걸음 점수는 선생님 화면에 남아요.',
+ 'me.clearDone':'연습 기록을 비웠어요.',
+ 'me.clearPartial':'연습 기록을 비웠어요. 이 기기의 옛 기록 일부는 다음에 마저 비워요.',
+ 'me.clearUnsent':'아직 보내지 못한 기록이 있어 지금은 비우지 못했어요.',
+ 'me.clearSkippedAsk':'서버가 아직 받지 못한 기록이 {n}개 있어요. 지금 비우면 이 기록도 지워지고, 숙제 답이라면 선생님께도 가지 않아요. 그래도 비울까요?',
+ 'me.clearFailed':'지금은 비우지 못했어요. 잠시 뒤 다시 해 주세요.',
+});
