@@ -2,9 +2,9 @@
   "schemaVersion": 1,
   "product": "platform",
   "channel": "preview",
-  "version": "0.5.5",
-  "releaseId": "platform-preview-0.5.5",
-  "buildId": "20261122.2",
+  "version": "0.5.6",
+  "releaseId": "platform-preview-0.5.6",
+  "buildId": "20261122.3",
   "manifestUrl": "https://synk.im/desktop/releases/preview.json",
   "baselines": [
     {
@@ -63,7 +63,7 @@
     }
   ],
   "electronVersion": "44.10.0",
-  "sourceHash": "0ec249289a1fb247bcdb04510cf66f5f16544cc9235ae130c63546e23e4747d1",
+  "sourceHash": "52bf5fe91de97d4be7744cd65047f1668498568d32f75f454565207b17652be8",
   "sourceFiles": [
     {
       "path": "assets/launcher/button.webp",
@@ -657,8 +657,8 @@
     },
     {
       "path": "src/main.cjs",
-      "bytes": 114276,
-      "sha256": "5b246acb2ee88407701beb2b5fd874ad54898fdb44d70d7480adfce1648bb9e1"
+      "bytes": 114656,
+      "sha256": "c27dc24d49bd48af7fb24169ef65e57ca5cb6ac669594df113ce7e443d5312cb"
     },
     {
       "path": "src/messenger-teacher.cjs",
