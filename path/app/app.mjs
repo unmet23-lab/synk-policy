@@ -1906,10 +1906,10 @@ function createPathDocument(lang = "ko") {
   return { schema: PATH_DOCUMENT_SCHEMA, version: PATH_DOCUMENT_VERSION, state: createInitialState(lang), savedJobs: [] };
 }
 function removeSavedJob(raw, id) {
-  const doc = validatePathDocument(raw);
-  if (doc.state.tasks.some((task) => task.sourceId === id)) fail("JOB_IN_USE");
-  doc.savedJobs = doc.savedJobs.filter((job) => job.id !== id);
-  return doc;
+  const doc2 = validatePathDocument(raw);
+  if (doc2.state.tasks.some((task) => task.sourceId === id)) fail("JOB_IN_USE");
+  doc2.savedJobs = doc2.savedJobs.filter((job) => job.id !== id);
+  return doc2;
 }
 
 // experiences/path-app/account.mjs
@@ -1935,8 +1935,8 @@ function browserLang() {
   }
 }
 function validateDoc(raw) {
-  const doc = validatePathDocument(raw);
-  return clone(doc);
+  const doc2 = validatePathDocument(raw);
+  return clone(doc2);
 }
 function tryValidate(raw) {
   try {
@@ -1982,11 +1982,11 @@ function createPathSession(options = {}) {
       return { ok: false, error };
     }
   }
-  function writeGuest(doc) {
+  function writeGuest(doc2) {
     if (guest.blocked) return false;
     try {
       if (!storage) throw fault2("LOCAL_STORAGE_UNAVAILABLE", "storage unavailable");
-      const raw = JSON.stringify(doc);
+      const raw = JSON.stringify(doc2);
       storage.setItem(GUEST_KEY, raw);
       if (storage.getItem(GUEST_KEY) !== raw) throw fault2("LOCAL_STORAGE_UNAVAILABLE", "storage verify failed");
       guest.raw = raw;
@@ -2019,9 +2019,9 @@ function createPathSession(options = {}) {
       } catch {
         parsed = void 0;
       }
-      const doc = parsed === void 0 ? null : tryValidate(parsed);
-      if (doc) {
-        guest.doc = doc;
+      const doc2 = parsed === void 0 ? null : tryValidate(parsed);
+      if (doc2) {
+        guest.doc = doc2;
         return;
       }
       guest.blocked = true;
@@ -2172,10 +2172,10 @@ function createPathSession(options = {}) {
       storage,
       onState: (state2) => {
         if (mode !== "account" || disposed) return;
-        const doc = state2 == null ? null : tryValidate(state2);
-        if (!doc) return;
-        if (!accountDoc || !same(doc, accountDoc)) bumpDoc();
-        accountDoc = doc;
+        const doc2 = state2 == null ? null : tryValidate(state2);
+        if (!doc2) return;
+        if (!accountDoc || !same(doc2, accountDoc)) bumpDoc();
+        accountDoc = doc2;
         emitDocument();
       },
       onStatus: (status) => {
@@ -2338,9 +2338,9 @@ function createPathSession(options = {}) {
       } catch {
         parsed = void 0;
       }
-      const doc = parsed === void 0 ? null : tryValidate(parsed);
-      if (doc) {
-        guest.doc = doc;
+      const doc2 = parsed === void 0 ? null : tryValidate(parsed);
+      if (doc2) {
+        guest.doc = doc2;
         guest.raw = stored.value;
       }
     }
@@ -2358,19 +2358,19 @@ function createPathSession(options = {}) {
     if (importing) throw fault2("ACCOUNT_BUSY", "가져오는 중이에요.");
   }
   function commit2(nextDoc) {
-    const doc = validateDoc(nextDoc);
-    if (same(doc, currentDoc())) return false;
+    const doc2 = validateDoc(nextDoc);
+    if (same(doc2, currentDoc())) return false;
     if (mode === "guest") {
-      guest.doc = doc;
-      writeGuest(doc);
+      guest.doc = doc2;
+      writeGuest(doc2);
       emitAll();
       if (guest.writeFailed) throw fault2("LOCAL_STORAGE_UNAVAILABLE", "변경은 화면에만 남아 있고 이 기기에 저장되지 않았어요.", { retryable: true });
       return true;
     }
-    const changed = sync.change(doc);
+    const changed = sync.change(doc2);
     if (changed) {
       bumpDoc();
-      accountDoc = doc;
+      accountDoc = doc2;
       emitDocument();
     }
     emitStatus();
@@ -2429,11 +2429,11 @@ function createPathSession(options = {}) {
     importing = true;
     emitStatus();
     try {
-      const doc = validateDoc(guest.doc);
-      const changed = sync.change(doc);
+      const doc2 = validateDoc(guest.doc);
+      const changed = sync.change(doc2);
       if (!changed || epoch !== openEpoch) return false;
       bumpDoc();
-      accountDoc = doc;
+      accountDoc = doc2;
       emitDocument();
       const ok = await sync.flush();
       if (epoch !== openEpoch || mode !== "account") return false;
@@ -3639,17 +3639,20 @@ var MAX_FUNDS_WON = 2e8;
 var MAX_COMPARE = 3;
 var MAX_DATES = 30;
 var MAX_CHANNELS_OFF = 10;
+var MAX_DOCS = 60;
 var isObj3 = (v) => v !== null && typeof v === "object" && !Array.isArray(v);
 var intIn = (v, min, max) => Number.isInteger(v) && v >= min && v <= max;
 var ID_RE3 = /^[a-z0-9][a-z0-9-]{0,63}$/;
 var DATE_ID_RE = /^[a-z0-9][a-z0-9-]{0,79}$/;
 var isDay = (v) => typeof v === "string" && /^\d{4}-\d{2}-\d{2}$/.test(v) && !Number.isNaN(Date.parse(v + "T00:00:00Z"));
+var isStamp = (v) => typeof v === "string" && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,3})?Z$/.test(v) && Number.isFinite(Date.parse(v));
+var cleanDoc = (d) => isObj3(d) && typeof d.id === "string" && ID_RE3.test(d.id) && isStamp(d.doneAt) ? { id: d.id, doneAt: d.doneAt } : null;
 var cleanDate = (d) => isObj3(d) && typeof d.id === "string" && DATE_ID_RE.test(d.id) && isDay(d.start) && isDay(d.end) && d.end >= d.start ? { id: d.id, start: d.start, end: d.end } : null;
 var GUEST_OWNER = "guest";
 var OWNER_RE = /^[A-Za-z0-9][A-Za-z0-9_.:@-]{0,127}$/;
 var ownerOf = (v) => typeof v === "string" && OWNER_RE.test(v) ? v : null;
 function createProfile() {
-  return { v: STUDY_VERSION, topik: null, gradePct: null, fundsWon: null, education: null, compare: [], dates: [], channelsOff: [] };
+  return { v: STUDY_VERSION, topik: null, gradePct: null, fundsWon: null, education: null, compare: [], dates: [], channelsOff: [], target: null, docs: [] };
 }
 function normalizeProfile(raw) {
   const out = createProfile();
@@ -3667,6 +3670,11 @@ function normalizeProfile(raw) {
   }
   if (Array.isArray(raw.channelsOff)) for (const id of raw.channelsOff) {
     if (typeof id === "string" && ID_RE3.test(id) && !out.channelsOff.includes(id) && out.channelsOff.length < MAX_CHANNELS_OFF) out.channelsOff.push(id);
+  }
+  if (typeof raw.target === "string" && ID_RE3.test(raw.target)) out.target = raw.target;
+  if (Array.isArray(raw.docs)) for (const d of raw.docs) {
+    const c = cleanDoc(d);
+    if (c && !out.docs.some((x) => x.id === c.id) && out.docs.length < MAX_DOCS) out.docs.push(c);
   }
   return out;
 }
@@ -3726,6 +3734,34 @@ function toggleChannel(profile2, id) {
   else if (p.channelsOff.length < MAX_CHANNELS_OFF) p.channelsOff.push(id);
   return p;
 }
+function setTarget(profile2, id, keep = null) {
+  const p = normalizeProfile(profile2);
+  if (id === null) {
+    p.target = null;
+    return { profile: p, dropped: 0 };
+  }
+  if (typeof id !== "string" || !ID_RE3.test(id)) throw new RangeError("target");
+  let dropped = 0;
+  if (p.target !== id && Array.isArray(keep)) {
+    const before = p.docs.length;
+    p.docs = p.docs.filter((d) => keep.includes(d.id));
+    dropped = before - p.docs.length;
+  }
+  p.target = id;
+  return { profile: p, dropped };
+}
+function toggleDoc(profile2, id, now = /* @__PURE__ */ new Date()) {
+  const p = normalizeProfile(profile2);
+  if (typeof id !== "string" || !ID_RE3.test(id)) throw new RangeError("doc");
+  if (p.docs.some((d) => d.id === id)) {
+    p.docs = p.docs.filter((d) => d.id !== id);
+    return { profile: p, on: false, full: false };
+  }
+  if (p.docs.length >= MAX_DOCS) return { profile: p, on: false, full: true };
+  const at = (now instanceof Date ? now : new Date(now)).toISOString();
+  p.docs.push({ id, doneAt: at });
+  return { profile: p, on: true, full: false };
+}
 function isEmptyProfile(profile2) {
   const p = normalizeProfile(profile2);
   return p.topik === null && p.gradePct === null && p.fundsWon === null && p.education === null;
@@ -3751,7 +3787,7 @@ function createProfileStore(storage) {
   } catch {
     persisted = false;
   }
-  const hasData = () => !isEmptyProfile(profile2) || profile2.compare.length > 0 || profile2.dates.length > 0 || profile2.channelsOff.length > 0;
+  const hasData = () => !isEmptyProfile(profile2) || profile2.compare.length > 0 || profile2.dates.length > 0 || profile2.channelsOff.length > 0 || profile2.target !== null || profile2.docs.length > 0;
   const write = () => {
     try {
       const raw = JSON.stringify({ ...profile2, owner });
@@ -3792,8 +3828,237 @@ function createProfileStore(storage) {
   };
 }
 
-// experiences/path-app/channel-data.mjs
+// experiences/path-app/docs-data.mjs
 var L3 = (ko, en) => Object.freeze({ ko, en });
+var freeze = (o) => Object.freeze(o);
+var DOC_STAGES = Object.freeze(["apply", "admitted", "visa"]);
+var KVAC_D22 = freeze({ title: L3("KVAC 몽골 「유학(D-2-1~D-2-4)」 서류 목록", "KVAC Mongolia student visa (D-2) document list"), url: "https://www.visaforkorea.mn/ko/study-visa-d-2-1d-2-4" });
+var KVAC_D42 = freeze({ title: L3("KVAC 몽골 「한국어연수(D-4-1)」 서류 목록", "KVAC Mongolia language trainee visa (D-4-1) document list"), url: "https://www.visaforkorea.mn/ko/korean-language-trainee-d-4-1" });
+var doc = (id, stage, name, extra = {}) => freeze({ id, stage, name, from: null, when: null, note: null, unclear: null, only: null, ...extra });
+var only = (ko, en) => freeze({ cond: L3(ko, en) });
+var JBNU_UG = freeze({
+  source: freeze({ title: L3("전북대학교 2027학년도 전기 학부 외국인특별전형 모집요강", "Jeonbuk National University, Spring 2027 undergraduate international admissions guide"), url: "https://ioffice.jbnu.ac.kr/bbs/ioffice/5310/401304/artclView.do" }),
+  id: "docs-jbnu-ug",
+  checkedAt: "2026-11-22",
+  term: L3("2027학년도 전기 요강 기준", "Based on the Spring 2027 guide"),
+  ask: L3("전북대 국제협력과(admissionu@jbnu.ac.kr, 요강 10쪽)", "JBNU Office of International Affairs (admissionu@jbnu.ac.kr, guide p. 10)"),
+  // 공개허용: 대학이 공개 요강에 적은 입학 업무 연락처
+  how: L3("UWAY에서 온라인으로 접수하고(성적증명서와 사진 파일을 올려요), 서류는 우편이나 방문으로 국제협력과에 내요. 전형료는 80,000원이에요.", "Apply online on UWAY (you upload your transcript and photo), then send the documents to the Office of International Affairs by post or in person. The application fee is ₩80,000."),
+  rules: [
+    L3("원본을 내는 것이 원칙이에요. 원본을 다시 받을 수 없으면 발급기관의 원본대조필 사본이나 공증본 원본을 내요.", "Originals are the rule. If you cannot get another original, submit a copy certified by the issuing office or a notarized copy."),
+    L3("한국어 · 영어가 아닌 서류는 번역본이 꼭 필요해요. 공증받지 않은 번역본에는 번역자확인서와 번역자 졸업증을 더 내요.", "Documents not in Korean or English need a translation. An unnotarized translation also needs the translator confirmation form and the translator’s diploma.")
+  ],
+  unclear: [L3("번역 형식이 요강의 두 곳에서 달라요. 앞쪽은 공증 없는 번역에 번역자확인서를 붙이면 된다고 하고, 서류 표는 「번역회사의 번역본」을 말해요. 개인 번역을 받아 주는지 대학에 먼저 물어보세요.", "The guide describes translations in two ways: one part accepts an unnotarized translation with the translator form, the document table asks for a translation by a translation company. Ask the university whether a personal translation is accepted.")],
+  docs: [
+    doc("jbnu-ug-forms", "apply", L3("입학지원서 · 유학경비부담서약서 · 개인정보이용동의서", "Application form, financial guarantee pledge, privacy consent"), { note: L3("온라인 접수에서 작성한 뒤 출력해 서명해요.", "Fill them in during online application, then print and sign.") }),
+    doc("jbnu-ug-grad", "apply", L3("고등학교 졸업(예정)증명서", "High school (expected) graduation certificate"), {
+      note: L3("원본이 원칙이에요. 졸업예정자는 졸업예정증명서를 먼저 내고, 졸업증명서는 2027-02-19까지 내요.", "Original as a rule. If you are about to graduate, submit the expected-graduation certificate first and the graduation certificate by 2027-02-19."),
+      unclear: L3("비고의 「아포스티유 확인서 혹은 영사확인 서류로 대체」가 졸업증명서에 아포스티유를 받으라는 뜻인지, 아래 학력인증서와 같은 서류라는 뜻인지 요강에서 갈리지 않아요.", "The note “replace with an apostille or consular confirmation” could mean the certificate itself needs an apostille, or that it is the same document as the diploma verification below. The guide does not say which.")
+    }),
+    doc("jbnu-ug-transcript", "apply", L3("고등학교 전 과정 성적증명서", "High school transcript (all years)"), {
+      note: L3("원본과 번역회사 번역본, 또는 공증받은 사본이에요. 온라인 접수 때 파일로도 올려요. 졸업예정자는 지금까지의 성적표를 내고 졸업 뒤 최종본을 더 내요.", "The original with a translation company’s translation, or a notarized copy. Also upload it during online application. If you are about to graduate, submit your current transcript and the final one after graduation."),
+      unclear: L3("성적증명서에 아포스티유가 필요한지 요강의 두 곳이 달라요. 서류 표에는 없고, 학력인증 안내는 「졸업 및 성적증명서에 대한 아포스티유」를 말해요.", "The guide differs on whether the transcript needs an apostille: the document table does not say so, but the verification section mentions an apostille for the graduation certificate and transcript.")
+    }),
+    doc("jbnu-ug-verify", "apply", L3("고등학교 졸업 학력인증서(아포스티유)", "High school diploma verification (apostille)"), {
+      note: L3("원본을 내요. 몽골은 아포스티유 협약국이라 아포스티유 확인서를 받아요. 졸업예정자는 2027-02-19까지 내요.", "Submit the original. Mongolia is an apostille country, so you get an apostille certificate. If you are about to graduate, submit it by 2027-02-19.")
+    }),
+    doc("jbnu-ug-family", "apply", L3("가족관계증명서와 부모 여권 사본", "Family relation certificate and parents’ passport copies"), { note: L3("증명서는 원본과 번역회사 번역본, 또는 공증받은 사본이에요. 부모 두 사람의 여권 사본(여권이 없으면 신분증 사본)을 내고, 본인과 부모의 이름 · 국적이 보여야 해요.", "The certificate as an original with a translation company’s translation, or a notarized copy. Add copies of both parents’ passports (or ID cards if they have no passport); names and nationalities must be visible.") }),
+    doc("jbnu-ug-language", "apply", L3("어학능력 증빙(TOPIK 성적표나 한국어학당 수료증)", "Language proof (TOPIK score report or language institute certificate)"), {
+      when: L3("원서 접수일 기준 최근 2년 안에 발급된 것", "Issued within the last two years as of the application date"),
+      note: L3("한국어 트랙은 TOPIK 2급 이상 같은 조건이 있어요. 시험에 접수만 했으면 접수증을 먼저 내요. 장학금은 2026-12-23까지 낸 성적만 반영해요.", "The Korean track needs TOPIK level 2 or similar. If you have only registered for the test, submit the registration slip first. Scholarships count only scores submitted by 2026-12-23.")
+    }),
+    doc("jbnu-ug-bank", "apply", L3("은행잔고증명서", "Bank balance certificate"), {
+      when: L3("제출일 기준 30일 안에 발급된 것", "Issued within 30 days of submission"),
+      note: L3("원본이에요. 본인이나 부모 계좌로 1,600만 원(약 13,000달러) 이상이에요. 원서를 낼 때나 합격 뒤에 내도 되고, 늦어도 비자 신청 전에 내요. 비자 묶음의 예치증명서와는 명의 · 기한 · 부수가 다를 수 있어요.", "Original, from your own or a parent’s account, ₩16,000,000 (about USD 13,000) or more. You may submit it with the application or after admission, but before the visa application at the latest. Owner, validity and copies can differ from the visa deposit certificate.")
+    }),
+    doc("jbnu-ug-passport", "apply", L3("여권 사본", "Passport copy")),
+    doc("jbnu-ug-arc", "apply", L3("외국인등록증 사본", "Alien registration card copy"), { only: only("한국에 살고 있는 사람만", "Only if you live in Korea") }),
+    doc("jbnu-ug-portfolio", "apply", L3("작품성과집(포트폴리오, USB 등)", "Portfolio (USB etc.)"), { only: only("예술대학 지원자만", "Only for College of Arts applicants") })
+  ],
+  // 서류 기한은 그 차수(시작 날)에 매단다: 날짜가 바뀌어도 id가 그대로라 넣어 둔 학생은 「날짜가 바뀌었어요」를 본다.
+  deadlines: [
+    freeze({ round: "2026-11-09", key: "docs", start: "2026-11-27", label: L3("2차 서류 제출 마감(2차 원서를 낸 사람만)", "Round 2 document deadline (only if you applied in round 2)") }),
+    freeze({ round: "2026-11-09", key: "originals", start: "2027-02-19", label: L3("원본 · 졸업 서류 제출(사본을 냈거나 졸업예정자)", "Originals and graduation documents (if you sent copies or were about to graduate)") })
+  ]
+});
+var JBNU_LANG = freeze({
+  source: freeze({ title: L3("전북대학교 한국어학당 입학신청 · 제출서류", "Jeonbuk National University Korean Language Institute: application and documents"), url: "https://wz3.jbnu.ac.kr/lec_korean/10899/subview.do" }),
+  id: "docs-jbnu-lang",
+  checkedAt: "2026-11-22",
+  term: L3("2027 봄학기 접수 기준(학당 누리집)", "Based on the spring 2027 intake (institute pages)"),
+  how: L3("온라인으로 접수하고 서류는 스캔해서 올려요. 전형료는 70,000원이에요(2027년 봄학기부터 오른 금액). 낸 서류와 전형료는 돌려주지 않아요.", "Apply online and upload scanned documents. The application fee is ₩70,000 (raised from spring 2027). Documents and the fee are not returned."),
+  rules: [L3("모든 서류에 국문이나 영문 번역본, 또는 공증본을 붙여요. 번역본이면 번역자 확인서를 더 내요.", "Attach a Korean or English translation, or a notarized copy, to every document. With a translation, add the translator confirmation form.")],
+  unclear: [],
+  docs: [
+    doc("jbnu-lang-photo", "apply", L3("사진(3.5 × 4.5cm 컬러)", "Photo (3.5 × 4.5 cm, colour)")),
+    doc("jbnu-lang-passport", "apply", L3("여권 사본", "Passport copy")),
+    doc("jbnu-lang-grad", "apply", L3("최종학력 학교 졸업증명서", "Graduation certificate from your last school"), {
+      note: L3("원본을 스캔해 올려요.", "Upload a scan of the original."),
+      unclear: L3("한국어 안내에는 이 줄에 「(중국)」 표기가 붙어 있고, 영어 안내에는 없이 모든 지원자 서류로 적혀 있어요. 졸업예정자가 무엇을 내는지도 학당 누리집에 없어요.", "The Korean page marks this line “(China)”, while the English page lists it for all applicants. The page also does not say what students who have not yet graduated submit.")
+    }),
+    doc("jbnu-lang-transcript", "apply", L3("최종학력 학교 성적증명서", "Transcript from your last school"), { note: L3("원본을 스캔해 올려요.", "Upload a scan of the original.") }),
+    doc("jbnu-lang-verify", "apply", L3("최종학력 인증서류(아포스티유)", "Diploma verification (apostille)"), { note: L3("원본이에요. 아포스티유나, 한국 영사관 · 주한 자국 공관의 영사인증을 받아요.", "Original, with an apostille or consular confirmation.") }),
+    doc("jbnu-lang-bank", "apply", L3("은행잔고증명서", "Bank balance certificate"), { when: L3("신청일 기준 30일 안에 발급된 것", "Issued within 30 days of applying"), note: L3("본인이나 부모 명의로 800만 원 이상이에요. 비자 묶음의 예치증명서와는 명의 · 기한 · 부수가 다를 수 있어요.", "In your own or a parent’s name, ₩8,000,000 or more. Owner, validity and copies can differ from the visa deposit certificate.") }),
+    doc("jbnu-lang-family", "apply", L3("가족관계증명서", "Family relation certificate"), { note: L3("가족 구성원이 모두 나와야 해요.", "All family members must be listed.") })
+  ],
+  deadlines: []
+});
+var WKU_UG = freeze({
+  source: freeze({ title: L3("원광대학교 2027학년도 1학기(3월) 외국인 학부 신(편)입학 모집요강(안)", "Wonkwang University, Spring 2027 undergraduate international admissions guide (draft)"), url: "https://ipsi.wku.ac.kr/detail.do?menuurl=qBExJT7yxTZkr1QAFxkj1g%3D%3D&board_seq=9786" }),
+  id: "docs-wku-ug",
+  checkedAt: "2026-11-22",
+  term: L3("2027학년도 1학기 요강 기준", "Based on the Spring 2027 guide"),
+  ask: L3("원광대 국제교류과(063-850-5843, 요강 문의처)", "Wonkwang University Office of International Affairs (+82-63-850-5843, from the guide)"),
+  how: L3("방문이나 우편으로 국제교류과에 내요. 온라인 접수는 없어요. 전형료는 100,000원이고 돌려주지 않아요.", "Submit in person or by post to the Office of International Affairs. There is no online application. The fee is ₩100,000 and is not refunded."),
+  status: L3("요강 파일 이름에 「(안)」이 붙어 있어 바뀔 수 있어요.", "The guide file is marked as a draft, so it may change."),
+  rules: [L3("서류는 한국어나 영어만 받아요. 다른 언어면 번역본에 번역자 확인서와 번역자 신분증 사본을 붙여요. 번역 공증은 요구하지 않아요.", "Only Korean or English documents are accepted. Other languages need a translation with the translator confirmation form and a copy of the translator’s ID. Notarization is not required.")],
+  unclear: [],
+  docs: [
+    doc("wku-ug-forms", "apply", L3("입학원서 · 개인정보 수집 및 이용 동의서(대학 서식)", "Application form and privacy consent (university forms)")),
+    doc("wku-ug-grad", "apply", L3("고등학교 졸업(예정)증명서", "High school (expected) graduation certificate"), {
+      note: L3("원본이에요. 졸업예정자는 졸업예정증명서를 낼 수 있고, 졸업 뒤 졸업증명서와 학력인증 서류를 입학 전까지 내요.", "Original. If you are about to graduate you may submit the expected-graduation certificate, then the graduation certificate and verification before entry."),
+      unclear: L3("「졸업 후 1년이 넘었으면 표준입학허가서 발행 전에 졸업증명서를 낸다」는 문장이 졸업예정자에게도 해당하는지 요강에서 갈리지 않아요.", "The guide does not make clear whether the rule “if more than a year has passed since graduation, submit the certificate before the admission letter is issued” applies to students about to graduate.")
+    }),
+    doc("wku-ug-transcript", "apply", L3("고등학교 전체 성적증명서", "High school transcript (all years)"), { note: L3("사본이에요.", "A copy.") }),
+    doc("wku-ug-verify", "apply", L3("고교 학력인증(아포스티유)", "High school diploma verification (apostille)"), {
+      when: L3("3개월 안에 발급된 것이 원칙이에요. 비자 발급 때(2월) 6개월 안이면 인정될 수 있어요.", "Issued within 3 months as a rule; within 6 months at visa time (February) may be accepted."),
+      note: L3("원본이에요.", "Original."),
+      unclear: L3("아포스티유가 졸업증명서에만 필요한지 성적증명서까지 필요한지 적혀 있지 않아요.", "The guide does not say whether the apostille is needed only for the graduation certificate or also for the transcript.")
+    }),
+    doc("wku-ug-passport", "apply", L3("여권 사본", "Passport copy"), { when: L3("여권이 6개월 이상 남아 있어야 해요.", "At least 6 months of passport validity.") }),
+    doc("wku-ug-family", "apply", L3("가족관계증명서", "Family relation certificate"), { note: L3("사본이에요.", "A copy.") }),
+    doc("wku-ug-parents-id", "apply", L3("부 · 모 신분증 사본", "Copies of parents’ ID cards")),
+    doc("wku-ug-translator", "apply", L3("번역자 확인서와 번역자 신분증 사본", "Translator confirmation form and translator’s ID copy"), { only: only("번역본을 내는 사람만", "Only if you submit translations") }),
+    doc("wku-ug-arc", "apply", L3("외국인등록증 사본", "Alien registration card copy"), { only: only("한국에 살고 있는 사람만", "Only if you live in Korea") }),
+    doc("wku-ug-language", "apply", L3("어학(한국어 · 영어) 입증 서류", "Language proof (Korean or English)"), { only: only("한국어나 영어 성적이 있는 사람만", "Only if you have a Korean or English score"), note: L3("입학할 때는 필수가 아니에요.", "It is not required for admission.") }),
+    doc("wku-ug-bank", "admitted", L3("재정능력 입증서류", "Proof of funds"), {
+      when: L3("발급일부터 1개월 안. 합격 통보 뒤 등록 기간 안에 발급받아요.", "Within 1 month of issue; get it after the admission notice, during registration."),
+      note: L3("원본 2부(출입국 · 재외공관용과 대학용)예요. 본인 명의로 1,600만 원 이상이고, 통장 앞뒤 사본과 은행 연락처가 있는 서식이 필요해요. 비자 묶음의 예치증명서와는 명의 · 기한 · 부수가 다를 수 있어요.", "Two originals (one for immigration, one for the university), in your own name, ₩16,000,000 or more, with copies of both sides of the bankbook and a bank form showing the bank’s contact. Owner, validity and copies can differ from the visa deposit certificate.")
+    })
+  ],
+  deadlines: []
+});
+var WKU_LANG = freeze({
+  source: freeze({ title: L3("2026 원광대학교 한국문화교육센터 모집요강", "Wonkwang University Korean Culture Education Center admissions guide, 2026"), url: "https://ipsi.wku.ac.kr/detail.do?menuurl=8pYtphfeWm2Bb85hdKCTcQ%3D%3D&board_seq=7060" }),
+  id: "docs-wku-lang",
+  checkedAt: "2026-11-22",
+  term: L3("2026학년도 요강의 2027 봄학기 일정", "Spring 2027 dates from the 2026 guide"),
+  ask: L3("원광대 한국문화교육센터(063-850-5504, 요강 문의처)", "Wonkwang University Korean Culture Education Center (+82-63-850-5504, from the guide)"),
+  how: L3("원본과 사본을 나눠 우편이나 방문으로 내요. 전형료 · 교재비는 100,000원이고 처음 입학할 때 한 번 내요.", "Submit originals and copies by post or in person. The application and textbook fee of ₩100,000 is paid once, at first entry."),
+  status: L3("2026학년도 요강이에요. 2027 봄학기 일정은 이 요강의 일정표에서 읽었어요.", "This is the 2026 guide; the spring 2027 dates come from its schedule table."),
+  rules: [L3("한국어 · 영어가 아닌 서류는 한국어나 영어 번역본을 함께 내요.", "Documents not in Korean or English need a Korean or English translation.")],
+  unclear: [],
+  docs: [
+    doc("wku-lang-form", "apply", L3("입학지원서(사진 3.5 × 4.5cm)", "Application form (photo 3.5 × 4.5 cm)")),
+    doc("wku-lang-essay", "apply", L3("자기소개서(학업계획 포함)", "Self-introduction (with study plan)")),
+    doc("wku-lang-passport", "apply", L3("여권 사본", "Passport copy"), { when: L3("여권이 6개월 이상 남아 있어야 해요.", "At least 6 months of passport validity.") }),
+    doc("wku-lang-family", "apply", L3("가족관계증명서", "Family relation certificate"), { note: L3("원본과 사본이에요. 지원자와 부모(또는 배우자)가 모두 나오지 않으면 공증을 붙여요.", "Original and copy. If you and your parents (or spouse) are not all listed, attach a notarization.") }),
+    doc("wku-lang-parents-id", "apply", L3("부 · 모 신분증 사본", "Copies of parents’ ID cards")),
+    doc("wku-lang-grad", "apply", L3("최종학력 졸업증명서(고등학교 졸업 이상)", "Graduation certificate (high school or higher)"), { note: L3("원본과 사본이에요.", "Original and copy.") }),
+    doc("wku-lang-transcript", "apply", L3("최종학력 성적증명서", "Transcript from your last school"), { note: L3("원본과 사본이에요.", "Original and copy.") }),
+    doc("wku-lang-verify", "apply", L3("학력인증보고서(아포스티유)", "Diploma verification report (apostille)"), { when: L3("비자 신청일부터 3개월 안에 발급된 것", "Issued within 3 months of the visa application"), note: L3("아포스티유 원본이에요.", "Original apostille.") }),
+    doc("wku-lang-translator", "apply", L3("번역자 확인서(출입국 서식)", "Translator confirmation form (immigration form)"), { only: only("번역본을 내는 사람만", "Only if you submit translations") }),
+    doc("wku-lang-bank", "admitted", L3("은행잔고증명서", "Bank balance certificate"), { when: L3("비자 신청일 기준 30일 안에 발급된 것", "Issued within 30 days of the visa application"), note: L3("원본이에요. 본인 명의로 800만 원(6,500달러) 이상이에요. 합격한 뒤에 내요. 비자 묶음의 예치증명서와는 명의 · 기한 · 부수가 다를 수 있어요.", "Original, in your own name, ₩8,000,000 (USD 6,500) or more. Submit after admission. Owner, validity and copies can differ from the visa deposit certificate.") })
+  ],
+  deadlines: []
+});
+var JJ_UG = freeze({
+  source: freeze({ title: L3("2027학년도 전주대학교 전기 외국인 신 · 편입학 특별전형 모집요강", "Jeonju University, Spring 2027 international admissions guide"), url: "https://www.jj.ac.kr/global/admission/guidelines.do" }),
+  id: "docs-jj-ug",
+  checkedAt: "2026-11-22",
+  term: L3("2027학년도 전기 요강 기준", "Based on the Spring 2027 guide"),
+  how: L3("oia.jj.ac.kr에서 온라인 원서를 내고 서류와 면접 동영상을 올린 뒤, 서류는 방문 · 택배 · 우편으로 기한까지 국제교육관에 도착하게 보내요. 이메일로는 받지 않아요. 전형료는 120,000원이에요.", "Apply online at oia.jj.ac.kr and upload the documents and interview video, then send the documents in person, by courier or by post so they arrive at the International Education Center by the deadline. Email is not accepted. The fee is ₩120,000."),
+  rules: [
+    L3("입학원서를 포함한 모든 서류는 원본, 또는 번역공증과 영사인증 · 아포스티유를 받은 것으로 내요.", "All documents, including the application form, must be originals or translated, notarized and apostilled (or consular-confirmed)."),
+    L3("원서 사진은 최근 3개월 안에 찍은 3 × 4cm 컬러사진을 스캔해 올려요.", "For the photo, upload a scan of a 3 × 4 cm colour photo taken within the last 3 months.")
+  ],
+  unclear: [],
+  docs: [
+    doc("jj-ug-form", "apply", L3("입학원서", "Application form"), { note: L3("인터넷 접수 뒤 출력해 원본 1부를 내요.", "Print after online application and submit one original.") }),
+    doc("jj-ug-passports", "apply", L3("지원자와 부모 여권 사본", "Passport copies for you and your parents"), { when: L3("입학 예정일에 유효한 여권", "Valid on the planned entry date") }),
+    doc("jj-ug-family", "apply", L3("가족관계 증명서류", "Family relation documents"), {
+      note: L3("원본 1부예요. 부모가 이혼하거나 돌아가셨으면 정부 발행 증명서를 더 내요.", "One original. If your parents are divorced or deceased, add the government certificate."),
+      unclear: L3("가족관계증명서 원본에 번역 · 공증이 필요한지 이 줄에는 없어요(대체 서류에만 공증이 적혀 있어요).", "This line does not say whether the original needs a translation or notarization (only substitute documents mention notarization).")
+    }),
+    doc("jj-ug-grad", "apply", L3("고등학교 졸업(예정)증명서(아포스티유 또는 영사확인)", "High school (expected) graduation certificate (apostille or consular confirmation)"), {
+      note: L3("원본 1부예요. 졸업예정자는 입학 전에 졸업하지 못하면 입학 허가가 취소돼요. 졸업 뒤 아포스티유를 받은 졸업증명서와 최종 성적증명서를 내요.", "One original. If you do not graduate before entry, admission is cancelled. After graduating, submit the apostilled graduation certificate and the final transcript."),
+      unclear: L3("몽골어 증명서에 번역공증이 필요한지 이 줄에는 없고, 요강 앞쪽의 일반 규칙으로만 알 수 있어요.", "This line does not say whether a Mongolian certificate needs a notarized translation; only the general rule at the front of the guide does.")
+    }),
+    doc("jj-ug-transcript", "apply", L3("고등학교 성적증명서(아포스티유 또는 영사확인, 번역공증)", "High school transcript (apostille or consular confirmation, notarized translation)"), { note: L3("원본 1부예요.", "One original.") }),
+    doc("jj-ug-language", "apply", L3("어학능력 입증서류", "Language proof"), { when: L3("원서 접수 시작일에 유효한 것", "Valid on the first day of applications"), note: L3("한국어 트랙은 TOPIK 2급 이상, 세종학당 초급2 이상(온라인 세종학당은 안 됨), 사회통합프로그램 2단계 같은 조건이에요.", "The Korean track needs TOPIK level 2 or higher, King Sejong Institute Beginner 2 or higher (not online), Social Integration Program level 2 or similar.") }),
+    doc("jj-ug-arc", "apply", L3("외국인등록증 사본(앞 · 뒷면)", "Alien registration card copy (front and back)"), { only: only("해당하는 사람만(한국에 살고 있는 사람)", "Only if it applies to you (living in Korea)") }),
+    doc("jj-ug-video", "apply", L3("면접 동영상", "Interview video"), { note: L3("3분 안, 100MB 이하로 원서 접수 기간에 올려요. 한국어 트랙은 한국어로 답해요.", "Up to 3 minutes and 100 MB, uploaded during the application period. Korean-track applicants answer in Korean.") }),
+    doc("jj-ug-bank", "admitted", L3("재정능력 입증서류", "Proof of funds"), { when: L3("원서 접수 뒤에 발급된 것만", "Issued after you applied"), note: L3("원본 1부예요. 최종 합격자만 내요. 본인이나 부모 명의로 1,600만 원(13,000달러) 이상이에요. 기한은 대학이 따로 알려요. 비자 묶음의 예치증명서와는 명의 · 기한 · 부수가 다를 수 있어요.", "One original, final admits only, in your own or a parent’s name, ₩16,000,000 (USD 13,000) or more. The university sets the deadline separately. Owner, validity and copies can differ from the visa deposit certificate.") })
+  ],
+  deadlines: [
+    freeze({ round: "2026-12-01", key: "docs", start: "2026-12-18", label: L3("2차 서류 도착 기한(2차 원서를 낸 사람만 · 대학 도착 기준)", "Round 2 documents must arrive (round 2 applicants only, arrival at the university)") }),
+    freeze({ round: "2027-01-04", key: "docs", start: "2027-01-15", label: L3("3차 서류 도착 기한(3차 원서를 낸 사람만 · 대학 도착 기준)", "Round 3 documents must arrive (round 3 applicants only, arrival at the university)") })
+  ]
+});
+var PROGRAM_DOCS = freeze({ "jbnu-ug": JBNU_UG, "jbnu-lang": JBNU_LANG, "wku-ug": WKU_UG, "wku-lang": WKU_LANG, "jj-ug": JJ_UG });
+var SPONSOR_CHECK = L3("KVAC 누리집에 「우수 인증 대학은 해당되지 않음」이라고 적혀 있어요. 97만 원이 한 달 소득인지 다른 기준인지도 문장만으로는 확실하지 않아요. 둘 다 KVAC에 물어보세요.", "KVAC says this does not apply to top-certified universities. The text also does not make clear whether ₩970,000 is a monthly income or another measure. Ask KVAC about both.");
+var EXEMPT = L3("KVAC 누리집에 「우수 인증 대학은 해당되지 않음」이라고 적혀 있어요. 내 대학이 해당되는지는 KVAC에 물어보세요.", "KVAC says this does not apply to top-certified universities. Ask KVAC whether your university counts.");
+var visaCommon = (p, src) => [
+  doc(`${p}-form`, "visa", L3("사증발급신청서(비자 신청서)", "Visa application form")),
+  doc(`${p}-photo`, "visa", L3("컬러사진(3.5 × 4.5cm)", "Colour photo (3.5 × 4.5 cm)"), { when: L3("최근 6개월 안에 찍은 것", "Taken within the last 6 months"), note: L3("흰색이나 황백색 배경, 정면, 선글라스 · 모자 없이 눈과 귀가 보여야 해요.", "White or off-white background, facing forward, no sunglasses or hat, eyes and ears visible.") }),
+  doc(`${p}-passport`, "visa", L3("여권과 여권 사본 1매", "Passport and one copy"), { when: L3("접수일부터 6개월 이상 남아 있어야 해요.", "At least 6 months of validity from the application date.") }),
+  doc(`${p}-essay`, "visa", L3("자기소개서(KVAC 서식, 본인 서명)", "Self-introduction (KVAC form, signed by you)"), { unclear: L3("KVAC 누리집에 「전액 장학생 및 우수 인증 대학은 해당되지 않음」이라고 적혀 있어요. 내가 해당되는지는 KVAC에 물어보세요.", "KVAC says this does not apply to full scholarship holders and top-certified universities. Ask KVAC whether that includes you.") }),
+  doc(`${p}-admission`, "visa", L3("표준입학허가서", "Standard certificate of admission"), { from: L3("합격한 대학이 보내 줘요.", "Sent by the university after admission."), when: L3("유효기간 3개월", "Valid for 3 months") }),
+  doc(`${p}-bizreg`, "visa", L3("교육기관 사업자등록증 사본", "Copy of the school’s business registration"), { from: L3("대학에서 받아요.", "From the university."), when: L3("최근 6개월 안에 발급된 것", "Issued within the last 6 months") })
+];
+var visaTail = (p) => [
+  doc(`${p}-sponsor`, "visa", L3("유학경비 부담능력 입증자료", "Proof that your sponsor can pay"), { note: L3("기본은 부모가 입증해요(부모가 없을 때만 형제자매). 유학경비 지원확인서, 신분증과 관계 증명, 사업자는 납세증명서(etax.mta.mn 영문)와 법인상세조회서(E-Mongolia), 직장인은 사회보험료 납부확인서와 재직증명서 원본, 그 밖에는 최근 3개월 은행거래내역서예요. KVAC 누리집에는 「재정능력 총액이 97만 원(250만 투그릭) 이상」이고 최근 6개월 사회보험료 납부내역으로 월평균 소득을 계산한다고 적혀 있어요. 입증하는 사람의 소득 조건으로 읽혀요. KVAC 누리집에서 예치증명서가 아니라 이 서류에 적힌 조건이에요.", "Usually your parents (siblings only if there are no parents): a support confirmation, IDs and proof of relationship; business owners add a tax certificate (English, etax.mta.mn) and a company record (E-Mongolia); employees add social insurance records and an original employment certificate; otherwise 3 months of bank statements. KVAC says the “total financial ability” must be at least ₩970,000 (MNT 2,500,000), with average monthly income taken from 6 months of social insurance. This reads as the sponsor’s income. It is listed separately from the deposit."), unclear: SPONSOR_CHECK }),
+  doc(`${p}-civil`, "visa", L3("혼인관계증명서(만 19세 미만은 출생등록증명서)", "Marriage record (under 19: birth registration certificate)"), { from: L3("E-Mongolia에서 외국어로 발급해요.", "Issued in a foreign language from E-Mongolia.") }),
+  doc(`${p}-birth`, "visa", L3("출생증명서", "Birth certificate")),
+  doc(`${p}-crime`, "visa", L3("범죄경력증명서", "Criminal record certificate"), { from: L3("E-Mongolia에서 외국어로 발급해요.", "Issued in a foreign language from E-Mongolia."), only: only("만 18세 이상이고 처음 신청하는 사람만", "Only if you are 18 or older and applying for the first time") }),
+  doc(`${p}-tb`, "visa", L3("결핵진단서", "Tuberculosis test certificate"), { note: L3("KVAC가 지정한 기관에서 받아요. 지정기관 목록 링크는 KVAC 누리집에서 열리지 않아 KVAC에 물어보세요.", "From a KVAC-designated clinic. The list link on the KVAC page does not open, so ask KVAC.") }),
+  doc(`${p}-school`, "visa", L3("최종학교 졸업 · 성적증명서 원본(아포스티유)", "Original graduation certificate and transcript (apostille)"), { note: L3("아포스티유를 받은 학력 서류, 또는 영사확인을 받은 서류예요.", "Apostilled education documents, or documents with consular confirmation.") }),
+  doc(`${p}-language`, "visa", L3("어학능력 입증서류", "Language proof"), { only: only("어학능력 요건이 있는 대학에 가는 사람만", "Only if your university has a language requirement") })
+];
+var VISA_DOCS = freeze({
+  "D-2": freeze({
+    id: "docs-visa-d2",
+    name: L3("유학(D-2)", "Student (D-2)"),
+    source: KVAC_D22,
+    checkedAt: "2026-11-22",
+    rules: [L3("몽골어 서류는 번역본 원본에 번역자 신분증 사본과 번역자 확인서를 붙여요. 신청은 비자신청센터(KVAC)나 공인대행법인에 본인이 직접 가는 것이 원칙이에요.", "Mongolian documents need an original translation with the translator’s ID copy and the translator confirmation form. You apply in person at the visa center (KVAC) or an authorized agency as a rule.")],
+    docs: [
+      ...visaCommon("visa-d2"),
+      doc("visa-d2-deposit", "visa", L3("예치증명서와 몽골 계좌 거래내역서", "Deposit certificate and Mongolian bank statement"), { when: L3("비자 신청일 기준 14일 안에 발급, 같은 금액을 30일 이상 유지", "Issued within 14 days of the visa application; keep the amount for at least 30 days"), note: L3("수도권 대학 2,000만 원, 비수도권 대학 1,600만 원 이상이에요. 본인이나 부모의 몽골 은행 계좌 거래내역서를 함께 내요. 대학에 내는 잔고 증명과는 명의 · 기한 · 부수가 다를 수 있어요.", "₩20,000,000 for Seoul-area universities, ₩16,000,000 elsewhere, plus the statement of your own or a parent’s Mongolian bank account. Owner, validity and copies can differ from the bank certificate the university asks for."), unclear: EXEMPT }),
+      ...visaTail("visa-d2")
+    ]
+  }),
+  "D-4-1": freeze({
+    id: "docs-visa-d4-1",
+    name: L3("어학연수(D-4-1)", "Language trainee (D-4-1)"),
+    source: KVAC_D42,
+    checkedAt: "2026-11-22",
+    rules: [L3("몽골어 서류는 번역본 원본에 번역자 신분증 사본과 번역자 확인서를 붙여요. 신청은 비자신청센터(KVAC)나 공인대행법인에 본인이 직접 가는 것이 원칙이에요.", "Mongolian documents need an original translation with the translator’s ID copy and the translator confirmation form. You apply in person at the visa center (KVAC) or an authorized agency as a rule.")],
+    docs: [
+      ...visaCommon("visa-d4"),
+      doc("visa-d4-plan", "visa", L3("연수계획서와 연수과정 운영 현황", "Training plan and program overview"), { from: L3("대학이 준비해요.", "Prepared by the university.") }),
+      doc("visa-d4-deposit", "visa", L3("예치증명서와 몽골 은행잔고증명서", "Deposit certificate and Mongolian bank balance certificate"), { when: L3("비자 신청일 기준 2주 안에 발급, 같은 금액을 30일 이상 유지", "Issued within 2 weeks of the visa application; keep the amount for at least 30 days"), note: L3("수도권 대학 1,000만 원, 비수도권 대학 800만 원 이상이에요. KVAC 누리집의 문장이 「800만원 이상(비」에서 끊겨 있어요. 대학에 내는 잔고 증명과는 명의 · 기한 · 부수가 다를 수 있어요.", "₩10,000,000 for Seoul-area universities, ₩8,000,000 elsewhere. The KVAC sentence is cut off after “₩8,000,000 or more (non-”. Owner, validity and copies can differ from the bank certificate the university asks for."), unclear: EXEMPT }),
+      ...visaTail("visa-d4")
+    ]
+  })
+});
+var visaFor = (program) => program && program.level === "language" ? "D-4-1" : "D-2";
+function docsFor(program) {
+  const pd = program && PROGRAM_DOCS[program.id];
+  if (!pd) return null;
+  const visa = VISA_DOCS[visaFor(program)];
+  const fits = (d) => !d.only;
+  const all = [...pd.docs, ...visa.docs];
+  return { program: pd, visa, all, mine: all.filter(fits), notMine: all.filter((d) => !fits(d)) };
+}
+function deadlineDates(programId) {
+  const pd = PROGRAM_DOCS[programId];
+  if (!pd) return [];
+  return pd.deadlines.map((x) => freeze({ id: `univ-${programId}-${x.round}-${x.key}`, kind: "deadline", start: x.start, label: x.label, docsDue: true }));
+}
+
+// experiences/path-app/channel-data.mjs
+var L4 = (ko, en) => Object.freeze({ ko, en });
 var DATE_KINDS = Object.freeze(["apply", "exam", "result", "deadline"]);
 var FOR_YOU = Object.freeze(["topikExam", "finance", "gksGrade", "program"]);
 var POST_STATUS = Object.freeze(["official", "announced"]);
@@ -3801,120 +4066,120 @@ var CHANNEL_TONES = Object.freeze(["lapis", "meadow", "ink", "coral"]);
 var STALE_DAYS = 90;
 var NEW_DAYS = 14;
 var CHANNELS = Object.freeze([
-  { id: "topik", tone: "lapis", name: L3("TOPIK", "TOPIK"), sub: L3("시험 일정, 접수, 성적 쓰는 법", "Test dates, registration and using your score") },
-  { id: "visa", tone: "ink", name: L3("비자와 서류", "Visas and documents"), sub: L3("유학 비자, 잔고 증명, 서류 확인", "Student visas, proof of funds and document checks") },
-  { id: "scholarship", tone: "meadow", name: L3("장학금", "Scholarships"), sub: L3("정부 장학금, 대학 장학금, 모집 시기", "Government and university scholarships and when they open") },
-  { id: "scam", tone: "coral", name: L3("사기 주의", "Scam alerts"), sub: L3("가짜 유학원 가리는 법, 공식 창구", "Spotting fake agencies and finding the official desks") },
-  { id: "univ", tone: "lapis", name: L3("대학 소식", "University news"), sub: L3("공개 모집 요강의 접수 일정", "Application dates from published admissions guides") }
+  { id: "topik", tone: "lapis", name: L4("TOPIK", "TOPIK"), sub: L4("시험 일정, 접수, 성적 쓰는 법", "Test dates, registration and using your score") },
+  { id: "visa", tone: "ink", name: L4("비자와 서류", "Visas and documents"), sub: L4("유학 비자, 잔고 증명, 서류 확인", "Student visas, proof of funds and document checks") },
+  { id: "scholarship", tone: "meadow", name: L4("장학금", "Scholarships"), sub: L4("정부 장학금, 대학 장학금, 모집 시기", "Government and university scholarships and when they open") },
+  { id: "scam", tone: "coral", name: L4("사기 주의", "Scam alerts"), sub: L4("가짜 유학원 가리는 법, 공식 창구", "Spotting fake agencies and finding the official desks") },
+  { id: "univ", tone: "lapis", name: L4("대학 소식", "University news"), sub: L4("공개 모집 요강의 접수 일정", "Application dates from published admissions guides") }
 ].map(Object.freeze));
-var COLLECTING = Object.freeze([L3("한국 생활", "Life in Korea"), L3("취업", "Jobs"), L3("선배 이야기", "Stories from seniors"), L3("부모님 방", "For parents")]);
+var COLLECTING = Object.freeze([L4("한국 생활", "Life in Korea"), L4("취업", "Jobs"), L4("선배 이야기", "Stories from seniors"), L4("부모님 방", "For parents")]);
 var freezePost = (p) => Object.freeze({ ...p, points: Object.freeze([...p.points]), dates: Object.freeze((p.dates || []).map(Object.freeze)) });
-var KVAC_D22 = "https://www.visaforkorea.mn/ko/study-visa-d-2-1d-2-4";
+var KVAC_D23 = "https://www.visaforkorea.mn/ko/study-visa-d-2-1d-2-4";
 var POSTS = Object.freeze([
   {
     id: "topik-mn-2026-results",
     channel: "topik",
     status: "official",
-    title: L3("몽골에서 본 하반기 TOPIK 성적은 12월에 나와요", "Scores from the autumn TOPIK tests in Mongolia come out in December"),
+    title: L4("몽골에서 본 하반기 TOPIK 성적은 12월에 나와요", "Scores from the autumn TOPIK tests in Mongolia come out in December"),
     points: [
-      L3("PBT 제108회(10월 18일 시험) 성적은 12월 10일, 제109회(11월 15일 시험) 성적은 12월 22일에 나와요.", "PBT round 108 (tested Oct 18) results come out on Dec 10, and round 109 (tested Nov 15) on Dec 22."),
-      L3("IBT 제16회는 11월 28일 몽골국립대학교에서 치르고 성적은 12월 18일에 나와요. 이 회차 접수는 끝났어요.", "IBT round 16 is held at the National University of Mongolia on Nov 28, with results on Dec 18. Registration for it has closed."),
-      L3("TOPIK 성적은 성적 발표일로부터 2년 동안 유효해요.", "TOPIK scores are valid for two years from the results date.")
+      L4("PBT 제108회(10월 18일 시험) 성적은 12월 10일, 제109회(11월 15일 시험) 성적은 12월 22일에 나와요.", "PBT round 108 (tested Oct 18) results come out on Dec 10, and round 109 (tested Nov 15) on Dec 22."),
+      L4("IBT 제16회는 11월 28일 몽골국립대학교에서 치르고 성적은 12월 18일에 나와요. 이 회차 접수는 끝났어요.", "IBT round 16 is held at the National University of Mongolia on Nov 28, with results on Dec 18. Registration for it has closed."),
+      L4("TOPIK 성적은 성적 발표일로부터 2년 동안 유효해요.", "TOPIK scores are valid for two years from the results date.")
     ],
-    source: { title: L3("TOPIK 누리집 시험 일정", "TOPIK official test schedule"), url: "https://www.topik.go.kr/TWGUID/TWGUID0020.do?searchGubun=ALL" },
+    source: { title: L4("TOPIK 누리집 시험 일정", "TOPIK official test schedule"), url: "https://www.topik.go.kr/TWGUID/TWGUID0020.do?searchGubun=ALL" },
     checkedAt: "2026-11-21",
     postedAt: "2026-11-21",
     dates: [
-      { id: "topik-ibt16-exam-mn", kind: "exam", start: "2026-11-28", label: L3("IBT 제16회 시험(몽골)", "IBT round 16 test (Mongolia)"), url: "https://topik.mn/ibt/Home/Content/3" },
-      { id: "topik-pbt108-result", kind: "result", start: "2026-12-10", label: L3("PBT 제108회 성적 발표", "PBT round 108 results") },
-      { id: "topik-ibt16-result", kind: "result", start: "2026-12-18", label: L3("IBT 제16회 성적 발표", "IBT round 16 results") },
-      { id: "topik-pbt109-result", kind: "result", start: "2026-12-22", label: L3("PBT 제109회 성적 발표", "PBT round 109 results") }
+      { id: "topik-ibt16-exam-mn", kind: "exam", start: "2026-11-28", label: L4("IBT 제16회 시험(몽골)", "IBT round 16 test (Mongolia)"), url: "https://topik.mn/ibt/Home/Content/3" },
+      { id: "topik-pbt108-result", kind: "result", start: "2026-12-10", label: L4("PBT 제108회 성적 발표", "PBT round 108 results") },
+      { id: "topik-ibt16-result", kind: "result", start: "2026-12-18", label: L4("IBT 제16회 성적 발표", "IBT round 16 results") },
+      { id: "topik-pbt109-result", kind: "result", start: "2026-12-22", label: L4("PBT 제109회 성적 발표", "PBT round 109 results") }
     ],
     forYou: "topikExam",
-    action: { label: L3("TOPIK 누리집 열기", "Open the TOPIK site"), url: "https://www.topik.go.kr/" }
+    action: { label: L4("TOPIK 누리집 열기", "Open the TOPIK site"), url: "https://www.topik.go.kr/" }
   },
   {
     id: "topik-2027-plan",
     channel: "topik",
     status: "official",
-    title: L3("2027년 TOPIK 일정이 나왔어요. 몽골 회차는 1월에 공지돼요", "2027 TOPIK dates are out. Mongolia rounds will be announced in January"),
+    title: L4("2027년 TOPIK 일정이 나왔어요. 몽골 회차는 1월에 공지돼요", "2027 TOPIK dates are out. Mongolia rounds will be announced in January"),
     points: [
-      L3("2027년에는 PBT가 제110회부터 제115회까지 여섯 번, IBT가 제17회부터 제22회까지 여섯 번 열려요(교육부 공고 제2026-419호).", "In 2027 there are six PBT rounds (110–115) and six IBT rounds (17–22), under Ministry of Education notice 2026-419."),
-      L3("몽골에서 어느 회차를 여는지와 몽골 접수 기간은 아직 공지되지 않았어요. 국외 PBT 시행 국가와 접수처는 2027년 1월 중 TOPIK 누리집에 올라와요.", "Which rounds run in Mongolia, and when registration opens there, has not been announced. Overseas PBT countries and registration offices will be posted on the TOPIK site in January 2027."),
-      L3("몽골 접수 기간은 한국 국내와 달라요. 2026년 제109회는 몽골 접수가 8월 17~21일, 국내 접수가 9월 1~7일이었어요. 몽골에서는 topik.mn에서 접수해요.", "Registration in Mongolia runs on different dates from Korea. For round 109 in 2026, Mongolia took registrations Aug 17–21 while Korea took them Sep 1–7. In Mongolia you register at topik.mn.")
+      L4("2027년에는 PBT가 제110회부터 제115회까지 여섯 번, IBT가 제17회부터 제22회까지 여섯 번 열려요(교육부 공고 제2026-419호).", "In 2027 there are six PBT rounds (110–115) and six IBT rounds (17–22), under Ministry of Education notice 2026-419."),
+      L4("몽골에서 어느 회차를 여는지와 몽골 접수 기간은 아직 공지되지 않았어요. 국외 PBT 시행 국가와 접수처는 2027년 1월 중 TOPIK 누리집에 올라와요.", "Which rounds run in Mongolia, and when registration opens there, has not been announced. Overseas PBT countries and registration offices will be posted on the TOPIK site in January 2027."),
+      L4("몽골 접수 기간은 한국 국내와 달라요. 2026년 제109회는 몽골 접수가 8월 17~21일, 국내 접수가 9월 1~7일이었어요. 몽골에서는 topik.mn에서 접수해요.", "Registration in Mongolia runs on different dates from Korea. For round 109 in 2026, Mongolia took registrations Aug 17–21 while Korea took them Sep 1–7. In Mongolia you register at topik.mn.")
     ],
-    source: { title: L3("TOPIK 누리집 「2027년 한국어능력시험 시행계획 공고」", "TOPIK site: 2027 TOPIK administration plan"), url: "https://www.topik.go.kr/TWINFO/TWINFO0011.do?bbsId=BBSMSTR00076&nttId=140003" },
+    source: { title: L4("TOPIK 누리집 「2027년 한국어능력시험 시행계획 공고」", "TOPIK site: 2027 TOPIK administration plan"), url: "https://www.topik.go.kr/TWINFO/TWINFO0011.do?bbsId=BBSMSTR00076&nttId=140003" },
     checkedAt: "2026-11-21",
     postedAt: "2026-11-21",
     dates: [],
     forYou: null,
-    action: { label: L3("몽골 TOPIK 접수처(topik.mn)", "TOPIK registration in Mongolia (topik.mn)"), url: "https://topik.mn/" }
+    action: { label: L4("몽골 TOPIK 접수처(topik.mn)", "TOPIK registration in Mongolia (topik.mn)"), url: "https://topik.mn/" }
   },
   {
     id: "visa-funds-proof",
     channel: "visa",
     status: "official",
-    title: L3("유학 비자 잔고 증명, 얼마를 얼마 동안", "Proof of funds for a student visa: how much, and for how long"),
+    title: L4("유학 비자 잔고 증명, 얼마를 얼마 동안", "Proof of funds for a student visa: how much, and for how long"),
     points: [
-      L3("유학(D-2)과 어학연수(D-4) 비자를 신청할 때 은행 잔고 증명이 필요해요. 금액은 비자 종류와 대학이 수도권인지에 따라 달라요.", "Student (D-2) and language training (D-4) visas need proof of funds. The amount depends on the visa and on whether the school is in the Seoul area."),
-      L3("몽골에서 신청할 때는 예치(잔고) 증명서와 본인이나 부모의 몽골 은행 계좌 거래내역서를 내요. 언제 발급받는지와 얼마 동안 유지하는지에도 조건이 있어요.", "In Mongolia you submit a deposit (balance) certificate and the statement of your own or a parent’s Mongolian bank account. There are rules on when it is issued and how long the money is kept."),
-      L3("법무부가 TOPIK 4급이 있으면 이 증명을 면제하는 계획을 발표했지만 시행일은 정해지지 않았어요. 지금은 증명이 필요해요.", "The Ministry of Justice has announced a plan to waive this proof for TOPIK level 4, but no start date has been set. For now the proof is required.")
+      L4("유학(D-2)과 어학연수(D-4) 비자를 신청할 때 은행 잔고 증명이 필요해요. 금액은 비자 종류와 대학이 수도권인지에 따라 달라요.", "Student (D-2) and language training (D-4) visas need proof of funds. The amount depends on the visa and on whether the school is in the Seoul area."),
+      L4("몽골에서 신청할 때는 예치(잔고) 증명서와 본인이나 부모의 몽골 은행 계좌 거래내역서를 내요. 언제 발급받는지와 얼마 동안 유지하는지에도 조건이 있어요.", "In Mongolia you submit a deposit (balance) certificate and the statement of your own or a parent’s Mongolian bank account. There are rules on when it is issued and how long the money is kept."),
+      L4("법무부가 TOPIK 4급이 있으면 이 증명을 면제하는 계획을 발표했지만 시행일은 정해지지 않았어요. 지금은 증명이 필요해요.", "The Ministry of Justice has announced a plan to waive this proof for TOPIK level 4, but no start date has been set. For now the proof is required.")
     ],
     // KVAC에서 읽은 사실은 출처 줄(법무부)과 따로 날짜와 함께 적는다.
-    note: L3("KVAC 몽골 유학(D-2) 서류 목록 7번 칸(2026-11-22 확인): 예치증명서와 본인 또는 부모의 몽골 은행 계좌 거래내역서. 같은 칸에 「우수 인증 대학은 해당되지 않음」이라고 적혀 있어요. 내 학교가 해당되는지는 아래 KVAC 서류 목록에서 확인하세요.", "KVAC Mongolia student visa (D-2) list, item 7 (checked 2026-11-22): a deposit certificate and the transaction statement of your own or a parent’s Mongolian bank account. The same item says it does not apply to top-certified universities. Check whether your school counts in the KVAC list below."),
-    source: { title: L3("법무부 2026-10-07 보도자료(별첨의 현행 기준)", "Ministry of Justice press release, 2026-10-07 (current rules in the annex)"), url: "https://www.moj.go.kr/bbs/moj/182/611170/artclView.do" },
+    note: L4("KVAC 몽골 유학(D-2) 서류 목록 7번 칸(2026-11-22 확인): 예치증명서와 본인 또는 부모의 몽골 은행 계좌 거래내역서. 같은 칸에 「우수 인증 대학은 해당되지 않음」이라고 적혀 있어요. 내 학교가 해당되는지는 아래 KVAC 서류 목록에서 확인하세요.", "KVAC Mongolia student visa (D-2) list, item 7 (checked 2026-11-22): a deposit certificate and the transaction statement of your own or a parent’s Mongolian bank account. The same item says it does not apply to top-certified universities. Check whether your school counts in the KVAC list below."),
+    source: { title: L4("법무부 2026-10-07 보도자료(별첨의 현행 기준)", "Ministry of Justice press release, 2026-10-07 (current rules in the annex)"), url: "https://www.moj.go.kr/bbs/moj/182/611170/artclView.do" },
     checkedAt: "2026-11-21",
     postedAt: "2026-11-21",
     dates: [],
     forYou: "finance",
-    action: { label: L3("KVAC 유학 비자 서류 목록", "KVAC student visa document list"), url: KVAC_D22 }
+    action: { label: L4("KVAC 유학 비자 서류 목록", "KVAC student visa document list"), url: KVAC_D23 }
   },
   {
     id: "visa-docs-mn",
     channel: "visa",
     status: "official",
-    title: L3("몽골에서 유학 비자를 낼 때 챙길 서류", "Documents for a student visa applied for in Mongolia"),
+    title: L4("몽골에서 유학 비자를 낼 때 챙길 서류", "Documents for a student visa applied for in Mongolia"),
     points: [
-      L3("KVAC 서류 목록에는 학력 서류를 「아포스티유 확인을 받은 서류」로 내라고 적혀 있어요. 몽골 학교 졸업자는 원본으로 되는지 문구가 분명하지 않으니 KVAC에 먼저 물어보세요.", "The KVAC list asks for academic documents “with an Apostille”. The wording on whether graduates of Mongolian schools may submit originals is unclear, so ask KVAC first."),
-      L3("결핵진단서가 필요해요. 대사관이 지정한 울란바토르 병원 아홉 곳에서 받을 수 있고, 병원 목록은 KVAC 누리집에 있어요.", "A tuberculosis certificate is required. You can get it at nine Ulaanbaatar hospitals designated by the embassy; the list is on the KVAC site."),
-      L3("몽골어 서류에는 번역본과 번역자 신분증 사본, 「번역자 확인서」를 함께 내요. 심사는 20일 걸리고, KVAC에 본인이 직접 접수할 수 있어요.", "Mongolian-language documents need a translation, a copy of the translator’s ID and a translator’s confirmation form. Review takes 20 days, and you can apply at KVAC yourself.")
+      L4("KVAC 서류 목록에는 학력 서류를 「아포스티유 확인을 받은 서류」로 내라고 적혀 있어요. 몽골 학교 졸업자는 원본으로 되는지 문구가 분명하지 않으니 KVAC에 먼저 물어보세요.", "The KVAC list asks for academic documents “with an Apostille”. The wording on whether graduates of Mongolian schools may submit originals is unclear, so ask KVAC first."),
+      L4("결핵진단서가 필요해요. 대사관이 지정한 울란바토르 병원 아홉 곳에서 받을 수 있고, 병원 목록은 KVAC 누리집에 있어요.", "A tuberculosis certificate is required. You can get it at nine Ulaanbaatar hospitals designated by the embassy; the list is on the KVAC site."),
+      L4("몽골어 서류에는 번역본과 번역자 신분증 사본, 「번역자 확인서」를 함께 내요. 심사는 20일 걸리고, KVAC에 본인이 직접 접수할 수 있어요.", "Mongolian-language documents need a translation, a copy of the translator’s ID and a translator’s confirmation form. Review takes 20 days, and you can apply at KVAC yourself.")
     ],
-    source: { title: L3("KVAC 몽골 「유학(D-2-1~D-2-4)」 서류 목록", "KVAC Mongolia: Study visa (D-2-1 to D-2-4) documents"), url: KVAC_D22 },
+    source: { title: L4("KVAC 몽골 「유학(D-2-1~D-2-4)」 서류 목록", "KVAC Mongolia: Study visa (D-2-1 to D-2-4) documents"), url: KVAC_D23 },
     checkedAt: "2026-11-21",
     postedAt: "2026-11-21",
     dates: [],
     forYou: null,
-    action: { label: L3("KVAC 유학 비자 서류 목록", "KVAC student visa document list"), url: KVAC_D22 }
+    action: { label: L4("KVAC 유학 비자 서류 목록", "KVAC student visa document list"), url: KVAC_D23 }
   },
   {
     id: "gks-2027-u",
     channel: "scholarship",
     status: "official",
-    title: L3("2027 정부초청장학생(GKS) 학부: 대사관 접수는 끝났고 1월 7일 발표", "2027 GKS undergraduate: embassy applications have closed, results on Jan 7"),
+    title: L4("2027 정부초청장학생(GKS) 학부: 대사관 접수는 끝났고 1월 7일 발표", "2027 GKS undergraduate: embassy applications have closed, results on Jan 7"),
     points: [
-      L3("2027 학부 장학생 대사관 전형은 몽골에서 4명을 뽑아요. 일반 전형 2명, 지방 대학에만 지원하는 R-GKS 전형 2명이에요. 접수는 2026년 9월 15~30일에 끝났어요.", "The 2027 undergraduate embassy track selects 4 students from Mongolia: 2 in the general track and 2 in R-GKS, which applies to regional universities only. Applications ran Sep 15–30, 2026 and have closed."),
-      L3("지원 조건은 만 25세 미만(2002년 3월 1일 이후 출생), 고등학교 졸업 또는 졸업 예정, 본인과 부모 모두 외국 국적이에요. TOPIK 3급 이상이면 가산점이 있어요.", "You must be under 25 (born on or after Mar 1, 2002), have finished or be finishing high school, and you and both parents must hold non-Korean nationality. TOPIK level 3 or higher earns extra points."),
-      L3("장학생은 한국어연수 1년과 학위 과정 동안 등록금(학기당 500만 원 한도), 왕복 항공료, 학업장려금(학위 기간 한 해 1,440만 원)을 받아요. 최종 합격 발표는 2027년 1월 7일 예정이에요.", "Scholars get one year of Korean training plus the degree, with tuition (up to ₩5,000,000 a semester), round-trip airfare and a stipend (₩14,400,000 a year during the degree). Final results are planned for Jan 7, 2027.")
+      L4("2027 학부 장학생 대사관 전형은 몽골에서 4명을 뽑아요. 일반 전형 2명, 지방 대학에만 지원하는 R-GKS 전형 2명이에요. 접수는 2026년 9월 15~30일에 끝났어요.", "The 2027 undergraduate embassy track selects 4 students from Mongolia: 2 in the general track and 2 in R-GKS, which applies to regional universities only. Applications ran Sep 15–30, 2026 and have closed."),
+      L4("지원 조건은 만 25세 미만(2002년 3월 1일 이후 출생), 고등학교 졸업 또는 졸업 예정, 본인과 부모 모두 외국 국적이에요. TOPIK 3급 이상이면 가산점이 있어요.", "You must be under 25 (born on or after Mar 1, 2002), have finished or be finishing high school, and you and both parents must hold non-Korean nationality. TOPIK level 3 or higher earns extra points."),
+      L4("장학생은 한국어연수 1년과 학위 과정 동안 등록금(학기당 500만 원 한도), 왕복 항공료, 학업장려금(학위 기간 한 해 1,440만 원)을 받아요. 최종 합격 발표는 2027년 1월 7일 예정이에요.", "Scholars get one year of Korean training plus the degree, with tuition (up to ₩5,000,000 a semester), round-trip airfare and a stipend (₩14,400,000 a year during the degree). Final results are planned for Jan 7, 2027.")
     ],
-    source: { title: L3("주몽골 한국대사관 「2027 정부초청 외국인(몽골국적) 학부 장학생 모집」", "Korean Embassy in Mongolia: 2027 GKS undergraduate call"), url: "https://overseas.mofa.go.kr/mn-ko/brd/m_373/view.do?seq=1339551" },
+    source: { title: L4("주몽골 한국대사관 「2027 정부초청 외국인(몽골국적) 학부 장학생 모집」", "Korean Embassy in Mongolia: 2027 GKS undergraduate call"), url: "https://overseas.mofa.go.kr/mn-ko/brd/m_373/view.do?seq=1339551" },
     checkedAt: "2026-11-21",
     postedAt: "2026-11-21",
-    dates: [{ id: "gks-2027-u-final", kind: "result", start: "2027-01-07", label: L3("GKS 학부 최종 합격 발표(예정)", "GKS undergraduate final results (planned)") }],
+    dates: [{ id: "gks-2027-u-final", kind: "result", start: "2027-01-07", label: L4("GKS 학부 최종 합격 발표(예정)", "GKS undergraduate final results (planned)") }],
     forYou: "gksGrade",
-    criteria: { gradePct: 80, of: L3("고등학교 전 학년 성적", "all high school years"), other: L3("또는 석차 상위 20% 안, 또는 CGPA 2.64/4.0 이상", "or the top 20% of your class, or a CGPA of 2.64/4.0 or higher") },
+    criteria: { gradePct: 80, of: L4("고등학교 전 학년 성적", "all high school years"), other: L4("또는 석차 상위 20% 안, 또는 CGPA 2.64/4.0 이상", "or the top 20% of your class, or a CGPA of 2.64/4.0 or higher") },
     action: null
   },
   {
     id: "gks-2027-g",
     channel: "scholarship",
     status: "official",
-    title: L3("2027 GKS 대학원 장학생은 아직 공고 전이에요", "2027 GKS graduate scholarships have not been announced yet"),
+    title: L4("2027 GKS 대학원 장학생은 아직 공고 전이에요", "2027 GKS graduate scholarships have not been announced yet"),
     points: [
-      L3("2027 대학원 장학생 요강은 2026년 11월 21일 현재 Study in Korea에 올라오지 않았어요. 2026년에는 2월 2일에 요강이 올라왔어요.", "As of Nov 21, 2026 the 2027 graduate guidelines are not on Study in Korea. In 2026 they were posted on Feb 2."),
-      L3("2026년 몽골 대사관 전형은 2월 12~25일에 접수했고 일반과정 13명을 뽑았어요.", "In 2026 the Mongolia embassy track took applications Feb 12–25 and selected 13 students for the general program."),
-      L3("2026년 기준 지원 조건은 40세 미만, 학사 또는 석사 졸업, 직전 과정 평균 80% 이상이에요. 2027년 요강이 나오면 다시 확인하세요.", "The 2026 requirements were: under 40, a bachelor’s or master’s degree, and an average of 80% or higher in your last program. Check again when the 2027 guidelines come out.")
+      L4("2027 대학원 장학생 요강은 2026년 11월 21일 현재 Study in Korea에 올라오지 않았어요. 2026년에는 2월 2일에 요강이 올라왔어요.", "As of Nov 21, 2026 the 2027 graduate guidelines are not on Study in Korea. In 2026 they were posted on Feb 2."),
+      L4("2026년 몽골 대사관 전형은 2월 12~25일에 접수했고 일반과정 13명을 뽑았어요.", "In 2026 the Mongolia embassy track took applications Feb 12–25 and selected 13 students for the general program."),
+      L4("2026년 기준 지원 조건은 40세 미만, 학사 또는 석사 졸업, 직전 과정 평균 80% 이상이에요. 2027년 요강이 나오면 다시 확인하세요.", "The 2026 requirements were: under 40, a bachelor’s or master’s degree, and an average of 80% or higher in your last program. Check again when the 2027 guidelines come out.")
     ],
-    source: { title: L3("Study in Korea 「정부초청 장학금」 안내", "Study in Korea: Government scholarships"), url: "https://www.studyinkorea.go.kr/ko/plan/scholarship.do" },
+    source: { title: L4("Study in Korea 「정부초청 장학금」 안내", "Study in Korea: Government scholarships"), url: "https://www.studyinkorea.go.kr/ko/plan/scholarship.do" },
     checkedAt: "2026-11-21",
     postedAt: "2026-11-21",
     dates: [],
@@ -3925,47 +4190,47 @@ var POSTS = Object.freeze([
     id: "scam-visa-guarantee",
     channel: "scam",
     status: "official",
-    title: L3("「비자를 받아 준다」는 말은 믿지 마세요", "Do not trust anyone who promises you a visa"),
+    title: L4("「비자를 받아 준다」는 말은 믿지 마세요", "Do not trust anyone who promises you a visa"),
     points: [
-      L3("비자는 대사관이 심사해서 내줘요. KVAC는 어떤 개인이나 제3자도 비자 발급을 보장할 수 없다고 공지했어요(2026-01-23).", "Visas are reviewed and issued by the embassy. KVAC has announced that no individual or third party can guarantee a visa (2026-01-23)."),
-      L3("KVAC 예약은 무료이고 이메일과 전화로만 받아요. 비자 수수료와 서비스 수수료는 신청할 때 KVAC에서 내고 영수증을 받아요.", "KVAC appointments are free and taken only by email and phone. Visa and service fees are paid at KVAC when you apply, and you get a receipt."),
-      L3("대사관은 정해진 수수료보다 많은 돈을 요구하면 사기라고 경고했어요(2026-02-06 취업비자 안내). 의심스러우면 대사관이나 KVAC에 알리세요.", "The embassy has warned that asking for more than the set fee is a scam (2026-02-06, work visa notice). If something seems wrong, tell the embassy or KVAC.")
+      L4("비자는 대사관이 심사해서 내줘요. KVAC는 어떤 개인이나 제3자도 비자 발급을 보장할 수 없다고 공지했어요(2026-01-23).", "Visas are reviewed and issued by the embassy. KVAC has announced that no individual or third party can guarantee a visa (2026-01-23)."),
+      L4("KVAC 예약은 무료이고 이메일과 전화로만 받아요. 비자 수수료와 서비스 수수료는 신청할 때 KVAC에서 내고 영수증을 받아요.", "KVAC appointments are free and taken only by email and phone. Visa and service fees are paid at KVAC when you apply, and you get a receipt."),
+      L4("대사관은 정해진 수수료보다 많은 돈을 요구하면 사기라고 경고했어요(2026-02-06 취업비자 안내). 의심스러우면 대사관이나 KVAC에 알리세요.", "The embassy has warned that asking for more than the set fee is a scam (2026-02-06, work visa notice). If something seems wrong, tell the embassy or KVAC.")
     ],
-    source: { title: L3("KVAC 몽골 「Important Notices」", "KVAC Mongolia: Important Notices"), url: "https://www.visaforkorea.mn/important-notices" },
+    source: { title: L4("KVAC 몽골 「Important Notices」", "KVAC Mongolia: Important Notices"), url: "https://www.visaforkorea.mn/important-notices" },
     checkedAt: "2026-11-21",
     postedAt: "2026-11-21",
     dates: [],
     forYou: null,
-    action: { label: L3("KVAC 공식 누리집", "KVAC official site"), url: "https://www.visaforkorea.mn/" }
+    action: { label: L4("KVAC 공식 누리집", "KVAC official site"), url: "https://www.visaforkorea.mn/" }
   },
   {
     id: "scam-check-university",
     channel: "scam",
     status: "official",
-    title: L3("지원하기 전에 인증 대학인지 확인하세요", "Check that the university is certified before you apply"),
+    title: L4("지원하기 전에 인증 대학인지 확인하세요", "Check that the university is certified before you apply"),
     points: [
-      L3("교육부와 법무부가 교육국제화역량을 인증한 대학은 학위과정 181곳, 어학연수과정 123곳이에요. 인증 기간은 2026년 3월부터 2030년 2월까지지만, 해마다 점검해 기준에 못 미치면 인증이 취소되니 지원할 때 명단을 다시 확인하세요.", "The Ministry of Education and the Ministry of Justice have certified 181 universities for degree programs and 123 for language programs, from Mar 2026 to Feb 2030. Certification is checked every year and can be withdrawn, so check the list again when you apply."),
-      L3("2026년 2학기부터 1년 동안 비자 발급이 제한되는 대학이 학위과정 16곳, 어학연수과정 4곳 있어요. 같은 대학도 과정마다 따로 정해지니 내가 갈 과정으로 확인하세요.", "For one year from the second semester of 2026, visas are restricted at 16 universities for degree programs and 4 for language programs. Degree and language tracks are judged separately, so check the track you plan to join."),
-      L3("KVAC도 학생비자를 신청하기 전에 Study in Korea의 인증 대학 명단에서 학교를 확인하라고 안내해요.", "KVAC also tells students to check the school against the certified list on Study in Korea before applying for a student visa.")
+      L4("교육부와 법무부가 교육국제화역량을 인증한 대학은 학위과정 181곳, 어학연수과정 123곳이에요. 인증 기간은 2026년 3월부터 2030년 2월까지지만, 해마다 점검해 기준에 못 미치면 인증이 취소되니 지원할 때 명단을 다시 확인하세요.", "The Ministry of Education and the Ministry of Justice have certified 181 universities for degree programs and 123 for language programs, from Mar 2026 to Feb 2030. Certification is checked every year and can be withdrawn, so check the list again when you apply."),
+      L4("2026년 2학기부터 1년 동안 비자 발급이 제한되는 대학이 학위과정 16곳, 어학연수과정 4곳 있어요. 같은 대학도 과정마다 따로 정해지니 내가 갈 과정으로 확인하세요.", "For one year from the second semester of 2026, visas are restricted at 16 universities for degree programs and 4 for language programs. Degree and language tracks are judged separately, so check the track you plan to join."),
+      L4("KVAC도 학생비자를 신청하기 전에 Study in Korea의 인증 대학 명단에서 학교를 확인하라고 안내해요.", "KVAC also tells students to check the school against the certified list on Study in Korea before applying for a student visa.")
     ],
-    source: { title: L3("법무부 · 교육부 「2025년 교육국제화역량 인증 결과」 보도자료(2026-02-12)", "Ministries of Justice and Education: 2025 certification results (2026-02-12)"), url: "https://www.moj.go.kr/bbs/moj/182/603491/artclView.do" },
+    source: { title: L4("법무부 · 교육부 「2025년 교육국제화역량 인증 결과」 보도자료(2026-02-12)", "Ministries of Justice and Education: 2025 certification results (2026-02-12)"), url: "https://www.moj.go.kr/bbs/moj/182/603491/artclView.do" },
     checkedAt: "2026-11-21",
     postedAt: "2026-11-21",
     dates: [],
     forYou: null,
-    action: { label: L3("Study in Korea 인증 대학 명단", "Study in Korea certified list"), url: "https://www.studyinkorea.go.kr/ko/plan/certifiedUniversity.do" }
+    action: { label: L4("Study in Korea 인증 대학 명단", "Study in Korea certified list"), url: "https://www.studyinkorea.go.kr/ko/plan/certifiedUniversity.do" }
   },
   {
     id: "scam-agency-registration",
     channel: "scam",
     status: "announced",
-    title: L3("해외 유학원 등록제는 아직 계획이에요", "Registration of overseas study agencies is still only a plan"),
+    title: L4("해외 유학원 등록제는 아직 계획이에요", "Registration of overseas study agencies is still only a plan"),
     points: [
-      L3("법무부는 2026-10-07에 재외공관과 함께 요건을 갖춘 현지 유학원을 골라 공개하고 관리하는 「해외 유학원 등록제」 계획을 발표했어요.", "On 2026-10-07 the Ministry of Justice announced a plan to select, publish and manage qualified local study agencies together with embassies."),
-      L3("추진 일정은 「2027년 하반기까지」로 적혀 있고 시행일은 정해지지 않았어요. 시범 운영할 공관도 공개되지 않았어요.", "The plan says “by the second half of 2027”; no start date has been set, and the pilot embassies have not been named."),
-      L3("법무부는 도입 이유로 유학원의 과도한 수수료, 부정확한 정보, 허위 서류 작성을 들었어요. 시행 전인 지금은 대학 요강과 KVAC 안내를 직접 확인하세요.", "The ministry cited excessive agency fees, inaccurate information and false documents. Until it starts, check university guides and KVAC notices yourself.")
+      L4("법무부는 2026-10-07에 재외공관과 함께 요건을 갖춘 현지 유학원을 골라 공개하고 관리하는 「해외 유학원 등록제」 계획을 발표했어요.", "On 2026-10-07 the Ministry of Justice announced a plan to select, publish and manage qualified local study agencies together with embassies."),
+      L4("추진 일정은 「2027년 하반기까지」로 적혀 있고 시행일은 정해지지 않았어요. 시범 운영할 공관도 공개되지 않았어요.", "The plan says “by the second half of 2027”; no start date has been set, and the pilot embassies have not been named."),
+      L4("법무부는 도입 이유로 유학원의 과도한 수수료, 부정확한 정보, 허위 서류 작성을 들었어요. 시행 전인 지금은 대학 요강과 KVAC 안내를 직접 확인하세요.", "The ministry cited excessive agency fees, inaccurate information and false documents. Until it starts, check university guides and KVAC notices yourself.")
     ],
-    source: { title: L3("법무부 2026-10-07 보도자료", "Ministry of Justice press release, 2026-10-07"), url: "https://www.moj.go.kr/bbs/moj/182/611170/artclView.do" },
+    source: { title: L4("법무부 2026-10-07 보도자료", "Ministry of Justice press release, 2026-10-07"), url: "https://www.moj.go.kr/bbs/moj/182/611170/artclView.do" },
     checkedAt: "2026-11-21",
     postedAt: "2026-11-21",
     dates: [],
@@ -3982,23 +4247,27 @@ function univPosts(programs) {
   return programs.filter((p) => !p.example && Array.isArray(p.applyRounds) && p.applyRounds.length).map((p) => {
     const rounds = p.applyRounds, many = rounds.length > 1, base = Number(rounds[0][0].slice(0, 4));
     const span = (r, en) => `${monthDay(r[0], en, base)} – ${monthDay(r[1], en, base)}`;
-    const roundsText = L3(
+    const roundsText = L4(
       `접수 기간(${base}년): ${rounds.map((r, i) => `${many ? `${i + 1}차 ` : ""}${span(r, false)}`).join(", ")}.`,
       `Application periods (${base}): ${rounds.map((r, i) => `${many ? `round ${i + 1} ` : ""}${span(r, true)}`).join(", ")}.`
     );
-    const who = L3(`${p.name.ko}${p.level !== "language" ? " 학부" : ""}`, `${p.name.en}${p.level !== "language" ? " undergraduate" : ""}`);
-    const korean = p.requires.topik ? L3(`TOPIK ${p.requires.topik}급 이상이 필요해요. 다른 길도 있는지 요강에서 확인하세요.`, `TOPIK level ${p.requires.topik} or higher is required. Check the guide for other ways to qualify.`) : L3("한국어 성적이 없어도 지원할 수 있어요.", "You can apply without a Korean test score.");
+    const who = L4(`${p.name.ko}${p.level !== "language" ? " 학부" : ""}`, `${p.name.en}${p.level !== "language" ? " undergraduate" : ""}`);
+    const korean = p.requires.topik ? L4(`TOPIK ${p.requires.topik}급 이상이 필요해요. 다른 길도 있는지 요강에서 확인하세요.`, `TOPIK level ${p.requires.topik} or higher is required. Check the guide for other ways to qualify.`) : L4("한국어 성적이 없어도 지원할 수 있어요.", "You can apply without a Korean test score.");
     const ug = p.level !== "language";
     return freezePost({
       id: "univ-" + p.id,
       channel: "univ",
       status: "official",
-      title: L3(`${p.name.ko}${ug ? " 학부" : ""}${p.term ? ` ${p.term.ko}` : ""} 원서 접수`, `${p.name.en}${ug ? " undergraduate" : ""}${p.term ? `, ${p.term.en}` : ""}: applications`),
-      points: [roundsText, korean, L3("대학이 공개한 모집 요강에서 옮겼어요. SYNK와 협약한 대학은 아니에요.", "Taken from the university’s published admissions guide. Not a SYNK partner university.")],
+      title: L4(`${p.name.ko}${ug ? " 학부" : ""}${p.term ? ` ${p.term.ko}` : ""} 원서 접수`, `${p.name.en}${ug ? " undergraduate" : ""}${p.term ? `, ${p.term.en}` : ""}: applications`),
+      points: [roundsText, korean, L4("대학이 공개한 모집 요강에서 옮겼어요. SYNK와 협약한 대학은 아니에요.", "Taken from the university’s published admissions guide. Not a SYNK partner university.")],
       source: p.source,
       checkedAt: p.checkedAt,
       postedAt: p.checkedAt,
-      dates: rounds.map((r, i) => ({ id: `univ-${p.id}-${r[0]}`, kind: "apply", start: r[0], end: r[1], label: many ? L3(`${i + 1}차 원서 접수`, `Round ${i + 1} applications`) : L3("원서 접수", "Applications"), who })),
+      // 원서 차수에 서류 기한(3단계 docs-data)을 더해 날짜순으로 둔다. 서류 기한의 id는 그 차수에 매달려 있다.
+      dates: [
+        ...rounds.map((r, i) => ({ id: `univ-${p.id}-${r[0]}`, kind: "apply", start: r[0], end: r[1], label: many ? L4(`${i + 1}차 원서 접수`, `Round ${i + 1} applications`) : L4("원서 접수", "Applications"), who })),
+        ...deadlineDates(p.id).map((d) => ({ ...d, who }))
+      ].sort((a, b) => a.start < b.start ? -1 : a.start > b.start ? 1 : 0),
       // 과정 자료에는 요강 주소만 있고 접수처 주소가 없다(원광대 학부는 방문 · 우편 접수). 접수처 단추를 걸지 않는다.
       forYou: "program",
       programId: p.id,
@@ -4054,9 +4323,10 @@ function isStalePost(post2, now = /* @__PURE__ */ new Date(), days = STALE_DAYS)
 function isNewPost(post2, now = /* @__PURE__ */ new Date(), days = NEW_DAYS) {
   return daysSince(post2.postedAt, now) < days;
 }
-function nextDate(post2, now = /* @__PURE__ */ new Date()) {
+function nextDate(post2, now = /* @__PURE__ */ new Date(), { skipDocs = false } = {}) {
   let best = null;
   for (const d of post2.dates) {
+    if (skipDocs && d.docsDue) continue;
     const st = dateStatus(d, now);
     if (st.state === "past" || st.state === "cancelled") continue;
     const due = st.state === "before" ? d.start : dueDay(d);
@@ -4068,7 +4338,7 @@ var newest = (a, b) => a.postedAt < b.postedAt ? 1 : a.postedAt > b.postedAt ? -
 function featuredPost(posts, now = /* @__PURE__ */ new Date()) {
   let best = null;
   for (const p of posts) {
-    const n = nextDate(p, now);
+    const n = nextDate(p, now, { skipDocs: true });
     if (n && (!best || n.due < best.due)) best = { post: p, due: n.due };
   }
   return best ? best.post : [...posts].sort(newest)[0] || null;
@@ -4167,12 +4437,12 @@ var CAL = svg('<rect x="3.5" y="4.5" width="13" height="12" rx="2"/><path d="M3.
 function ctx(view) {
   const now = view.now || /* @__PURE__ */ new Date();
   const en = view.lang === "en";
-  const L4 = (ko, e) => en ? e : ko;
+  const L5 = (ko, e) => en ? e : ko;
   const pick2 = (o) => o ? en ? o.en : o.ko : "";
   const won = (n) => en ? `₩${n.toLocaleString("en-US")}` : n < 1e4 ? `${n.toLocaleString("ko-KR")}원` : n % 1e4 === 0 ? `${(n / 1e4).toLocaleString("ko-KR")}만 원` : `${Math.floor(n / 1e4).toLocaleString("ko-KR")}만 ${(n % 1e4).toLocaleString("ko-KR")}원`;
   const thisYear = Number(new Date((now instanceof Date ? now.getTime() : new Date(now).getTime()) + 9 * 36e5).toISOString().slice(0, 4));
   const md = (d) => monthDay(d, en, thisYear);
-  return { now, en, L: L4, pick: pick2, won, md, posts: view.posts || [], programs: view.programs || [], rules: view.rules || [], profile: view.profile, lang: en ? "en" : "ko", condOn: view.condOn !== false, persisted: view.persisted !== false, note: typeof view.note === "string" ? view.note : "" };
+  return { now, en, L: L5, pick: pick2, won, md, posts: view.posts || [], programs: view.programs || [], rules: view.rules || [], profile: view.profile, lang: en ? "en" : "ko", condOn: view.condOn !== false, persisted: view.persisted !== false, note: typeof view.note === "string" ? view.note : "" };
 }
 var channelOf = (id) => CHANNELS.find((c) => c.id === id) || null;
 var newTab = (T2) => `<span class="sr-only"> (${T2.L("새 탭에서 열림", "opens in new tab")})</span>`;
@@ -4313,17 +4583,25 @@ function showButton(c, off, T2) {
   const on = !off.includes(c.id);
   return `<button type="button" class="sx-btn2 sm sx-show" aria-pressed="${on}" data-action="channelShow" data-id="${esc3(c.id)}"><span class="sx-on">${ON}</span>${T2.L("오늘 화면에 보이기", "Show on Today")}<span class="sr-only"> ${esc3(T2.pick(c.name))}</span></button>`;
 }
+function datesBlock(p, T2, saved, title) {
+  if (!p.dates.length) return "";
+  const live = p.dates.some((d) => {
+    const st = dateStatus(d, T2.now).state;
+    return st !== "past" && st !== "cancelled";
+  });
+  return `<h2 class="sx-h" id="sx-dates-h" tabindex="-1">${title || T2.L("날짜", "Dates")}</h2>${T2.note ? `<p class="sx-store is-warn sx-date-note">${esc3(T2.note)}</p>` : ""}${live ? storeLine(T2) : ""}<ul class="sx-days">${p.dates.map((d) => dateRow(p, d, T2, saved)).join("")}</ul>`;
+}
+function renderDates(view, post2, title) {
+  const T2 = ctx(view);
+  return post2 ? datesBlock(post2, T2, T2.profile && T2.profile.dates || [], title) : "";
+}
 function renderPost(view) {
   const T2 = ctx(view), profile2 = T2.profile || {}, p = postById(T2.posts, view.postId);
   const back = (c2) => `<button type="button" class="sx-back" data-action="channelOpen" data-id="${c2 ? esc3(c2.id) : ""}">${BACK}${c2 ? esc3(T2.pick(c2.name)) : T2.L("채널", "News")}</button>`;
   if (!p) return `<div class="sx">${back(null)}<h1 class="sx-title page-title" tabindex="-1">${T2.L("글을 찾지 못했어요.", "Post not found.")}</h1></div>`;
   const c = channelOf(p.channel), saved = profile2.dates || [];
   const stale = isStalePost(p, T2.now) ? `<p class="sx-note is-box">${T2.L("확인한 지 90일이 지났어요. 날짜는 공식 안내에서 다시 확인하세요.", "This was checked more than 90 days ago. Check the dates in the official notice.")}</p>` : "";
-  const live = p.dates.some((d) => {
-    const st = dateStatus(d, T2.now).state;
-    return st !== "past" && st !== "cancelled";
-  });
-  const dates = p.dates.length ? `<h2 class="sx-h" id="sx-dates-h" tabindex="-1">${T2.L("날짜", "Dates")}</h2>${T2.note ? `<p class="sx-store is-warn sx-date-note">${esc3(T2.note)}</p>` : ""}${live ? storeLine(T2) : ""}<ul class="sx-days">${p.dates.map((d) => dateRow(p, d, T2, saved)).join("")}</ul>` : "";
+  const dates = datesBlock(p, T2, saved);
   const action = p.action ? `<a class="sx-cta" href="${esc3(p.action.url)}" target="_blank" rel="noopener noreferrer">${esc3(T2.pick(p.action.label))}${newTab(T2)} ${GO}</a><p class="sx-fine">${T2.L("공식 쪽으로 연결해요. 접수와 신청은 본인이 직접 해요.", "This opens the official site. You apply yourself.")}</p>` : "";
   const tag2 = postTag(p, T2);
   return `<div class="sx">${back(c)}
@@ -4420,29 +4698,30 @@ var LEVEL = { language: ["어학 과정", "Language program"], undergraduate: ["
 function ctx2(view) {
   const now = view.now || /* @__PURE__ */ new Date();
   const en = view.lang === "en";
-  const L4 = (ko, e) => en ? e : ko;
+  const L5 = (ko, e) => en ? e : ko;
   const pick2 = (o) => o ? en ? o.en : o.ko : "";
   const pair = (a) => en ? a[1] : a[0];
   const won = (n) => en ? `₩${n.toLocaleString("en-US")}` : n < 1e4 ? `${n.toLocaleString("ko-KR")}원` : n % 1e4 === 0 ? `${(n / 1e4).toLocaleString("ko-KR")}만 원` : `${Math.floor(n / 1e4).toLocaleString("ko-KR")}만 ${(n % 1e4).toLocaleString("ko-KR")}원`;
-  const topik = (n) => n === null || n === void 0 ? L4("아직 안 넣음", "Not entered") : n === 0 ? L4("성적 없음", "No score yet") : L4(`TOPIK ${n}급`, `TOPIK level ${n}`);
+  const topik = (n) => n === null || n === void 0 ? L5("아직 안 넣음", "Not entered") : n === 0 ? L5("성적 없음", "No score yet") : L5(`TOPIK ${n}급`, `TOPIK level ${n}`);
   const programs = view.programs || PROGRAMS;
   const rules = view.rules || rulesAt(RULES, now);
   const profile2 = view.profile;
   const allExample = programs.length > 0 && programs.every((p) => p.example);
   const anyPartner = programs.some((p) => p.partner === true);
-  const fitText = (n) => allExample ? L4(`개의 예시 과정이 지금 조건에 맞아요 (예시 ${programs.length}개 중)`, `of ${programs.length} example programs fit your conditions`) : L4("개 과정이 지금 조건에 맞아요", n === 1 ? "program fits your conditions" : "programs fit your conditions");
+  const fitText = (n) => allExample ? L5(`개의 예시 과정이 지금 조건에 맞아요 (예시 ${programs.length}개 중)`, `of ${programs.length} example programs fit your conditions`) : L5("개 과정이 지금 조건에 맞아요", n === 1 ? "program fits your conditions" : "programs fit your conditions");
   const needs = countNeeds(programs);
-  const needWord = needs.length === 2 ? L4("성적과 한국어를", "your grades and Korean level") : needs[0] === "gradePct" ? L4("성적을", "your grades") : L4("한국어 급수를", "your Korean level");
+  const needWord = needs.length === 2 ? L5("성적과 한국어를", "your grades and Korean level") : needs[0] === "gradePct" ? L5("성적을", "your grades") : L5("한국어 급수를", "your Korean level");
   const MON2 = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
   const md = (d) => {
     const [, m, day] = d.split("-").map(Number);
-    return L4(`${m}월 ${day}일`, `${MON2[m - 1]} ${day}`);
+    return L5(`${m}월 ${day}일`, `${MON2[m - 1]} ${day}`);
   };
-  return { now, en, L: L4, pick: pick2, pair, won, topik, programs, rules, profile: profile2, allExample, anyPartner, fitText, needs, needWord, md };
+  return { now, en, L: L5, pick: pick2, pair, won, topik, programs, rules, profile: profile2, allExample, anyPartner, fitText, needs, needWord, md };
 }
 var tag = (status, T2) => `<span class="sx-tag is-${status}">${T2.pair(STATUS[status])}</span>`;
 var meter = (match, T2) => `<span class="sx-meter" role="img" aria-label="${esc4(match.items.map((i) => `${T2.pair(KEY_NAME[i.key])} ${T2.pair(STATUS[i.status])}`).join(", "))}">${match.items.map((i) => `<i class="is-${i.status}"></i>`).join("")}</span>`;
 var exampleTag = (p, T2) => p.example ? `<span class="sx-tag wait">${T2.L("예시", "Example")}</span>` : "";
+var programImage = (p) => image(p);
 var image = (p) => p.image ? `<img class="sx-img" src="./assets/${esc4(p.image)}.webp" alt="" width="960" height="640">` : `<span class="sx-cover is-${esc4(p.tone || "lapis")}" aria-hidden="true"><span>${esc4(p.place.en.split(",")[0].toUpperCase())}</span></span>`;
 var newTab2 = (T2) => `<span class="sr-only"> (${T2.L("새 탭에서 열림", "opens in new tab")})</span>`;
 var sourceLine = (rule, T2) => `<p class="sx-src"><b>${T2.L("출처", "Source")}</b> <a href="${esc4(rule.source.url)}" target="_blank" rel="noopener noreferrer">${esc4(T2.pick(rule.source.title))}${newTab2(T2)}</a> · ${T2.L(`${rule.basis} 시행 · 확인 ${rule.checkedAt}`, `in force from ${rule.basis} · checked ${rule.checkedAt}`)}</p>`;
@@ -4571,7 +4850,7 @@ function renderUnivDetail(view) {
 <div class="sx-photo is-hero">${image(p)}<span class="sx-photo-top">${exampleTag(p, T2)}<span class="sx-tag white">${esc4(opensLong(p, T2))}</span></span><span class="sx-photo-body"><small>${esc4(T2.pick(p.place))} · ${T2.pair(LEVEL[p.level])} · ${esc4(T2.pick(p.majors))}${p.term ? ` · ${esc4(T2.pick(p.term))}` : ""}</small></span></div>
 <h1 class="sx-title page-title" tabindex="-1">${esc4(T2.pick(p.name))}</h1>
 ${p.example ? `<p class="sx-lead">${T2.L("화면을 미리 보이려고 넣은 예시 과정이에요. 금액, 일정, 입학 조건은 실제 대학의 것이 아니에요.", "An example program to preview the screen. The amounts, dates and admission conditions are not from a real university.")}</p>` : `${p.partner ? "" : `<p class="sx-lead">${T2.L("대학이 공개한 모집 요강에서 옮긴 정보예요. SYNK와 협약한 대학은 아니에요. 지원하기 전에 원문을 꼭 확인하세요.", "Taken from the university’s published admissions guide. This is not a SYNK partner university. Check the original before applying.")}</p>`}${realSource}`}
-${p.applyNote ? `<p class="sx-note is-box"><b>${T2.L("원서 접수", "Applications")}</b> ${esc4(T2.pick(p.applyNote))}</p>` : ""}
+${p.applyNote ? `<p class="sx-note is-box"><b>${T2.L("원서 접수", "Applications")}</b> ${esc4(T2.pick(p.applyNote))}</p>` : ""}${view.pathPick || ""}
 <h2 class="sx-h">${T2.L("내 조건과 맞춰 보기", "Compare with my conditions")} ${meter(m, T2)}</h2><ul class="sx-match">${items}</ul>${note(p.requiresNote)}
 <h2 class="sx-h">${T2.L("한 해에 드는 돈", "Cost for one year")} ${exampleTag(p, T2)}</h2>
 <div class="sx-hero-num"><small>${costLabel(c, T2)}</small><b>${T2.won(c.total)}</b><small>${esc4(schNote)}</small></div>
@@ -4659,6 +4938,126 @@ ${field("sx-funds", "fundsWon", T2.L("준비한 돈", "Funds prepared"), T2.L("�
 <p class="sx-fine">${T2.L("누른 칸을 한 번 더 누르면 「아직 안 넣음」으로 돌아가요.", "Press a selected option again to clear it.")}</p>
 <div id="sx-cond-result">${renderCondResult(view)}</div>
 ${promise2(T2)}</div>`;
+}
+
+// experiences/path-app/path-ui.mjs
+var esc5 = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+var svg3 = (p) => `<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">${p}</svg>`;
+var GO3 = svg3('<path d="M4 10h11.5M11 5.5 15.5 10 11 14.5"/>');
+var BACK3 = svg3('<path d="M12.5 4.5 7 10l5.5 5.5"/>');
+var ON2 = svg3('<path d="m5 10.4 3.2 3.1L15 6.6"/>');
+function ctx3(view) {
+  const now = view.now || /* @__PURE__ */ new Date();
+  const en = view.lang === "en";
+  const L5 = (ko, e) => en ? e : ko;
+  const pick2 = (o) => o ? en ? o.en : o.ko : "";
+  const thisYear = Number(new Date((now instanceof Date ? now.getTime() : new Date(now).getTime()) + 9 * 36e5).toISOString().slice(0, 4));
+  return { now, en, L: L5, pick: pick2, md: (d) => monthDay(d, en, thisYear), profile: view.profile || {}, programs: view.programs || [], posts: view.posts || [], persisted: view.persisted !== false, note: typeof view.note === "string" ? view.note : "" };
+}
+var newTab3 = (T2) => `<span class="sr-only"> (${T2.L("새 탭에서 열림", "opens in new tab")})</span>`;
+var STAGE = {
+  apply: { ko: "원서와 함께", en: "With the application", who: { ko: "대학에 내요", en: "To the university" } },
+  admitted: { ko: "합격 뒤", en: "After admission", who: { ko: "대학에 내요", en: "To the university" } },
+  visa: { ko: "비자", en: "Visa", who: { ko: "비자신청센터(KVAC)에 내요", en: "To the visa center (KVAC)" } }
+};
+function nextInfo(post2, T2) {
+  const apply = post2 ? nextDate(post2, T2.now, { skipDocs: true }) : null;
+  if (apply) {
+    const st = apply.status.state, md = T2.md(apply.due);
+    const when = st === "before" ? T2.L(`${md} 시작`, `opens ${md}`) : st === "open" ? T2.L(`${md} 마감`, `closes ${md}`) : md;
+    return { closed: false, text: `${T2.pick(apply.date.label)} · ${when}` };
+  }
+  const docs = post2 ? nextDate(post2, T2.now) : null;
+  return { closed: true, docs: docs ? `${T2.pick(docs.date.label)} ${T2.md(docs.due)}` : "" };
+}
+function pathTarget(view) {
+  const T2 = ctx3(view), id = T2.profile.target;
+  const program = id ? programById(T2.programs, id) : null;
+  const set = program && !program.example ? docsFor(program, T2.profile) : null;
+  return set ? { program, set } : null;
+}
+var doneIds = (T2) => new Set((T2.profile.docs || []).map((d) => d.id));
+function stageCounts(set, profile2) {
+  const done = new Set((profile2.docs || []).map((d) => d.id));
+  const out = {};
+  for (const stage of ["apply", "admitted", "visa"]) {
+    const list = set.mine.filter((d) => d.stage === stage);
+    out[stage] = { n: list.filter((d) => done.has(d.id)).length, total: list.length };
+  }
+  return out;
+}
+function docRow(d, T2, done) {
+  const on = done.has(d.id);
+  const line = (label, o) => o ? `<p class="sx-doc-line"><b>${label}</b> ${esc5(T2.pick(o))}</p>` : "";
+  const visa = d.stage === "visa";
+  const unclear = !d.unclear ? "" : visa ? `<div class="sx-unclear"><p><b>${T2.L("KVAC에 확인할 것", "Check with KVAC")}</b> ${esc5(T2.pick(d.unclear))}</p></div>` : `<div class="sx-unclear"><p><b>${T2.L("요강에서 두 가지로 읽혀요", "The guide can be read two ways")}</b> ${esc5(T2.pick(d.unclear))}</p><p>${T2.L("대학에 먼저 물어보세요.", "Ask the university first.")}</p></div>`;
+  return `<li class="sx-docrow"><div class="sx-doc-main"><b class="sx-doc-name">${esc5(T2.pick(d.name))}</b>${T2.en ? `<small class="sx-doc-ko" lang="ko">${esc5(d.name.ko)}</small>` : ""}${d.only ? `<p class="sx-doc-line"><b>${T2.L("해당자", "Who")}</b> ${esc5(T2.pick(d.only.cond))}</p>` : ""}${line(T2.L("구하는 곳", "Where to get it"), d.from)}${line(T2.L("날짜 조건", "Date rule"), d.when)}${d.note ? `<p class="sx-doc-note">${esc5(T2.pick(d.note))}</p>` : ""}${unclear}</div><button type="button" class="sx-btn2 sm sx-docbtn" aria-pressed="${on}" data-action="docToggle" data-id="${esc5(d.id)}"><span class="sx-on">${ON2}</span>${T2.L("준비했어요", "Ready")}<span class="sr-only"> ${esc5(T2.pick(d.name))}</span></button></li>`;
+}
+function stageBlock(stage, t2, T2, done, counts) {
+  const docs = t2.set.mine.filter((d) => d.stage === stage), folds = t2.set.notMine.filter((d) => d.stage === stage);
+  if (!docs.length && !folds.length) return "";
+  const src = stage === "visa" ? t2.set.visa : t2.set.program;
+  const c = counts[stage];
+  const label = stage === "visa" ? `${T2.pick(STAGE.visa)} · ${T2.pick(t2.set.visa.name)}` : T2.pick(STAGE[stage]);
+  const head2 = `<div class="sx-stage-head"><h2 class="sx-h" id="sx-stage-${stage}">${esc5(label)}</h2><span class="sx-stage-who">${T2.pick(STAGE[stage].who)}</span></div>`;
+  const meta = `<p class="sx-src"><b>${T2.L("출처", "Source")}</b> <a href="${esc5(src.source.url)}" target="_blank" rel="noopener noreferrer">${esc5(T2.pick(src.source.title))}${newTab3(T2)}</a> · ${T2.L("확인", "checked")} ${esc5(src.checkedAt)}${stage !== "visa" && t2.set.program.term ? ` · ${esc5(T2.pick(t2.set.program.term))}` : ""}</p>`;
+  const stale = isStalePost({ checkedAt: src.checkedAt }, T2.now) ? `<p class="sx-note is-box">${T2.L("확인한 지 90일이 지났어요. 서류는 원문에서 다시 확인하세요.", "This was checked more than 90 days ago. Check the documents in the original.")}</p>` : "";
+  const rules = stage !== "admitted" && ((src.rules || []).length || (src.unclear || []).length) ? `<ul class="sx-rules">${(src.rules || []).map((r) => `<li>${esc5(T2.pick(r))}</li>`).join("")}${(src.unclear || []).map((r) => `<li class="is-unclear"><b>${T2.L("요강에서 두 가지로 읽혀요", "The guide can be read two ways")}</b> ${esc5(T2.pick(r))}</li>`).join("")}</ul>` : "";
+  const progress = `<div class="sx-prog-row"><progress class="sx-prog" value="${c.n}" max="${c.total}" aria-labelledby="sx-stage-${stage} sx-prog-${stage}"></progress><span class="sx-prog-text" id="sx-prog-${stage}">${T2.L(`${c.n}/${c.total} 표시`, `${c.n} of ${c.total} marked`)}</span></div>`;
+  let doneMsg = "";
+  if (stage === "apply" && c.total > 0 && c.n === c.total) {
+    const folded = folds.length, unclear = docs.filter((d) => d.unclear).length + (t2.set.program.unclear || []).length;
+    const extra = [folded ? T2.L(`해당하는 사람만 내는 서류 ${folded}개`, `${folded} document${folded === 1 ? "" : "s"} only some applicants submit`) : "", unclear ? T2.L(`요강이 두 가지로 읽히는 곳 ${unclear}개`, `${unclear} place${unclear === 1 ? "" : "s"} where the guide reads two ways`) : ""].filter(Boolean);
+    doneMsg = `<p class="sx-note is-box sx-done">${T2.L("원서 서류를 다 표시했어요.", "You have marked all application documents.")}${extra.length ? ` ${T2.L(`${extra.join(", ")}는 따로 확인하세요.`, `Check separately: ${extra.join("; ")}.`)}` : ""} ${T2.L("접수 방법은 요강에서 확인하세요.", "Check how to apply in the guide.")} <a href="${esc5(t2.set.program.source.url)}" target="_blank" rel="noopener noreferrer">${T2.L("요강 보기", "Open the guide")}${newTab3(T2)}</a></p>`;
+  }
+  const marked = folds.filter((d) => done.has(d.id)).length;
+  const foldedList = folds.length ? `<details class="sx-past sx-folded" data-fold="docs-${stage}"><summary>${T2.L(`해당하는 사람만 내는 서류 ${folds.length}개`, `${folds.length} document${folds.length === 1 ? "" : "s"} only some applicants submit`)}${marked ? T2.L(` · ${marked}개 표시`, ` · ${marked} marked`) : ""}</summary><ul class="sx-docs">${folds.map((d) => docRow(d, T2, done)).join("")}</ul></details>` : "";
+  return `<section class="sx-stage" aria-labelledby="sx-stage-${stage}">${head2}${meta}${stale}${docs.length ? progress : ""}${rules}${docs.length ? `<ul class="sx-docs">${docs.map((d) => docRow(d, T2, done)).join("")}</ul>` : ""}${foldedList}${doneMsg}</section>`;
+}
+function storeNote(T2) {
+  return T2.persisted ? `<p class="sx-fine">${T2.L("표시는 이 탭에만 있어요. 탭을 닫거나 로그아웃하면 사라져요.", "Marks stay in this tab only. They disappear when you close the tab or sign out.")}</p>` : `<p class="sx-store is-warn">${T2.L("이 브라우저에서는 저장할 수 없어서 표시를 지금 화면에서만 기억해요. 새로 고치면 사라져요.", "This browser cannot store marks, so they are remembered on this screen only and are lost on reload.")}</p>`;
+}
+function renderPath(view) {
+  const T2 = ctx3(view), t2 = pathTarget(view);
+  const back = `<button type="button" class="sx-back" data-action="nav" data-page="today">${BACK3}${T2.L("오늘", "Today")}</button>`;
+  if (!t2) {
+    return `<div class="sx">${back}<header class="sx-head"><p class="sx-kicker">${T2.L("내 길", "My path")}</p><h1 class="sx-title page-title" tabindex="-1">${T2.L("준비할 과정을 골라 주세요", "Pick a program to prepare for")}</h1><p class="sx-lead">${T2.L("대학 탭에서 과정을 열고 「이 과정으로 준비하기」를 누르면, 그 과정에 내는 서류와 기한을 여기에 모아 보여 줘요.", "Open a program in the Schools tab and press “Prepare for this program”. Its documents and deadlines will be gathered here.")}</p></header><button type="button" class="sx-cta" data-action="nav" data-page="univ">${T2.L("대학 보기", "Browse schools")} ${GO3}</button></div>`;
+  }
+  const { program, set } = t2, done = doneIds(T2), counts = stageCounts(set, T2.profile);
+  const post2 = postById(T2.posts, "univ-" + program.id);
+  const n = nextInfo(post2, T2);
+  const tag2 = !n.closed ? n.text : T2.L("이번 원서 접수 끝남", "Applications closed");
+  const closed = n.closed ? `<p class="sx-note is-box">${n.docs ? T2.L(`이번 원서 접수는 끝났어요. 이미 원서를 냈다면 남은 기한은 ${esc5(n.docs)}이에요. 아니면 다음 요강을 기다려요.`, `Applications for this intake have closed. If you already applied, your remaining deadline is ${esc5(n.docs)}. Otherwise, wait for the next guide.`) : T2.L("이번 원서 접수는 끝났어요. 다음 요강을 기다려요.", "Applications for this intake have closed. Wait for the next guide.")}</p>` : "";
+  const status = set.program.status ? `<p class="sx-note is-box">${esc5(T2.pick(set.program.status))}</p>` : "";
+  const ask = set.program.ask ? `<p class="sx-fine"><b>${T2.L("물을 곳", "Ask")}</b> ${esc5(T2.pick(set.program.ask))}</p>` : "";
+  return `<div class="sx">${back}
+<div class="sx-photo is-hero sx-post-hero">${programImage(program)}<span class="sx-photo-body"><span class="sx-tag white">${esc5(tag2)}</span></span></div>
+<p class="sx-kicker">${T2.L("준비 중인 과정", "Preparing for")} · ${esc5(T2.pick(program.place))}</p>
+<h1 class="sx-title page-title" tabindex="-1">${esc5(T2.pick(program.name))}${program.level !== "language" ? T2.L(" 학부", " undergraduate") : ""}</h1>
+<p class="sx-lead">${esc5(T2.pick(set.program.how))}</p>${closed}${status}${ask}
+<p class="sx-note">${T2.L("「준비했어요」는 내가 표시한 것이에요. 대학이나 비자신청센터(KVAC)가 확인한 것이 아니에요.", "“Ready” is your own mark. It is not a check by the university or the visa center (KVAC).")}</p>
+${storeNote(T2)}${view.docFull ? `<p class="sx-store is-warn">${T2.L("표시가 예순 개라 더 넣을 수 없어요. 다른 과정의 표시를 뺀 뒤 넣어 주세요.", "You already have 60 marks. Remove some from another program first.")}</p>` : ""}
+${renderDates(view, post2, T2.L("이 과정의 날짜", "Dates for this program"))}
+${["apply", "admitted", "visa"].map((s) => stageBlock(s, t2, T2, done, counts)).join("")}
+<div class="sx-row2"><button type="button" class="sx-btn2" data-action="univOpen" data-id="${esc5(program.id)}">${T2.L("과정 자세히 보기", "Program details")}</button><button type="button" class="sx-btn2 line" data-action="pathPick" data-id="${esc5(program.id)}">${T2.L("준비 그만하기", "Stop preparing")}</button></div>
+<p class="sx-fine">${T2.L("이 목록은 입학이나 비자를 약속하지 않아요. 마지막 판단은 대학과 출입국이 해요.", "This list does not promise admission or a visa. The university and immigration office make the final decision.")}</p></div>`;
+}
+function renderPathCard(view) {
+  const T2 = ctx3(view), t2 = pathTarget(view);
+  if (!t2) return "";
+  const c = stageCounts(t2.set, T2.profile).apply;
+  const n = nextInfo(postById(T2.posts, "univ-" + t2.program.id), T2);
+  const next = !n.closed ? T2.L(`다음: ${n.text}`, `Next: ${n.text}`) : n.docs ? T2.L(`이번 원서 접수는 끝났어요 · 이미 냈다면 ${n.docs}`, `Applications closed · if you applied: ${n.docs}`) : T2.L("이번 원서 접수는 끝났어요", "Applications closed");
+  return `<section class="sx sx-today" aria-labelledby="sx-path-h"><h2 class="sx-h" id="sx-path-h">${T2.L("내 길", "My path")}</h2><button type="button" class="sx-pathcard" data-action="nav" data-page="path"><span class="sx-pathcard-main"><small>${T2.L("준비 중인 과정", "Preparing for")}</small><b>${esc5(T2.pick(t2.program.name))}${t2.program.level !== "language" ? T2.L(" 학부", " undergraduate") : ""}</b><span class="sx-prog-row"><progress class="sx-prog" value="${c.n}" max="${c.total}" aria-hidden="true"></progress><span>${T2.L(`원서 서류 ${c.n}/${c.total} 표시`, `Application documents ${c.n} of ${c.total} marked`)}</span></span><small>${esc5(next)}</small></span><span class="sx-go" aria-hidden="true">${GO3}</span></button></section>`;
+}
+function renderPathPick(view, program) {
+  const T2 = ctx3(view);
+  if (!program || program.example) return "";
+  const set = docsFor(program, T2.profile);
+  if (!set) return "";
+  const on = T2.profile.target === program.id;
+  const visa = visaFor(program) === "D-2" ? T2.L("유학(D-2)", "student (D-2)") : T2.L("어학연수(D-4-1)", "language trainee (D-4-1)");
+  return `<section class="sx-card butter sx-pathpick"><p class="sx-k">${T2.L("내 길", "My path")}</p><h2>${T2.L(`이 과정의 원서 · 합격 뒤 서류와 ${visa} 비자 서류를 한곳에서 챙겨요.`, `Keep this program’s application and post-admission documents and the ${visa} visa documents in one place.`)}</h2><div class="sx-row2"><button type="button" class="sx-btn2" aria-pressed="${on}" data-action="pathPick" data-id="${esc5(program.id)}"><span class="sx-on">${ON2}</span>${T2.L("이 과정으로 준비하기", "Prepare for this program")}</button>${on ? `<button type="button" class="sx-link" data-action="nav" data-page="path">${T2.L("내 길 열기", "Open my path")}${GO3}</button>` : ""}</div></section>`;
 }
 
 // experiences/path-app/app.mjs
@@ -4813,7 +5212,7 @@ var DICT = {
 };
 var t = (k) => (DICT[k] || [k, k])[state.lang === "en" ? 1 : 0];
 var pick = (o) => o ? o[state.lang] ?? o.ko : "";
-var esc5 = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+var esc6 = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
 var goalById = (id) => GOALS.find((g) => g.id === id);
 var oppById = (id) => {
   const demo = OPPORTUNITIES.find((o) => o.id === id);
@@ -4887,7 +5286,7 @@ var ownerKey = () => {
   const st = session.status();
   return `${st.mode ?? ""}:${st.accountId ?? ""}`;
 };
-function resetForDoc(doc) {
+function resetForDoc(doc2) {
   cancelComposition();
   pendingBackup = null;
   S.taskId = null;
@@ -4898,7 +5297,7 @@ function resetForDoc(doc) {
   S.draft = newDraft();
   S.filter = state.primaryGoal || "all";
   S.help = state.primaryGoal || "study";
-  if (!doc?.state) S.page = "profile";
+  if (!doc2?.state) S.page = "profile";
   else if (!state.onboarded) S.page = session.status().canImportGuest ? "profile" : "onboard";
   else S.page = "today";
 }
@@ -4953,14 +5352,14 @@ function studyProfile() {
 }
 var session = createPathSession({
   configUrl: "./config.json",
-  onDocument(doc) {
-    state = doc?.state || createInitialState(state?.lang || "ko");
-    const owner = ownerKey(), ready = !!doc?.state, onb = !!state.onboarded;
+  onDocument(doc2) {
+    state = doc2?.state || createInitialState(state?.lang || "ko");
+    const owner = ownerKey(), ready = !!doc2?.state, onb = !!state.onboarded;
     const changed = activeOwner !== null && (owner !== activeOwner || ready && !hadDoc || wasOnboarded && !onb);
     activeOwner = owner;
     hadDoc = ready;
     wasOnboarded = onb;
-    if (changed) resetForDoc(doc);
+    if (changed) resetForDoc(doc2);
     if (!localMutation) render(false);
   },
   onStatus() {
@@ -4969,7 +5368,7 @@ var session = createPathSession({
 });
 state = session.document()?.state || createInitialState("ko");
 hadDoc = !!session.document()?.state;
-var S = { page: state.onboarded ? "today" : "onboard", step: 1, draft: null, filter: state.primaryGoal || "all", compare: [], oppId: null, taskId: null, help: state.primaryGoal || "study", flash: null, copyMsg: null, error: null, drop: MOTION, practiceOpen: false, univId: null, univFilter: "all", studyText: {}, studyErrors: {}, channelId: null, postId: null, dateNote: null };
+var S = { page: state.onboarded ? "today" : "onboard", step: 1, draft: null, filter: state.primaryGoal || "all", compare: [], oppId: null, taskId: null, help: state.primaryGoal || "study", flash: null, copyMsg: null, error: null, drop: MOTION, practiceOpen: false, univId: null, univFilter: "all", studyText: {}, studyErrors: {}, channelId: null, postId: null, dateNote: null, docFull: false };
 activeOwner = ownerKey();
 wasOnboarded = !!state.onboarded;
 function commit(next) {
@@ -4977,7 +5376,7 @@ function commit(next) {
   if (!session.status().canEdit) {
     const err = session.status().error;
     const m = err ? getAccountErrorMessage(err, state.lang) : state.lang === "en" ? "You can't change data right now. Please check the save status in Profile." : "현재는 자료를 바꿀 수 없어요. 내 정보에서 저장 상태를 확인해 주세요.";
-    S.flash = esc5(m);
+    S.flash = esc6(m);
     say(m);
     return false;
   }
@@ -4989,7 +5388,7 @@ function commit(next) {
   } catch (e) {
     state = session.document()?.state || state;
     const m = getAccountErrorMessage(e, state.lang);
-    S.flash = esc5(m);
+    S.flash = esc6(m);
     say(m);
     return false;
   } finally {
@@ -4999,26 +5398,26 @@ function commit(next) {
 function newDraft() {
   return { primaryGoal: state.primaryGoal, interests: [...state.interests || []], secondaryGoals: [...state.secondaryGoals || []], location: state.location || "unknown" };
 }
-var svg3 = (box, sw, p) => `<svg viewBox="0 0 ${box} ${box}" fill="none" stroke="currentColor" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">${p}</svg>`;
+var svg4 = (box, sw, p) => `<svg viewBox="0 0 ${box} ${box}" fill="none" stroke="currentColor" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">${p}</svg>`;
 var ICON2 = {
-  arrow: svg3(20, 1.7, '<path d="M4 10h11.5M11 5.5 15.5 10 11 14.5"/>'),
-  back: svg3(20, 1.7, '<path d="M16 10H4.5M9 5.5 4.5 10 9 14.5"/>'),
-  out: svg3(20, 1.7, '<path d="M6 14 14 6M7.5 6H14v6.5"/>'),
-  check: svg3(20, 2.4, '<path d="m5 10.4 3.2 3.1L15 6.6"/>')
+  arrow: svg4(20, 1.7, '<path d="M4 10h11.5M11 5.5 15.5 10 11 14.5"/>'),
+  back: svg4(20, 1.7, '<path d="M16 10H4.5M9 5.5 4.5 10 9 14.5"/>'),
+  out: svg4(20, 1.7, '<path d="M6 14 14 6M7.5 6H14v6.5"/>'),
+  check: svg4(20, 2.4, '<path d="m5 10.4 3.2 3.1L15 6.6"/>')
 };
 var TAB_ICON = {
-  today: svg3(24, 1.6, '<rect x="4" y="5.5" width="16" height="14.5" rx="2.5"/><path d="M4 10.2h16M8.5 3.5v4M15.5 3.5v4"/><path d="M11.9 14.9h.2" stroke-width="2.6"/>'),
-  explore: svg3(24, 1.6, '<circle cx="10.5" cy="10.5" r="6"/><path d="m15 15 5 5"/>'),
-  prepare: svg3(24, 1.6, '<path d="M4 20h4L19 9l-4-4L4 16z"/><path d="m13.5 6.5 4 4"/>'),
-  channels: svg3(24, 1.6, '<rect x="4" y="5" width="13" height="14.5" rx="2"/><path d="M17 9h3v8.5a2 2 0 0 1-2 2H6"/><path d="M7.5 9h6M7.5 12.5h6M7.5 16h4"/>'),
-  univ: svg3(24, 1.6, '<path d="M3.5 9.6 12 4.6l8.5 5"/><path d="M6 11v7.5M10 11v7.5M14 11v7.5M18 11v7.5M3.5 19.5h17"/>'),
-  help: svg3(24, 1.6, '<path d="M4.5 5.5h15v10h-8l-4 3.5v-3.5h-3z"/><path d="M10.4 8.9a1.7 1.7 0 1 1 2.3 1.6c-.5.2-.7.6-.7 1.1M12 13.4v.1"/>'),
-  profile: svg3(24, 1.6, '<circle cx="12" cy="8.5" r="3.6"/><path d="M5 20c1.2-3.6 4-5.4 7-5.4s5.8 1.8 7 5.4"/>')
+  today: svg4(24, 1.6, '<rect x="4" y="5.5" width="16" height="14.5" rx="2.5"/><path d="M4 10.2h16M8.5 3.5v4M15.5 3.5v4"/><path d="M11.9 14.9h.2" stroke-width="2.6"/>'),
+  explore: svg4(24, 1.6, '<circle cx="10.5" cy="10.5" r="6"/><path d="m15 15 5 5"/>'),
+  prepare: svg4(24, 1.6, '<path d="M4 20h4L19 9l-4-4L4 16z"/><path d="m13.5 6.5 4 4"/>'),
+  channels: svg4(24, 1.6, '<rect x="4" y="5" width="13" height="14.5" rx="2"/><path d="M17 9h3v8.5a2 2 0 0 1-2 2H6"/><path d="M7.5 9h6M7.5 12.5h6M7.5 16h4"/>'),
+  univ: svg4(24, 1.6, '<path d="M3.5 9.6 12 4.6l8.5 5"/><path d="M6 11v7.5M10 11v7.5M14 11v7.5M18 11v7.5M3.5 19.5h17"/>'),
+  help: svg4(24, 1.6, '<path d="M4.5 5.5h15v10h-8l-4 3.5v-3.5h-3z"/><path d="M10.4 8.9a1.7 1.7 0 1 1 2.3 1.6c-.5.2-.7.6-.7 1.1M12 13.4v.1"/>'),
+  profile: svg4(24, 1.6, '<circle cx="12" cy="8.5" r="3.6"/><path d="M5 20c1.2-3.6 4-5.4 7-5.4s5.8 1.8 7 5.4"/>')
 };
 var SYMBOL = {
-  study: svg3(48, 1.6, '<rect x="11" y="3.5" width="26" height="41" rx="13"/><rect x="15.5" y="8" width="17" height="32" rx="8.5"/><path d="M15.6 16.8h16.8"/><path d="M24 16.8v2.6"/><path d="M16 32.4c4.6-3 11.2-4.6 16.2-2.9"/><circle cx="27.6" cy="24.2" r="1.7"/>'),
-  student: svg3(48, 1.6, '<path d="M24 14.2c-4.7-3.3-11.1-4-17.2-2.7v24.4c6.1-1.3 12.5-.6 17.2 2.7 4.7-3.3 11.1-4 17.2-2.7V11.5c-6.1-1.3-12.5-.6-17.2 2.7z"/><path d="M24 14.2v24.4"/><path d="M11.2 18.6c3-.4 6.1 0 8.6 1M11.2 23.6c3-.4 6.1 0 8.6 1M28.2 19.6c2.5-1 5.6-1.4 8.6-1"/>'),
-  job: svg3(48, 1.6, '<rect x="6.5" y="15.5" width="35" height="25" rx="3.6"/><path d="M18 15.5v-3.4a2.6 2.6 0 0 1 2.6-2.6h6.8a2.6 2.6 0 0 1 2.6 2.6v3.4"/><path d="M6.5 26.5h13.5M28 26.5h13.5"/><rect x="20" y="23.6" width="8" height="6" rx="1.4"/>')
+  study: svg4(48, 1.6, '<rect x="11" y="3.5" width="26" height="41" rx="13"/><rect x="15.5" y="8" width="17" height="32" rx="8.5"/><path d="M15.6 16.8h16.8"/><path d="M24 16.8v2.6"/><path d="M16 32.4c4.6-3 11.2-4.6 16.2-2.9"/><circle cx="27.6" cy="24.2" r="1.7"/>'),
+  student: svg4(48, 1.6, '<path d="M24 14.2c-4.7-3.3-11.1-4-17.2-2.7v24.4c6.1-1.3 12.5-.6 17.2 2.7 4.7-3.3 11.1-4 17.2-2.7V11.5c-6.1-1.3-12.5-.6-17.2 2.7z"/><path d="M24 14.2v24.4"/><path d="M11.2 18.6c3-.4 6.1 0 8.6 1M11.2 23.6c3-.4 6.1 0 8.6 1M28.2 19.6c2.5-1 5.6-1.4 8.6-1"/>'),
+  job: svg4(48, 1.6, '<rect x="6.5" y="15.5" width="35" height="25" rx="3.6"/><path d="M18 15.5v-3.4a2.6 2.6 0 0 1 2.6-2.6h6.8a2.6 2.6 0 0 1 2.6 2.6v3.4"/><path d="M6.5 26.5h13.5M28 26.5h13.5"/><rect x="20" y="23.6" width="8" height="6" rx="1.4"/>')
 };
 var CARD_NO = { study: "01", student: "02", job: "03" };
 var CLIP = '<svg class="clip" viewBox="0 0 22 38" aria-hidden="true" focusable="false"><path d="M5.5 0h11v6.6a2 2 0 0 1-2 2h-7a2 2 0 0 1-2-2z" fill="url(#metal)"/><path d="M7.4 2.2h7.2" stroke="rgba(0,0,0,.18)" stroke-width=".8"/><circle cx="11" cy="12.6" r="3.8" fill="none" stroke="url(#metal)" stroke-width="2"/><rect x="9" y="16.1" width="4" height="4.6" rx="1.2" fill="url(#metal)"/><path d="M11 20.6v6.1a4.6 4.6 0 1 0 4.6-4.6" fill="none" stroke="url(#metal)" stroke-width="2.2" stroke-linecap="round"/></svg>';
@@ -5029,9 +5428,9 @@ function seal(n = 0) {
 function hang(goal, { i = 0, slot = "mid", radio = false, on = false, action = "", kicker = "", name = "", desc = null, mode = "goal" } = {}) {
   const g = goalById(goal);
   const nm = name || pick(g.label), ds = desc ?? pick(g.description);
-  const bottom = `${kicker ? `<span class="pass-kicker">${esc5(kicker)}</span>` : ""}<span class="pass-name">${esc5(nm)}</span>${ds ? `<span class="pass-desc">${esc5(ds)}</span>` : ""}`;
+  const bottom = `${kicker ? `<span class="pass-kicker">${esc6(kicker)}</span>` : ""}<span class="pass-name">${esc6(nm)}</span>${ds ? `<span class="pass-desc">${esc6(ds)}</span>` : ""}`;
   const face = `<span class="pass-band" aria-hidden="true"></span><span class="pass-face" aria-hidden="true"><span class="pass-top"><span class="pass-brand">PATH</span><span class="pass-no">No.${CARD_NO[goal]}</span></span><span class="pass-symbol">${SYMBOL[goal]}</span><span class="pass-bottom">${bottom}</span></span><span class="pick-mark" aria-hidden="true">${ICON2.check}</span>`;
-  const card2 = radio ? `<button type="button" class="pass goal-choice" role="radio" aria-checked="${on}" tabindex="${on || !S.draft?.primaryGoal && i === 0 ? 0 : -1}" data-action="pickGoal" data-id="${goal}" data-mode="${mode}" aria-label="${esc5(`${pick(g.label)} — ${pick(g.description)}`)}">${face}</button>` : action ? `<button type="button" class="pass" data-action="${action}" data-id="${goal}" data-mode="${mode}" aria-label="${esc5(ds ? `${nm} — ${ds}` : nm)}">${face}</button>` : `<div class="pass" data-mode="${mode}" role="img" aria-label="${esc5(ds ? `${nm} — ${ds}` : nm)}">${face}</div>`;
+  const card2 = radio ? `<button type="button" class="pass goal-choice" role="radio" aria-checked="${on}" tabindex="${on || !S.draft?.primaryGoal && i === 0 ? 0 : -1}" data-action="pickGoal" data-id="${goal}" data-mode="${mode}" aria-label="${esc6(`${pick(g.label)} — ${pick(g.description)}`)}">${face}</button>` : action ? `<button type="button" class="pass" data-action="${action}" data-id="${goal}" data-mode="${mode}" aria-label="${esc6(ds ? `${nm} — ${ds}` : nm)}">${face}</button>` : `<div class="pass" data-mode="${mode}" role="img" aria-label="${esc6(ds ? `${nm} — ${ds}` : nm)}">${face}</div>`;
   return `<div class="hang${S.drop ? " is-drop" : ""}${on ? " is-on" : ""}" data-goal="${goal}" data-i="${i}" data-slot="${slot}"><div class="strap" aria-hidden="true"><span class="strap-print">PATH PATH PATH PATH PATH PATH PATH PATH</span></div>${CLIP}<div class="card-wrap"><span class="card-shadow" aria-hidden="true"></span>${card2}</div></div>`;
 }
 var sec = (title, sub, body, cls = "") => `<section class="sec${cls ? ` ${cls}` : ""}"><div class="sec-h"><h2>${title}</h2>${sub ? `<span>${sub}</span>` : ""}</div>${body}</section>`;
@@ -5040,9 +5439,9 @@ function demoBadge(o) {
   if (o?.source === "live") return `<span class="badge">${state.lang === "en" ? "Official job posting" : "공식 채용 공고"}</span>`;
   return `<span class="badge">${t("demo")}</span>`;
 }
-var liveLink = (o) => o?.source === "live" && o.url ? `<p><a href="${esc5(o.url)}" target="_blank" rel="noopener noreferrer">${state.lang === "en" ? "View original posting (opens in new tab)" : "원문 공고 보기 (새 탭)"}</a></p>` : "";
+var liveLink = (o) => o?.source === "live" && o.url ? `<p><a href="${esc6(o.url)}" target="_blank" rel="noopener noreferrer">${state.lang === "en" ? "View original posting (opens in new tab)" : "원문 공고 보기 (새 탭)"}</a></p>` : "";
 var findJobEntry = (id) => (jobsFeed.snapshot().jobs || []).find((j) => j.id === id) || (session.document()?.savedJobs || []).find((j) => j.id === id);
-var oppRow = (o) => `<li><button type="button" class="row" data-action="detail" data-id="${esc5(o.id)}"><span><b>${demoBadge(o)}${esc5(pick(o.title))}</b><small>${esc5(pick(o.summary))}</small></span><span class="row-go" aria-hidden="true">${ICON2.arrow}</span></button></li>`;
+var oppRow = (o) => `<li><button type="button" class="row" data-action="detail" data-id="${esc6(o.id)}"><span><b>${demoBadge(o)}${esc6(pick(o.title))}</b><small>${esc6(pick(o.summary))}</small></span><span class="row-go" aria-hidden="true">${ICON2.arrow}</span></button></li>`;
 var TABS = ["today", "channels", "univ", "explore", "prepare", "help", "profile"].filter((p) => (p !== "univ" || STUDY_ON) && (p !== "channels" || CHANNEL_ON));
 var UNIV_PAGES = ["cond", "univDetail", "univCompare"];
 function shell(main) {
@@ -5059,7 +5458,7 @@ ${nav ? `<nav class="tabs" aria-label="${t("navLabel")}">${tabs}</nav>` : ""}<di
 ${main}${nav ? `<nav class="tabbar" aria-label="${t("navLabel")}">${bar}</nav>` : ""}</div>`;
 }
 function navActive(p) {
-  return S.page === p || p === "explore" && S.page === "detail" || p === "prepare" && S.page === "editor" || p === "univ" && UNIV_PAGES.includes(S.page) || p === "channels" && S.page === "post";
+  return S.page === p || p === "explore" && S.page === "detail" || p === "prepare" && S.page === "editor" || p === "univ" && UNIV_PAGES.includes(S.page) || p === "channels" && S.page === "post" || p === "today" && S.page === "path";
 }
 function notices(quiet = false, noFlash = false) {
   const accSt = session.status();
@@ -5079,13 +5478,13 @@ function onboard() {
     const cards = GOALS.map((g3, i) => hang(g3.id, { i, slot: ["left", "mid", "right"][i], radio: true, on: d.primaryGoal === g3.id })).join("");
     const g2 = goalById(d.primaryGoal);
     return `<main class="ob" id="main"><div class="ob-title">${notices(true)}<h1 class="title page-title" id="q1" tabindex="-1"><span>${t("obT1")}</span> <span class="title-2">${t("obT2")}</span></h1></div>
-<div class="ob-lead"><p class="lead" id="ob-lead" aria-live="polite">${g2 ? `<b class="lead-pick">${esc5(pick(g2.label))}</b>${esc5(pick(g2.note))}` : t("obLead")}</p></div>
+<div class="ob-lead"><p class="lead" id="ob-lead" aria-live="polite">${g2 ? `<b class="lead-pick">${esc6(pick(g2.label))}</b>${esc6(pick(g2.note))}` : t("obLead")}</p></div>
 <div class="stage ob-stage${d.primaryGoal ? " has-pick" : ""}" role="radiogroup" aria-label="${t("q1")}"><div class="rod" aria-hidden="true"></div>${cards}</div>
 <div class="ob-actions"><button type="button" class="btn" data-action="finish"${d.primaryGoal ? "" : " disabled"}>${t("startCard")} ${ICON2.arrow}</button><button type="button" class="link" data-action="skip">${t("browse")}</button>${state.onboarded ? `<button type="button" class="link" data-action="cancelOnboard">${t("cancel")}</button>` : ""}</div>
 <p class="fine ob-fine">${t("obFine")}${d.primaryGoal ? ` <button type="button" class="link link-sm" data-action="step2">${t("fineTune")}</button>` : ""}</p></main>`;
   }
   const g = goalById(d.primaryGoal);
-  const chips = (list, key) => list.map((x) => `<button type="button" class="chip" aria-pressed="${d[key].includes(x.id)}" data-action="toggle" data-key="${key}" data-id="${x.id}">${esc5(pick(x.label))}</button>`).join("");
+  const chips = (list, key) => list.map((x) => `<button type="button" class="chip" aria-pressed="${d[key].includes(x.id)}" data-action="toggle" data-key="${key}" data-id="${x.id}">${esc6(pick(x.label))}</button>`).join("");
   const locs = ["abroad", "korea", "unknown"].map((l) => `<option value="${l}"${d.location === l ? " selected" : ""}>${t(l)}</option>`).join("");
   return `<main class="ob2" id="main"><div class="ob2-card">${hang(g.id, { slot: "mid" })}</div><div class="ob2-main">${notices(true)}<p class="eyebrow">${t("step2")}</p><h1 class="title page-title" tabindex="-1"><span>${t("q2")}</span> <span class="title-2">${t("q2lead")}</span></h1>
 <fieldset class="field"><legend>${t("interests")}</legend><div class="chips">${chips(g.interests, "interests")}</div></fieldset>
@@ -5095,7 +5494,7 @@ function onboard() {
 }
 function stamps(states, descs) {
   const names = ["j1", "j2", "j3"];
-  return `<ol class="stamps" aria-label="${t("stampsLabel")}">${states.map((s, i) => `<li class="stamp is-${s}"${s === "now" ? ' aria-current="step"' : ""}><span class="slot" aria-hidden="true">${s === "done" ? seal(i) : s === "now" ? t("sNow") : `<span class="slot-num">${i + 1}</span>`}</span><h3>${t(names[i])} <span class="stamp-state">${t(s === "done" ? "sDone" : s === "now" ? "sNow" : "sNext")}</span></h3><p>${esc5(descs[i])}</p></li>`).join("")}</ol>`;
+  return `<ol class="stamps" aria-label="${t("stampsLabel")}">${states.map((s, i) => `<li class="stamp is-${s}"${s === "now" ? ' aria-current="step"' : ""}><span class="slot" aria-hidden="true">${s === "done" ? seal(i) : s === "now" ? t("sNow") : `<span class="slot-num">${i + 1}</span>`}</span><h3>${t(names[i])} <span class="stamp-state">${t(s === "done" ? "sDone" : s === "now" ? "sNow" : "sNext")}</span></h3><p>${esc6(descs[i])}</p></li>`).join("")}</ol>`;
 }
 function today() {
   const g = goalById(state.primaryGoal);
@@ -5103,8 +5502,8 @@ function today() {
     const cards = GOALS.map((x, i) => hang(x.id, { i, slot: ["left", "mid", "right"][i], action: "exploreGoal" })).join("");
     return `<main class="home" id="main"><aside class="stage home-stage is-three" aria-label="${t("pickCard")}"><div class="rod" aria-hidden="true"></div>${cards}<div class="home-cap"><span></span><button type="button" class="link" data-action="changeGoal">${t("pickCard")}</button></div></aside>
 <div class="home-main">${notices()}<p class="eyebrow">${t("today")}</p><h1 class="title page-title" tabindex="-1"><span>${t("nT1")}</span> <span class="title-2">${t("nT2")}</span></h1>
-<ul class="goal-list">${GOALS.map((x) => `<li><button type="button" class="goal-row" data-action="exploreGoal" data-id="${x.id}"><span class="goal-sym" data-goal="${x.id}">${SYMBOL[x.id]}</span><span class="goal-txt"><b>${esc5(pick(x.label))}</b><small>${esc5(pick(x.description))}</small></span><span class="row-go" aria-hidden="true">${ICON2.arrow}</span></button></li>`).join("")}</ul>
-${upcomingHtml()}${newsHtml()}<div class="home-grid">${sec(t("official"), t("offSub"), officialList("all"))}${sec(t("tools"), "", toolRows())}</div></div></main>`;
+<ul class="goal-list">${GOALS.map((x) => `<li><button type="button" class="goal-row" data-action="exploreGoal" data-id="${x.id}"><span class="goal-sym" data-goal="${x.id}">${SYMBOL[x.id]}</span><span class="goal-txt"><b>${esc6(pick(x.label))}</b><small>${esc6(pick(x.description))}</small></span><span class="row-go" aria-hidden="true">${ICON2.arrow}</span></button></li>`).join("")}</ul>
+${pathHtml()}${upcomingHtml()}${newsHtml()}<div class="home-grid">${sec(t("official"), t("offSub"), officialList("all"))}${sec(t("tools"), "", toolRows())}</div></div></main>`;
   }
   const mine = state.tasks.filter((x) => x.goal === g.id);
   const nt = getNextTask(state);
@@ -5115,27 +5514,27 @@ ${upcomingHtml()}${newsHtml()}<div class="home-grid">${sec(t("official"), t("off
   let card2;
   if (task) {
     const so = oppById(task.sourceId);
-    card2 = `<section class="resume" aria-label="${t("resume")}"><div><span class="resume-k">${t("resume")}</span><span class="resume-t">${so ? `${demoBadge(so)}${esc5(pick(so.title))}` : t("missing")}</span><span class="resume-s"><i aria-hidden="true"></i>${t("resumeS")}</span></div><button type="button" class="btn" data-action="openTask" data-id="${esc5(task.id)}">${t("resume")} ${ICON2.arrow}</button></section>`;
+    card2 = `<section class="resume" aria-label="${t("resume")}"><div><span class="resume-k">${t("resume")}</span><span class="resume-t">${so ? `${demoBadge(so)}${esc6(pick(so.title))}` : t("missing")}</span><span class="resume-s"><i aria-hidden="true"></i>${t("resumeS")}</span></div><button type="button" class="btn" data-action="openTask" data-id="${esc6(task.id)}">${t("resume")} ${ICON2.arrow}</button></section>`;
   } else if (allDone) {
     card2 = `<section class="resume is-done"><div><span class="resume-k">${t("nextStep")}</span><span class="resume-t">${t("doneNext")}</span></div><div class="resume-acts"><button type="button" class="btn" data-action="exploreGoal" data-id="${g.id}">${t("exploreMore")} ${ICON2.arrow}</button><button type="button" class="link" data-action="nav" data-page="prepare">${t("viewPrep")}</button></div></section>`;
   } else {
-    card2 = `<section class="resume is-start"><div><span class="resume-k">${t("nextStep")}</span><span class="resume-t">${esc5(pick(g.homeTitle))}</span><span class="resume-s">${esc5(pick(g.steps[0]))}</span></div><button type="button" class="btn" data-action="exploreGoal" data-id="${g.id}">${esc5(pick(g.homeAction))} ${ICON2.arrow}</button></section>`;
+    card2 = `<section class="resume is-start"><div><span class="resume-k">${t("nextStep")}</span><span class="resume-t">${esc6(pick(g.homeTitle))}</span><span class="resume-s">${esc6(pick(g.steps[0]))}</span></div><button type="button" class="btn" data-action="exploreGoal" data-id="${g.id}">${esc6(pick(g.homeAction))} ${ICON2.arrow}</button></section>`;
   }
   const opps = OPPORTUNITIES.filter((o) => o.goal === g.id).slice(0, 2);
   const off = g.id === "job" && jobsFeed.snapshot().status === "disabled" ? `<p class="off"><i aria-hidden="true"></i>${t("jobsOff")}</p>` : "";
   return `<main class="home" id="main"><aside class="stage home-stage" aria-label="${t("myCard")}"><div class="rod" aria-hidden="true"></div>${hang(g.id, { kicker: t("myCard"), mode: "next" })}<div class="home-cap"><span></span><button type="button" class="link" data-action="changeGoal">${t("changeCard")}</button></div></aside>
 <div class="home-main">${notices()}<p class="eyebrow">${t("today")}</p><h1 class="title page-title" tabindex="-1"><span>${h1a}</span> <span class="title-2">${h1b}</span></h1>
-${stamps(st, g.steps.map(pick))}${card2}${g.id === "study" && STUDY_ON ? renderStudyEntry(studyView()) : ""}${upcomingHtml()}${newsHtml()}
+${stamps(st, g.steps.map(pick))}${card2}${g.id === "study" && STUDY_ON ? renderStudyEntry(studyView()) : ""}${pathHtml()}${upcomingHtml()}${newsHtml()}
 <div class="home-grid">${sec(t("homeOpps"), t("demoSub"), `<ul class="rows">${opps.map(oppRow).join("")}</ul>`)}${sec(t("official"), t("offSub"), officialList(g.id) + off)}</div></div></main>`;
 }
 function officialList(goal) {
   const list = OFFICIAL_LINKS.filter((l) => goal === "all" || l.goal === goal || l.goal === null);
-  return `<ul class="rows">${list.map((l) => `<li><a class="row" href="${esc5(l.url)}" target="_blank" rel="noopener noreferrer"><span><b><span class="badge official">${t("officialBadge")}</span>${esc5(pick(l.title))}</b><small>${esc5(pick(l.summary))} · ${t("checked")} ${esc5(l.checkedAt)}</small></span><span class="row-go" aria-hidden="true">${ICON2.out}</span><span class="sr-only"> (${t("openNew")})</span></a></li>`).join("")}</ul>`;
+  return `<ul class="rows">${list.map((l) => `<li><a class="row" href="${esc6(l.url)}" target="_blank" rel="noopener noreferrer"><span><b><span class="badge official">${t("officialBadge")}</span>${esc6(pick(l.title))}</b><small>${esc6(pick(l.summary))} · ${t("checked")} ${esc6(l.checkedAt)}</small></span><span class="row-go" aria-hidden="true">${ICON2.out}</span><span class="sr-only"> (${t("openNew")})</span></a></li>`).join("")}</ul>`;
 }
-var toolRows = () => `<ul class="rows">${EXISTING_TOOLS.map((x) => `<li><a class="row" href="${esc5(x.url)}" target="_blank" rel="noopener noreferrer"><span><b>${esc5(pick(x.title))}</b><small>${esc5(pick(x.summary))}</small></span><span class="row-go" aria-hidden="true">${ICON2.out}</span><span class="sr-only"> (${t("openNew")})</span></a></li>`).join("")}</ul>`;
+var toolRows = () => `<ul class="rows">${EXISTING_TOOLS.map((x) => `<li><a class="row" href="${esc6(x.url)}" target="_blank" rel="noopener noreferrer"><span><b>${esc6(pick(x.title))}</b><small>${esc6(pick(x.summary))}</small></span><span class="row-go" aria-hidden="true">${ICON2.out}</span><span class="sr-only"> (${t("openNew")})</span></a></li>`).join("")}</ul>`;
 function explore() {
   const f = S.filter;
-  const filt = ["all", ...GOALS.map((g) => g.id)].map((id) => `<button type="button" class="chip" aria-pressed="${f === id}" data-action="filter" data-id="${id}">${id === "all" ? t("all") : esc5(pick(goalById(id).description))}</button>`).join("");
+  const filt = ["all", ...GOALS.map((g) => g.id)].map((id) => `<button type="button" class="chip" aria-pressed="${f === id}" data-action="filter" data-id="${id}">${id === "all" ? t("all") : esc6(pick(goalById(id).description))}</button>`).join("");
   const list = OPPORTUNITIES.filter((o) => f === "all" || o.goal === f);
   const full = S.compare.length >= 3;
   let h = head(t("exploreTitle"), t("explore"), "", t("exploreT2"));
@@ -5144,11 +5543,11 @@ function explore() {
   h += `<details class="practice"${S.practiceOpen ? " open" : ""}><summary><span>${t("practice")}</span><small>${t("demoSub")}</small></summary><p class="meta">${t("demoNote")}</p>`;
   h += `<ul class="rows opp-rows">${list.map((o) => {
     const on = S.compare.includes(o.id);
-    return `<li class="opp"><div class="opp-text"><b>${demoBadge(o)}${esc5(pick(o.title))}</b><small>${esc5(pick(o.summary))}</small></div><div class="opp-acts"><button type="button" class="btn-line" data-action="detail" data-id="${o.id}">${t("details")}</button><button type="button" class="chip" aria-pressed="${on}" data-action="compare" data-id="${o.id}"${full && !on ? " disabled" : ""}>${on ? t("compareOn") : t("compareAdd")}</button></div></li>`;
+    return `<li class="opp"><div class="opp-text"><b>${demoBadge(o)}${esc6(pick(o.title))}</b><small>${esc6(pick(o.summary))}</small></div><div class="opp-acts"><button type="button" class="btn-line" data-action="detail" data-id="${o.id}">${t("details")}</button><button type="button" class="chip" aria-pressed="${on}" data-action="compare" data-id="${o.id}"${full && !on ? " disabled" : ""}>${on ? t("compareOn") : t("compareAdd")}</button></div></li>`;
   }).join("")}</ul>`;
   if (full) h += `<p class="meta">${t("compareMax")}</p>`;
   if (S.compare.length) {
-    h += `<div class="sec-h compare-h"><h2>${t("compareTitle")} (${S.compare.length}/3)</h2><button type="button" class="text-button" data-action="clearCompare">${t("clearCompare")}</button></div><div class="compare-grid">${S.compare.map(oppById).map((o) => `<div class="compare-item">${demoBadge(o)}<h3>${esc5(pick(o.title))}</h3><ol class="reqs">${o.requirements.map((r, i) => `<li><b>${i + 1}</b>${esc5(pick(r))}</li>`).join("")}</ol></div>`).join("")}</div>`;
+    h += `<div class="sec-h compare-h"><h2>${t("compareTitle")} (${S.compare.length}/3)</h2><button type="button" class="text-button" data-action="clearCompare">${t("clearCompare")}</button></div><div class="compare-grid">${S.compare.map(oppById).map((o) => `<div class="compare-item">${demoBadge(o)}<h3>${esc6(pick(o.title))}</h3><ol class="reqs">${o.requirements.map((r, i) => `<li><b>${i + 1}</b>${esc6(pick(r))}</li>`).join("")}</ol></div>`).join("")}</div>`;
   }
   h += "</details>";
   h += sec(t("official"), t("offSub"), officialList(f));
@@ -5157,9 +5556,9 @@ function explore() {
 function detail() {
   const o = oppById(S.oppId);
   if (!o) return head(t("missing")) + `<button type="button" class="btn-line" data-action="nav" data-page="explore">${t("backList")}</button>`;
-  return `<article class="detail"><button type="button" class="back" data-action="nav" data-page="explore">${ICON2.back}${t("backList")}</button><p class="eyebrow">${demoBadge(o)} ${esc5(pick(goalById(o.goal)?.label))}</p><h1 class="title page-title" tabindex="-1"><span>${esc5(pick(o.title))}</span></h1><p class="lead">${esc5(pick(o.summary))}</p>${liveLink(o)}
-<h2 class="h2">${t("requirements")}</h2><ol class="reqs">${o.requirements.map((r, i) => `<li><b>${i + 1}</b>${esc5(pick(r))}</li>`).join("")}</ol>
-<div class="actions"><button type="button" class="btn" data-action="${o.source === "live" ? "prepareJob" : "prepareThis"}" data-id="${esc5(o.id)}">${t("prepareThis")} ${ICON2.arrow}</button></div></article>
+  return `<article class="detail"><button type="button" class="back" data-action="nav" data-page="explore">${ICON2.back}${t("backList")}</button><p class="eyebrow">${demoBadge(o)} ${esc6(pick(goalById(o.goal)?.label))}</p><h1 class="title page-title" tabindex="-1"><span>${esc6(pick(o.title))}</span></h1><p class="lead">${esc6(pick(o.summary))}</p>${liveLink(o)}
+<h2 class="h2">${t("requirements")}</h2><ol class="reqs">${o.requirements.map((r, i) => `<li><b>${i + 1}</b>${esc6(pick(r))}</li>`).join("")}</ol>
+<div class="actions"><button type="button" class="btn" data-action="${o.source === "live" ? "prepareJob" : "prepareThis"}" data-id="${esc6(o.id)}">${t("prepareThis")} ${ICON2.arrow}</button></div></article>
 ${sec(t("official"), t("offSub"), officialList(o.goal))}`;
 }
 var statusHtml = (task) => `<span class="status" data-state="${task.confirmedAt ? "done" : "draft"}">${task.confirmedAt ? t("done") : t("draft")}</span>`;
@@ -5169,9 +5568,9 @@ function prepare() {
   for (const g of GOALS) {
     const ts = state.tasks.filter((x) => x.goal === g.id);
     if (!ts.length) continue;
-    h += sec(esc5(pick(g.label)), "", `<ul class="rows">${ts.map((x) => {
+    h += sec(esc6(pick(g.label)), "", `<ul class="rows">${ts.map((x) => {
       const so = oppById(x.sourceId);
-      return `<li><button type="button" class="row" data-action="openTask" data-id="${esc5(x.id)}"><span><b>${demoBadge(so)}${so ? esc5(pick(so.title)) : t("missing")}</b><small>${statusHtml(x)}</small></span><span class="row-go" aria-hidden="true">${ICON2.arrow}</span></button></li>`;
+      return `<li><button type="button" class="row" data-action="openTask" data-id="${esc6(x.id)}"><span><b>${demoBadge(so)}${so ? esc6(pick(so.title)) : t("missing")}</b><small>${statusHtml(x)}</small></span><span class="row-go" aria-hidden="true">${ICON2.arrow}</span></button></li>`;
     }).join("")}</ul>`);
   }
   return h;
@@ -5185,12 +5584,12 @@ function editor() {
   const st = session.status(), signed = st.signedIn;
   const savedOk = st.canEdit && !st.error;
   let h = `<main class="ed" id="main"><aside class="stage ed-stage" aria-label="${t("source")}"><div class="rod" aria-hidden="true"></div>${hang(goal, { kicker: t("srcK"), name: pick(o.title), desc: "", mode: "source" })}
-<div class="ed-src"><b>${t("source")}</b><p>${demoBadge(o)}<span>${esc5(pick(o.title))}</span></p><small>${o.source === "live" ? t("liveNote") : t("srcNote")}</small>${liveLink(o)}<button type="button" class="link" data-action="detail" data-id="${esc5(o.id)}">${t("reopen")}</button></div></aside>
+<div class="ed-src"><b>${t("source")}</b><p>${demoBadge(o)}<span>${esc6(pick(o.title))}</span></p><small>${o.source === "live" ? t("liveNote") : t("srcNote")}</small>${liveLink(o)}<button type="button" class="link" data-action="detail" data-id="${esc6(o.id)}">${t("reopen")}</button></div></aside>
 <div class="ed-main">${notices(false, true)}<button type="button" class="back" data-action="nav" data-page="prepare">${ICON2.back}${t("backPrep")}</button>
-<p class="eyebrow">${t("edEyebrow")}</p><h1 class="title page-title" tabindex="-1"><span>${esc5(pick(o.prompt))}</span></h1>
-<ol class="reqs" aria-label="${t("requirements")}">${o.requirements.map((r, i) => `<li><b>${i + 1}</b>${esc5(pick(r))}</li>`).join("")}</ol>
+<p class="eyebrow">${t("edEyebrow")}</p><h1 class="title page-title" tabindex="-1"><span>${esc6(pick(o.prompt))}</span></h1>
+<ol class="reqs" aria-label="${t("requirements")}">${o.requirements.map((r, i) => `<li><b>${i + 1}</b>${esc6(pick(r))}</li>`).join("")}</ol>
 <section class="editor"><div class="field"><label for="body" class="field-label">${t("body")}</label>
-<textarea id="body" maxlength="6000" aria-describedby="body-hint edit-err" data-action="body"${S.error === "needBody" ? ' aria-invalid="true"' : ""}>${esc5(task.body)}</textarea>
+<textarea id="body" maxlength="6000" aria-describedby="body-hint edit-err" data-action="body"${S.error === "needBody" ? ' aria-invalid="true"' : ""}>${esc6(task.body)}</textarea>
 <div class="field-meta" id="body-hint"><span class="count" id="count">${countText(task.body)}</span>${savedOk ? `<span class="saved">${ICON2.check}${signed ? t("savedAccount") : t("savedGuest")}</span>` : ""}</div></div>
 <p id="task-status" class="task-status">${statusHtml(task)}</p>
 <label class="check"><input type="checkbox" id="ack"${task.confirmedAt ? " checked" : ""}><span class="box" aria-hidden="true">${ICON2.check}</span><span>${t("confirmCheck")}</span></label>
@@ -5199,8 +5598,8 @@ function editor() {
 ${S.flash ? `<div id="flash" class="notice flash-inline" role="status">${S.flash}</div>` : ""}<p class="fine">${t("confirmNote")}</p></section>`;
   if (task.confirmedAt) {
     const nx = getNextTask(state);
-    h += `<div id="confirmed-result" class="result"><div class="sec-h"><h2>${t("result")}</h2>${demoBadge(o)}</div><div class="result-body">${esc5(task.body)}</div>
-<div class="actions">${nx && nx.id !== task.id && !nx.confirmedAt ? `<button type="button" class="btn" data-action="openTask" data-id="${esc5(nx.id)}">${t("nextAction")} ${ICON2.arrow}</button>` : ""}<button type="button" class="btn-line" data-action="exploreGoal" data-id="${task.goal}">${t("exploreMore")}</button></div></div>`;
+    h += `<div id="confirmed-result" class="result"><div class="sec-h"><h2>${t("result")}</h2>${demoBadge(o)}</div><div class="result-body">${esc6(task.body)}</div>
+<div class="actions">${nx && nx.id !== task.id && !nx.confirmedAt ? `<button type="button" class="btn" data-action="openTask" data-id="${esc6(nx.id)}">${t("nextAction")} ${ICON2.arrow}</button>` : ""}<button type="button" class="btn-line" data-action="exploreGoal" data-id="${task.goal}">${t("exploreMore")}</button></div></div>`;
   }
   return h + "</div></main>";
 }
@@ -5226,10 +5625,10 @@ Thank you.` : `안녕하세요.
 감사합니다.`;
 }
 function help() {
-  const opts = [...GOALS.map((g) => [g.id, pick(g.label)]), ["general", t("general")]].map(([id, l]) => `<option value="${id}"${S.help === id ? " selected" : ""}>${esc5(l)}</option>`).join("");
+  const opts = [...GOALS.map((g) => [g.id, pick(g.label)]), ["general", t("general")]].map(([id, l]) => `<option value="${id}"${S.help === id ? " selected" : ""}>${esc6(l)}</option>`).join("");
   return head(t("helpTitle"), t("help"), t("helpLead"), t("helpT2")) + `<div class="field field-inline"><label for="topic" class="field-label">${t("topic")}</label><select id="topic" class="select" data-action="topic">${opts}</select></div>
 <section class="sec"><div class="sec-h"><h2>${t("template")}</h2><button type="button" class="btn-line" data-action="copy">${t("copy")}</button></div>
-${S.copyMsg ? `<p class="notice${S.copyMsg === "copyFail" ? " error" : ""}" role="status">${t(S.copyMsg)}</p>` : ""}<pre class="result-body" id="tpl">${esc5(helpTemplate(S.help))}</pre></section>
+${S.copyMsg ? `<p class="notice${S.copyMsg === "copyFail" ? " error" : ""}" role="status">${t(S.copyMsg)}</p>` : ""}<pre class="result-body" id="tpl">${esc6(helpTemplate(S.help))}</pre></section>
 ${sec(t("official"), t("offSub"), officialList(S.help === "general" ? "none" : S.help))}
 ${sec(t("tools"), t("offSub"), `<p class="meta">${t("toolsLead")}</p>${toolRows()}`)}`;
 }
@@ -5237,7 +5636,7 @@ function profile() {
   const g = goalById(state.primaryGoal);
   const accSt = session.status();
   return head(t("profileTitle"), t("profile"), "", t("profileT2")) + renderAccountPanel(accSt, state.lang, { pendingBackup: !!pendingBackup && !!accSt.canConfirmBackup && pendingBackup.owner === ownerKey(), useRemote: !!pendingBackup?.useRemote }) + `<div class="settings">
-<section class="settings-group"><h2>${t("goal")}</h2><p>${g ? esc5(pick(g.label)) : t("none")}</p><button type="button" class="btn-line" data-action="changeGoal">${t("changeGoal")}</button></section>
+<section class="settings-group"><h2>${t("goal")}</h2><p>${g ? esc6(pick(g.label)) : t("none")}</p><button type="button" class="btn-line" data-action="changeGoal">${t("changeGoal")}</button></section>
 <section class="settings-group"><h2>${t("location")}</h2><p>${t(state.location || "unknown")}</p></section>
 <section class="settings-group"><h2>${t("lang")}</h2><p>${state.lang === "en" ? "English" : "한국어"}</p></section>
 <section class="settings-group"><h2>${t("storage")}</h2>${accSt.signedIn ? `<p>${state.lang === "en" ? "Syncs to your account. Please check the save status above." : "계정에 동기화합니다. 위의 저장 상태를 확인해 주세요."}</p>` : `<p>${t("storageText")}</p><button type="button" class="btn-line danger" data-action="clear">${t("clear")}</button>`}${STUDY_ON ? `<p>${t("studyStore")}</p>` : CHANNEL_ON ? `<p>${t("datesStore")}</p>` : ""}</section></div>`;
@@ -5255,10 +5654,15 @@ var post = () => renderPost({ ...channelView(), postId: S.postId });
 var upcomingHtml = () => CHANNEL_ON ? renderUpcoming(channelView()) : "";
 var newsHtml = () => CHANNEL_ON ? renderNews(channelView()) : "";
 var univ = () => renderUniv({ ...studyView(), filter: S.univFilter });
-var univDetail = () => renderUnivDetail({ ...studyView(), programId: S.univId });
+var univDetail = () => {
+  const v = { ...channelView(), programId: S.univId };
+  return renderUnivDetail({ ...v, pathPick: renderPathPick(v, STUDY_PROGRAMS.find((p) => p.id === S.univId)) });
+};
+var path = () => renderPath({ ...channelView(), docFull: S.docFull });
+var pathHtml = () => STUDY_ON ? renderPathCard(channelView()) : "";
 var univCompare = () => renderUnivCompare(studyView());
 var cond = () => renderCond(condView());
-var PAGES = { today, channels, post, univ, univDetail, univCompare, cond, explore, detail, prepare, editor, help, profile };
+var PAGES = { today, path, channels, post, univ, univDetail, univCompare, cond, explore, detail, prepare, editor, help, profile };
 var LOCKED_ACTIONS = ["pickGoal", "step2", "toggle", "finish", "skip", "prepareThis", "confirm", "body", "loc", "setLang", "changeGoal", "prepareJob", "saveJob", "removeJob"];
 function render(focus = true) {
   if (composingEl && root.contains(composingEl) && document.activeElement === composingEl) {
@@ -5289,7 +5693,12 @@ function render(focus = true) {
   if (!S.draft) S.draft = newDraft();
   document.documentElement.lang = state.lang;
   const main = S.page === "onboard" ? onboard() : S.page === "today" ? today() : S.page === "editor" ? editor() : `<main class="content" id="main">${notices(S.page === "profile")}${PAGES[S.page]()}</main>`;
+  const openFolds = focus ? [] : [...root.querySelectorAll("[data-fold]")].filter((d) => d.open).map((d) => d.getAttribute("data-fold"));
   root.innerHTML = shell(main);
+  for (const f of openFolds) {
+    const d = root.querySelector(`[data-fold="${f}"]`);
+    if (d) d.open = true;
+  }
   S.drop = false;
   if (!accSt.canEdit) {
     root.querySelectorAll("[data-action]").forEach((c) => {
@@ -5330,6 +5739,7 @@ function go(page) {
   S.page = page;
   S.flash = null;
   S.dateNote = null;
+  S.docFull = false;
   S.error = null;
   S.copyMsg = null;
   S.studyText = {};
@@ -5518,12 +5928,49 @@ var ACT = {
   },
   studyClear() {
     const cur = studyProfile();
-    studyWrite({ ...createProfile(), compare: cur.compare, dates: cur.dates, channelsOff: cur.channelsOff });
+    studyWrite({ ...createProfile(), compare: cur.compare, dates: cur.dates, channelsOff: cur.channelsOff, target: cur.target, docs: cur.docs });
     S.studyText = {};
     S.studyErrors = {};
     render(false);
     root.querySelector('[data-action="studySet"]')?.focus();
     say(accL("조건을 모두 지웠어요.", "All conditions cleared."));
+  },
+  pathPick(el) {
+    const id = el.dataset.id, program = STUDY_PROGRAMS.find((p) => p.id === id), cur = studyProfile();
+    if (!program) return;
+    let msg;
+    if (cur.target === id) {
+      studyWrite(setTarget(cur, null).profile);
+      msg = accL("이 과정 준비를 그만했어요. 서류 표시는 남겨 둬요.", "Stopped preparing for this program. Your marks are kept.");
+    } else {
+      const set = docsFor(program, cur), keep = set ? set.all.map((d) => d.id) : [];
+      const drop = cur.docs.filter((d) => !keep.includes(d.id)).length;
+      if (drop && !confirm(accL(`앞 과정에서 표시한 서류 ${drop}개를 지우고 이 과정으로 바꿀까요?`, `Remove ${drop} mark${drop === 1 ? "" : "s"} from the previous program and switch to this one?`))) return;
+      studyWrite(setTarget(cur, id, keep).profile);
+      msg = drop ? accL(`이 과정으로 준비해요. 앞 과정의 표시 ${drop}개를 지웠어요.`, `Now preparing for this program. Removed ${drop} earlier mark${drop === 1 ? "" : "s"}.`) : accL("이 과정으로 준비해요. 오늘 화면의 「내 길」에서 서류를 챙길 수 있어요.", "Now preparing for this program. Track the documents in “My path” on Today.");
+    }
+    render(false);
+    (root.querySelector(`[data-action="pathPick"][data-id="${id}"]`) || root.querySelector(".page-title"))?.focus();
+    say(msg);
+  },
+  docToggle(el) {
+    const id = el.dataset.id, cur = studyProfile(), r = toggleDoc(cur, id, /* @__PURE__ */ new Date());
+    if (r.full) {
+      S.docFull = true;
+      render(false);
+      root.querySelector(`[data-action="docToggle"][data-id="${id}"]`)?.focus();
+      say(accL("표시가 예순 개라 더 넣을 수 없어요. 다른 과정의 표시를 뺀 뒤 넣어 주세요.", "You already have 60 marks. Remove some from another program first."));
+      return;
+    }
+    S.docFull = false;
+    const next = studyWrite(r.profile), t2 = pathTarget({ ...channelView(), profile: next });
+    render(false);
+    const btn2 = root.querySelector(`[data-action="docToggle"][data-id="${id}"]`), fold2 = btn2 && btn2.closest("details");
+    if (fold2) fold2.open = true;
+    btn2?.focus();
+    const doc2 = t2 && t2.set.mine.find((d) => d.id === id), c = doc2 ? stageCounts(t2.set, next)[doc2.stage] : null;
+    const count = c ? accL(` 이 묶음 ${c.n}/${c.total}.`, ` ${c.n} of ${c.total} in this group.`) : "";
+    say((r.on ? accL("준비했어요로 표시했어요.", "Marked as ready.") : accL("표시를 뺐어요.", "Mark removed.")) + count);
   },
   studyCompare(el) {
     const id = el.dataset.id, cur = studyProfile(), before = cur.compare.length;
@@ -5935,7 +6382,7 @@ root.addEventListener("click", (e) => {
   if (!el || el.disabled || !ACT[el.dataset.action]) return;
   const fail4 = (err) => {
     const m = getAccountErrorMessage(err, state.lang);
-    S.flash = esc5(m);
+    S.flash = esc6(m);
     render(false);
     say(m);
   };
@@ -5992,7 +6439,7 @@ root.addEventListener("input", (e) => {
       studyInput(e.target);
     } catch (err) {
       const m = getAccountErrorMessage(err, state.lang);
-      S.flash = esc5(m);
+      S.flash = esc6(m);
       render(false);
       say(m);
     }
@@ -6078,7 +6525,7 @@ S.draft = newDraft();
 render(false);
 void session.init().catch((err) => {
   const m = getAccountErrorMessage(err, state.lang);
-  S.flash = esc5(m);
+  S.flash = esc6(m);
   render(false);
   say(m);
 }).finally(() => {
