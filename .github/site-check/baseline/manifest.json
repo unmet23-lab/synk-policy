@@ -1,7 +1,7 @@
 {
- "createdAt": "2026-11-21T09:09:34.922Z",
- "commit": "c5784017a1c0832c3ea37a40d08b6c8b17f45200",
- "run": 44886470063,
+ "createdAt": "2026-11-22T11:05:41.815Z",
+ "commit": "6fe996812754985ca8cb69fe7d49bd3793c554c6",
+ "run": 45013816513,
  "env": {
   "chromium": "151.0.7922.34",
   "os": "ubuntu24"
@@ -10,15 +10,15 @@
   "/": {
    "desktop": {
     "file": "desktop/home.jpg",
-    "sha256": "87be94de171654fd8338beda1ea74e531da1a96ecde1d4d3068414bfe9ce5203",
-    "cssHeight": 20360,
-    "run": 44886470063
+    "sha256": "24a5b2af71a5f2d08599bda8725cc8c5c6d3bd8b83f22b05cb9e78a0b269ee68",
+    "cssHeight": 20353,
+    "run": 45013816513
    },
    "mobile": {
     "file": "mobile/home.jpg",
-    "sha256": "a15ebce45194354d9a55253f16704e1457e85301089d63440674dd4c80581403",
+    "sha256": "bea7edb63a825b71f7528f13cee299247aa2d3f5ed77d1a620fdd4f51ffcf6b3",
     "cssHeight": 14642,
-    "run": 44886470063
+    "run": 45013816513
    }
   },
   "/ai/": {
@@ -108,29 +108,29 @@
   "/classroom/": {
    "desktop": {
     "file": "desktop/classroom.jpg",
-    "sha256": "e6241f27c0c23b4cc0ebb6558a46f76aa84141dfec41a3e3522f6e5ad503a20b",
-    "cssHeight": 6492,
-    "run": 44872214436
+    "sha256": "05a1229a131d0b8498c72f73a2781f7612ad2d480ccc0b19654e009ad27ef231",
+    "cssHeight": 6533,
+    "run": 45013816513
    },
    "mobile": {
     "file": "mobile/classroom.jpg",
-    "sha256": "292f59a0bef33e18432a3db1ebb4e299fa1eebc907bff61b6e0fd4da37136f59",
-    "cssHeight": 5261,
-    "run": 44872214436
+    "sha256": "b8616e39046f327168dba044ff912960f6b7fb50505fe9443a1ab5e36a88525a",
+    "cssHeight": 5321,
+    "run": 45013816513
    }
   },
   "/community/": {
    "desktop": {
     "file": "desktop/community.jpg",
-    "sha256": "aa78edd6d938b704ee1f9222732d10dfe3c2f91ab4b915a2f5f503e827429140",
-    "cssHeight": 6579,
-    "run": 44872214436
+    "sha256": "49b0acd75643262ce5e8532d85e85e2b03090dc23b215dee7c84206dd953de46",
+    "cssHeight": 6619,
+    "run": 45013816513
    },
    "mobile": {
     "file": "mobile/community.jpg",
-    "sha256": "a77080c9239c2940b0e7cae9fdc5ab7c4322776f598ea697b9a106bd0aeaad4e",
-    "cssHeight": 5865,
-    "run": 44872214436
+    "sha256": "aff42f07814ccfa5b37c76ef9892d5d503f6739b43c4ec9d4eb847d788059a11",
+    "cssHeight": 5925,
+    "run": 45013816513
    }
   },
   "/data-deletion/": {
@@ -150,15 +150,15 @@
   "/en/": {
    "desktop": {
     "file": "desktop/en.jpg",
-    "sha256": "04df7001486279dab9141b6ebb647385eb1941aabf843f961499ec47d6aa061b",
+    "sha256": "f05ed3bea43d8ef1a4ce347e57cc63f9659fd6957699ecf5de696a27265246e0",
     "cssHeight": 20569,
-    "run": 44886470063
+    "run": 45013816513
    },
    "mobile": {
     "file": "mobile/en.jpg",
-    "sha256": "32e5b4e13026da874c3fd1746946a596d634d79dc6bfc26f85b8aa42f0022374",
+    "sha256": "b7ced83d6224bfa1834e830a38ca7632732cff22b6951252b86c365ef2d28193",
     "cssHeight": 15472,
-    "run": 44886470063
+    "run": 45013816513
    }
   },
   "/en/ai/": {
@@ -192,29 +192,29 @@
   "/en/classroom/": {
    "desktop": {
     "file": "desktop/en~classroom.jpg",
-    "sha256": "b78be8670386f6c0ebe4a5ceeaa0887e5514f83037f6f97c7ea57e508cc2ae8e",
-    "cssHeight": 6951,
-    "run": 44872214436
+    "sha256": "6717eb3e035011e856fbda3eece7d1bd7b8097541521081f132239a9ef6a6a28",
+    "cssHeight": 6991,
+    "run": 45013816513
    },
    "mobile": {
     "file": "mobile/en~classroom.jpg",
-    "sha256": "fd0148291e0dac75a51cd1dbc69b566d5f93b5ead2f28520de9e156f306849d7",
-    "cssHeight": 5718,
-    "run": 44872214436
+    "sha256": "6b8e8f39a36393f9783be9a984f87818e940a3ac51ddf79627df0aea866be022",
+    "cssHeight": 5778,
+    "run": 45013816513
    }
   },
   "/en/community/": {
    "desktop": {
     "file": "desktop/en~community.jpg",
-    "sha256": "0f72fed128ca8a7e462c643d8fde8328f27a6dab5961b7381d8f19f5e0c4ca39",
-    "cssHeight": 6625,
-    "run": 44872214436
+    "sha256": "8446ccadbe897bfa7f73abbeeaef9fe8381205c1606a609abd50078819f994cd",
+    "cssHeight": 6665,
+    "run": 45013816513
    },
    "mobile": {
     "file": "mobile/en~community.jpg",
-    "sha256": "39bdc27e767f32d85d742b90fe72f7a896312b569a23ffd7524d565ff8995af6",
-    "cssHeight": 6099,
-    "run": 44872214436
+    "sha256": "9473ea2b078f087437af0ecdfcd3f4f300dc74dc9206511d9efbb0c89c4fef33",
+    "cssHeight": 6160,
+    "run": 45013816513
    }
   },
   "/en/founder/": {
@@ -234,29 +234,29 @@
   "/en/job/": {
    "desktop": {
     "file": "desktop/en~job.jpg",
-    "sha256": "923dc35a59e1421f1b0c92e7c80c60c7511e6335d520c5256a94acca91ad91d1",
-    "cssHeight": 5536,
-    "run": 44872214436
+    "sha256": "7edf4eb57beff9e6311a3f561fb5d6d24d15f80eccab01e27096a2df06d6a35a",
+    "cssHeight": 5577,
+    "run": 45013816513
    },
    "mobile": {
     "file": "mobile/en~job.jpg",
-    "sha256": "bfe501d4cf8231526a743040a1df1088586e54086791e06c7d4b3201ffdb120e",
-    "cssHeight": 3839,
-    "run": 44872214436
+    "sha256": "3d6cb543c119be984de325fce8222378fa6b6338febc4102e6e0b672bf93a366",
+    "cssHeight": 3899,
+    "run": 45013816513
    }
   },
   "/en/korean/": {
    "desktop": {
     "file": "desktop/en~korean.jpg",
-    "sha256": "f3a9da3c9e3f0bddb93badda4a286f42a3e26ac7e8101300f99c6c4d01b820b7",
-    "cssHeight": 9822,
-    "run": 44872214436
+    "sha256": "250aff8148bb37c23ddf0fda35cc5f38e924e45c7256d4c1ff8023257c1b6f3c",
+    "cssHeight": 9863,
+    "run": 45013816513
    },
    "mobile": {
     "file": "mobile/en~korean.jpg",
-    "sha256": "29c8c8b8492ce69b94a6992b70ab6337e8d3fca23ca3cea18c33b8a804fc5d8e",
-    "cssHeight": 7934,
-    "run": 44872214436
+    "sha256": "ae452d3499d984b4ee0fd3ba7aa1ff738fa7d499544791e7c6f012d38fb6f123",
+    "cssHeight": 7994,
+    "run": 45013816513
    }
   },
   "/en/lab/": {
@@ -346,15 +346,15 @@
   "/en/study-abroad/": {
    "desktop": {
     "file": "desktop/en~study-abroad.jpg",
-    "sha256": "3d173738ab462a3187677285ce72c6f08455795aea9d18f5de34e78787be4095",
-    "cssHeight": 6828,
-    "run": 44872214436
+    "sha256": "29aace568f97a6e15a32d3d04f31409c83e42ed10288b2d3ec9d036a8889c8da",
+    "cssHeight": 6868,
+    "run": 45013816513
    },
    "mobile": {
     "file": "mobile/en~study-abroad.jpg",
-    "sha256": "c7f26c83406bd678ae1b57ecb409d368fe2b282291712ed91c517db2704543d3",
-    "cssHeight": 5725,
-    "run": 44872214436
+    "sha256": "84708fcce618643f7c8ebf2f6ec812d59c712eacd233d14ea496a311760c9fb6",
+    "cssHeight": 5785,
+    "run": 45013816513
    }
   },
   "/fortune/": {
@@ -388,29 +388,29 @@
   "/job/": {
    "desktop": {
     "file": "desktop/job.jpg",
-    "sha256": "1e94be101605d5dd4b7524946f6ac6c3293be3e71f88deebd584764a528ed155",
-    "cssHeight": 5480,
-    "run": 44872214436
+    "sha256": "fdbfcf1d38b51cda4c29b682d35a0a882b0fc2b889f99a01854a2858ef679360",
+    "cssHeight": 5520,
+    "run": 45013816513
    },
    "mobile": {
     "file": "mobile/job.jpg",
-    "sha256": "1ce12ac7b4e220ef3c61d79af6da0c56eaa1a0e785d332a04ff91bbeb8454aa0",
-    "cssHeight": 3679,
-    "run": 44872214436
+    "sha256": "58c37c06c292f9733bdf97c76134b7f40109df72239ac1919d4901aa4471a4fa",
+    "cssHeight": 3739,
+    "run": 45013816513
    }
   },
   "/korean/": {
    "desktop": {
     "file": "desktop/korean.jpg",
-    "sha256": "b922626dcc83cad9049a26898fe0b5b1305bcc925f9acf3a51e8bea69da56119",
-    "cssHeight": 9444,
-    "run": 44872214436
+    "sha256": "88285328fbdb80c2f6072f8dfe0d6903009382967ffbdad62b457592bf3c49d7",
+    "cssHeight": 9485,
+    "run": 45013816513
    },
    "mobile": {
     "file": "mobile/korean.jpg",
-    "sha256": "cd4496dd255331d4e75e4da5aea9d079e648e84554ecb7c6abf95e8783a3170d",
-    "cssHeight": 7488,
-    "run": 44872214436
+    "sha256": "9a34f5369eb652d16055c433855f71002ae92d2293c193648ac14c11dee15508",
+    "cssHeight": 7549,
+    "run": 45013816513
    }
   },
   "/lab/": {
@@ -472,15 +472,15 @@
   "/name/": {
    "desktop": {
     "file": "desktop/name.jpg",
-    "sha256": "e77d16bf9eb4358f60b32764f3849956580586a2c011399fcdbcb61cbaa03468",
-    "cssHeight": 1836,
-    "run": 40461875380
+    "sha256": "1cef4c4bca7b02b305da799707a5e24d704b800e62f887ac27b1812b61774b9d",
+    "cssHeight": 1876,
+    "run": 45013816513
    },
    "mobile": {
     "file": "mobile/name.jpg",
-    "sha256": "a92189d60340bed29ee128a659e9b86dc816ee53a8ba9832c2497eaea0e12a9e",
-    "cssHeight": 2284,
-    "run": 40461875380
+    "sha256": "c0f988640066881bd0ed9f7c7554ea9c4d24b02642513ead3e08c663fa218309",
+    "cssHeight": 2364,
+    "run": 45013816513
    }
   },
   "/name/family/": {
@@ -500,15 +500,15 @@
   "/nombre/": {
    "desktop": {
     "file": "desktop/nombre.jpg",
-    "sha256": "f4e124fe003428205fd13cf469afa67e03ad3ffb4f43dcb6c2ded7625f64d48d",
-    "cssHeight": 1326,
-    "run": 41525922792
+    "sha256": "80531c73ea75d56219b345877ceb7f6701797e471ac294ee4c2c5272a9c56863",
+    "cssHeight": 1366,
+    "run": 45013816513
    },
    "mobile": {
     "file": "mobile/nombre.jpg",
-    "sha256": "dc45d226ca7e779d3e69080c0c8543a1fbb6242474d74b9a21418005d544492c",
-    "cssHeight": 1536,
-    "run": 41525922792
+    "sha256": "e34f822ca961ac73ac543cf5836bcae10544886642b32f470f060daf61ca95ca",
+    "cssHeight": 1597,
+    "run": 45013816513
    }
   },
   "/path/": {
@@ -612,15 +612,15 @@
   "/rl/": {
    "desktop": {
     "file": "desktop/rl.jpg",
-    "sha256": "c2bb2cb665c413f87622be49ddf1410aaeafb6fa19253e68dbd50f615791973c",
-    "cssHeight": 1936,
-    "run": 41525922792
+    "sha256": "e1cd968c1cb5df5c99b89b84baefa102bd8589e0f207fd98540360a0fec43b83",
+    "cssHeight": 1976,
+    "run": 45013816513
    },
    "mobile": {
     "file": "mobile/rl.jpg",
-    "sha256": "93aa38b2e4af2d4838e97724f002d32fa73982ea4009f8a17bbd146cc5264669",
-    "cssHeight": 2244,
-    "run": 41525922792
+    "sha256": "8d613faf31ba17f10cc583597d6382243c5fd36d29fb90093abd6a990eb5be9d",
+    "cssHeight": 2305,
+    "run": 45013816513
    }
   },
   "/shift/": {
@@ -654,15 +654,15 @@
   "/study-abroad/": {
    "desktop": {
     "file": "desktop/study-abroad.jpg",
-    "sha256": "e9eb946a4a68fedfa2d2b7ebc93a80dbf997d2934bc0c1f479b366a412bfb985",
-    "cssHeight": 6576,
-    "run": 44872214436
+    "sha256": "a6d0af0eadb55fbf923d9c10eb42d9997297378e368460631a7d7eb28c4d8d54",
+    "cssHeight": 6616,
+    "run": 45013816513
    },
    "mobile": {
     "file": "mobile/study-abroad.jpg",
-    "sha256": "74b34edbcfa7a8b9453c837a4ece5dedc1d1e465a351b3a720ed2dbd24d8cbee",
-    "cssHeight": 5377,
-    "run": 44872214436
+    "sha256": "9774c3e267e8012af46557e9b6efb2646abe66a68dea4e6d756a3d5a0f0a6733",
+    "cssHeight": 5438,
+    "run": 45013816513
    }
   },
   "/terms/": {
@@ -696,15 +696,15 @@
   "/world/": {
    "desktop": {
     "file": "desktop/world.jpg",
-    "sha256": "8122f5448da6f71eff6aa8fd30f368b81af0674185b2401272887a96f52802d1",
+    "sha256": "787ef163902e20ec0440f531e3694c7ffddaa2bd141c303365d619cf4c6f7842",
     "cssHeight": 900,
-    "run": 42376261951
+    "run": 45013816513
    },
    "mobile": {
     "file": "mobile/world.jpg",
-    "sha256": "8051b36c9db022c2d5e68a7621a932c3339267174b63d544ff1f8be4b964da0f",
+    "sha256": "e9f351f64a54a7e2fda86443954aacbf80a6d6561c099d9146f4a1ed359d2ee7",
     "cssHeight": 844,
-    "run": 42376261951
+    "run": 45013816513
    }
   },
   "/world/hangul-stage/": {
