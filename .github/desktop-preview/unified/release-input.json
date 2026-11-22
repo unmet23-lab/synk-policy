@@ -2,9 +2,9 @@
   "schemaVersion": 1,
   "product": "platform",
   "channel": "preview",
-  "version": "0.5.6",
-  "releaseId": "platform-preview-0.5.6",
-  "buildId": "20261122.3",
+  "version": "0.5.7",
+  "releaseId": "platform-preview-0.5.7",
+  "buildId": "20261123.1",
   "manifestUrl": "https://synk.im/desktop/releases/preview.json",
   "baselines": [
     {
@@ -63,7 +63,7 @@
     }
   ],
   "electronVersion": "44.10.0",
-  "sourceHash": "52bf5fe91de97d4be7744cd65047f1668498568d32f75f454565207b17652be8",
+  "sourceHash": "e260284de2aeeb726ea0eb93e165fa224a225d0a3e779c4ad3d3eefda5c85656",
   "sourceFiles": [
     {
       "path": "assets/launcher/button.webp",
@@ -412,8 +412,8 @@
     },
     {
       "path": "renderer/solio-backup-model.mjs",
-      "bytes": 21632,
-      "sha256": "9de870844b40e2ebfaa981ecaa9e49f0e0c8224ff67d0d0e173b3b48027fb1a3"
+      "bytes": 22261,
+      "sha256": "6fc408d3c931a5bf08b66c0c5fec4a5b03e83a971d257ed1717c7fb0e0e1851b"
     },
     {
       "path": "renderer/solio-brief.mjs",
@@ -524,6 +524,11 @@
       "path": "src/auth-store.cjs",
       "bytes": 2057,
       "sha256": "f674183d4ef75a59b24dc6e7d0e01f6ad9c797df79d92f06e86ba6feb234e108"
+    },
+    {
+      "path": "src/blake2b.cjs",
+      "bytes": 6346,
+      "sha256": "42471baab9c22f75d8067187e8e5bf81aeca2ad6d05e1e63ef4f538afd37b9b6"
     },
     {
       "path": "src/care-account.cjs",
@@ -867,8 +872,8 @@
     },
     {
       "path": "src/solio-backup.cjs",
-      "bytes": 57909,
-      "sha256": "d815f6e7ba026ed4a2e6a08662f355c3329c6e5f38f608f9b3d90e077012ede7"
+      "bytes": 61968,
+      "sha256": "3327cdb0d240d324098d2fd0ca0329bc58b55fd3cf62df4f74d7f40f4d0684a3"
     },
     {
       "path": "src/space-view.cjs",
