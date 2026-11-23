@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "id": "workday-hotel-front",
+  "status": "making",
+  "title": "호텔 프런트의 하루",
+  "projection": "rectilinear-mono",
+  "stereo": false,
+  "source": {
+    "status": "making"
+  },
+  "notice": "인물과 장소는 AI로 만든 그림이에요. 실제 사람이나 시설이 아니에요.",
+  "clips": []
+}
