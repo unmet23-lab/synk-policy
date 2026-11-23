@@ -1,0 +1,63 @@
+{
+  "schemaVersion": 1,
+  "jobs": [
+    {
+      "id": "care-home",
+      "status": "open",
+      "title": "요양보호사의 하루",
+      "role": "요양보호사",
+      "minutes": 15,
+      "scenes": 5,
+      "poster": "care-home/places/office-senior.jpg",
+      "posterAlt": "요양원 사무실 문 앞에 근무복을 입은 선배 요양보호사가 서 있다.",
+      "summary": "어르신 두 분을 맡아 하루를 보내요. 건네는 말에 답하고, 갈림길에서 골라요."
+    },
+    {
+      "id": "hotel-front",
+      "status": "making",
+      "title": "호텔 프런트의 하루",
+      "role": "호텔 접수사무원",
+      "summary": "체크인과 체크아웃을 맡아 손님을 맞아요. 친절과 규칙 사이에서 골라요.",
+      "poster": "hotel-front/places/front-senior.jpg",
+      "posterAlt": "아침의 호텔 로비. 프런트 데스크 앞에 남색 제복을 입은 선배 직원이 서 있다."
+    },
+    {
+      "id": "duty-free",
+      "status": "making",
+      "title": "면세점 판매의 하루",
+      "role": "면세점 판매사무원",
+      "summary": "외국인 손님에게 물건을 안내하고, 면세 규칙을 지키며 팔아요.",
+      "poster": "duty-free/places/counter-senior.jpg",
+      "posterAlt": "화장품 진열장이 늘어선 면세점 매장 계산대에 검은 정장을 입은 선배 판매사원이 서 있다."
+    },
+    {
+      "id": "trade-office",
+      "status": "making",
+      "title": "해외영업·무역 사무의 하루",
+      "role": "해외영업원·무역 사무원",
+      "summary": "회의에서 지시를 받고, 해외 거래처와 연락하고, 상사에게 보고해요.",
+      "poster": "trade-office/places/meeting-two.jpg",
+      "posterAlt": "회의실 탁자 건너편에 해외영업팀 팀장과 대리가 나란히 앉아 있다."
+    },
+    {
+      "id": "medical-coordinator",
+      "status": "making",
+      "title": "의료 코디네이터의 하루",
+      "role": "의료 코디네이터",
+      "summary": "외국인 환자를 안내하고, 의사와 환자 사이의 말을 이어요.",
+      "poster": "medical-coordinator/places/desk-senior.jpg",
+      "posterAlt": "국제진료센터 접수 데스크 앞에 남색 정장을 입은 선배 코디네이터가 태블릿을 들고 서 있다."
+    },
+    {
+      "id": "customer-care",
+      "status": "making",
+      "title": "고객상담의 하루",
+      "role": "고객상담 사무원",
+      "minutes": 33,
+      "scenes": 5,
+      "poster": "customer-care/places/entrance-lead.jpg",
+      "posterAlt": "상담실 입구에 팀장과 선배 상담사가 서 있다. 뒤에 대기 콜 현황판, 공지 보드, 작은 보관함이 있다.",
+      "summary": "전화와 채팅으로 고객의 문의를 듣고, 정해진 대로 답해요."
+    }
+  ]
+}
