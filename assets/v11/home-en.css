@@ -392,6 +392,7 @@ p{text-wrap:pretty}
 .why-head h2 em{font-style:normal;color:var(--coral-ink)}
 .why-open{font:500 clamp(18px,1.46vw,21px)/1.55 var(--sans);letter-spacing:-.015em}
 .why-open b{font-weight:700}
+.why-go{margin:0}
 .why-cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(14px,1.6vw,24px);margin:0;padding:0;list-style:none}
 .why-cards li{display:flex;flex-direction:column;border-radius:clamp(18px,1.8vw,26px);overflow:hidden;background:var(--warm)}
 .why-cards img{display:block;width:100%;aspect-ratio:4 / 3;object-fit:cover}
