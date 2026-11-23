@@ -38,11 +38,11 @@ Windows 64비트와 Mac(Apple Silicon·Intel, macOS 13 이상)용 Preview 0.5.7�
 
 K드라마 속 유학생이 되어, 한국어로 대답합니다. 상대가 먼저 말을 걸고, 소리 내어 대답해야 다음 장면이 열립니다.
 
-K드라마 상황극의 1화 장면 체험과 SYNK WORLD의 연습·게임은 지금 이용할 수 있습니다. 전체 말하기 시범판, TOPIK 4급 반과 교재 「시냅스」는 준비 중입니다.
+K드라마 상황극의 1화 장면 체험과 SYNK WORLD의 연습·게임은 지금 이용할 수 있습니다. 전체 말하기 시범판과 교재 「시냅스」는 준비 중입니다. SYNK는 2027년 2월에 정식 출시하고, 지금은 사전예약(https://synk.im/reserve/)을 받습니다.
 
 - K드라마 상황극 — 1화 장면 체험은 지금 이용, 전체 시범판은 준비 중
 - SYNK WORLD — TOPIK 연습과 한국어 게임(지금 이용 · 미리보기)
-- TOPIK 4급 8주 온라인 반(준비 중 · 관심 등록)
+- SYNK 사전예약 — 2027년 2월 출시 안내(https://synk.im/reserve/)
 - TOPIK 4급 목표 정규 1년 과정(준비 중 · 개원 준비)
 - 교재 「시냅스」 8권(준비 중 · 원고 완성)
 
@@ -140,7 +140,7 @@ K드라마 상황극의 1화 장면 체험과 SYNK WORLD의 연습·게임은 �
 
 Everyone gets stuck somewhere different. We build AI that starts right there. We build Atlas, an engine that reads what one person has actually done and picks what they do next. Today SYNK does three things: Korean and study in Korea, AI lectures, and ads.
 
-- SYNK LAB — Say it, and the scene moves on. You are the student in a K-drama. Someone speaks first, and the next scene opens only when you answer aloud in Korean. The Episode 1 scene demo and SYNK WORLD practice and games are available now. The full speaking pilot, TOPIK Level 4 class and Synapse textbooks are in preparation.
+- SYNK LAB — Say it, and the scene moves on. You are the student in a K-drama. Someone speaks first, and the next scene opens only when you answer aloud in Korean. The Episode 1 scene demo and SYNK WORLD practice and games are available now. The full speaking pilot and Synapse textbooks are in preparation. SYNK officially launches in February 2027; pre-registration is open at https://synk.im/reserve/.
 - SYNK SHIFT — When the AI lecture ends, you keep one thing you made. Not a tour of tool names. Each person makes one piece of work from their own job and learns to do it again alone. After the lecture, we can automate one of your company’s repetitive tasks. Hands-on AI lectures for companies and institutions, where staff practise on their own work, and AI career lectures for schools on the careers and skills the AI era calls for. We find and assign instructors who fit each request, and automate repetitive work with AI for companies that took a lecture.
 - SYNK PULSE — AI models can look real. We make them act. Our founder, who has appeared on Netflix and tvN and starred in a web drama with 10 million views on Facebook, directs the glance, the hand holding the product and the timing of a smile. A first conversation needs just one product photo and where the ad will run. AI product ads, brand films and lookbooks, with every shot shown to you as a still image before the video. We also make the music and stories of Mongle, Kkamong and Marin.
 - SYNK PATH — Before you come to Korea, try it first. Rehearse your first interview and plan a day in Seoul. Study-abroad and job preparation open next, one at a time. “A day in Seoul” and caregiver interview practice are available now; help with preparing to study, finding out job requirements and settling into life in Korea is in preparation. We do not guarantee admission, visas, jobs or residence.
