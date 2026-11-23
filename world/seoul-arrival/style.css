@@ -405,6 +405,7 @@ p{text-wrap:pretty}
 /* 처음 보는 학생의 건너뛰기 확인(11-24): 꿈 시트와 같은 판을 장면 위 맨 앞 층에 */
 .skip-ask{position:absolute;inset:0;z-index:40;background:rgba(4,6,14,.55);opacity:0;transition:opacity .3s}
 .skip-ask.on{opacity:1}
+.skip-ask:not(.on){pointer-events:none}
 .skip-ask .sheet{z-index:auto}
 .skip-ask.on .sheet{transform:none;visibility:visible;transition:transform .6s var(--sp-slow,cubic-bezier(.2,.8,.2,1)),visibility 0s}
 @media (prefers-reduced-motion:reduce){.skip-ask,.skip-ask .sheet{transition:opacity .2s}.skip-ask .sheet{transform:none}}
@@ -586,6 +587,7 @@ p{text-wrap:pretty}
 .lk-q[aria-expanded="true"]{color:#08090C;background:#FAFAF9;box-shadow:none}
 .lk-why{position:absolute;left:16px;right:16px;z-index:3;padding:16px 18px 17px;border-radius:18px;background:rgba(18,22,34,.95);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);box-shadow:inset 0 0 0 1px var(--line2),0 14px 34px rgba(0,0,0,.45);opacity:0;transform:translateY(6px);transition:opacity .2s,transform .25s var(--sp-fast,ease-out)}
 .lk-why.on{opacity:1;transform:none}
+.lk-why:not(.on){pointer-events:none}
 .lk-why b{display:block;font-size:16px;font-weight:650;letter-spacing:-.025em;color:#fff}
 .lk-why p{margin-top:6px;font-size:14.5px;line-height:1.55;color:var(--ink2);word-break:keep-all;text-wrap:pretty}
 .look.shoot .lk-hintrow{opacity:0;pointer-events:none}
@@ -633,7 +635,8 @@ p{text-wrap:pretty}
 .me{color:var(--dream2);width:44px;height:44px;flex:none;border-radius:50%;display:grid;place-items:center;background:radial-gradient(circle at 50% 35%,color-mix(in srgb,var(--dream) 55%,#000),#0b0f24);box-shadow:0 0 0 1.5px var(--dream),0 0 16px color-mix(in srgb,var(--dream) 60%,transparent)}
 .me svg{width:22px;height:22px}
 .who{flex:1;min-width:0}
-.who b{display:block;font-size:16px;font-weight:650}
+.who b{display:block;font-size:16px;font-weight:650;word-break:keep-all;overflow-wrap:anywhere}
+.who b .gr{font-style:normal;white-space:nowrap}
 .who span{display:inline-flex;align-items:center;gap:6px;margin-top:3px;font-size:13px;font-weight:550;color:var(--dream2)}
 .who button{margin-left:2px;padding:14px 6px;margin-block:-14px;font-size:13.5px;font-weight:600;color:var(--ink2);text-decoration:underline;text-decoration-color:var(--ink4);text-underline-offset:3px}
 .lights{text-align:right}
@@ -653,8 +656,22 @@ p{text-wrap:pretty}
 .lock svg{width:12px;height:12px}
 .steps{position:relative;margin:0 16px;padding-top:30px}
 .steps::before{content:"";position:absolute;left:50%;top:0;bottom:30px;width:2px;transform:translateX(-50%);background:linear-gradient(180deg,var(--dream),rgba(250,250,249,.3) 22%,rgba(250,250,249,.3))}
-.lv{position:relative;z-index:1;display:flex;justify-content:center;margin:6px 0 22px}
+.lv{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;gap:8px;margin:6px 0 22px}
 .lv span{padding:5px 14px;border-radius:999px;font-family:var(--mono);font-size:11px;letter-spacing:.16em;color:var(--ink);background:#0b1126;box-shadow:0 0 0 1px rgba(250,250,249,.22) inset}
+.lv .lv-lock{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:999px;font-style:normal;font-size:13px;font-weight:600;color:var(--ink2);background:rgba(8,9,12,.82);box-shadow:inset 0 0 0 1px var(--line2);word-break:keep-all;text-align:center}
+.lv .lv-lock svg{flex:none;width:12px;height:12px}
+/* 승급 오디션: 길 위의 공고 한 장(설계 docs/WORLD_승급오디션_설계_20261123.md) */
+.exam{position:relative;z-index:1;display:flex;justify-content:center;margin:0 0 26px}
+.ex-card{display:grid;grid-template-columns:58px minmax(0,1fr);gap:12px;align-items:center;width:min(100%,300px);padding:12px 14px;border-radius:8px;background:#FAFAF9;color:#14161C;box-shadow:0 16px 36px rgba(0,0,0,.45)}
+.ex-card .ph{width:58px;height:72px;border-radius:5px;background-color:#1b2233}
+.ex-txt{min-width:0;word-break:keep-all}
+.ex-txt small{display:block;font-size:12px;font-weight:650;color:#5B616C}
+.ex-txt b{display:block;margin-top:2px;font-size:16.5px;font-weight:750;line-height:1.3;letter-spacing:-.035em}
+.ex-txt em{display:inline-block;margin-top:6px;padding:3px 8px;border-radius:7px;font-style:normal;font-size:12.5px;font-weight:650;color:#14161C;background:rgba(20,22,28,.07)}
+.ex-txt .town{display:flex;align-items:center;gap:6px;margin-top:6px;font-size:12.5px;font-weight:650;color:#5B616C}
+.ex-txt .town::before{content:"";width:6px;height:6px;border-radius:50%;background:#5B616C}
+.exam.locked .ex-card{filter:brightness(.6) saturate(.6)}
+.exam.locked .ex-txt small{color:#2E3239}
 .node{position:relative;z-index:1;display:grid;grid-template-columns:1fr 64px 1fr;align-items:center;margin-bottom:26px}
 .node .dot{grid-column:2;justify-self:center;width:44px;height:44px;border-radius:50%;display:grid;place-items:center;font-size:13px;font-weight:650;color:var(--ink);background:#0d1430;box-shadow:0 0 0 2px rgba(250,250,249,.5)}
 .node .txt{grid-row:1;padding:0 4px;word-break:keep-all;min-width:0}

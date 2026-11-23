@@ -699,15 +699,16 @@ $('#titleSkip').onclick=async e=>{
 // 학생증을 받은 적 있는 학생과, 한 번 답한 뒤에는 묻지 않는다. 묻는 동안 이야기는 그대로 흐른다.
 let skipAsked=false;
 function askSkip(){return new Promise(res=>{const w=$('#skipAsk'),stay=$('#skipStay'),go=$('#skipGo');w.hidden=false;void w.offsetWidth;w.classList.add('on');
-  const done=v=>{w.classList.remove('on');stay.onclick=go.onclick=w.onclick=w.onkeydown=null;setTimeout(()=>{if(!w.classList.contains('on'))w.hidden=true;},450);const b=$('#skipBtn');if(!v&&!b.hidden)b.focus({preventScroll:true});res(v);};
+  const done=v=>{w.classList.remove('on');stay.onclick=go.onclick=w.onclick=null;document.removeEventListener('keydown',key,true);setTimeout(()=>{if(!w.classList.contains('on'))w.hidden=true;},450);const b=$('#skipBtn');if(!v&&!b.hidden)b.focus({preventScroll:true});res(v);};
   stay.onclick=e=>{e.stopPropagation();done(false);};go.onclick=e=>{e.stopPropagation();done(true);};
   w.onclick=e=>{e.stopPropagation();if(!e.target.closest('.sheet'))done(false);};
   // 키보드: Esc는 「계속 볼게요」, Tab은 두 단추 사이에서만 돈다(A2)
-  w.onkeydown=e=>{if(e.key==='Escape'){e.preventDefault();done(false);}else if(e.key==='Tab'){e.preventDefault();(document.activeElement===stay?go:stay).focus({preventScroll:true});}};
+  function key(e){if(e.key==='Escape'){e.preventDefault();e.stopPropagation();done(false);}else if(e.key==='Tab'){e.preventDefault();(document.activeElement===stay?go:stay).focus({preventScroll:true});}}
+  document.addEventListener('keydown',key,true);
   stay.focus({preventScroll:true});});}
 $('#skipBtn').onclick=async e=>{
   e.stopPropagation();
-  if(!skipAsked&&!state.issuedAt){skipAsked=true;if(!await askSkip()||$('#skipBtn').hidden)return;}   // 묻는 동안 이야기가 다음 화면으로 넘어갔으면 건너뛰지 않는다(A1)
+  if(!skipAsked&&!state.issuedAt&&!state.replayOf){skipAsked=true;if(!await askSkip()||$('#skipBtn').hidden)return;}   // 묻는 동안 이야기가 다음 화면으로 넘어갔으면 건너뛰지 않는다(A1)
   const r=++RUN;
   ['amb_dawn','amb_cabin','amb_train','amb_airport','amb_hall','amb_clock'].forEach(n=>SND.stop(n,.4));
   ['banner','pa','place','bigTitle','trace','note','stamp','mrSheet','mrHint'].forEach(id=>$('#'+id).classList.remove('on'));spotOff();$('#mirror').classList.remove('on','lit','done','ask');$('#s-cut').classList.remove('mr-up');$('#vn').className='vn';closePanel();$('#narr').innerHTML='';$('#narrSub').hidden=true;$('#tapHint').classList.remove('on');
@@ -1056,7 +1057,7 @@ addEventListener('resize',()=>{if($('#s-card').classList.contains('on'))placeSig
 function putPhoto(){if(!state.look)return;const p=$('#idPhoto'),r=lookRects.crop(state.look,p.clientWidth,p.clientHeight,.6),im=new Image();im.alt='';im.src=state.look.src;Object.assign(im.style,px(r));p.replaceChildren(im);}
 function cardEnd(){$('#cardHead').classList.add('on');setTimeout(()=>$('#cardFoot').classList.add('on'),reduce?0:240);}
 /* 학생증 다시 보기 · 모습 다시 고르기: 내 길의 내 사진을 누르면 온다 */
-function openCardView(){const rig=$('#cardRig');for(const x of [$('#cardSwing'),$('#printer')])x.getAnimations().forEach(a=>a.cancel());$('#cardSwing').style.transform='';$('#cardBox').classList.remove('feeding');$('#printer').classList.remove('busy','on');cardAskDone();fillCard();CardFX.setup();rig.classList.add('down');show('s-card');putPhoto();$('#s-card').classList.add('view');$('#cardHead span').textContent=L('내 학생증');cardEnd();CardFX.live(true);SND.felt('open');}
+function openCardView(){const rig=$('#cardRig');for(const x of [$('#cardSwing'),$('#printer')])x.getAnimations().forEach(a=>a.cancel());$('#cardSwing').style.transform='';$('#cardBox').classList.remove('feeding');$('#printer').classList.remove('busy','on');cardAskDone();if(!state.issuedAt){state.issuedAt=Date.now();save({issuedAt:state.issuedAt});}fillCard();CardFX.setup();rig.classList.add('down');show('s-card');putPhoto();$('#s-card').classList.add('view');$('#cardHead span').textContent=L('내 학생증');cardEnd();CardFX.live(true);SND.felt('open');}
 $('#reLook').onclick=async()=>{const lk=await pickLook({change:true});$('#look').classList.remove('on');if(!lk)return;state.look=lk;save({look:lk.id});SND.felt('shutter');putPhoto();buildRoad();};
 // 카드에 손을 대야 이어지는 순간: 안내 한 줄과 키보드 초점(Enter · 스페이스)
 function cardAsk(text,label){const h=$('#cardHint'),rig=$('#cardRig');h.textContent=L(text);h.classList.add('on');rig.tabIndex=0;rig.setAttribute('role','button');rig.setAttribute('aria-label',L(label));}
@@ -1127,33 +1128,45 @@ const ROAD=[
   {lv:'TOPIK 1'},
   {t:'1화 · 개강 첫날',b:'학생 식당에서 길 묻기',goal:'위치 묻기'},
   {t:'2화 · 동아리 박람회',b:'동갑 친구와 말 놓기',goal:'반말로 바꾸기'},
-  {dream:0,goal:'자기소개 하기'},
+  {dream:0,goal:'자기소개 하기',exam:1},
   {lv:'TOPIK 2'},
   {t:'3화 · 첫 당번',b:'동아리 카페에서 주문 받기',goal:'부탁하기',town:true},
   {t:'4화 · 아픈 날',b:'시험 전날, 병원에 가기',goal:'아픈 곳 말하기'},
-  {dream:1,goal:'일정 맞추기'},
+  {dream:1,goal:'일정 맞추기',exam:2},
   {lv:'TOPIK 3'},
   {dream:2,goal:'의견 말하기'},
   {t:'5화 · 봄 축제',b:'고향 음식 부스 열고, 입구에서 표 확인하기',goal:'내 나라 설명하기'},
   {t:'6화 · 여름 MT',b:'소나기, 자전거, 숙소 앞 평상',goal:'제안하고 거절하기'},
+  {shoot:true,goal:'경험 말하고 되묻기',exam:3},
   {lv:'TOPIK 4'},
   {t:'7화 · 가을',b:'사유서를 처음 쓰기',goal:'사정 설명하기'},
   {dream:3,goal:'격식 자리에서 나를 소개하기'},
   {dream:4,goal:'일정 변경 보고하기'},
   {t:'8화 · 가을 축제',b:'국제처에서 내 입으로 말하기',goal:'격식 있게 설득하기'},
   {dream:5,goal:'질문에 답하기'},
-  {dream:6,goal:'무대 인사 3분'}
+  {dream:6,goal:'무대 인사 3분',exam:4}
 ];
 const DOT_CROP=[[190,'50% 55%'],[280,'30% 42%'],[240,'72% 60%'],[320,'50% 30%'],[220,'20% 70%'],[300,'78% 38%'],[170,'50% 50%']];
+/* 급마다 끝에 승급 오디션이 선다(설계 docs/WORLD_승급오디션_설계_20261123.md). 붙기 전에는 다음 급이 잠긴다.
+ * 오디션은 아직 없어 지금 급은 늘 1이다 — 오디션 기록이 생기면 여기서 읽는다. 3급 오디션은 6화 뒤 촬영하는 날(11-24 유호님 「가 · 촬영하는 날」). */
+const roadGrade=()=>1;
+const SHOOT={actor:()=>L('촬영하는 날'),idol:()=>L('티저 찍는 날')},SHOOT_CROP=[260,'40% 40%'];
+const LOCK_SVG='<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2" fill="currentColor"/><path d="M8 11V8a4 4 0 0 1 8 0v3" fill="none" stroke="currentColor" stroke-width="2.4"/></svg>';
+function examCard(r,D,locked){
+  const title=r.shoot?SHOOT[state.dream]():L(D.scenes[r.dream]),crop=r.shoot?SHOOT_CROP:DOT_CROP[r.dream];
+  const soon=!locked&&r.exam===1;   // 2화가 아직 없어 1급 오디션도 곧 열린다
+  return `<div class="exam${locked?' locked':''}"><div class="ex-card"><span class="ph" style="background-image:url(${IMG[state.dream]});background-size:${crop[0]}%;background-position:${crop[1]}"></span><span class="ex-txt"><small>${L('{n}급 승급 오디션',{n:r.exam})}</small><b>${title}</b><em>${L(r.goal)}</em>${soon?`<span class="town">${L('곧 열려요')}</span>`:''}</span></div></div>`;
+}
 function buildRoad(){
   const D=DREAM[state.dream];
   $('#lightNum').textContent=state.lights;$('#lightIcon').setAttribute('href',state.dream==='actor'?'#seat':'#stick');
-  $('#dreamChip').textContent=L(D.chip);$('#whoName').textContent=(state.name||L('유학생'))+' · '+L('1급');
+  $('#dreamChip').textContent=L(D.chip);const wn=$('#whoName'),gr=document.createElement('i');gr.className='gr';gr.textContent=L('{n}급 과정',{n:roadGrade()});wn.textContent=(state.name||L('유학생'))+'\u00a0· ';wn.append(gr);
   $('#meBadge').classList.toggle('face',!!state.look);
   $('#meBadge').innerHTML=state.look?faceTile(state.look,44,44,.66):state.name&&/[가-힣]/.test(state.name[0])?`<span style="font-size:19px;font-weight:680;color:#fff">${esc(state.name[0])}</span>`:`<svg viewBox="0 0 24 24"><use href="#${state.dream==='actor'?'seat':'stick'}"/></svg>`;
-  let side=0;const rows=[];
+  let side=0,g=0;const rows=[],G=roadGrade();
   ROAD.forEach((r,i)=>{
-    if(r.lv){rows.push(`<div class="lv"><span>${r.lv}</span></div>`);return;}
+    if(r.lv){g=Number(r.lv.slice(-1));rows.push(`<div class="lv"><span>${r.lv}</span>${g>G?`<em class="lv-lock">${LOCK_SVG}${L('{n}급 오디션에 붙으면 열려요',{n:g-1})}</em>`:''}</div>`);return;}
+    if(r.exam){rows.push(examCard(r,D,g>G));return;}
     const now=i===1,lock=i>1,cls=['node',side++%2?'l':'r'],soon=r.t&&r.t.startsWith('2화');
     if(r.dream!=null)cls.push('dn');if(now)cls.push('now');if(lock)cls.push('locked');
     const title=r.dream!=null?L('꿈 장면'):L(r.t),body=r.dream!=null?L(D.scenes[r.dream]):L(r.b);
