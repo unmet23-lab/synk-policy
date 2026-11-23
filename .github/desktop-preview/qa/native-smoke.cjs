@@ -103,7 +103,9 @@ function observe(config){
         // 방이 다 드러난 뒤 찍는다. 곧바로 찍으면 도착 움직임 도중이라 문장이 아직 보이지 않았다(0.4.95 대역 빌드 캡처, Windows 검사기와 같다)
         await waitFor("(()=>{const s=document.querySelector('#portal-entry .orb-stage'),say=document.querySelector('#portal-entry [data-layer=app] [data-say]');return !!s&&!!say&&s.classList.contains('settled')&&getComputedStyle(say.closest('.rise')||say).opacity==='1';})()",'orb-solio-shown');
         await screenshot('platform-orb-solio');
-        for(const id of ['world','messenger']){
+        // 거둔 Workspace 앱은 준비하지 않는다(SYNK-appsscript 4단계 구현 설계 14절)
+        const retired=await run("window.synkDesktop.prepareClient('messenger')");check('retired Workspace app is never prepared',retired?.ok===false,retired);
+        for(const id of ['world']){
           const installed=state.clients.find(x=>x.id===id);check(id+' managed DMG copy recognized by real hash verifier',installed?.status==='installed'&&installed?.canLaunch===true&&installed?.version===config.bundles[id].version,installed);
           const prepared=await run(`window.synkDesktop.prepareClient(${JSON.stringify(id)})`);check(id+' embedded DMG preparation starts',prepared.ok===true);
           await waitFor(`window.synkDesktop.getClients().then(list=>list.find(c=>c.id===${JSON.stringify(id)}).installer.status==='ready')`,id+'-installer-ready',60000);

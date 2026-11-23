@@ -16,8 +16,9 @@ const check=(name,ok,detail)=>{checks.push({name,ok:!!ok,...(detail===undefined?
 const applications=path.join(out,'Applications');fs.mkdirSync(applications);
 let failure=null;
 try{
-  check('manifest is current native macOS architecture',manifest.platform==='darwin'&&manifest.arch===process.arch&&manifest.packages.length===3,{host:process.arch,arch:manifest.arch});
-  for(const client of ['world','messenger','platform']){
+  check('manifest is current native macOS architecture',manifest.platform==='darwin'&&manifest.arch===process.arch&&manifest.packages.length===2,{host:process.arch,arch:manifest.arch});
+  // 따로 설치하는 Workspace 앱은 11-23에 거뒀다. 플랫폼 DMG는 WORLD DMG만 싣는다(SYNK-appsscript 4단계 구현 설계 14절)
+  for(const client of ['world','platform']){
     const p=manifest.packages.find(p=>p.client===client);check(client+' package exists',!!p);
     const dmg=resolve(p.installer.path);check(client+' DMG digest and byte size',sha(dmg)===p.installer.sha256&&fs.statSync(dmg).size===p.installer.bytes);
     const mount=path.join(out,'mount-'+client);fs.mkdirSync(mount);let mounted=false;
@@ -43,9 +44,9 @@ try{
     }finally{if(mounted)run('/usr/bin/hdiutil',['detach',mount]);}
   }
   check('WORLD uses live HTTPS entry',bundles.world.runtime.worldCloudPreview===true&&bundles.world.runtime.entry==='https://synk.im/account/client.html?product=world');
-  check('Workspace uses live HTTPS entry',bundles.messenger.runtime.messengerCloudPreview===true&&bundles.messenger.runtime.entry==='https://workspace.synk.im/?tab=messenger');
+  check('Platform carries no retired Workspace app',!bundles.platform.runtime.releases.some(r=>r.id==='messenger')&&!fs.existsSync(path.join(bundles.platform.app,'Contents/Resources/clients/messenger.dmg')));
   check('Platform has bundled local renderer',bundles.platform.runtime.entry==='synk-desktop://platform/index.html');
-  for(const client of ['world','messenger']){
+  for(const client of ['world']){
     const bundle=bundles[client],r=bundles.platform.runtime.releases.find(r=>r.id===client&&r.platform==='darwin'&&r.arch===manifest.arch&&r.version===bundle.metadata.version);
     check(client+' Platform executable/ASAR pins',r?.executableSHA256===bundle.manifestExecutableSha&&r?.asarSHA256===bundle.manifestAsarSha);
     const installer=path.join(bundles.platform.app,'Contents/Resources/clients',r.installer.relativePath);

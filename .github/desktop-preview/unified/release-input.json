@@ -2,9 +2,9 @@
   "schemaVersion": 1,
   "product": "platform",
   "channel": "preview",
-  "version": "0.5.8",
-  "releaseId": "platform-preview-0.5.8",
-  "buildId": "20261123.2",
+  "version": "0.5.9",
+  "releaseId": "platform-preview-0.5.9",
+  "buildId": "20261123.3",
   "manifestUrl": "https://synk.im/desktop/releases/preview.json",
   "baselines": [
     {
@@ -63,7 +63,7 @@
     }
   ],
   "electronVersion": "44.10.0",
-  "sourceHash": "025ef22ad6c2cd769f275a1e63fddcd37d5caaef9a6f7c7d03cc8ad483251caf",
+  "sourceHash": "e72d0dbb5bf19b2777e86131393dcf21f27c6a363cbde9c8e4954bf5539cfeaf",
   "sourceFiles": [
     {
       "path": "assets/launcher/button.webp",
@@ -282,8 +282,8 @@
     },
     {
       "path": "renderer/launcher.mjs",
-      "bytes": 31674,
-      "sha256": "910dc24896438c1c6bb88b770f1082d13cbe975a261b54d6d8c3c0ee511b2d77"
+      "bytes": 30923,
+      "sha256": "00bd70ca5d74b4cc0ffe17d13884cf405c9fd42ce7515a66dcf9b1ce44f23392"
     },
     {
       "path": "renderer/library.mjs",
@@ -572,8 +572,8 @@
     },
     {
       "path": "src/catalog.cjs",
-      "bytes": 2217,
-      "sha256": "6339aec7fa8b87b058c8f8925df993c9c8668419f9a720737d01e7bd84c7e3f9"
+      "bytes": 2592,
+      "sha256": "71cfda5ce70ecaefa3bd8c30c031583258dcc948239e122bfc5dfe4f3c746e35"
     },
     {
       "path": "src/classroom-main.cjs",
@@ -592,13 +592,13 @@
     },
     {
       "path": "src/client-lifecycle.cjs",
-      "bytes": 7157,
-      "sha256": "7833ee5eebe422400d5a1ebb5891bdab1030e140994e08f4f61e3195b6d5722a"
+      "bytes": 7238,
+      "sha256": "7c762b5738e196384bfa57e5716f3863b8f28b2b71c056b07e51525391424b1d"
     },
     {
       "path": "src/company-entry-destinations.cjs",
-      "bytes": 24994,
-      "sha256": "bd6c2205e8c2a08a5cbd2b2a6da866ff1c18a5db78bb6519c8778e8ceb2107bc"
+      "bytes": 25012,
+      "sha256": "a3176e2a88ee86137d0f6f672a573444f6cd460d4c800db7b51dcd8576c9685d"
     },
     {
       "path": "src/company-entry-preload.cjs",
@@ -712,8 +712,8 @@
     },
     {
       "path": "src/installations.cjs",
-      "bytes": 5385,
-      "sha256": "50a9fc3c2262da3772accab9fb2ff37663248bbd7f54c927d95c230a28f1681e"
+      "bytes": 5644,
+      "sha256": "45bbaa449e6c5c86e0089a47fea5bfc9195e9a933470d639681d5bc8fe265201"
     },
     {
       "path": "src/library-access.cjs",
@@ -722,8 +722,8 @@
     },
     {
       "path": "src/local-releases.cjs",
-      "bytes": 665,
-      "sha256": "af09ae0dc18c77fcee552c05b2460c1d3bbe2c1b58a8d3e125748f189686d371"
+      "bytes": 717,
+      "sha256": "e318d55ef6fdd3fe22dabd2fe778d03dad18ac64dd6010b59d060c201bb1cdde"
     },
     {
       "path": "src/local-server-owner.cjs",
@@ -737,8 +737,8 @@
     },
     {
       "path": "src/main.cjs",
-      "bytes": 115417,
-      "sha256": "1e592121ed09271987c99e3f7c8e83e088418df80a2a4d76063c9a3507be12b9"
+      "bytes": 118490,
+      "sha256": "97911ad5a4e2ab9c3bbc23e33d0600ed36673ffa42e7817edac36fd9a52c092a"
     },
     {
       "path": "src/messenger-teacher.cjs",
@@ -877,8 +877,8 @@
     },
     {
       "path": "src/preload.cjs",
-      "bytes": 22919,
-      "sha256": "8a19bb6a13f603c9ab13b37c320c169b7aea13521709fb1d9c8f643568620e00"
+      "bytes": 22841,
+      "sha256": "e9e42dd6f29bf0a420ab835fc78477a5d6c4b5597d12adc5792fc0bc9977375a"
     },
     {
       "path": "src/product-main.cjs",
@@ -1067,13 +1067,18 @@
     },
     {
       "path": "src/workspace-app.cjs",
-      "bytes": 28713,
-      "sha256": "275fda550f4b60adb7d0389cca3807025f3dc030e06a98cae32161f434f9ca87"
+      "bytes": 31468,
+      "sha256": "88a723df09e5cc88a0aae8d9ca43512093572816b386169596036f913d643c21"
+    },
+    {
+      "path": "src/workspace-teacher.cjs",
+      "bytes": 7691,
+      "sha256": "9a2afb3f6021ce6fadd36dc637fa663c45b93e89d052c2c3bdcc2eff832fde3b"
     },
     {
       "path": "src/workspace-view-preload.cjs",
-      "bytes": 3112,
-      "sha256": "09c9650f583947422736fe6d9141036c4ac14cccb2ca98a869b6fb419f1ec9a5"
+      "bytes": 4468,
+      "sha256": "f5a8763dae8c0b9c6b7e3cd0e0496831d2a3143fd467fe8061368e8e90e97523"
     },
     {
       "path": "src/world-requests.cjs",
