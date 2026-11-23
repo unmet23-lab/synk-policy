@@ -25,12 +25,14 @@
     },
     {
       "id": "duty-free",
-      "status": "making",
+      "status": "open",
       "title": "면세점 판매의 하루",
       "role": "면세점 판매사무원",
-      "summary": "외국인 손님에게 물건을 안내하고, 면세 규칙을 지키며 팔아요.",
+      "minutes": 19,
+      "scenes": 5,
       "poster": "duty-free/places/counter-senior.jpg",
-      "posterAlt": "화장품 진열장이 늘어선 면세점 매장 계산대에 검은 정장을 입은 선배 판매사원이 서 있다."
+      "posterAlt": "화장품 진열장이 늘어선 면세점 매장 계산대에 검은 정장을 입은 선배 판매사원이 서 있다.",
+      "summary": "외국인 손님에게 물건을 안내하고, 면세 규칙을 지키며 팔아요."
     },
     {
       "id": "trade-office",
