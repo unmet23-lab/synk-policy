@@ -9,10 +9,16 @@ export function homeTutorRecommendation({owner,summary,snapshot,lessons=[],pract
  if(['unreadable','conflict'].includes(summary.status?.phase)||summary.status?.rejected||summary.status?.code==='LIFE_PROGRESS_REJECTED')return {kind:'unavailable'};
  if(summary.education?.status==='unavailable')return {kind:'conditions',command:'study',label:'학습 조건 바꾸기',reason:'지금 조건에 맞는 활동이 없어요. 시간이나 도움 방식을 바꿀 수 있어요.'};
  if(summary.education?.selected){const next=summary.education.selected;return {kind:summary.education.resume?'resume':'start',title:next.label||next.title,command:'learn',label:next.route==='review'?'나의 복습 시작':'맞춤 연습 시작',reason:summary.education.reason};}
+ // 새 길 홈(Atlas 재설계 단계 4-3 — 단계4_계획 §20-5): 튜터는 세 줄의 단추가 열 줄을 따른다(위 selected). 줄이 없으면 진도로 따로 고르지 않는다 —
+ // 확인 중이면 기다림, 그 밖(다 한 날 · 상한 날)은 마침이다. 조건에 걸려 줄이 모두 빈 날은 위 conditions가 먼저 받으므로,
+ // 여기까지 오는 빈 날은 생활 레슨을 다 마쳤을 때뿐이다.
+ if(summary.education?.today)return summary.education.today.state==='checking'?{kind:'loading'}:{kind:'complete',command:'packs',label:'생활 팩 둘러보기'};
  const known=Object.values(snapshot.reviews||{}).flatMap(r=>{
   const lesson=lessons.find(l=>l.id===r.lessonId),q=lesson?.questions.find(q=>q.id===r.questionId&&q.review?.id===r.id);
   return q?[{...r,expressionId:q.expressionId,title:lifeTutorExpression(lesson,q),lessonTitle:lesson.title}]:[];
  });
+ // 돌아온 복습: 새 길(atlasNext — 4-2, 단계4_계획 §19-1 ⑤)은 진도 요약에 넣은 판정(dueState · dueIds — 확인 중이면 없음), 지금 판은 진도의 dueAt.
+ const dueIds=summary.dueState?new Set(Array.isArray(summary.dueIds)?summary.dueIds:[]):null,isBack=r=>dueIds?dueIds.has(r.id):r.dueAt<=now;
  const todayItems=snapshot.daily?.days?.[homeDayKey(now)]?.items||{};
  const practisedToday=r=>{
   const family=known.filter(k=>k.expressionId===r.expressionId).flatMap(k=>{const item=todayItems[k.questionId];return item?.lessonId===k.lessonId?[item]:[];});
@@ -22,17 +28,20 @@ export function homeTutorRecommendation({owner,summary,snapshot,lessons=[],pract
  };
  const days=homeTutorDays(snapshot,lessons,now),previous=days.previous?.items[0];
  const memory=previous?{...previous,when:days.when}:null;
- const returning=known.find(r=>r.questionId===previous?.id&&r.dueAt<=now&&!practisedToday(r));
+ const returning=known.find(r=>r.questionId===previous?.id&&isBack(r)&&!practisedToday(r));
  if(returning&&['guided','assisted'].includes(previous.kind)&&!days.today.count){
   const run=snapshot.activeReview,firstPending=run?.ids.find(id=>!run.answers[id]);
-  return {kind:'recall',id:returning.questionId,title:returning.title,command:'review',label:'오늘의 복습 시작',memory:{...memory,tryAlone:!firstPending||firstPending===returning.id&&!run.pendingHelp?.[returning.id]}};
+  // 추천하는 표현이 판의 첫 남은 복습이고 그 도움 표시가 없거나 앞선 때의 것이면(새 길 — 진도 요약 helpExpired, 합친 끝 판 F3) 먼저 혼자.
+  // 하던 판은 늘 이으므로 첫 남은 복습이 다른 문항이면 그 문항의 만료로 「네가 먼저」를 내지 않는다(끝 판 A1 — 4-2 앞과 같이 거짓). 지금 판 · 라이브의
+  // 요약에는 helpExpired가 없어 4-2 앞 식 그대로다.
+  return {kind:'recall',id:returning.questionId,title:returning.title,command:'review',label:'오늘의 복습 시작',memory:{...memory,tryAlone:!firstPending||firstPending===returning.id&&(!run.pendingHelp?.[returning.id]||summary.helpExpired===true)}};
  }
  const difficult=known.filter(r=>r.lapses>0&&r.streak===0&&practised.get(r.questionId)!==r.lastAt&&!practisedToday(r))
-  .sort((a,b)=>Number(b.dueAt<=now)-Number(a.dueAt<=now)||b.lastAt-a.lastAt||a.id.localeCompare(b.id))[0];
+  .sort((a,b)=>Number(isBack(b))-Number(isBack(a))||b.lastAt-a.lastAt||a.id.localeCompare(b.id))[0];
  if(difficult)return {kind:'difficult',id:difficult.questionId,title:difficult.title,lessonTitle:difficult.lessonTitle,lastAt:difficult.lastAt,command:'practice',label:'이 표현 같이 연습',...(memory&&!days.today.count&&memory.id===difficult.questionId?{memory}:{})};
  // fresh: 돌아온 복습 가운데 30분 안에 답한 문제가 있다(레슨에서 틀린 말이 1분 뒤 돌아온 때) — 튜터가 「방금 만난 말」이라고 해도 되는 때만(끝 판 F2).
  // 오늘 기록만 보면 아침에 맞혀 둔 복습 문항이 저녁 레슨 직후 「방금」으로 읽힌다(끝 판 FA1).
- const back=known.filter(r=>r.dueAt<=now&&!practisedToday(r));
+ const back=known.filter(r=>isBack(r)&&!practisedToday(r));
  const metJustNow=r=>{const item=todayItems[r.questionId];return item?.lessonId===r.lessonId&&now-Math.max(item.observedAt||0,item.guidedAt||0)<JUST_NOW;};
  if(summary.dueCount&&back.length)return {kind:'review',command:'review',label:'오늘의 복습 열기',...(back.some(metJustNow)?{fresh:true}:{}),...(memory&&!days.today.count?{memory}:{})};
  if(summary.nextLesson)return {kind:summary.resume?'resume':'start',title:summary.nextLesson.title,command:'learn',label:summary.resume?'하던 학습 이어 하기':'오늘의 학습 시작',...(memory&&!days.today.count?{memory}:{})};
@@ -41,6 +50,8 @@ export function homeTutorRecommendation({owner,summary,snapshot,lessons=[],pract
 
 // Keep immediate guided help available beside the selected activity, using the same owner and daily checks.
 export function homeTutorPracticeRecommendation(input={}){
+ // 새 길 홈(§20-5): 곁 단추 「헷갈린 표현 연습하기」를 두지 않는다 — 그 일은 복습 줄이 맡는다.
+ if(input.summary?.education?.today)return null;
  const result=homeTutorRecommendation({...input,summary:input.summary?{...input.summary,education:null}:input.summary});
  return result.kind==='difficult'?result:null;
 }

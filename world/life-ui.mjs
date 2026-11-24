@@ -31,7 +31,7 @@ const escape=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&
 const backCount=s=>s.dueExpressions??s.dueCount;
 export function reviewRowsByExpression(rows){
  const out=new Map();
- for(const row of rows){if(!row.korean)continue;const kept=out.get(row.korean);if(kept){kept.scenes+=1;kept.soon=kept.soon===true||row.soon===true;}else out.set(row.korean,{...row,scenes:1});}
+ for(const row of rows){if(!row.korean)continue;const kept=out.get(row.korean);if(kept){kept.scenes+=1;kept.soon=kept.soon===true||row.soon===true;kept.again=kept.again===true||row.again===true;}else out.set(row.korean,{...row,scenes:1});}
  return [...out.values()];
 }
 // 모든 줄의 때 · 곳이나 장면 수가 같으면 줄마다 되풀이하지 않는다(11-09 미학 맹검 — 복제된 자료처럼 읽혔다). 때 · 곳은 목록 위 한 줄로, 장면 수는 복습 화면 부제가 이미 말한다.
@@ -54,6 +54,18 @@ const dayLabel=at=>{
  if(day(at)===day(now+86400000))return t('life.when.tomorrow',{time});
  return formatDate(at,{month:'short',day:'numeric'});
 };
+// 새 길(4-2 — 단계 4 §19-1 ⑤ F)의 「다음 돌아올 때」는 엔진의 예상이라 날까지만, 예상으로 말한다 — 오늘 중 · 내일쯤 · ○월 ○일쯤(분 · 시각은 말하지 않는다).
+// 문장(「다음 복습 {date}」 · 「{date}에 열려요」)은 지금 판과 같고 {date} 자리만 다르다.
+const dayOnly=at=>{
+ if(!Number.isFinite(at))return '';
+ const now=Date.now(),day=value=>new Date(value).toDateString();
+ if(at<=now||day(at)===day(now))return t('life.when.todayDay');
+ const next=new Date(now);next.setDate(next.getDate()+1);
+ if(day(at)===day(next.getTime()))return t('life.when.tomorrowDay');
+ return t('life.when.aroundDay',{date:formatDate(at,{month:'short',day:'numeric'})});
+};
+// 진도에 새 길 판정이 들어 있으면(s.dueState) 날까지, 아니면 지금 판 그대로.
+const whenOf=(s,at)=>s?.dueState?dayOnly(at):dayLabel(at);
 // 복습에서 「언제 · 어디서」 배운 표현인지 붙인다. 시각은 그때그때 계산한다.
 const ago=at=>{if(!Number.isFinite(at))return '';const minutes=Math.floor(Math.max(0,Date.now()-at)/60000);if(minutes<1)return t('life.ago.now');if(minutes<60)return t('life.ago.minutes',{n:minutes});const hours=Math.floor(minutes/60);return hours<24?t('life.ago.hours',{n:hours}):t('life.ago.days',{n:Math.floor(hours/24)});};
 const placeAt=packId=>hasString(`life.place.${packId}`)?t(`life.place.${packId}`):'';
@@ -73,7 +85,7 @@ const meter=(done,total,label=`${done} / ${total}`)=>`<span class="life-meter" a
 // 문제의 표현: 문제가 가리키는 레슨 표현(없으면 정답 문장).
 const expressionOf=(lesson,q)=>lesson?.expressions.find(e=>e.id===q?.expressionId)||{korean:q?.choices?.find(c=>c.id===q.answerId)?.text||'',meaning:''};
 // learning: 배움의 거울이 쓰는 학습 호스트(world-learning-ui.mjs lifeLearning — {coach(), prepare()}). 없으면 거울 없이 지금과 같다.
-export function createLifeExperience({home,getProgress,show=(title,html,options)=>home.showPanel(title,html,options),asset,onSummary=()=>{},onNext=null,presentation=null,leadRows=null,moreRows=null,positionTotal=null,learning=null}){
+export function createLifeExperience({home,getProgress,show=(title,html,options)=>home.showPanel(title,html,options),asset,onSummary=()=>{},onNext=null,presentation=null,leadRows=null,moreRows=null,positionTotal=null,learning=null,today=null}){
  const panel=document.querySelector('#world-panel'),content=document.querySelector('#panel-content');
  // 10-17 움직임: 고른 답의 초록이 손끝 자리에서 번지도록 마지막으로 누른 자리를 기억한다. 진행 막대는 같은 레슨에서 늘 때만 움직인다.
  let lastPoint=null,justChose=false,barMemo={key:'',value:-1},flight=0;
@@ -84,17 +96,40 @@ export function createLifeExperience({home,getProgress,show=(title,html,options)
  // 흰 인화지에 붙인 펠트 사진(assets/world-felt). 한 화면에 같은 사진은 한 번만 쓴다.
  const print=(name,className='')=>`<span class="w-print ${className}${PACK_PRINTS[name]?' is-photo':''}" aria-hidden="true"><img src="${asset(PACK_PRINTS[name]||'world-felt/'+name+'.webp')}" alt="" width="640" height="640" decoding="async"></span>`;
  // helpBy: 지금 문제의 도움을 누가 열었나. 'setting'은 「한 단계씩 도움받기」가 답하기 전에 스스로 펼친 것, 'user'는 사람이 연 것.
- let context=null,shown=false,rendering=false,ended=false,reviewRun=null,lastFeedback=null,helped=false,helpBy=null,generation=0,timer,cafeRun=null,cafeView='',companion=null,place='life',signClip=null,viewPhase=null;
+ let screenView=null,reviewMark=null,context=null,shown=false,rendering=false,ended=false,reviewRun=null,lastFeedback=null,helped=false,helpBy=null,generation=0,timer,cafeRun=null,cafeView='',companion=null,place='life',signClip=null,viewPhase=null;
  const practised=new Set();
- const exposedTransfers=new Set();
+ const exposedTransfers=new Map(); // 복습 id → 그 표현을 보여 준 때(새 길은 같은 학습일에만 도움으로 — 진도 markReviewHelp seenAt)
  // 배움의 거울(Atlas × WORLD D, 11-08 — life-trail.mjs): 문항이 보이고 · 도움이 열리고 · 소리가 들리고 · 첫 답을 낸 순간을 Trail practice로 남긴다.
  // 제품 기록 · 판정 · 화면은 그대로이고, 거울이 실패해도 레슨은 그대로 간다.
  // 거울 부품(learning.life = worldLearning.life, life-trail.mjs)은 계정 묶음이 넘긴다 — 이 화면 모듈은 브라우저가 묶지 않고 바로 읽으므로
  // Strata(CJS) · 검수 판정(JSON)을 직접 부르지 않는다. 부품이 없으면 거울 없이 레슨만 간다.
  const life=learning?.life&&typeof learning.life.createLifeTrail==='function'?learning.life:null;
- const trail=life?life.createLifeTrail({coach:()=>{try{return learning?.coach?.()||null;}catch{return null;}},snapshot:()=>getProgress().exportSnapshot()}):NO_TRAIL;
+ // 새 길(atlasNext — 4-2, 단계 4 §19-1 ①): 셸이 learning.next를 넘긴 문서는 새 판 겉(world-life-next.mjs)이 새 코치(은행 world-life)로 적는다.
+ // 판이 바뀌어 코치가 닫히면 이 화면도 안내 한 줄과 함께 닫는다. 입구가 있어도 판은 문서 동안 바뀐다(엔진 · 확인 중 · 지금 판 — 서버 스위치가
+ // 꺼진 계정 · 엔진을 못 받은 연습은 지금 판) — 레슨 · 복습 · 안내 연습을 열 때마다 그때의 판으로 이번 시도의 기록부를 고른다: 새 길 · 확인 중이면
+ // 새 판 겉(확인 중에는 쌓아 두었다가 코치가 서면 흘려보낸다), 지금 판이면 옛 거울과 옛 코치 준비(합친 끝 판 GB2 · B1). 한 시도의
+ // 보임 · 답은 한 기록부에만 간다(한 답을 두 기록부에 쓰지 않는다).
+ const nextPath=learning?.next&&typeof life?.createLifeNext==='function'?learning.next:null;
+ const pathNow=()=>{if(!nextPath)return 'old';let value=null;try{value=nextPath.state?.()??null;}catch{value=null;}return value==='engine'?'engine':value==='old'||value==='disposed'?'old':'checking';};
+ const oldTrail=life?life.createLifeTrail({coach:()=>{try{return learning?.coach?.()||null;}catch{return null;}},snapshot:()=>getProgress().exportSnapshot()}):NO_TRAIL;
+ const newTrail=nextPath?life.createLifeNext({coach:()=>nextPath.coach(),watch:(made,fn)=>nextPath.retired(made,fn),snapshot:()=>getProgress().exportSnapshot(),note:(axis,detail)=>nextPath.note?.(axis,detail),onRetired:()=>retiredClose()}):null;
+ let attemptTrail=null; // 이번 시도의 기록부 — 시도를 열 때(beginAttempt) 정한다. 열기 전의 일은 그때의 판으로.
+ const pickTrail=()=>newTrail&&pathNow()!=='old'?newTrail:oldTrail;
+ const via=()=>attemptTrail??pickTrail();
+ const trail=newTrail?Object.freeze({shown:(...a)=>via().shown(...a),help:(...a)=>via().help(...a),delivery:(...a)=>via().delivery(...a),answer:(...a)=>via().answer(...a),guided:(...a)=>via().guided(...a),release:(...a)=>via().release(...a),
+  metrics:()=>({...via().metrics(),path:pathNow(),record:via()===newTrail?'next':'old'}),dispose(){newTrail.dispose();oldTrail.dispose();}}):oldTrail;
  const lessonSlot=(attempt,id)=>life?life.lessonSlot(attempt,id):null,reviewSlot=(run,id)=>life?life.reviewSlot(run,id):null;
- const prepareLearning=()=>{try{void learning?.prepare?.();}catch{/* the mirror retries when the coach appears */}};
+ // 진도가 앞선 때의 도움 표시를 걷었으면 그 문항의 칸을 두 기록부(옛 거울 · 새 판 겉) 모두에서 놓는다 — 표시는 두 판이 함께 쓰는 진도에 있어, 지금 쓰는
+ // 기록부만 놓으면 판을 오간 뒤 다른 기록부가 어제 도움이 붙은 칸을 다시 썼다(지금 판 23:22 해설 → 새 길 → 다음 날 새 길에서 걷음 → 지금 판 답 2판 다시 검수 GA1).
+ const releaseReview=key=>{for(const each of new Set([oldTrail,newTrail]))if(each)try{each.release(key);}catch{/* 다음 보임이 새 칸을 연다 */}};
+ // 시도를 연다 — 그때의 판으로 기록부를 정한다(위). keep: 시도 가운데(레슨 · 카페 · 복습 문항이 열린 동안)의 안내 연습은 그 시도의 기록부를
+ // 그대로 쓴다 — 레슨 도중 판이 바뀌어 다시 고르면 본문항 보임은 앞 기록부에, 답은 뒤 기록부에 가 슬롯을 못 찾고 버려졌다(처리 판 GA1).
+ // 그 시도가 옛 거울이면 옛 코치를 준비하고(새 판 겉이면 하지 않는다 — 생활 코치는 셸이 문서 시작 때 연다, §19-1 ⑤ M7) 입구에 판을 다시
+ // 묻는다(§19-3 7 — 열 때마다 묻는다, 새 길이 되면 다음 시도부터). 입구가 없는 지금 판(라이브)은 늘 옛 거울 · 옛 코치 준비 — 4-2 앞과 같다.
+ // 새 판 겉이면 그 자리에서 코치를 청해 판 바뀜을 듣게 한다 — 첫 문항 전(소개 · 이야기 · 카페 인사)에 판이 내려가도 화면이 닫힌다(합친 끝 판 F7).
+ const prepareLearning=({keep=false}={})=>{if(!(keep&&attemptTrail))attemptTrail=newTrail&&pathNow()!=='old'?newTrail:oldTrail;if(attemptTrail!==oldTrail){try{attemptTrail.prepare?.();}catch{/* 판 겉이 첫 일에 다시 청한다 */}return;}try{void learning?.prepare?.();}catch{/* the mirror retries when the coach appears */}if(nextPath)try{void Promise.resolve(nextPath.coach()).catch(()=>{});}catch{/* 다음 시도에 다시 묻는다 */}};
+ // 판이 바뀌어 생활 코치가 닫혔다(새 길) — 열린 레슨 · 복습 화면이면 안내 한 줄과 함께 닫는다(진도는 남아 다시 열면 이어진다, §19-1 ①).
+ function retiredClose(){if(ended||!shown)return;try{void getProgress().flush().catch(()=>{});}catch{}home.closePanel();updateHome();home.toast(t('life.next.changed'));}
  const engineItem=(lesson,question,review=false)=>life?life.lifeItem({lesson,question,review}):null;
  const lessonOfQuestion=id=>LESSONS.find(lesson=>lesson.questions.some(q=>q.id===id))||null;
  // 지금 화면의 판(레슨 시도 · 복습 회차 · 문항).
@@ -106,12 +141,13 @@ export function createLifeExperience({home,getProgress,show=(title,html,options)
   return attempt&&q?lessonSlot(attempt,q.id):null;
  }
  // 튜터 「이 표현 같이 연습」이 복습 원고를 미리 보인다 — 그 복습 문항을 「보임 + 도움」으로.
- function guideTransfer(questionId){prepareLearning();const lesson=lessonOfQuestion(questionId),q=lesson?.questions.find(x=>x.id===questionId);if(q)trail.guided(engineItem(lesson,q,true));}
+ function guideTransfer(questionId){prepareLearning({keep:Boolean(context)});const lesson=lessonOfQuestion(questionId),q=lesson?.questions.find(x=>x.id===questionId);if(q)trail.guided(engineItem(lesson,q,true));}
  // 제품이 새 첫 답으로 저장했을 때만(duplicate:false — 두 번째 탭 · 묵은 화면의 답은 남기지 않는다) 저장된 답 그대로 거울에 적는다.
  // 저장이 던지면 이 줄에 오지 않는다(레슨은 그 오류를 알린다).
  function mirrorAnswer(slot,saved,stored,correctId){
   if(!saved||saved.duplicate!==false||!stored||typeof stored.correct!=='boolean')return;
-  trail.answer(slot,{correct:stored.correct,choiceId:stored.choiceId??null,correctId,helped:stored.helped===true});
+  // helpBy: 설정(「한 단계씩」)이 스스로 편 도움이면 'setting' — 새 길은 그 답을 시범 답으로 적는다(§19-1 ② D). 옛 거울은 읽지 않는다.
+  trail.answer(slot,{correct:stored.correct,choiceId:stored.choiceId??null,correctId,helped:stored.helped===true,helpBy:stored.helped===true?stored.helpSource==='setting'?'setting':'user':null});
  }
  // 한 자리에서 한 시간을 넘기면 「잠깐 쉬어도 돼요」를 한 번만 보여 준다(10분 넘게 자리를 비우면 다시 센다).
  let sittingSince=Date.now(),hiddenSince=0,restKey=null;
@@ -133,7 +169,14 @@ export function createLifeExperience({home,getProgress,show=(title,html,options)
  const positionCount=()=>{let n=null;try{n=positionTotal?.();}catch{}return Number.isInteger(n)&&n>0?n:16;};
  const photo=(speaker,size='')=>friends[speaker]?`<img class="life-friend ${size}" src="${asset('home/'+friends[speaker].file)}" alt="${friends[speaker].name}" width="384" height="384">`:'';
  const cut=speaker=>friends[speaker]?`<img class="life-friend" src="${asset('tutors/'+friends[speaker].cut+'-기본.webp')}" alt="${friends[speaker].name}" width="480" height="480" decoding="async">`:'';
- function updateHome(){if(ended)return;try{const value=summary();home.updateLearning?.(value,{snapshot:getProgress().exportSnapshot(),lessons:LESSONS,preparePractice:prepareHomePractice,completePractice:completeTutorPractice,finishDay:finishTutorDay});onSummary(value);}catch{}}
+ // 복습 첫 화면이 열려 있으면 그린 때의 판정 표지(확인 중 · 엔진 · 수 · 목록 · 다음 때) — 판정이 바뀌면 그 화면을 다시 그린다. 진도가 바뀌면
+ // 셸이 홈만 새로 그려, 확인 중에 연 복습 화면이 엔진이 서도 「확인 중」으로 남던 것(합친 끝 판 GB1). 새 길 입구가 있는 문서에서만 —
+ // 지금 판(입구 없음 · 라이브)은 12/10까지 그대로라, 15초마다 홈을 새로 해도 열린 복습 화면은 다시 그리지 않는다.
+ const reviewSign=s=>[s.dueState??'',s.dueCount,(s.dueIds||[]).join(','),s.nextReviewAt??'',new Date().toDateString()].join('|');
+ // 다시 그리기는 튜터의 「표현 도움」 · 「연습하기」 창이 열려 있으면 미룬다(다시 그리면 튜터를 새로 세워 그 창이 닫혔다 — 다음 새로 하기에 다시 본다).
+ // 허브 · 팩 화면은 확인 중으로 그린 뒤 판정이 엔진으로 서는 때 한 번만 다시 그린다(복습 줄 · 「복습 보기」 단추 — 합친 끝 판 넘친 #6).
+ const tutorBusy=()=>{try{const m=companion?.metrics?.();return !!(m?.guideOpen||m?.practice);}catch{return false;}};
+ function updateHome(){if(ended)return;try{const value=summary();if(nextPath&&shown&&!rendering&&reviewMark!==reviewSign(value)&&!tutorBusy()){if(screenView==='review'){review({again:true});return;}if(String(reviewMark).startsWith('checking|')&&value.dueState==='engine'){if(screenView==='packs'){packs({again:true});return;}if(String(screenView).startsWith('pack:')){pack(screenView.slice(5),{again:true});return;}}}home.updateLearning?.(value,{snapshot:getProgress().exportSnapshot(),lessons:LESSONS,preparePractice:prepareHomePractice,completePractice:completeTutorPractice,finishDay:finishTutorDay});onSummary(value);}catch{}}
  function completeTutorPractice(questionId,tutorId){if(ended)throw Error('로그인한 계정이 바뀌어 저장하지 못했어요. 다시 시도해 주세요.');return getProgress().recordGuidedPractice({questionId,tutorId});}
  function finishTutorDay(){if(ended)throw Error('로그인한 계정이 바뀌어 저장하지 못했어요. 다시 시도해 주세요.');return getProgress().markDayComplete();}
  function prepareHomePractice(id){
@@ -142,8 +185,11 @@ export function createLifeExperience({home,getProgress,show=(title,html,options)
    const p=getProgress(),s=p.status();if(['loading','conflict','unreadable'].includes(s.phase)||s.rejected)return false;
    const snapshot=p.exportSnapshot(),record=Object.values(snapshot.reviews).find(r=>r.questionId===id);
    if(!record||record.lapses<=0||record.streak!==0)return false;
-   exposedTransfers.add(record.id);guideTransfer(record.questionId);
-   const run=record.dueAt<=Date.now()?p.startReview(6,record.id):snapshot.activeReview;
+   exposedTransfers.set(record.id,Date.now());guideTransfer(record.questionId);
+   // 새 길(엔진 판정)은 그 표현 하나만 연다(간격 · 판정을 건너뜀 — 제품 간격표로 고른 복습 판을 만들지 않는다, §19-1 ⑤ M5). 확인 중 · 지금 판이면
+   // 지금 판 규칙 그대로(돌아올 때가 안 된 표현의 복습을 만들지 않는다 — 합친 끝 판 B2). 가르는 것은 진도의 판정(요약의 dueState)이다 —
+   // 입구(감시)가 엔진이어도 저장소가 아직 얹지 못한 동안 판정은 확인 중이다(처리 판 GA2).
+   const run=summary().dueState==='engine'?p.startReview(1,record.id,null,{ids:[record.id]}):record.dueAt<=Date.now()?p.startReview(6,record.id):snapshot.activeReview;
    // Seeing this same transfer before finishing an active review is assistance.
    if(run?.ids.includes(record.id)&&!run.answers[record.id])p.markReviewHelp(record.id);
    return true;
@@ -181,8 +227,13 @@ export function createLifeExperience({home,getProgress,show=(title,html,options)
   trail.help(currentSlot(),'explanation');if(context.phase!=='review')guideTransfer(id);
  }
  const retryButton=q=>home.mountLifeTutor&&home.tutor?.().tutor?`<button class="life-tutor-retry" data-life-tutor-retry="${escape(q.id)}">${t('life.tutorRetry')}</button>`:'';
- function paint(title,html,{type='life-library',focus='.life-heading',eyebrow='LIFE IN KOREA',keepScroll=false,tutorSlot=null,tutorPhase=null}={}){
-  viewPhase=tutorPhase;
+ // 다시 그리기(again) 전 초점이 있던 생활 단추 — 판을 다시 열면 닫기 단추로 초점이 옮겨 가 엔터가 화면을 닫았다(넘친 #6). 같은 data-life-* 단추로 되돌린다:
+ // 속성 이름 · 값을 들고, 다시 그린 판에서 그 이름의 단추 가운데 값이 같은 것 먼저(레슨 · 팩 목록처럼 이름이 같은 단추가 여럿 — 처리 다시
+ // 검수 A2), 없으면 그 이름의 첫 단추. 값은 선택자에 넣지 않고 견준다(따옴표 · 역슬래시를 거르지 않아도 된다).
+ const focusedKey=()=>{try{const el=document.activeElement;if(!el||el===document.body||!content.contains?.(el))return null;const attr=[...(el.attributes||[])].find(a=>a.name.startsWith('data-life-')||a.name==='data-view');return attr?{name:attr.name,value:attr.value??''}:null;}catch{return null;}};
+ const refocus=key=>{try{const list=[...(content.querySelectorAll?.(`[${key.name}]`)||[])];const target=(key.value?list.find(el=>el.getAttribute?.(key.name)===key.value):null)||list[0];target?.focus({preventScroll:true});}catch{/* 초점은 덤이다 */}};
+ function paint(title,html,{type='life-library',focus='.life-heading',eyebrow='LIFE IN KOREA',keepScroll=false,tutorSlot=null,tutorPhase=null,screen=null,keepFocus=null}={}){
+  viewPhase=tutorPhase;screenView=screen;
   // 집중 판은 내용 영역이 스크롤된다. 같은 장면을 다시 그릴 때(낱말 고르기 등)만 자리를 지키고, 새 장면은 맨 위에서 시작한다.
   const scroll=keepScroll&&shown?content.scrollTop:0;
   // 그리는 동안(rendering) 멈춘 타자는 배울 말 판을 열지 않는다 — 날던 말도 거둔다.
@@ -192,7 +243,7 @@ export function createLifeExperience({home,getProgress,show=(title,html,options)
   // 이야기 장면에서는 튜터 띠를 사진 위 작은 「표현 도움」 알약으로 접는다(장면이 주인공). 문제·결과 화면은 그대로 띠.
   if(tutorSlot&&tutor?.element){const slot=content.querySelector(tutorSlot);if(slot){tutor.element.dataset.layout='scene';slot.append(tutor.element);}}
   home.attachPanelResource({dispose(){tutor?.dispose();if(companion===tutor)companion=null;if(!rendering){shown=false;flight++;for(const ghost of panel.querySelectorAll?.('.life-ghost')||[])ghost.remove();speech.stop();story.stop();signClip?.pause();signClip=null;generation++;try{void getProgress().flush().catch(()=>{});}catch{}context=null;reviewRun=null;lastFeedback=null;}}});
-  rendering=false;shown=true;content.scrollTop=scroll;content.dataset.reduced=String(!!home.state?.reduced);content.querySelector(focus)?.focus({preventScroll:true});updateHome();
+  rendering=false;shown=true;content.scrollTop=scroll;content.dataset.reduced=String(!!home.state?.reduced);if(focus)content.querySelector(focus)?.focus({preventScroll:true});else if(keepFocus)refocus(keepFocus);updateHome();
   decorate(type,keepScroll);
  }
  // 10-17 움직임(유호님 「시안에 있는 움직임 전부 앱에 넣어 줘」): 라벨 타이핑 · 포스터 잉크 · 인화지 툭 놓기/손가락 따라 기울기 · 지금 팩 바느질 · 숫자 굴림
@@ -277,32 +328,75 @@ export function createLifeExperience({home,getProgress,show=(title,html,options)
  // 「지금 할 일」: 하던 레슨 → 돌아온 복습 → 다음 레슨 순서. 코랄 포스터는 허브에 이것 하나.
  // 종이 겉의 포스터 머리: 영문 모노 라벨(밤 겉 그대로 둔다) 대신 화면 언어 한 줄.
  const kicker=()=>`<span class="life-poster-kicker">${t('life.upNext')}</span>`;
+ // 새 길(Atlas 재설계 단계 4-3 — 단계4_계획 §20-8): 셸이 학습 화면의 today()를 넘기면 포스터는 홈의 단추가 지금 열 줄(selected)과 같은 활동이고
+ // 홈의 그 줄과 같은 이유 문장을 단다. 레슨 줄은 레슨 포스터(팩 카드의 「지금」은 그 팩에 — 지금 규칙), 복습 줄은 복습 포스터, 그 밖(한글 먼저 ·
+ // 짧은 연습)은 같은 꼴의 포스터이고 단추는 홈과 같은 길(data-life-next — education.next())로 연다. 줄이 없는 날은 지금 규칙이되 복습 수 포스터를
+ // 세우지 않는다(엔진이 지금 낼 복습이 없다고 한 날 · 상한 날 — §20-3). 지금 판과 생활 단독은 today가 없어 지금 규칙 그대로다.
+ let todayMark='';
+ const dayNow=()=>{if(typeof today!=='function')return null;try{return today()||null;}catch{return null;}};
+ const todaySign=day=>day?[day.state,day.capped?'capped':'',day.selectedKind||'',day.selected?.id||'',day.reason||'',(day.items||[]).map(row=>`${row.kind}:${row.activityId}`).join(',')].join('|'):'';
+ const cappedOf=day=>day?.capped&&day.cappedText?day.cappedText:'';
+ const whyLine=why=>why?`<span class="life-poster-why">${escape(why)}</span>`:'';
+ function lessonPoster(lesson,started,why=''){
+  const pack=packById(lesson.packId),packIndex=PACKS.indexOf(pack),index=Math.max(0,pack.lessons.findIndex(l=>l.id===lesson.id)),total=pack.lessons.length;
+  return {kind:'lesson',packId:pack.id,html:`<section class="life-poster life-now" aria-label="${t('life.upNext')}">${print(pack.id)}<small class="life-poster-label">${started?'CONTINUE':'UP NEXT'} · PACK ${pad(packIndex+1)}</small>${kicker()}<strong class="life-poster-word" lang="ko">${escape(lesson.title)}</strong><span class="life-poster-sub">${escape(packTitle(pack))} · ${phaseName(lesson.type)}${whyLine(why)}</span>${meter(index,total,`${pad(index+1)} / ${pad(total)}`)}<button class="felt-button" data-life-lesson="${lesson.id}">${t(started?'life.continue':'life.start')} <span aria-hidden="true">→</span></button></section>`};
+ }
+ // 하던 복습 판(답하지 않은 문항이 남음)이 있는가. 판정을 확인하는 중에는 돌아온 수가 0이어도 하던 판은 이어 할 수 있다 — startReview가 하던 판을
+ // 그대로 연다. 그때 허브 포스터는 「이어 하기」로 그 판을 열고(「0개가 돌아왔어요」로 막히지 않는다), 복습 화면에도 이어 하기 단추를 둔다(검수 s3d GD3).
+ // 새 길 판정(dueState)이 있을 때만이다 — 꺼진 판의 복습 첫 화면과 허브는 라이브 그대로다(검수 -s3f1 F1).
+ const resumableReview=()=>{try{const run=getProgress().exportSnapshot().activeReview;return !!run&&Array.isArray(run.ids)&&run.ids.some(id=>!run.answers?.[id]);}catch{return false;}};
+ const resumePoster=(why='')=>({kind:'review',html:`<section class="life-poster life-now" aria-label="${t('life.upNext')}">${print('review')}<small class="life-poster-label">CONTINUE · REVIEW</small>${kicker()}<strong class="life-poster-word">${t('plan.resumeReview')}</strong><span class="life-poster-sub">${whyLine(why)}</span><button class="felt-button" data-life-review-start>${t('life.continue')} <span aria-hidden="true">→</span></button></section>`});
+ const reviewPoster=(s,why='')=>!backCount(s)&&!!s.dueState&&resumableReview()?resumePoster(why):({kind:'review',html:`<section class="life-poster life-now" aria-label="${t('life.upNext')}">${print('review')}<small class="life-poster-label">REVIEW · ${pad(backCount(s))}</small>${kicker()}<strong class="life-poster-word">${t('life.backWord')}</strong><span class="life-poster-sub">${t('life.backSub',{n:backCount(s)})}${whyLine(why)}</span><button class="felt-button" data-life-review>${t('life.reviewNow')} <span aria-hidden="true">→</span></button></section>`});
+ // 새 길의 그 밖의 줄(한글 먼저 · 짧은 연습): 이름은 홈과 같은 이름표(home.planLabel — 화면 언어), 이유와 걸리는 시간도 홈의 그 줄 그대로다.
+ function todayPoster(row){
+  const open=row.open,hangul=open.route==='game'&&open.gameId==='hangul';
+  // 꼬리표는 그 줄의 일(모든 언어에서 영어 대문자 — UP NEXT · PACK과 같은 관례). 쓰기 · 말하기 줄을 READING으로 쓰지 않는다(검수 s3d GD4).
+  const mode=hangul?'HANGUL':({listening:'LISTENING',writing:'WRITING',speaking:'SPEAKING'})[open.modality]||'READING';
+  let name='';try{name=home.planLabel?.(open)||'';}catch{name='';}
+  const minutes=Number.isFinite(row.minutes)?`<span class="life-poster-count">${escape(t('goal.minutes.n',{n:row.minutes}))}</span>`:'';
+  return {kind:'today',html:`<section class="life-poster life-now" aria-label="${t('life.upNext')}">${print(hangul?'hangul':'goals')}<small class="life-poster-label">UP NEXT · ${mode}</small>${kicker()}<strong class="life-poster-word">${escape(name||open.label||row.title||'')}</strong><span class="life-poster-sub">${escape(row.why?.text||'')}</span>${minutes}<button class="felt-button" data-life-next>${t('life.start')} <span aria-hidden="true">→</span></button></section>`};
+ }
+ function rowPoster(s,day){
+  const row=(day.items||[]).find(item=>item.kind===day.selectedKind&&item.open?.id===day.selected?.id);if(!row)return null;
+  const why=row.why?.text||'';
+  if(row.route==='lesson'){const lesson=lessonById(row.open.lessonId);return lesson?lessonPoster(lesson,!!row.open.resume||stateOf(lesson.id)==='started',why):null;}
+  if(row.route==='review')return reviewPoster(s,why);
+  return todayPoster(row);
+ }
+ function restPoster(s,day=null){
+  const future=Number.isFinite(s.nextReviewAt)?whenOf(s,s.nextReviewAt):'',capped=cappedOf(day);
+  // 새 길의 상한 날(§20-3): 다음 복습 때 대신 상한 문장이다.
+  return {kind:'rest',html:`<section class="life-poster life-now" aria-label="${t('life.upNext')}">${print('complete')}<small class="life-poster-label">ALL PACKS · ${s.completed} / ${s.total}</small>${kicker()}<strong class="life-poster-word">${t('life.allPacksWord')}</strong><span class="life-poster-sub">${capped?escape(capped):future?t('life.nextReviewOpens',{date:escape(future)}):t('life.pickPackAgain')}</span><button class="felt-button" data-life-review>${t('life.reviewSchedule')} <span aria-hidden="true">→</span></button></section>`};
+ }
  function nowPoster(s){
+  const day=dayNow();todayMark=todaySign(day);
+  const poster=day?rowPoster(s,day):null;if(poster)return poster;
   const lesson=s.nextLesson;
-  if(lesson&&(s.resume||!s.dueCount)){
-   const pack=packById(lesson.packId),packIndex=PACKS.indexOf(pack),index=Math.max(0,pack.lessons.findIndex(l=>l.id===lesson.id)),total=pack.lessons.length,started=s.resume||stateOf(lesson.id)==='started';
-   return {kind:'lesson',packId:pack.id,html:`<section class="life-poster life-now" aria-label="${t('life.upNext')}">${print(pack.id)}<small class="life-poster-label">${started?'CONTINUE':'UP NEXT'} · PACK ${pad(packIndex+1)}</small>${kicker()}<strong class="life-poster-word" lang="ko">${escape(lesson.title)}</strong><span class="life-poster-sub">${escape(packTitle(pack))} · ${phaseName(lesson.type)}</span>${meter(index,total,`${pad(index+1)} / ${pad(total)}`)}<button class="felt-button" data-life-lesson="${lesson.id}">${t(started?'life.continue':'life.start')} <span aria-hidden="true">→</span></button></section>`};
-  }
-  if(s.dueCount)return {kind:'review',html:`<section class="life-poster life-now" aria-label="${t('life.upNext')}">${print('review')}<small class="life-poster-label">REVIEW · ${pad(backCount(s))}</small>${kicker()}<strong class="life-poster-word">${t('life.backWord')}</strong><span class="life-poster-sub">${t('life.backSub',{n:backCount(s)})}</span><button class="felt-button" data-life-review>${t('life.reviewNow')} <span aria-hidden="true">→</span></button></section>`};
-  const future=Number.isFinite(s.nextReviewAt)?dayLabel(s.nextReviewAt):'';
-  return {kind:'rest',html:`<section class="life-poster life-now" aria-label="${t('life.upNext')}">${print('complete')}<small class="life-poster-label">ALL PACKS · ${s.completed} / ${s.total}</small>${kicker()}<strong class="life-poster-word">${t('life.allPacksWord')}</strong><span class="life-poster-sub">${future?t('life.nextReviewOpens',{date:escape(future)}):t('life.pickPackAgain')}</span><button class="felt-button" data-life-review>${t('life.reviewSchedule')} <span aria-hidden="true">→</span></button></section>`};
+  if(lesson&&(s.resume||!s.dueCount||day))return lessonPoster(lesson,s.resume||stateOf(lesson.id)==='started');
+  if(s.dueCount&&!day)return reviewPoster(s);
+  return restPoster(s,day);
  }
  function reviewRow(s){
-  const future=Number.isFinite(s.nextReviewAt)?dayLabel(s.nextReviewAt):'';
-  return `<button class="life-row" data-life-review>${print('review','life-row-print')}<span class="life-row-copy"><strong>${t('life.review')}</strong><small>${s.dueCount?t('life.reviewBack',{n:backCount(s)}):t('life.reviewNext',{date:escape(future)})}</small></span>${s.dueCount?`<span class="life-row-state"><i class="w-led check"></i>${t('life.count',{n:backCount(s)})}</span>`:''}</button>`;
+  const future=Number.isFinite(s.nextReviewAt)?whenOf(s,s.nextReviewAt):'',capped=cappedOf(dayNow()),count=s.dueCount&&!capped;
+  // 새 길의 상한 날(§20-3): 수 대신 상한 문장이고 수 칩을 두지 않는다.
+  return `<button class="life-row" data-life-review>${print('review','life-row-print')}<span class="life-row-copy"><strong>${t('life.review')}</strong><small>${capped?escape(capped):s.dueCount?t('life.reviewBack',{n:backCount(s)}):t('life.reviewNext',{date:escape(future)})}</small></span>${count?`<span class="life-row-state"><i class="w-led check"></i>${t('life.count',{n:backCount(s)})}</span>`:''}</button>`;
  }
- function packs(){if(!ensureReadable())return;place='life';context=null;const s=summary(),now=nowPoster(s),hasReviews=s.dueCount>0||Number.isFinite(s.nextReviewAt);
+ // 새 길(§20-8): 홈의 세 줄이 바뀌면(판이 자리를 잡음 · 새벽 4시 · 방금 놓친 것이 열림) 보고 있는 허브를 다시 그린다 — 학습 화면이 다시 계획한 뒤
+ // 셸이 부른다. 지금 판에는 today가 없어 아무것도 하지 않는다.
+ function syncToday(){if(ended||!shown||rendering||screenView!=='packs'||tutorBusy()||typeof today!=='function')return;if(todayMark!==todaySign(dayNow()))packs({again:true});}
+ function packs({again=false}={}){if(!ensureReadable())return;place='life';context=null;const s=summary(),now=nowPoster(s),hasReviews=s.dueCount>0||Number.isFinite(s.nextReviewAt);
   const episodes=PACKS.filter(p=>p.lessons.some(l=>l.type==='story')).length;
   // 처음 쓰는 사람에게는 복습 줄·완료 표시처럼 아직 쓸모없는 것을 두지 않는다.
   const rows=[`<button class="life-row" data-life-stories>${print('stories','life-row-print')}<span class="life-row-copy"><strong>${t('life.stories')}</strong><small>${t('life.storiesCount',{n:episodes})}</small></span></button>`];
-  if(now.kind==='lesson'&&hasReviews)rows.push(reviewRow(s));
+  // 새 길의 그 밖의 포스터(today — 한글 먼저 · 짧은 연습)일 때도 복습 줄을 둔다(복습으로 가는 길을 잃지 않게, §20-8).
+  if((now.kind==='lesson'||now.kind==='today')&&hasReviews)rows.push(reviewRow(s));
   // 내 위치(10-19 결정): TOPIK I 항목 지도와 짧은 진단. 홈이 그 판을 연다(data-view). 다 마친 포스터가 채운 칸 판을 쓰면 나침반으로.
   rows.push(`<button class="life-row" data-view="position">${print(now.kind==='rest'?'goals':'complete','life-row-print')}<span class="life-row-copy"><strong>${t('position.title')}</strong><small>${t('position.row',{total:positionCount()})}</small></span></button>`);
   // 호스트가 더하는 줄(app-shell의 TOPIK II 쓰기 연습 등). 호스트가 없는 화면에는 없다 — 누를 곳이 없는 단추를 두지 않는다.
   if(typeof moreRows==='function'){const extra=moreRows(print);if(extra)rows.push(extra);}
   // 호스트가 생활 팩 위에 두는 줄(10-22 app-shell — TOPIK II를 목표로 저장한 학생의 쓰기 연습). 없으면 「지금 할 일」 바로 아래가 생활 팩이다.
   const lead=typeof leadRows==='function'?leadRows(print):'';
-  paint(t('life.learn'),`<div class="life-hub life-heading" tabindex="-1">${now.html}${lead?`<section class="life-rows life-lead-rows" aria-label="${t('goal.reason.exam')}"><p class="life-section-label is-text">${t('goal.reason.exam')}</p>${lead}</section>`:''}<section class="life-pack-section" aria-label="${t('life.packsSection')}"><div class="life-section-head"><p class="life-section-label is-text">${t('life.packsSection')}</p><small class="life-library-note">${s.completed?t('life.lessonsDone',{done:s.completed,total:s.total}):t('life.packsAndLessons',{packs:PACKS.length,lessons:LESSONS.length})}</small></div><div class="life-pack-grid">${PACKS.map((p,i)=>packCard(p,i,now.kind==='lesson'?now.packId:null)).join('')}</div></section><section class="life-rows" aria-label="${t('life.more')}"><p class="life-section-label is-text">${t('life.more')}</p>${rows.join('')}</section></div>`);}
+  reviewMark=reviewSign(s);paint(t('life.learn'),`<div class="life-hub life-heading" tabindex="-1">${now.html}${lead?`<section class="life-rows life-lead-rows" aria-label="${t('goal.reason.exam')}"><p class="life-section-label is-text">${t('goal.reason.exam')}</p>${lead}</section>`:''}<section class="life-pack-section" aria-label="${t('life.packsSection')}"><div class="life-section-head"><p class="life-section-label is-text">${t('life.packsSection')}</p><small class="life-library-note">${s.completed?t('life.lessonsDone',{done:s.completed,total:s.total}):t('life.packsAndLessons',{packs:PACKS.length,lessons:LESSONS.length})}</small></div><div class="life-pack-grid">${PACKS.map((p,i)=>packCard(p,i,now.kind==='lesson'?now.packId:null)).join('')}</div></section><section class="life-rows" aria-label="${t('life.more')}"><p class="life-section-label is-text">${t('life.more')}</p>${rows.join('')}</section></div>`,{screen:'packs',...(again?{keepScroll:true,focus:null,keepFocus:focusedKey()}:{})});}
  // 레슨 목록 줄: 번호 → 단계·제목·한 줄 설명 → 상태 LED. 시작 전 레슨은 상태 글 없이, 「지금」 줄만 코랄.
  function lessonRow(l,number,{nowId=null,className='',lead=null,kicker=phaseName(l.type),labels=[t('life.state.done'),t('life.state.doing'),'']}={}){
   const state=stateOf(l.id),now=l.id===nowId,text=state==='completed'?labels[0]:state==='started'?labels[1]:now?t('life.state.now'):labels[2];
@@ -313,14 +407,14 @@ export function createLifeExperience({home,getProgress,show=(title,html,options)
  function stories(){if(!ensureReadable())return;place='life';context=null;
   const episodes=PACKS.map(p=>({pack:p,episode:p.lessons.find(l=>l.type==='story')})).filter(e=>e.episode);
   paint(t('life.stories'),`<div class="life-heading" tabindex="-1"><section class="life-poster life-stories-poster">${print('stories')}<small class="life-poster-label">STORIES · ${pad(episodes.length)}</small><strong class="life-poster-word">${t('life.stories')}</strong><span class="life-poster-sub">${t('life.storiesSub')}</span></section></div><section class="life-list" aria-label="${t('life.stories')}"><p class="life-section-label is-text">${t('life.stories')}</p><div class="life-lesson-list">${episodes.map(({pack,episode})=>lessonRow(episode,0,{className:'life-story-card',lead:print(pack.id,'life-row-print'),kicker:packTitle(pack),labels:[t('life.state.readAgain'),t('life.state.reading'),'']})).join('')}</div></section><section class="life-list" aria-label="${t('life.cafeVisits')}"><div class="life-section-head"><p class="life-section-label is-text">${t('life.cafeVisits')}</p><small class="life-library-note">${t('life.visitsCount',{n:CAFE_VISITS.length})}</small></div><div class="life-lesson-list">${cafeVisitCards()}</div></section>`);}
- function pack(id){if(!ensureReadable())return;const value=packById(id);if(!value)return;place=id==='cafe'?'cafe':'life';context=null;
-  const p=getProgress(),s=summary(),hasReviews=s.dueCount>0||Number.isFinite(s.nextReviewAt),activeId=p.exportSnapshot().activeLessonId,nextVisit=CAFE_VISITS.find(v=>v.id===activeId)||CAFE_VISITS.find(v=>p.lessonState(v.id).status==='started')||CAFE_VISITS.find(v=>p.lessonState(v.id).status!=='completed')||CAFE_VISITS[0],visited=CAFE_VISITS.filter(v=>p.lessonState(v.id).status==='completed').length;
+ function pack(id,{again=false}={}){if(!ensureReadable())return;const value=packById(id);if(!value)return;place=id==='cafe'?'cafe':'life';context=null;
+  const p=getProgress(),s=summary(),hasReviews=s.dueCount>0||Number.isFinite(s.nextReviewAt)||s.dueState==='checking'&&Object.keys(p.exportSnapshot().reviews||{}).length>0,activeId=p.exportSnapshot().activeLessonId,nextVisit=CAFE_VISITS.find(v=>v.id===activeId)||CAFE_VISITS.find(v=>p.lessonState(v.id).status==='started')||CAFE_VISITS.find(v=>p.lessonState(v.id).status!=='completed')||CAFE_VISITS[0],visited=CAFE_VISITS.filter(v=>p.lessonState(v.id).status==='completed').length;
   const lessons=value.lessons.filter(l=>id!=='cafe'||!isCafeLesson(l.id)),index=PACKS.findIndex(p=>p.id===id),[word,label]=packWords[id]||[value.title,id.toUpperCase()],done=packDone(value);
   const cafe=id==='cafe'?`<section class="cafe-pack-preview"><img src="${asset('home/cafe-room-v1.webp')}" alt="${t('life.cafeAlt')}" width="1600" height="900"><div><small class="life-section-label is-text">${t('life.visitN',{n:nextVisit.number})}</small><h3>${escape(nextVisit.title)}</h3><p>${escape(nextVisit.description)}</p><button class="felt-button" data-life-lesson="${nextVisit.id}">${t(p.lessonState(nextVisit.id).status==='started'?'life.continue':nextVisit.number===1?'life.cafeEnter':'life.cafeNext')} <span aria-hidden="true">→</span></button></div></section><section class="life-list" aria-label="${t('life.cafeVisits')}"><div class="life-section-head"><p class="life-section-label is-text">${t('life.cafeVisits')}</p><small class="life-library-note">${visited?t('life.visited',{done:visited,total:CAFE_VISITS.length}):t('life.visitsCount',{n:CAFE_VISITS.length})}</small></div><div class="life-lesson-list cafe-visit-list">${cafeVisitCards(nextVisit.id)}</div></section>`:'';
   const heading=id==='cafe'?`<div class="life-heading life-pack-head" tabindex="-1"><div class="life-section-head"><p class="life-section-label is-text">${t('life.lessonsLabel')}</p><small class="life-library-note">${t('life.cafeBefore')}</small></div><p class="life-pack-description">${escape(packSub(value))}</p></div>`
    :`<div class="life-heading life-pack-head" tabindex="-1"><section class="life-poster life-pack-poster">${print(id)}<small class="life-poster-label">PACK ${pad(index+1)} · ${label}</small><strong class="life-poster-word" lang="ko" style="--len:${[...word].length}">${escape(word)}</strong><span class="life-poster-sub life-pack-description">${escape(packTitle(value))} · ${escape(packSub(value))}</span>${meter(done,value.lessons.length)}</section></div>`;
   const nowId=id==='cafe'?null:nowIn(lessons);
-  paint(packTitle(value),`${cafe}${heading}<div class="life-lesson-list">${lessons.map((l,i)=>lessonRow(l,i+1,{nowId})).join('')}</div><div class="life-library-footer"><button class="quiet-button" data-life-packs>${t('life.toPacks')}</button>${hasReviews?`<button class="quiet-button" data-life-review>${t('life.seeReviews')}</button>`:''}</div>`);}
+  reviewMark=reviewSign(s);paint(packTitle(value),`${cafe}${heading}<div class="life-lesson-list">${lessons.map((l,i)=>lessonRow(l,i+1,{nowId})).join('')}</div><div class="life-library-footer"><button class="quiet-button" data-life-packs>${t('life.toPacks')}</button>${hasReviews?`<button class="quiet-button" data-life-review>${t('life.seeReviews')}</button>`:''}</div>`,{screen:`pack:${id}`,...(again?{keepScroll:true,focus:null,keepFocus:focusedKey()}:{})});}
  function next(){if(!ensureReadable())return;if(onNext)return onNext();const s=summary();if(s.nextLesson)return start(s.nextLesson.id);if(s.dueCount)return review();packs();}
  function start(id){if(!ensureReadable())return;const lesson=lessonById(id);if(!lesson)return;place=lesson.packId==='cafe'?'cafe':'life';
   speech.stop();prepareLearning();
@@ -540,13 +634,24 @@ export function createLifeExperience({home,getProgress,show=(title,html,options)
   const at=snapshot.lessons[record.lessonId]?.answers?.[record.questionId]?.at??record.lastAt;
   return [ago(at),placeAt(record.packId)].filter(Boolean).join(' · ');
  }
- function review(){if(!ensureReadable())return;place='life';context=null;lastFeedback=null;helped=false;helpBy=null;reviewRun=null;const s=summary(),future=Number.isFinite(s.nextReviewAt)?dayLabel(s.nextReviewAt):'',snapshot=getProgress().exportSnapshot();
+ // again: 판정이 바뀌어 열린 화면을 다시 그린다(자리 · 초점은 그대로).
+ function review({again=false}={}){if(!ensureReadable())return;place='life';context=null;lastFeedback=null;helped=false;helpBy=null;reviewRun=null;const s=summary();reviewMark=reviewSign(s);const future=Number.isFinite(s.nextReviewAt)?whenOf(s,s.nextReviewAt):'',snapshot=getProgress().exportSnapshot(),checking=s.dueState==='checking',resume=!s.dueCount&&!!s.dueState&&resumableReview();
   const items=reviewRowsByExpression(s.dueReviews.map(r=>{const l=lessonById(r.lessonId),q=l?.questions.find(x=>x.id===r.questionId);return {korean:expressionOf(l,q).korean,origin:reviewOrigin(r,snapshot)};}));
   const backList=reviewListShape(items);
   // 아직 열린 복습이 없으면 곧 돌아올 표현과 그때를 보인다 — 포스터 한 장만 남은 빈 화면이 「잊을 때쯤 다시」를 가렸다(11-08 프론트 검수).
   // 같은 표현이 레슨 · 이야기에서 따로 잡혀도 한 번만(가장 이른 때), 여섯 개까지.
   const upcoming=[];
-  if(!s.dueCount){
+  // 새 길: 엔진이 낸 「다음 돌아올 때」의 단위마다 복습 하나(lifeDue upcoming) — 날까지만. 확인 중에는 목록을 그리지 않는다.
+  if(!s.dueCount&&s.dueState==='engine'){
+   const metKorean=new Set();
+   for(const row of s.dueUpcoming||[]){
+    const r=snapshot.reviews?.[row.id],l=lessonById(r?.lessonId),q=l?.questions.find(x=>x.id===r.questionId),korean=q?expressionOf(l,q).korean:'';
+    if(!korean||metKorean.has(korean))continue;
+    metKorean.add(korean);upcoming.push({korean,when:dayOnly(row.at)});
+    if(upcoming.length>=6)break;
+   }
+  }
+  else if(!s.dueCount&&!s.dueState){
    const metKorean=new Set();
    for(const r of Object.values(snapshot.reviews||{}).filter(r=>Number.isFinite(r?.dueAt)&&r.dueAt>Date.now()).sort((a,b)=>a.dueAt-b.dueAt||String(a.id).localeCompare(String(b.id)))){
     const l=lessonById(r.lessonId),q=l?.questions.find(x=>x.id===r.questionId),korean=q?expressionOf(l,q).korean:'';
@@ -555,19 +660,32 @@ export function createLifeExperience({home,getProgress,show=(title,html,options)
     if(upcoming.length>=6)break;
    }
   }
-  paint(t('life.reviewTitle'),`<div class="life-review-summary life-heading" tabindex="-1"><section class="life-poster life-review-poster">${print('review')}<small class="life-poster-label">REVIEW${s.dueCount?` · ${pad(backCount(s))}`:''}</small><h3 class="life-poster-word">${s.dueCount?t('life.reviewWordCount',{n:backCount(s)}):t(future?'life.reviewWordNext':'life.reviewWordNone')}</h3><p class="life-poster-sub">${s.dueCount?s.dueCount>s.dueReviews.length?t('life.reviewSubFirst',{n:s.dueReviews.length}):t('life.reviewSubScenes',{n:s.dueCount}):future?t('life.reviewSubOpens',{date:escape(future)}):t('life.reviewSubNone')}</p></section>${items.length?`<section class="life-review-list" aria-label="${t('life.backWord')}"><p class="life-section-label${listHead()}">${t(s.dueCount>s.dueReviews.length?'life.reviewFirstList':'life.backWord')}</p>${backList.origin?`<p class="life-review-origin">${escape(backList.origin)}</p>`:''}<ul>${backList.rows.map(i=>{const note=[i.origin,i.scenes>1?t('life.reviewScenes',{n:i.scenes}):''].filter(Boolean).join(' · ');return `<li><strong lang="ko">${escape(i.korean)}</strong>${note?`<small>${escape(note)}</small>`:''}</li>`;}).join('')}</ul></section>`:''}${upcoming.length?`<section class="life-review-list" data-upcoming aria-label="${t('life.comingBack')}"><p class="life-section-label${listHead()}">${t('life.comingBack')}</p><ul>${upcoming.map(i=>`<li><strong lang="ko">${escape(i.korean)}</strong><small>${escape(i.when)}</small></li>`).join('')}</ul></section>`:''}${restLine('review')}</div><div class="life-actions">${s.dueCount?`<button class="felt-button" data-life-review-start>${t('life.reviewStart')} <span aria-hidden="true">→</span></button><button class="quiet-button" data-life-next>${t('life.doNextLesson')}</button>`:`<button class="felt-button" data-life-next>${t('life.doNextLesson')} <span aria-hidden="true">→</span></button><button class="quiet-button" data-life-home>${t('life.toTown')}</button>`}</div>`,{type:'life-review',tutorPhase:s.dueCount?'reviewDue':future?'reviewNext':'reviewEmpty'});
+  paint(t('life.reviewTitle'),`<div class="life-review-summary life-heading" tabindex="-1"><section class="life-poster life-review-poster">${print('review')}<small class="life-poster-label">REVIEW${s.dueCount?` · ${pad(backCount(s))}`:''}</small><h3 class="life-poster-word">${s.dueCount?t('life.reviewWordCount',{n:backCount(s)}):t(future||checking?'life.reviewWordNext':'life.reviewWordNone')}</h3><p class="life-poster-sub">${s.dueCount?s.dueCount>s.dueReviews.length?t('life.reviewSubFirst',{n:s.dueReviews.length}):t('life.reviewSubScenes',{n:s.dueCount}):checking?t('life.reviewChecking'):future?t('life.reviewSubOpens',{date:escape(future)}):t('life.reviewSubNone')}</p></section>${items.length?`<section class="life-review-list" aria-label="${t('life.backWord')}"><p class="life-section-label${listHead()}">${t(s.dueCount>s.dueReviews.length?'life.reviewFirstList':'life.backWord')}</p>${backList.origin?`<p class="life-review-origin">${escape(backList.origin)}</p>`:''}<ul>${backList.rows.map(i=>{const note=[i.origin,i.scenes>1?t('life.reviewScenes',{n:i.scenes}):''].filter(Boolean).join(' · ');return `<li><strong lang="ko">${escape(i.korean)}</strong>${note?`<small>${escape(note)}</small>`:''}</li>`;}).join('')}</ul></section>`:''}${upcoming.length?`<section class="life-review-list" data-upcoming aria-label="${t('life.comingBack')}"><p class="life-section-label${listHead()}">${t('life.comingBack')}</p><ul>${upcoming.map(i=>`<li><strong lang="ko">${escape(i.korean)}</strong><small>${escape(i.when)}</small></li>`).join('')}</ul></section>`:''}${restLine('review')}</div><div class="life-actions">${s.dueCount||resume?`<button class="felt-button" data-life-review-start>${t(resume?'life.continue':'life.reviewStart')} <span aria-hidden="true">→</span></button><button class="quiet-button" data-life-next>${t('life.doNextLesson')}</button>`:`<button class="felt-button" data-life-next>${t('life.doNextLesson')} <span aria-hidden="true">→</span></button><button class="quiet-button" data-life-home>${t('life.toTown')}</button>`}</div>`,{type:'life-review',tutorPhase:s.dueCount?'reviewDue':checking?null:future?'reviewNext':'reviewEmpty',screen:'review',...(again?{keepScroll:true,focus:null,keepFocus:focusedKey()}:{})});
  }
+ // 새 길: 그 복습의 생활 단위가 하루 안에 다시 돌아오는가(엔진의 다음 돌아올 때 — 모르면 아니다, §19-1 ④ M4). 지금 판은 늘 아니다(글 그대로).
+ const backSoon=id=>{if(!nextPath)return false;let at=null;try{at=nextPath.nextAt?.(id)??null;}catch{at=null;}return Number.isFinite(at)&&at<=Date.now()+86400000;};
  // soon: 레슨 결과의 「새 장면으로 다시 보기」 — 방금 놓친 표현은 1분 안에 돌아오므로 그 1분을 기다리지 않는다.
- function reviewStart(lessonId=null,requestedIds=null,{soon=false}={}){prepareLearning();const p=getProgress(),ids=Array.isArray(requestedIds)&&requestedIds.length?requestedIds:null;reviewRun=p.startReview(ids?Math.min(6,ids.length):6,ids?.[0]||null,ids,{soon:soon&&!!ids});if(!reviewRun)return review();for(const id of reviewRun.ids)if(exposedTransfers.has(id)&&!reviewRun.answers[id])p.markReviewHelp(id);lastFeedback=null;helped=false;helpBy=null;renderReview();}
+ function reviewStart(lessonId=null,requestedIds=null,{soon=false}={}){prepareLearning();const p=getProgress(),ids=Array.isArray(requestedIds)&&requestedIds.length?requestedIds:null;reviewRun=p.startReview(ids?Math.min(6,ids.length):6,ids?.[0]||null,ids,{soon:soon&&!!ids});if(!reviewRun)return review();for(const id of reviewRun.ids)if(exposedTransfers.has(id)&&!reviewRun.answers[id])p.markReviewHelp(id,{seenAt:exposedTransfers.get(id)});lastFeedback=null;helped=false;helpBy=null;renderReview();}
  function renderReview(){
   const run=getProgress().exportSnapshot().activeReview;if(!run)return review();reviewRun=run;
   const index=run.ids.findIndex(id=>!run.answers[id]);
   if(index<0){
-   summary();const snapshot=getProgress().exportSnapshot(),items=reviewRowsByExpression(run.ids.map(id=>{const r=snapshot.reviews[id],l=lessonById(r?.lessonId),q=l?.questions.find(x=>x.id===r.questionId),a=run.answers[id];return {korean:expressionOf(l,q).korean,soon:!(a&&a.correct&&!a.helped)};})).map(i=>({korean:i.korean,note:t(i.soon?'life.reviewSoon':'life.reviewRemembered'),tone:i.soon?'check':'ok'})).sort((a,b)=>(a.tone==='ok'?0:1)-(b.tone==='ok'?0:1));
+   summary();const snapshot=getProgress().exportSnapshot(),items=reviewRowsByExpression(run.ids.map(id=>{const r=snapshot.reviews[id],l=lessonById(r?.lessonId),q=l?.questions.find(x=>x.id===r.questionId),a=run.answers[id],alone=!!(a&&a.correct&&!a.helped);return {korean:expressionOf(l,q).korean,soon:!alone,again:alone&&backSoon(id)};})).map(i=>({korean:i.korean,note:t(i.soon?'life.reviewSoon':i.again?'life.reviewAgainSoon':'life.reviewRemembered'),tone:i.soon||i.again?'check':'ok'})).sort((a,b)=>(a.tone==='ok'?0:1)-(b.tone==='ok'?0:1));
    paint(t('life.reviewResultTitle'),`<div class="life-complete life-result life-heading" tabindex="-1"><section class="life-poster life-complete-poster">${print('review')}<small class="life-poster-label">RESULT · REVIEW</small><strong class="life-poster-word">${t('life.reviewDoneWord')}</strong><h3 class="life-poster-sub">${t('life.reviewMet',{n:items.length||run.ids.length})}</h3></section>${learnedList(items,t('life.reviewedList'),listHead(),items.some(i=>i.tone==='ok')?t('life.reviewSpacing'):'')}</div><div class="life-actions"><button class="felt-button" data-life-home>${t('life.toTown')} <span aria-hidden="true">→</span></button><button class="quiet-button" data-life-next>${t('life.nextLesson')}</button></div>`,{type:'life-review-complete',tutorPhase:'complete'});
    celebrate();return;
   }
-  const id=run.ids[index],record=getProgress().exportSnapshot().reviews[id],l=lessonById(record.lessonId),original=l.questions.find(q=>q.id===record.questionId),q=original.review;if(!lastFeedback){helped=run.pendingHelp?.[id]===true;helpBy=helped?'user':null;}
+  const id=run.ids[index],record=getProgress().exportSnapshot().reviews[id],l=lessonById(record.lessonId),original=l.questions.find(q=>q.id===record.questionId),q=original.review;if(!lastFeedback){
+   // 새 길: 앞선 때의 도움 표시는 지금 도움이 아니다 — 보이기 전에 그 표시를 걷고, 표시가 있었는데 지금 도움이 아니면 두 기록부의 앞 칸(그 도움이 붙은
+   // 제시)을 놓아 새로 보인다(문서를 연 채 날을 넘겨 이은 판은 같은 run.id라 칸을 다시 써 Atlas에 어제 해설이 붙은 답으로 남았다 — 다시 검수 GA3).
+   // 놓기는 걷기 쓰기의 성공이 아니라 「표시 있음 · 지금 도움 아님」으로 가른다 — 걷기가 저장 충돌로 던져도 놓는다(설계 확인 고2). 같은 날이면
+   // 그대로이고, 판정이 없으면(지금 판 · 라이브) 표시가 곧 도움이라 놓지 않는다. 지키는 것은 「답이 붙는 제시의 도움 = 제품 helped」다(옛 Trail의
+   // assisted는 문항 · 계열의 이력이라 이 잣대가 아니다 — 설계 확인 고1).
+   const marked=run.pendingHelp?.[id]===true;try{getProgress().dropStaleHelp(id);}catch{/* 걷기가 던져도 아래가 칸을 놓는다 */}
+   // ③ 공개 직후 캐시에 남은 옛 진도 모듈에는 reviewHelped가 없다 — 그때는 옛 뜻(표시가 곧 도움)으로 읽는다.
+   const prog=getProgress();helped=typeof prog.reviewHelped==='function'?prog.reviewHelped(id):marked;helpBy=helped?'user':null;if(marked&&!helped)releaseReview(reviewSlot(run.id,id));
+   // 지금 도움인 표시면 해설이 펼쳐 보인다 — 그 본 때를 진도에 알린다(표시의 때 = 마지막으로 본 때: 단추를 다시 누르지 않고 다시 열어 본 해설도 —
+   // 10:00 해설을 23:55에 다시 열어 보고 00:03에 답하면 도움 받은 답, 설계 검토 D1). 지금 판 · 라이브의 때 없는 표시면 쓰지 않는다.
+   if(helped)try{getProgress().markReviewHelp(id);}catch{/* 표시는 그대로 — 답이 그 도움을 싣는다 */}}
   context={lessonId:l.id,phase:'review',questionIndex:index,reviewId:id,reviewQuestion:q};
   // 거울: 답하지 않은 새 상황 복습이 보였다(미리 본 도움이 있으면 그 도움도).
   if(!lastFeedback)trail.shown(reviewSlot(run.id,id),engineItem(l,original,true),{helped});
@@ -620,5 +738,5 @@ export function createLifeExperience({home,getProgress,show=(title,html,options)
  // 첫 실행 「한글을 읽을 수 있어요?」의 답: 이 진도 기록(계정이면 계정, 손님이면 이 기기)에 읽고 쓴다.
  function hangulReading(){try{return getProgress().hangulReading();}catch{return null;}}
  async function setHangulReading(answer,options){if(ended)throw Error('로그인한 계정이 바뀌어 저장하지 못했어요. 다시 시도해 주세요.');const p=getProgress(),result=p.setHangulReading(answer,options);updateHome();await p.flush();return result;}
- return {packs,stories,review,reviewStart,next,pack,start,cafe:()=>pack('cafe'),summary,refresh:updateHome,hangulReading,setHangulReading,metrics:()=>({shown,lessonId:context?.lessonId||null,phase:context?.phase||null,step:context?.questionIndex??null,cafe:isCafeLesson(context?.lessonId)?cafeRun:null,speech:speech.metrics(),tutor:companion?.metrics()||null,owner:getProgress().owner,progress:getProgress().exportSnapshot(),trail:trail.metrics()}),dispose(){ended=true;trail.dispose();speech.dispose();story.dispose();clearInterval(timer);document.removeEventListener('click',click);document.removeEventListener('visibilitychange',sitting);if(shown)home.closePanel();}};
+ return {packs,syncToday,stories,review,reviewStart,next,pack,start,cafe:()=>pack('cafe'),summary,refresh:updateHome,hangulReading,setHangulReading,metrics:()=>({shown,lessonId:context?.lessonId||null,phase:context?.phase||null,step:context?.questionIndex??null,cafe:isCafeLesson(context?.lessonId)?cafeRun:null,speech:speech.metrics(),tutor:companion?.metrics()||null,owner:getProgress().owner,progress:getProgress().exportSnapshot(),trail:trail.metrics()}),dispose(){ended=true;trail.dispose();speech.dispose();story.dispose();clearInterval(timer);document.removeEventListener('click',click);document.removeEventListener('visibilitychange',sitting);if(shown)home.closePanel();}};
 }

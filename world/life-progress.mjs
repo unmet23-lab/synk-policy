@@ -5,7 +5,7 @@ import {readArrival} from './seoul-record.mjs';
 // supply its storage port; guest/device records remain in their owner's namespace.
 export const LIFE_PROGRESS_KEY='synk.life-korean.progress.v1';
 export const LIFE_PROGRESS_VERSION=1;
-const MINUTE=60000,DAY=86400000,INTERVALS=[1,3,7,14,30];
+const MINUTE=60000,DAY=86400000,INTERVALS=[1,3,7,14,30],HELP_FRESH=30*MINUTE;
 const clone=value=>JSON.parse(JSON.stringify(value));
 const fail=(code,message)=>Object.assign(new Error(message||code),{code});
 const safeId=value=>typeof value==='string'&&/^[a-z0-9][a-z0-9_-]{0,119}$/i.test(value);
@@ -211,29 +211,75 @@ export function createLifeProgress({storage=globalThis.localStorage,owner='guest
   if(!duplicate||state.activeLessonId===id)commit(next);
   return {id,completed:true,duplicate,completedAt:next.lessons[id].completedAt,totalCompleted:Object.values(state.lessons).filter(v=>v.completedAt!==null).length};
  }
- function dueReviews(limit=100,horizon=now()){check();return Object.values(state.reviews).filter(v=>v.dueAt<=horizon).sort((a,b)=>a.dueAt-b.dueAt||a.id.localeCompare(b.id)).slice(0,Math.max(0,Math.min(100,limit))).map(clone);}
+ // 새 길(atlasNext)의 「돌아온 복습」 판정(단계 4 §19-1 ⑤ — world-life-next.mjs lifeDue). 넣은 것이 없으면 null — 지금 판(dueAt 간격표) 그대로.
+ // 판정은 { state:'checking' }(코치가 아직 없거나 보기가 얹지 못함 — 수 · 날짜를 그리지 않는다) 또는 { state:'engine', ids, nextAt, times, upcoming }.
+ let dueSource=null;
+ // 판정이 null이면 지금 판(이 문서는 지금 판으로 정해짐 · 판정을 거둠), 던지거나 엔진 꼴이 아니면 확인 중.
+ function judged(){if(!dueSource)return null;let value;try{value=dueSource(state,now());}catch{value=undefined;}if(value===null)return null;if(value?.state==='engine'&&Array.isArray(value.ids))return {...value,ids:value.ids.filter(id=>state.reviews[id])};return {state:'checking',ids:[],nextAt:null,times:[],upcoming:[]};}
+ // given: 이미 잰 판정(summary — 한 요약 안에서 판정을 한 번만 잰다, 두 번 재면 그 사이 경계 · 상태가 바뀌어 수와 목록이 갈렸다, 합친 끝 판 B4).
+ function dueReviews(limit=100,horizon=now(),given=undefined){check();const engine=given===undefined?judged():given;if(engine)return engine.ids.slice(0,Math.max(0,Math.min(100,limit))).map(id=>clone(state.reviews[id]));return Object.values(state.reviews).filter(v=>v.dueAt<=horizon).sort((a,b)=>a.dueAt-b.dueAt||a.id.localeCompare(b.id)).slice(0,Math.max(0,Math.min(100,limit))).map(clone);}
+ // 복습 판의 도움 표시(pendingHelp)가 지금 답의 도움인가. 판정이 없거나 null이면 표시가 있으면 도움이다(4-2 앞). 새 길은 표시마다 든 때(pendingHelpAt)가
+ // 같은 학습일이거나 30분 안일 때만 도움이고, 때가 없는 표시(판정 없이 단 것)는 도움으로 친다 — 판의 날 하나로 가르면 하던 판을 버리거나 오늘 본
+ // 도움을 지웠다(합친 끝 판 F3 → GA1 → 확인 검수, 같은 자리 세 회차 뒤 설계를 다시).
+ const freshHelp=(marked,at)=>dailyTime(marked)&&dailyTime(at)&&(lifeDayKey(marked)===lifeDayKey(at)||Math.abs(at-marked)<=HELP_FRESH);
+ const helpTimes=run=>{const value=run?.pendingHelpAt;return value&&typeof value==='object'&&!Array.isArray(value)?value:null;};
+ function helpNow(run,id,at=now(),engine=judged()){if(run?.pendingHelp?.[id]!==true)return false;if(!engine)return true;const marked=helpTimes(run)?.[id];return !dailyTime(marked)||freshHelp(marked,at);}
+ // 첫 남은 복습의 도움 표시가 지금 도움이 아니다(앞선 때의 표시) — 홈 튜터가 「오늘은 네가 먼저」를 고를 때 읽는다.
+ function helpExpired(run,engine){const first=run?.ids.find(id=>!run.answers[id]);return !!first&&run.pendingHelp?.[first]===true&&!helpNow(run,first,now(),engine);}
+ function reviewHelped(id){check();const run=state.activeReview;return !!run&&run.ids.includes(id)&&helpNow(run,id);}
  // soon: a lesson result may open its just-missed expressions in a new scene right away. Those are
  // due at most a minute after the answer, so only reviews coming due within that minute are added.
- function startReview(limit=6,preferredId=null,allowedIds=null,{soon=false}={}){
+ // ids(새 길): 고른 복습을 그대로 연다 — 간격 거르기를 건너뛴다(튜터 「이 표현 같이 연습」 · 레슨 결과의 「새 장면으로 다시 보기」).
+ function startReview(limit=6,preferredId=null,allowedIds=null,{soon=false,ids:chosen=null}={}){
   check();const existing=state.activeReview;
   if(existing&&existing.ids.some(id=>!existing.answers[id]))return clone(existing);
   if(allowedIds!==null&&(!Array.isArray(allowedIds)||allowedIds.length>100||new Set(allowedIds).size!==allowedIds.length||allowedIds.some(id=>!safeId(id)||!state.reviews[id])))throw TypeError('Invalid review selection');
-  if(soon&&allowedIds===null)throw TypeError('An early review needs its expressions');
-  const due=dueReviews(100,now()+(soon?MINUTE:0)).filter(row=>allowedIds===null||allowedIds.includes(row.id));if(preferredId){const index=due.findIndex(r=>r.id===preferredId);if(index>0)due.unshift(...due.splice(index,1));}
+  if(chosen!==null&&(!Array.isArray(chosen)||!chosen.length||chosen.length>100||new Set(chosen).size!==chosen.length||chosen.some(id=>!safeId(id)||!state.reviews[id])))throw TypeError('Invalid review selection');
+  if(soon&&allowedIds===null&&chosen===null)throw TypeError('An early review needs its expressions');
+  const engine=chosen===null?judged():null;
+  const due=chosen!==null?chosen.map(id=>clone(state.reviews[id])):engine?(soon&&allowedIds!==null?allowedIds.map(id=>clone(state.reviews[id])):dueReviews(100).filter(row=>allowedIds===null||allowedIds.includes(row.id))):dueReviews(100,now()+(soon?MINUTE:0)).filter(row=>allowedIds===null||allowedIds.includes(row.id));if(preferredId){const index=due.findIndex(r=>r.id===preferredId);if(index>0)due.unshift(...due.splice(index,1));}
   const next=clone(state),ids=due.slice(0,Math.max(0,Math.min(100,limit))).map(v=>v.id);if(!ids.length)return null;
   next.activeReview={id:uuid(),startedAt:now(),ids,answers:{},pendingHelp:{}};commit(next);return clone(next.activeReview);
  }
- function markReviewHelp(id){
+ // seenAt: 화면이 그 표현을 보여 준 때(life-ui exposedTransfers). 도움 표시는 판정이 있을 때(새 길)만 표시마다 때를 든다(pendingHelpAt — 판의 startedAt은 그대로).
+ // · 판정이 없거나 null(지금 판): 표시가 있으면 도움이다(4-2 앞). 새 길을 거쳐 때가 든 표시를 다시 보면 그 때를 걷어 「때 없는 표시 = 도움」으로 되돌린다 —
+ // 새 길 → 지금 판 → 새 길로 오가면 오늘 본 도움이 앞선 때로 읽혔다(다시 지음 다시 검수 F1 GA1). 때 칸은 새 길을 거친 기록에만 있어
+ //   라이브의 쓰기는 4-2 앞 그대로다.
+ // · 새 길: 표시의 때는 그 도움을 마지막으로 본 때다 — 본 표현은 그 본 때(seenAt)로, 그 밖에는 지금으로 든다. 같은 날 다시 봐도 때를 새로 들어야 자정 30분
+ //   보호가 선다(10:00 표시 → 23:55 다시 봄 → 다음 날 00:03 답, GA2). 이미 든 때가 지금 도움이고 새 때의 30분 너머까지 같은 학습일로 덮으면 쓰지 않는다.
+ // 같은 학습일이거나 30분 안이 아닌 본 표현은 달지 않는다(문서를 연 채 날을 넘긴 차례, 합친 끝 판 F3).
+ function markReviewHelp(id,{seenAt}={}){
   check();const run=state.activeReview;if(!run||!run.ids.includes(id))throw TypeError('Invalid review help');
-  if(run.answers[id]||run.pendingHelp?.[id])return clone(run);
-  const next=clone(state);next.activeReview.pendingHelp={...(next.activeReview.pendingHelp||{}),[id]:true};commit(next);return clone(next.activeReview);
+  if(run.answers[id])return clone(run);
+  const engine=judged(),at=now(),marked=run.pendingHelp?.[id]===true,before=helpTimes(run)?.[id];
+  if(!engine){
+   if(marked&&before===undefined)return clone(run);
+   const next=clone(state);next.activeReview.pendingHelp={...(next.activeReview.pendingHelp||{}),[id]:true};
+   if(before!==undefined)delete helpTimes(next.activeReview)[id];
+   commit(next);return clone(next.activeReview);
+  }
+  if(seenAt!==undefined&&!freshHelp(seenAt,at))return clone(run);
+  const seen=seenAt!==undefined?seenAt:at,kept=marked&&dailyTime(before)&&freshHelp(before,at),last=kept?Math.max(before,seen):seen;
+  if(kept&&(last===before||lifeDayKey(before)===lifeDayKey(last+HELP_FRESH)))return clone(run);
+  const next=clone(state);next.activeReview.pendingHelp={...(next.activeReview.pendingHelp||{}),[id]:true};
+  next.activeReview.pendingHelpAt={...(helpTimes(next.activeReview)||{}),[id]:last};
+  commit(next);return clone(next.activeReview);
+ }
+ // 새 길: 지금 도움이 아닌 표시(앞선 때)를 걷는다 — 화면이 그 복습 문항을 보일 때 부르고, 걷었으면 기록부의 앞 칸(그 도움이 붙은 제시)을 놓아
+ // 제품 · Atlas가 함께 「도움 없음」에서 다시 시작한다 — 문서를 연 채 날을 넘겨 이은 판은 같은 run.id라 기록부 칸을 다시 써, 제품은 혼자 맞힘인데
+ // Atlas에는 어제 해설이 붙은 답으로 남았다(다시 검수 GA3). 판정이 없거나 null이면 표시는 늘 도움이라 걷지 않는다(4-2 앞). 걷었으면 참.
+ function dropStaleHelp(id){
+  check();const run=state.activeReview;if(!run||!run.ids.includes(id)||run.answers[id]||run.pendingHelp?.[id]!==true)return false;
+  const engine=judged();if(!engine||helpNow(run,id,now(),engine))return false;
+  const next=clone(state);delete next.activeReview.pendingHelp[id];const times=helpTimes(next.activeReview);if(times)delete times[id];
+  commit(next);return true;
  }
  function answerReview({id,reviewId,questionId,correct,helped=false,runId}={}){
   check();const run=state.activeReview,keyId=id||reviewId||run?.ids.find(id=>state.reviews[id].questionId===questionId);
   if(!run||runId&&run.id!==runId||!run.ids.includes(keyId)||typeof correct!=='boolean'||typeof helped!=='boolean')throw TypeError('Invalid review answer');
   if(run.answers[keyId])return {duplicate:true,done:run.ids.every(id=>run.answers[id]),remaining:run.ids.filter(id=>!run.answers[id]).length};
   const at=now(),guided=dailyTime(at)&&state.daily?.days[lifeDayKey(at)]?.items[state.reviews[keyId].questionId]?.guidedAt!==undefined;
-  helped=helped||run.pendingHelp?.[keyId]===true||guided;
+  helped=helped||helpNow(run,keyId,at)||guided;
   const next=clone(state),review=next.reviews[keyId],difficult=!correct||helped;
   review.streak=difficult?0:review.streak+1;review.lapses+=difficult?1:0;review.intervalDays=difficult?0:INTERVALS[Math.min(review.streak-1,INTERVALS.length-1)];review.dueAt=at+(difficult?MINUTE:review.intervalDays*DAY);review.lastAt=at;
   next.activeReview.answers[keyId]={correct,helped,at};const remaining=next.activeReview.ids.filter(id=>!next.activeReview.answers[id]).length;
@@ -365,20 +411,24 @@ export function createLifeProgress({storage=globalThis.localStorage,owner='guest
   // the player back to the first untouched pack. Existing record IDs stay intact.
   const cafeNext=latest&&isCafeLesson(latest.id)?nextVisit||ordered.find(l=>l.packId==='cafe'&&state.lessons[l.id]?.completedAt==null):null;
   const next=active||cafeNext||ordered.find(lesson=>state.lessons[lesson.id]?.completedAt==null)||null;
-  const due=dueReviews(),total=ordered.length,completed=ordered.filter(lesson=>state.lessons[lesson.id]?.completedAt!=null).length;
+  const engine=judged(),due=dueReviews(100,now(),engine),total=ordered.length,completed=ordered.filter(lesson=>state.lessons[lesson.id]?.completedAt!=null).length;
   // Only a lesson with an answered question is 「하던 자리」. One merely opened stays the next lesson,
   // but a returned review is not hidden behind it.
   const resume=!!active&&Object.keys(state.lessons[active.id]?.answers||{}).length>0;
   return {owner,completed,total,allCompleted:total>0&&completed===total,nextLesson:next?{...next,progress:lessonState(next.id)}:null,resume,
    cafe:{completed:visits.filter(l=>state.lessons[l.id]?.completedAt!=null).length,total:visits.length,nextNumber:next&&isCafeLesson(next.id)?CAFE_LESSON_IDS.indexOf(next.id)+1:null},
-   dueCount:due.length,dueExpressions:dueExpressionCount(due),dueReviews:due.slice(0,6),nextReviewAt:Object.values(state.reviews).length?Math.min(...Object.values(state.reviews).map(v=>v.dueAt)):null,
+   // 화면이 말하는 「돌아온 표현 N개」는 새 길에서도 표현 글로 묶은 수다 — 같은 표현을 두 레슨에서 놓치면 장면(문항)은 둘이어도 목록 줄 · 표현은 하나(합친 끝 판 F5).
+   dueCount:due.length,dueExpressions:dueExpressionCount(due),dueReviews:due.slice(0,6),nextReviewAt:engine?engine.nextAt??null:Object.values(state.reviews).length?Math.min(...Object.values(state.reviews).map(v=>v.dueAt)):null,
+   ...(engine?{dueState:engine.state,dueIds:[...engine.ids],dueTimes:[...(engine.times??[])],dueUpcoming:(engine.upcoming??[]).map(row=>({...row})),helpExpired:helpExpired(state.activeReview,engine)}:{}),
    packs:packs.map(pack=>{const ids=(pack.lessons||[]).map(value=>typeof value==='string'?value:value.id);return {id:pack.id,completed:ids.filter(id=>state.lessons[id]?.completedAt!=null).length,total:ids.length};}),status:status()};
  }
  async function flush(){
   check();if(readError)throw readError;if(saving)return saving;
   saving=(async()=>{check();if(writeError){storage.setItem(key,JSON.stringify(state));writeError=null;}const result=save?await save():status();check();emit();return result;})().finally(()=>{saving=null;});return saving;
  }
- const api=Object.freeze({arrival,setArrival,key,owner,status,summary,lessonState,startLesson,setStage,recordAnswer,finishLesson,dueReviews,startReview,markReviewHelp,answerReview,recordGuidedPractice,markDayComplete,selectedTutor,selectTutor,hangulReading,setHangulReading,displayLanguage,setDisplayLanguage,importRecords,learningProfile,learningProfileValues,updateLearningProfile,clearLearningProfile,flush,
-  exportSnapshot(){check();return clone(state);},stop(){stopped=true;},registerLesson:register});
+ const api=Object.freeze({arrival,setArrival,key,owner,status,summary,lessonState,startLesson,setStage,recordAnswer,finishLesson,dueReviews,startReview,markReviewHelp,reviewHelped,dropStaleHelp,answerReview,recordGuidedPractice,markDayComplete,selectedTutor,selectTutor,hangulReading,setHangulReading,displayLanguage,setDisplayLanguage,importRecords,learningProfile,learningProfileValues,updateLearningProfile,clearLearningProfile,flush,
+  exportSnapshot(){check();return clone(state);},stop(){stopped=true;},registerLesson:register,
+  // 새 길의 판정을 넣는다(app-shell — 깃발이 켜진 문서만). null이면 지금 판으로 돌아간다. 판정이 바뀌면 화면에 알린다.
+  setDueSource(source){dueSource=typeof source==='function'?source:null;emit();}});
  return api;
 }
