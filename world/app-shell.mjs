@@ -1,4 +1,5 @@
 import {WorldClient} from './world-client.mjs';
+import {clearMonthAnswer} from './world-month-answer.mjs';
 import {mountEnrollment} from './enrollment.mjs';
 import {mountClassroomLessons} from './classroom-lessons.mjs';
 import {mountClassroomHomework,homeworkWeek} from './classroom-homework.mjs';
@@ -19,7 +20,7 @@ import {createWorkbenchStorage,thumbnailKey,wardrobeThumbnailCache} from './ward
 import {play as playSound,getPref} from './brand-opening/world-sound.mjs'
 import {profilePhoto,welcomePhoto} from './brand-opening/tutor-photos.mjs';
 // 화면 언어(10-19 1판): 계정 연결·로그인 안내·저장 확인·오류는 고른 언어로. 첫 문장 놀이·타운·노래 화면은 2판까지 한국어다.
-import {t,tMessage,currentLang,setLang} from './brand-opening/world-lang.mjs';
+import {t,tMessage,currentLang,setLang,hasString,situationName,meText} from './brand-opening/world-lang.mjs';
 import {restoreDisplayLanguage,commitDisplayLanguage} from './display-language-sync.mjs';
 import {createSeoulEntry,seoulText} from './seoul-entry.mjs';
 import {createFrontEntry} from './world-front-entry.mjs';
@@ -32,6 +33,59 @@ const connection=await loadWorldConfig();
 const operating=connection.mode==='account';
 // 학습자 응답(WORLD 학습자 응답 설계 §6): 설정값 worldFeedback이 켜졌을 때만 연습 끝 화면의 「이번 연습 어땠어요?」와 「내 계정」의 응답 목록이 있다(기본 꺼짐).
 const responsesOn=connection.features?.worldFeedback===true;
+// Atlas 새 길(재설계 단계 4, 기능 atlasNext — 리허설만 켠다, operating-mode.mjs): 켜졌을 때만 새 길 입구(world-atlas-next.mjs)를 처음 쓸 때 받는다.
+// 꺼지면 이 입구도 엔진(/atlas/loader.mjs)도 받지 않는다(단계4_계획 §6).
+const atlasNextOn=connection.features?.atlasNext===true;
+// 손님 깃발(atlasNextGuest — operating-mode.mjs): 꺼져 있으면 손님 주인에게는 새 길 입구를 주지 않는다(손님은 지금 판 — 계정만 새 길).
+const atlasNextGuestOn=atlasNextOn&&connection.features?.atlasNextGuest===true;
+// 받기는 한 번(동시에 불러도 같은 약속), 받는 사이에 닫히면 받은 것을 바로 닫는다 — 주인이 바뀌어 생활 기록을 버릴 때(keep) 떠난 주인의
+// 새 길 코치 · 호스트가 남지 않게(11-12 화면 검수 A6). 받기가 실패하면 다음에 다시 받는다. 첫 실패는 계기에 한 번 남긴다(load · ENTRY_IMPORT —
+// 깃발이 잘못 켜져 입구가 없을 때(404)도 부르는 곳은 지금 판으로 가고, 브라우저는 실패한 모듈을 문서 안에서 다시 받지 않는다. 설계 주인 11-23 조건 1).
+// 계정 길(단계 4 ④ — 단계4_계획 §18-2 · §18-5): 운영은 계정을 다시 읽는 world-account의 prepareAtlasTrail, 리허설은 리허설 서버의 trail
+// (rehearsal-trail.mjs — WorldClient와 같은 세션 머리말). 판 정하기 · 옮기기 물음 · 로그아웃 표지는 입구(world-atlas-next.mjs)가 한다.
+function lazyAtlasNext(owner){
+ // gaveOld: 입구 모듈을 못 받아 면(생활 판정 · 짧은 연습)에 지금 판을 줬다 — 다음에 받으면 판이 풀렸다고 알린다(입구는 제가 서기 전의 일을 몰라
+ // 알리지 않아, 짧은 연습은 새 길인데 생활 판정 · 홈 칩 · 알림은 지금 판에 남았다 — 합친 끝 판 F9). early: 받기 전의 계기(50개까지 — 입구가 서면 흘려보낸다).
+ let made=null,loading=null,disposed=false,gaveOld=false,entryFailed=false;const reopeners=new Set(),early=[];
+ // 리허설 나르개의 401은 그 나르개를 만든 로그인의 세대에서만 로그인으로 보낸다 — 로그아웃 뒤 같은 합성 계정으로 다시 들어온 새 로그인을 앞 로그인의
+ // 늦은 401이 로그인 화면으로 돌리지 않게(합친 끝 판 넘친 #26 — 계정 번호만 견주면 같은 계정의 새 세션을 못 가렸다).
+ const trailOf=m=>{if(owner==='guest')return null;if(operating)return()=>account.prepareAtlasTrail();const generation=client.generation;return m.rehearsalTrail({headers:()=>({...(client.accessToken?{Authorization:`Bearer ${client.accessToken}`}:{}),'X-Synk-Rehearsal-Tab':client.tabId}),owner:()=>client.snapshot?.accountId||'guest',onAuth:()=>{if(client.generation===generation&&(client.snapshot?.accountId||'guest')===owner)client.expire?.();}});};
+ // 옛 엔진의 두 문(4-5 연습 기록 비우기 — 단계4_계획 §22-4 · world-old-engine-doors.mjs를 입구 모듈이 다시 내보낸다): 계정의 옛 올리기 대기열(옛 학습
+ // 호스트)과 옛 손님 기록(옛 손님 코치를 열어 쓰기 임대 안에서 다시 판단해 비운다 — 4-5 코드 검수 GA1). 입구가 비우기에서만 부른다. 새 길이 꺼진
+ // 셸은 입구 모듈을 받지 않으므로 이 문도 받지 않는다.
+ const oldDoorsOf=m=>m.oldEngineDoors?.({openGame:()=>worldLearning.engine.createGame({gameId:'world-home',storage:window.localStorage}),host:()=>window.SYNKLearningHost||null});
+ const load=()=>loading??=import('./world-atlas-next.mjs').then(m=>{made=m.createAtlasNext({owner,lang:currentLang,label:id=>{if(String(id).startsWith('sit-'))return situationName(id);const key=`position.skill.${id}`;return hasString(key)?t(key):null;},presentation:()=>life.education?.presentation?.()??null,trail:trailOf(m),oldEngine:oldDoorsOf(m)});made.reopened?.(detail=>{for(const fn of [...reopeners])try{fn(detail);}catch{}});if(disposed){made.dispose();return made;}for(const [kind,outcome] of early.splice(0))try{made.note(kind,outcome);}catch{}if(gaveOld){gaveOld=false;for(const fn of [...reopeners])try{fn({reason:'loaded'});}catch{}}return made;},error=>{loading=null;gaveOld=true;if(!entryFailed&&!disposed){entryFailed=true;early.push(['load',{ok:false,code:'ENTRY_IMPORT'}]);}throw error;});
+ return {async practiceCoach(pool){if(disposed)return null;const entry=await load();return disposed?null:entry.practiceCoach(pool);},createPracticeNextSession:(...args)=>made.createPracticeNextSession(...args),
+  // 생활 화면의 코치(4-2 — 은행 world-life, 단계4_계획 §19-1 ①). 지금 판이면 null.
+  async lifeCoach(){if(disposed)return null;const entry=await load();return disposed?null:entry.lifeCoach();},
+  // 홈의 코치와 플래너(4-3 — 단계4_계획 §20-4). 지금 판이면 코치는 null, 엔진을 못 받으면 플래너도 null이다.
+  async homeCoach(pool){if(disposed)return null;const entry=await load();return disposed?null:entry.homeCoach(pool);},
+  // 시험 형식 연습의 코치(4-4d — 단계4_계획 §21-23의 1, 경험 world-mock). 지금 판이면 null.
+  async mockCoach(pool){if(disposed)return null;const entry=await load();return disposed?null:entry.mockCoach(pool);},
+  // 게임 틀을 열 때의 문(4-6c — 단계4_계획 §23-2). 이 문서에서 계정이 지금 판으로 정해졌거나 닫았으면 null(문 없이 옛 길).
+  async gameDoor(id){if(disposed)return null;const entry=await load();return disposed?null:entry.gameDoor(id);},
+  async homePlanner(){if(disposed)return null;const entry=await load();return disposed?null:entry.homePlanner();},
+  // 지금 판으로 정했던 판이 풀렸을 때(지금 판 → 새 길일 수 있음) — 생활 · 홈이 판을 다시 묻는다(단계4_계획 §19-3 7). 끊는 함수를 돌려준다.
+  reopened(fn){if(disposed||typeof fn!=='function')return()=>{};reopeners.add(fn);return()=>reopeners.delete(fn);},
+  note:(kind,outcome)=>{if(disposed)return;if(made)made.note(kind,outcome);else if(early.length<50)early.push([kind,outcome]);},
+  retired:(coach,fn)=>made&&!disposed?made.retired(coach,fn):()=>{},
+  // 이 기기의 판 기록(4-4b — 단계4_계획 §21-6 가): 입구가 연 코치(홈 · 짧은 연습)의 저장소 이름으로 연다. 입구를 받기 전이거나 닫았으면 null(그 판을 세지 못할 뿐이다).
+  planLog:coach=>made&&!disposed?made.planLog?.(coach)??null:null,
+  // 30일째 문장의 돌아보기 읽기(4-4c 둘째 묶음 — 단계4_계획 §21-22): 입구가 연 코치의 판으로 묻는 줄. 입구를 받기 전이거나 닫았으면 null(문장 없이 그린다).
+  lookbackOf:coach=>made&&!disposed?made.lookbackOf?.(coach)??null:null,
+  firstAnswersOf:coach=>made&&!disposed?made.firstAnswersOf?.(coach)??null:null,
+  // 판 응답 읽기(4-5 — 단계4_계획 §22-5): 입구가 연 코치의 판이 올리는 길이면 서버를 읽어 코치에 넘기고 코치의 목록을 준다. 입구를 받기 전이거나 닫았으면 null.
+  readResponses:async coach=>made&&!disposed?(await made.readResponses?.(coach))??null:null,
+  // 연습 기록 비우기(4-5 — 단계4_계획 §22-4): 입구의 clearPractice(한 번 더 묻기는 「나」 칸이 한다). 닫았으면 null.
+  async clearPractice(options){if(disposed)return null;const entry=await load();return disposed?null:entry.clearPractice(options);},
+  async guestMove(input){if(disposed)return null;const entry=await load();return disposed?null:entry.guestMove(input);},
+  async noteLogout(){return made&&!disposed?made.noteLogout():false;},
+  // 이 문서에서 학습 기록 설정(동의)을 바꾼 뒤 — 입구가 판을 다시 정한다(넘친 #18).
+  redecide(reason){if(made&&!disposed)made.redecide(reason);},
+  // 계기 — 입구를 받기 전(못 받았을 때 포함)에는 모은 계기를 입구의 health()와 같은 꼴(early)로 준다.
+  health:()=>made?.health()??{early:early.map(([kind,outcome])=>({kind,...outcome}))},
+  dispose(){disposed=true;reopeners.clear();made?.dispose();}};
+}
 // 10-19 결정 「WORLD 손님」(공개판 설계 §2): 손님(로그인 전)에게 한글 만나기를 연다 — 진도는 그 기기에 남는다.
 // 바람길·말의 리듬은 한 판씩 체험으로 연다(guest-trial.mjs, 기록·코인은 로그인 뒤). 체험을 마친 게임은 로그인부터 열고, 추천도 같은 목록을 쓴다.
 const GUEST_GAMES=new Set(['hangul']);
@@ -380,19 +434,38 @@ function lifeProgressFor({owner,port,guard,fallback}){
  const status=progress.status;return Object.freeze({...progress,status:()=>({...status(),message:'계정 진도를 불러오지 못해 이 기기의 기록으로 이어 가요.'})});
 }
 // 배우기 화면(생활 화면 → 학습 화면 → 알림)을 세운다. keep으로 붙인 조각은 생활 세션이 그 기록과 함께 만든 반대 순서로 버린다(home 연결도 그때 끊는다).
-function mountLifeLearning({owner,keep}){
+function mountLifeLearning({owner,progress,keep}){
  let education=null,reminders=null;
+ // Atlas 새 길(기능 atlasNext — 4-2 생활, 단계4_계획 §19-1 ① · ⑤): 입구를 생활 화면보다 먼저 세운다. 문서 시작 때 생활 코치를 열어(M7 — 홈의 첫 그림을
+ // 막지 않는다) 진도에 「돌아온 복습」 판정을 넣고(world-life-next watchLifeDue — 홈 칩 · 튜터 · 홈 후보 · 알림이 같은 목록을 읽는다), 생활 화면은 옛 거울 대신
+ // 새 판 겉으로 적는다(learning.next). 꺼진 판은 입구 · 엔진을 받지 않는다(지금 판 그대로).
+ const atlasNext=atlasNextOn&&(owner!=='guest'||atlasNextGuestOn)?keep('atlasNext',lazyAtlasNext(owner)):null;
+ const lifeDue=atlasNext&&progress&&typeof worldLearning.life.watchLifeDue==='function'?keep('lifeDue',worldLearning.life.watchLifeDue({open:()=>atlasNext.lifeCoach(),retired:(coach,fn)=>atlasNext.retired(coach,fn),reopened:fn=>atlasNext.reopened(fn),progress,lessons:LESSONS,note:(kind,outcome)=>atlasNext.note(kind,outcome)})):null;
+ const lifeNext=lifeDue?{coach:()=>lifeDue.coach(),retired:(coach,fn)=>atlasNext.retired(coach,fn),note:(kind,outcome)=>atlasNext.note(kind,outcome),nextAt:id=>lifeDue.nextAt(id),state:()=>lifeDue.state()}:null;
+ // 새 길 홈(4-3 — 단계4_계획 §20-4): 생활 판정이 있을 때만. 홈은 생활 판정의 판을 따르고(ask — 단추를 누를 때 지금 판이면 다시 묻는다), 홈 코치 ·
+ // 플래너는 입구가 준다. 「내 성향」 답과 손님이 열 수 있는 게임은 지금 판의 createPlan과 같은 값이다. 꺼진 판은 null(지금 판 그대로).
+ const homeNext=lifeDue?{coach:pool=>atlasNext.homeCoach(pool),planner:()=>atlasNext.homePlanner(),retired:(coach,fn)=>atlasNext.retired(coach,fn),planLog:coach=>atlasNext.planLog(coach),lookback:coach=>atlasNext.lookbackOf(coach),firstAnswers:coach=>atlasNext.firstAnswersOf(coach),note:(kind,outcome)=>atlasNext.note(kind,outcome),life:()=>lifeDue.state(),ask:()=>lifeDue.coach(),
+  judge:(snapshot,now)=>lifeDue.judge(snapshot,now),answers:()=>life.answers,openGames:()=>operating&&!client.snapshot?guestGames():null,
+  // 줄이 없는 날(다 한 날 · 상한 날)의 「다음 연습」은 생활 팩으로 · 홈 계획을 새로 그린 뒤 보고 있는 허브 포스터를 맞춘다(§20-8).
+  packs:()=>life.ui?.packs?.(),painted:()=>life.ui?.syncToday?.()}:null;
  const ui=keep('ui',createLifeExperience({home,getProgress:()=>life.progress,asset:path=>worldUrl('brand-opening/assets/'+path),show:(title,html,options)=>show(title,html,options.type,{eyebrow:options.eyebrow,nav:options.nav}),onSummary:()=>{education?.refresh();queueMicrotask(repaintWritingRow);},onNext:()=>education?.next(),presentation:()=>education?.presentation(),
   // TOPIK II를 목표로 저장한 학생(이번 주 계획이 TOPIK II)은 쓰기 연습 줄이 생활 팩 위에 온다(10-22 — 첫 연락 메일·신청 페이지가 약속하는 무료 연습). 그 밖에는 아래 줄 그대로.
   leadRows:print=>education?.examType?.()==='topik2'?writingRow(print):'',
   moreRows:print=>[education?.planRow?.(print),education?.examType?.()==='topik2'?'':writingRow(print),speakingModule?.speakingRow?.(print),reminders?.askMarkup()].filter(Boolean).join(''),positionTotal:()=>education?.positionTotal?.(),
+  // 새 길 홈의 세 줄(4-3 — 단계4_계획 §20-8): 허브 「지금 할 일」 포스터가 홈의 단추가 지금 열 줄을 따른다. 지금 판이면 null(지금 규칙 그대로).
+  today:()=>education?.today?.()??null,
   // 배움의 거울(Atlas × WORLD D, 11-08 — life-trail.mjs): 생활 화면이 먼저 서므로 학습 호스트는 늦게 읽는다.
-  learning:{coach:()=>education?.lifeLearning?.coach()??null,prepare:()=>education?.lifeLearning?.prepare(),life:worldLearning.life}}));
+  learning:{coach:()=>education?.lifeLearning?.coach()??null,prepare:()=>education?.lifeLearning?.prepare(),life:worldLearning.life,...(lifeNext?{next:lifeNext}:{})}}));
  // 공개판(계정 모드)의 손님은 GUEST_GAMES와 체험이 남은 게임만 바로 열고 나머지는 로그인부터 연다(launchGame). 추천도 같은 목록을 써야 로그인 창을 맴돌지 않는다.
  // 「내 성향」 답(life.answers)은 이 주인의 것이 늦게 와도 그때부터 쓴다.
- const createPlan=options=>createWorldLearningPlan({...options,answers:life.answers,openGames:operating&&!client.snapshot?guestGames():null});
+ // 새 길이면 생활 복습 후보도 진도에 넣은 판정(lifeDue)에서 고른다(§19-1 ⑤ M8 — 확인 중이면 복습 후보 없음).
+ const createPlan=options=>createWorldLearningPlan({...options,answers:life.answers,openGames:operating&&!client.snapshot?guestGames():null,...(lifeDue?{due:lifeDue.judge(options.progress,Number.isFinite(+options.now)?+options.now:Date.now())}:{})});
  // 내 위치(10-19 결정): 짧은 진단 듣기 문항의 녹음은 게임 폴더(korean-runner·korean-rhythm)에서 부른다.
  education=keep('education',createWorldEducation({home,getProgress:()=>life.progress,engine:worldLearning,createPlan,target:window,position:worldPosition,audioUrl:worldUrl,responses:responsesOn,
+  atlasNext,
+  homeNext,
+  // 홈을 다시 그릴 때마다 — 시험 점검 카드의 판정이 바뀌었으면 열린 카드에 시험 형식 단추를 더한다(4-4d §21-23의 5).
+  mockChanged:()=>reminders?.examChanged?.(),
   launchGame,startLesson:id=>ui.start(id),startReview:(id,ids)=>ui.reviewStart(id,ids),
   // 시험 계획(10-20): 온라인 반 「이번 주 과제」를 그 주의 연습으로 먼저 세고, TOPIK II 쓰기 연습은 문항이 열렸을 때만 계획에 넣는다.
   readClasswork:classworkThisWeek,writingPractice:{candidates:()=>writingReady()?WRITING_CANDIDATES:[],open:route=>openWriting({dataset:{writingRoute:route}}),attempts:()=>readWritingSummary({storage:localStorage,owner:writingOwnerId()}).times},
@@ -417,7 +490,12 @@ function mountLifeLearning({owner,keep}){
  keep('trail',createTrailTimes({host:()=>window.SYNKLearningHost||null,
   make:source=>source?source.createGame({gameId:'world-reminders'},worldLearning.engine.createGame,worldLearning.createLearningSync)
    :owner==='guest'?worldLearning.engine.createGame({gameId:'world-reminders',storage:localStorage,followups:true}):null}));
- reminders=keep('reminders',createWorldReminders({owner,storage:localStorage,target:window,read:reminderInputs,open:openReminder,canMock:()=>typeof education?.mock==='function',
+ reminders=keep('reminders',createWorldReminders({owner,storage:localStorage,target:window,read:reminderInputs,open:openReminder,
+  // 시험 점검 카드: 이름은 옛 뜻을 지키고 새 뜻에는 새 이름을 붙인다(③ 공개 직후 캐시에 남은 옛 알림 모듈과 섞일 때를 막는다).
+  // canMock은 옛 뜻(시험 형식 입구가 있는 화면인가 — 옛 알림 모듈이 주 단추 글을 이것으로 고른다), mockNow는 새 뜻(4-4d §21-23의 5 — 셸이 낸 판정,
+  // 새 길이면 홈 코치로 지금 열 수 있는가). mockNow를 넘기는 셸만 두 단추(exam-mock · exam-check)를 안다. 판정이 바뀌면 열린 카드에 단추를 더한다(panel).
+  canMock:()=>typeof education?.mock==='function',
+  mockNow:()=>typeof education?.mockReady==='function'?education.mockReady()===true:typeof education?.mock==='function',panel:()=>home.openPanel?.()??null,
   show:(title,html)=>show(title,html,'world-reminder'),toast:message=>home.toast(message),repaint:repaintReminderCard,push:owner==='guest'?null:worldPush,pushFeature:pushOn,close}),value=>{value.dispose();home.connectReminders?.(null);});
  home.connectReminders?.(reminders);window.__synkReminders=reminders;reminders.schedule();
  window.__synkLife=ui;
@@ -426,8 +504,11 @@ function mountLifeLearning({owner,keep}){
 function reminderInputs(){
  const progress=life.progress;if(!progress)return null;
  const snapshot=progress.exportSnapshot(),examPlan=life.education?.metrics?.().plan?.examPlan||null,exam=examPlan?.exam||null;
- const reviews=Object.values(snapshot.reviews||{}).map(review=>review?.dueAt).filter(Number.isFinite);
- return {reviews,exam,examPlan,studyTimes:studyTimes(snapshot),hangulStage:snapshot.hangul?.answer==='new',hasReturn:reviews.length>0||typeof exam?.date==='string'&&exam.date.length===10};
+ // 새 길(4-2 — §19-1 ⑤): 진도에 넣은 「돌아온 복습」 판정의 때들(돌아온 것 · 앞으로 열릴 것). 확인 중이면 복습 알림을 잡지 않는다 — 엔진이 되면 진도가 다시 부른다.
+ // 판정이 없으면 지금 판 그대로(진도의 dueAt). 「돌아올 것이 있는가」는 두 판 모두 복습 기록이 있는가다.
+ const judged=life.lifeDue?.judge(snapshot,Date.now())??null,records=Object.values(snapshot.reviews||{});
+ const reviews=judged?(judged.state==='engine'?[...judged.times]:[]):records.map(review=>review?.dueAt).filter(Number.isFinite);
+ return {reviews,exam,examPlan,studyTimes:studyTimes(snapshot),hangulStage:snapshot.hangul?.answer==='new',hasReturn:(judged?records.length>0:reviews.length>0)||typeof exam?.date==='string'&&exam.date.length===10};
 }
 // 공부한 시각(「그날 이미 공부했는지」와 공부하던 시간대): 학습 기록(Trail)의 답 · 생활 레슨·복습의 답 · 쓰기 점검.
 // 학습 기록은 읽기 전용 코치로 읽는다(쓰지 않는다 — world-reminder-device.mjs createTrailTimes, 게임 판이 닫혀 코치가 끊기면 다시 만든다).
@@ -444,11 +525,15 @@ function studyTimes(snapshot){
  return times;
 }
 // 알림을 누르면 그 알림이 가리키는 자리로: 돌아온 복습은 나의 복습 화면, 이번 주 연습은 이번 주 계획, 시험 점검 카드의 주 단추는
-// 시험 형식 연습(미니 모의, ④ education.mock — 열 수 없으면 그쪽이 알리고 내 위치로 간다), 그 입구가 없는 화면이면 짧은 진단.
+// 시험 형식 연습(미니 모의, ④ education.mock — 열 수 없으면 그쪽이 알리고 내 위치로 간다), 짧은 진단 단추(exam-check)는 짧은 진단. 두 단추는 그린 때 고른
+// 대상을 그대로 연다 — 누른 때 「education.mock이 있는가」로 다시 고르지 않는다(4-4d §21-23의 5 · 설계 다시 검수 A1 · A2). 옛 이름 exam-start는 옛 뜻
+// 그대로 남긴다 — ③ 공개 직후 캐시에 남은 옛 알림 모듈이 그린 주 단추이고, 누른 때 고른다.
 // (추천 「다음 연습」으로 바로 보내면 목표를 아직 정하지 않은 학생에게 목표 창이 먼저 떠서, 알림이 말한 자리와 달라진다.)
 function openReminder(kind){
  const run=task=>void Promise.resolve().then(task).catch(e=>home.toast(errorText(e)));
  if(kind==='plan')return run(()=>life.education?.plan?.());
+ if(kind==='exam-mock')return run(()=>life.education?.mock?.());
+ if(kind==='exam-check')return run(()=>life.education?.position?.({start:true}));
  if(kind==='exam-start')return run(()=>{const education=life.education;return typeof education?.mock==='function'?education.mock():education?.position?.({start:true});});
  return run(()=>openLife('review'));
 }
@@ -690,26 +775,164 @@ function responsesSection(){
  const item=(row,index)=>{const [kind,value]=name(row);return `<li${index>=RESPONSE_PAGE?' data-response-later hidden':''}><span>${escape(kind)} · ${escape(value)}</span><button class="quiet-button" type="button" data-response-remove="${escape(row.id)}" aria-label="${escape(t('response.removeLabel',{kind,value}))}">${escape(t('response.remove'))}</button></li>`;};
  return `<section class="ws-responses" data-world-responses data-label="RESPONSES" aria-labelledby="ws-responses-title"><h3 id="ws-responses-title" tabindex="-1">${escape(t('response.mine'))}</h3><p class="ws-responses-note">${escape(t('response.note30'))}</p><ul>${rows.map(item).join('')}</ul>${rows.length>RESPONSE_PAGE?`<button class="quiet-button ws-responses-more" type="button" data-responses-more>${escape(t('life.more'))}</button>`:''}<p class="ws-responses-note">${escape(t(local?'response.removeNoteDevice':'response.removeNote'))}</p></section>`;
 }
+// 「더 보기」를 펼쳤는가 — 학생이 누른 때만 참이다. 단추가 처음부터 없던 짧은 목록을 펼친 것으로 보면, 서버 읽기 뒤 길어진 목록이 처음부터
+// 다 펼쳐지고 「더 보기」가 사라졌다(4-5 끝 판 GB6 · B1). 칸을 다시 그리면 새 칸에 이어 둔다.
+const responsesOpened=box=>box?.dataset.responsesOpen==='1';
+function openResponses(box){for(const row of box.querySelectorAll('[data-response-later]'))row.hidden=false;box.querySelector('[data-responses-more]')?.remove();box.dataset.responsesOpen='1';}
 function mountResponses(){
  const box=$('#panel-content [data-world-responses]');if(!box)return;
  box.addEventListener('click',event=>{
   const more=event.target.closest?.('[data-responses-more]');
-  if(more){for(const row of box.querySelectorAll('[data-response-later]'))row.hidden=false;more.remove();box.querySelector('[data-response-later] button')?.focus?.();return;}
+  if(more){openResponses(box);box.querySelector('[data-response-later] button')?.focus?.();return;}
   const button=event.target.closest?.('[data-response-remove]');if(!button)return;
   const rows=[...box.querySelectorAll('[data-response-remove]')],index=rows.indexOf(button);
   let removed=false;try{removed=life.education?.removeResponse?.(button.dataset.responseRemove)===true;}catch{removed=false;}
   home.toast(t(removed?'response.removed':'response.removeFailed'));
   // 목록을 다시 그리고 초점을 같은 자리(없으면 제목)로 옮긴다. 펼친 「더 보기」는 펼친 채로 둔다.
-  const open=!box.querySelector('[data-responses-more]'),html=responsesSection();
+  const open=responsesOpened(box),html=responsesSection();
   // 마지막 응답을 뺐으면 카드가 사라지므로 초점을 바로 위 학습 기록 연결(없으면 시트의 첫 단추)로 옮긴다.
   if(!html){const near=$('#panel-content [data-world-learning]')||$('#panel-content .world-actions button');box.remove();near?.focus?.({preventScroll:true});return;}
   box.outerHTML=html;mountResponses();
   const next=$('#panel-content [data-world-responses]');if(!next)return;
-  if(open){for(const row of next.querySelectorAll('[data-response-later]'))row.hidden=false;next.querySelector('[data-responses-more]')?.remove();}
+  if(open)openResponses(next);
   const buttons=next.querySelectorAll('[data-response-remove]');(buttons[Math.min(index,buttons.length-1)]||next.querySelector('h3'))?.focus?.();
  });
 }
-function profile(){if(!client.snapshot)return signIn();const tutorId=home.tutor?.()?.tutor,tutorName=TUTOR_NAMES[tutorId]?t(`tutor.name.${tutorId}`):null;show(t('account.meTitle'),`<div class="ws-me"><div class="ws-me-id"><span class="ws-me-portrait"><img src="${profilePortrait()}" alt=""></span><div><p class="ws-me-name">${tutorName?t('account.learningWith',{name:tutorName}):t('account.learningTogether')}</p><p class="ws-me-sub">${t('account.savedTo',{where:t(operating?'account.whereId':'account.whereTest')})}</p></div></div>${notice('SAVE',client.pending?'check':'ok',t(client.pending?'account.savePending':'account.saveOk'),t('account.revision',{revision:escape(client.snapshot.revision),kind:t(operating?'account.kindId':'account.kindTest')}))}${operating?`<section class="world-notice" data-tone="info" data-label="LEARNING"><strong>${t('account.learningRecords')}</strong>${account.preferences()?`<label><input type="checkbox" data-world-learning data-revision="${account.preferences().revision}" ${account.preferences().enabled?'checked':''}> ${t('account.learningSave')}</label><span>${t('account.learningNote')}</span>`:`<span>${t('account.learningElsewhere')}</span>`}<a class="felt-button" href="https://synk.im/account/client.html?product=world">${t('account.classSettings')} <span aria-hidden="true">→</span></a></section>`:''}${responsesSection()}<div id="world-classroom-lessons"></div><div id="world-classroom-homework"></div><div id="world-classroom-entry"></div><div class="world-actions"><button class="felt-button" data-world="wardrobe">${t('wardrobe.open')}</button><button class="quiet-button" data-world="logout">${t('account.logout')}</button></div></div>`,'world-profile');mountResponses();if(home.isMaru){const actions=$('#panel-content .ws-me>.world-actions');if(actions)actions.before(hanger);else $('#panel-content').append(hanger);renderHomeHanger(client.snapshot);}if(operating){const generation=client.generation,owner=client.snapshot.accountId,guard=()=>{account.assertActive();if(generation!==client.generation||client.snapshot?.accountId!==owner)throw Object.assign(Error('ACCOUNT_CHANGED'),{code:'ACCOUNT_CHANGED'});};
+// 새 길의 판 응답(4-5 — 단계4_계획 §22-5): 「내 계정」을 열면 서버의 판 응답을 다시 읽고(학습 화면 readResponses), 목록이 바뀌었으면 그 칸만 다시
+// 그린다. 초점은 옮기지 않고, 펼친 「더 보기」는 펼친 채로 둔다. 그 사이 시트를 닫았거나 다른 시트로 바뀌었으면 그리지 않는다.
+function refreshResponses(){
+ const education=life.education;if(typeof education?.readResponses!=='function')return;
+ const sheet=$('#panel-content .ws-me');
+ void education.readResponses().then(changed=>{
+  if(!changed||!sheet||!sheet.isConnected)return;
+  const box=$('#panel-content [data-world-responses]'),html=responsesSection();
+  if(box){
+   // 초점이 칸 안에 있었으면 다시 그린 뒤 같은 응답의 단추로, 그 응답이 사라졌거나 접힌 줄이면 칸 제목으로 돌려준다(4-5 끝 판 GB7).
+   const open=responsesOpened(box),focused=box.contains(document.activeElement)?document.activeElement:null,keep=focused?.dataset?.responseRemove??null;
+   if(!html){box.remove();if(focused)($('#panel-content [data-world-learning]')||$('#panel-content .world-actions button'))?.focus?.({preventScroll:true});return;}
+   box.outerHTML=html;mountResponses();
+   const next=$('#panel-content [data-world-responses]');
+   if(open&&next)openResponses(next);
+   if(focused&&next)([...next.querySelectorAll('[data-response-remove]')].find(button=>button.dataset.responseRemove===keep&&!button.closest('[hidden]'))||next.querySelector('h3'))?.focus?.({preventScroll:true});
+   return;
+  }
+  const anchor=$('#panel-content [data-world-me]')||$('#panel-content #world-classroom-lessons');if(!html||!anchor)return;
+  anchor.insertAdjacentHTML('beforebegin',html);mountResponses();
+ },()=>{});
+}
+// 「나」 칸(4-5 — 단계4_계획 §22-6): 「내가 남긴 응답」 뒤에 붙는다. 새 길 홈 코치가 엔진 판일 때만 선다(학습 화면 me() — 아니면 null). 흔들리는 말 ·
+// 또렷한 말 · 내가 안다고 한 말과 그 수, 줄마다 단추 하나(흔들리는 말은 「이미 알아요」, 나머지는 「다시 배울래요」), 끝에 「연습 기록 비우기」. 지금 판의
+// 글 꼴과 단추 꼴(응답 목록과 같은 칸)을 그대로 쓰고 새 디자인은 하지 않는다 — 화면은 리디자인에서 다시 짓는다. 글은 한국어 화면에서만 있다(meText —
+// 영어 · 몽골어는 켜기 전 4-8의 현지어 절차 뒤). 계정 화면이 이 계정 것이 아니면 그리지 않는다. 목록마다 처음 다섯 줄만 보이고 나머지는 「더 보기」로 편다.
+const ME_PAGE=5;
+// 「다시 배울래요」 뒤의 되돌리기(설계 주인 I) — { unit, eventId, label, state, at }. 같은 자리(그 목록의 맨 위)에 두고, 그 단위에 다시 답했거나(마지막 자리가
+// 그 뒤) 시트를 다시 열면 지운다.
+let meUndo=null;
+function meNow(){const education=life.education;if(typeof education?.me!=='function'||education.metrics?.().owner!==client.snapshot?.accountId||meText('me.title')==null)return null;try{return education.me();}catch{return null;}}
+function meSection(fresh=false){
+ if(fresh)meUndo=null; // 시트를 새로 열었다 — 앞 시트의 되돌리기는 두지 않는다
+ const me=meNow();if(!me)return '';
+ const all=[...me.shaky,...me.clear,...me.said];
+ if(meUndo&&all.some(row=>row.unit===meUndo.unit&&Number.isFinite(row.lastAt)&&row.lastAt>meUndo.at))meUndo=null;
+ const button=(kind,row)=>`<button class="quiet-button" type="button" data-me-tell="${kind}" data-me-unit="${escape(row.unit)}" aria-label="${escape(meText(`me.${kind}Label`,{label:row.label}))}">${escape(meText(`me.${kind}`))}</button>`;
+ const undo=()=>`<li><span>${escape(meUndo.label)}</span><button class="quiet-button" type="button" data-me-undo="${escape(meUndo.eventId)}" aria-label="${escape(meText('me.undoLabel',{label:meUndo.label}))}">${escape(meText('me.undo'))}</button></li>`;
+ // 제목의 수는 보이는 줄(되돌리기 줄 포함), 「더 보기」는 되돌리기로 가린 단위를 뺀 줄로 센다 — 걸러내기 전 수를 쓰면 0개 제목이나 빈 「더 보기」가 섰다(4-5 끝 판 B2).
+ const list=(state,kind)=>{
+  const shown=me[state].filter(row=>row.unit!==meUndo?.unit);
+  const rows=shown.map((row,index)=>`<li${index>=ME_PAGE?' data-me-later hidden':''}><span>${escape(row.label)}</span>${button(kind,row)}</li>`);
+  if(meUndo?.state===state)rows.unshift(undo());
+  if(!rows.length)return '';
+  return `<h4>${escape(meText(`me.${state}`,{n:rows.length}))}</h4><ul data-me-list="${state}">${rows.join('')}</ul>${shown.length>ME_PAGE?`<button class="quiet-button ws-responses-more" type="button" data-me-more="${state}">${escape(t('life.more'))}</button>`:''}`;
+ };
+ return `<section class="ws-responses" data-world-me data-label="ME" aria-labelledby="ws-me-title"><h3 id="ws-me-title" tabindex="-1">${escape(meText('me.title'))}</h3><p class="ws-responses-note">${escape(meText(all.length||meUndo?'me.note':'me.empty'))}</p>${list('shaky','known')}${list('clear','relearn')}${list('said','relearn')}<button class="quiet-button" type="button" data-me-clear>${escape(meText('me.clearButton'))}</button></section>`;
+}
+// 칸만 다시 그린다 — 초점은 focus(고른 단추)나 제목으로 옮긴다. 칸이 더 서지 않으면(엔진 판이 아님) 칸을 걷는다.
+function redrawMe(focus=null){
+ const box=$('#panel-content [data-world-me]');if(!box)return;
+ const html=meSection();if(!html){box.remove();return;}
+ box.outerHTML=html;mountMe();
+ const next=$('#panel-content [data-world-me]');
+ ((focus&&next?.querySelector(focus))||next?.querySelector('h3'))?.focus?.({preventScroll:true});
+}
+// 「나」 칸은 새 길 홈 코치가 엔진 판일 때만 선다 — 확인 중에 시트를 열었으면 코치가 선 뒤 제자리(응답 칸 뒤 · 반 수업 앞)에 넣는다. 초점은
+// 옮기지 않는다. 그사이 시트를 닫았거나 바꿨으면 넣지 않는다(4-5 끝 판 GB5).
+function waitMe(){
+ const education=life.education,view=$('#panel-content .ws-me');
+ if(typeof education?.meReady!=='function'||!view||$('#panel-content [data-world-me]'))return;
+ void education.meReady().then(ready=>{
+  if(!ready||!sheetOpen(view)||$('#panel-content [data-world-me]'))return;
+  const html=meSection(),anchor=$('#panel-content #world-classroom-lessons');if(!html||!anchor)return;
+  anchor.insertAdjacentHTML('beforebegin',html);mountMe();
+ },()=>{});
+}
+function mountMe(){
+ const box=$('#panel-content [data-world-me]');if(!box)return;
+ box.addEventListener('click',event=>{
+  const more=event.target.closest?.('[data-me-more]');
+  if(more){for(const row of box.querySelectorAll(`[data-me-list="${more.dataset.meMore}"] [data-me-later]`))row.hidden=false;more.remove();return;}
+  const tell=event.target.closest?.('[data-me-tell]');
+  if(tell){
+   const kind=tell.dataset.meTell,unit=tell.dataset.meUnit,me=meNow();
+   const state=me?['shaky','clear','said'].find(name=>me[name].some(row=>row.unit===unit)):null,row=state?me[state].find(item=>item.unit===unit):null;
+   let id=null;try{id=life.education?.tellMe?.(unit,kind)??null;}catch{id=null;}
+   if(!id){home.toast(meText('me.toldFailed'));return;}
+   if(kind==='relearn'&&row)meUndo={unit,eventId:id,label:row.label,state,at:Date.now()};
+   redrawMe(kind==='relearn'?'[data-me-undo]':null);return;
+  }
+  const undo=event.target.closest?.('[data-me-undo]');
+  // 되돌리기는 저장이 끝난 뒤에 칸을 다시 그린다 — 뺀 효과가 요약에 서는 때다. 저장되지 않으면 되돌리기를 남긴 채 알린다(4-5 끝 판 GB4).
+  if(undo){
+   if(undo.disabled)return;undo.disabled=true;const id=undo.dataset.meUndo;
+   void Promise.resolve().then(()=>life.education?.undoMe?.(id)).then(done=>done===true,()=>false).then(done=>{
+    if(!box.isConnected)return;
+    if(!done){undo.disabled=false;home.toast(meText('me.toldFailed'));return;}
+    if(meUndo?.eventId===id)meUndo=null;redrawMe();
+   });
+   return;
+  }
+  if(event.target.closest?.('[data-me-clear]'))void clearPracticeNow();
+ });
+}
+// 연습 기록 비우기(§22-4 셸): 정해진 글로 한 번 더 묻고, 확인하면 입구의 clearPractice를 부른다. 결과를 알린 뒤 계정 설정 스냅샷을 새로 받아 「내 계정」
+// 시트 전체를 다시 그린다(22-4의 5 — 동의 체크박스의 판 번호와 응답 목록). 아무것도 비우지 못했으면 「지금은 비우지 못했어요」 쪽으로 알린다.
+// 비우는 사이 단추를 다시 누르면 묻지 않는다 — 두 번째 확인이 첫 비우기가 연 새 판을 또 비웠다(4-5 끝 판 B3).
+let clearingPractice=false;
+async function clearPracticeNow(){
+ if(clearingPractice)return;
+ const view=$('#panel-content .ws-me');
+ if(!window.confirm(meText('me.clearAsk')))return;
+ clearingPractice=true;const button=view?.querySelector('[data-me-clear]');if(button)button.disabled=true;
+ try{
+ // 다시 묻고 다시 부르는 것은 처음 누른 로그인의 학습 화면에만 한다 — 기다리는 사이 계정이 바뀌었으면 묻지 않고 멈춘다(4-5 코드 다시 검수 -c GA1).
+ const education=life.education,owner=client.snapshot?.accountId||'guest',same=()=>life.education===education&&(client.snapshot?.accountId||'guest')===owner;
+ let result=null;try{result=await education?.clearPractice?.();}catch{result=null;}
+ // 서버가 받지 않아 지금 보낼 수 없는 기록이 있으면 그 수를 알리고 한 번 더 묻는다 — 비우면 그 기록도 지워진다(4-5 대체 설계 검토 F4). 그사이 수가
+ // 늘었으면 새 수로 다시 묻는다(GA4).
+ for(let asks=0;asks<3&&result?.code==='UNSENT_SKIPPED'&&Number.isSafeInteger(result.skipped)&&result.skipped>0;asks+=1){
+  if(!same()||!window.confirm(meText('me.clearSkippedAsk',{n:result.skipped}))||!same())return;
+  try{result=await education.clearPractice({allowSkipped:result.skipped});}catch{result=null;}
+ }
+ home.toast(meText(result?.ok?(result.partial?'me.clearPartial':'me.clearDone'):result?.code==='UNSENT'?'me.clearUnsent':'me.clearFailed'));
+ // 결과와 상관없이 계정 설정 스냅샷을 새로 받아 그린다 — 결과를 모르는 실패도 서버에서는 비워졌을 수 있다(동의 체크박스의 판 번호 — §22-4 · 4-5 대체 설계 검토 F8).
+ if(operating)try{await account.restore();}catch{/* 앞 스냅샷으로 다시 그린다 */}
+ // 누른 시트가 아직 열려 있을 때만 그린다 — 닫는 중(닫기 전환)이거나 다른 시트로 바꿨으면 다시 열지 않는다. 쓰던 반 과제 원고가 있으면 시트
+ // 전체를 다시 그리지 않고 동의 판 번호 · 응답 · 「나」 칸만 고친다 — 다시 그리면 원고를 버렸다(4-5 끝 판 GB1).
+ if(!sheetOpen(view))return;
+ if(sheet?.hasDraft?.()){redrawMeParts();return;}
+ profile();
+ }finally{clearingPractice=false;if(button?.isConnected)button.disabled=false;}
+}
+// 「내 계정」 시트가 그대로 열려 있는가(닫기 전환 중이면 시트가 아직 붙어 있어도 아니다).
+function sheetOpen(view){const kind=home.openPanel?.();return Boolean(view?.isConnected)&&(kind==null||kind==='world-profile');}
+// 시트를 다시 그리지 않고 비우기의 결과만 맞춘다 — 학습 기록 연결 칸의 판 번호와 켬, 「내가 남긴 응답」, 「나」 칸.
+function redrawMeParts(){
+ const box=$('#panel-content [data-world-learning]');
+ if(box){try{const value=account.preferences();box.dataset.revision=String(value.revision);box.checked=Boolean(value.enabled);}catch{/* 다음에 열 때 맞춘다 */}}
+ const responses=$('#panel-content [data-world-responses]'),html=responsesSection();
+ if(responses){if(html){const open=responsesOpened(responses);responses.outerHTML=html;mountResponses();const next=$('#panel-content [data-world-responses]');if(open&&next)openResponses(next);}else responses.remove();}
+ redrawMe();
+}
+function profile(){if(!client.snapshot)return signIn();const tutorId=home.tutor?.()?.tutor,tutorName=TUTOR_NAMES[tutorId]?t(`tutor.name.${tutorId}`):null;show(t('account.meTitle'),`<div class="ws-me"><div class="ws-me-id"><span class="ws-me-portrait"><img src="${profilePortrait()}" alt=""></span><div><p class="ws-me-name">${tutorName?t('account.learningWith',{name:tutorName}):t('account.learningTogether')}</p><p class="ws-me-sub">${t('account.savedTo',{where:t(operating?'account.whereId':'account.whereTest')})}</p></div></div>${notice('SAVE',client.pending?'check':'ok',t(client.pending?'account.savePending':'account.saveOk'),t('account.revision',{revision:escape(client.snapshot.revision),kind:t(operating?'account.kindId':'account.kindTest')}))}${operating?`<section class="world-notice" data-tone="info" data-label="LEARNING"><strong>${t('account.learningRecords')}</strong>${account.preferences()?`<label><input type="checkbox" data-world-learning data-revision="${account.preferences().revision}" ${account.preferences().enabled?'checked':''}> ${t('account.learningSave')}</label><span>${t('account.learningNote')}</span>`:`<span>${t('account.learningElsewhere')}</span>`}<a class="felt-button" href="https://synk.im/account/client.html?product=world">${t('account.classSettings')} <span aria-hidden="true">→</span></a></section>`:''}${responsesSection()}${meSection(true)}<div id="world-classroom-lessons"></div><div id="world-classroom-homework"></div><div id="world-classroom-entry"></div><div class="world-actions"><button class="felt-button" data-world="wardrobe">${t('wardrobe.open')}</button><button class="quiet-button" data-world="logout">${t('account.logout')}</button></div></div>`,'world-profile');mountResponses();refreshResponses();mountMe();waitMe();if(home.isMaru){const actions=$('#panel-content .ws-me>.world-actions');if(actions)actions.before(hanger);else $('#panel-content').append(hanger);renderHomeHanger(client.snapshot);}if(operating){const generation=client.generation,owner=client.snapshot.accountId,guard=()=>{account.assertActive();if(generation!==client.generation||client.snapshot?.accountId!==owner)throw Object.assign(Error('ACCOUNT_CHANGED'),{code:'ACCOUNT_CHANGED'});};
  void addMe2Row();
  // 「우리 반 수업」은 반 연결 바로 위: 연결하면 이 시트를 다시 그려 같은 자리에 수업이 이어진다. 시트가 열려 있는 동안만 30초마다 묻는다.
  // 우리 반 수업·과제·반 연결은 이 시트 하나의 자원이다(시트를 바꾸거나 닫으면 함께 버린다).
@@ -845,8 +1068,10 @@ function showGameConflict(id,session){
 // seoul: 서울행 내 길에서 여는 1화 — 튜터 고르기는 우리 동네에 들어갈 때 한다. 제목은 화면 언어로.
 async function launchGame(id,{seoul:fromSeoul=false}={}){
  if(id==='drama'&&dramaInvite.language&&operating&&!client.snapshot)return signInForDramaInvite();
+ // 게임 문을 치운다 — 패널이 닫히면 겉과 그 판을 닫는다(4-6c).
+ const closeDoor=door=>{if(!door)return;door.dispose();if(window.SYNKAtlasGame===door.api)delete window.SYNKAtlasGame;};
  const listed=games[id];if(!listed)return;const game=fromSeoul?{...listed,title:seoulText('dramaTitle')}:listed;
- const owner=client.snapshot?.accountId;let launchTicket=gameLaunch,session,trialHost=null,companion,dramaHost=null;
+ const owner=client.snapshot?.accountId;let launchTicket=gameLaunch,session,trialHost=null,companion,dramaHost=null,gameDoor=null;
  try{
  if(!fromSeoul&&!front?.free()&&home.ensureTutor&&!home.tutor()?.tutor)return await home.ensureTutor(()=>launchGame(id));
  // 손님의 한글 만나기는 계정 놀이 기록 없이 기기 진도로, 바람길·리듬은 체험이 남아 있으면 한 판 체험으로 연다(계정 호스트를 설치하지 않는다).
@@ -864,6 +1089,10 @@ async function launchGame(id,{seoul:fromSeoul=false}={}){
   if(ticket!==gameLaunch||!worldPanel.open||home.isMaru&&home.openPanel()!=='world-game-loading'||client.snapshot?.accountId!==accountId){session.dispose();return;}
   if(session.status().play.phase==='conflict'){showGameConflict(id,session);return;}
  }
+ // 새 엔진 게임 문(4-6c — 단계4_계획 §23-2): 새 길 입구가 있으면 틀보다 먼저 둔다. 틀의 게임이 셸 창의 게임 코치를 겉으로 받는다(입구가 판을 정한다).
+ // 기다리는 동안 패널을 닫거나 다른 화면을 열면 gameLaunch가 바뀐다. 패널은 기다리기 전에 열려 있던 길(계정의 「불러오는 중」)만 본다 — 손님 · 리허설은
+ // 패널 없이 연다(입구가 없을 때 · 404도 문 없이 옛 길로 연다, 설계 주인 11-23 조건 1 브라우저 측정).
+ if(life.atlasNext?.gameDoor){const doorTicket=gameLaunch,panelWas=worldPanel.open;gameDoor=await life.atlasNext.gameDoor(id).catch(()=>null);if(doorTicket!==gameLaunch||panelWas&&!worldPanel.open){gameDoor?.dispose();gameDoor=null;session?.dispose();return;}if(gameDoor)window.SYNKAtlasGame=gameDoor.api;}
  if(life.education?.applyPreferences()===false)throw Error('도움 방식을 저장하지 못했어요. 잠시 뒤 다시 저장해 주세요.');
  // 체험 판의 틀은 메모리 호스트를 받는다: 판이 끝나면 그 게임의 체험을 닫고 추천을 다시 고르며, 결과의 로그인 단추는 계정 연결을 연다.
  if(trial){trialHost=createGuestTrialPlayHost({game:id,onRound:()=>{guestTrials.finish(id);life.education?.refresh();},signIn:()=>setTimeout(()=>{if(client.snapshot)return;close();signIn(id);},0)});window.SYNKPlayHost=trialHost;}
@@ -873,9 +1102,9 @@ async function launchGame(id,{seoul:fromSeoul=false}={}){
  launchTicket=gameLaunch;
  companion=home.mountGameTutor?.(id,{frame:document.querySelector('.game-frame')});
  if(session)activeGameSession=session;
- home.attachPanelResource({dispose:()=>{companion?.dispose();dramaHost?.dispose();if(session){if(activeGameSession===session)activeGameSession=null;session.closeGame();}if(trialHost){if(window.SYNKPlayHost===trialHost)delete window.SYNKPlayHost;trialHost.stop();}queueMicrotask(()=>refreshLife());}});
+ home.attachPanelResource({dispose:()=>{closeDoor(gameDoor);companion?.dispose();dramaHost?.dispose();if(session){if(activeGameSession===session)activeGameSession=null;session.closeGame();}if(trialHost){if(window.SYNKPlayHost===trialHost)delete window.SYNKPlayHost;trialHost.stop();}queueMicrotask(()=>refreshLife());}});
  }catch(error){
-  companion?.dispose();dramaHost?.dispose();if(session){if(activeGameSession===session)activeGameSession=null;session.dispose();}
+  closeDoor(gameDoor);companion?.dispose();dramaHost?.dispose();if(session){if(activeGameSession===session)activeGameSession=null;session.dispose();}
   if(trialHost){if(window.SYNKPlayHost===trialHost)delete window.SYNKPlayHost;trialHost.stop();}
   if(launchTicket!==gameLaunch||client.snapshot?.accountId!==owner)return;
   show(t('account.gameCheck'),`${notice('PLAY','check',t('account.gameCheckNotice'),escape(errorText(error)))}<div class="world-actions"><button class="felt-button" data-world-game="${id}">${t('account.reconnect')}</button><button class="plain-button" data-world="profile">${t('account.checkMine')}</button></div>`,'world-game-error');
@@ -900,9 +1129,12 @@ const commands={
  refresh:async()=>{try{await client.refresh();home.toast(t('account.reconnected'));}catch(e){home.toast(errorText(e));}},
  // 학습 알림 단추(world-reminder-device.mjs): 앱 안 묻기·멈춤 뒤 묻기·시험 점검 카드. 「알려 주세요」는 누른 그 자리에서 OS 권한을 청한다.
  // 2단(앱을 닫아도 받기): 휴대폰 묻는 카드 · 동의 상자의 「동의하고 켜기」(누른 그 동작 안에서 world-push가 권한을 청한다) · 「괜찮아요」.
- ...Object.fromEntries(['reminder-yes','reminder-no','reminder-keep','reminder-stop','reminder-exam-start','reminder-exam-plan','reminder-push-ask','reminder-push-yes','reminder-push-no'].map(name=>[name,()=>life.reminders?.command(name)])),
+ ...Object.fromEntries(['reminder-yes','reminder-no','reminder-keep','reminder-stop','reminder-exam-start','reminder-exam-mock','reminder-exam-check','reminder-exam-plan','reminder-push-ask','reminder-push-yes','reminder-push-no'].map(name=>[name,()=>life.reminders?.command(name)])),
  // 로그아웃: 이 뒤에 생긴 손님 기록만 다음 로그인에 옮길지 묻는다(device-records.mjs — 앞 사람의 손님 기록이 다음 사람에게 가지 않게).
- logout:async()=>{if(dramaInvite.language)finishDramaInvite();accountActionPending=true;authBoundary++;entryGate?.invalidate();const leaving=client.snapshot?.accountId;try{try{await worldPush?.logout();}catch{/* 다음 열 때 상태가 다시 정리한다 */}await client.logout();const signedOutAt=Date.now();if(leaving)noteDeviceAccount(localStorage,leaving,signedOutAt);noteDeviceSignOut(localStorage,signedOutAt);sessionConfirmed=false;close();if(front?.active()){front.drop();entryDestinationHandled=false;void startOpening();}else if(home.isMaru)await entryGate.start();else welcome();}catch(e){if(e.code==='STALE_RESPONSE')return;home.toast(t('account.logoutFailed'));if(home.isMaru)showEntryRecovery();else welcome();}finally{accountActionPending=false;}},
+ logout:async()=>{if(dramaInvite.language)finishDramaInvite();accountActionPending=true;authBoundary++;entryGate?.invalidate();const leaving=client.snapshot?.accountId;try{try{await worldPush?.logout();}catch{/* 다음 열 때 상태가 다시 정리한다 */}
+   // Atlas 새 길의 로그아웃 표지(손님 저장소 — 되는 만큼만, 단계4_계획 §18-5-3): 이미 연 계정 코치가 있을 때만, 잠깐만 기다린다.
+   try{const leavingAtlas=life.owner===leaving?life.atlasNext:null;if(leavingAtlas){let timer;await Promise.race([leavingAtlas.noteLogout(),new Promise(resolve=>{timer=setTimeout(resolve,1500);})]).finally(()=>clearTimeout(timer));}}catch{/* 로그아웃을 막지 않는다 */}
+   await client.logout();const signedOutAt=Date.now();if(leaving){noteDeviceAccount(localStorage,leaving,signedOutAt);clearMonthAnswer(localStorage,leaving);}noteDeviceSignOut(localStorage,signedOutAt);sessionConfirmed=false;close();if(front?.active()){front.drop();entryDestinationHandled=false;void startOpening();}else if(home.isMaru)await entryGate.start();else welcome();}catch(e){if(e.code==='STALE_RESPONSE')return;home.toast(t('account.logoutFailed'));if(home.isMaru)showEntryRecovery();else welcome();}finally{accountActionPending=false;}},
 };
 commands.speaking=openSpeaking;
 commands.me2=openMe2;
@@ -922,7 +1154,14 @@ document.addEventListener('click',event=>{
   event.preventDefault();event.stopImmediatePropagation();(action==='quickplay'?play:action==='profile'?profile:action==='about'?about:action==='photo'?photo:action==='town'||nav==='town'?town:wardrobe)();
  }
 },true);
-document.addEventListener('change',event=>{const control=event.target;if(control.matches?.('[data-world-learning]')){control.disabled=true;const enabled=control.checked;void account.setLearning(enabled,Number(control.dataset.revision)).then(()=>{if(screen==='world-profile')profile();}).catch(error=>{control.checked=!enabled;home.toast(errorText(error));}).finally(()=>{control.disabled=false;});return;}if(!control.matches?.('[data-town-sharing]'))return;control.disabled=true;const enabled=control.checked,revision=Number(control.dataset.revision);void client.request('town/sharing',{method:'POST',body:{enabled,revision}}).then(()=>town()).catch(error=>{control.checked=!enabled;home.toast(errorText(error));}).finally(()=>{control.disabled=false;});});
+document.addEventListener('change',event=>{const control=event.target;if(control.matches?.('[data-world-learning]')){control.disabled=true;const enabled=control.checked,owner=client.snapshot?.accountId;void account.setLearning(enabled,Number(control.dataset.revision)).then(()=>{clearMonthAnswer(localStorage,owner);if(life.owner===(owner||'guest'))life.atlasNext?.redecide?.('account');if(screen==='world-profile')profile();}).catch(error=>{control.checked=!enabled;clearMonthAnswer(localStorage,owner);home.toast(errorText(error));if(life.owner===(owner||'guest'))life.atlasNext?.redecide?.('account');
+ // 학습일 답은 실패한 갈래에서도 지운다 — 서버의 동의 판은 바뀌었을 수 있다(세대 수만 오르고 해가 없다 — 4-4c 끝 판 F3). 지우는 열쇠는 누른 때의
+ // 계정 것이다 — 기다리는 사이 다른 계정으로 바뀌어도 그 계정의 학습일 답은 그대로 둔다.
+ // 서버는 바뀌었는데 뒤 확인만 실패했거나 · 다른 기기가 먼저 바꿨으면(REVISION_CONFLICT) 체크 · 판 번호가 서버와 어긋난 채 남아 다시 눌러도 계속 실패했다 —
+ // 계정을 한 번 다시 읽어 시트를 서버 값으로 다시 그린다(합친 끝 판 넘친 #12). 다시 읽기도 못 하면 되돌린 값 그대로. 다시 읽기가 끝날 때까지
+ // 토글은 잠근다 — 먼저 풀면 옛 체크 · 판 번호로 다시 눌러 또 실패했다(처리 다시 검수 A1). 계정 묶음에 refreshLearning이 없으면(공개 직후의
+ // 옛 묶음) 세션을 다시 확인하는 restore()로 읽는다 — 그대로 두면 다른 기기가 바꾼 판 번호로 같은 충돌이 되풀이됐다(검수 s3e2 GA2).
+ return Promise.resolve().then(()=>typeof account.refreshLearning==='function'?account.refreshLearning():account.restore?.()).then(()=>{if(screen==='world-profile')profile();},()=>{});}).finally(()=>{control.disabled=false;});return;}if(!control.matches?.('[data-town-sharing]'))return;control.disabled=true;const enabled=control.checked,revision=Number(control.dataset.revision);void client.request('town/sharing',{method:'POST',body:{enabled,revision}}).then(()=>town()).catch(error=>{control.checked=!enabled;home.toast(errorText(error));}).finally(()=>{control.disabled=false;});});
 // pagehide: 생활 세션을 닫고(그 뒤 계정 정리·늦은 준비가 생활 화면을 다시 세우지 않는다) 지금 시트의 자원을 버린 다음 계정을 멈춘다.
 window.addEventListener('pagehide',()=>{authBoundary++;worldPush?.flush();writing?.dispose();speaking?.dispose();life.close();releaseSheet();account?.stop();});
 window.addEventListener('online',()=>{if(client.snapshot)client.refresh().then(refreshTutorAccount).catch(()=>{});});
@@ -933,7 +1172,7 @@ document.addEventListener('visibilitychange',()=>{if(!document.hidden&&client.sn
 // A queued close event from sign-in must not clear a newly opened fitting room.
 const worldPanel=$('#world-panel')||$('#panel');
 worldPanel.addEventListener('close',()=>{if(!worldPanel.open){gameLaunch++;gameRecovery=null;screen='';hangerSignature='';renderHomeHanger(client.snapshot);releaseSheet();}});
-window.__synkWorld={client,screen:()=>screen,wardrobe:()=>wardrobeStudio?.metrics(),life:()=>life.ui?.metrics()};
+window.__synkWorld={client,screen:()=>screen,wardrobe:()=>wardrobeStudio?.metrics(),life:()=>life.ui?.metrics(),atlas:()=>life.atlasNext?.health?.()??null};
 home.connectHost?.({tutorFree:()=>!!front?.free(),road:()=>seoul.openRoad(),profile,wardrobe,play,town,about,photo,songs,launchGame,prepareTutor,selectTutor,selectLanguage,tutorStatus,hangulReading,setHangulReading,learn:()=>openLife('next'),packs:()=>openLife('packs'),stories:()=>openLife('stories'),review:()=>openLife('review'),cafe:()=>openLife('cafe'),pack:id=>openLife('pack',id),lesson:id=>openLife('start',id),replayOpening:()=>{close();return startOpening(true);}});
 // 공개판 설계 §2: 로그인할 때 이 기기의 손님 한글 기록(한글 만나기 진도·첫 실행 답)을 계정으로 옮길지 한 번 묻는다(device-records.mjs).
 // 계정 생활 진도와 학습 호스트가 준비된 뒤 입장 관문이 튜터 고르기 앞에서 연다. 다른 계정의 기록에는 쓰지 않는다.
@@ -956,7 +1195,7 @@ async function importDeviceLife(records){
  const status=progress.status();if(status.scoped&&status.phase!=='synced')throw Object.assign(Error('생활 진도가 아직 계정에 저장되지 않았어요.'),{code:'LIFE_NOT_SAVED',added});
  refreshLife();life.education?.refresh();return added;
 }
-const deviceRecords=createDeviceRecordsOffer({storage:localStorage,learningStatus:()=>window.SYNKLearningHost?.status?.()||null,accountOwner:()=>client.snapshot?.accountId||'guest',
+const deviceRecords=createDeviceRecordsOffer({storage:localStorage,learningStatus:()=>window.SYNKLearningHost?.status?.()||null,accountOwner:()=>client.snapshot?.accountId||'guest',accountGeneration:()=>client.generation,
  importLife:importDeviceLife,importLearning:operating?events=>account.importDeviceLearning(events):null,
  accountAnswer:()=>accountLife().hangulReading(),setAccountAnswer:async(answer,options)=>{const ui=accountLife();try{return await ui.setHangulReading(answer,options);}finally{refreshLife();}},
  present:({title,html,onClose})=>{show(title,html,'world-device-records');home.attachPanelResource({dispose:onClose});},close,toast:message=>home.toast(message),head:accountPrint(),text:deviceRecordsText});
@@ -966,13 +1205,17 @@ commands['device-records']=button=>{const line=document.querySelector('[data-dev
 seoul=createSeoulEntry({dramaPending:()=>dramaRequested||me2Requested,restored:initialRestoreReady,client:()=>client,life,home,worldUrl,launchGame,show,close,selectLanguage,tutorStatus,native:()=>operating&&account?.supportsSpeaking===false,frontOn:()=>!!front?.soon()});
 // 첫날 끝 · 맞춤 앞면(1차, 결정 11-19): 서울행을 끝낸 학생은 튜터 고르기 · 펠트 동네 대신 앞면을 홈으로 쓴다. 스위치(FRONT_AUTO)를 끄면 지금 길 그대로다.
 front=createFrontEntry({client:()=>client,life,home,worldUrl,launchGame,openLife:(...v)=>openLife(...v),signIn,profile,openStory:()=>seoul.openRoad(),native:()=>operating&&account?.supportsSpeaking===false,
- guestArrival:()=>seoul.arrival?.('guest')||null,newEngine:()=>false,bypass:()=>!!(dramaRequested||me2Requested||wardrobeRequested||examRequested),
+ guestArrival:()=>seoul.arrival?.('guest')||null,newEngine:owner=>atlasNextOn&&(owner!=='guest'||atlasNextGuestOn),bypass:()=>!!(dramaRequested||me2Requested||wardrobeRequested||examRequested),
  openSettings:()=>{if(!home.showSettings)return false;home.showSettings();const actions=document.querySelector('#world-panel .panel-actions');if(actions){const b=document.createElement('button');b.type='button';b.className='quiet-button';b.textContent=t(client.snapshot?'account.meTitle':'account.title');b.addEventListener('click',()=>{if(client.snapshot)profile();else signIn();});actions.append(b);}return true;},blocked:()=>{try{return !!tutorStatus(client.snapshot?.accountId||'guest')?.blocked;}catch{return true;}},hangulReading:(...v)=>hangulReading(...v),setHangulReading:(...v)=>setHangulReading(...v),
  goalConsent:()=>{let scoped=false;try{scoped=!!life.progress?.status?.()?.scoped;}catch{}return {needed:true,label:t(scoped?'goal.consent.account':'goal.consent.device'),note:t('goal.consent.note')};}});
 entryGate=createWorldEntryGate({
  restore:async()=>{await initialRestoreReady;if(sessionTask)await sessionTask;else if(!sessionConfirmed)await restoreSession();},
  prepare:prepareWorldTutor,
- offer:identity=>deviceRecords.offer(identity),
+ offer:identity=>{
+  // Atlas 새 길(기능 atlasNext): 이 주인의 새 길 입구가 손님 저장소에서 옮길 수를 센다(올리는 길의 계정일 때만 — 아니면 지금 판 물음).
+  const next=atlasNextOn&&identity.owner!=='guest'&&life.owner===identity.owner?life.atlasNext:null;
+  return deviceRecords.offer(identity,{atlas:next?input=>next.guestMove(input):null});
+ },
  read:()=>({owner:client.snapshot?.accountId||'guest',generation:client.generation,tutor:home.tutor?.().tutor||(front?.free()&&!dramaInvite.language?'front':null)}),
  choose:then=>dramaInvite.language&&operating&&!client.snapshot?signInForDramaInvite():home.ensureTutor?.(then),
  onState:state=>{home.setEntryState?.(state);home.setSceneActive?.(state.phase==='ready');},
