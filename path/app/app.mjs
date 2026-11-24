@@ -646,8 +646,8 @@ function createProductAccount({
       reader.releaseLock();
     }
   }
-  async function send(url, token, body, { logout = false } = {}) {
-    const abort = new AbortController(), timer = setTimeout(() => abort.abort(), 12e3);
+  async function send(url, token2, body, { logout = false, timeoutMs = 12e3 } = {}) {
+    const abort = new AbortController(), timer = setTimeout(() => abort.abort(), timeoutMs);
     controllers.add(abort);
     try {
       const response = await fetcher(url, {
@@ -656,7 +656,7 @@ function createProductAccount({
         credentials: "omit",
         cache: "no-store",
         redirect: "error",
-        headers: { apikey: config.supabasePublishableKey, Authorization: `Bearer ${token}`, "X-SYNK-Product": "platform", "X-SYNK-Contract": "1", ...body === void 0 ? {} : { "Content-Type": "application/json" } },
+        headers: { apikey: config.supabasePublishableKey, Authorization: `Bearer ${token2}`, "X-SYNK-Product": "platform", "X-SYNK-Contract": "1", ...body === void 0 ? {} : { "Content-Type": "application/json" } },
         ...body === void 0 ? {} : { body: JSON.stringify(body) }
       });
       const data = logout && response.status === 204 ? null : await responseJson(response);
@@ -716,16 +716,16 @@ function createProductAccount({
       guard(expected);
     } else {
       if (!session2?.access_token) throw fault("AUTH_REQUIRED", "SYNK ID로 로그인해 주세요.");
-      let token = session2.access_token;
-      if (session2.expires_at <= now() + 3e4) token = await refresh(expected);
+      let token2 = session2.access_token;
+      if (session2.expires_at <= now() + 3e4) token2 = await refresh(expected);
       guard(expected);
       const url = `${config.accountApiUrl.replace(/\/$/, "")}/functions/v1/${endpoint}${res && body === void 0 ? `?resource=${encodeURIComponent(res)}` : ""}`;
-      let result = await send(url, token, body === void 0 || !res ? body : { ...body, resource: res });
+      let result = await send(url, token2, body === void 0 || !res ? body : { ...body, resource: res });
       guard(expected);
       if (result.response.status === 401 && session2?.refresh_token) {
-        token = session2.access_token !== token ? session2.access_token : await refresh(expected);
+        token2 = session2.access_token !== token2 ? session2.access_token : await refresh(expected);
         guard(expected);
-        result = await send(url, token, body === void 0 || !res ? body : { ...body, resource: res });
+        result = await send(url, token2, body === void 0 || !res ? body : { ...body, resource: res });
         guard(expected);
       }
       if (!result.response.ok || result.data?.ok !== true) {
@@ -1005,17 +1005,17 @@ function createProductAccount({
     const expected = epoch, ownerId = snapshot.accountId;
     try {
       guard(expected);
-      let token = session2?.access_token;
-      if (!token) throw fault("AUTH_REQUIRED", "SYNK ID로 다시 로그인해 주세요.");
-      if (session2.expires_at <= now() + 3e4) token = await refresh(expected);
+      let token2 = session2?.access_token;
+      if (!token2) throw fault("AUTH_REQUIRED", "SYNK ID로 다시 로그인해 주세요.");
+      if (session2.expires_at <= now() + 3e4) token2 = await refresh(expected);
       guard(expected);
       const url = `${config.accountApiUrl.replace(/\/$/, "")}/functions/v1/synk-care-push`;
-      let result = await send(url, token, body);
+      let result = await send(url, token2, body);
       guard(expected);
       if (result.response.status === 401 && session2?.refresh_token) {
-        token = session2.access_token !== token ? session2.access_token : await refresh(expected);
+        token2 = session2.access_token !== token2 ? session2.access_token : await refresh(expected);
         guard(expected);
-        result = await send(url, token, body);
+        result = await send(url, token2, body);
         guard(expected);
       }
       const data = result.data;
@@ -1023,6 +1023,37 @@ function createProductAccount({
       if (data.accountId !== ownerId) throw fault("ACCOUNT_CHANGED", "계정이 바뀌어 알림 설정을 적용하지 않았어요.");
       if (data.scope !== "synk-care-push" || typeof data.enabled !== "boolean" || data.timeZone !== "Asia/Seoul" || !Number.isInteger(data.hour) || data.hour < 0 || data.hour > 23 || !Number.isInteger(data.minute) || data.minute < 0 || data.minute > 59 || typeof data.publicKey !== "string" || !/^[A-Za-z0-9_-]{87}$/.test(data.publicKey)) throw fault("INVALID_RESPONSE", "알림 서버의 응답을 받지 못했어요. 잠시 뒤 다시 시도해 주세요.");
       return { ok: true, scope: data.scope, accountId: ownerId, enabled: data.enabled, hour: data.hour, minute: data.minute, timeZone: data.timeZone, publicKey: data.publicKey, ...typeof data.deviceId === "string" ? { deviceId: data.deviceId } : {} };
+    } catch (error) {
+      if (expected === epoch && (AUTH_ERRORS.has(error.code) || error.code === "ACCOUNT_CHANGED")) clearSession(error);
+      throw error;
+    }
+  }
+  async function requestTranslate(body) {
+    if (!pathApp || native) throw fault("TRANSLATE_UNSUPPORTED", "번역 초안은 PATH 웹에서만 만들 수 있어요.");
+    if (!snapshot.signedIn || !snapshot.accountId) throw fault("AUTH_REQUIRED", "SYNK ID로 로그인한 뒤 번역 초안을 만들어 주세요.");
+    if (!body || typeof body !== "object" || Array.isArray(body) || !["translate", "check"].includes(body.action)) throw fault("INVALID_REQUEST", "번역 요청 형식이 맞지 않아요.");
+    if (new TextEncoder().encode(JSON.stringify(body)).byteLength > 65536) throw fault("INVALID_REQUEST", "번역할 글이 너무 길어요.");
+    const expected = epoch, ownerId = snapshot.accountId, wait = { timeoutMs: 125e3 };
+    try {
+      guard(expected);
+      let token2 = session2?.access_token;
+      if (!token2) throw fault("AUTH_REQUIRED", "SYNK ID로 다시 로그인해 주세요.");
+      if (session2.expires_at <= now() + 3e4) token2 = await refresh(expected);
+      guard(expected);
+      const url = `${config.accountApiUrl.replace(/\/$/, "")}/functions/v1/synk-path`;
+      let result = await send(url, token2, body, wait);
+      guard(expected);
+      if (result.response.status === 401 && session2?.refresh_token) {
+        token2 = session2.access_token !== token2 ? session2.access_token : await refresh(expected);
+        guard(expected);
+        result = await send(url, token2, body, wait);
+        guard(expected);
+      }
+      const data = result.data;
+      if (!result.response.ok || data?.ok !== true) throw fault(data?.error?.code || (result.response.status === 401 ? "AUTH_REQUIRED" : "TRANSLATE_UNAVAILABLE"), "번역 초안을 만들지 못했어요.", { status: result.response.status, retryable: false });
+      if (data.accountId !== ownerId) throw fault("ACCOUNT_CHANGED", "계정이 바뀌어 번역 초안을 보이지 않았어요.");
+      if (data.scope !== "synk-path" || data.action !== body.action) throw fault("INVALID_RESPONSE", "번역 초안의 형식을 확인하지 못했어요.");
+      return data;
     } catch (error) {
       if (expected === epoch && (AUTH_ERRORS.has(error.code) || error.code === "ACCOUNT_CHANGED")) clearSession(error);
       throw error;
@@ -1038,7 +1069,7 @@ function createProductAccount({
     unsubscribe?.();
     stopRequests();
   }
-  return Object.freeze({ start, status, signIn, signOut, request, requestPush, dispose });
+  return Object.freeze({ start, status, signIn, signOut, request, requestPush, requestTranslate, dispose });
 }
 
 // experiences/synk-account/src/document-sync.mjs
@@ -2696,6 +2727,12 @@ function createPathSession(options = {}) {
     if (!acc) throw fault2("ACCOUNT_UNAVAILABLE", "계정 연결을 확인하지 못했어요.");
     return acc.request(operation, values, { resource: STUDY_RESOURCE });
   }
+  async function translate2(body) {
+    if (disposed) throw fault2("PATH_SESSION_DISPOSED", "disposed");
+    const acc = account || await startAccount();
+    if (!acc || typeof acc.requestTranslate !== "function") throw fault2("TRANSLATE_UNSUPPORTED", "번역 초안을 만들 수 없어요.");
+    return acc.requestTranslate(body);
+  }
   return Object.freeze({
     document: () => clone(currentDoc()),
     status: snapshot,
@@ -2707,6 +2744,7 @@ function createPathSession(options = {}) {
     removeJob,
     importGuest,
     studyRequest,
+    translate: translate2,
     exportGuest,
     exportCurrent,
     confirmBackup,
@@ -4568,6 +4606,26 @@ var VISA_DOCS = freeze({
     ]
   })
 });
+var TRANSLATE_DOCS = freeze({
+  "jbnu-ug-grad": "grad",
+  "jbnu-ug-transcript": "transcript",
+  "jbnu-lang-grad": "grad",
+  "jbnu-lang-transcript": "transcript",
+  "wku-ug-grad": "grad",
+  "wku-ug-transcript": "transcript",
+  "wku-lang-grad": "grad",
+  "wku-lang-transcript": "transcript",
+  "jj-ug-grad": "grad",
+  "jj-ug-transcript": "transcript",
+  "visa-d2-school": "either",
+  "visa-d4-school": "either"
+});
+var translateEntry = (docId) => Object.hasOwn(TRANSLATE_DOCS, docId) ? TRANSLATE_DOCS[docId] : null;
+var translateKindOf = (docId) => {
+  const k = translateEntry(docId);
+  return k === "either" ? "grad" : k;
+};
+var translateKindChoice = (docId) => translateEntry(docId) === "either";
 var visaFor = (program) => program && program.level === "language" ? "D-4-1" : "D-2";
 function docsFor(program) {
   const pd = program && PROGRAM_DOCS[program.id];
@@ -5517,7 +5575,7 @@ function docRow(d, T2, done) {
   const line = (label, o) => o ? `<p class="sx-doc-line"><b>${label}</b> ${esc6(T2.pick(o))}</p>` : "";
   const visa = d.stage === "visa";
   const unclear = !d.unclear ? "" : visa ? `<div class="sx-unclear"><p><b>${T2.L("KVAC에 확인할 것", "Check with KVAC")}</b> ${esc6(T2.pick(d.unclear))}</p></div>` : `<div class="sx-unclear"><p><b>${T2.L("요강에서 두 가지로 읽혀요", "The guide can be read two ways")}</b> ${esc6(T2.pick(d.unclear))}</p><p>${T2.L("대학에 먼저 물어보세요.", "Ask the university first.")}</p></div>`;
-  return `<li class="sx-docrow"><div class="sx-doc-main"><b class="sx-doc-name">${esc6(T2.pick(d.name))}</b>${T2.en ? `<small class="sx-doc-ko" lang="ko">${esc6(d.name.ko)}</small>` : ""}${d.only ? `<p class="sx-doc-line"><b>${T2.L("해당자", "Who")}</b> ${esc6(T2.pick(d.only.cond))}</p>` : ""}${line(T2.L("구하는 곳", "Where to get it"), d.from)}${line(T2.L("날짜 조건", "Date rule"), d.when)}${d.note ? `<p class="sx-doc-note">${esc6(T2.pick(d.note))}</p>` : ""}${unclear}</div><button type="button" class="sx-btn2 sm sx-docbtn" aria-pressed="${on}" data-action="docToggle" data-id="${esc6(d.id)}"><span class="sx-on">${ON3}</span>${T2.L("준비했어요", "Ready")}<span class="sr-only"> ${esc6(T2.pick(d.name))}</span></button></li>`;
+  return `<li class="sx-docrow"><div class="sx-doc-main"><b class="sx-doc-name">${esc6(T2.pick(d.name))}</b>${T2.en ? `<small class="sx-doc-ko" lang="ko">${esc6(d.name.ko)}</small>` : ""}${d.only ? `<p class="sx-doc-line"><b>${T2.L("해당자", "Who")}</b> ${esc6(T2.pick(d.only.cond))}</p>` : ""}${line(T2.L("구하는 곳", "Where to get it"), d.from)}${line(T2.L("날짜 조건", "Date rule"), d.when)}${d.note ? `<p class="sx-doc-note">${esc6(T2.pick(d.note))}</p>` : ""}${unclear}${translateKindOf(d.id) ? `<button type="button" class="sx-link sx-trlink" data-action="trOpen" data-id="${esc6(d.id)}">${T2.L("몽골어 서류의 번역 초안 만들기", "Make a translation draft of the Mongolian document")}<span class="sr-only"> · ${esc6(T2.pick(d.name))}</span>${GO3}</button>` : ""}</div><button type="button" class="sx-btn2 sm sx-docbtn" aria-pressed="${on}" data-action="docToggle" data-id="${esc6(d.id)}"><span class="sx-on">${ON3}</span>${T2.L("준비했어요", "Ready")}<span class="sr-only"> ${esc6(T2.pick(d.name))}</span></button></li>`;
 }
 function stageBlock(stage, t2, T2, done, counts) {
   const docs = t2.set.mine.filter((d) => d.stage === stage), folds = t2.set.notMine.filter((d) => d.stage === stage);
@@ -5586,6 +5644,382 @@ function renderPathPick(view, program) {
   const on = T2.profile.target === program.id;
   const visa = visaFor(program) === "D-2" ? T2.L("유학(D-2)", "student (D-2)") : T2.L("어학연수(D-4-1)", "language trainee (D-4-1)");
   return `<section class="sx-card butter sx-pathpick"><p class="sx-k">${T2.L("내 길", "My path")}</p><h2>${T2.L(`이 과정의 원서 · 합격 뒤 서류와 ${visa} 비자 서류를 한곳에서 챙겨요.`, `Keep this program’s application and post-admission documents and the ${visa} visa documents in one place.`)}</h2><div class="sx-row2"><button type="button" class="sx-btn2" aria-pressed="${on}" data-action="pathPick" data-id="${esc6(program.id)}"><span class="sx-on">${ON3}</span>${T2.L("이 과정으로 준비하기", "Prepare for this program")}</button>${on ? `<button type="button" class="sx-link" data-action="nav" data-page="path">${T2.L("내 길 열기", "Open my path")}${GO3}</button>` : ""}</div></section>`;
+}
+
+// experiences/path-app/translate-shape.mjs
+var TRANSLATE_KINDS = Object.freeze(["grad", "transcript"]);
+var TRANSLATE_CONSENT_VERSION = 1;
+var TRANSLATE_LANGS = Object.freeze(["ko", "en", "mn"]);
+var TRANSLATE_AGES = Object.freeze(["adult", "teen"]);
+var MAX_LINES = 80;
+var MAX_LINE_CHARS = 300;
+var MAX_TOTAL_CHARS = 4e3;
+var MIN_TOTAL_CHARS = 20;
+var MIN_CYRILLIC_SHARE = 0.4;
+var MAX_OUT_CHARS = 1200;
+var FLAGS = Object.freeze(["name", "school", "grade", "term", "none"]);
+var VERDICTS = Object.freeze(["same", "differs", "unsure"]);
+var REASONS = Object.freeze(["meaning", "missing", "added", "term", "none"]);
+var STATUSES = Object.freeze(["done", "refused", "limit", "busy", "unavailable", "done_before"]);
+var MAX_REQUEST_BYTES = 64 * 1024;
+var UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+var fault3 = (code) => Object.assign(new Error(code), { code });
+var plain = (v) => {
+  if (v === null || typeof v !== "object" || Array.isArray(v)) return false;
+  const p = Object.getPrototypeOf(v);
+  return p === null || Object.getPrototypeOf(p) === null;
+};
+var exactKeys = (v, keys) => plain(v) && Object.keys(v).length === keys.length && keys.every((k) => Object.hasOwn(v, k));
+var chars = (s) => [...s].length;
+var HIDDEN_SRC = "[\\u0000-\\u001F\\u007F-\\u009F\\u200B-\\u200F\\u202A-\\u202E\\u2060-\\u2069\\uFEFF]";
+var hasHidden = (s) => new RegExp(HIDDEN_SRC).test(s);
+var cellSpaces = (s) => s.replace(/[\t\v\f]+/g, " ");
+var RD_LETTER = "[А-ЯЁӨҮа-яёөүABCEHKMOPTXYaceopxy]";
+var RD_SRC = `(?<![\\p{L}\\p{N}⟦])(${RD_LETTER}{2})[\\s-]?(\\d{8})(?![\\p{N}⟧])`;
+var rdRe = () => new RegExp(RD_SRC, "gu");
+var TOKEN_RE = () => /⟦R(\d{1,3})⟧/g;
+var token = (n) => `⟦R${n}⟧`;
+var SERVER_TOKEN = token(0);
+var LATIN_TO_CYR = { A: "А", B: "В", C: "С", E: "Е", H: "Н", K: "К", M: "М", O: "О", P: "Р", T: "Т", X: "Х", Y: "У" };
+var canonRd = (letters, digits) => [...letters.toUpperCase()].map((c) => LATIN_TO_CYR[c] || c).join("") + digits;
+function maskLines(lines) {
+  const keys = [], slots = [];
+  const masked = lines.map((line) => line.replace(rdRe(), (whole, letters, digits) => {
+    const key = canonRd(letters, digits);
+    let n = keys.indexOf(key) + 1;
+    if (!n) {
+      keys.push(key);
+      slots.push(whole);
+      n = keys.length;
+    }
+    return token(n);
+  }));
+  return { lines: masked, slots };
+}
+var tokensOf = (text2) => [...String(text2 ?? "").matchAll(TOKEN_RE())].map((m) => m[0]).sort();
+var sameTokens = (a, b) => {
+  const x = tokensOf(a), y = tokensOf(b);
+  return x.length === y.length && x.every((t2, i) => t2 === y[i]);
+};
+function restoreTokens(text2, slots, hidden) {
+  return String(text2 ?? "").replace(TOKEN_RE(), (whole, n) => {
+    const i = Number(n) - 1;
+    return i >= 0 && i < slots.length ? slots[i] : hidden;
+  });
+}
+var MN_UNIT_ORDINALS = [
+  ["нэгдүгээр", 1],
+  ["хоёрдугаар", 2],
+  ["гуравдугаар", 3],
+  ["дөрөвдүгээр", 4],
+  ["тавдугаар", 5],
+  ["зургаадугаар", 6],
+  ["зургадугаар", 6],
+  ["долоодугаар", 7],
+  ["долдугаар", 7],
+  ["наймдугаар", 8],
+  ["есдүгээр", 9]
+];
+var MN_TENS = { арван: 10, хорин: 20, гучин: 30, дөчин: 40, тавин: 50, жаран: 60, далан: 70, наян: 80, ерэн: 90 };
+var MN_TEN_ORDINALS = [["аравдугаар", 10], ["хорьдугаар", 20], ["гучдугаар", 30]];
+var MN_COMPOUND_RE = new RegExp(`(${Object.keys(MN_TENS).join("|")})\\s+(${MN_UNIT_ORDINALS.map(([w]) => w).join("|")})`, "gu");
+var ROMAN = { I: 1, II: 2, III: 3, IV: 4, V: 5, VI: 6, VII: 7, VIII: 8, IX: 9, X: 10, XI: 11, XII: 12 };
+function numberize(text2) {
+  let s = String(text2 ?? "").replace(TOKEN_RE(), " ").toLowerCase();
+  s = s.replace(MN_COMPOUND_RE, (m, tens, unit) => ` ${MN_TENS[tens] + MN_UNIT_ORDINALS.find(([w]) => w === unit)[1]} `);
+  for (const [word, n] of [...MN_TEN_ORDINALS, ...MN_UNIT_ORDINALS]) s = s.split(word).join(` ${n} `);
+  return s.replace(/(?<![\p{L}\p{N}])(XII|XI|IX|X|VIII|VII|VI|IV|V|III|II|I)(?![\p{L}\p{N}])/giu, (m) => ` ${ROMAN[m.toUpperCase()]} `);
+}
+function digitSet(text2) {
+  return new Set((numberize(text2).match(/\d+/g) || []).map((d) => d.replace(/^0+(?=\d)/, "")));
+}
+function sameNumbers(source, draft) {
+  const a = digitSet(source), b = digitSet(draft);
+  return a.size === b.size && [...a].every((v) => b.has(v));
+}
+function splitPasted(text2) {
+  const raw = String(text2 ?? "").normalize("NFC").replace(/\r\n?/g, "\n");
+  const lines = raw.split("\n").map((l) => cellSpaces(l).replace(new RegExp(HIDDEN_SRC, "g"), "").replace(/\s+/g, " ").trim().normalize("NFC")).filter(Boolean);
+  if (!lines.length) return { error: "empty", lines: [] };
+  if (lines.length > MAX_LINES) return { error: "lines", lines };
+  const sent = maskLines(lines).lines;
+  if (sent.some((l) => chars(l) > MAX_LINE_CHARS)) return { error: "line", lines };
+  const total = sent.reduce((n, l) => n + chars(l), 0);
+  if (total > MAX_TOTAL_CHARS) return { error: "total", lines };
+  if (total < MIN_TOTAL_CHARS) return { error: "short", lines };
+  if (!mongolianEnough(sent)) return { error: "language", lines };
+  return { error: null, lines };
+}
+function mongolianEnough(lines) {
+  const text2 = lines.join(" ").replace(TOKEN_RE(), " ");
+  const letters = text2.match(/\p{L}/gu) || [];
+  const cyr = text2.match(/\p{Script=Cyrillic}/gu) || [];
+  return letters.length > 0 && cyr.length / letters.length >= MIN_CYRILLIC_SHARE;
+}
+function checkLines(lines, bad) {
+  if (!Array.isArray(lines) || !lines.length || lines.length > MAX_LINES) bad();
+  let total = 0;
+  for (const line of lines) {
+    if (typeof line !== "string" || !line || line !== line.trim() || line !== line.normalize("NFC") || /\s{2,}|\n/.test(line) || hasHidden(line)) bad();
+    const n = chars(line);
+    if (n > MAX_LINE_CHARS) bad();
+    total += n;
+  }
+  if (total > MAX_TOTAL_CHARS || total < MIN_TOTAL_CHARS) bad();
+}
+function validateTranslateRequest(body) {
+  const bad = () => {
+    throw fault3("INVALID_TRANSLATE_REQUEST");
+  };
+  const check = plain(body) && body.action === "check";
+  if (!exactKeys(body, check ? ["action", "request_id", "kind", "lines", "drafts", "consent"] : ["action", "request_id", "kind", "lines", "consent"])) bad();
+  if (!["translate", "check"].includes(body.action)) bad();
+  if (typeof body.request_id !== "string" || !UUID_RE.test(body.request_id)) bad();
+  if (!TRANSLATE_KINDS.includes(body.kind)) bad();
+  const c = body.consent;
+  if (!exactKeys(c, ["v", "age", "guardian", "lang"]) || c.v !== TRANSLATE_CONSENT_VERSION || !TRANSLATE_AGES.includes(c.age) || c.guardian !== (c.age === "teen") || !TRANSLATE_LANGS.includes(c.lang)) bad();
+  checkLines(body.lines, bad);
+  if (!mongolianEnough(body.lines)) throw fault3("NOT_MONGOLIAN");
+  if (check) {
+    if (!Array.isArray(body.drafts) || body.drafts.length !== body.lines.length) bad();
+    for (const d of body.drafts) if (typeof d !== "string" || !d.trim() || chars(d) > MAX_OUT_CHARS || hasHidden(d) || /\n/.test(d)) bad();
+  }
+  return {
+    action: body.action,
+    request_id: body.request_id.toLowerCase(),
+    kind: body.kind,
+    lines: [...body.lines],
+    ...check ? { drafts: [...body.drafts] } : {},
+    consent: { v: c.v, age: c.age, guardian: c.guardian, lang: c.lang }
+  };
+}
+function replyHead(data, action, bad) {
+  if (!plain(data) || data.ok !== true || data.scope !== "synk-path" || data.action !== action || typeof data.prompt !== "string" || !STATUSES.includes(data.status) || !(data.remaining === null || Number.isSafeInteger(data.remaining) && data.remaining >= 0) || !Array.isArray(data.lines)) bad();
+  if (data.status !== "done" && data.lines.length) bad();
+}
+function validateTranslateReply(data, count) {
+  const bad = () => {
+    throw fault3("INVALID_TRANSLATE_REPLY");
+  };
+  replyHead(data, "translate", bad);
+  if (data.status === "done" && data.lines.length !== count) bad();
+  const lines = data.lines.map((l, i) => {
+    if (!exactKeys(l, ["i", "ko", "flag"]) || l.i !== i || typeof l.ko !== "string" || !l.ko || chars(l.ko) > MAX_OUT_CHARS || !FLAGS.includes(l.flag)) bad();
+    return { i, ko: l.ko, flag: l.flag };
+  });
+  return { status: data.status, remaining: data.remaining, prompt: data.prompt, lines };
+}
+function validateCheckReply(data, count) {
+  const bad = () => {
+    throw fault3("INVALID_TRANSLATE_REPLY");
+  };
+  replyHead(data, "check", bad);
+  if (data.status === "done" && (data.lines.length !== count || typeof data.compared !== "boolean")) bad();
+  const compared = data.status === "done" && data.compared === true;
+  const lines = data.lines.map((l, i) => {
+    if (!exactKeys(l, ["i", "back", "verdict", "reason"]) || l.i !== i || typeof l.back !== "string" || !l.back || chars(l.back) > MAX_OUT_CHARS || !VERDICTS.includes(l.verdict) || !REASONS.includes(l.reason)) bad();
+    return { i, back: l.back, verdict: compared ? l.verdict : "same", reason: compared ? l.reason : "none" };
+  });
+  return { status: data.status, remaining: data.remaining, prompt: data.prompt, compared, lines };
+}
+function draftRows(source, drafts, checks, slots, hidden) {
+  return drafts.map((d, i) => {
+    const idOk = sameTokens(source[i], d.ko);
+    const reasons = [];
+    if (!idOk) reasons.push("id");
+    if (!sameNumbers(source[i], d.ko)) reasons.push("numbers");
+    if (d.flag === "name") reasons.push("name");
+    else if (d.flag !== "none") reasons.push("term");
+    const c = checks ? checks[i] : null;
+    if (c && c.verdict !== "same") reasons.push(c.verdict);
+    return {
+      i,
+      source: restoreTokens(source[i], slots, hidden),
+      ko: idOk ? restoreTokens(d.ko, slots, hidden) : restoreTokens(d.ko, [], hidden),
+      back: c ? restoreTokens(c.back, sameTokens(source[i], c.back) ? slots : [], hidden) : null,
+      flag: d.flag,
+      verdict: c ? c.verdict : null,
+      reason: c ? c.reason : null,
+      reasons
+    };
+  });
+}
+
+// experiences/path-app/translate-ui.mjs
+var esc7 = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+var svg5 = (p) => `<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">${p}</svg>`;
+var BACK5 = svg5('<path d="M12.5 4.5 7 10l5.5 5.5"/>');
+var ON4 = svg5('<path d="m5 10.4 3.2 3.1L15 6.6"/>');
+var PRIVACY_URL2 = "https://synk.im/privacy/#path-translate";
+var PRIVACY_URL_EN = "https://synk.im/privacy/#synk-id-en";
+var M = {
+  kicker: ["번역 초안", "Translation draft", "Орчуулгын ноорог"],
+  kind: ["서류 종류", "Document", "Баримтын төрөл"],
+  grad: ["졸업증명서", "Graduation certificate", "Төгссөний гэрчилгээ"],
+  transcript: ["성적증명서", "Transcript", "Дүнгийн хуудас"],
+  lead: [
+    "몽골어 서류의 글을 붙여 넣으면 한국어 초안을 만들어요. 초안은 번역자가 원문과 대조해 고치는 출발점이에요. 그대로 내는 번역본이 아니에요.",
+    "Paste the text of a Mongolian document and get a Korean draft. The draft is a starting point that a translator checks against the original and corrects. It is not a translation you can submit as it is.",
+    "Монгол баримтын бичвэрийг буулгавал солонгос хэл дээрх ноорог гаргана. Ноорог бол орчуулагч эх хувьтай тулгаж засах эхлэл юм. Тэр чигээр нь өгөх орчуулга биш."
+  ],
+  rules: ["이 서류를 내는 곳의 번역 규칙", "Translation rules where you submit this", "Энэ баримтыг өгөх газрын орчуулгын журам"],
+  howTitle: ["글을 가져오는 법", "How to get the text", "Бичвэрийг яаж авах вэ"],
+  how1: ["E-Mongolia에서 받은 PDF는 글을 복사해 붙여 넣어요.", "For a PDF from E-Mongolia, copy the text and paste it.", "E-Mongolia-аас авсан PDF бол бичвэрийг хуулж буулгана."],
+  how2: ["종이 서류는 휴대폰 카메라의 글자 복사로 가져와요. 붙여 넣은 뒤 숫자와 이름이 원문과 같은지 먼저 보세요.", "For a paper document, use your phone camera’s copy-text feature. After pasting, first check that numbers and names match the original.", "Цаасан баримтын бичвэрийг утасны камерын бичвэр хуулах функцээр авна. Буулгасны дараа тоо, нэр эх хувьтай ижил эсэхийг эхлээд шалгана уу."],
+  textLabel: ["서류의 글(몽골어)", "Document text (Mongolian)", "Баримтын бичвэр (монгол хэлээр)"],
+  consentTitle: ["보내기 전에 확인해 주세요", "Before you send", "Илгээхээсээ өмнө шалгана уу"],
+  what: ["보내는 것", "What is sent", "Илгээх зүйл"],
+  whatText: ["붙여 넣은 서류의 글이에요. 이름과 생년월일도 함께 가요. 등록번호는 보내기 전에 가려요.", "The text you paste, including names and dates of birth. Registration numbers are hidden before sending.", "Таны буулгасан баримтын бичвэр илгээгдэнэ. Түүн доторх нэр, төрсөн огноо ч хамт явна. Регистрийн дугаарыг илгээхээс өмнө нууна."],
+  who: ["받는 곳", "Who receives it", "Хүлээн авах газар"],
+  whoText: [
+    "한국어 초안은 Anthropic(미국)의 Claude가, 다시 몽골어로 옮겨 견주는 일은 Google(미국)의 Gemini가 해요. 글은 SYNK 서버(Supabase, 싱가포르)를 거쳐 가요. 정보가 몽골 밖으로 옮겨져요.",
+    "Claude by Anthropic (USA) writes the Korean draft, and Gemini by Google (USA) translates it back into Mongolian for the check. The text passes through the SYNK server (Supabase, Singapore). Your information leaves Mongolia.",
+    "Солонгос хэл дээрх ноорог гаргах ажлыг Anthropic (АНУ)-ийн Claude, буцаан монгол хэл рүү орчуулж тулгах ажлыг Google (АНУ)-ийн Gemini хийнэ. Бичвэр SYNK-ийн серверээр (Supabase, Сингапур) дамжина. Мэдээллийг Монголоос гадагш дамжуулна."
+  ],
+  keep: ["저장", "Storage", "Хадгалалт"],
+  keepText: [
+    "SYNK는 보낸 글과 초안을 저장하지 않아요. 두 회사는 악용을 막으려고 각자 정한 기간 동안 보관할 수 있고, AI 학습에는 쓰지 않아요. SYNK에는 요청한 시각, 결과 상태, 이 동의만 남아요.",
+    "SYNK does not store the text or the draft. The two companies may keep it for the period each sets to prevent misuse, and do not use it to train AI. SYNK keeps only the request time, the result status and this consent.",
+    "SYNK нь илгээсэн бичвэр, ноорог хоёрыг хадгалахгүй. Хоёр компани үйлчилгээг зүй бусаар ашиглахаас сэргийлэх зорилгоор өөрсдийн тогтоосон хугацаанд хадгалж болох боловч хиймэл оюуныг сургахад ашиглахгүй. SYNK-д зөвхөн хүсэлт илгээсэн цаг, үр дүнгийн төлөв, энэ зөвшөөрөл үлдэнэ."
+  ],
+  no: ["거부", "Saying no", "Татгалзах"],
+  noText: ["보내지 않아도 돼요. 그러면 이 기능은 쓸 수 없고, 서류를 번역자에게 바로 맡기면 돼요.", "You do not have to send it. Then you cannot use this feature, and you can give the document straight to a translator.", "Илгээхгүй байж болно. Тэгвэл энэ үйлчилгээг ашиглах боломжгүй ч баримтаа орчуулагчид шууд өгч болно."],
+  ask: ["문의", "Questions", "Холбоо барих"],
+  age: ["나이", "Age", "Нас"],
+  adult: ["만 18세 이상", "18 or older", "18 ба түүнээс дээш настай"],
+  teen: ["만 14~17세", "14 to 17", "14–17 настай"],
+  under14: ["만 14세 미만", "Under 14", "14 нас хүрээгүй"],
+  under14Note: ["만 14세 미만은 이 기능을 쓸 수 없어요.", "This feature is not available if you are under 14.", "14 нас хүрээгүй бол энэ үйлчилгээг ашиглах боломжгүй."],
+  guardian: ["보호자가 이 내용을 함께 읽고 동의했어요", "A parent or guardian read this with me and agreed", "Эцэг эх эсвэл асран хамгаалагч маань энэ мэдээллийг надтай хамт уншиж, зөвшөөрсөн"],
+  agree: ["위 내용을 읽었고, 이 글을 보내는 데 동의해요", "I have read the above and agree to send this text", "Дээрх мэдээллийг уншсан бөгөөд энэ бичвэрийг илгээхийг зөвшөөрч байна"],
+  send: ["한국어 초안 만들기", "Make a Korean draft", "Солонгос хэл дээрх ноорог гаргах"],
+  quota: ["하루 10장까지 만들 수 있어요. 울란바토르 시각 08:00(서울 09:00)에 다시 채워져요.", "You can make up to 10 a day. The count resets at 08:00 Ulaanbaatar time (09:00 Seoul).", "Өдөрт 10 хуудас хүртэл гаргаж болно. Улаанбаатарын цагаар 08:00-д (Сөүлийн цагаар 09:00) дахин шинэчлэгдэнэ."],
+  waiting: ["한국어로 옮기는 중이에요. 1분쯤 걸려요. 이 화면을 열어 두세요.", "Translating into Korean. This takes about a minute. Keep this screen open.", "Солонгос хэл рүү орчуулж байна. Нэг минут орчим болно. Энэ дэлгэцийг нээлттэй байлгана уу."],
+  checking: ["다시 몽골어로 옮겨 원문과 견주는 중이에요.", "Translating back into Mongolian to compare with the original.", "Эх хувьтай тулгахын тулд буцаан монгол хэл рүү орчуулж байна."],
+  band: ["번역 초안 — 번역본이 아니에요", "Translation draft — not a translation for submission", "Орчуулгын ноорог — албан ёсны орчуулга биш"],
+  notice1: ["번역자가 원문과 대조해 고치고 번역자 확인서를 붙여 내요. 대학에 따라 번역 공증을 요구해요.", "A translator must check it against the original, correct it and attach a translator confirmation form. Some universities require a notarized translation.", "Орчуулагч эх хувьтай тулгаж засаад, орчуулагчийн баталгааны хуудсыг хавсаргаж өгнө. Зарим их сургууль нотариатаар гэрчлүүлсэн орчуулга шаарддаг."],
+  notice3: ["비자 서류의 공식 접수는 본인이 KVAC에 하거나 등록 행정사에게 맡겨요.", "For the visa, you file the official documents yourself at KVAC or through a registered administrative agent.", "Визийн бичиг баримтыг KVAC-д өөрөө, эсвэл бүртгэлтэй захиргааны төлөөлөгчөөр (행정사) дамжуулан албан ёсоор өгнө."],
+  checkNote: ["대조는 뜻이 크게 달라진 곳만 찾아요. 이름, 학교 이름, 숫자는 직접 보세요.", "The check only finds lines whose meaning changed a lot. Check names, school names and numbers yourself.", "Тулгалт зөвхөн утга нь их өөрчлөгдсөн мөрийг олно. Нэр, сургуулийн нэр, тоог өөрөө шалгана уу."],
+  notCompared: ["자동 대조를 하지 못했어요. 원문과 다시 옮긴 몽골어를 직접 견줘 보세요.", "The automatic check did not run. Compare the original and the back-translation yourself.", "Автомат тулгалт хийгдсэнгүй. Эх хувь болон буцаан орчуулгыг өөрөө тулгана уу."],
+  noBack: ["다시 옮겨 견주지 못했어요. 초안은 이 화면에 남아 있으니 원문과 직접 견줘 보세요.", "The back-translation check did not finish. The draft stays on this screen; compare it with the original yourself.", "Буцаан орчуулгаар тулгаж чадсангүй. Ноорог энэ дэлгэц дээр үлдсэн тул эх бичвэртэй өөрөө тулгана уу."],
+  noDiff: ["뜻이 크게 달라진 줄은 찾지 못했어요", "No line with a large change in meaning was found", "Утга нь их өөрчлөгдсөн мөр олдсонгүй"],
+  copied: ["초안을 복사했어요. 맨 위와 맨 아래에 「번역 초안」 표시가 함께 들어가요.", "Copied the draft. The “translation draft” label is included at the top and bottom.", "Ноорог хуулагдлаа. Эхэнд болон төгсгөлд «орчуулгын ноорог» гэсэн тэмдэглэгээ хамт орсон."],
+  copyFail: ["복사하지 못했어요. 「초안 내려받기」를 써 주세요.", "Could not copy. Use “Download draft”.", "Хуулж чадсангүй. «Ноорог татах»-ыг ашиглана уу."],
+  source: ["원문", "Original", "Эх бичвэр"],
+  draft: ["한국어 초안", "Korean draft", "Солонгос хэл дээрх ноорог"],
+  back: ["다시 옮긴 몽골어", "Back-translation", "Буцаан орчуулга"],
+  onlyFlagged: ["확인할 줄만 보기", "Show only lines to check", "Шалгах мөрийг л харуулах"],
+  copy: ["초안 복사", "Copy draft", "Ноорог хуулах"],
+  download: ["초안 내려받기(.txt)", "Download draft (.txt)", "Ноорог татах (.txt)"],
+  recheck: ["다시 견주기", "Check again", "Дахин тулгах"],
+  edit: ["글 고치기", "Edit the text", "Бичвэр засах"],
+  fresh: ["새로 만들기", "Start over", "Шинээр эхлэх"],
+  signIn: ["SYNK ID로 로그인하면 번역 초안을 만들 수 있어요.", "Sign in with your SYNK ID to make a translation draft.", "SYNK ID-аар нэвтэрвэл орчуулгын ноорог гаргаж болно."],
+  fine: ["이 초안은 입학이나 비자를 약속하지 않아요. 마지막 판단은 대학과 출입국이 해요.", "This draft does not promise admission or a visa. The university and immigration office make the final decision.", "Энэ ноорог элсэлт, визийг баталгаажуулахгүй. Эцсийн шийдвэрийг их сургууль, цагаачлалын байгууллага гаргана."]
+};
+var REASON_TEXT = {
+  id: ["등록번호를 원문에서 직접 옮기세요.", "Copy the registration number from the original yourself.", "Регистрийн дугаарыг эх хувиас өөрөө хуулж бичнэ үү."],
+  numbers: ["숫자가 원문과 달라요. 원문과 맞춰 보세요.", "The numbers differ from the original. Compare them.", "Тоо эх хувиас өөр байна. Эх хувьтай тулгана уу."],
+  name: ["이름은 여권의 영문 철자로 맞추세요.", "Match names to the English spelling in the passport.", "Нэрийг паспорт дээрх латин үсгийн бичиглэлтэй тааруулна уу."],
+  term: ["학교 이름이나 용어는 번역자가 대학이 쓰는 말로 고쳐야 해요.", "A translator should fix school names and terms to the words the university uses.", "Орчуулагч нь сургуулийн нэр, нэр томьёог их сургуулийн хэрэглэдэг нэршлээр засах хэрэгтэй."],
+  meaning: ["다시 옮긴 글의 뜻이 원문과 달라요.", "The back-translation means something different from the original.", "Буцаан орчуулсан бичвэрийн утга эх хувиас өөр байна."],
+  missing: ["원문의 내용이 빠졌을 수 있어요.", "Part of the original may be missing.", "Эх хувийн агуулга орхигдсон байж магадгүй."],
+  added: ["원문에 없는 내용이 들어갔을 수 있어요.", "Something not in the original may have been added.", "Эх хувьд байхгүй агуулга нэмэгдсэн байж магадгүй."],
+  changed: ["용어가 바뀌었을 수 있어요.", "A term may have changed.", "Нэр томьёо өөрчлөгдсөн байж магадгүй."],
+  unsure: ["자동 대조가 판단하지 못했어요. 직접 견줘 보세요.", "The automatic check could not decide. Compare it yourself.", "Энэ мөр зөв эсэхийг автомат тулгалт шийдэж чадсангүй. Өөрөө тулгана уу."]
+};
+var ERROR_TEXT = {
+  empty: ["서류의 글을 붙여 넣어 주세요.", "Paste the document text.", "Баримтын бичвэрийг буулгана уу."],
+  short: ["글이 너무 짧아요. 서류의 글을 모두 붙여 넣어 주세요.", "The text is too short. Paste the whole document.", "Бичвэр хэт богино байна. Баримтын бичвэрийг бүтнээр нь буулгана уу."],
+  lines: ["줄이 너무 많아요. 80줄까지 한 번에 옮길 수 있어요. 나눠서 만들어 주세요.", "Too many lines. Up to 80 lines at a time. Split the text.", "Мөр хэт олон байна. Нэг удаад 80 мөр хүртэл орчуулна. Хувааж оруулна уу."],
+  line: ["300자가 넘는 줄이 있어요. 줄을 나눠 주세요.", "A line is longer than 300 characters. Split it.", "300 тэмдэгтээс урт мөр байна. Мөрийг хуваана уу."],
+  total: [`글이 너무 길어요. ${MAX_TOTAL_CHARS.toLocaleString("en-US")}자까지 한 번에 옮길 수 있어요. 나눠서 만들어 주세요.`, `The text is too long. Up to ${MAX_TOTAL_CHARS.toLocaleString("en-US")} characters at a time. Split it.`, `Бичвэр хэт урт байна. Нэг удаад ${MAX_TOTAL_CHARS} тэмдэгт хүртэл орчуулна. Хувааж оруулна уу.`],
+  language: ["몽골어 서류의 글을 붙여 넣어 주세요.", "Paste the text of a Mongolian document.", "Монгол баримтын бичвэрийг буулгана уу."],
+  limit: ["오늘 만들 수 있는 10장을 다 썼어요. 울란바토르 시각 08:00(서울 09:00)에 다시 채워져요.", "You have used today’s 10. The count resets at 08:00 Ulaanbaatar time (09:00 Seoul).", "Өнөөдрийн 10 хуудсыг ашиглаж дууслаа. Улаанбаатарын цагаар 08:00-д (Сөүлийн цагаар 09:00) дахин шинэчлэгдэнэ."],
+  busy: ["같은 요청을 처리하고 있어요. 잠시 뒤에 다시 확인해 주세요.", "This request is still being processed. Check again in a moment.", "Ижил хүсэлтийг боловсруулж байна. Хэсэг хүлээгээд дахин шалгана уу."],
+  done_before: ["이 요청은 이미 끝났어요. 초안은 저장하지 않아 다시 보여 드리지 못해요. 다시 만들면 오늘 한 장을 더 써요.", "This request already finished. Drafts are not stored, so it cannot be shown again. Making it again uses one more of today’s 10.", "Энэ хүсэлт аль хэдийн дууссан. Ноорог хадгалагддаггүй тул дахин харуулах боломжгүй. Дахин гаргавал өнөөдрийн нэг хуудсыг нэмж ашиглана."],
+  unavailable: ["번역 초안은 잠시 쉬어요. 조금 뒤에 다시 해 주세요.", "Translation drafts are paused for now. Try again a little later.", "Орчуулгын ноорог гаргах үйлчилгээ түр зогссон байна. Хэсэг хугацааны дараа дахин оролдоно уу."],
+  refused: ["이 글은 옮기지 못했어요. 서류의 글이 맞는지 확인해 주세요.", "This text could not be translated. Check that it is the document text.", "Энэ бичвэрийг орчуулж чадсангүй. Баримтын бичвэр мөн эсэхийг шалгана уу."],
+  lost: ["결과를 받지 못했어요. 오늘 한 장이 쓰였을 수 있어요. 다시 만들면 한 장을 더 써요.", "The result did not arrive. One of today’s 10 may have been used. Making it again uses one more.", "Үр дүн ирсэнгүй. Өнөөдрийн нэг хуудсыг ашигласан байж магадгүй. Дахин гаргавал нэг хуудсыг нэмж ашиглана."],
+  account: ["계정이 바뀌어 초안을 지웠어요.", "Your account changed, so the draft was cleared.", "Бүртгэл солигдсон тул ноорог устгагдлаа."]
+};
+var pick3 = (en, a) => en ? a[1] : a[0];
+var mnLine = (a) => `<span class="sx-mn" lang="mn">${esc7(a[2])}</span>`;
+var both = (en, a, tag2 = "p", cls = "") => `<${tag2}${cls ? ` class="${cls}"` : ""}><span>${esc7(pick3(en, a))}</span>${mnLine(a)}</${tag2}>`;
+var reasonKeys = (row) => row.reasons.flatMap((r) => r === "differs" ? [row.reason === "term" ? "changed" : row.reason === "missing" || row.reason === "added" ? row.reason : "meaning"] : [r]);
+function renderTranslate(view) {
+  const en = view.lang === "en", L5 = (ko, e) => en ? e : ko, P = (a) => pick3(en, a);
+  const tr = view.tr || {};
+  const back = `<button type="button" class="sx-back" data-action="trLeave">${BACK5}${L5("내 길", "My path")}</button>`;
+  const head2 = `<header class="sx-head"><p class="sx-kicker">${esc7(P(M.kicker))}</p><h1 class="sx-title page-title" id="tr-title" tabindex="-1">${esc7(en ? view.docName?.en : view.docName?.ko)}</h1>${both(en, M.lead, "p", "sx-lead")}</header>`;
+  if (!view.signedIn) {
+    return `<div class="sx sx-tr">${back}${head2}${both(en, M.signIn, "p", "sx-note is-box")}<button type="button" class="sx-cta" data-action="accountSignIn">${L5("SYNK ID로 로그인", "Sign in with SYNK ID")}</button></div>`;
+  }
+  const busy = tr.phase === "sending";
+  const notice = tr.notice ? `<p class="sx-store is-warn" role="status"><span>${esc7(P(ERROR_TEXT[tr.notice] || ERROR_TEXT.unavailable))}</span>${mnLine(ERROR_TEXT[tr.notice] || ERROR_TEXT.unavailable)}</p>` : "";
+  const rules = (view.rules || []).length ? `<section class="sx-tr-rules" aria-labelledby="sx-tr-rules-h"><h2 class="sx-h" id="sx-tr-rules-h">${esc7(P(M.rules))}</h2><ul class="sx-rules">${view.rules.map((r) => `<li>${esc7(en ? r.en : r.ko)}</li>`).join("")}</ul></section>` : "";
+  if (tr.phase === "draft" && Array.isArray(tr.rows)) return `<div class="sx sx-tr">${back}${head2}${notice}${renderDraft(tr, en, rules)}${both(en, M.fine, "p", "sx-fine")}</div>`;
+  const err = tr.error ? `<p class="sx-err" id="tr-err" role="alert"><span>${esc7(P(ERROR_TEXT[tr.error] || ERROR_TEXT.unavailable))}</span>${mnLine(ERROR_TEXT[tr.error] || ERROR_TEXT.unavailable)}</p>` : "";
+  const ages = ["adult", "teen", "under14"].map((a) => `<label class="sx-choice"><input type="radio" id="tr-age-${a}" name="tr-age" value="${a}" data-action="trAge"${tr.age === a ? " checked" : ""}${busy ? " disabled" : ""}><span>${esc7(P(M[a]))}<span class="sx-mn" lang="mn">${esc7(M[a][2])}</span></span></label>`).join("");
+  const item = (k, t2) => `<div class="sx-tr-item"><dt>${esc7(P(M[k]))}</dt><dd><span>${esc7(P(M[t2]))}</span>${mnLine(M[t2])}</dd></div>`;
+  const ready = tr.age === "adult" || tr.age === "teen" && tr.guardian;
+  const canSend = !busy && ready && tr.agree === true && String(tr.text || "").trim().length > 0;
+  const consent = `<section class="sx-card sx-tr-consent" aria-labelledby="sx-tr-consent-h"><h2 class="sx-h" id="sx-tr-consent-h">${esc7(P(M.consentTitle))}<span class="sx-mn" lang="mn">${esc7(M.consentTitle[2])}</span></h2>
+<dl class="sx-tr-items">${item("what", "whatText")}${item("who", "whoText")}${item("keep", "keepText")}${item("no", "noText")}<div class="sx-tr-item"><dt>${esc7(P(M.ask))}</dt><dd>SYNK · hello@synk.im · <a href="${en ? PRIVACY_URL_EN : PRIVACY_URL2}" target="_blank" rel="noopener noreferrer">${L5("개인정보 처리방침", "Privacy policy")}<span class="sr-only"> (${L5("새 탭에서 열림", "opens in new tab")})</span></a></dd></div></dl>
+<fieldset class="sx-tr-age"><legend>${esc7(P(M.age))}</legend>${ages}</fieldset>
+${tr.age === "under14" ? both(en, M.under14Note, "p", "sx-store is-warn") : ""}
+${tr.age === "teen" ? `<label class="sx-check"><input type="checkbox" id="tr-guardian" data-action="trGuardian"${tr.guardian ? " checked" : ""}${busy ? " disabled" : ""}><span><span>${esc7(P(M.guardian))}</span>${mnLine(M.guardian)}</span></label>` : ""}
+${tr.age && tr.age !== "under14" ? `<label class="sx-check"><input type="checkbox" id="tr-agree" data-action="trAgree"${tr.agree ? " checked" : ""}${busy ? " disabled" : ""}><span><span>${esc7(P(M.agree))}</span>${mnLine(M.agree)}</span></label>` : ""}</section>`;
+  const kinds = view.kindChoice ? `<fieldset class="sx-tr-kind"><legend>${esc7(P(M.kind))}</legend>${["grad", "transcript"].map((k) => `<label class="sx-choice"><input type="radio" id="tr-kind-${k}" name="tr-kind" value="${k}" data-action="trKind"${tr.kind === k ? " checked" : ""}${busy ? " disabled" : ""}><span>${esc7(P(M[k]))}<span class="sx-mn" lang="mn">${esc7(M[k][2])}</span></span></label>`).join("")}</fieldset>` : "";
+  return `<div class="sx sx-tr">${back}${head2}
+${rules}
+<section class="sx-tr-how" aria-labelledby="sx-tr-how-h"><h2 class="sx-h" id="sx-tr-how-h">${esc7(P(M.howTitle))}</h2>${both(en, M.how1, "p", "sx-fine")}${both(en, M.how2, "p", "sx-fine")}</section>
+${kinds}
+<div class="sx-field"><label for="tr-text">${esc7(P(M.textLabel))}</label><textarea id="tr-text" class="sx-tr-text" lang="mn" rows="10" spellcheck="false" autocomplete="off" data-action="trText"${tr.error ? ' aria-invalid="true" aria-describedby="tr-err tr-count"' : ' aria-describedby="tr-count"'}${busy ? " readonly" : ""}>${esc7(tr.text || "")}</textarea><p class="sx-fine" id="tr-count">${esc7(countText(tr.text, en))}</p>${err}</div>
+${consent}
+<button type="button" class="sx-cta" data-action="trSend"${canSend ? "" : " disabled"}>${esc7(P(M.send))}</button>
+${busy ? `<p class="sx-note is-box" role="status"><span>${esc7(P(M.waiting))}</span>${mnLine(M.waiting)}</p>` : notice}
+${both(en, M.quota, "p", "sx-fine")}${leftLine(tr, en)}
+${both(en, M.fine, "p", "sx-fine")}</div>`;
+}
+var leftLine = (tr, en) => Number.isInteger(tr.remaining) && tr.remaining > 0 ? both(en, [`오늘 ${tr.remaining}장 더 만들 수 있어요.`, `${tr.remaining} left today.`, `Өнөөдөр дахиад ${tr.remaining} хуудас гаргаж болно.`], "p", "sx-fine") : "";
+function countText(text2, en) {
+  const lines = String(text2 || "").split(/\r\n?|\n/).filter((l) => l.trim()).length, n = [...String(text2 || "")].length;
+  return en ? `${lines} lines · ${n.toLocaleString("en-US")} / ${MAX_TOTAL_CHARS.toLocaleString("en-US")} characters` : `${lines}줄 · ${n.toLocaleString("ko-KR")} / ${MAX_TOTAL_CHARS.toLocaleString("ko-KR")}자`;
+}
+function renderDraft(tr, en, rules) {
+  const P = (a) => pick3(en, a), L5 = (ko, e) => en ? e : ko;
+  const rows = tr.rows;
+  const flagged = rows.filter((r) => reasonKeys(r).length).length;
+  const meaning = rows.filter((r) => r.verdict === "differs" || r.verdict === "unsure").length;
+  const band = `<div class="sx-tr-band" role="note"><b>${esc7(P(M.band))}</b><span class="sx-mn" lang="mn">${esc7(M.band[2])}</span></div>`;
+  const notices2 = `<ul class="sx-tr-notices">${[M.notice1, M.notice3].map((a) => `<li><span>${esc7(P(a))}</span>${mnLine(a)}</li>`).join("")}</ul>`;
+  let checkLine = "";
+  if (tr.check === "checking") checkLine = `<p class="sx-note" role="status"><span>${esc7(P(M.checking))}</span>${mnLine(M.checking)}</p>`;
+  else if (tr.check === "failed") checkLine = `<div class="sx-note is-box" role="status">${both(en, M.noBack)}<button type="button" class="sx-btn2 sm line" data-action="trRecheck">${esc7(P(M.recheck))}</button></div>`;
+  else if (tr.check === "done") {
+    const summary = meaning ? [`뜻이 달라 보이는 줄 ${meaning}곳`, `${meaning} line${meaning === 1 ? "" : "s"} may differ in meaning`, `Утга нь өөр байж болзошгүй ${meaning} мөр байна`] : M.noDiff;
+    checkLine = `<div class="sx-note" role="status">${tr.compared ? `<p><b>${esc7(P(summary))}</b></p>${mnLine(summary)}` : both(en, M.notCompared)}${both(en, M.checkNote)}</div>`;
+  }
+  const only2 = tr.onlyFlagged === true && flagged > 0;
+  const list = rows.filter((r) => !only2 || reasonKeys(r).length).map((r) => {
+    const keys = reasonKeys(r);
+    const reasons = keys.length ? `<ul class="sx-tr-why">${keys.map((k) => `<li><span>${esc7(P(REASON_TEXT[k]))}</span>${mnLine(REASON_TEXT[k])}</li>`).join("")}</ul>` : "";
+    return `<li class="sx-tr-row${keys.length ? " is-flag" : ""}"><p class="sx-tr-n">${r.i + 1}</p><dl><div><dt>${esc7(P(M.source))}</dt><dd lang="mn">${esc7(r.source)}</dd></div><div><dt>${esc7(P(M.draft))}</dt><dd lang="ko">${esc7(r.ko)}</dd></div>${r.back !== null ? `<div><dt>${esc7(P(M.back))}</dt><dd lang="mn">${esc7(r.back)}</dd></div>` : ""}</dl>${reasons}</li>`;
+  }).join("");
+  const tools = `<div class="sx-row2"><button type="button" class="sx-btn2" data-action="trCopy">${esc7(P(M.copy))}</button><button type="button" class="sx-btn2" data-action="trDownload">${esc7(P(M.download))}</button></div>
+<div class="sx-row2"><button type="button" class="sx-btn2 line" data-action="trEdit">${esc7(P(M.edit))}</button><button type="button" class="sx-btn2 line" data-action="trFresh">${esc7(P(M.fresh))}</button></div>`;
+  const toggle = flagged === 0 ? "" : `<button type="button" class="sx-btn2 sm" aria-pressed="${only2}" data-action="trFlagged"><span class="sx-on">${ON4}</span>${esc7(P(M.onlyFlagged))} (${flagged})</button>`;
+  return `<section class="sx-tr-draft" aria-labelledby="sx-tr-draft-h"><h2 class="sx-h sr-only" id="sx-tr-draft-h">${esc7(P(M.draft))}</h2>${band}${notices2}${rules}${checkLine}${toggle}
+<ol class="sx-tr-rows">${list}</ol>${tools}${tr.copied === "copied" || tr.copied === "copyFail" ? `<p class="sx-note" role="status"><span>${esc7(P(M[tr.copied]))}</span>${mnLine(M[tr.copied])}</p>` : ""}${leftLine(tr, en)}</section>`;
+}
+function draftText(rows, docName) {
+  const head2 = ["[번역 초안 — 번역본이 아닙니다. 번역자가 원문과 대조해 고쳐야 합니다.]", "[Орчуулгын ноорог — албан ёсны орчуулга биш. Орчуулагч эх хувьтай тулгаж засах ёстой.]"];
+  const body = rows.flatMap((r) => {
+    const keys = reasonKeys(r);
+    return [`${r.i + 1}. ${r.ko}`, `   원문: ${r.source}`, ...keys.length ? [`   확인 필요: ${keys.map((k) => REASON_TEXT[k][0]).join(" ")}`] : []];
+  });
+  return [...head2, `${docName?.ko || ""}`.trim(), "", ...body, "", ...head2].join("\n") + "\n";
 }
 
 // experiences/path-app/app.mjs
@@ -5740,7 +6174,7 @@ var DICT = {
 };
 var t = (k) => (DICT[k] || [k, k])[state.lang === "en" ? 1 : 0];
 var pick = (o) => o ? o[state.lang] ?? o.ko : "";
-var esc7 = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+var esc8 = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
 var goalById = (id) => GOALS.find((g) => g.id === id);
 var oppById = (id) => {
   const demo = OPPORTUNITIES.find((o) => o.id === id);
@@ -6077,7 +6511,7 @@ function commit(next) {
   if (!session.status().canEdit) {
     const err = session.status().error;
     const m = err ? getAccountErrorMessage(err, state.lang) : state.lang === "en" ? "You can't change data right now. Please check the save status in Profile." : "현재는 자료를 바꿀 수 없어요. 내 정보에서 저장 상태를 확인해 주세요.";
-    S.flash = esc7(m);
+    S.flash = esc8(m);
     say(m);
     return false;
   }
@@ -6089,7 +6523,7 @@ function commit(next) {
   } catch (e) {
     state = session.document()?.state || state;
     const m = getAccountErrorMessage(e, state.lang);
-    S.flash = esc7(m);
+    S.flash = esc8(m);
     say(m);
     return false;
   } finally {
@@ -6099,26 +6533,26 @@ function commit(next) {
 function newDraft() {
   return { primaryGoal: state.primaryGoal, interests: [...state.interests || []], secondaryGoals: [...state.secondaryGoals || []], location: state.location || "unknown" };
 }
-var svg5 = (box, sw, p) => `<svg viewBox="0 0 ${box} ${box}" fill="none" stroke="currentColor" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">${p}</svg>`;
+var svg6 = (box, sw, p) => `<svg viewBox="0 0 ${box} ${box}" fill="none" stroke="currentColor" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">${p}</svg>`;
 var ICON2 = {
-  arrow: svg5(20, 1.7, '<path d="M4 10h11.5M11 5.5 15.5 10 11 14.5"/>'),
-  back: svg5(20, 1.7, '<path d="M16 10H4.5M9 5.5 4.5 10 9 14.5"/>'),
-  out: svg5(20, 1.7, '<path d="M6 14 14 6M7.5 6H14v6.5"/>'),
-  check: svg5(20, 2.4, '<path d="m5 10.4 3.2 3.1L15 6.6"/>')
+  arrow: svg6(20, 1.7, '<path d="M4 10h11.5M11 5.5 15.5 10 11 14.5"/>'),
+  back: svg6(20, 1.7, '<path d="M16 10H4.5M9 5.5 4.5 10 9 14.5"/>'),
+  out: svg6(20, 1.7, '<path d="M6 14 14 6M7.5 6H14v6.5"/>'),
+  check: svg6(20, 2.4, '<path d="m5 10.4 3.2 3.1L15 6.6"/>')
 };
 var TAB_ICON = {
-  today: svg5(24, 1.6, '<rect x="4" y="5.5" width="16" height="14.5" rx="2.5"/><path d="M4 10.2h16M8.5 3.5v4M15.5 3.5v4"/><path d="M11.9 14.9h.2" stroke-width="2.6"/>'),
-  explore: svg5(24, 1.6, '<circle cx="10.5" cy="10.5" r="6"/><path d="m15 15 5 5"/>'),
-  prepare: svg5(24, 1.6, '<path d="M4 20h4L19 9l-4-4L4 16z"/><path d="m13.5 6.5 4 4"/>'),
-  channels: svg5(24, 1.6, '<rect x="4" y="5" width="13" height="14.5" rx="2"/><path d="M17 9h3v8.5a2 2 0 0 1-2 2H6"/><path d="M7.5 9h6M7.5 12.5h6M7.5 16h4"/>'),
-  univ: svg5(24, 1.6, '<path d="M3.5 9.6 12 4.6l8.5 5"/><path d="M6 11v7.5M10 11v7.5M14 11v7.5M18 11v7.5M3.5 19.5h17"/>'),
-  help: svg5(24, 1.6, '<path d="M4.5 5.5h15v10h-8l-4 3.5v-3.5h-3z"/><path d="M10.4 8.9a1.7 1.7 0 1 1 2.3 1.6c-.5.2-.7.6-.7 1.1M12 13.4v.1"/>'),
-  profile: svg5(24, 1.6, '<circle cx="12" cy="8.5" r="3.6"/><path d="M5 20c1.2-3.6 4-5.4 7-5.4s5.8 1.8 7 5.4"/>')
+  today: svg6(24, 1.6, '<rect x="4" y="5.5" width="16" height="14.5" rx="2.5"/><path d="M4 10.2h16M8.5 3.5v4M15.5 3.5v4"/><path d="M11.9 14.9h.2" stroke-width="2.6"/>'),
+  explore: svg6(24, 1.6, '<circle cx="10.5" cy="10.5" r="6"/><path d="m15 15 5 5"/>'),
+  prepare: svg6(24, 1.6, '<path d="M4 20h4L19 9l-4-4L4 16z"/><path d="m13.5 6.5 4 4"/>'),
+  channels: svg6(24, 1.6, '<rect x="4" y="5" width="13" height="14.5" rx="2"/><path d="M17 9h3v8.5a2 2 0 0 1-2 2H6"/><path d="M7.5 9h6M7.5 12.5h6M7.5 16h4"/>'),
+  univ: svg6(24, 1.6, '<path d="M3.5 9.6 12 4.6l8.5 5"/><path d="M6 11v7.5M10 11v7.5M14 11v7.5M18 11v7.5M3.5 19.5h17"/>'),
+  help: svg6(24, 1.6, '<path d="M4.5 5.5h15v10h-8l-4 3.5v-3.5h-3z"/><path d="M10.4 8.9a1.7 1.7 0 1 1 2.3 1.6c-.5.2-.7.6-.7 1.1M12 13.4v.1"/>'),
+  profile: svg6(24, 1.6, '<circle cx="12" cy="8.5" r="3.6"/><path d="M5 20c1.2-3.6 4-5.4 7-5.4s5.8 1.8 7 5.4"/>')
 };
 var SYMBOL = {
-  study: svg5(48, 1.6, '<rect x="11" y="3.5" width="26" height="41" rx="13"/><rect x="15.5" y="8" width="17" height="32" rx="8.5"/><path d="M15.6 16.8h16.8"/><path d="M24 16.8v2.6"/><path d="M16 32.4c4.6-3 11.2-4.6 16.2-2.9"/><circle cx="27.6" cy="24.2" r="1.7"/>'),
-  student: svg5(48, 1.6, '<path d="M24 14.2c-4.7-3.3-11.1-4-17.2-2.7v24.4c6.1-1.3 12.5-.6 17.2 2.7 4.7-3.3 11.1-4 17.2-2.7V11.5c-6.1-1.3-12.5-.6-17.2 2.7z"/><path d="M24 14.2v24.4"/><path d="M11.2 18.6c3-.4 6.1 0 8.6 1M11.2 23.6c3-.4 6.1 0 8.6 1M28.2 19.6c2.5-1 5.6-1.4 8.6-1"/>'),
-  job: svg5(48, 1.6, '<rect x="6.5" y="15.5" width="35" height="25" rx="3.6"/><path d="M18 15.5v-3.4a2.6 2.6 0 0 1 2.6-2.6h6.8a2.6 2.6 0 0 1 2.6 2.6v3.4"/><path d="M6.5 26.5h13.5M28 26.5h13.5"/><rect x="20" y="23.6" width="8" height="6" rx="1.4"/>')
+  study: svg6(48, 1.6, '<rect x="11" y="3.5" width="26" height="41" rx="13"/><rect x="15.5" y="8" width="17" height="32" rx="8.5"/><path d="M15.6 16.8h16.8"/><path d="M24 16.8v2.6"/><path d="M16 32.4c4.6-3 11.2-4.6 16.2-2.9"/><circle cx="27.6" cy="24.2" r="1.7"/>'),
+  student: svg6(48, 1.6, '<path d="M24 14.2c-4.7-3.3-11.1-4-17.2-2.7v24.4c6.1-1.3 12.5-.6 17.2 2.7 4.7-3.3 11.1-4 17.2-2.7V11.5c-6.1-1.3-12.5-.6-17.2 2.7z"/><path d="M24 14.2v24.4"/><path d="M11.2 18.6c3-.4 6.1 0 8.6 1M11.2 23.6c3-.4 6.1 0 8.6 1M28.2 19.6c2.5-1 5.6-1.4 8.6-1"/>'),
+  job: svg6(48, 1.6, '<rect x="6.5" y="15.5" width="35" height="25" rx="3.6"/><path d="M18 15.5v-3.4a2.6 2.6 0 0 1 2.6-2.6h6.8a2.6 2.6 0 0 1 2.6 2.6v3.4"/><path d="M6.5 26.5h13.5M28 26.5h13.5"/><rect x="20" y="23.6" width="8" height="6" rx="1.4"/>')
 };
 var CARD_NO = { study: "01", student: "02", job: "03" };
 var CLIP = '<svg class="clip" viewBox="0 0 22 38" aria-hidden="true" focusable="false"><path d="M5.5 0h11v6.6a2 2 0 0 1-2 2h-7a2 2 0 0 1-2-2z" fill="url(#metal)"/><path d="M7.4 2.2h7.2" stroke="rgba(0,0,0,.18)" stroke-width=".8"/><circle cx="11" cy="12.6" r="3.8" fill="none" stroke="url(#metal)" stroke-width="2"/><rect x="9" y="16.1" width="4" height="4.6" rx="1.2" fill="url(#metal)"/><path d="M11 20.6v6.1a4.6 4.6 0 1 0 4.6-4.6" fill="none" stroke="url(#metal)" stroke-width="2.2" stroke-linecap="round"/></svg>';
@@ -6129,9 +6563,9 @@ function seal(n = 0) {
 function hang(goal, { i = 0, slot = "mid", radio = false, on = false, action = "", kicker = "", name = "", desc = null, mode = "goal" } = {}) {
   const g = goalById(goal);
   const nm = name || pick(g.label), ds = desc ?? pick(g.description);
-  const bottom = `${kicker ? `<span class="pass-kicker">${esc7(kicker)}</span>` : ""}<span class="pass-name">${esc7(nm)}</span>${ds ? `<span class="pass-desc">${esc7(ds)}</span>` : ""}`;
+  const bottom = `${kicker ? `<span class="pass-kicker">${esc8(kicker)}</span>` : ""}<span class="pass-name">${esc8(nm)}</span>${ds ? `<span class="pass-desc">${esc8(ds)}</span>` : ""}`;
   const face = `<span class="pass-band" aria-hidden="true"></span><span class="pass-face" aria-hidden="true"><span class="pass-top"><span class="pass-brand">PATH</span><span class="pass-no">No.${CARD_NO[goal]}</span></span><span class="pass-symbol">${SYMBOL[goal]}</span><span class="pass-bottom">${bottom}</span></span><span class="pick-mark" aria-hidden="true">${ICON2.check}</span>`;
-  const card2 = radio ? `<button type="button" class="pass goal-choice" role="radio" aria-checked="${on}" tabindex="${on || !S.draft?.primaryGoal && i === 0 ? 0 : -1}" data-action="pickGoal" data-id="${goal}" data-mode="${mode}" aria-label="${esc7(`${pick(g.label)} — ${pick(g.description)}`)}">${face}</button>` : action ? `<button type="button" class="pass" data-action="${action}" data-id="${goal}" data-mode="${mode}" aria-label="${esc7(ds ? `${nm} — ${ds}` : nm)}">${face}</button>` : `<div class="pass" data-mode="${mode}" role="img" aria-label="${esc7(ds ? `${nm} — ${ds}` : nm)}">${face}</div>`;
+  const card2 = radio ? `<button type="button" class="pass goal-choice" role="radio" aria-checked="${on}" tabindex="${on || !S.draft?.primaryGoal && i === 0 ? 0 : -1}" data-action="pickGoal" data-id="${goal}" data-mode="${mode}" aria-label="${esc8(`${pick(g.label)} — ${pick(g.description)}`)}">${face}</button>` : action ? `<button type="button" class="pass" data-action="${action}" data-id="${goal}" data-mode="${mode}" aria-label="${esc8(ds ? `${nm} — ${ds}` : nm)}">${face}</button>` : `<div class="pass" data-mode="${mode}" role="img" aria-label="${esc8(ds ? `${nm} — ${ds}` : nm)}">${face}</div>`;
   return `<div class="hang${S.drop ? " is-drop" : ""}${on ? " is-on" : ""}" data-goal="${goal}" data-i="${i}" data-slot="${slot}"><div class="strap" aria-hidden="true"><span class="strap-print">PATH PATH PATH PATH PATH PATH PATH PATH</span></div>${CLIP}<div class="card-wrap"><span class="card-shadow" aria-hidden="true"></span>${card2}</div></div>`;
 }
 var sec = (title, sub, body, cls = "") => `<section class="sec${cls ? ` ${cls}` : ""}"><div class="sec-h"><h2>${title}</h2>${sub ? `<span>${sub}</span>` : ""}</div>${body}</section>`;
@@ -6140,9 +6574,9 @@ function demoBadge(o) {
   if (o?.source === "live") return `<span class="badge">${state.lang === "en" ? "Official job posting" : "공식 채용 공고"}</span>`;
   return `<span class="badge">${t("demo")}</span>`;
 }
-var liveLink = (o) => o?.source === "live" && o.url ? `<p><a href="${esc7(o.url)}" target="_blank" rel="noopener noreferrer">${state.lang === "en" ? "View original posting (opens in new tab)" : "원문 공고 보기 (새 탭)"}</a></p>` : "";
+var liveLink = (o) => o?.source === "live" && o.url ? `<p><a href="${esc8(o.url)}" target="_blank" rel="noopener noreferrer">${state.lang === "en" ? "View original posting (opens in new tab)" : "원문 공고 보기 (새 탭)"}</a></p>` : "";
 var findJobEntry = (id) => (jobsFeed.snapshot().jobs || []).find((j) => j.id === id) || (session.document()?.savedJobs || []).find((j) => j.id === id);
-var oppRow = (o) => `<li><button type="button" class="row" data-action="detail" data-id="${esc7(o.id)}"><span><b>${demoBadge(o)}${esc7(pick(o.title))}</b><small>${esc7(pick(o.summary))}</small></span><span class="row-go" aria-hidden="true">${ICON2.arrow}</span></button></li>`;
+var oppRow = (o) => `<li><button type="button" class="row" data-action="detail" data-id="${esc8(o.id)}"><span><b>${demoBadge(o)}${esc8(pick(o.title))}</b><small>${esc8(pick(o.summary))}</small></span><span class="row-go" aria-hidden="true">${ICON2.arrow}</span></button></li>`;
 var TABS = ["today", "channels", "univ", "explore", "prepare", "help", "profile"].filter((p) => (p !== "univ" || STUDY_ON) && (p !== "channels" || CHANNEL_ON));
 var UNIV_PAGES = ["cond", "univDetail", "univCompare"];
 function shell(main) {
@@ -6181,13 +6615,13 @@ function onboard() {
     const cards = GOALS.map((g3, i) => hang(g3.id, { i, slot: ["left", "mid", "right"][i], radio: true, on: d.primaryGoal === g3.id })).join("");
     const g2 = goalById(d.primaryGoal);
     return `<main class="ob" id="main"><div class="ob-title">${notices(true)}<h1 class="title page-title" id="q1" tabindex="-1"><span>${t("obT1")}</span> <span class="title-2">${t("obT2")}</span></h1></div>
-<div class="ob-lead"><p class="lead" id="ob-lead" aria-live="polite">${g2 ? `<b class="lead-pick">${esc7(pick(g2.label))}</b>${esc7(pick(g2.note))}` : t("obLead")}</p></div>
+<div class="ob-lead"><p class="lead" id="ob-lead" aria-live="polite">${g2 ? `<b class="lead-pick">${esc8(pick(g2.label))}</b>${esc8(pick(g2.note))}` : t("obLead")}</p></div>
 <div class="stage ob-stage${d.primaryGoal ? " has-pick" : ""}" role="radiogroup" aria-label="${t("q1")}"><div class="rod" aria-hidden="true"></div>${cards}</div>
 <div class="ob-actions"><button type="button" class="btn" data-action="finish"${d.primaryGoal ? "" : " disabled"}>${t("startCard")} ${ICON2.arrow}</button><button type="button" class="link" data-action="skip">${t("browse")}</button>${state.onboarded ? `<button type="button" class="link" data-action="cancelOnboard">${t("cancel")}</button>` : ""}</div>
 <p class="fine ob-fine">${t("obFine")}${d.primaryGoal ? ` <button type="button" class="link link-sm" data-action="step2">${t("fineTune")}</button>` : ""}</p></main>`;
   }
   const g = goalById(d.primaryGoal);
-  const chips = (list, key) => list.map((x) => `<button type="button" class="chip" aria-pressed="${d[key].includes(x.id)}" data-action="toggle" data-key="${key}" data-id="${x.id}">${esc7(pick(x.label))}</button>`).join("");
+  const chips = (list, key) => list.map((x) => `<button type="button" class="chip" aria-pressed="${d[key].includes(x.id)}" data-action="toggle" data-key="${key}" data-id="${x.id}">${esc8(pick(x.label))}</button>`).join("");
   const locs = ["abroad", "korea", "unknown"].map((l) => `<option value="${l}"${d.location === l ? " selected" : ""}>${t(l)}</option>`).join("");
   return `<main class="ob2" id="main"><div class="ob2-card">${hang(g.id, { slot: "mid" })}</div><div class="ob2-main">${notices(true)}<p class="eyebrow">${t("step2")}</p><h1 class="title page-title" tabindex="-1"><span>${t("q2")}</span> <span class="title-2">${t("q2lead")}</span></h1>
 <fieldset class="field"><legend>${t("interests")}</legend><div class="chips">${chips(g.interests, "interests")}</div></fieldset>
@@ -6197,7 +6631,7 @@ function onboard() {
 }
 function stamps(states, descs) {
   const names = ["j1", "j2", "j3"];
-  return `<ol class="stamps" aria-label="${t("stampsLabel")}">${states.map((s, i) => `<li class="stamp is-${s}"${s === "now" ? ' aria-current="step"' : ""}><span class="slot" aria-hidden="true">${s === "done" ? seal(i) : s === "now" ? t("sNow") : `<span class="slot-num">${i + 1}</span>`}</span><h3>${t(names[i])} <span class="stamp-state">${t(s === "done" ? "sDone" : s === "now" ? "sNow" : "sNext")}</span></h3><p>${esc7(descs[i])}</p></li>`).join("")}</ol>`;
+  return `<ol class="stamps" aria-label="${t("stampsLabel")}">${states.map((s, i) => `<li class="stamp is-${s}"${s === "now" ? ' aria-current="step"' : ""}><span class="slot" aria-hidden="true">${s === "done" ? seal(i) : s === "now" ? t("sNow") : `<span class="slot-num">${i + 1}</span>`}</span><h3>${t(names[i])} <span class="stamp-state">${t(s === "done" ? "sDone" : s === "now" ? "sNow" : "sNext")}</span></h3><p>${esc8(descs[i])}</p></li>`).join("")}</ol>`;
 }
 function today() {
   const g = goalById(state.primaryGoal);
@@ -6205,7 +6639,7 @@ function today() {
     const cards = GOALS.map((x, i) => hang(x.id, { i, slot: ["left", "mid", "right"][i], action: "exploreGoal" })).join("");
     return `<main class="home" id="main"><aside class="stage home-stage is-three" aria-label="${t("pickCard")}"><div class="rod" aria-hidden="true"></div>${cards}<div class="home-cap"><span></span><button type="button" class="link" data-action="changeGoal">${t("pickCard")}</button></div></aside>
 <div class="home-main">${notices()}<p class="eyebrow">${t("today")}</p><h1 class="title page-title" tabindex="-1"><span>${t("nT1")}</span> <span class="title-2">${t("nT2")}</span></h1>
-<ul class="goal-list">${GOALS.map((x) => `<li><button type="button" class="goal-row" data-action="exploreGoal" data-id="${x.id}"><span class="goal-sym" data-goal="${x.id}">${SYMBOL[x.id]}</span><span class="goal-txt"><b>${esc7(pick(x.label))}</b><small>${esc7(pick(x.description))}</small></span><span class="row-go" aria-hidden="true">${ICON2.arrow}</span></button></li>`).join("")}</ul>
+<ul class="goal-list">${GOALS.map((x) => `<li><button type="button" class="goal-row" data-action="exploreGoal" data-id="${x.id}"><span class="goal-sym" data-goal="${x.id}">${SYMBOL[x.id]}</span><span class="goal-txt"><b>${esc8(pick(x.label))}</b><small>${esc8(pick(x.description))}</small></span><span class="row-go" aria-hidden="true">${ICON2.arrow}</span></button></li>`).join("")}</ul>
 ${pathHtml()}${upcomingHtml()}${newsHtml()}<div class="home-grid">${sec(t("official"), t("offSub"), officialList("all"))}${sec(t("tools"), "", toolRows())}</div></div></main>`;
   }
   const mine = state.tasks.filter((x) => x.goal === g.id);
@@ -6217,11 +6651,11 @@ ${pathHtml()}${upcomingHtml()}${newsHtml()}<div class="home-grid">${sec(t("offic
   let card2;
   if (task) {
     const so = oppById(task.sourceId);
-    card2 = `<section class="resume" aria-label="${t("resume")}"><div><span class="resume-k">${t("resume")}</span><span class="resume-t">${so ? `${demoBadge(so)}${esc7(pick(so.title))}` : t("missing")}</span><span class="resume-s"><i aria-hidden="true"></i>${t("resumeS")}</span></div><button type="button" class="btn" data-action="openTask" data-id="${esc7(task.id)}">${t("resume")} ${ICON2.arrow}</button></section>`;
+    card2 = `<section class="resume" aria-label="${t("resume")}"><div><span class="resume-k">${t("resume")}</span><span class="resume-t">${so ? `${demoBadge(so)}${esc8(pick(so.title))}` : t("missing")}</span><span class="resume-s"><i aria-hidden="true"></i>${t("resumeS")}</span></div><button type="button" class="btn" data-action="openTask" data-id="${esc8(task.id)}">${t("resume")} ${ICON2.arrow}</button></section>`;
   } else if (allDone) {
     card2 = `<section class="resume is-done"><div><span class="resume-k">${t("nextStep")}</span><span class="resume-t">${t("doneNext")}</span></div><div class="resume-acts"><button type="button" class="btn" data-action="exploreGoal" data-id="${g.id}">${t("exploreMore")} ${ICON2.arrow}</button><button type="button" class="link" data-action="nav" data-page="prepare">${t("viewPrep")}</button></div></section>`;
   } else {
-    card2 = `<section class="resume is-start"><div><span class="resume-k">${t("nextStep")}</span><span class="resume-t">${esc7(pick(g.homeTitle))}</span><span class="resume-s">${esc7(pick(g.steps[0]))}</span></div><button type="button" class="btn" data-action="exploreGoal" data-id="${g.id}">${esc7(pick(g.homeAction))} ${ICON2.arrow}</button></section>`;
+    card2 = `<section class="resume is-start"><div><span class="resume-k">${t("nextStep")}</span><span class="resume-t">${esc8(pick(g.homeTitle))}</span><span class="resume-s">${esc8(pick(g.steps[0]))}</span></div><button type="button" class="btn" data-action="exploreGoal" data-id="${g.id}">${esc8(pick(g.homeAction))} ${ICON2.arrow}</button></section>`;
   }
   const opps = OPPORTUNITIES.filter((o) => o.goal === g.id).slice(0, 2);
   const off = g.id === "job" && jobsFeed.snapshot().status === "disabled" ? `<p class="off"><i aria-hidden="true"></i>${t("jobsOff")}</p>` : "";
@@ -6232,12 +6666,12 @@ ${stamps(st, g.steps.map(pick))}${card2}${g.id === "study" && STUDY_ON ? renderS
 }
 function officialList(goal) {
   const list = OFFICIAL_LINKS.filter((l) => goal === "all" || l.goal === goal || l.goal === null);
-  return `<ul class="rows">${list.map((l) => `<li><a class="row" href="${esc7(l.url)}" target="_blank" rel="noopener noreferrer"><span><b><span class="badge official">${t("officialBadge")}</span>${esc7(pick(l.title))}</b><small>${esc7(pick(l.summary))} · ${t("checked")} ${esc7(l.checkedAt)}</small></span><span class="row-go" aria-hidden="true">${ICON2.out}</span><span class="sr-only"> (${t("openNew")})</span></a></li>`).join("")}</ul>`;
+  return `<ul class="rows">${list.map((l) => `<li><a class="row" href="${esc8(l.url)}" target="_blank" rel="noopener noreferrer"><span><b><span class="badge official">${t("officialBadge")}</span>${esc8(pick(l.title))}</b><small>${esc8(pick(l.summary))} · ${t("checked")} ${esc8(l.checkedAt)}</small></span><span class="row-go" aria-hidden="true">${ICON2.out}</span><span class="sr-only"> (${t("openNew")})</span></a></li>`).join("")}</ul>`;
 }
-var toolRows = () => `<ul class="rows">${EXISTING_TOOLS.map((x) => `<li><a class="row" href="${esc7(x.url)}" target="_blank" rel="noopener noreferrer"><span><b>${esc7(pick(x.title))}</b><small>${esc7(pick(x.summary))}</small></span><span class="row-go" aria-hidden="true">${ICON2.out}</span><span class="sr-only"> (${t("openNew")})</span></a></li>`).join("")}</ul>`;
+var toolRows = () => `<ul class="rows">${EXISTING_TOOLS.map((x) => `<li><a class="row" href="${esc8(x.url)}" target="_blank" rel="noopener noreferrer"><span><b>${esc8(pick(x.title))}</b><small>${esc8(pick(x.summary))}</small></span><span class="row-go" aria-hidden="true">${ICON2.out}</span><span class="sr-only"> (${t("openNew")})</span></a></li>`).join("")}</ul>`;
 function explore() {
   const f = S.filter;
-  const filt = ["all", ...GOALS.map((g) => g.id)].map((id) => `<button type="button" class="chip" aria-pressed="${f === id}" data-action="filter" data-id="${id}">${id === "all" ? t("all") : esc7(pick(goalById(id).description))}</button>`).join("");
+  const filt = ["all", ...GOALS.map((g) => g.id)].map((id) => `<button type="button" class="chip" aria-pressed="${f === id}" data-action="filter" data-id="${id}">${id === "all" ? t("all") : esc8(pick(goalById(id).description))}</button>`).join("");
   const list = OPPORTUNITIES.filter((o) => f === "all" || o.goal === f);
   const full = S.compare.length >= 3;
   let h = head(t("exploreTitle"), t("explore"), "", t("exploreT2"));
@@ -6246,11 +6680,11 @@ function explore() {
   h += `<details class="practice"${S.practiceOpen ? " open" : ""}><summary><span>${t("practice")}</span><small>${t("demoSub")}</small></summary><p class="meta">${t("demoNote")}</p>`;
   h += `<ul class="rows opp-rows">${list.map((o) => {
     const on = S.compare.includes(o.id);
-    return `<li class="opp"><div class="opp-text"><b>${demoBadge(o)}${esc7(pick(o.title))}</b><small>${esc7(pick(o.summary))}</small></div><div class="opp-acts"><button type="button" class="btn-line" data-action="detail" data-id="${o.id}">${t("details")}</button><button type="button" class="chip" aria-pressed="${on}" data-action="compare" data-id="${o.id}"${full && !on ? " disabled" : ""}>${on ? t("compareOn") : t("compareAdd")}</button></div></li>`;
+    return `<li class="opp"><div class="opp-text"><b>${demoBadge(o)}${esc8(pick(o.title))}</b><small>${esc8(pick(o.summary))}</small></div><div class="opp-acts"><button type="button" class="btn-line" data-action="detail" data-id="${o.id}">${t("details")}</button><button type="button" class="chip" aria-pressed="${on}" data-action="compare" data-id="${o.id}"${full && !on ? " disabled" : ""}>${on ? t("compareOn") : t("compareAdd")}</button></div></li>`;
   }).join("")}</ul>`;
   if (full) h += `<p class="meta">${t("compareMax")}</p>`;
   if (S.compare.length) {
-    h += `<div class="sec-h compare-h"><h2>${t("compareTitle")} (${S.compare.length}/3)</h2><button type="button" class="text-button" data-action="clearCompare">${t("clearCompare")}</button></div><div class="compare-grid">${S.compare.map(oppById).map((o) => `<div class="compare-item">${demoBadge(o)}<h3>${esc7(pick(o.title))}</h3><ol class="reqs">${o.requirements.map((r, i) => `<li><b>${i + 1}</b>${esc7(pick(r))}</li>`).join("")}</ol></div>`).join("")}</div>`;
+    h += `<div class="sec-h compare-h"><h2>${t("compareTitle")} (${S.compare.length}/3)</h2><button type="button" class="text-button" data-action="clearCompare">${t("clearCompare")}</button></div><div class="compare-grid">${S.compare.map(oppById).map((o) => `<div class="compare-item">${demoBadge(o)}<h3>${esc8(pick(o.title))}</h3><ol class="reqs">${o.requirements.map((r, i) => `<li><b>${i + 1}</b>${esc8(pick(r))}</li>`).join("")}</ol></div>`).join("")}</div>`;
   }
   h += "</details>";
   h += sec(t("official"), t("offSub"), officialList(f));
@@ -6259,9 +6693,9 @@ function explore() {
 function detail() {
   const o = oppById(S.oppId);
   if (!o) return head(t("missing")) + `<button type="button" class="btn-line" data-action="nav" data-page="explore">${t("backList")}</button>`;
-  return `<article class="detail"><button type="button" class="back" data-action="nav" data-page="explore">${ICON2.back}${t("backList")}</button><p class="eyebrow">${demoBadge(o)} ${esc7(pick(goalById(o.goal)?.label))}</p><h1 class="title page-title" tabindex="-1"><span>${esc7(pick(o.title))}</span></h1><p class="lead">${esc7(pick(o.summary))}</p>${liveLink(o)}
-<h2 class="h2">${t("requirements")}</h2><ol class="reqs">${o.requirements.map((r, i) => `<li><b>${i + 1}</b>${esc7(pick(r))}</li>`).join("")}</ol>
-<div class="actions"><button type="button" class="btn" data-action="${o.source === "live" ? "prepareJob" : "prepareThis"}" data-id="${esc7(o.id)}">${t("prepareThis")} ${ICON2.arrow}</button></div></article>
+  return `<article class="detail"><button type="button" class="back" data-action="nav" data-page="explore">${ICON2.back}${t("backList")}</button><p class="eyebrow">${demoBadge(o)} ${esc8(pick(goalById(o.goal)?.label))}</p><h1 class="title page-title" tabindex="-1"><span>${esc8(pick(o.title))}</span></h1><p class="lead">${esc8(pick(o.summary))}</p>${liveLink(o)}
+<h2 class="h2">${t("requirements")}</h2><ol class="reqs">${o.requirements.map((r, i) => `<li><b>${i + 1}</b>${esc8(pick(r))}</li>`).join("")}</ol>
+<div class="actions"><button type="button" class="btn" data-action="${o.source === "live" ? "prepareJob" : "prepareThis"}" data-id="${esc8(o.id)}">${t("prepareThis")} ${ICON2.arrow}</button></div></article>
 ${sec(t("official"), t("offSub"), officialList(o.goal))}`;
 }
 var statusHtml = (task) => `<span class="status" data-state="${task.confirmedAt ? "done" : "draft"}">${task.confirmedAt ? t("done") : t("draft")}</span>`;
@@ -6271,14 +6705,14 @@ function prepare() {
   for (const g of GOALS) {
     const ts = state.tasks.filter((x) => x.goal === g.id);
     if (!ts.length) continue;
-    h += sec(esc7(pick(g.label)), "", `<ul class="rows">${ts.map((x) => {
+    h += sec(esc8(pick(g.label)), "", `<ul class="rows">${ts.map((x) => {
       const so = oppById(x.sourceId);
-      return `<li><button type="button" class="row" data-action="openTask" data-id="${esc7(x.id)}"><span><b>${demoBadge(so)}${so ? esc7(pick(so.title)) : t("missing")}</b><small>${statusHtml(x)}</small></span><span class="row-go" aria-hidden="true">${ICON2.arrow}</span></button></li>`;
+      return `<li><button type="button" class="row" data-action="openTask" data-id="${esc8(x.id)}"><span><b>${demoBadge(so)}${so ? esc8(pick(so.title)) : t("missing")}</b><small>${statusHtml(x)}</small></span><span class="row-go" aria-hidden="true">${ICON2.arrow}</span></button></li>`;
     }).join("")}</ul>`);
   }
   return h;
 }
-var countText = (v) => `${String(v || "").length.toLocaleString(state.lang === "en" ? "en-US" : "ko-KR")} / 6,000${state.lang === "en" ? "" : "자"}`;
+var countText2 = (v) => `${String(v || "").length.toLocaleString(state.lang === "en" ? "en-US" : "ko-KR")} / 6,000${state.lang === "en" ? "" : "자"}`;
 function editor() {
   const task = state.tasks.find((x) => x.id === S.taskId);
   const o = task && oppById(task.sourceId);
@@ -6287,13 +6721,13 @@ function editor() {
   const st = session.status(), signed = st.signedIn;
   const savedOk = st.canEdit && !st.error;
   let h = `<main class="ed" id="main"><aside class="stage ed-stage" aria-label="${t("source")}"><div class="rod" aria-hidden="true"></div>${hang(goal, { kicker: t("srcK"), name: pick(o.title), desc: "", mode: "source" })}
-<div class="ed-src"><b>${t("source")}</b><p>${demoBadge(o)}<span>${esc7(pick(o.title))}</span></p><small>${o.source === "live" ? t("liveNote") : t("srcNote")}</small>${liveLink(o)}<button type="button" class="link" data-action="detail" data-id="${esc7(o.id)}">${t("reopen")}</button></div></aside>
+<div class="ed-src"><b>${t("source")}</b><p>${demoBadge(o)}<span>${esc8(pick(o.title))}</span></p><small>${o.source === "live" ? t("liveNote") : t("srcNote")}</small>${liveLink(o)}<button type="button" class="link" data-action="detail" data-id="${esc8(o.id)}">${t("reopen")}</button></div></aside>
 <div class="ed-main">${notices(false, true)}<button type="button" class="back" data-action="nav" data-page="prepare">${ICON2.back}${t("backPrep")}</button>
-<p class="eyebrow">${t("edEyebrow")}</p><h1 class="title page-title" tabindex="-1"><span>${esc7(pick(o.prompt))}</span></h1>
-<ol class="reqs" aria-label="${t("requirements")}">${o.requirements.map((r, i) => `<li><b>${i + 1}</b>${esc7(pick(r))}</li>`).join("")}</ol>
+<p class="eyebrow">${t("edEyebrow")}</p><h1 class="title page-title" tabindex="-1"><span>${esc8(pick(o.prompt))}</span></h1>
+<ol class="reqs" aria-label="${t("requirements")}">${o.requirements.map((r, i) => `<li><b>${i + 1}</b>${esc8(pick(r))}</li>`).join("")}</ol>
 <section class="editor"><div class="field"><label for="body" class="field-label">${t("body")}</label>
-<textarea id="body" maxlength="6000" aria-describedby="body-hint edit-err" data-action="body"${S.error === "needBody" ? ' aria-invalid="true"' : ""}>${esc7(task.body)}</textarea>
-<div class="field-meta" id="body-hint"><span class="count" id="count">${countText(task.body)}</span>${savedOk ? `<span class="saved">${ICON2.check}${signed ? t("savedAccount") : t("savedGuest")}</span>` : ""}</div></div>
+<textarea id="body" maxlength="6000" aria-describedby="body-hint edit-err" data-action="body"${S.error === "needBody" ? ' aria-invalid="true"' : ""}>${esc8(task.body)}</textarea>
+<div class="field-meta" id="body-hint"><span class="count" id="count">${countText2(task.body)}</span>${savedOk ? `<span class="saved">${ICON2.check}${signed ? t("savedAccount") : t("savedGuest")}</span>` : ""}</div></div>
 <p id="task-status" class="task-status">${statusHtml(task)}</p>
 <label class="check"><input type="checkbox" id="ack"${task.confirmedAt ? " checked" : ""}><span class="box" aria-hidden="true">${ICON2.check}</span><span>${t("confirmCheck")}</span></label>
 <p id="edit-err" class="err" role="alert">${S.error ? t(S.error) : ""}</p>
@@ -6301,8 +6735,8 @@ function editor() {
 ${S.flash ? `<div id="flash" class="notice flash-inline" role="status">${S.flash}</div>` : ""}<p class="fine">${t("confirmNote")}</p></section>`;
   if (task.confirmedAt) {
     const nx = getNextTask(state);
-    h += `<div id="confirmed-result" class="result"><div class="sec-h"><h2>${t("result")}</h2>${demoBadge(o)}</div><div class="result-body">${esc7(task.body)}</div>
-<div class="actions">${nx && nx.id !== task.id && !nx.confirmedAt ? `<button type="button" class="btn" data-action="openTask" data-id="${esc7(nx.id)}">${t("nextAction")} ${ICON2.arrow}</button>` : ""}<button type="button" class="btn-line" data-action="exploreGoal" data-id="${task.goal}">${t("exploreMore")}</button></div></div>`;
+    h += `<div id="confirmed-result" class="result"><div class="sec-h"><h2>${t("result")}</h2>${demoBadge(o)}</div><div class="result-body">${esc8(task.body)}</div>
+<div class="actions">${nx && nx.id !== task.id && !nx.confirmedAt ? `<button type="button" class="btn" data-action="openTask" data-id="${esc8(nx.id)}">${t("nextAction")} ${ICON2.arrow}</button>` : ""}<button type="button" class="btn-line" data-action="exploreGoal" data-id="${task.goal}">${t("exploreMore")}</button></div></div>`;
   }
   return h + "</div></main>";
 }
@@ -6328,10 +6762,10 @@ Thank you.` : `안녕하세요.
 감사합니다.`;
 }
 function help() {
-  const opts = [...GOALS.map((g) => [g.id, pick(g.label)]), ["general", t("general")]].map(([id, l]) => `<option value="${id}"${S.help === id ? " selected" : ""}>${esc7(l)}</option>`).join("");
+  const opts = [...GOALS.map((g) => [g.id, pick(g.label)]), ["general", t("general")]].map(([id, l]) => `<option value="${id}"${S.help === id ? " selected" : ""}>${esc8(l)}</option>`).join("");
   return head(t("helpTitle"), t("help"), t("helpLead"), t("helpT2")) + `<div class="field field-inline"><label for="topic" class="field-label">${t("topic")}</label><select id="topic" class="select" data-action="topic">${opts}</select></div>
 <section class="sec"><div class="sec-h"><h2>${t("template")}</h2><button type="button" class="btn-line" data-action="copy">${t("copy")}</button></div>
-${S.copyMsg ? `<p class="notice${S.copyMsg === "copyFail" ? " error" : ""}" role="status">${t(S.copyMsg)}</p>` : ""}<pre class="result-body" id="tpl">${esc7(helpTemplate(S.help))}</pre></section>
+${S.copyMsg ? `<p class="notice${S.copyMsg === "copyFail" ? " error" : ""}" role="status">${t(S.copyMsg)}</p>` : ""}<pre class="result-body" id="tpl">${esc8(helpTemplate(S.help))}</pre></section>
 ${sec(t("official"), t("offSub"), officialList(S.help === "general" ? "none" : S.help))}
 ${sec(t("tools"), t("offSub"), `<p class="meta">${t("toolsLead")}</p>${toolRows()}`)}`;
 }
@@ -6339,7 +6773,7 @@ function profile() {
   const g = goalById(state.primaryGoal);
   const accSt = session.status();
   return head(t("profileTitle"), t("profile"), "", t("profileT2")) + renderAccountPanel(accSt, state.lang, { pendingBackup: !!pendingBackup && !!accSt.canConfirmBackup && pendingBackup.owner === ownerKey(), useRemote: !!pendingBackup?.useRemote }) + `<div class="settings">
-<section class="settings-group"><h2>${t("goal")}</h2><p>${g ? esc7(pick(g.label)) : t("none")}</p><button type="button" class="btn-line" data-action="changeGoal">${t("changeGoal")}</button></section>
+<section class="settings-group"><h2>${t("goal")}</h2><p>${g ? esc8(pick(g.label)) : t("none")}</p><button type="button" class="btn-line" data-action="changeGoal">${t("changeGoal")}</button></section>
 <section class="settings-group"><h2>${t("location")}</h2><p>${t(state.location || "unknown")}</p></section>
 <section class="settings-group"><h2>${t("lang")}</h2><p>${state.lang === "en" ? "English" : "한국어"}</p></section>
 <section class="settings-group"><h2>${t("storage")}</h2>${accSt.signedIn ? `<p>${state.lang === "en" ? "Syncs to your account. Please check the save status above." : "계정에 동기화합니다. 위의 저장 상태를 확인해 주세요."}</p>` : `<p>${t("storageText")}</p><button type="button" class="btn-line danger" data-action="clear">${t("clear")}</button>`}${STUDY_ON ? studyStore() === "tab" ? `<p>${t("studyStore")}</p>` : "" : CHANNEL_ON ? `<p>${t("datesStore")}</p>` : ""}</section>${STUDY_ON && accSt.signedIn ? renderStudyAccountSettings({ lang: state.lang, phase: studyAcct.snapshot().phase, consent: studyAcct.snapshot().consent, store: studyStore(), errorCode: studyAcct.snapshot().error?.code || null }) : ""}</div>`;
@@ -6366,7 +6800,130 @@ var pathHtml = () => STUDY_ON ? renderPathCard(channelView()) : "";
 var univCompare = () => renderUnivCompare(studyView());
 var cond = () => renderCond(condView());
 var studyConsent = () => renderStudyConsent({ lang: state.lang, minor: S.consentMinor, guardian: S.consentGuardian, busy: S.consentBusy, error: S.consentError });
-var PAGES = { today, path, channels, post, univ, univDetail, univCompare, cond, explore, detail, prepare, editor, help, profile, studyConsent };
+var trDoc = () => {
+  const t2 = S.tr && pathTarget(channelView());
+  const d = t2 ? t2.set.all.find((x) => x.id === S.tr.docId) : null;
+  return d ? { doc: d, rules: d.stage === "visa" ? t2.set.visa.rules || [] : [...t2.set.program.rules || [], ...t2.set.program.unclear || []] } : null;
+};
+var translate = () => {
+  const found = trDoc();
+  return renderTranslate({ lang: state.lang, signedIn: session.status().signedIn === true, docName: found?.doc.name, rules: found?.rules || [], kindChoice: Boolean(S.tr && translateKindChoice(S.tr.docId)), tr: S.tr || {} });
+};
+var trMsg = (key) => (ERROR_TEXT[key] || ERROR_TEXT.unavailable)[state.lang === "en" ? 1 : 0];
+var trHidden = () => state.lang === "en" ? "[hidden number]" : "[가린 번호]";
+var newTr = (docId) => ({
+  owner: ownerKey(),
+  docId,
+  kind: translateKindOf(docId) || "grad",
+  text: "",
+  age: null,
+  guardian: false,
+  agree: false,
+  phase: "edit",
+  error: null,
+  notice: null,
+  remaining: null,
+  rows: null,
+  drafts: null,
+  sent: null,
+  check: "idle",
+  compared: false,
+  onlyFlagged: false,
+  seq: 0
+});
+var trConsent = (tr) => ({ v: TRANSLATE_CONSENT_VERSION, age: tr.age, guardian: tr.age === "teen", lang: state.lang === "en" ? "en" : "ko" });
+var trCanSend = (tr) => tr.phase !== "sending" && (tr.age === "adult" || tr.age === "teen" && tr.guardian) && tr.agree === true && String(tr.text || "").trim().length > 0;
+function trFailKey(err) {
+  const code = err?.code || "";
+  if (code === "NETWORK" || code === "INVALID_TRANSLATE_REPLY" || code === "INVALID_RESPONSE") return "lost";
+  if (code === "NOT_MONGOLIAN") return "language";
+  return "unavailable";
+}
+var trStale = (tr, seq) => S.tr !== tr || tr.seq !== seq || tr.owner !== ownerKey();
+async function trSend() {
+  const tr = S.tr;
+  if (!tr || !trCanSend(tr)) return;
+  const split = splitPasted(tr.text);
+  if (split.error) {
+    tr.error = split.error;
+    render(false);
+    root.querySelector("#tr-text")?.focus();
+    say(trMsg(split.error));
+    return;
+  }
+  const { lines, slots } = maskLines(split.lines);
+  let body;
+  try {
+    body = validateTranslateRequest({ action: "translate", request_id: crypto.randomUUID(), kind: tr.kind, lines, consent: trConsent(tr) });
+  } catch (err) {
+    if (err?.code === "NOT_MONGOLIAN") {
+      tr.error = "language";
+      render(false);
+      root.querySelector("#tr-text")?.focus();
+      say(trMsg(tr.error));
+      return;
+    }
+    tr.notice = "unavailable";
+    render(false);
+    say(trMsg(tr.notice));
+    return;
+  }
+  const seq = ++tr.seq;
+  Object.assign(tr, { phase: "sending", error: null, notice: null });
+  render(false);
+  say(accL("한국어로 옮기는 중이에요. 1분쯤 걸려요. 이 화면을 열어 두세요.", "Translating into Korean. This takes about a minute. Keep this screen open."));
+  let reply = null, failed = null;
+  try {
+    reply = validateTranslateReply(await session.translate(body), lines.length);
+  } catch (err) {
+    failed = err;
+  }
+  if (trStale(tr, seq)) return;
+  if (reply && reply.remaining !== null) tr.remaining = reply.remaining;
+  if (failed || reply.status !== "done") {
+    tr.phase = "edit";
+    tr.notice = failed ? trFailKey(failed) : reply.status;
+    render(false);
+    root.querySelector('[data-action="trSend"]')?.focus();
+    say(trMsg(tr.notice));
+    return;
+  }
+  Object.assign(tr, { phase: "draft", sent: { lines, slots, kind: body.kind }, drafts: reply.lines, rows: draftRows(lines, reply.lines, null, slots, trHidden()), check: "idle", compared: false, copied: null });
+  render(false);
+  root.querySelector(".page-title")?.focus();
+  say(accL("번역 초안이 나왔어요. 번역본이 아니에요. 이어서 다시 몽골어로 옮겨 견줘요.", "The translation draft is ready. It is not a translation for submission. Next, it is translated back into Mongolian for a check."));
+  void trRunCheck(tr);
+}
+function trRender() {
+  const ae = document.activeElement, act = ae && root.contains(ae) && !ae.id ? ae.getAttribute("data-action") : null;
+  render(false);
+  if (act) root.querySelector(`[data-action="${act}"]`)?.focus();
+}
+async function trRunCheck(tr) {
+  if (!tr?.sent || !tr.drafts) return;
+  const seq = ++tr.seq;
+  tr.check = "checking";
+  render(false);
+  let reply = null, failed = null;
+  try {
+    const body = validateTranslateRequest({ action: "check", request_id: crypto.randomUUID(), kind: tr.sent.kind, lines: tr.sent.lines, drafts: tr.drafts.map((d) => d.ko), consent: trConsent(tr) });
+    reply = validateCheckReply(await session.translate(body), tr.sent.lines.length);
+  } catch (err) {
+    failed = err;
+  }
+  if (trStale(tr, seq)) return;
+  if (failed || reply.status !== "done") {
+    tr.check = "failed";
+    trRender();
+    say(accL("다시 옮겨 견주지 못했어요. 초안은 이 화면에 남아 있으니 원문과 직접 견줘 보세요.", "The back-translation check did not finish. The draft stays on this screen; compare it with the original yourself."));
+    return;
+  }
+  Object.assign(tr, { check: "done", compared: reply.compared, rows: draftRows(tr.sent.lines, tr.drafts, reply.lines, tr.sent.slots, trHidden()) });
+  trRender();
+  const n = tr.rows.filter((r) => r.verdict === "differs" || r.verdict === "unsure").length;
+  say(reply.compared ? accL(`견주기를 마쳤어요. 뜻이 달라 보이는 줄 ${n}곳.`, `Check finished. ${n} line(s) may differ in meaning.`) : accL("자동 대조를 하지 못했어요. 원문과 다시 옮긴 몽골어를 직접 견줘 보세요.", "The automatic check did not run. Compare the original and the back-translation yourself."));
+}
+var PAGES = { today, path, channels, post, univ, univDetail, univCompare, cond, explore, detail, prepare, editor, help, profile, studyConsent, translate };
 var LOCKED_ACTIONS = ["pickGoal", "step2", "toggle", "finish", "skip", "prepareThis", "confirm", "body", "loc", "setLang", "changeGoal", "prepareJob", "saveJob", "removeJob"];
 function render(focus = true) {
   if (composingEl && root.contains(composingEl) && document.activeElement === composingEl) {
@@ -6379,6 +6936,17 @@ function render(focus = true) {
   syncStudyAccount();
   if (!STUDY_ON && (S.page === "univ" || UNIV_PAGES.includes(S.page))) S.page = "today";
   if (!CHANNEL_ON && (S.page === "channels" || S.page === "post")) S.page = "today";
+  if (S.tr && S.tr.owner !== ownerKey()) {
+    const had = S.tr.phase !== "edit" || S.tr.text;
+    if (had) {
+      S.tr = null;
+      if (S.page === "translate") S.flash = esc8(trMsg("account"));
+    } else S.tr = newTr(S.tr.docId);
+  }
+  if (S.page === "translate" && (!S.tr || !trDoc())) {
+    S.tr = null;
+    S.page = STUDY_ON ? "path" : "today";
+  }
   const accSt = session.status();
   const ae = document.activeElement;
   const keepId = !focus && ae && root.contains(ae) ? ae.id : "";
@@ -6440,6 +7008,11 @@ var toTop = () => {
   }
 };
 function go(page) {
+  if (S.page === "translate" && page !== "translate") {
+    if (S.tr?.phase === "draft" && !confirm(state.lang === "en" ? "Leaving this page deletes the draft. It is not stored anywhere. Leave?" : "이 화면을 떠나면 초안이 지워져요. 어디에도 저장하지 않아요. 떠날까요?")) return;
+    if (S.tr?.phase === "sending" && !confirm(state.lang === "en" ? "The draft is still being made. If you leave, it is discarded and one of today’s 10 may still be used. Leave?" : "초안을 만드는 중이에요. 지금 떠나면 초안은 버려지고 오늘 한 장이 쓰일 수 있어요. 떠날까요?")) return;
+    S.tr = null;
+  }
   S.drop = MOTION && page !== S.page && (page === "onboard" || page === "today");
   S.page = page;
   S.flash = null;
@@ -6657,6 +7230,77 @@ var ACT = {
     render(false);
     (root.querySelector(`[data-action="pathPick"][data-id="${id}"]`) || root.querySelector(".page-title"))?.focus();
     say(msg);
+  },
+  trOpen(el) {
+    const id = el.dataset.id;
+    if (!translateKindOf(id)) return;
+    S.tr = newTr(id);
+    go("translate");
+  },
+  trLeave() {
+    go(STUDY_ON ? "path" : "today");
+  },
+  trSend: () => trSend(),
+  // 「다시 견주기」 단추는 다시 그리면 사라지므로 초점을 쪽 제목에 먼저 둔다(제목은 id가 있어 다시 그려도 남는다).
+  trRecheck: () => {
+    if (S.tr?.phase !== "draft") return;
+    root.querySelector("#tr-title")?.focus();
+    say(accL("다시 몽골어로 옮겨 원문과 견주는 중이에요.", "Translating back into Mongolian to compare again."));
+    return trRunCheck(S.tr);
+  },
+  trFlagged() {
+    if (!S.tr) return;
+    S.tr.onlyFlagged = !S.tr.onlyFlagged;
+    render(false);
+    root.querySelector('[data-action="trFlagged"]')?.focus();
+  },
+  async trCopy() {
+    const found = trDoc();
+    if (!S.tr?.rows || !found) return;
+    const tr = S.tr;
+    try {
+      await navigator.clipboard.writeText(draftText(tr.rows, found.doc.name));
+      tr.copied = "copied";
+    } catch {
+      tr.copied = "copyFail";
+    }
+    if (S.tr !== tr) return;
+    render(false);
+    root.querySelector('[data-action="trCopy"]')?.focus();
+    say(tr.copied === "copied" ? accL("초안을 복사했어요. 맨 위와 맨 아래에 「번역 초안」 표시가 함께 들어가요.", "Copied the draft. The “translation draft” label is included at the top and bottom.") : accL("복사하지 못했어요. 「초안 내려받기」를 써 주세요.", "Could not copy. Use “Download draft”."));
+  },
+  trDownload() {
+    const found = trDoc();
+    if (!S.tr?.rows || !found) return;
+    const kind = S.tr.sent?.kind === "transcript" ? "성적증명서" : "졸업증명서";
+    const url = URL.createObjectURL(new Blob([draftText(S.tr.rows, found.doc.name)], { type: "text/plain;charset=utf-8" }));
+    let a = null;
+    try {
+      a = document.createElement("a");
+      a.href = url;
+      a.download = `번역초안_${kind}_${accStamp()}.txt`;
+      a.rel = "noopener";
+      document.body.appendChild(a);
+      a.click();
+    } finally {
+      a?.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 6e4);
+    }
+  },
+  trEdit() {
+    if (!S.tr) return;
+    if (S.tr.phase === "draft" && !confirm(accL("초안이 지워져요. 붙여 넣은 글은 남겨요. 글을 고칠까요?", "The draft will be deleted. The pasted text stays. Edit the text?"))) return;
+    Object.assign(S.tr, { phase: "edit", rows: null, drafts: null, sent: null, check: "idle", compared: false, onlyFlagged: false, notice: null, copied: null, seq: S.tr.seq + 1 });
+    render(false);
+    root.querySelector("#tr-text")?.focus();
+  },
+  trFresh() {
+    if (!S.tr) return;
+    if ((S.tr.phase === "draft" || S.tr.text) && !confirm(accL("붙여 넣은 글과 초안을 모두 지울까요?", "Delete the pasted text and the draft?"))) return;
+    const id = S.tr.docId, keep = { age: S.tr.age, remaining: S.tr.remaining };
+    S.tr = { ...newTr(id), remaining: keep.remaining, age: keep.age };
+    render(false);
+    root.querySelector("#tr-text")?.focus();
   },
   docToggle(el) {
     const id = el.dataset.id, cur = studyProfile(), r = toggleDoc(cur, id, /* @__PURE__ */ new Date());
@@ -7227,14 +7871,14 @@ root.addEventListener("click", (e) => {
   if (!el || el.disabled || !ACT[el.dataset.action]) return;
   if (STUDY_WRITE_ACTS.has(el.dataset.action) && studyLocked()) {
     const m = studyStoreNote();
-    S.flash = esc7(m);
+    S.flash = esc8(m);
     render(false);
     say(m);
     return;
   }
   const fail5 = (err) => {
     const m = getAccountErrorMessage(err, state.lang);
-    S.flash = esc7(m);
+    S.flash = esc8(m);
     render(false);
     say(m);
   };
@@ -7286,12 +7930,27 @@ root.addEventListener("input", (e) => {
     S.jobQueryText = e.target.value;
     return;
   }
+  if (e.target.dataset.action === "trText") {
+    if (!S.tr || S.tr.phase === "sending") return;
+    S.tr.text = e.target.value;
+    const cnt = root.querySelector("#tr-count");
+    if (cnt) cnt.textContent = countText(S.tr.text, state.lang === "en");
+    const btn2 = root.querySelector('[data-action="trSend"]');
+    if (btn2) btn2.disabled = !trCanSend(S.tr);
+    if (S.tr.error) {
+      S.tr.error = null;
+      e.target.removeAttribute("aria-invalid");
+      e.target.setAttribute("aria-describedby", "tr-count");
+      root.querySelector("#tr-err")?.remove();
+    }
+    return;
+  }
   if (e.target.dataset.action === "studyInput") {
     try {
       studyInput(e.target);
     } catch (err) {
       const m = getAccountErrorMessage(err, state.lang);
-      S.flash = esc7(m);
+      S.flash = esc8(m);
       render(false);
       say(m);
     }
@@ -7314,7 +7973,7 @@ root.addEventListener("input", (e) => {
       return;
     }
     const cnt = root.querySelector("#count");
-    if (cnt) cnt.textContent = countText(v);
+    if (cnt) cnt.textContent = countText2(v);
     if (S.error === "needBody" && e.target.value.trim()) {
       S.error = null;
       e.target.removeAttribute("aria-invalid");
@@ -7342,6 +8001,17 @@ root.addEventListener("change", (e) => {
     S.copyMsg = null;
     render(false);
     root.querySelector("#topic")?.focus();
+  } else if (S.tr && S.tr.phase !== "sending" && ["trKind", "trAge", "trGuardian", "trAgree"].includes(a)) {
+    if (a === "trKind" && translateKindChoice(S.tr.docId) && ["grad", "transcript"].includes(e.target.value)) S.tr.kind = e.target.value;
+    else if (a === "trAge" && ["adult", "teen", "under14"].includes(e.target.value)) {
+      S.tr.age = e.target.value;
+      if (S.tr.age !== "teen") S.tr.guardian = false;
+      if (S.tr.age === "under14") S.tr.agree = false;
+    } else if (a === "trGuardian") S.tr.guardian = !!e.target.checked;
+    else if (a === "trAgree") S.tr.agree = !!e.target.checked;
+    const id = e.target.id;
+    render(false);
+    if (id) root.querySelector("#" + id)?.focus();
   }
 });
 root.addEventListener("pointerover", (e) => {
@@ -7377,7 +8047,7 @@ S.draft = newDraft();
 render(false);
 void session.init().catch((err) => {
   const m = getAccountErrorMessage(err, state.lang);
-  S.flash = esc7(m);
+  S.flash = esc8(m);
   render(false);
   say(m);
 }).finally(() => {
