@@ -9,12 +9,13 @@ import { isUsedUp, num, nameOf } from './subscriptions-model.mjs';
 import { SOLIO_TODAY_NAMES, josa } from './solio-today.mjs';
 import { profileChange, pendingDeletion } from './account-page.mjs';
 import { briefLive, tokSample } from './solio-brief.mjs';
+import { pcRoom } from './pc-fit-model.mjs';
 
 /* 두 번 누르기의 막이(설계 8.2, 설계 검토 D1). 묻고 0.6초 안의 두 번째 누름은 받지 않고(더블클릭 · Enter 되풀이), 10초가 지나면 물음을 거둔다.
    account는 계정 요청 하나를 기다리는 한도(옛 내 계정과 같다), tokLive는 모델별 토큰 줄이 열린 동안 실시간을 다시 부탁하는 사이다(옛 구독 판과 같다) */
 export const ROOM_TIMING = Object.freeze({ armGuard: 600, armExpire: 10000, account: 15000, tokLive: 60000, tokPaint: 1000 });
 /* 펼침이나 구독 방에서 여는 방 */
-export const ASIDE_ROOMS = Object.freeze(['manage', 'account', 'settings']);
+export const ASIDE_ROOMS = Object.freeze(['manage', 'account', 'settings', 'pc']);
 const UPDATE_METHOD = Object.freeze({ 'update-check': 'check', 'update-download': 'download', 'update-install': 'install' });
 const PREF_KEYS = Object.freeze(['launchAtLogin', 'startHidden', 'closeToTray', 'uiSound']);
 /* 알림 잠시 쉬기(옛 설정과 같은 30분 · 1시간 · 쉬지 않음) */
@@ -56,8 +57,45 @@ export function createOrbRooms({ subs = null, account = null, pc = {}, now = () 
   /* 설정(설계 6.4). 방이 열릴 때 데스크톱 설정 · 쓰던 글 되살리기 · 업데이트 상태를 읽고, 열린 동안 바뀜 알림을 듣고, 닫으면 듣기를 뗀다.
      rev는 업데이트 판이 들어온 차례다. 동작을 보낸 뒤 알림으로 새 판이 먼저 오면 늦게 온 답으로 덮지 않는다(update-view.mjs와 같다).
      member는 방을 그릴 때 받은 「회원으로 보이는가」다. 손님에게 잠긴 칸(쓰던 글 되살리기, 구독 팁)은 동작도 받지 않는다 */
-  const freshSet = () => ({ desktop: null, drafts: null, care: null, update: null, rev: 0, unsubs: [], member: false });
+  const freshSet = () => ({ desktop: null, drafts: null, care: null, chatgpt: null, chatgptRead: 0, chatgptAction: null, closed: false, update: null, rev: 0, unsubs: [], member: false });
   let sets = freshSet();
+  /* 「이 PC에 이렇게 맞췄습니다」(PC 진단 설계 5.2). 설정 방과 이 판을 열 때 본체가 잰 값을 읽는다(10분 넘은 값은 본체가 다시 잰다).
+     판을 열어 「이 PC가 바뀌었습니다」를 보였으면 본체에 본 것으로 알리고, 판이 열린 동안은 그 글을 그대로 둔다(changedShown) */
+  const freshPc = () => ({ snap: null, changedShown: null });
+  let pcs = freshPc();
+  function pcRead({ again = false, opened = false } = {}) {
+    const api = dev.pcProfile, my = gen, box = pcs;
+    if (!api) { box.snap = { ok: false }; changed(); return Promise.resolve(null); }
+    return Promise.resolve().then(() => (again ? api.again() : api.snapshot())).then(v => {
+      if (my !== gen || box !== pcs) return null;
+      box.snap = v && typeof v === 'object' ? v : { ok: false };
+      if (opened && current === 'pc' && Array.isArray(v?.changed) && v.changed.length) { box.changedShown = v.changed; Promise.resolve().then(() => api.seen()).catch(() => {}); }
+      changed();
+      return v;
+    }, () => { if (my === gen && box === pcs) { box.snap = { ok: false }; changed(); } return null; });
+  }
+  async function pcAct(key, act) {
+    const api = dev.pcProfile;
+    if (!api) return true;
+    if (st.busy) { if (key) refuseBusy(key); return true; }
+    // 끝난 뒤 계정이 바뀌었거나(reset) 판을 닫았으면 그 뒤에 시작된 일과 다른 방의 알림을 건드리지 않는다(카본 A3)
+    const my = gen, here = () => my === gen && current === 'pc';
+    if (act === 'pc-again') {
+      st.busy = 'pc:pc-again'; st.roomNote = ''; changed();
+      await pcRead({ again: true });
+      if (my === gen && st.busy === 'pc:pc-again') { st.busy = null; changed(); }
+      return true;
+    }
+    if (act === 'pc-storage') {
+      let res = null;
+      try { res = await api.openStorage(); } catch { res = null; }
+      if (!here()) return true;
+      note(key, res?.ok === true ? 'Windows 설정을 열었습니다. 「새 콘텐츠를 저장할 위치」에서 고릅니다.' : '설정을 열지 못했습니다. Windows 설정의 시스템 → 저장소 → 고급 저장소 설정 → 「새 콘텐츠를 저장할 위치」에서 바꿉니다.');
+      changed();
+      return true;
+    }
+    return false;
+  }
 
   const note = (key, text) => { if (text) st.notes.set(key, text); else st.notes.delete(key); };
   // 다른 일이 도는 동안 누른 단추는 보내지 않고 그 줄에 알린다. 그 줄 자신의 일이 도는 중이면(그 단추가 흐려져 있다) 알리지 않는다(검수)
@@ -273,12 +311,15 @@ export function createOrbRooms({ subs = null, account = null, pc = {}, now = () 
     if (st.armed && ACCOUNT_ROWS.includes(st.armed.key)) disarm();
     for (const k of ACCOUNT_ROWS) st.notes.delete(k);
     st.notes.delete('draft');
+    st.notes.delete('chatgpt');
+    sets.chatgptAction = null;
+    if (typeof st.busy === 'string' && st.busy.startsWith('chatgpt:')) st.busy = null;
     if (careNote && st.notes.get('notice') === careNote) st.notes.delete('notice');
     careNote = '';
     if (current === 'account') void accLoad();
     // 쓰던 글 되살리기는 계정마다 따로다. 설정 방이 열려 있으면 새 계정의 상태를 다시 읽는다
     // 플레저 PC 알림도 계정마다다(본체가 계정마다 따로 저장한다)
-    if (current === 'settings') { sets.drafts = null; sets.care = null; readDrafts(); readCare(); }
+    if (current === 'settings') { sets.drafts = null; sets.care = null; sets.chatgpt = null; sets.chatgptRead++; readDrafts(); readCare(); void readChatGPT(); }
     changed();
   }
 
@@ -304,11 +345,104 @@ export function createOrbRooms({ subs = null, account = null, pc = {}, now = () 
     const my = gen, a = accGen, s = sets;
     Promise.resolve().then(() => dev.care.status()).then(v => { if (my === gen && a === accGen && s === sets) { s.care = v && typeof v === 'object' ? v : { ok: false }; changed(); } }, () => { if (my === gen && a === accGen && s === sets) { s.care = { ok: false }; changed(); } });
   }
+  const CHATGPT_ALLOWED = {
+    disconnected: ['connect'],
+    connecting: ['cancel'],
+    connected: ['disconnect'],
+    recheck: ['connect', 'disconnect'],
+    'storage-error': ['disconnect']
+  };
+  const CHATGPT_FAIL_NOTES = {
+    NETWORK: 'OpenAI에 연결하지 못했습니다. 인터넷 연결을 확인한 뒤 다시 시도해 주세요.',
+    TIMEOUT: '로그인 시간이 지났습니다. 다시 시도해 주세요.',
+    BROWSER_UNAVAILABLE: '기본 브라우저를 열지 못했습니다. Windows 기본 앱 설정을 확인한 뒤 다시 시도해 주세요.',
+    CALLBACK_UNAVAILABLE: '로그인 응답 주소를 열지 못했습니다. 잠시 후 다시 시도해 주세요.',
+    IDENTITY_INVALID: 'ChatGPT 계정 정보를 확인하지 못했습니다. 다시 로그인해 주세요.',
+    DIFFERENT_ACCOUNT: '이전에 연결한 ChatGPT 계정과 다릅니다. 같은 계정으로 로그인하거나 먼저 이 기기의 연결을 해제해 주세요.',
+    SIGN_IN_FAILED: 'OpenAI에서 로그인을 마치지 못했습니다. 다시 시도해 주세요.',
+    CONSENT_DENIED: '로그인을 취소했거나 동의를 마치지 않았습니다. 다시 시도할 수 있습니다.',
+    STORAGE_UNAVAILABLE: 'Windows 보안 저장소를 사용할 수 없습니다. 저장소 상태를 확인한 뒤 다시 시도해 주세요.',
+    STORAGE_CORRUPTED: 'Windows 보안 저장소의 연결 기록이 손상되었습니다. 이 기기의 연결을 해제한 뒤 다시 연결해 주세요.',
+    STORAGE_READ_FAILED: 'Windows 보안 저장소에서 연결 기록을 읽지 못했습니다. 이 기기의 연결을 해제한 뒤 다시 시도해 주세요.',
+    STORAGE_WRITE_FAILED: 'Windows 보안 저장소에 연결 기록을 저장하지 못했습니다. 저장소 상태를 확인한 뒤 다시 시도해 주세요.',
+    DPAPI_FAILED: 'Windows 암호화 저장소를 처리하지 못했습니다. Windows 로그인 상태를 확인한 뒤 다시 시도해 주세요.',
+    STATE_MISMATCH: '로그인 보안 확인이 일치하지 않습니다. 다시 시도해 주세요.',
+    OAUTH_STATE_MISMATCH: '로그인 보안 확인이 일치하지 않습니다. 다시 시도해 주세요.',
+    TOKEN_EXCHANGE_FAILED: 'OpenAI 인증 확인을 마치지 못했습니다. 잠시 후 다시 시도해 주세요.',
+    BUSY: '이미 연결 작업이 진행 중입니다. 잠시만 기다려 주세요.',
+    INVALID_STATE: '연결 상태가 바뀌었습니다. 현재 상태를 확인한 뒤 다시 시도해 주세요.'
+  };
+  function chatgptFailNote(op, code) {
+    if (op === 'disconnect') return '이 기기의 연결을 해제하지 못했습니다. 다시 시도해 주세요.';
+    if (op === 'cancel') return '로그인 취소를 마치지 못했습니다. 연결 상태를 확인해 주세요.';
+    if (op === 'connect' && code && CHATGPT_FAIL_NOTES[code]) return CHATGPT_FAIL_NOTES[code];
+    return 'ChatGPT 연결 요청을 마치지 못했습니다. 다시 시도해 주세요.';
+  }
+  async function readChatGPT() {
+    if (typeof dev.chatgpt?.status !== 'function') return;
+    const my = gen, owner = accGen, s = sets, revision = ++s.chatgptRead;
+    let next;
+    try {
+      next = await dev.chatgpt.status();
+    } catch {
+      next = { ok: true, state: 'unavailable' };
+    }
+    if (my !== gen || owner !== accGen || s !== sets || s.closed || revision !== s.chatgptRead) return;
+    if (next && typeof next === 'object') {
+      if (next.code === 'ACCOUNT_CHANGED' || next.code === 'STALE_ACCOUNT') return;
+      s.chatgpt = next.ok === true ? next : { ok: true, state: 'unavailable', code: next.code || '' };
+    } else {
+      s.chatgpt = { ok: true, state: 'unavailable' };
+    }
+    if (s.chatgpt.state === 'connected' || s.chatgpt.state === 'connecting') st.notes.delete('chatgpt');
+    changed();
+  }
+  async function actChatGPT(key, act) {
+    if (key !== 'chatgpt' || current !== 'settings' || !sets.member) return;
+    const op = act.slice('chatgpt-'.length);
+    const curState = sets.chatgpt?.state;
+    const canCancelBusy = op === 'cancel' && st.busy === 'chatgpt:connect';
+    if (!(canCancelBusy || CHATGPT_ALLOWED[curState]?.includes(op)) || typeof dev.chatgpt?.[op] !== 'function') return;
+    if (st.busy && !canCancelBusy) { refuseBusy(key); return; }
+    const my = gen, owner = accGen, s = sets, ticket = Symbol('chatgpt');
+    s.chatgptAction = ticket;
+    s.chatgptRead++;
+    st.busy = 'chatgpt:' + op;
+    note('chatgpt', '');
+    changed();
+    let errNote = '';
+    try {
+      const result = await dev.chatgpt[op]();
+      if (result?.ok === false && result.code !== 'CANCELLED' && result.code !== 'CANCELED' && result.code !== 'ACCOUNT_CHANGED' && result.code !== 'STALE_ACCOUNT') {
+        errNote = chatgptFailNote(op, result.code);
+      }
+    } catch {
+      errNote = chatgptFailNote(op, '');
+    } finally {
+      if (my === gen && owner === accGen && s === sets && !s.closed && s.chatgptAction === ticket) {
+        await readChatGPT();
+      }
+      if (s.chatgptAction === ticket && st.busy === 'chatgpt:' + op) {
+        st.busy = null;
+      }
+      if (my === gen && owner === accGen && s === sets && !s.closed && s.chatgptAction === ticket) {
+        if (errNote) note('chatgpt', errNote);
+        changed();
+      }
+    }
+  }
   function setStart() {
     const my = gen, s = sets;
+    s.unsubs.push(() => {
+      s.closed = true;
+      s.chatgptAction = null;
+      st.notes.delete('chatgpt');
+      if (typeof st.busy === 'string' && st.busy.startsWith('chatgpt:')) st.busy = null;
+    });
     if (typeof dev.desktop?.get === 'function') Promise.resolve().then(() => dev.desktop.get()).then(v => { if (my === gen && s === sets && v?.ok === true) { s.desktop = v; changed(); } }, () => {});
     readDrafts();
     readCare();
+    void readChatGPT();
     if (typeof dev.updates?.status === 'function') {
       const start = s.rev;
       Promise.resolve().then(() => dev.updates.status()).then(v => { if (my === gen && s === sets && s.rev === start && !takeUpdate(v, s)) takeUpdate({ ...(s.update || {}), state: 'error', code: 'UPDATE_UNAVAILABLE' }, s); },
@@ -316,6 +450,7 @@ export function createOrbRooms({ subs = null, account = null, pc = {}, now = () 
     }
     const listen = (on, fn) => { try { const off = on(fn); if (typeof off === 'function') s.unsubs.push(off); } catch { /* 듣지 못하면 열 때 읽은 값으로 둔다 */ } };
     if (typeof dev.desktop?.onChange === 'function') listen(dev.desktop.onChange, v => { if (s === sets && v?.ok === true) { s.desktop = v; changed(); } });
+    if (typeof dev.chatgpt?.onChange === 'function') listen(dev.chatgpt.onChange, () => { if (my === gen && s === sets && !s.closed) void readChatGPT(); });
     if (typeof dev.drafts?.onChange === 'function') listen(dev.drafts.onChange, () => { if (s === sets) readDrafts(); });
     if (typeof dev.care?.onChange === 'function') listen(dev.care.onChange, () => { if (s === sets) readCare(); });
     if (typeof dev.updates?.onChange === 'function') listen(dev.updates.onChange, v => { takeUpdate(v, s); });
@@ -391,6 +526,7 @@ export function createOrbRooms({ subs = null, account = null, pc = {}, now = () 
     const rowUsageOff = Boolean(row && (isGeminiSvc(row.service) || row.usageDisabled));
     const addGemini = isGeminiSvc(arg || (key === 'add' ? st.add.svc : ''));
     if (act !== 'grp' && act !== 'kind-pick') note(key, '');
+    if (act === 'pc-again' || act === 'pc-storage') return pcAct(key, act);
     switch (act) {
       case 'add-pick': {
         if (st.add.svc !== arg) { st.add = { svc: addInfo(arg) ? arg : '' }; delete st.kinds.add; st.ended = null; }
@@ -619,6 +755,7 @@ export function createOrbRooms({ subs = null, account = null, pc = {}, now = () 
         return true;
       }
       /* ── 설정(설계 6.4, 설계 검토 D7 · D9) ── */
+      case 'chatgpt-connect': case 'chatgpt-cancel': case 'chatgpt-disconnect': await actChatGPT(key, act); return true;
       case 'update-check': case 'update-download': case 'update-install': await updateRun(act); return true;
       case 'pref': {
         const p = sets.desktop?.preferences;
@@ -865,9 +1002,11 @@ export function createOrbRooms({ subs = null, account = null, pc = {}, now = () 
   }
 
   /* 방을 열 때: 구독 줄에서 왔으면 그 구독의 첫 계정 줄, 손볼 계정이 있으면 그 계정 줄, 계정이 없으면 계정 더하기를 연 채 연다(설계 9.3) */
-  function open(name, { svc = null } = {}) {
+  /* back: 다른 방(이 PC에 맞춘 것)에서 돌아왔으면 그 방을 연 단추 { key, act }에 초점을 둔다 */
+  function open(name, { svc = null, back = null } = {}) {
     close();
     current = name;
+    if (back && typeof back.key === 'string' && typeof back.act === 'string') focusReq = ask({ key: back.key, act: back.act });
     if (name === 'manage') {
       const key = manageOpenKey(snapshot(), svc, now());
       openReq = key ? ask({ key }) : null;
@@ -875,7 +1014,8 @@ export function createOrbRooms({ subs = null, account = null, pc = {}, now = () 
     // 내 계정은 열 때마다 읽는다. 앞에 읽은 자료가 있으면 그것을 보이며 조용히 읽는다
     if (name === 'account') void accLoad({ quiet: !!acc.data });
     // 설정은 열 때 읽고, 열린 동안 바뀜 알림을 듣는다(설계 6.4)
-    if (name === 'settings') setStart();
+    if (name === 'settings') { setStart(); void pcRead(); }
+    if (name === 'pc') { pcs.changedShown = null; void pcRead({ opened: true }); }
   }
   function close() {
     disarm();
@@ -886,6 +1026,7 @@ export function createOrbRooms({ subs = null, account = null, pc = {}, now = () 
     if (!loginNow()) st.relogin = null;
     acc.askDelete = false;
     if (current === 'settings') setStop();
+    if (current === 'pc') pcs.changedShown = null;
     focusReq = null; openReq = null; closeReq = null; current = null;
   }
   function reset() {
@@ -900,6 +1041,7 @@ export function createOrbRooms({ subs = null, account = null, pc = {}, now = () 
     lastLogin = undefined; loginEmail = undefined;
     tokReset();
     acc = freshAcc(); deleteRequestId = null;
+    pcs = freshPc();
   }
 
   return {
@@ -925,7 +1067,8 @@ export function createOrbRooms({ subs = null, account = null, pc = {}, now = () 
     /* 옛 내 계정 화면에서 돌아올 때 컨트롤러가 부른다. 내 계정 방이 열려 있으면 보이던 자료를 둔 채 조용히 다시 읽는다(검수) */
     reloadAccount() { if (current === 'account') void accLoad({ quiet: true }); },
     /* ctx: { checking, name(로그인 정보의 이름), accountKey, member(회원으로 보이는가) } */
-    scene({ aside = null, checking = false, name = '', accountKey = '', member = false } = {}) {
+    /* features: 「이 PC에 맞춘 것」 판이 말해도 되는 기능(원클릭 · 사무실이 이 계정에 보이는가, 사무실에서 직접 정한 수) — Fable 최종 P1 · P2-3 */
+    scene({ aside = null, checking = false, name = '', accountKey = '', member = false, features = null } = {}) {
       const req = { focus: focusReq, opening: openReq, closing: closeReq };
       if (aside === 'manage') return { manage: { ...manageRoom(snapshot(), view(), now(), { checking, sentence }), ...req } };
       if (aside === 'account') return { account: { ...accountRoom(acc, view(), now(), { name, accountKey }), ...req } };
@@ -933,9 +1076,10 @@ export function createOrbRooms({ subs = null, account = null, pc = {}, now = () 
         // 구독 팁 켜고 끄기는 회원의 구독 자료가 있을 때만 둔다(저장 자리가 구독 판의 settings.tipsOff다, 설계 검토 D7)
         const snap = snapshot(), tipsOff = member && snap && snap.ok !== false && snap.settings ? snap.settings.tipsOff === true : null;
         sets.member = !!member;
-        const room = settingsRoom({ update: sets.update, loading: typeof dev.updates?.status === 'function', desktop: sets.desktop, drafts: sets.drafts, care: sets.care, notices: noticesNow(), env: envNow(), member: !!member, tipsOff }, view(), now());
+        const room = settingsRoom({ update: sets.update, loading: typeof dev.updates?.status === 'function', desktop: sets.desktop, drafts: sets.drafts, care: sets.care, chatgpt: sets.chatgpt, notices: noticesNow(), env: envNow(), member: !!member, tipsOff, pc: dev.pcProfile ? pcs.snap : undefined, pcFeatures: features || {} }, view(), now());
         return { settings: { ...room, ...req } };
       }
+      if (aside === 'pc') return { pc: { ...pcRoom(pcs.snap, { ...view(), changedShown: pcs.changedShown, features: features || {} }, now()), ...req } };
       return null;
     },
   };

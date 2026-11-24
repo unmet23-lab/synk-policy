@@ -48,12 +48,14 @@ const {yieldToUpdatingInstaller}=require('./platform-update-marker.cjs');
 const {createSiteVisits}=require('./site-visits.cjs');
 const {createSnsHealth}=require('./sns-health.cjs');
 const {createSolioBackup}=require('./solio-backup.cjs');
+const {createPcProfile}=require('./pc-profile.cjs');
 const {createMacApplicationLocationGate}=require('./mac-application-location.cjs');
 const {createAiSubscriptions}=require('./ai-subscriptions.cjs');
 const {createEstimateWindow}=require('./estimate-window.cjs');
 const {createLocalServerGate}=require('./local-server-owner.cjs');
 const {createOffice,loadOfficeModel}=require('./office.cjs');
 const {enabled:officeTasksEnabled,createTaskRuntime}=require('./office-task-runtime.cjs');
+const {createChatGPTConnection}=require('./chatgpt-connection.cjs');
 app.enableSandbox();
 protocol.registerSchemesAsPrivileged([{scheme:'synk-desktop',privileges:{standard:true,secure:true,supportFetchAPI:true}}]);
 const packaged=app.isPackaged;
@@ -113,7 +115,7 @@ const suiteBindingKey=authConfig?suiteKey(authConfig,runtime.mode):null;
 // Workspace 로그인의 Suite 따라가기를 500ms 틈 없이 지금 플랫폼 기록에 묶는다. 묶지 않으면 계정을 바꾼 직후 새 계정의 뷰가 앞 계정의 로그인 상태와 계정 정보를 받는다(4단계 설계 검토 R2).
 // 따라가기를 아직 만들지 않았거나 닫은 뒤에 불려도 다음 따라가기가 다시 본다
 function followWorkspaceNow(){try{void workspaceFollower?.refresh();}catch{}}
-function publishAuthState(state){careNotifications?.syncAccount();pulseApp?.syncContext(state);followWorkspaceNow();workspaceApp?.syncContext(state);syncCompanyEntry();estimateWindow?.sync();officeService?.accountChanged(officeLoginOf(state));officeEmployeeTasks?.accountChanged(officeLoginOf(state));solioBackupSweep();scheduleHiddenAuthRetry(state);void syncTrayApps();if(window&&!window.isDestroyed()&&trustedEntry(window.webContents.getURL(),entry,runtime.clientId))window.webContents.send('synk:auth-changed',state);}
+function publishAuthState(state){chatgptConnection?.accountChanged();careNotifications?.syncAccount();pulseApp?.syncContext(state);followWorkspaceNow();workspaceApp?.syncContext(state);syncCompanyEntry();estimateWindow?.sync();officeService?.accountChanged(officeLoginOf(state));officeEmployeeTasks?.accountChanged(officeLoginOf(state));solioBackupSweep();scheduleHiddenAuthRetry(state);void syncTrayApps();if(window&&!window.isDestroyed()&&trustedEntry(window.webContents.getURL(),entry,runtime.clientId))window.webContents.send('synk:auth-changed',state);}
 // 설치 생명주기는 창 밖에서 만든다. 숨은 시작의 트레이 메뉴도 설치 여부를 본다(PC 0.5.0 설계 1.5)
 function ensureInstallations(){
   if(installations)return installations;
@@ -267,7 +269,17 @@ function snsHealthCall(){if(runtime.clientId!=='platform'||smoke)return {ok:fals
 // 솔리오 「백업·복구」(11-20): 업무 백업 엔진의 입구. 플랫폼 창에서 로그인한 계정만 묻고, 실제 입구는 유호님 계정에만 보인다(solio-backup.cjs).
 // 힌트는 SYNK ID에 Google 로그인이 이어져 있고 그 주소를 알 때만 엔진의 setup 요청에 넘긴다(STAGE1_DESIGN 4.13 「로그인」).
 let solioBackupService=null;
-function solioBackup(){if(!solioBackupService)solioBackupService=createSolioBackup({packaged,cacheRoot:path.join(app.getPath('userData'),'WorkBackupSetup'),openExternal:url=>shell.openExternal(url)});return solioBackupService;}
+// 원클릭(11-23)의 04 업데이트 확인: PC 앱 업데이터의 상태를 읽고 확인을 부탁한다(받지는 않는다). platformUpdate는 부를 때 읽는다
+const solioAppUpdate=Object.freeze({snapshot:()=>platformUpdate?.snapshot(),checkForUpdate:()=>platformUpdate?.checkForUpdate()});
+function solioBackup(){if(!solioBackupService)solioBackupService=createSolioBackup({packaged,cacheRoot:path.join(app.getPath('userData'),'WorkBackupSetup'),openExternal:url=>shell.openExternal(url),pcDrives:pcSpaceDrives,appUpdate:solioAppUpdate});return solioBackupService;}
+// 솔리오 「내 PC 진단」(11-24, docs/디자인/솔리오_PC진단_20261123/설계.md): 이 PC의 사양을 읽어 앱 자료 폴더에만 둔다. 계정과 상관없이 PC마다 하나이고, 서버 · 로그로 보내지 않는다
+let pcProfileService=null;
+function pcProfile(){if(runtime.clientId!=='platform'||smoke)return null;if(!pcProfileService)pcProfileService=createPcProfile({userData:app.getPath('userData'),display:()=>{const d=screen.getPrimaryDisplay();return {width:d.size.width,height:d.size.height,scale:d.scaleFactor,workWidth:d.workAreaSize.width};}});return pcProfileService;}
+// 원클릭 판이 엔진 보고서 전에 빌려 쓰는 드라이브. 10분 넘은 값이면 뒤에서 다시 읽고 지금 값을 준다(Fable 최종 P2-2)
+function pcSpaceDrives(){const service=pcProfile();if(!service)return null;void service.refresh().catch(()=>{});return service.spaceDrives();}
+function pcProfileCall(work){const service=pcProfile();if(!service)return {ok:false,code:'LAUNCHER_ONLY'};return work(service);}
+// 앱을 켜면 첫 화면을 막지 않게 조금 뒤에 가벼운 값을 읽는다(설계 6절). 그래픽 값은 하루 한 번이다
+function pcProfileWarm(){if(!pcProfile())return;const timer=setTimeout(()=>{void pcProfile()?.refresh().catch(()=>{});},8000);timer.unref?.();}
 // 로그인 알림마다 남은 setup 요청을 치운다. 방을 아직 열지 않았어도 서비스를 만들어 치우므로, 앱을 다시 켠 뒤 첫 알림이 앞 실행의 요청을 지운다(Fable 요청 수명 확인 P2)
 function solioBackupSweep(){if(runtime.clientId!=='platform'||smoke)return;try{solioBackup().accountChanged();}catch{}}
 function solioBackupCall(work){if(runtime.clientId!=='platform'||smoke)return {ok:false,code:'LAUNCHER_ONLY'};const status=accountStatus();if(status?.signedIn!==true||!status.account)return {ok:false,code:'SIGN_IN_REQUIRED'};return work(solioBackup(),status.account);}
@@ -280,14 +292,36 @@ function solioBackupCall(work){if(runtime.clientId!=='platform'||smoke)return {o
 // 끄는 자리는 officeShipped 한 줄이다. 꺼 둔 포장 판은 사무실 채널이 모두 NOT_AVAILABLE로 답해 오브제와 방이 서지 않는다. 소스 실행은 그대로 열린다
 const officeShipped=true;
 const officeOff=()=>packaged&&!officeShipped;
+let chatgptConnection;
+function chatgptCall(op) {
+  if (runtime.clientId !== 'platform' || process.platform !== 'win32' || smoke) return {ok:false,code:'NOT_AVAILABLE'};
+  const login = () => {
+    const state = accountStatus();
+    return state?.signedIn ? {owner:state.account?.synk_user_id, generation:state.sessionGeneration} : null;
+  };
+  if (!login()) return {ok:false,code:'SIGN_IN_REQUIRED'};
+  chatgptConnection ??= createChatGPTConnection({registration:require('./chatgpt-partner.json'), userData:app.getPath('userData'),
+    safeStorage, session:login, openExternal:url=>shell.openExternal(url),
+    fetcher:(url,options)=>session.fromPartition('solio-chatgpt-identity',{cache:false}).fetch(url,options),
+    changed:()=>sendDesktop('synk:chatgpt-changed')});
+  return chatgptConnection[op]();
+}
 let officeService=null,officeLoading=null;
 const officeTaskSource=officeTasksEnabled({packaged,mode:runtime.mode,clientId:runtime.clientId,platform:process.platform,smoke});
 let officeEmployeeTasks=null;
 function officeTasks(){
   if(!officeTaskSource)return null;
-  if(!officeEmployeeTasks)officeEmployeeTasks=createTaskRuntime({userData:app.getPath('userData'),current:()=>officeLoginOf(accountStatus()),office,model:loadOfficeModel,changed:()=>sendDesktop('synk:office-changed')});
+  if(!officeEmployeeTasks)officeEmployeeTasks=createTaskRuntime({userData:app.getPath('userData'),current:()=>officeLoginOf(accountStatus()),office,model:loadOfficeModel,changed:()=>sendDesktop('synk:office-changed'),mailOptions:{secrets:subscriptionSecrets,openExternal:url=>shell.openExternal(url)},featureOptions:{pick:officePickFiles,reveal:officeReveal}});
   return officeEmployeeTasks;
 }
+// 기능(사업계획서 등)의 파일은 본체가 고르기 창으로 받는다. 화면은 경로를 보내지 않는다(사업계획서_설계.md 2절)
+async function officePickFiles({multi=false,filters=[]}={}){
+  if(!window||window.isDestroyed())return [];
+  const result=await dialog.showOpenDialog(window,{properties:multi?['openFile','multiSelections']:['openFile'],filters});
+  return result&&!result.canceled&&Array.isArray(result.filePaths)?result.filePaths.filter(p=>typeof p==='string'&&path.isAbsolute(p)):[];
+}
+function officeReveal(file){if(typeof file!=='string'||!path.isAbsolute(file))return {ok:false,code:'VALUE'};shell.showItemInFolder(file);return {ok:true};}
+const officeSameLogin=account=>{const now=officeLoginOf(accountStatus());return !!now&&now.synk_user_id===account?.synk_user_id&&now.sessionGeneration===account?.sessionGeneration;};
 async function officeWithTasks(service,account){
   const view=await service.snapshot(account);
   const tasks=view?.available&&officeTasks();
@@ -295,7 +329,8 @@ async function officeWithTasks(service,account){
   const history=await tasks.snapshot(account);
   if(history.code==='NOT_ALLOWED')return view;
   if(!history.ok && !['STORAGE','STORAGE_FULL'].includes(history.code))return {ok:false,code:history.code};
-  return {...view,tasking:{tasks:history.tasks||[],...(history.code?{code:history.code}:{})}};
+  const mail=tasks.mail?await tasks.mail.snapshot(account):null;
+  return {...view,tasking:{tasks:history.tasks||[],...(history.code?{code:history.code}:{}),...(mail?{mail}:{})}};
 }
 const officeAccountOf=state=>{if(state?.signedIn===true&&state.account)return state.account;const renewing=renewingAccount();return renewing?{synk_user_id:renewing}:null;};
 // 로그인 묶음(구현설계 11.1 「계정 묶기」, GPT 검수 r7 · r8 GA1): 계정에 로그인 회차(sessionGeneration)를 실어 넘긴다. 사무실은 들어온 순간의 묶음이 지금 묶음과 같을 때만 기억을 바꾸고 답한다
@@ -345,6 +380,7 @@ const subscriptionBoardFile=()=>path.join(app.getPath('userData'),'AiSubscriptio
 require('node:timers').setInterval(()=>{if(quittingRequested||runtime.clientId!=='platform'||smoke||accountStatus()?.signedIn!==true||(!aiSubscriptions&&!fs.existsSync(subscriptionBoardFile())&&!fs.existsSync(path.join(app.getPath('userData'),'AiSubscriptions','token-usage.json'))))return;void Promise.resolve(subscriptions()?.autoTick()).catch(()=>{});void Promise.resolve(subscriptions()?.tokensAuto?.()).catch(()=>{});},2*60*1000).unref?.();
 app.on('before-quit',()=>{quittingRequested=true;startupWindow?.prepareForQuit();handoffCover?.prepareForQuit();});
 app.on('before-quit',()=>aiSubscriptions?.dispose());
+app.on('before-quit',()=>{chatgptConnection?.close();chatgptConnection=undefined;});
 app.on('before-quit',()=>estimateWindow?.close());
 app.on('before-quit',()=>officeService?.close());
 app.on('before-quit',()=>officeEmployeeTasks?.close());
@@ -756,6 +792,7 @@ function initializeAccountServices(){
     const signInReturn=createSignInReturn();
     auth=createAuthService({config:authConfig,store,openExternal:url=>shell.openExternal(url),appVersion:app.getVersion(),device:suiteDeviceId,onChange:state=>{suitePublisher?.publish(state);publishAuthState(projectAuth(state));if(signInReturn(state))bringToFront(window,{app});}});
     solioBackupSweep();
+    pcProfileWarm();
     if(suiteStore&&runtime.clientId!=='platform'){suiteFollower=createSuiteFollower({store:suiteStore,auth});void suiteFollower.start();}else if(suitePublisher)void suitePublisher.initialize(auth);else void auth.initialize();
   }
   if(runtime.clientId==='platform'&&!careNotifications){
@@ -974,10 +1011,27 @@ function createWindow(){
     'synk:solio-backup-start':mode=>solioBackupCall((service,account)=>{const generation=accountStatus()?.sessionGeneration;return service.start(account,mode,{isCurrent:()=>{const now=accountStatus();return now?.signedIn===true&&now.account?.synk_user_id===account.synk_user_id&&now.sessionGeneration===generation;},isSameLogin:()=>{const now=accountStatus();if(now?.sessionGeneration!==generation)return false;return now?.signedIn===true?now.account?.synk_user_id===account.synk_user_id:renewingAccount()===account.synk_user_id;}});}),
     'synk:solio-backup-open':topic=>solioBackupCall((service,account)=>service.open(account,topic)),
     'synk:solio-backup-dismiss':()=>solioBackupCall((service,account)=>service.dismiss(account)),
+    // 원클릭(11-23): run-now 요청을 쓰고 엔진의 요청 작업을 깨운다. 본체가 계정 · 엔진 · 보호 상태를 다시 확인한다
+    'synk:solio-backup-oneclick':()=>solioBackupCall((service,account)=>service.oneClick(account)),
+    // 「이 PC에 이렇게 맞췄습니다」(PC 진단 설계 5.2): 넘기는 값은 없다. 저장 위치 열기는 Windows 설정의 정해진 화면 하나만 연다
+    'synk:pc-profile':()=>pcProfileCall(service=>service.refresh()),
+    'synk:pc-profile-again':()=>pcProfileCall(service=>service.refresh({full:true})),
+    'synk:pc-profile-seen':()=>pcProfileCall(service=>service.seen()),
+    'synk:pc-open-storage':()=>pcProfileCall(()=>process.platform!=='win32'?{ok:false,code:'NOT_AVAILABLE'}:Promise.resolve().then(()=>shell.openExternal('ms-settings:savelocations')).then(()=>({ok:true}),()=>({ok:false,code:'OPEN_FAILED'}))),
     // 솔리오 「사무실」(구현설계.md 13절): 모두 officeCall을 거친다. 폴더는 본체가 고르기 창이나 지금 선 세션에서 받는다
     'synk:office-snapshot':()=>officeCall(officeWithTasks),
+    'synk:chatgpt-status':()=>chatgptCall('status'),
+    'synk:chatgpt-connect':()=>chatgptCall('connect'),
+    'synk:chatgpt-cancel':()=>chatgptCall('cancel'),
+    'synk:chatgpt-disconnect':()=>chatgptCall('disconnect'),
     'synk:office-task-submit':input=>officeCall((_service,account)=>officeTasks()?.submit(account,input)??{ok:false,code:'NOT_AVAILABLE'}),
+    'synk:office-mail-connect':p=>officeCall((_s,a)=>officeTasks()?.mail?.connect(a,p)??{ok:false,code:'NOT_AVAILABLE'}),
+    'synk:office-mail-disconnect':p=>officeCall((_s,a)=>officeTasks()?.mail?.disconnect(a,p)??{ok:false,code:'NOT_AVAILABLE'}),
+    'synk:office-mail-open':(task,item)=>officeCall((_s,a)=>officeTasks()?.mail?.openResult(a,task,item)??{ok:false,code:'NOT_AVAILABLE'}),
+    'synk:office-mail-more':(task,provider,page)=>officeCall((_s,a)=>officeTasks()?.mail?.moreMail(a,task,provider,page)??{ok:false,code:'NOT_AVAILABLE'}),
     'synk:office-task-action':(id,action,text)=>officeCall((_service,account)=>officeTasks()?.action(account,id,action,text)??{ok:false,code:'NOT_AVAILABLE'}),
+    'synk:office-feature-snapshot':(feature,departmentId)=>officeCall((_service,account)=>officeTasks()?.features?.snapshot(account,{feature,departmentId})??{ok:false,code:'NOT_AVAILABLE'}),
+    'synk:office-feature-action':(feature,departmentId,action,args)=>officeCall((_service,account)=>officeTasks()?.features?.act(account,{feature,departmentId,action,args},()=>officeSameLogin(account))??{ok:false,code:'NOT_AVAILABLE'}),
     'synk:office-watch':on=>officeCall((service,account)=>service.watch(on===true,account)),
     'synk:office-department-save':input=>officeCall((service,account)=>officeSaveDepartment(service,account,input)),
     'synk:office-department-remove':id=>officeCall((service,account)=>service.removeDepartment(id,account)),

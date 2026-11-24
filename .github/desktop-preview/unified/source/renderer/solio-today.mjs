@@ -129,6 +129,8 @@ function rowOf(snapshot, g, fact, now, checking) {
       Object.assign(row, { val: best.left + '% 남음', gauge: best.left, when: at ? shortWhen(at, now) + ' 초기화' : '', urgent: fact?.kind === 'pace' || best.state === 'low' });
       row.spoken = at ? spokenWhen(at, now) + ' 초기화' : '';
     } else if (g.projected.length) {
+      // 다시 찼을 계정이 있어도 다 쓴 계정 수는 작은 글에 함께 쓴다. 계정판의 「다 쓴 n개」와 같은 사실이다(Fable 최종 solio-subs-accounts-20261124 F4)
+      if (count >= 2 && g.out.length) row.sub = '계정 ' + count + '개 · ' + g.out.length + (g.out.some(a => a.focus === 'session') ? '개 막힘' : '개 다 씀');
       Object.assign(row, { val: '다시 찼을 것', when: checking ? '다시 읽고 있습니다' : '다시 읽으면 확인됩니다' });
     } else if (g.login.length) {
       Object.assign(row, { val: '다시 로그인', when: '계정 관리에서 다시 로그인합니다' });
@@ -360,7 +362,7 @@ export function solioToday({ native = true, signedIn = true, waiting = null, aut
   if (!snapshot) return { ...empty, state: 'loading', say: '', then: '' };
   const rows = snapshot.rows || [], checkAt = snapshot.check?.at || null, busy = checking || !!snapshot.checking;
   const groups = serviceGroups(rows, now, checkAt).filter(g => here(g).length > 0);
-  if (!groups.length) return { ...empty, state: 'none', say: '아직 연결한 AI 구독이 없습니다.', then: '구독을 연결하면 남은 양과 다시 차는 때를 여기에서 알려 드립니다.', action: 'connect' };
+  if (!groups.length) return { ...empty, state: 'none', say: '아직 연결한 AI 구독이 없습니다.', then: '연결하면 남은 양과 다시\u00a0차는\u00a0때를 알려 드립니다.', action: 'connect' };
   const facts = groups.filter(g => g.kind === 'weekly' && g.service).map(g => ({ g, name: groupName(g), fact: weeklyFact(snapshot, g, now) }));
   const factOf = g => facts.find(f => f.g === g)?.fact || null;
   const lines = groups.map(g => rowOf(snapshot, g, factOf(g), now, busy));

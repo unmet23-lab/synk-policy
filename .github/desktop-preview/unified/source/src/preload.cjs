@@ -39,6 +39,7 @@ const companyInvalid=input=>Promise.resolve({ok:false,requestId:inviteNamed(inpu
 // 솔리오 「사무실」(구현설계.md 13절): 부서 번호와 세션 번호는 정해진 꼴만, 부서 폴더는 'choose'(본체의 고르기 창)나 {fromSession}(그 세션의 작업 폴더)뿐이다.
 // 부서 폴더와 더할 보는 폴더는 경로 글자로 건너가지 않는다. 빼는 보는 폴더만 글자로 건너가고, 본체가 손님이 더한 목록에 있는지 다시 본다.
 const OFFICE_ID=/^[A-Za-z0-9_-]{4,32}$/,OFFICE_SESSION=/^[A-Za-z0-9_-]{8,128}$/,OFFICE_VIEWS=['tilted','top'];
+const OFFICE_SKINS=['black','walnut'],OFFICE_HATS=['beanie','beret','gat','phones','sprout'],OFFICE_SEAT=/^(?:d:[A-Za-z0-9_-]{4,32}|lobby):(?:0|[1-9]\d?)$/;
 const officeId=value=>typeof value==='string'&&OFFICE_ID.test(value);
 const officeSession=value=>typeof value==='string'&&OFFICE_SESSION.test(value);
 const officeInvalid=()=>Promise.resolve({ok:false,code:'VALUE'});
@@ -46,11 +47,32 @@ const officeTaskId=value=>typeof value==='string'&&/^[0-9a-f]{8}(?:-[0-9a-f]{4})
 function officeTaskInput(input){
   if(!input||!officeTaskId(input.id)||!['claude','codex'].includes(input.provider)||typeof input.prompt!=='string'||!input.prompt.trim()||input.prompt.length>8000)return null;
   if(input.departmentId!=null&&!officeId(input.departmentId)||input.previousId!=null&&!officeTaskId(input.previousId))return null;
-  return {id:input.id,provider:input.provider,departmentId:input.departmentId??null,prompt:input.prompt,previousId:input.previousId??null};
+  if(input.mailSearch!=null&&(typeof input.mailSearch!=='boolean'||input.mailSearch&&input.provider!=='codex'))return null;
+  if(input.quoteHandoff!=null&&(typeof input.quoteHandoff!=='boolean'||input.quoteHandoff&&(input.provider!=='codex'||input.mailSearch===false||input.mailRetry)))return null;
+  if(input.quoteResumeOf!=null&&(!officeTaskId(input.quoteResumeOf)||input.quoteHandoff!==true||input.mailSearch!==true||input.previousId!=null))return null;
+  if(input.mailRetry!=null&&(typeof input.mailRetry!=='boolean'||input.mailRetry&&(!input.mailSearch||!input.previousId)))return null;
+  return {id:input.id,provider:input.provider,departmentId:input.departmentId??null,prompt:input.prompt,previousId:input.previousId??null,...(typeof input.mailSearch==='boolean'?{mailSearch:input.mailSearch}:{}),...(input.mailRetry===true?{mailRetry:true}:{}),...(input.quoteHandoff===true?{quoteHandoff:true}:{}),...(input.quoteResumeOf?{quoteResumeOf:input.quoteResumeOf}:{})};
+}
+// 기능(사업계획서_설계.md 9절): 기능 이름, 부서 번호, 정해 둔 동작과 그 동작의 칸만 건너간다. 경로는 건너가지 않는다(파일은 본체가 고르기 창으로 받는다)
+const OFFICE_FEATURE=/^[a-z][a-z0-9-]{1,31}$/;
+const OFFICE_FEATURE_ACTIONS=['pick-plan','pick-data','remove-data','criteria','start','choose','draft','save','reveal','handoff','clear'];
+const officeText=(v,max)=>typeof v==='string'&&v.length<=max&&!/[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f]/.test(v);
+function officeFeatureArgs(action,a){
+  if(a==null)a={};
+  if(typeof a!=='object'||Array.isArray(a))return null;
+  const out={};
+  const take=(k,ok)=>{if(a[k]===undefined)return true;if(!ok(a[k]))return false;out[k]=a[k];return true;};
+  const ok=take('index',v=>Number.isInteger(v)&&v>=0&&v<100)&&take('mode',v=>['default','pasted'].includes(v))&&take('text',v=>officeText(v,4000))&&
+    take('provider',v=>['claude','codex'].includes(v))&&take('key',v=>typeof v==='string'&&/^n\d{1,3}$/.test(v))&&take('kind',v=>['fix','edit','keep','undo'].includes(v))&&
+    take('item',v=>officeText(v,40))&&take('answers',v=>Array.isArray(v)&&v.length<=3&&v.every(x=>Number.isInteger(x)&&x>=0&&x<4))&&take('remove',v=>typeof v==='boolean')&&
+    take('departmentId',officeId)&&take('extra',v=>officeText(v,2000))&&take('confirm',v=>typeof v==='boolean');
+  return ok&&Object.keys(a).every(k=>k in out)&&OFFICE_FEATURE_ACTIONS.includes(action)?out:null;
 }
 // 번호가 있는 부서는 이름이나 폴더 가운데 하나만 건너갈 수 있다. 뺀 칸은 본체가 저장된 값으로 채운다(GPT 검수 GA3)
 const officeDepartment=input=>{if(!input||typeof input!=='object'||(input.id!==undefined&&input.id!==null&&!officeId(input.id)))return null;const id=officeId(input.id);if(typeof input.name!=='string'&&!(input.name===undefined&&id))return null;const value={...(id?{id:input.id}:{}),...(typeof input.name==='string'?{name:input.name.slice(0,200)}:{})},folder=input.folder;if(folder==='choose')value.folder='choose';else if(folder&&typeof folder==='object'&&officeSession(folder.fromSession))value.folder={fromSession:folder.fromSession};else if(folder!==undefined||!value.id||value.name===undefined)return null;return value;};
-const officeSettings=input=>{if(!input||typeof input!=='object')return null;const value={};if(input.view!==undefined){if(!OFFICE_VIEWS.includes(input.view))return null;value.view=input.view;}if(input.manualCap!==undefined){if(input.manualCap!==null&&!Number.isInteger(input.manualCap))return null;value.manualCap=input.manualCap;}return 'view' in value||'manualCap' in value?value:null;};
+// 꾸미기(사무실스킨 PC앱_설계.md 4절)는 스킨 하나나 자리 하나의 모자 · 이름 하나만, 다른 설정과 섞지 않고 보낸다. 본체가 다시 본다
+const officeLook=input=>{if(!input||typeof input!=='object'||Array.isArray(input)||typeof input.seat!=='string'||input.seat.length>48||!OFFICE_SEAT.test(input.seat))return null;const hat=input.hat!==undefined,name=input.name!==undefined;if(hat===name)return null;if(hat)return input.hat===null||OFFICE_HATS.includes(input.hat)?{seat:input.seat,hat:input.hat}:null;return typeof input.name==='string'&&input.name.length<=64?{seat:input.seat,name:input.name}:null;};
+const officeSettings=input=>{if(!input||typeof input!=='object')return null;if(input.skin!==undefined||input.look!==undefined){if(input.view!==undefined||input.manualCap!==undefined||(input.skin!==undefined&&input.look!==undefined))return null;if(input.skin!==undefined)return OFFICE_SKINS.includes(input.skin)?{skin:input.skin}:null;const look=officeLook(input.look);return look?{look}:null;}const value={};if(input.view!==undefined){if(!OFFICE_VIEWS.includes(input.view))return null;value.view=input.view;}if(input.manualCap!==undefined){if(input.manualCap!==null&&!Number.isInteger(input.manualCap))return null;value.manualCap=input.manualCap;}return 'view' in value||'manualCap' in value?value:null;};
 const pulseViewPlace=input=>input&&typeof input==='object'&&typeof input.visible==='boolean'&&typeof input.top==='number'&&Number.isFinite(input.top)&&input.top>=0&&input.top<=160?{visible:input.visible,top:input.top}:null;
 contextBridge.exposeInMainWorld('synkDesktop',Object.freeze({
   openEstimate:()=>ipcRenderer.invoke('synk:open-estimate'),
@@ -176,17 +198,55 @@ contextBridge.exposeInMainWorld('synkDesktop',Object.freeze({
     start:mode=>['protect','move'].includes(mode)?ipcRenderer.invoke('synk:solio-backup-start',mode):Promise.resolve({ok:false,code:'INVALID'}),
     open:topic=>typeof topic==='string'&&/^[a-z]{1,16}$/.test(topic)?ipcRenderer.invoke('synk:solio-backup-open',topic):Promise.resolve({ok:false,code:'INVALID'}),
     dismiss:()=>ipcRenderer.invoke('synk:solio-backup-dismiss'),
+    oneClick:()=>ipcRenderer.invoke('synk:solio-backup-oneclick'),
+  }),
+  // 솔리오 「내 PC 진단」(11-24): 이 PC의 사양(수와 종류)만 받는다. 넘기는 값은 없다.
+  pcProfile:Object.freeze({
+    snapshot:()=>ipcRenderer.invoke('synk:pc-profile'),
+    again:()=>ipcRenderer.invoke('synk:pc-profile-again'),
+    seen:()=>ipcRenderer.invoke('synk:pc-profile-seen'),
+    openStorage:()=>ipcRenderer.invoke('synk:pc-open-storage'),
   }),
   // 솔리오 「사무실」(11-20): 세션 모음의 모습을 받고, 부서 · 보낼 부서 · 설정 · 보는 폴더를 고친다. 인자는 위의 꼴로 다시 만든 것만 건너간다.
+  chatgptConnection:Object.freeze({
+    status:()=>ipcRenderer.invoke('synk:chatgpt-status'),
+    connect:()=>ipcRenderer.invoke('synk:chatgpt-connect'),
+    cancel:()=>ipcRenderer.invoke('synk:chatgpt-cancel'),
+    disconnect:()=>ipcRenderer.invoke('synk:chatgpt-disconnect'),
+    onChange:callback=>subscribe('synk:chatgpt-changed',callback),
+  }),
   office:Object.freeze({
     snapshot:()=>ipcRenderer.invoke('synk:office-snapshot'),
+    connectMail:p=>['gmail','outlook'].includes(p)?ipcRenderer.invoke('synk:office-mail-connect',p):officeInvalid(),
+    disconnectMail:p=>['gmail','outlook'].includes(p)?ipcRenderer.invoke('synk:office-mail-disconnect',p):officeInvalid(),
+    openMailResult:(task,item)=>officeTaskId(task)&&officeTaskId(item)?ipcRenderer.invoke('synk:office-mail-open',task,item):officeInvalid(),
+    moreMail:(task,provider,page)=>officeTaskId(task)&&['gmail','outlook'].includes(provider)&&Number.isSafeInteger(page)&&page>=0
+      ?ipcRenderer.invoke('synk:office-mail-more',task,provider,page):officeInvalid(),
     submitTask:input=>{const value=officeTaskInput(input);return value?ipcRenderer.invoke('synk:office-task-submit',value):officeInvalid();},
     taskAction:(id,action,text)=>{
       if(!officeTaskId(id))return officeInvalid();
       if(action==='saveAnswer')return typeof text==='string' && text.trim() && text.length<=524288
         ? ipcRenderer.invoke('synk:office-task-action',id,action,text) : officeInvalid();
+      if(action==='reviewMail')return text===undefined?ipcRenderer.invoke('synk:office-task-action',id,action):officeInvalid();
+      if(action==='confirmMail'){
+        if(!text||typeof text!=='object'||Array.isArray(text)||!Object.hasOwn(text,'reviewId')||!Object.hasOwn(text,'filter')||!officeTaskId(text.reviewId))return officeInvalid();
+        const choices=['allowUnboundedPeriod','omitUnmet'].filter(key=>Object.hasOwn(text,key));
+        const hasRoles=Object.hasOwn(text,'roleDecisions'),roles=text.roleDecisions;
+        if(Object.keys(text).length!==2+choices.length+Number(hasRoles)||choices.some(key=>typeof text[key]!=='boolean'))return officeInvalid();
+        if(hasRoles&&(!roles||typeof roles!=='object'||Array.isArray(roles)||!Object.keys(roles).length||
+          Object.keys(roles).some(k=>!['from','folder'].includes(k)||!['apply','exclude','edit'].includes(roles[k]))))return officeInvalid();
+        const f=text.filter,fields=['from','after','before','folder','provider','attachment'];
+        if(!f||Object.keys(f).length!==7||!Object.hasOwn(f,'terms')||!Array.isArray(f.terms)||f.terms.length>6||
+          !f.terms.every(term=>typeof term==='string'&&term.length>0&&term.length<=80)||!fields.every(k=>Object.hasOwn(f,k)&&typeof f[k]==='string'&&f[k].length<=80)||
+          !['received','inbox','sent','inbox_sent','all'].includes(f.folder)||!['gmail','outlook','all'].includes(f.provider)||!['','has'].includes(f.attachment))return officeInvalid();
+        const filter={terms:[...f.terms],from:f.from,after:f.after,before:f.before,folder:f.folder,provider:f.provider,attachment:f.attachment};
+        return ipcRenderer.invoke('synk:office-task-action',id,action,{reviewId:text.reviewId,filter,...Object.fromEntries(choices.map(key=>[key,text[key]])),
+          ...(hasRoles?{roleDecisions:{...roles}}:{})});
+      }
       return ['cancel','resume','terminal'].includes(action)?ipcRenderer.invoke('synk:office-task-action',id,action):officeInvalid();
     },
+    featureSnapshot:(feature,departmentId)=>OFFICE_FEATURE.test(feature||'')&&officeId(departmentId)?ipcRenderer.invoke('synk:office-feature-snapshot',feature,departmentId):officeInvalid(),
+    featureAction:(feature,departmentId,action,args)=>{const value=OFFICE_FEATURE.test(feature||'')&&officeId(departmentId)?officeFeatureArgs(action,args):null;return value?ipcRenderer.invoke('synk:office-feature-action',feature,departmentId,action,value):officeInvalid();},
     watch:on=>ipcRenderer.invoke('synk:office-watch',on===true),
     saveDepartment:input=>{const value=officeDepartment(input);return value?ipcRenderer.invoke('synk:office-department-save',value):officeInvalid();},
     removeDepartment:id=>officeId(id)?ipcRenderer.invoke('synk:office-department-remove',id):officeInvalid(),

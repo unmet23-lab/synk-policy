@@ -2,9 +2,9 @@
   "schemaVersion": 1,
   "product": "platform",
   "channel": "preview",
-  "version": "0.5.9",
-  "releaseId": "platform-preview-0.5.9",
-  "buildId": "20261123.3",
+  "version": "0.5.10",
+  "releaseId": "platform-preview-0.5.10",
+  "buildId": "20261125.3",
   "manifestUrl": "https://synk.im/desktop/releases/preview.json",
   "baselines": [
     {
@@ -63,7 +63,7 @@
     }
   ],
   "electronVersion": "44.10.0",
-  "sourceHash": "e72d0dbb5bf19b2777e86131393dcf21f27c6a363cbde9c8e4954bf5539cfeaf",
+  "sourceHash": "985913a941c99b3a24ee8ec4376559fcae01ac5a6e1db40bea07d930d7b7ca29",
   "sourceFiles": [
     {
       "path": "assets/launcher/button.webp",
@@ -282,8 +282,8 @@
     },
     {
       "path": "renderer/launcher.mjs",
-      "bytes": 30923,
-      "sha256": "00bd70ca5d74b4cc0ffe17d13884cf405c9fd42ce7515a66dcf9b1ce44f23392"
+      "bytes": 31263,
+      "sha256": "c5915c7e820d8fddfea2ed41521f360162ee2fd09d329206b17ee7d87306864e"
     },
     {
       "path": "renderer/library.mjs",
@@ -331,49 +331,94 @@
       "sha256": "d2cec200e8004b7a5cc163b2183efd047f85d436c70f789e21c37ec54bdc6bbd"
     },
     {
+      "path": "renderer/office-bizplan-model.mjs",
+      "bytes": 15937,
+      "sha256": "ed5cc3203bb59064c9bfaacb9b619154b5eaf4ba7059b698c2d8222d1576a856"
+    },
+    {
+      "path": "renderer/office-bizplan-room.mjs",
+      "bytes": 10629,
+      "sha256": "628d3129f17769ff403953f3c8da6bc02c5757f7b88cf395b66f2a4f253aaf44"
+    },
+    {
+      "path": "renderer/office-bizplan-view.mjs",
+      "bytes": 17200,
+      "sha256": "86e4e6a2c084b762ca12af71ee59b8b97d0d84035fb2042ce0e1cd48e4f9d78f"
+    },
+    {
       "path": "renderer/office-floor.mjs",
-      "bytes": 20233,
-      "sha256": "725f5ba78eaffeafdf503bb5cf5528373559c12186dd5ace90e680ca5282539e"
+      "bytes": 56673,
+      "sha256": "5761d3329d52316203b17438977ccee6b85c6f5b60947405896c908fc481ab9e"
+    },
+    {
+      "path": "renderer/office-mail-model.mjs",
+      "bytes": 25780,
+      "sha256": "6d296d1082cae69ff6d637edc4ff2cc53f95fc5ec02327eefbb92647249d57dd"
+    },
+    {
+      "path": "renderer/office-mail-review-actions.mjs",
+      "bytes": 10621,
+      "sha256": "e8797c255020bc7e33ed95a7708493ddcd9ca91d7ee8fbc5665d6ce3437b8d69"
+    },
+    {
+      "path": "renderer/office-mail-review-filter.mjs",
+      "bytes": 5139,
+      "sha256": "713aa5b5212a16a37d985ccae15bf5b38847ea4d2c2c05b9d8c389ca6d724057"
+    },
+    {
+      "path": "renderer/office-mail-review.mjs",
+      "bytes": 45891,
+      "sha256": "982863fcc6e0d80cc8f818b863fe93513d59b1208a5cf12a2da4e59ab68cee8a"
+    },
+    {
+      "path": "renderer/office-mail-view.mjs",
+      "bytes": 43275,
+      "sha256": "befabec4479193921573412caf1d9c93b13ed7b89ae24bc42593000c79de4bd4"
     },
     {
       "path": "renderer/office-model.mjs",
-      "bytes": 26426,
-      "sha256": "f68c363f3fe7b199b55b5f097ca868493fd4a73eea208e4f3beecc2059fc2cfc"
+      "bytes": 32110,
+      "sha256": "1d9733f478f41f49799ef5fe9a5827281a788b099503d749bc7402964dcd880e"
+    },
+    {
+      "path": "renderer/office-quote-handoff-view.mjs",
+      "bytes": 4458,
+      "sha256": "f7ea385e0ba63d5112219b5109f20a447909e3c3ef09337651d63f2a3375417f"
     },
     {
       "path": "renderer/office-room.mjs",
-      "bytes": 34207,
-      "sha256": "ba8901fd7927ae0b2c25cb03a8388d19c65a3876940c019ee95580427bde15aa"
+      "bytes": 52505,
+      "sha256": "736d4d18d3a3517d406f4980862a4327124c08ca71ee00b9dfbbe8fcfd3bab69"
     },
     {
       "path": "renderer/office-task-room.mjs",
-      "bytes": 18307,
-      "sha256": "c82026de9bbd561ed4c20b39ad5f2d92b8baf6409c7f443ffccfb9a9326d766e"
+      "bytes": 26352,
+      "sha256": "735bfebb7b4c75b056ff1d739f7783dea2564bb35200da6c02b949480bd2ed0f"
     },
     {
       "path": "renderer/office-task-view.mjs",
-      "bytes": 38135,
-      "sha256": "6e7fab728594274ba0316feef5c220041a9db32e623e1f990f01441aa0d78136"
+      "bytes": 51858,
+      "sha256": "1c9d9e184b0084fe0380551aa0711203dd1fdb9ff461dd43eca14b7ea3fa0f03"
     },
     {
       "path": "renderer/orb-face-view.mjs",
-      "bytes": 152279,
-      "sha256": "9f4b2f65d57b0664c470f68ddd82536ffc5e3e750206af58b01714741080e723"
+      "bytes": 176842,
+      "sha256": "de31c850ebf171e8f1ee9588ef1d52839ec7b0ecfabec35e83d58ccd62703e3a"
     },
     {
       "path": "renderer/orb-face.css",
-      "bytes": 72117,
-      "sha256": "ef220e232d5a49a5a8b1ae2298eefa83108ca165c2f5a5154fc7440787f940cd"
+      "bytes": 123837,
+      "sha256": "b0940d7cfc523b00c9a28eea9c5e83eb35d975b2c595410283aae2f3e51b67b0"
     },
     {
       "path": "renderer/orb-face.mjs",
-      "bytes": 135300,
-      "sha256": "4333c0a6ffd32b048ac23378a50b19853c8abf34ae150e2b0b0c0aea654d5db9"
+      "bytes": 155967,
+      "sha256": "0fe77f668c91013173bb1c4006a67bef394e6b4e4a6052028f79a0097b5a9bb9"
     },
     {
       "path": "renderer/orb-rooms.mjs",
-      "bytes": 61127,
-      "sha256": "d0971109f9953cbd1d92e45b965ff77721baf536736f83590da958621460092f"
+      "bytes": 70543,
+      "sha256": "91cdb283d90b9f6236a287c988147cf497e4087a20d947b4d0c7c3607af1ea79"
     },
     {
       "path": "renderer/orb-signature.mjs",
@@ -382,13 +427,18 @@
     },
     {
       "path": "renderer/orb-sound.mjs",
-      "bytes": 7916,
-      "sha256": "69e462f76ae2274e14b3ce000b4fa5e78ea35089c127316d6e68d386f0884e1c"
+      "bytes": 8438,
+      "sha256": "0d24757b6e53dc2061847bb1a107a90f093debd3e520c2a4625484c76a55d759"
     },
     {
       "path": "renderer/orb-stage.mjs",
       "bytes": 49170,
       "sha256": "fa8bab65003747fe32049bedd49df8eaf19c75f28475d8cf801e74c66553175c"
+    },
+    {
+      "path": "renderer/pc-fit-model.mjs",
+      "bytes": 18381,
+      "sha256": "f9b84294b939acc2cf09552f188a14113f61382a2a60563f86ce0f1550645ae2"
     },
     {
       "path": "renderer/personalization.mjs",
@@ -432,23 +482,28 @@
     },
     {
       "path": "renderer/solio-backup-model.mjs",
-      "bytes": 22261,
-      "sha256": "6fc408d3c931a5bf08b66c0c5fec4a5b03e83a971d257ed1717c7fb0e0e1851b"
+      "bytes": 58666,
+      "sha256": "1842f8020f4eaa67adf45d65d8a77562b7b466f4a1fa5cd4f7e040368e4d1516"
     },
     {
       "path": "renderer/solio-brief.mjs",
-      "bytes": 49238,
-      "sha256": "777d669e45cb4fa5dcaa1fb622691e082a397dd04d026c722a8f6de2925b94f9"
+      "bytes": 68341,
+      "sha256": "a4a2b413d37c7067c507bbbeff975a85911d4db34605d2869bd8a59eec119477"
+    },
+    {
+      "path": "renderer/solio-queue.mjs",
+      "bytes": 21184,
+      "sha256": "07e07d8ad599b9ab0c263526326b0fb03f4cc7ecb317d2002c08c1bbcc93e211"
     },
     {
       "path": "renderer/solio-rooms.mjs",
-      "bytes": 122660,
-      "sha256": "05b9dc6ba272921064b126e134b5b953c19c4d2f04448d825232fcbbda040841"
+      "bytes": 130175,
+      "sha256": "d4f8fe46873cd6793852d0c598fdb6b9751bc4c18abccf901ddf2d91385fa84e"
     },
     {
       "path": "renderer/solio-today.mjs",
-      "bytes": 35625,
-      "sha256": "f144a25c1465790f4fcabb712c0bc70abf7995368b9b52422415984b08489066"
+      "bytes": 35975,
+      "sha256": "4cce58339e71cc4c21c86923f691cbe55b3ef33b3f9e53c80def32533e5fea9b"
     },
     {
       "path": "renderer/solio.mjs",
@@ -574,6 +629,21 @@
       "path": "src/catalog.cjs",
       "bytes": 2592,
       "sha256": "71cfda5ce70ecaefa3bd8c30c031583258dcc948239e122bfc5dfe4f3c746e35"
+    },
+    {
+      "path": "src/chatgpt-connection.cjs",
+      "bytes": 9426,
+      "sha256": "0c90e6fdb0e30457b366456fb281b5ca2ee8bc28a2f026c59d2f0c8b45b2bc10"
+    },
+    {
+      "path": "src/chatgpt-identity.cjs",
+      "bytes": 5115,
+      "sha256": "dcff88e8f2b5bb0e065d86c0002706084f245d366e6fc381aea536cd67f18ab2"
+    },
+    {
+      "path": "src/chatgpt-partner.json",
+      "bytes": 5,
+      "sha256": "38e0b9de817f645c4bec37c0d4a3e58baecccb040f5718dc069a72c7385a0bed"
     },
     {
       "path": "src/classroom-main.cjs",
@@ -737,8 +807,8 @@
     },
     {
       "path": "src/main.cjs",
-      "bytes": 118490,
-      "sha256": "97911ad5a4e2ab9c3bbc23e33d0600ed36673ffa42e7817edac36fd9a52c092a"
+      "bytes": 124420,
+      "sha256": "e8ebe1bf643f8818d14d647a79d4971394f70a28d2f31f32164c1eddc5e868f7"
     },
     {
       "path": "src/messenger-teacher.cjs",
@@ -761,19 +831,134 @@
       "sha256": "4edc4e671d9ee2f74d3e2d141c35c886620d490f314d81496c4024e3c61f13ee"
     },
     {
+      "path": "src/office-bizplan-check.cjs",
+      "bytes": 17055,
+      "sha256": "45c03be282a987a67fa660706097772accdf9e4a42aebb4ccf56bdd76a6aa8e7"
+    },
+    {
+      "path": "src/office-bizplan-items.schema.json",
+      "bytes": 1493,
+      "sha256": "47443233512cbf8c169f173a0413bdf1ce9043844f15a828575cad5f075cbda5"
+    },
+    {
+      "path": "src/office-bizplan.schema.json",
+      "bytes": 831,
+      "sha256": "7ebcf19f3e6fa8aa81af9b9996ca81eafd5537760182abb9458cb61e9f46dca6"
+    },
+    {
       "path": "src/office-capacity.cjs",
       "bytes": 2309,
       "sha256": "f9c209b9a083ac7e612cdfaa9e646a217387b0e73ecf7912dd106eae85f69fe3"
     },
     {
+      "path": "src/office-feature-bizplan.cjs",
+      "bytes": 25658,
+      "sha256": "db7c7cd94808b14c2c0bbc252c55c82680f75c2ba05e4ad3aaae7457575bf1c4"
+    },
+    {
+      "path": "src/office-features.cjs",
+      "bytes": 5418,
+      "sha256": "45f488760591b5094237c0674ba434f8165dd56d43d9ee6f0da07e938389a945"
+    },
+    {
+      "path": "src/office-mail-api.cjs",
+      "bytes": 75014,
+      "sha256": "1b2ee931a0552b55a53f88726746bf4b3e29d9f4223d6e7095f6d39dd7ea788b"
+    },
+    {
+      "path": "src/office-mail-calendar.cjs",
+      "bytes": 21422,
+      "sha256": "c412008d39b9e72435aadab73dabbbaf68f198b843613fba15bcd604a0560767"
+    },
+    {
+      "path": "src/office-mail-http.cjs",
+      "bytes": 2205,
+      "sha256": "08b810f1b1727d240b4be1ac5b94ef977f08544acf80d2453faefbf0ed21d574"
+    },
+    {
+      "path": "src/office-mail-oauth.cjs",
+      "bytes": 7930,
+      "sha256": "faf4d47da4be9bc068e8b670bfd3bfc1669aa4468a873b64345b85521ffb1a92"
+    },
+    {
+      "path": "src/office-mail-pages.cjs",
+      "bytes": 5336,
+      "sha256": "207bf1ba5272a861e9315306944e61d2b106d3f86ab38e026bdf1bf53023a18b"
+    },
+    {
+      "path": "src/office-mail-plan.cjs",
+      "bytes": 9471,
+      "sha256": "36270a7ef4a166a43849ff858be7ca23b206930924bba5429a81cad5f8d875e1"
+    },
+    {
+      "path": "src/office-mail-plan.schema.json",
+      "bytes": 2107,
+      "sha256": "f0f1a1ce43d7b44c62be0b7d5639a387fb95b368c6828e32b0ab0701a701b126"
+    },
+    {
+      "path": "src/office-mail-rpc.cjs",
+      "bytes": 5560,
+      "sha256": "04f94c03477480d8607a1af2524499691ddc4dcc66a33c1d5ea2b27fbbab7ae7"
+    },
+    {
+      "path": "src/office-mail-vault.cjs",
+      "bytes": 11291,
+      "sha256": "39b18aac53935e8727e98c43a8e95181c3ed3dc1e4c6727835ef3865ac21b8b8"
+    },
+    {
+      "path": "src/office-mail.cjs",
+      "bytes": 20926,
+      "sha256": "0d507d2ee91d649e141a1a01703e3bf5961393fb812750724b36783c8e99e96e"
+    },
+    {
+      "path": "src/office-ooxml.cjs",
+      "bytes": 22833,
+      "sha256": "c9e6f8f5adbc0074796f6462e882bcf438bf15ea4f65866ca74ec4bae25d51a9"
+    },
+    {
+      "path": "src/office-quote-cards.cjs",
+      "bytes": 6371,
+      "sha256": "1ba069d1ec4105132ff655bc3e035bc0046d3e0d0ad669765bae34c64620db97"
+    },
+    {
+      "path": "src/office-quote-draft.cjs",
+      "bytes": 1748,
+      "sha256": "b724272d0042e6abfc638cf2dd69e5a096a3b8e303af582ab64fe22148fbe1ce"
+    },
+    {
+      "path": "src/office-quote-draft.schema.json",
+      "bytes": 132,
+      "sha256": "49a99938581e00cd937920341a5ea50ef7d87bb3d6a3890478e813a2c399739a"
+    },
+    {
+      "path": "src/office-quote-providers.cjs",
+      "bytes": 13704,
+      "sha256": "9f1d36bb764e974da270cd5a445a85b6a8fa7ed706a52c47b8116490f01fcbc2"
+    },
+    {
+      "path": "src/office-quote-search.schema.json",
+      "bytes": 1469,
+      "sha256": "b19ef6e8ff21ff41c56804713c528452745c3ce57d0a71f35dcbe1905efe6a67"
+    },
+    {
+      "path": "src/office-quote-thread.cjs",
+      "bytes": 34997,
+      "sha256": "adb5261ee99cae5e871e4869a312e97419264bb16f0d806fa6213d7cc902481c"
+    },
+    {
       "path": "src/office-records.cjs",
-      "bytes": 23014,
-      "sha256": "1d608469b373c75699eb8e20c8d248b7569cc0f9f4f23e62901424ee37638d61"
+      "bytes": 33683,
+      "sha256": "6cd6eb69ef0354b0bbba2e9185f62bfc2c2e3bd5dc4cff8678a98d9500ff0457"
+    },
+    {
+      "path": "src/office-schema-turn.cjs",
+      "bytes": 11764,
+      "sha256": "56dc233c9abceebd317d25fa32ae88c40f9a8bed15141578c4d14b8c79995073"
     },
     {
       "path": "src/office-store.cjs",
-      "bytes": 26755,
-      "sha256": "63848af98c37a35cf4fe8d23ff9ac042f1e3fbb6c919e2525876bb24b4a94467"
+      "bytes": 31576,
+      "sha256": "03344ecfec41ab83edd40dd619ddf91cbb084caa5c121c298f90122b8fde2747"
     },
     {
       "path": "src/office-task-claude-hook.cjs",
@@ -787,8 +972,8 @@
     },
     {
       "path": "src/office-task-codex.cjs",
-      "bytes": 16417,
-      "sha256": "d7bd1495d13d897232e48e8f136bc6cf43f8cd344d2ce0b2d4ac7559e76d57f6"
+      "bytes": 19625,
+      "sha256": "7bbc83763da808a2b15e3f258cdc26f788a431dab7c2c690cdeebeb115ac5597"
     },
     {
       "path": "src/office-task-console.cjs",
@@ -797,23 +982,28 @@
     },
     {
       "path": "src/office-task-runtime.cjs",
-      "bytes": 8271,
-      "sha256": "d21ff84bfe69fe2a7fbb670f3b8f9abce1f3927e59758cfc7c7412ff5e85a46f"
+      "bytes": 11216,
+      "sha256": "37d2806474d56f5e86ce90d90db67e0f719b82586a818c83661ab379ab49ab2d"
     },
     {
       "path": "src/office-task-store.cjs",
-      "bytes": 12569,
-      "sha256": "24c53a0c6da8b42e732ceae8459a8bbca3dafba761f849093d879ef9054051a2"
+      "bytes": 18633,
+      "sha256": "1faf306f707756c63f458894a1c9d9e4f4d760a9719798a334653b2a45466bbb"
     },
     {
       "path": "src/office-tasks.cjs",
-      "bytes": 16521,
-      "sha256": "632d84daee0faff6f23e14430db290683a1e159aabff7287f96561d9a3185fc5"
+      "bytes": 57616,
+      "sha256": "8c1df5b74fc606fb43ade464351079f843e46bdfe06f26b5294d49c458cbdcb0"
     },
     {
       "path": "src/office.cjs",
-      "bytes": 27785,
-      "sha256": "b97bf2085c4f991f888c4fe511a9534cb0325d0c655a7da77ae9bbcc795304d8"
+      "bytes": 27933,
+      "sha256": "e756695026fd8b187c44897df418b8a3705644a0551d104f63f768abb98679c7"
+    },
+    {
+      "path": "src/pc-profile.cjs",
+      "bytes": 19087,
+      "sha256": "f3e945695b6a14c06ffa4f415c47da9279adccaa3ee343d3ce843c2cec4d64c1"
     },
     {
       "path": "src/personal-account.cjs",
@@ -877,8 +1067,8 @@
     },
     {
       "path": "src/preload.cjs",
-      "bytes": 22841,
-      "sha256": "e9e42dd6f29bf0a420ab835fc78477a5d6c4b5597d12adc5792fc0bc9977375a"
+      "bytes": 29974,
+      "sha256": "051df1893fbc9009521d3ea073e496af1b92e07bcaab342b371081252de744ab"
     },
     {
       "path": "src/product-main.cjs",
@@ -947,8 +1137,13 @@
     },
     {
       "path": "src/solio-backup.cjs",
-      "bytes": 61968,
-      "sha256": "3327cdb0d240d324098d2fd0ca0329bc58b55fd3cf62df4f74d7f40f4d0684a3"
+      "bytes": 72951,
+      "sha256": "6d45dd5e8c9657483d945e439e810d780152db99cf433cc003e589316e36fcda"
+    },
+    {
+      "path": "src/solio-oneclick.cjs",
+      "bytes": 19785,
+      "sha256": "207834aa43d3ff300b1c31be2318c932fb66811324f717b898ef82e05ae74e4b"
     },
     {
       "path": "src/space-view.cjs",
@@ -1059,6 +1254,11 @@
       "path": "src/teacher-security.cjs",
       "bytes": 1616,
       "sha256": "68fe4d72e8538ea79b330d8c9b7874c07e98d61be44db90ae023a8bc3921e3ed"
+    },
+    {
+      "path": "src/vendor/chatgpt-jose.cjs",
+      "bytes": 30868,
+      "sha256": "6b35bdf2a62030070d70dc3de16ebc69d18a3f9bd3985fa1b2f71f3e141cefdb"
     },
     {
       "path": "src/window-placement.cjs",

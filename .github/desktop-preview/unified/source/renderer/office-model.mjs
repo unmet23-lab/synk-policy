@@ -7,6 +7,7 @@ const SEC = 1e3, MIN = 60e3, HOUR = 3600e3;
 /* 경계 시간(설계의 표 그대로). 본체의 기록 살피기도 drop을 쓴다 */
 export const OFFICE_TIMES = Object.freeze({
   recordWork: 90 * SEC, // 기록이 이보다 짧게 그대로면 일하는 중(4.1, 4.2)
+  recordBusy: 12 * MIN, // 기록 끝이 차례 중(도구 결과를 기다림 · 답을 쓰는 중)이면 기록이 이만큼 그대로일 때까지 일하는 중(4.5)
   silent: 12 * MIN, // 일하는 중인데 훅과 기록이 둘 다 이만큼 조용하면 「소식이 없습니다」(4.1)
   longTurn: 2 * MIN, // 이보다 오래 걸린 차례만 끝냄 느낌표를 붙인다(D12)
   stopGrace: 10 * SEC, // Stop 뒤 이 안의 기록 바뀜은 그 차례의 마무리다(4.1)
@@ -16,7 +17,9 @@ export const OFFICE_TIMES = Object.freeze({
 const T = OFFICE_TIMES;
 const TOOLS = ['claude', 'codex'];
 const HOOK_EVENTS = new Set(['SessionStart', 'PostToolUse', 'Notification', 'Stop', 'SubagentStart', 'SubagentStop', 'SessionEnd']);
-const UNKNOWN_NOTE = '승인 물음은 모릅니다';
+const UNKNOWN_NOTE = '승인 요청은 여기에 뜨지 않습니다';
+const RECORD_TURNS = new Set(['ended', 'waiting', 'working']);
+const timeOrNull = v => (v != null && v !== '' && Number.isFinite(Number(v)) ? Number(v) : null);
 
 const own = (o, k) => o != null && Object.prototype.hasOwnProperty.call(o, k);
 const later = (a, b) => (a == null ? b : Math.max(a, b));
@@ -37,7 +40,19 @@ function normPath(p) {
   const unc = /^[\\/]{2}/.test(s);
   return ((unc ? '\\' : '') + s.replace(/[\\/]+/g, '\\').replace(/\\+$/, '')).toLowerCase();
 }
-const folderName = cwd => String(cwd ?? '').trim().replace(/[\\/]+$/, '').split(/[\\/]/).pop() || '';
+/* 작업 폴더의 이름. Claude Code가 만든 작업 사본(워크트리) 폴더는 무작위 이름이라(「peaceful-rhodes-e8e7dc」) 처음 보는 사람이 무엇인지 모른다.
+   그 폴더는 저장소 이름으로 쓴다: 「저장소\.claude\worktrees\이름」과 「…worktrees\저장소\이름」(11-23 맹검이 닫힌 줄의 폴더 이름을 짚음) */
+const WORKTREE_NAME = /^[a-z]+-[a-z]+-[0-9a-f]{6}$/;
+export function officeFolderName(cwd) {
+  const parts = String(cwd ?? '').trim().replace(/[\\/]+$/, '').split(/[\\/]/);
+  const last = parts.at(-1) || '', up = parts.length - 2;
+  if (WORKTREE_NAME.test(last) && up >= 1) {
+    if (/^worktrees$/i.test(parts[up]) && /^\.claude$/i.test(parts[up - 1] || '') && parts[up - 2]) return parts[up - 2];
+    if (/worktrees$/i.test(parts[up - 1] || '') && parts[up]) return parts[up];
+  }
+  return last;
+}
+const folderName = officeFolderName;
 
 /* 앱이 남은 양을 읽으려고 스스로 돌리는 Claude Code는 직원이 아니다. userData가 셋이라 끝이 AiSubscriptions\run인 꼴로 거른다(4.4) */
 export function officeIgnoredCwd(cwd) {
@@ -69,6 +84,7 @@ export const officeState = () => ({ sessions: {}, ignored: {} });
 const fresh = (id, tool) => ({
   id, tool, cwd: null, model: null, modelAt: null, hooked: false,
   firstAt: null, hookedAt: null, lastHookAt: null, lastRecordAt: null,
+  recordTurn: null, recordTurnAt: null, recordHelperAt: null, // 마지막으로 닿은 기록 살피기가 읽은 끝 줄의 갈래 · 그 줄의 때 · 도우미 기록의 고친 때(4.5)
   postAt: null, // 마지막 PostToolUse(도우미 것까지)
   askAt: null, clearAt: null, // 승인 물음과 그것을 푸는 소식(도우미 것이 아닌 PostToolUse, Stop)의 마지막 때. 끝(SessionEnd)은 그 앞의 물음을 지운다
   idleAt: null, stopAt: null, turnStartAt: null, seenAt: null,
@@ -133,7 +149,8 @@ function dropUpTo(s, t) {
 
 /* 소식 하나를 접는다. 들어오는 것:
    { kind:'hook', event, sessionId, cwd, at, toolName?, toolDetail?, notificationType?, agentId?, model? }
-   { kind:'record', sessionId, cwd, tool:'claude'|'codex', changedAt } — changedAt은 도우미 기록까지 본 가장 늦은 고친 때
+   { kind:'record', sessionId, cwd, tool:'claude'|'codex', changedAt, turn?, turnAt?, helperAt?, seenAt? } — changedAt은 도우미 기록까지 본 가장 늦은 고친 때,
+     turn은 본 기록 끝 줄의 갈래('ended' · 'waiting' · 'working', 모르면 null), turnAt은 그 줄의 때, helperAt은 도우미 기록의 고친 때, seenAt은 살핀 때(4.5)
    { kind:'seen', departmentId, at } — 그 부서의 줄을 열었다 닫음. departmentId null은 「부서 없는 일」. ctx의 부서로 직원을 고른다
    { kind:'reset' } — 계정이 바뀌면 다 비운다
    늦게 닿은 소식도 있으므로 순서가 아니라 때(at)로 견준다. 주어진 상태는 고치지 않고 새 상태를 돌려준다.
@@ -164,6 +181,12 @@ export function officeReduce(state, event, ctx = {}) {
   if (cwd && (!isRecord || !s.hooked || !s.cwd)) s.cwd = cwd;
   if (isRecord) {
     if (event.tool === 'codex' || event.tool === 'claude') s.tool = event.tool;
+    // 끝 줄의 갈래는 마지막으로 닿은 살피기의 것을 쓴다(4.5). 본체는 기록을 한 번에 하나씩 살피고 그 차례대로 접는다(office.cjs).
+    // 그래서 고친 때나 살핀 때로 견주지 않는다. 도우미 파일이 지워져 고친 때가 앞으로 돌아가도, 시계를 뒤로 돌려도 새 살피기가 이긴다
+    // (GPT 검수 solio-office-turn GA3, -r2 GA2)
+    s.recordTurn = RECORD_TURNS.has(event.turn) ? event.turn : null;
+    s.recordTurnAt = timeOrNull(event.turnAt);
+    s.recordHelperAt = timeOrNull(event.helperAt);
     s.lastRecordAt = later(s.lastRecordAt, at);
     // 훅을 받기 전의 기록은 모른다(4.1 「훅을 중간에 켠 세션」). Stop 뒤 10초 안의 바뀜은 새 차례가 아니다
     if (s.hooked && at >= s.hookedAt && afterStop(s, at, T.stopGrace)) turnNews(s, at);
@@ -260,6 +283,25 @@ function statusOf(s, now) {
     // 훅 소식이 없는 세션은 기록만 안다. 승인 · 끝냄을 말하지 않고 느낌표도 없다
     const age = now - s.lastRecordAt;
     if (!(age < T.drop)) return null;
+    const turn = s.recordTurn;
+    if (turn) {
+      // 갈래를 아는 세션은 파일의 고친 때가 아니라 끝 줄의 때로 잰다(4.5). 차례와 상관없는 줄(대기열 · 제목 · 비용)이 오래된 기록을 고쳐도
+      // 끊긴 차례가 일하는 중이 되거나 며칠 전에 끝난 차례가 서지 않는다(설계 검토 solio-office-turn-20261123 고칠 것 1).
+      // 끝 줄의 때가 없거나 고친 때보다 늦게 적혀 있으면 고친 때로 잰다
+      const turnFrom = s.recordTurnAt != null && s.recordTurnAt <= s.lastRecordAt ? s.recordTurnAt : s.lastRecordAt;
+      if (turn === 'ended' || turn === 'waiting') {
+        // 차례가 끝났거나 손님의 답을 기다린다. 끝 줄보다 늦게 도우미 기록이 바뀌었고 그것이 90초 안이면 도우미가 일하는 중이다.
+        // 끝 줄 앞에 적은 도우미는 그 결과를 본 차례가 이미 끝냈다(GPT 검수 solio-office-turn GA2)
+        if (s.recordHelperAt != null && s.recordHelperAt > turnFrom && now - s.recordHelperAt < T.recordWork) return view('working', '일하는 중');
+        if (!(now - turnFrom < T.drop)) return null;
+        return view('quiet', minutes(now - turnFrom) + '분째 조용합니다');
+      }
+      // 차례 중이면 긴 명령이 도는 동안에도 일하는 중이다. 도우미가 적으면 그때부터 다시 잰다.
+      // 12분 넘게 아무것도 적히지 않았으면 멈췄거나 승인을 기다릴 수 있어 조용하다고 한다
+      const busyFrom = Math.max(turnFrom, s.recordHelperAt ?? -Infinity);
+      if (!(now - busyFrom < T.drop)) return null;
+      return now - busyFrom < T.recordBusy ? view('working', '일하는 중') : view('quiet', minutes(now - busyFrom) + '분째 조용합니다');
+    }
     return age < T.recordWork ? view('working', '일하는 중') : view('quiet', minutes(age) + '분째 조용합니다');
   }
   if (!(quiet < keepFor(s))) return null;
@@ -312,17 +354,25 @@ export function officeSessions(state, now, { departments = [], assignments = {} 
    차례: 승인을 물은 세션 · 수용 인원을 넘음 · 일하는 수 · 모두 쉼. 훅 소식이 없는 세션(Codex 포함)이 있으면 둘째 줄이 그 수를 말한다.
    input: officeSessions의 값, { cap 수용 인원, hooksOn 「승인 물음도 보기」를 켰는지 }. 돌려주는 값: { say, then, hint, active, unknown } */
 const whoOf = v => v.departmentName || (v.folder ? v.folder + ' 폴더의 일' : '부서 없는 일');
+/* 승인을 하는 창의 이름: 화면에 선 직원의 도구들(「Claude Code」, 「Claude Code와 Codex」). 모르는 도구가 섞이면 「각 프로그램」 */
+const TOOL_WINDOW = Object.freeze({ claude: 'Claude Code', codex: 'Codex' });
+function toolWindows(list) {
+  const tools = [...new Set(list.map(v => v.tool))];
+  if (!tools.length || tools.some(t => !own(TOOL_WINDOW, t))) return '각 프로그램';
+  return TOOLS.filter(t => tools.includes(t)).map(t => TOOL_WINDOW[t]).join('와 ');
+}
 export function officeHeadline(list, { cap = null, hooksOn = true } = {}) {
   const shown = Array.isArray(list) ? list : [];
   const asks = shown.filter(v => v.status === 'asked').sort((a, b) => a.askedAt - b.askedAt);
   const busy = shown.filter(v => v.status === 'working' || v.status === 'silent');
   const active = busy.length + asks.length; // 수용 인원에 세는 것은 일하는 직원과 승인을 물은 직원이다(6절)
   const unknown = shown.filter(v => !v.hooked).length;
-  const over = Number.isFinite(cap) && cap >= 1 && active > cap ? countWord(cap) + '까지인데 지금 ' + ga(countWord(active)) + ' 일하고 있습니다.' : '';
-  const unknownSay = !unknown ? '' : unknown < shown.length ? neun(countWord(unknown)) + ' 승인 물음을 모릅니다.' : shown.length === 1 ? '승인 물음은 모릅니다.' : '모두 승인 물음을 모릅니다.';
+  const over = Number.isFinite(cap) && cap >= 1 && active > cap ? countWord(cap) + '까지인데 지금 직원 ' + ga(countWord(active)) + ' 일하고 있습니다.' : '';
+  // 모두가 모르면 어디서 승인하는지를 말한다(11-23 맹검 「모두 승인 물음을 모릅니다」가 어색하다). 일부만 모르면 그 수를 말한다
+  const unknownSay = !unknown ? '' : unknown < shown.length ? neun(countWord(unknown)) + ' 승인 요청이 여기에 뜨지 않습니다.' : '승인 요청은 ' + toolWindows(shown) + ' 창에서 확인해 주세요.';
   const silent = shown.find(v => v.status === 'silent'), done = shown.find(v => v.status === 'done' && v.alert);
   const news = silent ? ga(whoOf(silent)) + ' ' + silent.say + '.' : done ? ga(whoOf(done)) + ' 일을 하나 끝냈습니다.' : '';
-  const hint = hooksOn === false ? '승인 물음은 설정에서 켜면 봅니다.' : '';
+  const hint = hooksOn === false ? '승인 요청은 설정에서 켜면 여기에 뜹니다.' : '';
   let say, then;
   if (asks.length) {
     say = ga(whoOf(asks[0])) + ' ' + asks[0].say + '.';
@@ -330,7 +380,8 @@ export function officeHeadline(list, { cap = null, hooksOn = true } = {}) {
       || (busy.length ? '그 밖에 ' + ga(countWord(busy.length)) + ' 일하고 있습니다.' : '')
       || (shown.some(v => v.status === 'quiet') ? '' : '다른 일은 없습니다.');
   } else if (busy.length) {
-    say = over || ga(countWord(busy.length)) + ' 일하고 있습니다.';
+    // 「아홉이 일하고 있습니다」는 누가 일하는지 몰랐다(11-23 맹검). 사무실의 낱말 「직원」을 붙인다
+    say = over || '직원 ' + ga(countWord(busy.length)) + ' 일하고 있습니다.';
     then = unknownSay || news;
   } else if (!shown.length) {
     say = '지금 이 PC에서 도는 일이 없습니다.';
@@ -352,17 +403,23 @@ export function officeHeadline(list, { cap = null, hooksOn = true } = {}) {
    합친 인원은 PC 한도와 도구별 인원의 합 가운데 적은 쪽이고 가장 적어도 하나다. 직접 정한 값(1~논리 코어 수)이 이긴다 */
 export function officeCapacity({ cores, totalMemGb, subscriptions = {}, manual = null } = {}) {
   const c = Math.max(1, Math.floor(Number(cores) || 0));
+  const m = Number(manual), mine = manual != null && manual !== '' && Number.isInteger(m) && m >= 1 && m <= c;
+  // 본체가 메모리를 읽지 못하면 null을 보낸다. 그때 PC 한도는 셀 수 없어 하나로 둔다(못 읽은 메모리를 0GB로 셈하지 않는다).
+  const memKnown = totalMemGb != null && totalMemGb !== '' && Number.isFinite(Number(totalMemGb));
   // Windows는 16GB PC의 메모리를 15.7쯤으로 알려 준다. GB로 반올림해 셈해야 「8코어 16GB는 넷」이 맞는다
-  const pcCap = Math.max(1, Math.min(Math.floor(c / 2), Math.floor(Math.round(Math.max(0, Number(totalMemGb) || 0)) / 4)));
+  const pcCap = memKnown ? Math.max(1, Math.min(Math.floor(c / 2), Math.floor(Math.round(Math.max(0, Number(totalMemGb))) / 4))) : 1;
+  // 직접 정한 수는 메모리를 읽었든 못 읽었든 PC 한도를 대신하고, 도구별 수도 그 수에서 구독 규칙으로 센다. 그래서 메모리와 직접 정한 수에 대해서는
+  // 화면(수용 인원 줄)과 일 맡기기 실행(office-task-runtime.cjs)이 이 함수로 같은 수를 쓴다(P2 묶음 GA1, 검수 solio-office-ga1 F2, 설계 검토 solio-office-model-20261122 고칠 것 1).
+  // 구독 남은 양은 지금 실행이 넘기지 않아 그 몫은 다를 수 있다(같은 검토 고칠 것 3, 구현설계 6절)
+  const base = mine ? m : pcCap;
   const toolCaps = {}, missing = [];
   for (const tool of TOOLS) {
     const left = subscriptions?.[tool]?.leftPercent;
-    if (typeof left !== 'number' || !Number.isFinite(left)) { toolCaps[tool] = pcCap; missing.push(tool); continue; }
-    toolCaps[tool] = left >= 50 ? pcCap : left >= 20 ? Math.ceil(pcCap / 2) : left > 0 ? 1 : 0;
+    if (typeof left !== 'number' || !Number.isFinite(left)) { toolCaps[tool] = base; missing.push(tool); continue; }
+    toolCaps[tool] = left >= 50 ? base : left >= 20 ? Math.ceil(base / 2) : left > 0 ? 1 : 0;
   }
   const auto = Math.max(1, Math.min(pcCap, TOOLS.reduce((sum, t) => sum + toolCaps[t], 0)));
-  const m = Number(manual), mine = manual != null && manual !== '' && Number.isInteger(m) && m >= 1 && m <= c;
-  return { pcCap, toolCaps, cap: mine ? m : auto, source: mine ? 'manual' : 'auto', missing, note: missing.length ? '구독 방에 계정을 이으면 남은 양도 봅니다.' : '' };
+  return { pcCap, toolCaps, cap: mine ? m : auto, source: mine ? 'manual' : 'auto', memKnown, missing, note: missing.length ? '구독 방에 계정을 이으면 남은 양도 봅니다.' : '' };
 }
 /* 부서 하나의 자리: 수용 인원을 셋으로 나눠 올린 수, 하나부터 셋까지 */
 export const officeSeats = cap => Math.min(3, Math.max(1, Math.ceil((Number(cap) || 0) / 3)));

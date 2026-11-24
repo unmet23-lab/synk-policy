@@ -29,6 +29,13 @@
 
 #portal-entry .orb-stage{position:relative;height:100%;min-height:0;overflow:hidden;background:var(--void);user-select:none;-webkit-user-select:none;cursor:default}
 #portal-entry .orb-canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+/* 공간 안에 들어온 뒤에만 구 쪽(왼쪽 위)에서 오는 흐린 빛 한 겹을 얹는다(유호님 11-23 「앱에 넣기」, 솔리오 앱 겉 시안).
+   켤 때와 묻는 화면은 「검정 구 하나만」 그대로다. 구는 캔버스에 검정 바탕째 그려지므로 빛은 캔버스 위에 밝게만 섞는다 */
+#portal-entry .orb-stage::after{content:"";position:absolute;inset:0;pointer-events:none;mix-blend-mode:screen;opacity:0;transition:opacity 1.2s ease .6s;background:
+  radial-gradient(ellipse 62% 52% at 10% -6%,rgba(197,214,245,.13),rgba(197,214,245,0) 72%),
+  radial-gradient(ellipse 55% 45% at 104% 108%,rgba(243,241,236,.055),rgba(243,241,236,0) 70%)}
+#portal-entry .orb-stage[data-ui="app"]::after{opacity:1}
+@media (prefers-reduced-motion:reduce){#portal-entry .orb-stage::after{transition:none}}
 /* WebGL도 2D 캔버스도 없을 때: 그리기가 넘긴 자리 · 크기 · 빛으로 정적 구를 그린다. 들어와서 배정된 공간이 열리기를 기다리는 동안에도 남는다(11-16 토큰 세션 전달) */
 #portal-entry .orb-canvas[data-orb-mode="static"]{background:radial-gradient(circle var(--orb-sr,0px) at var(--orb-sx,50%) var(--orb-sy,50%),#030303 calc(100% - 1.5px),var(--orb-ring,rgba(243,241,236,.3)) calc(100% - .5px),transparent 100%),#000}
 /* 점으로 된 synk 표가 뜨는 자리. 구 안으로 들어온 순간에만 그린다 */
@@ -112,6 +119,8 @@
 #portal-entry .obj-n small{font:var(--small);color:var(--dim)}
 #portal-entry .rail.near .obj-n,#portal-entry .obj[aria-current="true"] .obj-n,#portal-entry .obj:focus-visible .obj-n{max-width:9em;margin-left:9px;opacity:1}
 #portal-entry .obj[aria-current="true"],#portal-entry .obj:hover,#portal-entry .obj:focus-visible{color:var(--paper)}
+/* 넓은 창에서도 이름을 늘 세우지 않는다. 11-23에 늘 보이게 했다가 유호님이 11-24 「뭔가 gpt느낌 … 원래대로 되돌려」로 되돌리셨다.
+   지금 프로그램만 이름이 있고, 나머지는 다가가면 차례로 펼쳐진다(위 규칙) */
 #portal-entry .obj:focus-visible{outline:1px solid var(--ring);outline-offset:1px}
 #portal-entry .room{position:absolute;left:clamp(20px,9.5vw,168px);right:clamp(20px,9.5vw,168px);top:52%;transform:translateY(-50%);max-height:calc(100% - 168px);overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin;transition:opacity .3s ease}
 /* 구 곁의 펼침(2단계 첫 조각, 시안 .fan): 갈 수 있는 공간이 구 옆으로 차례로 나온다. 끌기 띠(z-index 4)에 가리지 않게 그 위에 둔다(설계 검토 1차 4) */
@@ -182,12 +191,12 @@
    맨 아랫줄이 아래 흐림에 들지 않게 흐림보다 넓은 아래 여백을 둔다(시안 .room, 사이트방문 설계 6절, 2단계 둘째 조각 설계 10.2절) */
 /* 비서 판(11-20 솔리오 구독 비서 설계 3절): 맨 위 한 가지 아래에 다가오는 일, 지금 출력, 오늘 진단, 상세내역 단추. 줄은 상세내역 안에 접힌다 */
 #portal-entry .brief{margin-top:clamp(18px,3.5vh,44px);max-width:min(100%,62em);display:grid;grid-template-columns:minmax(0,1fr);column-gap:clamp(24px,4vw,64px)}
-/* 넓은 창에서 문자판이 없을 때는 「지금 출력」을 다가오는 일 옆에 세운다. 다가오는 일이 숨으면 세우지 않는다(화면 검수 r2 A9) */
+/* 넓은 창에서 계정판이 없을 때는 「지금 출력」을 다가오는 일 옆에 세운다. 다가오는 일이 숨으면 세우지 않는다(화면 검수 r2 A9) */
 @media (min-width:900px){
-  #portal-entry .room:not(.dialed) .brief:has(> .soon:not([hidden])){grid-template-columns:minmax(0,1fr) auto}
-  #portal-entry .room:not(.dialed) .brief:has(> .soon:not([hidden])) > .soon,#portal-entry .room:not(.dialed) .brief:has(> .soon:not([hidden])) > .soon-more{grid-column:1}
-  #portal-entry .room:not(.dialed) .brief:has(> .soon:not([hidden])) > .live{grid-column:2;grid-row:1 / span 2;margin:0;padding:0 0 0 clamp(18px,2.4vw,32px);border-top:0;border-left:1px solid var(--hair);flex-direction:column;align-items:flex-start;justify-content:center;gap:6px}
-  #portal-entry .room:not(.dialed) .brief > .diag,#portal-entry .room:not(.dialed) .brief > .details{grid-column:1 / -1}
+  #portal-entry .room:not(.boarded) .brief:has(> .soon:not([hidden])){grid-template-columns:minmax(0,1fr) auto}
+  #portal-entry .room:not(.boarded) .brief:has(> .soon:not([hidden])) > .soon,#portal-entry .room:not(.boarded) .brief:has(> .soon:not([hidden])) > .soon-more{grid-column:1}
+  #portal-entry .room:not(.boarded) .brief:has(> .soon:not([hidden])) > .live{grid-column:2;grid-row:1 / span 2;margin:0;padding:0 0 0 clamp(18px,2.4vw,32px);border-top:0;border-left:1px solid var(--hair);flex-direction:column;align-items:flex-start;justify-content:center;gap:6px}
+  #portal-entry .room:not(.boarded) .brief > .diag,#portal-entry .room:not(.boarded) .brief > .details{grid-column:1 / -1}
 }
 #portal-entry .brief > .details{justify-self:start}
 #portal-entry .soon{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:auto minmax(0,1fr);column-gap:clamp(16px,2.4vw,32px);row-gap:10px}
@@ -216,94 +225,149 @@
 #portal-entry .details-h{margin:18px 0 10px;font:var(--small);color:var(--paper)}
 #portal-entry .details-h:first-child{margin-top:0}
 #portal-entry .details-top .diag-line{margin-bottom:10px}
-/* ── 문자판(11-20 유호님이 고르신 A, 솔리오 구독 비서 설계 10절) ──
-   왼쪽에 구를 가운데 둔 사흘짜리 시계판, 오른쪽에 맨 위 한 가지와 다가오는 일, 지금 출력, 오늘 진단. 줄은 그 아래 상세내역에 접힌다.
-   금색은 「막히지 않는 때까지」와 다가오는 일의 때에만 쓴다. 모두 막히는 동안만 붉다 */
-#portal-entry .room[data-room="solio"]{--dial:max(260px,min(560px,calc(100vh - 330px),44vw));--gold:#D9C29A;--block:#E0705A}
-#portal-entry .dial{position:relative;width:var(--dial);aspect-ratio:1;margin:0;container-type:inline-size}
-#portal-entry .dial[hidden]{display:none}
-#portal-entry .dial svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible;font-family:var(--orb-sans)}
-#portal-entry .dial .dial-sweep{pointer-events:none}
-#portal-entry .dial .d-rim{fill:none;stroke:rgba(243,241,236,.12);stroke-width:1}
-#portal-entry .dial .d-inner{fill:none;stroke:rgba(243,241,236,.05);stroke-width:1}
-#portal-entry .dial .d-sweep{transform-box:view-box;transform-origin:50% 50%;animation:orb-dial-spin 72s linear infinite}
-#portal-entry .dial .d-sweep-c{fill:none;stroke-width:2}
-@keyframes orb-dial-spin{to{transform:rotate(360deg)}}
-#portal-entry .dial .d-t{stroke:rgba(243,241,236,.16);stroke-width:1}
-#portal-entry .dial .d-t-six{stroke:rgba(243,241,236,.38)}
-#portal-entry .dial .d-t-day{stroke:rgba(243,241,236,.72);stroke-width:1.4}
-#portal-entry .dial .d-day{fill:rgba(243,241,236,.6);font-size:max(17px,calc(11px * var(--u,1)));letter-spacing:.06em;text-anchor:middle;dominant-baseline:middle}
-#portal-entry .dial .d-now{fill:var(--paper)}
-#portal-entry .dial .d-safe{fill:none;stroke:var(--gold);stroke-width:1.8;stroke-linecap:round}
-#portal-entry .dial .d-gap{fill:none;stroke:var(--block);stroke-width:1.8;stroke-linecap:round}
-#portal-entry .dial .d-after{fill:none;stroke:rgba(243,241,236,.2);stroke-width:1;stroke-dasharray:2 5}
-#portal-entry .dial .d-nowdot{fill:var(--paper)}
-#portal-entry .dial .d-ev{fill:#000;stroke:var(--gold);stroke-width:1.4}
-#portal-entry .dial .d-reset{stroke:rgba(243,241,236,.6)}
-#portal-entry .dial .d-runout{fill:var(--block);stroke:none}
-#portal-entry .dial .d-other{fill:rgba(243,241,236,.6);stroke:none}
-#portal-entry .dial .d-cell{fill:none;stroke:rgba(243,241,236,calc(.35 + var(--l,0) * .6));stroke-width:12}
-#portal-entry .dial .d-cell-out{stroke:rgba(243,241,236,.09)}
-#portal-entry .dial .d-cell-unknown{stroke:rgba(243,241,236,.3);stroke-width:1.2;stroke-dasharray:3 4}
-#portal-entry .dial .d-cell-side{opacity:.62}
-#portal-entry .dial .d-svc{fill:rgba(243,241,236,.5);font-size:max(15px,calc(10.5px * var(--u,1)));letter-spacing:.04em;text-anchor:middle;dominant-baseline:central}
-#portal-entry .dial .d-svc-focus{fill:rgba(243,241,236,.8)}
-#portal-entry .dial-orb{position:absolute;left:50%;top:50%;width:25.5%;aspect-ratio:1;transform:translate(-50%,-50%);border-radius:50%;
-  background:radial-gradient(circle at 50% 30%,#232321 0%,#0c0c0b 46%,#020202 72%);box-shadow:inset 0 0 0 1px rgba(243,241,236,.16),inset 0 -18px 40px rgba(243,241,236,.05),0 0 120px rgba(217,194,154,.06)}
-#portal-entry .dial-orb::before,#portal-entry .dial-orb::after{content:"";position:absolute;top:37%;width:3.8%;aspect-ratio:1;border-radius:50%;background:var(--paper);box-shadow:0 0 10px rgba(243,241,236,.5);animation:orb-dial-blink 6s infinite}
-#portal-entry .dial-orb::before{left:35%}
-#portal-entry .dial-orb::after{right:35%}
-@keyframes orb-dial-blink{0%,96%,100%{transform:scaleY(1)}98%{transform:scaleY(.1)}}
-/* 구 아래 큰 숫자. 구(37%~63%)와 안쪽 고리(79%) 사이에 들게 글자와 틈을 문자판 지름(cqw)으로 잰다(화면 검수 dial A3) */
-#portal-entry .dial-hero{position:absolute;left:0;right:0;top:62%;margin:0;text-align:center;pointer-events:none}
-#portal-entry .dial-hero b{font:200 7.5cqw/1 var(--orb-sans);letter-spacing:-.03em;font-variant-numeric:tabular-nums}
-#portal-entry .dial-hero small{font:300 3.4cqw/1 var(--orb-sans);color:var(--dim);margin-left:2px}
-#portal-entry .dial-hero span{display:block;margin-top:1.2cqw;font:400 clamp(10px,2.3cqw,13px)/1.2 var(--orb-sans);color:var(--dim)}
-/* 문자판이 있는 방: 넓은 창은 두 칸, 좁은 창은 문자판 아래에 글 */
-#portal-entry .room.dialed .say{font:200 clamp(24px,min(2.7vw,4.6vh),40px)/1.3 var(--orb-sans);letter-spacing:-.022em;max-width:15em}
-#portal-entry .room.dialed .say .then{margin-top:12px;font:300 clamp(14px,1.15vw,17px)/1.6 var(--orb-sans);letter-spacing:0}
-#portal-entry .room.dialed .brief:not([hidden]){display:block;margin-top:clamp(18px,3vh,32px);max-width:34em}
-#portal-entry .room.dialed .soon{padding-top:clamp(10px,1.6vh,14px);border-top:1px solid var(--hair)}
-#portal-entry .room.dialed .soon .w{color:var(--gold)}
-#portal-entry .room.dialed .live{margin-top:clamp(16px,2.6vh,26px)}
-#portal-entry .room.dialed .live-big{font:200 clamp(30px,3.2vw,46px)/1 var(--orb-sans)}
-/* 진단 한 줄: 구독 이름과 판정을 한 줄에, 할 일은 그 아래 넓게 */
-#portal-entry .room.dialed .diag-line{grid-template-columns:auto minmax(0,1fr);row-gap:4px}
-#portal-entry .room.dialed .diag-line > :last-child{grid-column:1 / -1}
-#portal-entry .room.dialed .diag-line em{color:var(--gold)}
-#portal-entry .room.dialed .dial{margin:0 auto clamp(18px,3vh,28px)}
-/* 지금 출력은 문자판 안 구 위에 크로노그래프의 작은 판처럼 놓는다. 문자판이 있는 동안 화면(orb-face-view renderDial)이 이 줄을 문자판 안으로 옮긴다 */
-#portal-entry .dial > .live{position:absolute;left:50%;top:24%;transform:translateX(-50%);z-index:1;margin:0;padding:0;border:0;max-width:40%;display:flex;flex-direction:column;align-items:center;gap:.8cqw;text-align:center}
-#portal-entry .dial > .live .live-big{font:200 6cqw/1 var(--orb-sans)}
-#portal-entry .dial > .live .live-unit,#portal-entry .dial > .live .live-small{font:400 clamp(10px,2.2cqw,12px)/1.25 var(--orb-sans)}
-/* 구 위 자리에는 숫자와 이름만 둔다. 최근 10분과 도구 몫은 낭독 이름(aria-label)에 있다 */
-#portal-entry .dial > .live[data-state="on"] .live-small{display:none}
-/* 넓은 창: 왼쪽 문자판, 오른쪽 글. 960×680에서도 맨 위부터 「다시 읽기」까지 한 화면에 든다(Fable 최종 F2와 같은 기준) */
+/* ── 계정판과 솔리오 보고(11-24 유호님 「어떤 계정이 남아있는지 먼저」, 솔리오 구독 비서 설계 11절) ──
+   맨 위에 Claude · Codex의 계정마다 남은 양, 그 아래 솔리오 보고. 금색은 지금 쓸 수 있는 남은 양과 「먼저 쓰세요」에만,
+   붉은 흙빛은 막힘과 손볼 일에만 쓴다. 이름과 숫자는 Inter Tight(앱에 400 · 600 · 700이 실린다, launcher.css), 문장은 SUIT다.
+   움직임은 방에 들어올 때 금색 막대가 한 번 차오르는 것뿐이다(사용자가 알게 되는 것: 남은 양) */
+#portal-entry .room[data-room="solio"]{--gold:#D9C29A;--block:#E0705A;--note:rgba(243,241,236,.62);--num:'Inter Tight',SUIT,system-ui,sans-serif;--tagw:76px;--tagg:clamp(14px,1.6vw,22px)}
+#portal-entry .board[hidden],#portal-entry .rep-h[hidden],#portal-entry .rep-tag[hidden],#portal-entry .report[hidden],#portal-entry .rep-more[hidden],#portal-entry .rep-cost[hidden],#portal-entry .b-more[hidden]{display:none}
+#portal-entry .board{margin:0}
+#portal-entry .b-cols{display:grid;grid-template-columns:minmax(0,1fr);gap:clamp(26px,4vh,40px) clamp(40px,5.5vw,96px)}
+#portal-entry .b-col{min-width:0}
+#portal-entry .b-head{display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"svc big" "sub cap";align-items:baseline;column-gap:16px;row-gap:6px;padding-bottom:12px;border-bottom:1px solid var(--hair-strong)}
+#portal-entry .b-svc{grid-area:svc;margin:0;font:600 20px/1.2 var(--num);letter-spacing:-.01em;color:var(--paper)}
+#portal-entry .b-big{grid-area:big;margin:0;justify-self:end;white-space:nowrap;font:400 clamp(34px,3.2vw,44px)/1 var(--num);letter-spacing:-.025em;font-variant-numeric:tabular-nums;color:var(--paper)}
+#portal-entry .b-big small{font:400 .5em/1 var(--num);letter-spacing:0;color:var(--note);margin-left:2px}
+#portal-entry .b-big.b-word b{font:500 clamp(22px,2vw,28px)/1.2 var(--orb-sans);letter-spacing:0;color:var(--block)}
+#portal-entry .b-sub{grid-area:sub;margin:0;font:400 13px/1.4 var(--orb-sans);color:var(--note)}
+#portal-entry .b-alarm{font-style:normal;color:var(--block)}
+#portal-entry .b-cap{grid-area:cap;margin:0;justify-self:end;white-space:nowrap;font:400 12px/1.4 var(--orb-sans);color:var(--note)}
+#portal-entry .b-cap:empty{display:none}
+#portal-entry .b-rows{list-style:none;margin:0;padding:0}
+/* 계정 줄: 이름 · 막대 · % 한 줄, 그 아래 막대 자리에 작은 글 */
+#portal-entry .b-row{display:grid;grid-template-columns:minmax(5.5em,7.5em) minmax(48px,1fr) 4.4em;grid-template-areas:"name bar pct" ". note note";column-gap:14px;row-gap:1px;align-items:center;padding:8px 0;border-bottom:1px solid var(--hair)}
+#portal-entry .b-name{grid-area:name;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font:400 15px/1.35 var(--num);color:var(--paper)}
+#portal-entry .b-bar{grid-area:bar;position:relative;height:6px;background:rgba(243,241,236,.14);overflow:hidden}
+#portal-entry .b-bar i{position:absolute;left:0;top:0;bottom:0;width:calc(var(--v,0) * 100%);background:var(--gold);transform-origin:left center;animation:orb-b-fill .6s cubic-bezier(.2,.7,.2,1) both}
+@keyframes orb-b-fill{from{transform:scaleX(0)}}
+#portal-entry .board.still .b-bar i{animation:none}
+#portal-entry .b-pct{grid-area:pct;justify-self:end;white-space:nowrap;font:600 15px/1.35 var(--num);font-variant-numeric:tabular-nums;color:var(--paper)}
+#portal-entry .b-note{grid-area:note;min-width:0;font:400 13px/1.4 var(--orb-sans);color:var(--note)}
+#portal-entry .b-note:empty{display:none}
+#portal-entry .b-go{font-style:normal;color:var(--gold);margin-left:.5em}
+#portal-entry .b-go::before{content:"· ";color:var(--note)}
+/* 5시간 한도로 막힌 계정: 주간 남은 양은 흐린 막대와 흐린 %, 붉은 작은 글이 할 일이다(설계 검토 10) */
+#portal-entry .b-held .b-bar i{background:rgba(243,241,236,.24)}
+#portal-entry .b-held .b-pct{font:400 13px/1.35 var(--num);color:var(--note)}
+#portal-entry .b-held .b-note,#portal-entry .b-fix .b-note{color:var(--block)}
+/* 막대가 없는 줄(다 씀, 손볼 계정, 읽기 전): 이름 옆에 작은 글 한 줄 */
+#portal-entry .b-out,#portal-entry .b-fix,#portal-entry .b-idle{grid-template-areas:"name note note"}
+#portal-entry .b-out .b-bar,#portal-entry .b-fix .b-bar,#portal-entry .b-idle .b-bar,#portal-entry .b-out .b-pct,#portal-entry .b-fix .b-pct,#portal-entry .b-idle .b-pct{display:none}
+#portal-entry .b-out .b-name,#portal-entry .b-idle .b-name{color:var(--note)}
+#portal-entry .b-fold{appearance:none;display:flex;width:100%;align-items:center;justify-content:space-between;gap:12px;margin:0;padding:10px 0;background:none;border:0;border-bottom:1px solid var(--hair);border-radius:0;font:500 13px/1.4 var(--orb-sans);color:rgba(243,241,236,.82);text-align:left;cursor:pointer}
+#portal-entry .b-fold::after{content:"";flex:none;width:8px;height:8px;margin-right:4px;border-right:1.5px solid currentColor;border-bottom:1.5px solid currentColor;transform:translateY(-3px) rotate(45deg);transition:transform .2s ease}
+/* 펼친 다 쓴 계정은 한 단 들여 흐린 판 위에 둔다(미학 맹검 11-24 K56) */
+#portal-entry .b-more{background:rgba(243,241,236,.03)}
+#portal-entry .b-more .b-row{padding-left:14px;padding-right:12px}
+/* 펼친 다 쓴 계정은 이름을 흐리게, 다시 열리는 때를 밝게 둔다. 훑는 것은 때다(미학 맹검 11-24 3차) */
+#portal-entry .b-more .b-out .b-note{color:rgba(243,241,236,.86)}
+#portal-entry .b-fold[aria-expanded="true"]::after{transform:translateY(1px) rotate(225deg)}
+#portal-entry .b-fold:hover{color:var(--paper)}
+#portal-entry .b-fold:focus-visible{outline:1px solid var(--ring);outline-offset:3px}
+/* 솔리오 보고: 꼬리표(지금 · 곧 · 오늘 · 때 · 진단)와 문장. 첫 줄은 [data-say]이고 계정판이 이미 말한 사실 대신 할 일을 쓴다 */
+/* 보고 머리는 서비스 머리와 같은 목소리(Inter Tight, 종이색)로 둔다. 작은 회색 머리는 꼬리표 하나처럼 묻혔다(미학 맹검 11-24 3차) */
+#portal-entry .rep-h{margin:clamp(26px,4.4vh,44px) 0 10px;font:600 16px/1.3 var(--num);letter-spacing:-.005em;color:var(--paper)}
+#portal-entry .room.boarded .say{max-width:none;min-height:0;font:300 clamp(18px,1.6vw,22px)/1.45 var(--orb-sans);letter-spacing:-.01em;text-wrap:pretty}
+#portal-entry .room.reported .say{display:grid;grid-template-columns:var(--tagw) minmax(0,1fr);column-gap:var(--tagg)}
+/* 보고는 글 길이에 맞는 폭으로. 선이 창 끝까지 가면 오른쪽 절반이 비어 보였다(미학 맹검 11-24) */
+#portal-entry .room.reported .say,#portal-entry .room.boarded .report,#portal-entry .room.boarded .rep-more,#portal-entry .room.boarded .rep-cost{max-width:780px}
+#portal-entry .room.reported .say > [data-say],#portal-entry .room.reported .say > .then{grid-column:2}
+#portal-entry .room.boarded .say .then{margin-top:2px;font:400 15px/1.5 var(--orb-sans);color:var(--paper)}
+#portal-entry .rep-tag,#portal-entry .r-tag{font:500 12px/1.3 var(--orb-sans);font-style:normal;letter-spacing:.03em;color:var(--note);white-space:nowrap;padding-top:.45em}
+#portal-entry .rep-tag[data-tone="now"],#portal-entry .r-item[data-tone="now"] > .r-tag{color:var(--block)}
+#portal-entry .rep-tag[data-tone="plan"],#portal-entry .r-item[data-tone="plan"] > .r-tag{color:var(--paper)}
+/* 보고 아래 한 줄: 왼쪽에 지금 출력, 오른쪽 끝에 상세내역 */
+#portal-entry .room.boarded .brief:not([hidden]){display:grid;grid-template-columns:minmax(0,1fr) auto;column-gap:24px;align-items:end;margin-top:0;max-width:none}
+#portal-entry .room.boarded .brief > *{grid-column:1 / -1}
+#portal-entry .room.boarded .brief > .live{grid-column:1}
+#portal-entry .room.boarded .read > .details{margin:0}
+#portal-entry .report{list-style:none;margin:0;padding:0}
+#portal-entry .r-item{display:grid;grid-template-columns:var(--tagw) minmax(0,1fr);column-gap:var(--tagg);margin-top:12px;padding-top:12px;border-top:1px solid var(--hair)}
+#portal-entry .r-item .r-tag{padding-top:.2em}
+#portal-entry .r-say{font:400 15px/1.5 var(--orb-sans);color:var(--paper)}
+#portal-entry .r-name{font:600 15px/1.5 var(--num);margin-right:.45em}
+#portal-entry .r-word{font-style:normal;font-weight:600;margin-right:.5em}
+#portal-entry .r-then{display:block}
+#portal-entry .rep-cost{margin:10px 0 0;padding-left:calc(var(--tagw) + var(--tagg));font:400 13px/1.4 var(--orb-sans);color:var(--note)}
+/* 첫 화면에 못 보인 보고 수: 구독료 줄보다 진하게(할 일이 남았다는 뜻) */
+#portal-entry .rep-more{margin:12px 0 0;padding-left:calc(var(--tagw) + var(--tagg));font:500 13px/1.4 var(--orb-sans);color:rgba(243,241,236,.82)}
+#portal-entry .room.boarded .brief::before{content:"";order:5;grid-column:1 / -1;height:1px;margin-top:clamp(16px,2.6vh,26px);background:var(--hair)}
+#portal-entry .room.boarded .brief > .live{order:6}
+#portal-entry .room.boarded .live{margin-top:12px;padding-top:0;border-top:0}
+#portal-entry .room.boarded .live-big{font:400 clamp(20px,1.7vw,24px)/1 var(--num);letter-spacing:-.01em}
+#portal-entry .details-top .report{margin-bottom:6px}
+/* 넓은 창: 계정판은 서비스마다 한 칸씩 나란히 */
 @media (min-width:900px){
-  #portal-entry .room.dialed:not([hidden]){display:grid;grid-template-columns:var(--dial) minmax(0,1fr);grid-template-rows:auto auto;column-gap:clamp(40px,5.2vw,96px);align-content:start}
-  #portal-entry .room.dialed > .dial{grid-column:1;grid-row:1 / span 2;margin:0;align-self:start}
-  #portal-entry .room.dialed > .say{grid-column:2;grid-row:1;align-self:end}
-  #portal-entry .room.dialed > .brief{grid-column:2;grid-row:2;align-self:start}
-  #portal-entry .room.dialed > .details-top,#portal-entry .room.dialed > .rows,#portal-entry .room.dialed > .read{grid-column:1 / -1}
+  #portal-entry .b-cols{grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
 }
-/* 낮은 창: 첫 화면을 줄인다. 한 달 구독료는 상세내역 요금 줄에 있다 */
-@media (min-width:900px) and (max-height:760px){
-  #portal-entry .room.dialed .say{font-size:clamp(22px,2.4vw,30px)}
-  #portal-entry .room.dialed .say .then{margin-top:8px;font-size:14px}
-  #portal-entry .room.dialed .soon{row-gap:6px}
-  #portal-entry .room.dialed .soon .t{font-size:14px}
-  #portal-entry .room.dialed .diag{margin-top:12px;padding-top:10px}
-  #portal-entry .room.dialed .diag-h{margin-bottom:6px}
-  #portal-entry .room.dialed .diag-cost{display:none}
+/* 넓은 창(1100px 이상): 계정판은 왼쪽에 서비스를 위아래로 쌓고, 솔리오 보고와 단추는 오른쪽 칸에 둔다.
+   쌍 맹검(11-24)에서 보고를 아래에 둔 판(오른쪽 아래가 빈다)과 세 칸 판(막대가 짧다)을 둘 다 이겼다. 보고 머리는 서비스 머리와 같은 목소리, 꼬리표는 글 위에 */
+@media (min-width:1100px){
+  /* 계정판이 오른쪽 칸보다 길면 남는 높이는 맨 끝 빈 줄(7)이 받는다. 1fr로 두면 상세내역을 펼쳐 방이 최대 높이에 닿을 때 그 줄이 0이 되어 계정판이 아래 내역과 겹쳤다 */
+  #portal-entry .room.boarded{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);grid-template-rows:repeat(7,auto);column-gap:clamp(56px,6vw,104px);align-content:start}
+  #portal-entry .room.boarded > *{grid-column:1 / -1}
+  #portal-entry .room.boarded > .board{grid-column:1;grid-row:1 / 8}
+  #portal-entry .room.boarded .b-cols{grid-template-columns:minmax(0,1fr)}
+  #portal-entry .room.boarded > .rep-h{grid-column:2;grid-row:1;margin:0 0 16px;padding:4px 0 12px;border-bottom:1px solid var(--hair-strong);font:600 20px/1.2 var(--num);letter-spacing:-.01em;color:var(--paper)}
+  #portal-entry .room.boarded > .say{grid-column:2;grid-row:2}
+  #portal-entry .room.boarded > .brief{grid-column:2;grid-row:3}
+  #portal-entry .room.boarded > .read{grid-column:2;grid-row:4;align-self:start}
+  #portal-entry .room.boarded > [data-orb-act="open-estimate"]{grid-column:2;grid-row:5;justify-self:start;align-self:start}
+  #portal-entry .room.boarded > [data-estimate-note]{grid-column:2;grid-row:6;justify-self:start;align-self:start}
+  #portal-entry .room.reported .say{display:block}
+  #portal-entry .room.reported .say .rep-tag{display:block;padding:0 0 4px}
+  #portal-entry .room.boarded .r-item{display:block}
+  #portal-entry .room.boarded .r-item .r-tag{display:block;padding:0 0 4px}
+  #portal-entry .room.boarded .rep-more,#portal-entry .room.boarded .rep-cost{padding-left:0}
+  #portal-entry .room.reported .say,#portal-entry .room.boarded .report,#portal-entry .room.boarded .rep-more,#portal-entry .room.boarded .rep-cost{max-width:none}
 }
-@media (prefers-reduced-motion:reduce){#portal-entry .dial .d-sweep,#portal-entry .dial-orb::before,#portal-entry .dial-orb::after{animation:none}}
-html[data-motion="reduced"] #portal-entry .dial .d-sweep,html[data-motion="reduced"] #portal-entry .dial-orb::before,html[data-motion="reduced"] #portal-entry .dial-orb::after{animation:none}
+/* 한 칸으로 쌓는 창: 맨 위가 말한 서비스(급한 쪽)를 먼저 둔다(설계 검토 12) */
+@media (max-width:899px){
+  #portal-entry .b-urgent{order:-1}
+}
+/* 낮은 창: 줄 사이를 줄여 「다시 읽기」까지 한 화면에 든다. 한 달 구독료는 상세내역 요금 줄에 있다.
+   보고가 계정판 아래에 서는 창(1100px보다 좁다)은 높이 900까지 같은 규칙을 쓴다. 761~900에서 보고 셋이 서면 「다시 읽기」가 밀렸다(Fable 다시 검수 -d) */
+@media (max-height:760px),(max-width:1099px) and (max-height:900px){
+  #portal-entry .b-row{padding:4px 0}
+  #portal-entry .b-note{font-size:12px}
+  #portal-entry .b-head{padding-bottom:8px;row-gap:4px}
+  #portal-entry .b-big{font-size:32px}
+  #portal-entry .b-fold{padding:6px 0}
+  #portal-entry .rep-h{margin:10px 0 4px;font-size:15px}
+  #portal-entry .room.boarded .say{font-size:18px}
+  #portal-entry .room.boarded .say .then{font-size:14px}
+  #portal-entry .r-item{margin-top:5px;padding-top:5px}
+  #portal-entry .r-say{font-size:14px}
+  #portal-entry .rep-cost{display:none}
+  #portal-entry .rep-more{margin-top:4px}
+  #portal-entry .room.boarded .brief::before{margin-top:10px}
+  #portal-entry .room.boarded .live{margin-top:8px}
+  #portal-entry .room.boarded .live-big{font-size:20px}
+}
+@media (prefers-reduced-motion:reduce){#portal-entry .b-bar i{animation:none}}
+html[data-motion="reduced"] #portal-entry .b-bar i{animation:none}
 @media (min-width:641px){
   /* 2단계 첫 조각부터는 오브제 줄이 없는 계정의 방도 위에서부터 놓는다. 줄을 펼쳐도 손 밑의 줄이 위로 밀리지 않게 한다(설계 검토 1차 ④) */
   #portal-entry .room-top{top:clamp(92px,21vh,196px);transform:none;max-height:calc(100% - clamp(92px,21vh,196px) - 70px);padding-bottom:34px;scrollbar-width:none;
     -webkit-mask-image:linear-gradient(#000 calc(100% - 30px),transparent);mask-image:linear-gradient(#000 calc(100% - 30px),transparent)}
+  /* 계정판이 있는 구독 방은 조금 위에서 시작한다. 계정 줄과 보고가 「다시 읽기」까지 한 화면에 들게 한다(솔리오 구독 비서 설계 11절) */
+  #portal-entry .room-top.boarded{top:clamp(88px,14vh,150px);max-height:calc(100% - clamp(88px,14vh,150px) - 70px)}
   /* 방을 내렸으면 위쪽 끝도 흐린다. 위로 밀려난 줄의 글자가 반쯤 잘린 채 남지 않게 한다 */
   #portal-entry .room-top.scrolled{-webkit-mask-image:linear-gradient(transparent,#000 30px,#000 calc(100% - 30px),transparent);mask-image:linear-gradient(transparent,#000 30px,#000 calc(100% - 30px),transparent)}
+}
+/* 낮은 창(앱 최소 창 960×680 등)에서는 계정판이 있는 방을 더 위에서 시작한다. 보고 셋과 「보고 n개가 더」 줄이 서도 「다시 읽기」까지 든다(Fable 다시 검수 FA4) */
+@media (min-width:641px) and (max-height:760px),(min-width:641px) and (max-width:1099px) and (max-height:900px){
+  #portal-entry .room-top.boarded{top:clamp(72px,11vh,150px);max-height:calc(100% - clamp(72px,11vh,150px) - 70px)}
 }
 /* 줄 안쪽의 작은 줄(누르는 줄이 아니다). 그림이 가운데를 차지하는 줄(지난 7일)은 가운데 두 칸을 쓴다 */
 #portal-entry div.row{cursor:default}
@@ -318,6 +382,18 @@ html[data-motion="reduced"] #portal-entry .dial .d-sweep,html[data-motion="reduc
 #portal-entry .row.now .mid,#portal-entry button.row:hover .mid,#portal-entry button.row.opened .mid{color:rgba(243,241,236,.84)}
 #portal-entry .row.unread .val{color:var(--dim)}
 #portal-entry button.row.opened{color:var(--paper)}
+/* 여는 줄과 보이기만 하는 줄을 가른다(11-24 맹검 세 번 「상태를 보이는 줄과 누르는 줄이 같아 보인다」, 솔리오 방 짜임 시안).
+   여는 줄(button)은 끝에 「›」가 있고, 다가가면 한 겹 밝아지며, 열리면 「›」가 아래를 본다. 보이기만 하는 줄(div)에는 둘 다 없다 */
+#portal-entry .rows > button.row{position:relative;padding-right:30px;transition:color .25s ease,background-color .25s ease}
+#portal-entry .rows > button.row::after{content:"";position:absolute;right:6px;top:50%;width:14px;height:14px;margin-top:-7px;background:currentColor;opacity:.5;pointer-events:none;
+  -webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M6 3.5 10.5 8 6 12.5' fill='none' stroke='%23000' stroke-width='1.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / contain no-repeat;
+  mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M6 3.5 10.5 8 6 12.5' fill='none' stroke='%23000' stroke-width='1.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / contain no-repeat;
+  transition:transform .3s cubic-bezier(.2,.8,.2,1),opacity .25s ease}
+#portal-entry .rows > button.row:hover,#portal-entry .rows > button.row.opened{background-color:rgba(243,241,236,.035)}
+#portal-entry .rows > button.row:hover::after{opacity:.9}
+#portal-entry .rows > button.row[aria-expanded="true"]::after{transform:rotate(90deg);opacity:.9}
+@media (prefers-reduced-motion:reduce){#portal-entry .rows > button.row::after{transition:none}}
+html[data-motion="reduced"] #portal-entry .rows > button.row::after{transition:none}
 /* 줄의 안쪽: 다가가면 그 줄 아래로 차례로 펼쳐진다 */
 #portal-entry .more{grid-column:1 / -1;display:grid;grid-template-columns:subgrid;grid-template-rows:0fr;transition:grid-template-rows .46s cubic-bezier(.2,.8,.2,1)}
 #portal-entry .more.open{grid-template-rows:1fr}
@@ -445,6 +521,44 @@ html[data-motion="reduced"] #portal-entry .dial .d-sweep,html[data-motion="reduc
 /* 구독 방에서 맨 아래 글이 비면(구독이 없어 모델별 토큰 줄만 선 때) 단추 하나가 문장 아래 왼쪽에 선다 */
 #portal-entry .room[data-room="solio"] .read:has(> [data-read]:empty){justify-content:flex-start}
 #portal-entry .room[data-room="solio"] .read > [data-read]:empty{display:none}
+/* 연결한 구독이 없을 때 먼저 할 일 하나(11-23 맹검: 작은 글 단추라 할 일이 안 보였다). 꽉 찬 단추는 이 방에서 이것 하나다(DESIGN 11-23 「꽉 찬 단추는 먼저 할 일 하나」) */
+#portal-entry .sub-start{margin:clamp(28px,5.4vh,52px) 0 0;display:flex;flex-wrap:wrap;align-items:center;gap:14px 24px}
+#portal-entry .sub-start[hidden]{display:none}
+#portal-entry .sub-go{appearance:none;height:54px;margin:0;padding:0 34px;border:1px solid var(--paper);border-radius:999px;background:var(--paper);font:600 16px/1 var(--orb-sans);color:var(--void);cursor:pointer;white-space:nowrap;transition:background-color .25s ease,border-color .25s ease}
+#portal-entry .sub-go:hover{background:#FFFFFF;border-color:#FFFFFF}
+#portal-entry .sub-go:focus-visible{outline:1px solid var(--ring);outline-offset:5px}
+#portal-entry .sub-start span{font:var(--small);color:var(--dim)}
+/* 예시 계정판(11-24 짜임 쌍 맹검 A, 유호님 「둘 다 옮겨」): 연결하면 보게 될 계정 명단을 흐리게 미리 보인다.
+   움푹 들어간 판 안에 둔다. 판 밖의 단추와 같은 밝기로 서면 이미 연결된 화면처럼 읽혔다(맹검). 맨 위 문장은 그동안 한 단계 작다 */
+#portal-entry .room.peeking .say{font:300 clamp(24px,min(2.6vw,4.3vh),40px)/1.3 var(--orb-sans);letter-spacing:-.02em}
+#portal-entry .room.peeking .sub-start{margin-top:clamp(20px,3.4vh,34px)}
+#portal-entry .room.peeking .rows{margin-top:clamp(16px,2.6vh,26px)}
+#portal-entry .room.peeking .read{margin-top:10px}
+#portal-entry .sub-peek{margin:clamp(22px,3.6vh,34px) 0 0;padding:14px 22px 4px;border-radius:16px;background:rgba(243,241,236,.025);box-shadow:inset 0 0 0 1px rgba(243,241,236,.06)}
+#portal-entry .sub-peek[hidden]{display:none}
+#portal-entry .peek-h{display:flex;align-items:center;gap:12px;margin:0;font:var(--small);color:rgba(243,241,236,.74)}
+#portal-entry .peek-tag{display:inline-flex;align-items:center;height:22px;padding:0 10px;border:1px solid var(--hair-strong);border-radius:999px;font:500 11px/1 var(--orb-sans);letter-spacing:.06em}
+#portal-entry .peek-cols{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:clamp(28px,4vw,64px);margin-top:14px;opacity:.42;filter:saturate(.7);
+  -webkit-mask-image:linear-gradient(#000 70%,rgba(0,0,0,.35));mask-image:linear-gradient(#000 70%,rgba(0,0,0,.35))}
+#portal-entry .peek-col-h{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;padding-bottom:12px;border-bottom:1px solid var(--hair-strong)}
+#portal-entry .peek-col-h b{font:700 20px/1.2 var(--orb-sans)}
+#portal-entry .peek-col-h small{display:block;margin-top:6px;font:var(--small);color:var(--dim)}
+#portal-entry .peek-num{text-align:right;font:var(--small);color:var(--dim)}
+#portal-entry .peek-num strong{display:block;font:300 44px/1 var(--orb-sans);letter-spacing:-.02em;color:var(--paper)}
+#portal-entry .peek-num em{font-style:normal;font-size:20px;color:var(--dim)}
+#portal-entry .peek-acct{display:grid;grid-template-columns:minmax(70px,120px) minmax(0,1fr) 52px;align-items:center;gap:3px 18px;padding:8px 0;border-bottom:1px solid var(--hair)}
+#portal-entry .peek-nm{font:var(--body)}
+#portal-entry .peek-bar{position:relative;height:6px;background:rgba(243,241,236,.10)}
+#portal-entry .peek-bar i{position:absolute;inset:0 auto 0 0;background:#E3C9A0}
+#portal-entry .peek-pc{font:600 15px/1 var(--orb-sans);text-align:right;font-variant-numeric:tabular-nums}
+#portal-entry .peek-when{grid-column:2 / -1;font:var(--small);color:var(--dim)}
+#portal-entry .peek-acct.used .peek-nm{color:var(--dim)}
+@media (max-width:760px){#portal-entry .peek-cols{grid-template-columns:minmax(0,1fr)}#portal-entry .peek-col + .peek-col{display:none}}
+/* 낮은 창에서는 예시판을 줄인다. 예시 아래의 실제 줄(모델별 토큰, 견적 비서 열기)이 첫 화면의 아래 흐림 위에 서야 한다(검수 solio-room-layout-20261124 대체 최종 F2).
+   960 이하는 계정을 서비스마다 둘까지(머리 다음 넷째 아이부터 숨김), 800 이하는 초기화 때와 부제를 빼고, 720 이하는 예시판을 두지 않는다 */
+@media (max-height:960px){#portal-entry .peek-acct:nth-child(n+4){display:none}#portal-entry .peek-num strong{font-size:34px}#portal-entry .peek-num em{font-size:16px}#portal-entry .peek-col-h{padding-bottom:10px}#portal-entry .peek-acct{padding:6px 0}}
+@media (max-height:800px){#portal-entry .peek-when,#portal-entry .peek-col-h small{display:none}#portal-entry .peek-num strong{font-size:28px}#portal-entry .sub-peek{padding-top:12px}#portal-entry .peek-cols{margin-top:10px}}
+@media (max-height:720px){#portal-entry .sub-peek{display:none}}
 
 /* 사무실에서 직접 맡긴 일과 답변 */
 #portal-entry .off-task-panel,
@@ -646,6 +760,34 @@ html[data-motion="reduced"] #portal-entry .dial .d-sweep,html[data-motion="reduc
 #portal-entry .rows.off .row > .val:empty,#portal-entry .rows.off .row > .when:empty{display:none}
 #portal-entry .rows.off .val{font:var(--small)}
 #portal-entry .rows.off > button.row .val{font:var(--small);color:inherit}
+/* 11-24 짜임 C(쌍 맹검에서 지금 판 · 큰 무대 · 부서 카드를 모두 이김, 유호님 「둘 다 옮겨」): 부서 줄과 수용 인원은 줄로 서고,
+   설정 · 꾸미기 · 부서 더하기는 그 아래 한 줄의 알약 단추로 선다. 알약 셋을 한 줄에 세우려고 상자는 flex다.
+   줄과 안쪽 판은 저마다 같은 열(--off-row · --off-more)을 쓰고, 알약은 차례 1, 알약의 안쪽 판은 차례 2라 알약 줄 아래에서 열린다.
+   흐름 시험이 [data-off-rows] 안의 cfg · look · add 줄을 누르므로 줄은 같은 상자에 둔다 */
+#portal-entry .rows.off{--off-row:minmax(84px,8.5em) minmax(0,1fr) auto;--off-more:var(--off-row);display:flex;flex-wrap:wrap;align-items:flex-start;column-gap:10px;row-gap:0}
+#portal-entry .rows.off > .row{flex:0 0 100%;min-width:0;grid-template-columns:var(--off-row);column-gap:18px}
+#portal-entry .rows.off > .more{flex:0 0 100%;min-width:0;grid-template-columns:var(--off-more);column-gap:18px}
+#portal-entry .rows.off > .more:last-child{border-bottom:0}
+/* 부서 · 수용 인원 줄의 이름은 밝게, 상태는 그다음으로 둔다(시안 C). 하는 일과 폴더는 흐린 그대로다 */
+#portal-entry .rows.off > button.row > .nm{color:var(--paper)}
+#portal-entry .rows.off > button.row > .val{color:rgba(243,241,236,.74)}
+#portal-entry .rows.off > button.row:is(:hover,.opened,.now) > .val{color:var(--paper)}
+#portal-entry .rows.off > button.row:is([data-key="cfg"],[data-key="look"],[data-key="add"]){order:1;flex:0 0 auto;display:inline-flex;align-items:center;gap:8px;width:auto;height:40px;min-height:0;margin:22px 0 0;padding:0 18px;border:0;border-radius:999px;
+  background:rgba(243,241,236,.07);color:var(--paper);font:500 14px/1 var(--orb-sans);white-space:nowrap;transition:background-color .2s ease}
+#portal-entry .rows.off > button.row:is([data-key="cfg"],[data-key="look"],[data-key="add"]) + .more{order:2}
+#portal-entry .rows.off > button.row:is([data-key="cfg"],[data-key="look"],[data-key="add"]) > :not(.nm){display:none}
+#portal-entry .rows.off > button.row:is([data-key="cfg"],[data-key="look"],[data-key="add"]) > .nm{font:inherit;color:inherit}
+#portal-entry .rows.off > button.row:is([data-key="cfg"],[data-key="look"],[data-key="add"]):is(:hover,.opened){background:rgba(243,241,236,.13)}
+#portal-entry .rows.off > button.row:is([data-key="cfg"],[data-key="look"],[data-key="add"]):focus-visible{outline:1px solid var(--ring);outline-offset:3px}
+/* 그 순간 먼저 할 일 하나만 꽉 찬 단추다(DESIGN 11-23). 사무실에서는 부서 더하기다 */
+#portal-entry .rows.off > button.row[data-key="add"]{background:var(--paper);color:var(--void)}
+#portal-entry .rows.off > button.row[data-key="add"]:is(:hover,.opened){background:#FFFFFF}
+/* 알약의 그림: 설정은 밀대 둘, 꾸미기는 붓, 부서 더하기는 더하기. 줄 끝의 「›」는 알약에 쓰지 않는다 */
+#portal-entry .rows.off > button.row:is([data-key="cfg"],[data-key="look"],[data-key="add"])::after{display:none}
+#portal-entry .rows.off > button.row:is([data-key="cfg"],[data-key="look"],[data-key="add"])::before{content:"";width:15px;height:15px;flex:none;background:currentColor;opacity:.86;-webkit-mask:var(--ico) center / contain no-repeat;mask:var(--ico) center / contain no-repeat}
+#portal-entry .rows.off > button.row[data-key="cfg"]{--ico:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M2.5 4.5h11M2.5 11.5h11' stroke='%23000' stroke-width='1.3' stroke-linecap='round'/%3E%3Ccircle cx='10.5' cy='4.5' r='2.2' fill='%23000'/%3E%3Ccircle cx='5.5' cy='11.5' r='2.2' fill='%23000'/%3E%3C/svg%3E")}
+#portal-entry .rows.off > button.row[data-key="look"]{--ico:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M10.5 2.2l3.3 3.3-6.3 6.3-3.3-3.3Z' fill='%23000'/%3E%3Cpath d='M3.6 9.2l3.2 3.2-4.6 1.4Z' fill='%23000'/%3E%3C/svg%3E")}
+#portal-entry .rows.off > button.row[data-key="add"]{--ico:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M8 2.5v11M2.5 8h11' stroke='%23000' stroke-width='1.7' stroke-linecap='round'/%3E%3C/svg%3E")}
 /* 직원 줄: 상태 문장은 밝게, 작업 폴더와 마지막 도구는 작게. 그림에서 가리킨 직원(hot)과 승인을 물은 직원은 더 밝다 */
 #portal-entry .row.staff .nm{font:var(--small);color:rgba(243,241,236,.7)}
 #portal-entry .row.staff .mid b{display:block;font:var(--small);font-weight:400;color:rgba(243,241,236,.84)}
@@ -656,8 +798,9 @@ html[data-motion="reduced"] #portal-entry .dial .d-sweep,html[data-motion="reduc
 #portal-entry .row.sub.item .nm{font:var(--small);font-weight:500;color:rgba(243,241,236,.84)}
 #portal-entry .row.sub.item:hover .nm,#portal-entry .row.sub.item.opened .nm{color:var(--paper)}
 #portal-entry .row.sub.item:focus-visible{outline:1px solid var(--ring);outline-offset:-1px}
-/* 느낌표: 부서 줄과 직원 줄의 이름 옆, 위쪽 「사무실」 오브제 */
-#portal-entry .flag{display:inline-block;margin-left:7px;font:700 13px/1 var(--orb-sans);font-style:normal;color:var(--paper)}
+/* 느낌표: 부서 줄과 직원 줄의 이름 옆, 위쪽 「사무실」 오브제. 줄의 느낌표는 바닥 그림의 것과 같은 꽉 찬 작은 표다(11-24 맹검 「맨 글자를 띡 얹었다」) */
+#portal-entry .flag{display:inline-grid;place-items:center;width:17px;height:17px;margin-left:8px;border-radius:50%;background:var(--paper);vertical-align:-2px;
+  font:800 11px/1 var(--orb-sans);font-style:normal;color:var(--void);box-shadow:0 0 10px rgba(243,241,236,.22)}
 #portal-entry .obj.news{position:relative}
 #portal-entry .obj.news::after{content:"!";position:absolute;left:25px;top:5px;font:700 11px/1 var(--orb-sans);color:var(--paper)}
 /* 그림과 나란히 선 줄 칸이 좁아지면(사무실 폭 1100px 아래, 줄 칸 약 420px 아래) 이름 아래로 글을 내린다. 오른쪽 칸이 가장 긴 상태 글만큼 자리를 잡아
@@ -665,8 +808,10 @@ html[data-motion="reduced"] #portal-entry .dial .d-sweep,html[data-motion="reduc
 #portal-entry .office{container:office / inline-size}
 @media (min-width:1001px){
   @container office (max-width:1100px){
-    #portal-entry .rows.off{grid-template-columns:minmax(0,1fr)}
+    #portal-entry .rows.off{--off-row:minmax(0,1fr) auto;--off-more:minmax(0,1fr)}
     #portal-entry .rows.off .row{grid-template-columns:minmax(0,1fr) auto;column-gap:16px;row-gap:8px;padding:14px 0}
+    /* 여는 줄 끝 「›」의 자리는 이 폭에서도 남긴다(카본 solio-room-layout-20261124 A2) */
+    #portal-entry .rows.off > button.row{padding-right:30px}
     #portal-entry .rows.off .mid{grid-column:1 / -1;grid-row:2}
     #portal-entry .rows.off .when{grid-column:1 / -1;grid-row:3;text-align:left;white-space:normal}
     #portal-entry .rows.off .row-plain > :nth-child(2){grid-column:1 / -1;grid-row:2}
@@ -730,7 +875,7 @@ html[data-orb-client="app"] #portal-entry .orb-stage[data-fan] ~ .portal-window-
   #portal-entry .gauge{grid-column:1 / -1;grid-row:2}
   #portal-entry .when{grid-column:1 / -1;grid-row:3;text-align:left;white-space:normal}
   #portal-entry .rows.vis{grid-template-columns:minmax(0,1fr)}
-  #portal-entry .rows.off{grid-template-columns:minmax(0,1fr)}
+  #portal-entry .rows.off{--off-row:minmax(0,1fr) auto;--off-more:minmax(0,1fr)}
   /* 사무실 줄의 column-gap:normal(위 규칙)이 이 폭의 16px를 이기지 않게 다시 적는다(0.5.2 공개 검수 B2) */
   #portal-entry .rows.off .row{column-gap:16px}
   #portal-entry .mid{grid-column:1 / -1;grid-row:2}
@@ -862,3 +1007,316 @@ html[data-orb-client] #leave-dialog .ghost-button{background:none;color:#F3F1EC;
 .host-fallback .i{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:1.6}
 .host-fallback [data-maximized=true] .when-normal,.host-fallback [data-maximized=false] .when-maximized{display:none}
 .host-fallback p{margin:0;padding:0 24px;text-align:center}
+
+/* ── 기획부 「사업계획서」 작업 화면(사업계획서_설계.md 6절, 사무실 시안 #plan) ──
+   흰 종이 한 장이 주인공이다. 글자와 색의 역할(사무실 README 「짓기 전에 적은 것」 6): 종이 위 계획서 글은 명조, 화면 글은 SUIT.
+   청금(lapis)은 「고칠 곳」 한 역할, 풀빛(meadow)은 「끝냄」 한 역할이다. 밑줄 · 형광펜은 쓰지 않는다 */
+#portal-entry .biz-host{--sheet:#FAF8F2;--sheet-ink:#151514;--sheet-dim:#6B6A66;--sheet-rule:#E6E2D8;--serif:"Noto Serif KR","Nanum Myeongjo","Batang",serif;
+  --lapis:#3D6BC9;--lapis-soft:#C5D6F5;--meadow:#7DB45A;width:min(1180px,100%);margin:0 auto;text-align:left}
+#portal-entry .biz-top{margin-bottom:clamp(10px,2vh,18px)}
+#portal-entry .biz-say{margin:0 0 clamp(14px,2.4vh,24px)}
+#portal-entry .biz-say:focus{outline:none}
+#portal-entry .biz-say .then{display:block}
+#portal-entry .biz-warn{display:flex;flex-wrap:wrap;align-items:center;gap:10px 18px;margin:0 0 16px;padding:12px 0;border-top:1px solid var(--lapis-soft);font:var(--small);color:rgba(243,241,236,.86)}
+#portal-entry .biz-warn p{margin:0}
+#portal-entry .biz-grid{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(280px,1fr);gap:clamp(22px,3vw,44px);align-items:start}
+@media (max-width:860px){#portal-entry .biz-grid{grid-template-columns:1fr}}
+#portal-entry .biz-host .sheet{background:var(--sheet);color:var(--sheet-ink);border-radius:3px;padding:clamp(22px,3vw,40px) clamp(22px,3.4vw,46px) clamp(14px,2vw,24px);box-shadow:0 60px 140px -60px rgba(197,214,245,.22),0 30px 70px -30px rgba(0,0,0,.95)}
+#portal-entry .biz-host .sheet-h{padding-bottom:16px}
+#portal-entry .biz-host .sheet-h small{font:400 12px/1.3 var(--orb-sans);color:var(--sheet-dim)}
+#portal-entry .biz-host .sheet-h h3{margin:10px 0 6px;font:600 clamp(21px,2vw,27px)/1.3 var(--serif);letter-spacing:-.01em}
+#portal-entry .biz-host .sheet-h p{margin:0;font:400 13.5px/1.5 var(--orb-sans);color:var(--sheet-dim)}
+#portal-entry .biz-host .sec{position:relative;padding:16px 0 17px;border-top:1px solid var(--sheet-rule);transition:opacity .45s ease}
+#portal-entry .biz-host .sec .pg{display:block;margin-bottom:6px;font:600 15px/1.45 var(--serif);color:var(--sheet-ink)}
+#portal-entry .biz-host .sec.has .pg{color:var(--lapis)}
+#portal-entry .biz-host .sec p{margin:0 0 6px;font:400 15.5px/1.8 var(--serif);color:#2b2a27;white-space:pre-wrap}
+#portal-entry .biz-host .sec p[data-biz-note]{position:relative;cursor:pointer}
+#portal-entry .biz-host .sec p[data-biz-note]::before{content:"";position:absolute;left:-17px;top:.75em;width:6px;height:6px;border-radius:50%;background:var(--lapis)}
+#portal-entry .biz-host .sec p[data-biz-note].sel::before{top:.2em;bottom:.2em;left:-16px;width:3px;height:auto;border-radius:0}
+#portal-entry .biz-host .sec p[data-biz-note]:focus-visible{outline:1px solid var(--lapis);outline-offset:4px}
+#portal-entry .biz-host .sec.pick p{position:relative}
+#portal-entry .biz-host .sec.pick p::before{content:"";position:absolute;left:-16px;top:.2em;bottom:.2em;width:3px;background:var(--lapis)}
+#portal-entry .biz-host .sec p.changed{animation:biz-settle .9s cubic-bezier(.2,.8,.2,1)}
+#portal-entry .biz-host .sec p.draft{color:var(--sheet-ink);border-left:2px solid var(--meadow);padding-left:12px;margin-left:-14px}
+#portal-entry .biz-host .sec.unread{opacity:.2}
+#portal-entry .biz-host .sec.on{opacity:1}
+@keyframes biz-settle{from{opacity:.35;transform:translateY(4px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){#portal-entry .biz-host .sec p.changed{animation:none}#portal-entry .biz-host .sec{transition:none}}
+#portal-entry .biz-host .sheet.blank{display:grid;place-items:center;min-height:clamp(280px,46vh,460px);text-align:center;outline:1px dashed #CFCAC0;outline-offset:-18px}
+#portal-entry .biz-host .blank-in{display:grid;justify-items:center;gap:10px;max-width:24em}
+#portal-entry .biz-host .blank-in b{font:600 19px/1.35 var(--orb-sans)}
+#portal-entry .biz-host .blank-in small{font:400 13px/1.55 var(--orb-sans);color:var(--sheet-dim)}
+#portal-entry .biz-host .pill{appearance:none;display:inline-flex;align-items:center;height:38px;margin:0;padding:0 18px;border:1px solid var(--paper);border-radius:999px;background:var(--paper);font:500 14px/1 var(--orb-sans);color:#000;cursor:pointer;white-space:nowrap}
+#portal-entry .biz-host .pill:hover:not(:disabled){background:#fff}
+#portal-entry .biz-host .pill.ghost{background:none;border-color:rgba(243,241,236,.42);color:var(--paper)}
+#portal-entry .biz-host .pill.ghost:hover:not(:disabled){border-color:var(--paper)}
+#portal-entry .biz-host .pill.ghost[aria-pressed=true]{background:var(--paper);color:#000}
+#portal-entry .biz-host .pill.small{height:34px;padding:0 14px;font-weight:400}
+#portal-entry .biz-host .pill.dark{margin-top:8px;background:var(--sheet-ink);border-color:var(--sheet-ink);color:#fff}
+#portal-entry .biz-host .pill:disabled{opacity:.4;cursor:default}
+#portal-entry .biz-host .pill:focus-visible{outline:1px solid var(--ring);outline-offset:3px}
+#portal-entry .biz-side{min-width:0}
+#portal-entry .biz-block{padding:14px 0 16px;border-top:1px solid var(--hair-strong)}
+#portal-entry .biz-block h4{margin:0 0 8px;font:500 15px/1.4 var(--orb-sans);color:var(--paper)}
+#portal-entry .biz-host .why{margin:6px 0 0;font:400 13px/1.55 var(--orb-sans);color:rgba(243,241,236,.62)}
+#portal-entry .biz-files{list-style:none;margin:0 0 6px;padding:0}
+#portal-entry .biz-files li{display:flex;justify-content:space-between;gap:12px;padding:6px 0;font:400 14px/1.4 var(--orb-sans);color:rgba(243,241,236,.86);border-bottom:1px solid var(--hair)}
+#portal-entry .biz-pick{display:flex;flex-wrap:wrap;gap:8px 16px;margin:4px 0 2px}
+#portal-entry .biz-pick .lab{min-width:5.5em;font:var(--small);color:rgba(243,241,236,.5)}
+#portal-entry .note .biz-pick{margin-top:12px}
+#portal-entry .biz-pick .quiet[aria-pressed=true]{color:var(--paper);border-bottom-color:var(--paper)}
+#portal-entry .biz-pick .quiet[aria-pressed=false]{color:rgba(243,241,236,.55);border-bottom-color:transparent}
+#portal-entry .biz-host .acts{display:flex;flex-wrap:wrap;align-items:center;gap:10px 16px;margin-top:13px}
+#portal-entry .biz-fld{display:grid;gap:6px;margin-top:12px}
+#portal-entry .biz-fld .lab{font:var(--small);color:rgba(243,241,236,.62)}
+#portal-entry .biz-fld textarea{width:100%;box-sizing:border-box;padding:10px 12px;border:1px solid var(--hair-strong);border-radius:2px;background:rgba(243,241,236,.04);color:var(--paper);font:400 14.5px/1.6 var(--orb-sans);resize:vertical}
+#portal-entry .biz-fld textarea:focus{outline:none;border-color:var(--paper)}
+#portal-entry .biz-privacy{margin:14px 0 0;font:400 12.5px/1.55 var(--orb-sans);color:rgba(243,241,236,.5)}
+#portal-entry .biz-step{margin:4px 0 0;font:500 15px/1.5 var(--orb-sans);color:var(--paper)}
+#portal-entry .biz-live{min-height:1.3em;margin-top:14px}
+#portal-entry .biz-host .notes{display:grid}
+#portal-entry .biz-host .note{padding:12px 0 14px;border-top:1px solid var(--hair-strong)}
+#portal-entry .biz-host .note .pg{display:block;font:400 12px/1.3 var(--orb-sans);color:var(--lapis-soft)}
+#portal-entry .biz-host .note .what{display:block;margin:4px 0 0;padding:0;background:none;border:0;text-align:left;font:400 15px/1.45 var(--orb-sans);color:rgba(243,241,236,.78);cursor:pointer}
+#portal-entry .biz-host .note button.what:hover{color:var(--paper)}
+#portal-entry .biz-host .note .arw{color:var(--dim)}
+#portal-entry .biz-host .note.sel{border-top-color:var(--lapis-soft)}
+#portal-entry .biz-host .note.sel .what{font-size:17px;font-weight:500;color:var(--paper);cursor:default}
+#portal-entry .biz-host .note .quote{margin:8px 0 0;font:400 14.5px/1.7 var(--serif);color:rgba(243,241,236,.86)}
+#portal-entry .biz-host .note.done .pg{color:rgba(243,241,236,.45)}
+#portal-entry .biz-host .note.done .what::before{content:"";display:inline-block;width:6px;height:6px;margin-right:9px;border-radius:50%;background:var(--meadow);vertical-align:2px}
+#portal-entry .biz-host .note.done .what{font-size:13.5px;color:rgba(243,241,236,.66)}
+#portal-entry .biz-host .prop{margin-top:12px;padding:12px 14px;border:1px solid var(--hair-strong);border-radius:2px}
+#portal-entry .biz-host .prop small{display:block;margin-bottom:2px;font:400 12px/1.3 var(--orb-sans);color:var(--dim)}
+#portal-entry .biz-host .prop p{margin:0;font:400 14.5px/1.75 var(--serif);color:var(--paper)}
+#portal-entry .biz-host .prop p.pre{white-space:pre-wrap;font:400 13px/1.6 var(--orb-sans);color:rgba(243,241,236,.8)}
+#portal-entry .biz-host .talk{margin-top:12px}
+#portal-entry .biz-host .talk .q{margin:12px 0 0;font:400 14px/1.5 var(--orb-sans);color:var(--dim)}
+#portal-entry .biz-host .talk .q.now{color:var(--paper)}
+#portal-entry .biz-host .talk .chips{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0 0}
+#portal-entry .biz-host .items{list-style:none;display:flex;flex-wrap:wrap;gap:6px 18px;margin:16px 0 0;padding:14px 0 0;border-top:1px solid var(--hair-strong)}
+#portal-entry .biz-host .items li{display:flex;align-items:center;gap:7px;font:400 13.5px/1.4 var(--orb-sans);color:rgba(243,241,236,.82)}
+#portal-entry .biz-host .items li i{width:6px;height:6px;border-radius:50%;background:var(--meadow)}
+#portal-entry .biz-host .items li small{font:400 12px/1.3 var(--orb-sans);color:var(--dim)}
+#portal-entry .biz-host .items li.weak{color:var(--lapis-soft)}
+#portal-entry .biz-host .items li.weak i{width:10px;height:2px;border-radius:0;background:var(--lapis-soft)}
+#portal-entry .row.sub.item.feature .val{color:rgba(243,241,236,.62)}
+
+/* 11-23 미학 맹검 반영 */
+/* 작업 화면이 열렸을 때는 방의 위아래 흐림을 끈다. 흰 종이 위에 검은 흐림이 덮여 그을린 것처럼 보였다 */
+#portal-entry .room-top:has(.biz-host:not([hidden])){-webkit-mask-image:none;mask-image:none}
+#portal-entry .biz-top{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px 18px}
+#portal-entry .biz-top .biz-doc{margin-top:0}
+/* 맨 위 두 줄은 작업 화면에서는 한 단계 작게. 세 줄로 화면 절반을 차지했다 */
+#portal-entry .biz-say{font:300 clamp(22px,2.1vw,32px)/1.32 var(--orb-sans);max-width:34em}
+/* 글자 단추는 설명 글과 갈리게 밝은 글자와 밑줄로 */
+#portal-entry .biz-host .quiet{color:var(--paper);border-bottom-color:rgba(243,241,236,.55)}
+#portal-entry .biz-host .quiet:hover:not(:disabled){border-bottom-color:var(--paper)}
+#portal-entry .biz-host .sheet .quiet{color:var(--sheet-ink);border-bottom-color:rgba(21,21,20,.4)}
+/* 고르기(평가 항목, 읽을 직원)는 테두리 있는 작은 알약 */
+#portal-entry .biz-pick .quiet,#portal-entry .biz-pick .quiet[aria-pressed]{height:32px;padding:0 14px;border:1px solid rgba(243,241,236,.34);border-radius:999px;color:var(--paper);font:400 13.5px/30px var(--orb-sans)}
+#portal-entry .biz-pick .quiet[aria-pressed=true]{background:rgba(243,241,236,.14);border-color:var(--paper);color:var(--paper);font-weight:500}
+#portal-entry .biz-pick .quiet[aria-pressed=false]:hover:not(:disabled){border-color:var(--paper)}
+/* 종이 머리의 평가 항목 요약 */
+#portal-entry .biz-host .sheet-h .items{margin:12px 0 0;padding:0;border-top:0}
+#portal-entry .biz-host .sheet-h .items li{color:var(--sheet-ink);font:400 13px/1.4 var(--orb-sans)}
+#portal-entry .biz-host .sheet-h .items li small{color:var(--sheet-dim)}
+#portal-entry .biz-host .sheet-h .items li.weak{color:var(--lapis)}
+#portal-entry .biz-host .sheet-h .items li.weak i{background:var(--lapis)}
+/* 고른 계획서 미리 보기(목차) */
+#portal-entry .biz-host .sheet.preview .toc{margin:4px 0 18px;padding:0;list-style:none;border-top:1px solid var(--sheet-rule)}
+#portal-entry .biz-host .sheet.preview .toc li{padding:13px 0;border-bottom:1px solid var(--sheet-rule);font:600 15px/1.45 var(--serif);color:var(--sheet-ink)}
+#portal-entry .biz-saved{margin:14px 0 0;font:400 13px/1.5 var(--orb-sans);color:rgba(243,241,236,.7);word-break:break-all}
+/* 좁은 창에서는 메모를 종이보다 먼저 둔다. 메모와 단추가 시야 밖으로 밀렸다 */
+@media (max-width:860px){#portal-entry .biz-side{order:-1}}
+
+/* ── 솔리오 원클릭 방(11-23, docs/디자인/솔리오_원클릭_20261123 · PC앱_옮기기.md). 시안의 판 짜임을 옮긴다.
+   글자는 PC 앱의 SUIT 하나이고, 재어 볼 작은 값은 고정폭 숫자로 쓴다(앱에 DM Mono가 없다).
+   색 역할: 종이색은 글, 청금석(--one-lapis)은 솔리오가 짚은 곳(지금 일하는 줄 · 다시 만들 수 있는 크기), 풀빛(--one-meadow)은 끝남 · 통과,
+   흰 알약은 결정 단추. 회색은 시각 · 단위 · 번호처럼 물러설 말에만 쓴다. 알림은 색 없이 느낌표만 ── */
+#portal-entry [data-room="solio-backup"]{--soft:rgba(243,241,236,.74);--one-lapis:#C5D6F5;--one-meadow:#8FC46B;--one-ease:cubic-bezier(.2,.8,.2,1)}
+#portal-entry [data-room="solio-backup"] .go{appearance:none;height:46px;margin:0;padding:0 26px;border:1px solid rgba(243,241,236,.42);border-radius:999px;background:var(--pit);font:600 15px/1 var(--orb-sans);color:var(--paper);cursor:pointer;white-space:nowrap;transition:background-color .25s ease,border-color .25s ease,color .25s ease}
+#portal-entry [data-room="solio-backup"] .go.main{background:var(--paper);border-color:var(--paper);color:var(--void)}
+#portal-entry [data-room="solio-backup"] .go.main:hover:not([aria-disabled="true"]){background:#FFFFFF}
+#portal-entry [data-room="solio-backup"] .go[aria-disabled="true"]{background:var(--pit);border-color:var(--hair-strong);color:rgba(243,241,236,.62);cursor:default}
+#portal-entry .one-board{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(320px,1fr);gap:clamp(30px,5vw,96px);margin-top:clamp(26px,5vh,56px);align-items:start}
+#portal-entry .one-board[hidden]{display:none}
+/* 1100px 아래에서는 오른쪽 칸이 좁아 설명이 세 줄로 꺾인다. 한 칸으로 쌓는다(Fable F5) */
+@media (max-width:1100px){#portal-entry .one-board{grid-template-columns:minmax(0,1fr)}}
+/* 왼쪽: 드라이브 하나의 남은 공간(큰 숫자), 0부터 정한 선의 두 배까지의 막대, 이대로면 며칠 뒤인지 */
+#portal-entry .one-board .d-lab{display:flex;align-items:baseline;justify-content:space-between;gap:14px;margin:0;font:500 13px/1.3 var(--orb-sans);letter-spacing:.06em;color:var(--soft)}
+#portal-entry .one-board .d-lab span{font-weight:400;letter-spacing:0;color:var(--dim)}
+#portal-entry .one-board .d-big{display:flex;align-items:baseline;flex-wrap:wrap;gap:6px 16px;margin:18px 0 0}
+#portal-entry .one-board .d-free{font:200 clamp(64px,8vw,132px)/.9 var(--orb-sans);letter-spacing:-.04em;font-variant-numeric:tabular-nums}
+#portal-entry .one-board .d-unit{font:400 19px/1.2 var(--orb-sans);color:var(--soft)}
+#portal-entry .one-board .d-bar{position:relative;height:12px;margin-top:40px;background:var(--hair)}
+#portal-entry .one-board .d-fill{position:absolute;left:0;top:0;bottom:0;display:block;background:rgba(243,241,236,.82);transition:width .6s var(--one-ease)}
+#portal-entry .one-board .d-line{position:absolute;top:-9px;bottom:-9px;width:1px;display:block;background:var(--paper)}
+#portal-entry .one-board .d-ticks{position:relative;height:30px;margin-top:10px;font:400 12px/1.3 var(--orb-sans);color:var(--dim);font-variant-numeric:tabular-nums}
+#portal-entry .one-board .d-ticks span{position:absolute;top:6px;white-space:nowrap}
+#portal-entry .one-board .d-ticks .t0{left:0}
+#portal-entry .one-board .d-ticks .t2{right:0}
+#portal-entry .one-board .d-ticks .tl{transform:translateX(-50%);color:var(--soft)}
+#portal-entry .one-board .d-pred{margin:18px 0 0;font:400 16px/1.5 var(--orb-sans);color:var(--soft)}
+#portal-entry .one-board .d-pred.below{color:var(--paper);font-weight:500}
+#portal-entry .one-board .d-pace{margin:6px 0 0;font:400 13px/1.45 var(--orb-sans);color:var(--dim)}
+#portal-entry .one-board .d-rows{display:grid;gap:14px;margin:24px 0 0;padding-top:16px;border-top:1px solid var(--hair)}
+#portal-entry .one-board .d-row-h{display:flex;align-items:baseline;gap:10px;margin:0;font:400 13px/1.3 var(--orb-sans);color:var(--dim);font-variant-numeric:tabular-nums}
+#portal-entry .one-board .d-row-h b{font-weight:500;letter-spacing:.04em;color:var(--soft)}
+#portal-entry .one-board .d-row-h .d-row-free{margin-left:auto;color:var(--soft)}
+#portal-entry .one-board .d-row.below .d-row-h .d-row-free{color:var(--paper);font-weight:500}
+#portal-entry .one-board .d-mini{position:relative;height:4px;margin-top:8px;background:var(--hair)}
+#portal-entry .one-board .d-mini .f{position:absolute;left:0;top:0;bottom:0;display:block;background:rgba(243,241,236,.6)}
+#portal-entry .one-board .d-mini .l{position:absolute;top:-4px;bottom:-4px;width:1px;display:block;background:var(--paper)}
+#portal-entry .one-board .d-more{display:grid;gap:14px}
+/* details의 내용은 ::details-content 상자 하나로 묶여 gap이 줄 사이에 들지 않는다(Fable 최종 P2-1) */
+#portal-entry .one-board .d-more .d-row + .d-row{margin-top:14px}
+#portal-entry .one-board .d-more summary{cursor:pointer;list-style:none;font:400 13px/1.4 var(--orb-sans);color:var(--soft)}
+#portal-entry .one-board .d-more summary::-webkit-details-marker{display:none}
+#portal-entry .one-board .d-more summary:focus-visible{outline:1px solid var(--paper);outline-offset:4px}
+#portal-entry .one-board .d-more[open] summary{color:var(--dim)}
+#portal-entry .one-board .d-empty{margin:14px 0 0;font:400 15px/1.5 var(--orb-sans);color:var(--soft)}
+/* 오른쪽: 네 줄. 작은 구(솔리오의 분신)가 지금 일하는 줄의 번호 자리에 앉는다(움직임의 일: 지금 어디인지) */
+#portal-entry .one-flow{position:relative;min-width:0}
+#portal-entry .one-helper{position:absolute;left:-4px;top:0;z-index:1;width:22px;height:22px;border-radius:50%;background:var(--void);box-shadow:inset 0 0 0 1px rgba(243,241,236,.6);display:flex;align-items:center;justify-content:center;gap:4px;pointer-events:none;transition:transform .55s var(--one-ease)}
+#portal-entry .one-helper[hidden]{display:none}
+#portal-entry .one-helper i{width:3px;height:3px;border-radius:50%;background:var(--paper)}
+#portal-entry .one-steps{list-style:none;margin:0;padding:0;border-bottom:1px solid var(--hair)}
+#portal-entry .one-steps .one-step,#portal-entry .one-flow .one-sum{position:relative;display:grid;grid-template-columns:30px minmax(92px,auto) minmax(0,1fr) auto;column-gap:12px;align-items:baseline;padding:17px 0;border-top:1px solid var(--hair)}
+#portal-entry .one-flow .one-sum{appearance:none;width:100%;margin:0;background:none;border:0;border-top:1px solid var(--hair);border-bottom:1px solid var(--hair);grid-template-columns:30px minmax(0,auto) minmax(0,1fr) auto 18px;text-align:left;color:var(--paper);cursor:pointer}
+#portal-entry .one-flow .one-sum[hidden]{display:none}
+#portal-entry .one-flow.folded .one-steps{display:none}
+#portal-entry .one-flow:not(.folded) .one-sum{border-bottom:0}
+#portal-entry .one-flow .s-no{font:400 12px/1 var(--orb-sans);color:var(--dim);font-variant-numeric:tabular-nums;transition:opacity .25s ease}
+#portal-entry .one-steps .one-step.at .s-no{opacity:0}
+#portal-entry .one-steps .one-step.done .s-no,#portal-entry .one-flow .one-sum .s-no{font-size:0}
+#portal-entry .one-steps .one-step.done .s-no::before,#portal-entry .one-flow .one-sum .s-no::before{content:"\2713";font:600 13px/1 var(--orb-sans);color:var(--paper)}
+#portal-entry .one-flow .s-nm{font:500 16px/1.3 var(--orb-sans);color:var(--soft);white-space:nowrap}
+#portal-entry .one-flow .s-mid{min-width:0;font:400 13px/1.45 var(--orb-sans);color:var(--soft)}
+#portal-entry .one-flow .s-val{font:500 13px/1.3 var(--orb-sans);text-align:right;white-space:nowrap;color:var(--soft);font-variant-numeric:tabular-nums}
+#portal-entry .one-steps .one-step:is(.now,.done,.fail,.wait,.news) .s-nm,#portal-entry .one-flow .one-sum .s-nm{color:var(--paper)}
+#portal-entry .one-steps .one-step.now .s-val{color:var(--one-lapis)}
+#portal-entry .one-steps .one-step:is(.done,.ok) .s-val{color:var(--one-meadow)}
+#portal-entry .one-steps .one-step:is(.fail,.news) .s-nm::after{content:"!";margin-left:7px;font-weight:700}
+#portal-entry .one-steps .s-bar{position:absolute;left:42px;right:0;bottom:-1px;height:2px;display:block;background:var(--one-lapis);transform-origin:left;transform:scaleX(var(--p,0));transition:transform .6s var(--one-ease)}
+#portal-entry .one-flow .g-ch{width:8px;height:8px;margin-right:3px;justify-self:end;align-self:center;border-right:1px solid currentColor;border-bottom:1px solid currentColor;transform:rotate(-45deg);transition:transform .35s var(--one-ease);opacity:.7}
+#portal-entry .one-flow .one-sum .g-ch{transform:rotate(45deg)}
+#portal-entry .one-flow.folded .one-sum .g-ch{transform:rotate(-45deg)}
+/* 묶음 셋(공간 보고서의 합계). 누르면 그 자리에서 열린다 */
+#portal-entry .one-after{margin-top:34px}
+#portal-entry .one-after:empty{display:none}
+#portal-entry .one-flow.folded .one-after{margin-top:0}
+#portal-entry .one-flow.folded .one-after .g:first-child{border-top:0}
+#portal-entry .one-after .g{border-top:1px solid var(--hair)}
+#portal-entry .one-after .g:last-child{border-bottom:1px solid var(--hair)}
+#portal-entry .one-after .g-h{appearance:none;width:100%;margin:0;padding:16px 0;background:none;border:0;display:grid;grid-template-columns:minmax(0,auto) minmax(0,1fr) auto 18px;column-gap:14px;align-items:baseline;text-align:left;cursor:pointer;color:var(--soft)}
+#portal-entry .one-after .g-h:hover,#portal-entry .one-after .g.open .g-h{color:var(--paper)}
+#portal-entry .one-after .g-h:focus-visible{outline:1px solid var(--ring);outline-offset:-1px}
+#portal-entry .one-after .g-nm{font:500 15px/1.3 var(--orb-sans);white-space:nowrap}
+#portal-entry .one-after .g-mid{min-width:0;font:400 13px/1.4 var(--orb-sans);color:var(--dim)}
+#portal-entry .one-after .g-val,#portal-entry .one-after .it-v{font:400 14px/1.4 var(--orb-sans);white-space:nowrap;text-align:right;font-variant-numeric:tabular-nums;color:var(--soft)}
+/* 등급 클래스에 gr- 를 붙인다. 옛 런처 CSS의 .view(좌우 여백)가 크기 칸에 붙었다 */
+#portal-entry .one-after :is(.g-val,.it-v).gr-auto{color:var(--one-lapis)}
+#portal-entry .one-after .g.open .g-ch{transform:rotate(45deg)}
+#portal-entry .one-after .g-b{display:grid;grid-template-rows:0fr;transition:grid-template-rows .46s var(--one-ease)}
+#portal-entry .one-after .g.open .g-b{grid-template-rows:1fr}
+/* 접힌 속은 닫힘 움직임이 끝난 뒤 보이지 않게 해 쪽 안 찾기에도 걸리지 않는다(카본 A9) */
+#portal-entry .one-after .g-in{min-height:0;overflow:hidden;visibility:hidden;transition:visibility 0s linear .46s}
+#portal-entry .one-after .g.open .g-in{visibility:visible;transition:visibility 0s}
+#portal-entry .one-after .g-in > *{opacity:0;transform:translateY(-7px);transition:opacity .14s ease,transform .14s ease}
+#portal-entry .one-after .g.open .g-in > *{opacity:1;transform:none;transition:opacity .34s ease calc(70ms + var(--j,0) * 50ms),transform .46s var(--one-ease) calc(70ms + var(--j,0) * 50ms)}
+#portal-entry .one-after .it{display:grid;grid-template-columns:minmax(0,1fr) auto;column-gap:14px;align-items:start;padding:11px 32px 11px 0}
+#portal-entry .one-after .it + .it{border-top:1px solid rgba(243,241,236,.06)}
+#portal-entry .one-after .it-t{margin:0;min-width:0}
+#portal-entry .one-after .it-t b{font:500 14px/1.4 var(--orb-sans);color:var(--paper)}
+#portal-entry .one-after .it-t .cnt{margin-left:8px;font:400 12px/1 var(--orb-sans);color:var(--dim);font-variant-numeric:tabular-nums}
+#portal-entry .one-after .it-t small{display:block;margin-top:4px;font:400 13px/1.5 var(--orb-sans);color:var(--soft)}
+/* 좁은 창: 설명은 이름 아래 줄로 내린다 */
+@media (max-width:640px){
+  #portal-entry .one-steps .one-step{grid-template-columns:30px minmax(0,1fr) auto;row-gap:5px}
+  #portal-entry .one-flow .one-sum{grid-template-columns:30px minmax(0,1fr) auto 18px;row-gap:5px}
+  #portal-entry .one-flow .s-mid{grid-column:2 / -1;grid-row:2}
+  #portal-entry .one-after .g-h{grid-template-columns:minmax(0,1fr) auto 18px;row-gap:4px}
+  #portal-entry .one-after .g-mid{grid-column:1 / -1;grid-row:2}
+  #portal-entry .one-after .it{padding-right:0}
+}
+@media (prefers-reduced-motion:reduce){#portal-entry .one-board *,#portal-entry .one-board *::before{transition:none !important}}
+html[data-motion="reduced"] #portal-entry .one-board *,html[data-motion="reduced"] #portal-entry .one-board *::before{transition:none !important}
+
+/* 11-23 미학 맹검 2차 반영 */
+/* 작업 화면에서는 방을 위로 올려 맨 위 두 줄과 저장 단추가 첫 화면에 든다 */
+@media (min-width:641px){#portal-entry .room-top:has(.biz-host:not([hidden])){top:clamp(76px,12vh,128px);max-height:calc(100% - clamp(76px,12vh,128px) - 24px)}}
+/* 오른쪽 메모 줄만 창 아래에서 흐린다. 흰 종이에는 흐림을 얹지 않는다(종이는 창 아래로 이어지는 문서로 보인다) */
+#portal-entry .biz-side::after{content:"";position:sticky;bottom:0;display:block;height:36px;background:linear-gradient(rgba(0,0,0,0),#000);pointer-events:none}
+@media (max-width:860px){#portal-entry .biz-side::after{display:none}}
+/* 고른 보기 칩은 실행 단추(흰 알약)와 갈리게 옅은 채움과 밝은 테두리 */
+#portal-entry .biz-host .pill.ghost[aria-pressed=true]{background:rgba(243,241,236,.14);border-color:var(--paper);color:var(--paper);font-weight:500}
+/* 메모 안의 둘째 단추(직접 고치기, 맡기기)는 작은 테두리 알약, 셋째(그대로 두기)는 글자 */
+#portal-entry .biz-host .note .acts .pill.ghost{height:34px;padding:0 14px;font-weight:400}
+/* 접힌 메모는 줄 전체가 눌리는 곳으로 보이게: 오른쪽 끝 화살표와 올렸을 때 옅은 바탕 */
+#portal-entry .biz-host .note button.what{display:flex;align-items:flex-start;justify-content:flex-start;gap:0;width:100%;margin-left:-8px;margin-right:-8px;padding:4px 8px;border-radius:4px;box-sizing:content-box}
+#portal-entry .biz-host .note button.what:hover{background:rgba(243,241,236,.06)}
+#portal-entry .biz-host .note.done button.what::before{flex:none;margin-top:.5em;vertical-align:0}
+#portal-entry .biz-host .note button.what .arw{flex:none;margin-left:auto;padding-left:14px;font-size:18px;line-height:1.1;color:rgba(243,241,236,.6)}
+/* 11-23 미학 맹검 3차 반영 */
+/* 흐림이 창 아래 끝에 붙게 방의 아래 여백을 뺀다(여백만큼 위에서 멈춰 잘린 글이 보였다). 끝에 닿는 여백은 작업 화면이 가진다 */
+#portal-entry .room-top:has(.biz-host:not([hidden])){padding-bottom:0}
+#portal-entry .biz{padding-bottom:28px}
+/* 고친 문장과 초안은 계획서에 들어갈 글이라 종이 조각에 명조로 보인다. 회색 테두리 상자를 걷었다 */
+#portal-entry .biz-host .prop:not(:has(.pre)){border:0;border-radius:3px;background:var(--paper);padding:13px 16px 14px}
+#portal-entry .biz-host .prop:not(:has(.pre)) small{color:#6B6A66}
+#portal-entry .biz-host .prop:not(:has(.pre)) p{color:#151514}
+/* 메모 사이 가는 줄을 걷고, 고른 메모는 살짝 떠 있는 바탕으로 */
+#portal-entry .biz-host .note{border-top:0;padding:12px 0}
+#portal-entry .biz-host .note.sel{margin:6px 0 6px -16px;padding:16px;border-radius:6px;background:rgba(243,241,236,.06);box-shadow:inset 0 0 0 1px rgba(243,241,236,.05)}
+/* 고른 보기는 정리된 것의 색(메도우) 테두리와 점으로. 실행 단추(흰 알약)와도, 안 고른 보기와도 갈린다 */
+#portal-entry .biz-host .pill.ghost[aria-pressed=true],#portal-entry .biz-pick .quiet[aria-pressed=true]{background:rgba(125,180,90,.14);border-color:var(--meadow);color:var(--paper)}
+#portal-entry .biz-host .pill.ghost[aria-pressed=true]::before,#portal-entry .biz-pick .quiet[aria-pressed=true]::before{content:"";display:inline-block;width:6px;height:6px;margin-right:8px;border-radius:50%;background:var(--meadow);vertical-align:1px}
+#portal-entry .biz-host .pill.ghost[aria-pressed=false],#portal-entry .biz-pick .quiet[aria-pressed=false]{color:rgba(243,241,236,.7);border-color:rgba(243,241,236,.22)}
+/* 처음 화면 오른쪽 칸도 가는 줄 대신 간격으로 묶는다 */
+#portal-entry .biz-side .biz-block{border-top:0;padding:4px 0 22px}
+
+/* ── 「한 번에 처리」(docs/디자인/솔리오_한번에처리_20261124/README.md 2절) ──
+   머리 줄 오른쪽에 「할 일 N」과 꽉 찬 단추 하나. 창 단추(맨 위 40px의 오른쪽 144px)를 비켜 서고, 좁은 창(760px 이하)에서는 오브제 줄과 겹치지 않게 창 아래 오른쪽으로 내린다.
+   방은 아래 70px를 비워 두므로 그 자리에 선다. 카드는 방 하나의 짜임(작은 머리 줄 · 큰 문장 · 흐린 둘째 줄 · 단추)이고 꽉 찬 단추는 그 일을 끝내는 하나뿐이다 */
+#portal-entry .todo-bar{position:absolute;z-index:5;top:clamp(12px,3.4vh,38px);right:max(clamp(20px,9.5vw,168px),152px);height:44px;display:flex;align-items:center;gap:16px;-webkit-app-region:no-drag;transition:opacity .25s ease}
+#portal-entry .todo-n{max-width:min(46vw,420px);overflow:hidden;text-overflow:ellipsis;font:400 13px/1.3 var(--orb-sans);letter-spacing:.02em;color:var(--dim);font-variant-numeric:tabular-nums;white-space:nowrap}
+#portal-entry .todo-n:empty{display:none}
+#portal-entry .todo-go{appearance:none;height:38px;margin:0;padding:0 20px;border:1px solid var(--paper);border-radius:999px;background:var(--paper);font:600 14px/1 var(--orb-sans);color:var(--void);cursor:pointer;white-space:nowrap;transition:background-color .25s ease,border-color .25s ease}
+#portal-entry .todo-go:hover{background:#FFFFFF;border-color:#FFFFFF}
+#portal-entry .todo-go:focus-visible{outline:1px solid var(--ring);outline-offset:4px}
+#portal-entry .orb-stage[data-fan] .todo-bar{opacity:0;pointer-events:none;visibility:hidden}
+/* 펼친 오브제 이름이 단추에 닿는 창(프로그램이 다섯일 때 따위)에서는 보기가 .low를 붙여 같은 자리로 내린다(Fable F2) */
+#portal-entry .todo-bar.low{top:auto;bottom:16px;right:clamp(20px,9.5vw,168px)}
+@media (max-width:760px){#portal-entry .todo-bar{top:auto;bottom:16px;right:clamp(20px,9.5vw,168px)}}
+/* 카드가 선 동안 오브제 줄은 물러난다. 한 장에만 눈이 가게 한다 */
+#portal-entry .orb-stage[data-todo] .rail{opacity:0;pointer-events:none;visibility:hidden}
+#portal-entry .todo-meta{display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 12px;margin:0 0 clamp(14px,2.4vh,22px);font:500 13px/1.3 var(--orb-sans);letter-spacing:.02em;color:var(--dim)}
+#portal-entry .todo-meta b{font-weight:600;letter-spacing:.04em;color:var(--paper)}
+#portal-entry .todo-meta span::before{content:"·";margin-right:12px;color:var(--dim)}
+/* 둘째 줄은 끝내는 법이다. 큰 문장보다 한 단계 작게 두어 눈이 할 일 → 단추로 간다 */
+#portal-entry .room-todo .say .then{margin-top:10px;font:300 clamp(18px,1.7vw,24px)/1.45 var(--orb-sans);letter-spacing:-.01em;max-width:34em}
+#portal-entry .todo-acts{display:flex;flex-wrap:wrap;align-items:center;gap:12px;margin:clamp(28px,5vh,48px) 0 0}
+#portal-entry .todo-main,#portal-entry .todo-alt{appearance:none;height:54px;margin:0;padding:0 30px;border:1px solid var(--paper);border-radius:999px;font:600 16px/1 var(--orb-sans);cursor:pointer;white-space:nowrap;transition:background-color .25s ease,border-color .25s ease,color .25s ease}
+#portal-entry .todo-main{background:var(--paper);color:var(--void)}
+#portal-entry .todo-main:hover{background:#FFFFFF;border-color:#FFFFFF}
+#portal-entry .todo-alt{background:none;border-color:rgba(243,241,236,.42);color:var(--paper);font-weight:500}
+#portal-entry .todo-alt:hover{border-color:var(--paper)}
+#portal-entry .todo-main:focus-visible,#portal-entry .todo-alt:focus-visible{outline:1px solid var(--ring);outline-offset:5px}
+#portal-entry .todo-main[aria-disabled="true"],#portal-entry .todo-alt[aria-disabled="true"]{opacity:.45;cursor:default}
+#portal-entry .todo-note{margin:16px 0 0;min-height:1.45em;max-width:36em;font:400 14px/1.45 var(--orb-sans);color:var(--paper)}
+#portal-entry .todo-foot{display:flex;flex-wrap:wrap;gap:12px 26px;margin:clamp(18px,3.4vh,34px) 0 0}
+#portal-entry .todo-foot kbd{margin-left:8px;font:400 11px/1 var(--orb-sans);letter-spacing:.14em;color:var(--dim)}
+@media (hover:none),(max-width:640px){#portal-entry .todo-foot kbd{display:none}}
+#portal-entry .todo-left{margin:14px 0 0;max-width:40em;font:var(--small);color:var(--dim)}
+#portal-entry .todo-left:empty{display:none}
+#portal-entry .room-todo.end .todo-acts{margin-top:clamp(24px,4vh,40px)}
+/* 일이 바뀌면 한 장이 아래에서 떠오른다. 머리 줄 · 문장 · 단추 차례로 조금씩 늦게 */
+@keyframes orb-todo-in{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+#portal-entry .room-todo.todo-in > *{animation:orb-todo-in .55s cubic-bezier(.2,.7,.2,1) both}
+#portal-entry .room-todo.todo-in > :nth-child(2){animation-delay:.05s}
+#portal-entry .room-todo.todo-in > :nth-child(3){animation-delay:.1s}
+#portal-entry .room-todo.todo-in > :nth-child(n+4){animation-delay:.14s}
+@media (prefers-reduced-motion:reduce){#portal-entry .room-todo.todo-in > *{animation:none}}
+/* 앱 안 「움직임 줄이기」도 같이 막는다(PC 0.5.10 공개 후보 Fable F6) */
+html[data-motion="reduced"] #portal-entry .room-todo.todo-in > *{animation:none}
