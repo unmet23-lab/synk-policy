@@ -1,19 +1,19 @@
 {
-  "version": "0.7.4",
+  "version": "0.7.5",
   "notes": "",
-  "pub_date": "2026-11-24T22:45:35Z",
+  "pub_date": "2026-11-25T22:32:26Z",
   "platforms": {
     "windows-x86_64-nsis": {
-      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVTcEJ0ZHVHTnhRNUpnMW9sbzNxQkczOXU1dGpwc1ZNdnNLT0hTRlRaRWlEUWFqRkw2TkhJMWU0VDhNYVlDMTBZNExFOS9QNkM4R3NzRW4yUHlUcmhROWtrOHk2TGxOdlFjPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzk1NTYwMzM1CWZpbGU6U3lua1dvcmtCYWNrdXAtMC43LjQtc2V0dXAuZXhlCXZlcnNpb246MC43LjQKc21hVEY2ZXNZSDVpbGdRRE1FQjZHS3NmdU1ENFVRZUJJZ3RSaVJOWnVYQUxvaDlLTTN5MzdZYlpON2N1R2NNdCtCR0trQXN3Y21RaWd2a0kzMFRwQ0E9PQo=",
-      "url": "https://github.com/unmet23-lab/synk-policy/releases/download/workbackup-0.7.4/SynkWorkBackup-0.7.4-setup.exe",
-      "size": 37716659,
-      "sha256": "f77843aab0478c138e20842538e8d718eeeea7f051d20a75b9901aa6733610ef"
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVTcEJ0ZHVHTnhRNU91QS9LTUQ0MmhvU0Nia3YzMEJ1bExnS3NMczlWeGNQalhhT0NETlRPd0N5L2c4T2ZST09CM0Z1SUJoZVdpU0ZPRWJGN3NWS3dGVXhEVW9heEk4a3dRPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzk1NjQ1OTQ2CWZpbGU6U3lua1dvcmtCYWNrdXAtMC43LjUtc2V0dXAuZXhlCXZlcnNpb246MC43LjUKdHZ0UjQvSWF3aEZWNnJUdWVNY2JQbEdYMUY0Y1Nqam15Y1BWY1htR1ZWV2dmN203TDFYbFVpTU5oOU92RE1qeXJvaGNqM3QrZ0ZmdHMxbFJMS3NrQ1E9PQo=",
+      "url": "https://github.com/unmet23-lab/synk-policy/releases/download/workbackup-0.7.5/SynkWorkBackup-0.7.5-setup.exe",
+      "size": 37735582,
+      "sha256": "f1fad51c46a902d2a12fce35a1421a5cd660ac94300942ee9b6d1020e493bd80"
     },
     "windows-x86_64": {
-      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVTcEJ0ZHVHTnhRNUpnMW9sbzNxQkczOXU1dGpwc1ZNdnNLT0hTRlRaRWlEUWFqRkw2TkhJMWU0VDhNYVlDMTBZNExFOS9QNkM4R3NzRW4yUHlUcmhROWtrOHk2TGxOdlFjPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzk1NTYwMzM1CWZpbGU6U3lua1dvcmtCYWNrdXAtMC43LjQtc2V0dXAuZXhlCXZlcnNpb246MC43LjQKc21hVEY2ZXNZSDVpbGdRRE1FQjZHS3NmdU1ENFVRZUJJZ3RSaVJOWnVYQUxvaDlLTTN5MzdZYlpON2N1R2NNdCtCR0trQXN3Y21RaWd2a0kzMFRwQ0E9PQo=",
-      "url": "https://github.com/unmet23-lab/synk-policy/releases/download/workbackup-0.7.4/SynkWorkBackup-0.7.4-setup.exe",
-      "size": 37716659,
-      "sha256": "f77843aab0478c138e20842538e8d718eeeea7f051d20a75b9901aa6733610ef"
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVTcEJ0ZHVHTnhRNU91QS9LTUQ0MmhvU0Nia3YzMEJ1bExnS3NMczlWeGNQalhhT0NETlRPd0N5L2c4T2ZST09CM0Z1SUJoZVdpU0ZPRWJGN3NWS3dGVXhEVW9heEk4a3dRPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzk1NjQ1OTQ2CWZpbGU6U3lua1dvcmtCYWNrdXAtMC43LjUtc2V0dXAuZXhlCXZlcnNpb246MC43LjUKdHZ0UjQvSWF3aEZWNnJUdWVNY2JQbEdYMUY0Y1Nqam15Y1BWY1htR1ZWV2dmN203TDFYbFVpTU5oOU92RE1qeXJvaGNqM3QrZ0ZmdHMxbFJMS3NrQ1E9PQo=",
+      "url": "https://github.com/unmet23-lab/synk-policy/releases/download/workbackup-0.7.5/SynkWorkBackup-0.7.5-setup.exe",
+      "size": 37735582,
+      "sha256": "f1fad51c46a902d2a12fce35a1421a5cd660ac94300942ee9b6d1020e493bd80"
     }
   }
 }
