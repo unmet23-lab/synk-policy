@@ -536,6 +536,7 @@ var PUBLIC = Object.freeze({ world: "https://synk.im/world/", care: "https://syn
 
 // experiences/synk-account/src/product-account.mjs
 var AUTH_ERRORS = /* @__PURE__ */ new Set(["AUTH_REQUIRED", "AUTH_SESSION_MISSING", "SESSION_REVOKED"]);
+var PATH_AI_WAIT_MS = Object.freeze({ translate: 125e3, check: 125e3, doc_check: 6e4, interview_turn: 3e4, interview_review: 3e4 });
 var fault = (code, message, extra = {}) => Object.assign(new Error(message), { code, ...extra });
 var missingAsset = (error) => ["ASSET_NOT_FOUND", "ASSET_NOT_CONFIRMED"].includes(error?.code) && typeof error?.assetId === "string" && /^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/i.test(error.assetId) ? { assetId: error.assetId } : {};
 var publicError = (error) => ({ code: error.code || "ACCOUNT_UNAVAILABLE", message: error.message || "계정 연결을 확인하지 못했어요.", retryable: error.retryable === true, ...error.status ? { status: error.status } : {}, ...missingAsset(error) });
@@ -963,7 +964,7 @@ function createProductAccount({
       const accountUrl = `${config.accountApiUrl.replace(/\/$/, "")}/functions/v1/synk-account`;
       try {
         const loaded = await send(accountUrl, old.access_token);
-        const current = loaded.data?.sessions?.find((item) => item.current && !item.revoked);
+        const current = loaded.data?.sessions?.find((item2) => item2.current && !item2.revoked);
         if (current?.id) {
           const revoked = await send(accountUrl, old.access_token, { action: "revoke-session", session_id: current.id });
           serverSessionRevoked = revoked.response.ok && revoked.data?.ok === true;
@@ -1029,11 +1030,11 @@ function createProductAccount({
     }
   }
   async function requestTranslate(body) {
-    if (!pathApp || native) throw fault("TRANSLATE_UNSUPPORTED", "번역 초안은 PATH 웹에서만 만들 수 있어요.");
-    if (!snapshot.signedIn || !snapshot.accountId) throw fault("AUTH_REQUIRED", "SYNK ID로 로그인한 뒤 번역 초안을 만들어 주세요.");
-    if (!body || typeof body !== "object" || Array.isArray(body) || !["translate", "check"].includes(body.action)) throw fault("INVALID_REQUEST", "번역 요청 형식이 맞지 않아요.");
-    if (new TextEncoder().encode(JSON.stringify(body)).byteLength > 65536) throw fault("INVALID_REQUEST", "번역할 글이 너무 길어요.");
-    const expected = epoch, ownerId = snapshot.accountId, wait = { timeoutMs: 125e3 };
+    if (!pathApp || native) throw fault("TRANSLATE_UNSUPPORTED", "이 기능은 PATH 웹에서만 쓸 수 있어요.");
+    if (!snapshot.signedIn || !snapshot.accountId) throw fault("AUTH_REQUIRED", "SYNK ID로 로그인한 뒤 다시 눌러 주세요.");
+    if (!body || typeof body !== "object" || Array.isArray(body) || !Object.hasOwn(PATH_AI_WAIT_MS, body.action)) throw fault("INVALID_REQUEST", "요청 형식이 맞지 않아요.");
+    if (new TextEncoder().encode(JSON.stringify(body)).byteLength > 65536) throw fault("INVALID_REQUEST", "보낼 글이 너무 길어요.");
+    const expected = epoch, ownerId = snapshot.accountId, wait = { timeoutMs: PATH_AI_WAIT_MS[body.action] };
     try {
       guard(expected);
       let token2 = session2?.access_token;
@@ -1050,9 +1051,9 @@ function createProductAccount({
         guard(expected);
       }
       const data = result.data;
-      if (!result.response.ok || data?.ok !== true) throw fault(data?.error?.code || (result.response.status === 401 ? "AUTH_REQUIRED" : "TRANSLATE_UNAVAILABLE"), "번역 초안을 만들지 못했어요.", { status: result.response.status, retryable: false });
-      if (data.accountId !== ownerId) throw fault("ACCOUNT_CHANGED", "계정이 바뀌어 번역 초안을 보이지 않았어요.");
-      if (data.scope !== "synk-path" || data.action !== body.action) throw fault("INVALID_RESPONSE", "번역 초안의 형식을 확인하지 못했어요.");
+      if (!result.response.ok || data?.ok !== true) throw fault(data?.error?.code || (result.response.status === 401 ? "AUTH_REQUIRED" : "TRANSLATE_UNAVAILABLE"), "요청을 처리하지 못했어요.", { status: result.response.status, retryable: false });
+      if (data.accountId !== ownerId) throw fault("ACCOUNT_CHANGED", "계정이 바뀌어 결과를 보이지 않았어요.");
+      if (data.scope !== "synk-path" || data.action !== body.action) throw fault("INVALID_RESPONSE", "결과의 형식을 확인하지 못했어요.");
       return data;
     } catch (error) {
       if (expected === epoch && (AUTH_ERRORS.has(error.code) || error.code === "ACCOUNT_CHANGED")) clearSession(error);
@@ -4340,55 +4341,55 @@ var MINOR_NOTE = [
   "Хэрэв 18 нас хүрээгүй бол асран хамгаалагч тань энэ мэдээллийг хамт уншиж, зөвшөөрөх ёстой. SYNK асран хамгаалагчийг тусад нь шалгахгүй."
 ];
 function renderStudyConsent(view) {
-  const en = view.lang === "en", L5 = (ko, e) => en ? e : ko;
+  const en = view.lang === "en", L6 = (ko, e) => en ? e : ko;
   const minor = view.minor === true || view.minor === false ? view.minor : null, guardian = view.guardian === true;
   const ready = minor === false || minor === true && guardian;
-  const rows = ITEMS.map(([id, hk, he, , tk, te]) => `<div class="sx-consent-row"><dt>${esc3(en ? he : hk)}</dt><dd>${esc3(en ? te : tk)}${id === "ask" ? ` · <a href="${PRIVACY_URL}" target="_blank" rel="noopener noreferrer">${L5("개인정보처리방침", "Privacy policy")}<span class="sr-only"> (${L5("새 탭에서 열림", "opens in new tab")})</span></a>` : ""}</dd></div>`).join("");
+  const rows = ITEMS.map(([id, hk, he, , tk, te]) => `<div class="sx-consent-row"><dt>${esc3(en ? he : hk)}</dt><dd>${esc3(en ? te : tk)}${id === "ask" ? ` · <a href="${PRIVACY_URL}" target="_blank" rel="noopener noreferrer">${L6("개인정보처리방침", "Privacy policy")}<span class="sr-only"> (${L6("새 탭에서 열림", "opens in new tab")})</span></a>` : ""}</dd></div>`).join("");
   const mn = `<details class="sx-past sx-consent-mn" lang="mn" data-fold="consent-mn"><summary>Монгол хэлээр унших</summary><h2 class="sx-h">Миний нөхцөлийг бүртгэлдээ хадгалах уу?</h2><dl class="sx-consent">${ITEMS.map(([, , , hm, , , tm]) => `<div class="sx-consent-row"><dt>${esc3(hm)}</dt><dd>${esc3(tm)}</dd></div>`).join("")}</dl><p class="sx-fine">${esc3(MINOR_NOTE[2])}</p></details>`;
-  const age = (id, ko, e, mnText) => `<button type="button" class="sx-btn2 sx-consent-age" aria-pressed="${id === "minor" === minor && minor !== null}" data-action="consentAge" data-id="${id}"><span class="sx-consent-main"><span class="sx-on">${ON}</span>${esc3(L5(ko, e))}</span><small lang="mn">${esc3(mnText)}</small></button>`;
-  const guardianBox = minor === true ? `<button type="button" class="sx-consent-guardian" role="checkbox" aria-checked="${guardian}" data-action="consentGuardian"><span class="sx-consent-box">${ON}</span><span class="sx-consent-text"><span>${esc3(L5("보호자가 이 내용을 함께 읽고 동의했어요", "A parent or guardian read this with me and agreed"))}</span><small lang="mn">Асран хамгаалагч маань энэ мэдээллийг хамт уншиж, зөвшөөрсөн</small></span></button>` : "";
+  const age = (id, ko, e, mnText) => `<button type="button" class="sx-btn2 sx-consent-age" aria-pressed="${id === "minor" === minor && minor !== null}" data-action="consentAge" data-id="${id}"><span class="sx-consent-main"><span class="sx-on">${ON}</span>${esc3(L6(ko, e))}</span><small lang="mn">${esc3(mnText)}</small></button>`;
+  const guardianBox = minor === true ? `<button type="button" class="sx-consent-guardian" role="checkbox" aria-checked="${guardian}" data-action="consentGuardian"><span class="sx-consent-box">${ON}</span><span class="sx-consent-text"><span>${esc3(L6("보호자가 이 내용을 함께 읽고 동의했어요", "A parent or guardian read this with me and agreed"))}</span><small lang="mn">Асран хамгаалагч маань энэ мэдээллийг хамт уншиж, зөвшөөрсөн</small></span></button>` : "";
   const error = view.error ? `<p class="sx-store is-warn" role="alert">${esc3(view.error)}</p>` : "";
-  const why = minor === null ? [L5("나이를 고르면 저장할 수 있어요.", "Choose your age to save."), "Насаа сонговол хадгалах боломжтой."] : minor === true && !guardian ? [L5("보호자 확인을 누르면 저장할 수 있어요.", "Tick the guardian check to save."), "Асран хамгаалагчийн зөвшөөрлийн нүдийг чагталбал хадгалах боломжтой."] : null;
+  const why = minor === null ? [L6("나이를 고르면 저장할 수 있어요.", "Choose your age to save."), "Насаа сонговол хадгалах боломжтой."] : minor === true && !guardian ? [L6("보호자 확인을 누르면 저장할 수 있어요.", "Tick the guardian check to save."), "Асран хамгаалагчийн зөвшөөрлийн нүдийг чагталбал хадгалах боломжтой."] : null;
   const whyLine = why ? `<p class="sx-fine sx-consent-why" id="sx-consent-why">${esc3(why[0])} <span lang="mn">${esc3(why[1])}</span></p>` : "";
   return `<div class="sx">
-<button type="button" class="sx-back" data-action="consentRefuse">${BACK}${L5("돌아가기", "Back")}</button>
-<header class="sx-head"><p class="sx-kicker">${L5("계정에 저장", "Save to account")}</p><h1 class="sx-title page-title" tabindex="-1">${L5("내 조건을 계정에 저장할까요?", "Save your conditions to your account?")}</h1></header>
+<button type="button" class="sx-back" data-action="consentRefuse">${BACK}${L6("돌아가기", "Back")}</button>
+<header class="sx-head"><p class="sx-kicker">${L6("계정에 저장", "Save to account")}</p><h1 class="sx-title page-title" tabindex="-1">${L6("내 조건을 계정에 저장할까요?", "Save your conditions to your account?")}</h1></header>
 <dl class="sx-consent">${rows}</dl>
 ${mn}
-<fieldset class="sx-consent-ages"><legend class="sx-h">${L5("나이", "Age")}</legend><p class="sx-fine">${esc3(L5(MINOR_NOTE[0], MINOR_NOTE[1]))}</p><div class="sx-row2">${age("adult", "만 18세 이상이에요", "I am 18 or older", "Би 18 нас хүрсэн")}${age("minor", "만 18세 미만이에요", "I am under 18", "Би 18 нас хүрээгүй")}</div>${guardianBox}</fieldset>
+<fieldset class="sx-consent-ages"><legend class="sx-h">${L6("나이", "Age")}</legend><p class="sx-fine">${esc3(L6(MINOR_NOTE[0], MINOR_NOTE[1]))}</p><div class="sx-row2">${age("adult", "만 18세 이상이에요", "I am 18 or older", "Би 18 нас хүрсэн")}${age("minor", "만 18세 미만이에요", "I am under 18", "Би 18 нас хүрээгүй")}</div>${guardianBox}</fieldset>
 ${error}
 ${whyLine}
-<div class="sx-row2 sx-consent-actions"><button type="button" class="sx-cta" data-action="consentSave"${why ? ' aria-describedby="sx-consent-why"' : ""}${ready && !view.busy ? "" : ' disabled aria-disabled="true"'}><span class="sx-consent-main">${view.busy ? L5("저장하는 중…", "Saving…") : L5("계정에 저장", "Save to account")}</span><small lang="mn">Бүртгэлдээ хадгалах</small></button><button type="button" class="sx-btn2 line" data-action="consentRefuse"><span class="sx-consent-main">${L5("이 탭에만 두기", "Keep in this tab only")}</span><small lang="mn">Зөвхөн энэ табд үлдээх</small></button></div>
+<div class="sx-row2 sx-consent-actions"><button type="button" class="sx-cta" data-action="consentSave"${why ? ' aria-describedby="sx-consent-why"' : ""}${ready && !view.busy ? "" : ' disabled aria-disabled="true"'}><span class="sx-consent-main">${view.busy ? L6("저장하는 중…", "Saving…") : L6("계정에 저장", "Save to account")}</span><small lang="mn">Бүртгэлдээ хадгалах</small></button><button type="button" class="sx-btn2 line" data-action="consentRefuse"><span class="sx-consent-main">${L6("이 탭에만 두기", "Keep in this tab only")}</span><small lang="mn">Зөвхөн энэ табд үлдээх</small></button></div>
 </div>`;
 }
 function renderStudyNotices(view) {
-  const en = view.lang === "en", L5 = (ko, e) => en ? e : ko;
+  const en = view.lang === "en", L6 = (ko, e) => en ? e : ko;
   const out = [];
-  if (view.blocked) out.push(`<div class="notice error" role="alert"><p>${L5("계정에 저장한 조건을 지금 불러오지 못했어요. 연결을 확인하고 「다시 시도」를 눌러 주세요. 그동안은 조건을 고칠 수 없어요.", "Your saved conditions could not be loaded right now. Check your connection and press Retry. Until then, conditions cannot be changed.")}</p><div class="actions"><button type="button" class="secondary" data-action="studyAccountRetry">${L5("다시 시도", "Retry")}</button></div></div>`);
-  if (view.drafts) out.push(`<div class="notice" role="status"><p>${L5("이 탭에 계정에 올라가지 않은 조건 변경이 남아 있는데, 그사이 계정 쪽도 바뀌었어요. 어느 쪽을 쓸까요?", "This tab has condition changes that never reached your account, and your account changed in the meantime. Which should we use?")}</p><div class="actions"><button type="button" class="secondary" data-action="studyDraftAccount">${L5("계정 것 쓰기", "Use the account")}</button><button type="button" class="secondary" data-action="studyDraftPick">${L5("남은 변경 쓰기", "Use the unsent changes")}</button></div></div>`);
-  if (view.choice) out.push(`<div class="notice" role="status"><p>${L5("이 탭에서 넣은 조건이 계정에 저장된 것과 달라요. 어느 쪽을 쓸까요?", "The conditions in this tab differ from the ones saved to your account. Which should we use?")}</p><div class="actions"><button type="button" class="secondary" data-action="studyUseAccount">${L5("계정 것 쓰기", "Use the account")}</button><button type="button" class="secondary" data-action="studyUseTab">${L5("이 탭 것으로 바꾸기", "Replace with this tab")}</button></div></div>`);
-  if (view.deleted) out.push(`<div class="notice" role="status"><p>${L5("계정의 유학 준비 자료가 다른 곳에서 지워졌어요. 이제 넣는 조건은 이 탭에만 남아요.", "Your study data was deleted from your account elsewhere. Conditions you add now stay in this tab only.")}</p><div class="actions"><button type="button" class="secondary" data-action="studyNoticeClose">${L5("알겠어요", "OK")}</button></div></div>`);
-  if (view.ask) out.push(`<div class="notice" role="status"><p>${L5("이 조건을 계정에 저장하면 다른 기기에서도 이어서 볼 수 있어요. 저장하기 전에 무엇을 어디에 두는지 읽어 주세요.", "If you save these conditions to your account, you can continue on other devices. Before saving, please read what is stored and where.")}</p><div class="actions"><button type="button" class="secondary" data-action="studyConsentOpen">${L5("읽고 정하기", "Read and decide")}</button><button type="button" class="secondary" data-action="consentRefuse">${L5("이 탭에만 두기", "Keep in this tab only")}</button></div></div>`);
-  if (view.pending) out.push(`<div class="notice" role="status"><p>${L5("아직 계정에 올라가지 않은 변경이 있어요. 연결이 돌아오면 다시 보내요.", "Some changes are not in your account yet. They are sent again when your connection is back.")}</p><div class="actions"><button type="button" class="secondary" data-action="studyAccountRetry">${L5("지금 다시 보내기", "Send again now")}</button></div></div>`);
+  if (view.blocked) out.push(`<div class="notice error" role="alert"><p>${L6("계정에 저장한 조건을 지금 불러오지 못했어요. 연결을 확인하고 「다시 시도」를 눌러 주세요. 그동안은 조건을 고칠 수 없어요.", "Your saved conditions could not be loaded right now. Check your connection and press Retry. Until then, conditions cannot be changed.")}</p><div class="actions"><button type="button" class="secondary" data-action="studyAccountRetry">${L6("다시 시도", "Retry")}</button></div></div>`);
+  if (view.drafts) out.push(`<div class="notice" role="status"><p>${L6("이 탭에 계정에 올라가지 않은 조건 변경이 남아 있는데, 그사이 계정 쪽도 바뀌었어요. 어느 쪽을 쓸까요?", "This tab has condition changes that never reached your account, and your account changed in the meantime. Which should we use?")}</p><div class="actions"><button type="button" class="secondary" data-action="studyDraftAccount">${L6("계정 것 쓰기", "Use the account")}</button><button type="button" class="secondary" data-action="studyDraftPick">${L6("남은 변경 쓰기", "Use the unsent changes")}</button></div></div>`);
+  if (view.choice) out.push(`<div class="notice" role="status"><p>${L6("이 탭에서 넣은 조건이 계정에 저장된 것과 달라요. 어느 쪽을 쓸까요?", "The conditions in this tab differ from the ones saved to your account. Which should we use?")}</p><div class="actions"><button type="button" class="secondary" data-action="studyUseAccount">${L6("계정 것 쓰기", "Use the account")}</button><button type="button" class="secondary" data-action="studyUseTab">${L6("이 탭 것으로 바꾸기", "Replace with this tab")}</button></div></div>`);
+  if (view.deleted) out.push(`<div class="notice" role="status"><p>${L6("계정의 유학 준비 자료가 다른 곳에서 지워졌어요. 이제 넣는 조건은 이 탭에만 남아요.", "Your study data was deleted from your account elsewhere. Conditions you add now stay in this tab only.")}</p><div class="actions"><button type="button" class="secondary" data-action="studyNoticeClose">${L6("알겠어요", "OK")}</button></div></div>`);
+  if (view.ask) out.push(`<div class="notice" role="status"><p>${L6("이 조건을 계정에 저장하면 다른 기기에서도 이어서 볼 수 있어요. 저장하기 전에 무엇을 어디에 두는지 읽어 주세요.", "If you save these conditions to your account, you can continue on other devices. Before saving, please read what is stored and where.")}</p><div class="actions"><button type="button" class="secondary" data-action="studyConsentOpen">${L6("읽고 정하기", "Read and decide")}</button><button type="button" class="secondary" data-action="consentRefuse">${L6("이 탭에만 두기", "Keep in this tab only")}</button></div></div>`);
+  if (view.pending) out.push(`<div class="notice" role="status"><p>${L6("아직 계정에 올라가지 않은 변경이 있어요. 연결이 돌아오면 다시 보내요.", "Some changes are not in your account yet. They are sent again when your connection is back.")}</p><div class="actions"><button type="button" class="secondary" data-action="studyAccountRetry">${L6("지금 다시 보내기", "Send again now")}</button></div></div>`);
   return out.join("");
 }
 var NETWORK_CODES = /* @__PURE__ */ new Set(["NETWORK", "OFFLINE", "ACCOUNT_UNAVAILABLE"]);
 function renderStudyAccountSettings(view) {
-  const en = view.lang === "en", L5 = (ko, e) => en ? e : ko;
-  const box = (body) => `<section class="settings-group"><h2>${L5("유학 준비 자료", "Study data")}</h2>${body}</section>`;
-  const retry = `<button type="button" class="btn-line" data-action="studyAccountRetry">${L5("다시 시도", "Retry")}</button>`;
+  const en = view.lang === "en", L6 = (ko, e) => en ? e : ko;
+  const box = (body) => `<section class="settings-group"><h2>${L6("유학 준비 자료", "Study data")}</h2>${body}</section>`;
+  const retry = `<button type="button" class="btn-line" data-action="studyAccountRetry">${L6("다시 시도", "Retry")}</button>`;
   if (view.phase === "consented") {
     const when = view.consent?.at ? new Date(view.consent.at) : null;
     const at = when && !Number.isNaN(when.getTime()) ? `${when.getFullYear()}-${String(when.getMonth() + 1).padStart(2, "0")}-${String(when.getDate()).padStart(2, "0")}` : "";
-    return box(`<p>${L5(`「내 조건」 · 「다가오는 날」 · 고른 과정 · 서류 표시를 계정에 저장하고 있어요(동의 ${esc3(at)}). 다른 기기에서도 보여요.`, `Your conditions, upcoming dates, the program you picked and your marks are saved to your account (consent ${esc3(at)}). They show on your other devices too.`)}</p><button type="button" class="btn-line danger" data-action="studyAccountDelete">${L5("계정의 유학 준비 자료 지우기", "Delete study data from account")}</button>`);
+    return box(`<p>${L6(`「내 조건」 · 「다가오는 날」 · 고른 과정 · 서류 표시를 계정에 저장하고 있어요(동의 ${esc3(at)}). 다른 기기에서도 보여요.`, `Your conditions, upcoming dates, the program you picked and your marks are saved to your account (consent ${esc3(at)}). They show on your other devices too.`)}</p><button type="button" class="btn-line danger" data-action="studyAccountDelete">${L6("계정의 유학 준비 자료 지우기", "Delete study data from account")}</button>`);
   }
-  if (view.phase === "choose") return box(`<p>${L5("이 탭에 계정에 올라가지 않은 조건 변경이 남아 있어요. 고르기 전에는 조건을 고칠 수 없어요.", "This tab has condition changes that never reached your account. You cannot change conditions until you choose.")}</p><div class="actions"><button type="button" class="btn-line" data-action="studyDraftAccount">${L5("계정 것 쓰기", "Use the account")}</button><button type="button" class="btn-line" data-action="studyDraftPick">${L5("남은 변경 쓰기", "Use the unsent changes")}</button></div>`);
-  if (view.store === "wait") return box(`<p class="meta">${L5("계정에 저장한 조건을 불러오는 중이에요.", "Loading the conditions saved to your account.")}</p>`);
-  if (view.store === "blocked") return box(`<p>${L5("계정에 저장한 조건을 지금 불러오지 못했어요. 그동안은 조건을 고칠 수 없어요.", "Your saved conditions could not be loaded right now. Until then, conditions cannot be changed.")}</p>${retry}`);
-  if (view.phase === "none") return box(`<p>${L5("계정에 저장하면 다른 기기에서도 이어서 볼 수 있어요.", "Save them to your account to continue on other devices.")}</p><button type="button" class="btn-line" data-action="studyConsentOpen">${L5("계정에 저장하기", "Save to account")}</button>`);
-  if (view.phase === "paused" && NETWORK_CODES.has(view.errorCode)) return box(`<p>${L5("계정에 연결하지 못했어요. 연결을 확인하고 다시 시도해 주세요.", "Could not reach your account. Check your connection and try again.")}</p>${retry}`);
+  if (view.phase === "choose") return box(`<p>${L6("이 탭에 계정에 올라가지 않은 조건 변경이 남아 있어요. 고르기 전에는 조건을 고칠 수 없어요.", "This tab has condition changes that never reached your account. You cannot change conditions until you choose.")}</p><div class="actions"><button type="button" class="btn-line" data-action="studyDraftAccount">${L6("계정 것 쓰기", "Use the account")}</button><button type="button" class="btn-line" data-action="studyDraftPick">${L6("남은 변경 쓰기", "Use the unsent changes")}</button></div>`);
+  if (view.store === "wait") return box(`<p class="meta">${L6("계정에 저장한 조건을 불러오는 중이에요.", "Loading the conditions saved to your account.")}</p>`);
+  if (view.store === "blocked") return box(`<p>${L6("계정에 저장한 조건을 지금 불러오지 못했어요. 그동안은 조건을 고칠 수 없어요.", "Your saved conditions could not be loaded right now. Until then, conditions cannot be changed.")}</p>${retry}`);
+  if (view.phase === "none") return box(`<p>${L6("계정에 저장하면 다른 기기에서도 이어서 볼 수 있어요.", "Save them to your account to continue on other devices.")}</p><button type="button" class="btn-line" data-action="studyConsentOpen">${L6("계정에 저장하기", "Save to account")}</button>`);
+  if (view.phase === "paused" && NETWORK_CODES.has(view.errorCode)) return box(`<p>${L6("계정에 연결하지 못했어요. 연결을 확인하고 다시 시도해 주세요.", "Could not reach your account. Check your connection and try again.")}</p>${retry}`);
   if (view.phase === "paused") return "";
-  if (view.phase === "error") return box(`<p>${L5("계정 상태를 확인하지 못했어요.", "Could not check your account.")}</p>${retry}`);
+  if (view.phase === "error") return box(`<p>${L6("계정 상태를 확인하지 못했어요.", "Could not check your account.")}</p>${retry}`);
   return "";
 }
 
@@ -4949,8 +4950,8 @@ function matchProgram(profile2, program, rules) {
   const items = [];
   const edu = p.education === "graduated" || p.education === "expected" ? "ok" : p.education === "none" ? "lack" : "check";
   items.push({ key: "education", status: edu, need: need.education, mine: p.education ?? null, gap: null, rule: null });
-  const grade = num(p.gradePct, 0, 100);
-  items.push({ key: "grade", status: need.gradePct === 0 ? "ok" : grade === null ? "check" : grade >= need.gradePct ? "ok" : "lack", need: need.gradePct, mine: grade, gap: grade === null ? null : Math.max(0, need.gradePct - grade), rule: null });
+  const grade2 = num(p.gradePct, 0, 100);
+  items.push({ key: "grade", status: need.gradePct === 0 ? "ok" : grade2 === null ? "check" : grade2 >= need.gradePct ? "ok" : "lack", need: need.gradePct, mine: grade2, gap: grade2 === null ? null : Math.max(0, need.gradePct - grade2), rule: null });
   const topik = Number.isInteger(p.topik) ? num(p.topik, 0, MAX_TOPIK) : null;
   const topikStatus = need.topik === 0 ? "ok" : topik === null ? "check" : topik >= need.topik ? "ok" : "lack";
   items.push({ key: "topik", status: topikStatus, need: need.topik, mine: topik, gap: topik === null ? null : Math.max(0, need.topik - topik), rule: null });
@@ -5021,12 +5022,12 @@ var CAL = svg2('<rect x="3.5" y="4.5" width="13" height="12" rx="2"/><path d="M3
 function ctx(view) {
   const now = view.now || /* @__PURE__ */ new Date();
   const en = view.lang === "en";
-  const L5 = (ko, e) => en ? e : ko;
+  const L6 = (ko, e) => en ? e : ko;
   const pick2 = (o) => o ? en ? o.en : o.ko : "";
   const won = (n) => en ? `₩${n.toLocaleString("en-US")}` : n < 1e4 ? `${n.toLocaleString("ko-KR")}원` : n % 1e4 === 0 ? `${(n / 1e4).toLocaleString("ko-KR")}만 원` : `${Math.floor(n / 1e4).toLocaleString("ko-KR")}만 ${(n % 1e4).toLocaleString("ko-KR")}원`;
   const thisYear = Number(new Date((now instanceof Date ? now.getTime() : new Date(now).getTime()) + 9 * 36e5).toISOString().slice(0, 4));
   const md = (d) => monthDay(d, en, thisYear);
-  return { now, en, L: L5, pick: pick2, won, md, posts: view.posts || [], programs: view.programs || [], rules: view.rules || [], profile: view.profile, lang: en ? "en" : "ko", condOn: view.condOn !== false, store: ["account", "blocked", "wait"].includes(view.store) ? view.store : "tab", storeNote: String(view.storeNote || ""), persisted: view.persisted !== false, note: typeof view.note === "string" ? view.note : "" };
+  return { now, en, L: L6, pick: pick2, won, md, posts: view.posts || [], programs: view.programs || [], rules: view.rules || [], profile: view.profile, lang: en ? "en" : "ko", condOn: view.condOn !== false, store: ["account", "blocked", "wait"].includes(view.store) ? view.store : "tab", storeNote: String(view.storeNote || ""), persisted: view.persisted !== false, note: typeof view.note === "string" ? view.note : "" };
 }
 var channelOf = (id) => CHANNELS.find((c) => c.id === id) || null;
 var newTab = (T2) => `<span class="sr-only"> (${T2.L("새 탭에서 열림", "opens in new tab")})</span>`;
@@ -5266,6 +5267,36 @@ ${en ? "Check the official notice before you act." : "움직이기 전에 공식
   ].map(fold).join("\r\n") + "\r\n";
 }
 
+// experiences/path-app/interview-shape.mjs
+var INTERVIEW_LANGS = Object.freeze(["ko", "en", "mn"]);
+var INTERVIEW_STATUSES = Object.freeze(["done", "refused", "limit", "busy", "unavailable", "done_before"]);
+var INTERVIEW_PROGRAMS = Object.freeze({ "jbnu-ug": "전북대학교", "wku-ug": "원광대학교", "jj-ug": "전주대학교" });
+var track = (id, name, main, followups, about) => Object.freeze({ id, name, main, followups: Object.freeze(followups), about });
+var TRACKS = Object.freeze([
+  track(
+    "motive",
+    "지원한 이유",
+    "우리 학교에 지원한 이유를 말씀해 주세요.",
+    ["그렇게 생각하게 된 계기를 한 가지 이야기해 주세요.", "다른 나라가 아니라 한국을 고른 이유는 무엇입니까?"],
+    "why the applicant wants to study at this Korean university"
+  ),
+  track(
+    "study",
+    "공부할 계획",
+    "입학하면 무엇을 어떻게 공부하고 싶습니까?",
+    ["그 공부를 위해 지금 준비하고 있는 것은 무엇입니까?", "수업을 듣다가 모르는 것이 있으면 어떻게 하겠습니까?"],
+    "what the applicant wants to study after admission and how"
+  ),
+  track(
+    "life",
+    "한국 생활",
+    "한국에서 혼자 생활할 때 가장 신경 쓸 것은 무엇입니까?",
+    ["그 일을 위해 어떤 준비를 하겠습니까?", "힘든 일이 생기면 누구와 어떻게 이야기하겠습니까?"],
+    "how the applicant will manage daily life and adapt in Korea"
+  )
+]);
+var TRACK_IDS = Object.freeze(TRACKS.map((t2) => t2.id));
+
 // experiences/path-app/study-ui.mjs
 var STUDY_FILTERS = Object.freeze(["all", "fit", "language", "undergraduate"]);
 var GRADE_MAX = 100;
@@ -5282,25 +5313,25 @@ var LEVEL = { language: ["어학 과정", "Language program"], undergraduate: ["
 function ctx2(view) {
   const now = view.now || /* @__PURE__ */ new Date();
   const en = view.lang === "en";
-  const L5 = (ko, e) => en ? e : ko;
+  const L6 = (ko, e) => en ? e : ko;
   const pick2 = (o) => o ? en ? o.en : o.ko : "";
   const pair = (a) => en ? a[1] : a[0];
   const won = (n) => en ? `₩${n.toLocaleString("en-US")}` : n < 1e4 ? `${n.toLocaleString("ko-KR")}원` : n % 1e4 === 0 ? `${(n / 1e4).toLocaleString("ko-KR")}만 원` : `${Math.floor(n / 1e4).toLocaleString("ko-KR")}만 ${(n % 1e4).toLocaleString("ko-KR")}원`;
-  const topik = (n) => n === null || n === void 0 ? L5("아직 안 넣음", "Not entered") : n === 0 ? L5("성적 없음", "No score yet") : L5(`TOPIK ${n}급`, `TOPIK level ${n}`);
+  const topik = (n) => n === null || n === void 0 ? L6("아직 안 넣음", "Not entered") : n === 0 ? L6("성적 없음", "No score yet") : L6(`TOPIK ${n}급`, `TOPIK level ${n}`);
   const programs = view.programs || PROGRAMS;
   const rules = view.rules || rulesAt(RULES, now);
   const profile2 = view.profile;
   const allExample = programs.length > 0 && programs.every((p) => p.example);
   const anyPartner = programs.some((p) => p.partner === true);
-  const fitText = (n) => allExample ? L5(`개의 예시 과정이 지금 조건에 맞아요 (예시 ${programs.length}개 중)`, `of ${programs.length} example programs fit your conditions`) : L5("개 과정이 지금 조건에 맞아요", n === 1 ? "program fits your conditions" : "programs fit your conditions");
+  const fitText = (n) => allExample ? L6(`개의 예시 과정이 지금 조건에 맞아요 (예시 ${programs.length}개 중)`, `of ${programs.length} example programs fit your conditions`) : L6("개 과정이 지금 조건에 맞아요", n === 1 ? "program fits your conditions" : "programs fit your conditions");
   const needs = countNeeds(programs);
-  const needWord = needs.length === 2 ? L5("성적과 한국어를", "your grades and Korean level") : needs[0] === "gradePct" ? L5("성적을", "your grades") : L5("한국어 급수를", "your Korean level");
+  const needWord = needs.length === 2 ? L6("성적과 한국어를", "your grades and Korean level") : needs[0] === "gradePct" ? L6("성적을", "your grades") : L6("한국어 급수를", "your Korean level");
   const MON2 = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
   const md = (d) => {
     const [, m, day] = d.split("-").map(Number);
-    return L5(`${m}월 ${day}일`, `${MON2[m - 1]} ${day}`);
+    return L6(`${m}월 ${day}일`, `${MON2[m - 1]} ${day}`);
   };
-  return { now, en, L: L5, pick: pick2, pair, won, topik, programs, rules, profile: profile2, allExample, anyPartner, fitText, needs, needWord, md };
+  return { now, en, L: L6, pick: pick2, pair, won, topik, programs, rules, profile: profile2, allExample, anyPartner, fitText, needs, needWord, md };
 }
 var tag = (status, T2) => `<span class="sx-tag is-${status}">${T2.pair(STATUS[status])}</span>`;
 var meter = (match, T2) => `<span class="sx-meter" role="img" aria-label="${esc5(match.items.map((i) => `${T2.pair(KEY_NAME[i.key])} ${T2.pair(STATUS[i.status])}`).join(", "))}">${match.items.map((i) => `<i class="is-${i.status}"></i>`).join("")}</span>`;
@@ -5329,18 +5360,18 @@ var opensLong = (p, T2) => {
 };
 var costLabel = (c, T2) => c.missing.length ? T2.L("확인된 비용의 합", "Confirmed costs") : T2.L("내가 낼 돈", "What you pay");
 var needKorean = (p, T2) => p.requires.topik ? T2.L(`${p.requires.topik}급`, `Level ${p.requires.topik}`) : T2.L("없어도 됨", "None");
-function needText(item, T2) {
-  if (item.key === "education") return T2.L("고등학교 졸업", "High school graduation");
-  if (item.key === "grade") return item.need === 0 ? T2.L("조건 없음", "No requirement") : T2.L(`평균 ${item.need}% 이상`, `Average ${item.need}% or higher`);
-  if (item.key === "topik") return item.need === 0 ? T2.L("없어도 됨", "Not required") : T2.L(`TOPIK ${item.need}급 이상`, `TOPIK level ${item.need} or higher`);
-  return item.need === null ? T2.L("기준 확인 필요", "Requirement to be checked") : T2.L(`은행 잔고 ${T2.won(item.need)}`, `Bank balance of ${T2.won(item.need)}`);
+function needText(item2, T2) {
+  if (item2.key === "education") return T2.L("고등학교 졸업", "High school graduation");
+  if (item2.key === "grade") return item2.need === 0 ? T2.L("조건 없음", "No requirement") : T2.L(`평균 ${item2.need}% 이상`, `Average ${item2.need}% or higher`);
+  if (item2.key === "topik") return item2.need === 0 ? T2.L("없어도 됨", "Not required") : T2.L(`TOPIK ${item2.need}급 이상`, `TOPIK level ${item2.need} or higher`);
+  return item2.need === null ? T2.L("기준 확인 필요", "Requirement to be checked") : T2.L(`은행 잔고 ${T2.won(item2.need)}`, `Bank balance of ${T2.won(item2.need)}`);
 }
-function mineText(item, T2) {
+function mineText(item2, T2) {
   const none = T2.L("아직 안 넣음", "Not entered");
-  if (item.key === "education") return item.mine ? T2.pair(EDU[item.mine]) : none;
-  if (item.key === "grade") return item.mine === null ? none : `${item.mine}%`;
-  if (item.key === "topik") return T2.topik(item.mine);
-  return item.mine === null ? none : T2.won(item.mine);
+  if (item2.key === "education") return item2.mine ? T2.pair(EDU[item2.mine]) : none;
+  if (item2.key === "grade") return item2.mine === null ? none : `${item2.mine}%`;
+  if (item2.key === "topik") return T2.topik(item2.mine);
+  return item2.mine === null ? none : T2.won(item2.mine);
 }
 function uncheckedNote(T2) {
   const fit = T2.programs.map((p) => matchProgram(T2.profile, p, T2.rules)).filter((m) => m.fits);
@@ -5533,10 +5564,10 @@ var ON3 = svg4('<path d="m5 10.4 3.2 3.1L15 6.6"/>');
 function ctx3(view) {
   const now = view.now || /* @__PURE__ */ new Date();
   const en = view.lang === "en";
-  const L5 = (ko, e) => en ? e : ko;
+  const L6 = (ko, e) => en ? e : ko;
   const pick2 = (o) => o ? en ? o.en : o.ko : "";
   const thisYear = Number(new Date((now instanceof Date ? now.getTime() : new Date(now).getTime()) + 9 * 36e5).toISOString().slice(0, 4));
-  return { now, en, L: L5, pick: pick2, md: (d) => monthDay(d, en, thisYear), profile: view.profile || {}, programs: view.programs || [], posts: view.posts || [], persisted: view.persisted !== false, store: ["account", "blocked", "wait"].includes(view.store) ? view.store : "tab", storeNote: String(view.storeNote || ""), note: typeof view.note === "string" ? view.note : "" };
+  return { now, en, L: L6, pick: pick2, md: (d) => monthDay(d, en, thisYear), profile: view.profile || {}, programs: view.programs || [], posts: view.posts || [], persisted: view.persisted !== false, store: ["account", "blocked", "wait"].includes(view.store) ? view.store : "tab", storeNote: String(view.storeNote || ""), note: typeof view.note === "string" ? view.note : "" };
 }
 var newTab3 = (T2) => `<span class="sr-only"> (${T2.L("새 탭에서 열림", "opens in new tab")})</span>`;
 var STAGE = {
@@ -5575,7 +5606,7 @@ function docRow(d, T2, done) {
   const line = (label, o) => o ? `<p class="sx-doc-line"><b>${label}</b> ${esc6(T2.pick(o))}</p>` : "";
   const visa = d.stage === "visa";
   const unclear = !d.unclear ? "" : visa ? `<div class="sx-unclear"><p><b>${T2.L("KVAC에 확인할 것", "Check with KVAC")}</b> ${esc6(T2.pick(d.unclear))}</p></div>` : `<div class="sx-unclear"><p><b>${T2.L("요강에서 두 가지로 읽혀요", "The guide can be read two ways")}</b> ${esc6(T2.pick(d.unclear))}</p><p>${T2.L("대학에 먼저 물어보세요.", "Ask the university first.")}</p></div>`;
-  return `<li class="sx-docrow"><div class="sx-doc-main"><b class="sx-doc-name">${esc6(T2.pick(d.name))}</b>${T2.en ? `<small class="sx-doc-ko" lang="ko">${esc6(d.name.ko)}</small>` : ""}${d.only ? `<p class="sx-doc-line"><b>${T2.L("해당자", "Who")}</b> ${esc6(T2.pick(d.only.cond))}</p>` : ""}${line(T2.L("구하는 곳", "Where to get it"), d.from)}${line(T2.L("날짜 조건", "Date rule"), d.when)}${d.note ? `<p class="sx-doc-note">${esc6(T2.pick(d.note))}</p>` : ""}${unclear}${translateKindOf(d.id) ? `<button type="button" class="sx-link sx-trlink" data-action="trOpen" data-id="${esc6(d.id)}">${T2.L("몽골어 서류의 번역 초안 만들기", "Make a translation draft of the Mongolian document")}<span class="sr-only"> · ${esc6(T2.pick(d.name))}</span>${GO3}</button>` : ""}</div><button type="button" class="sx-btn2 sm sx-docbtn" aria-pressed="${on}" data-action="docToggle" data-id="${esc6(d.id)}"><span class="sx-on">${ON3}</span>${T2.L("준비했어요", "Ready")}<span class="sr-only"> ${esc6(T2.pick(d.name))}</span></button></li>`;
+  return `<li class="sx-docrow"><div class="sx-doc-main"><b class="sx-doc-name">${esc6(T2.pick(d.name))}</b>${T2.en ? `<small class="sx-doc-ko" lang="ko">${esc6(d.name.ko)}</small>` : ""}${d.only ? `<p class="sx-doc-line"><b>${T2.L("해당자", "Who")}</b> ${esc6(T2.pick(d.only.cond))}</p>` : ""}${line(T2.L("구하는 곳", "Where to get it"), d.from)}${line(T2.L("날짜 조건", "Date rule"), d.when)}${d.note ? `<p class="sx-doc-note">${esc6(T2.pick(d.note))}</p>` : ""}${unclear}${visa ? "" : `<button type="button" class="sx-link sx-trlink" data-action="dcOpen" data-id="${esc6(d.id)}">${T2.L("서류 점검", "Check this document")}<span class="sr-only"> · ${esc6(T2.pick(d.name))}</span>${GO3}</button>`}${translateKindOf(d.id) ? `<button type="button" class="sx-link sx-trlink" data-action="trOpen" data-id="${esc6(d.id)}">${T2.L("몽골어 서류의 번역 초안 만들기", "Make a translation draft of the Mongolian document")}<span class="sr-only"> · ${esc6(T2.pick(d.name))}</span>${GO3}</button>` : ""}</div><button type="button" class="sx-btn2 sm sx-docbtn" aria-pressed="${on}" data-action="docToggle" data-id="${esc6(d.id)}"><span class="sx-on">${ON3}</span>${T2.L("준비했어요", "Ready")}<span class="sr-only"> ${esc6(T2.pick(d.name))}</span></button></li>`;
 }
 function stageBlock(stage, t2, T2, done, counts) {
   const docs = t2.set.mine.filter((d) => d.stage === stage), folds = t2.set.notMine.filter((d) => d.stage === stage);
@@ -5603,6 +5634,10 @@ function storeNote(T2) {
   if (T2.store === "account") return `<p class="sx-fine">${T2.L("표시는 계정에 저장돼요. 내 정보에서 지울 수 있어요.", "Marks are saved to your account. You can delete them on the Profile page.")}</p>`;
   return T2.persisted ? `<p class="sx-fine">${T2.L("표시는 이 탭에만 있어요. 탭을 닫거나 로그아웃하면 사라져요.", "Marks stay in this tab only. They disappear when you close the tab or sign out.")}</p>` : `<p class="sx-store is-warn">${T2.L("이 브라우저에서는 저장할 수 없어서 표시를 지금 화면에서만 기억해요. 새로 고치면 사라져요.", "This browser cannot store marks, so they are remembered on this screen only and are lost on reload.")}</p>`;
 }
+function interviewCard(program, T2) {
+  if (!Object.hasOwn(INTERVIEW_PROGRAMS, program.id)) return "";
+  return `<section class="sx-card lapis" aria-labelledby="sx-interview-h"><h2 id="sx-interview-h">${T2.L("면접을 한국어로 연습해 봐요", "Practice the interview in Korean")}</h2><p>${T2.L("여섯 질문에 글이나 말로 답해요. 실제 질문은 대학마다 달라요. 연습이고, 점수나 합격을 말하지 않아요.", "Answer six questions by typing or speaking. Real questions differ by university. It is practice and gives no score or admission result.")}</p><button type="button" class="sx-btn2" data-action="interviewOpen" data-id="${esc6(program.id)}">${T2.L("면접 연습", "Interview practice")}${GO3}</button></section>`;
+}
 function renderPath(view) {
   const T2 = ctx3(view), t2 = pathTarget(view);
   const back = `<button type="button" class="sx-back" data-action="nav" data-page="today">${BACK4}${T2.L("오늘", "Today")}</button>`;
@@ -5624,6 +5659,7 @@ function renderPath(view) {
 <p class="sx-note">${T2.L("「준비했어요」는 내가 표시한 것이에요. 대학이나 비자신청센터(KVAC)가 확인한 것이 아니에요.", "“Ready” is your own mark. It is not a check by the university or the visa center (KVAC).")}</p>
 ${storeNote(T2)}${view.docFull ? `<p class="sx-store is-warn">${T2.L("표시가 예순 개라 더 넣을 수 없어요. 다른 과정의 표시를 뺀 뒤 넣어 주세요.", "You already have 60 marks. Remove some from another program first.")}</p>` : ""}
 ${renderDates(view, post2, T2.L("이 과정의 날짜", "Dates for this program"))}
+${interviewCard(program, T2)}
 ${["apply", "admitted", "visa"].map((s) => stageBlock(s, t2, T2, done, counts)).join("")}
 <div class="sx-row2"><button type="button" class="sx-btn2" data-action="univOpen" data-id="${esc6(program.id)}">${T2.L("과정 자세히 보기", "Program details")}</button><button type="button" class="sx-btn2 line" data-action="pathPick" data-id="${esc6(program.id)}">${T2.L("준비 그만하기", "Stop preparing")}</button></div>
 <p class="sx-fine">${T2.L("이 목록은 입학이나 비자를 약속하지 않아요. 마지막 판단은 대학과 출입국이 해요.", "This list does not promise admission or a visa. The university and immigration office make the final decision.")}</p></div>`;
@@ -5943,17 +5979,18 @@ var ERROR_TEXT = {
   lost: ["결과를 받지 못했어요. 오늘 한 장이 쓰였을 수 있어요. 다시 만들면 한 장을 더 써요.", "The result did not arrive. One of today’s 10 may have been used. Making it again uses one more.", "Үр дүн ирсэнгүй. Өнөөдрийн нэг хуудсыг ашигласан байж магадгүй. Дахин гаргавал нэг хуудсыг нэмж ашиглана."],
   account: ["계정이 바뀌어 초안을 지웠어요.", "Your account changed, so the draft was cleared.", "Бүртгэл солигдсон тул ноорог устгагдлаа."]
 };
+var CONSENT_TEXT = Object.freeze(Object.fromEntries(["how1", "how2", "consentTitle", "what", "whatText", "who", "keep", "no", "ask", "age", "adult", "teen", "under14", "under14Note", "guardian", "agree"].map((k) => [k, M[k]])));
 var pick3 = (en, a) => en ? a[1] : a[0];
 var mnLine = (a) => `<span class="sx-mn" lang="mn">${esc7(a[2])}</span>`;
 var both = (en, a, tag2 = "p", cls = "") => `<${tag2}${cls ? ` class="${cls}"` : ""}><span>${esc7(pick3(en, a))}</span>${mnLine(a)}</${tag2}>`;
 var reasonKeys = (row) => row.reasons.flatMap((r) => r === "differs" ? [row.reason === "term" ? "changed" : row.reason === "missing" || row.reason === "added" ? row.reason : "meaning"] : [r]);
 function renderTranslate(view) {
-  const en = view.lang === "en", L5 = (ko, e) => en ? e : ko, P = (a) => pick3(en, a);
+  const en = view.lang === "en", L6 = (ko, e) => en ? e : ko, P = (a) => pick3(en, a);
   const tr = view.tr || {};
-  const back = `<button type="button" class="sx-back" data-action="trLeave">${BACK5}${L5("내 길", "My path")}</button>`;
+  const back = `<button type="button" class="sx-back" data-action="trLeave">${BACK5}${L6("내 길", "My path")}</button>`;
   const head2 = `<header class="sx-head"><p class="sx-kicker">${esc7(P(M.kicker))}</p><h1 class="sx-title page-title" id="tr-title" tabindex="-1">${esc7(en ? view.docName?.en : view.docName?.ko)}</h1>${both(en, M.lead, "p", "sx-lead")}</header>`;
   if (!view.signedIn) {
-    return `<div class="sx sx-tr">${back}${head2}${both(en, M.signIn, "p", "sx-note is-box")}<button type="button" class="sx-cta" data-action="accountSignIn">${L5("SYNK ID로 로그인", "Sign in with SYNK ID")}</button></div>`;
+    return `<div class="sx sx-tr">${back}${head2}${both(en, M.signIn, "p", "sx-note is-box")}<button type="button" class="sx-cta" data-action="accountSignIn">${L6("SYNK ID로 로그인", "Sign in with SYNK ID")}</button></div>`;
   }
   const busy = tr.phase === "sending";
   const notice = tr.notice ? `<p class="sx-store is-warn" role="status"><span>${esc7(P(ERROR_TEXT[tr.notice] || ERROR_TEXT.unavailable))}</span>${mnLine(ERROR_TEXT[tr.notice] || ERROR_TEXT.unavailable)}</p>` : "";
@@ -5961,11 +5998,11 @@ function renderTranslate(view) {
   if (tr.phase === "draft" && Array.isArray(tr.rows)) return `<div class="sx sx-tr">${back}${head2}${notice}${renderDraft(tr, en, rules)}${both(en, M.fine, "p", "sx-fine")}</div>`;
   const err = tr.error ? `<p class="sx-err" id="tr-err" role="alert"><span>${esc7(P(ERROR_TEXT[tr.error] || ERROR_TEXT.unavailable))}</span>${mnLine(ERROR_TEXT[tr.error] || ERROR_TEXT.unavailable)}</p>` : "";
   const ages = ["adult", "teen", "under14"].map((a) => `<label class="sx-choice"><input type="radio" id="tr-age-${a}" name="tr-age" value="${a}" data-action="trAge"${tr.age === a ? " checked" : ""}${busy ? " disabled" : ""}><span>${esc7(P(M[a]))}<span class="sx-mn" lang="mn">${esc7(M[a][2])}</span></span></label>`).join("");
-  const item = (k, t2) => `<div class="sx-tr-item"><dt>${esc7(P(M[k]))}</dt><dd><span>${esc7(P(M[t2]))}</span>${mnLine(M[t2])}</dd></div>`;
+  const item2 = (k, t2) => `<div class="sx-tr-item"><dt>${esc7(P(M[k]))}</dt><dd><span>${esc7(P(M[t2]))}</span>${mnLine(M[t2])}</dd></div>`;
   const ready = tr.age === "adult" || tr.age === "teen" && tr.guardian;
   const canSend = !busy && ready && tr.agree === true && String(tr.text || "").trim().length > 0;
   const consent = `<section class="sx-card sx-tr-consent" aria-labelledby="sx-tr-consent-h"><h2 class="sx-h" id="sx-tr-consent-h">${esc7(P(M.consentTitle))}<span class="sx-mn" lang="mn">${esc7(M.consentTitle[2])}</span></h2>
-<dl class="sx-tr-items">${item("what", "whatText")}${item("who", "whoText")}${item("keep", "keepText")}${item("no", "noText")}<div class="sx-tr-item"><dt>${esc7(P(M.ask))}</dt><dd>SYNK · hello@synk.im · <a href="${en ? PRIVACY_URL_EN : PRIVACY_URL2}" target="_blank" rel="noopener noreferrer">${L5("개인정보 처리방침", "Privacy policy")}<span class="sr-only"> (${L5("새 탭에서 열림", "opens in new tab")})</span></a></dd></div></dl>
+<dl class="sx-tr-items">${item2("what", "whatText")}${item2("who", "whoText")}${item2("keep", "keepText")}${item2("no", "noText")}<div class="sx-tr-item"><dt>${esc7(P(M.ask))}</dt><dd>SYNK · hello@synk.im · <a href="${en ? PRIVACY_URL_EN : PRIVACY_URL2}" target="_blank" rel="noopener noreferrer">${L6("개인정보 처리방침", "Privacy policy")}<span class="sr-only"> (${L6("새 탭에서 열림", "opens in new tab")})</span></a></dd></div></dl>
 <fieldset class="sx-tr-age"><legend>${esc7(P(M.age))}</legend>${ages}</fieldset>
 ${tr.age === "under14" ? both(en, M.under14Note, "p", "sx-store is-warn") : ""}
 ${tr.age === "teen" ? `<label class="sx-check"><input type="checkbox" id="tr-guardian" data-action="trGuardian"${tr.guardian ? " checked" : ""}${busy ? " disabled" : ""}><span><span>${esc7(P(M.guardian))}</span>${mnLine(M.guardian)}</span></label>` : ""}
@@ -5988,7 +6025,7 @@ function countText(text2, en) {
   return en ? `${lines} lines · ${n.toLocaleString("en-US")} / ${MAX_TOTAL_CHARS.toLocaleString("en-US")} characters` : `${lines}줄 · ${n.toLocaleString("ko-KR")} / ${MAX_TOTAL_CHARS.toLocaleString("ko-KR")}자`;
 }
 function renderDraft(tr, en, rules) {
-  const P = (a) => pick3(en, a), L5 = (ko, e) => en ? e : ko;
+  const P = (a) => pick3(en, a), L6 = (ko, e) => en ? e : ko;
   const rows = tr.rows;
   const flagged = rows.filter((r) => reasonKeys(r).length).length;
   const meaning = rows.filter((r) => r.verdict === "differs" || r.verdict === "unsure").length;
@@ -6020,6 +6057,215 @@ function draftText(rows, docName) {
     return [`${r.i + 1}. ${r.ko}`, `   원문: ${r.source}`, ...keys.length ? [`   확인 필요: ${keys.map((k) => REASON_TEXT[k][0]).join(" ")}`] : []];
   });
   return [...head2, `${docName?.ko || ""}`.trim(), "", ...body, "", ...head2].join("\n") + "\n";
+}
+
+// experiences/path-app/doc-check.mjs
+var DOC_CHECK_CONSENT_VERSION = 1;
+var DOC_CHECK_STATUSES = Object.freeze(["done", "refused", "limit", "busy", "unavailable", "done_before"]);
+var MAX_FOUND_LINES = 5;
+var L5 = (ko, en) => Object.freeze({ ko, en });
+var item = (key, ask, label) => Object.freeze({ key, ask, label });
+var TITLE_GRAD = item("title", "the line that names this document as a graduation certificate, or as an expected-graduation (enrollment/completion) certificate", L5("졸업(예정)증명서라는 제목", "The title of the graduation or expected-graduation certificate"));
+var DONE = item("done", "every line that says the person graduated, completed the program, or is expected to graduate, including the year or date", L5("졸업했거나 졸업할 예정이라는 말과 그 날짜", "The statement and date of graduation or expected graduation"));
+var SCHOOL = item("school", "every line that names the school the person attended", L5("다닌 학교의 이름", "The name of the school"));
+var ISSUER = item("issuer", "every line that names the issuing authority, the issue date, a signature or seal, or a certificate or registration number of the document itself", L5("발급한 곳, 발급한 날, 증서 번호", "The issuer, issue date or certificate number"));
+var TITLE_TR = item("title", "the line that names this document as a transcript, grade sheet or academic record", L5("성적증명서라는 제목", "The title of the transcript"));
+var grade = (n) => item(`g${n}`, `lines that give marks or grades for school year ${n} (Mongolian: "${n} дугаар анги", "${n}-р анги", or a table column for year ${n})`, L5(`${n}학년 성적`, `Grade ${n} results`));
+var MARKS = item("marks", "lines that give subject names together with marks or grades", L5("과목과 성적이 적힌 줄", "Lines with subjects and marks"));
+var GRAD = Object.freeze([TITLE_GRAD, DONE, SCHOOL, ISSUER]);
+var TRANSCRIPT_HS = Object.freeze([TITLE_TR, grade(10), grade(11), grade(12), SCHOOL, ISSUER]);
+var TRANSCRIPT_LAST = Object.freeze([TITLE_TR, MARKS, SCHOOL, ISSUER]);
+var DOC_CHECKS = Object.freeze({
+  "jbnu-ug-grad": GRAD,
+  "jbnu-ug-transcript": TRANSCRIPT_HS,
+  "jbnu-lang-grad": GRAD,
+  "jbnu-lang-transcript": TRANSCRIPT_LAST,
+  "wku-ug-grad": GRAD,
+  "wku-ug-transcript": TRANSCRIPT_HS,
+  "wku-lang-grad": GRAD,
+  "wku-lang-transcript": TRANSCRIPT_LAST,
+  "jj-ug-grad": GRAD,
+  "jj-ug-transcript": TRANSCRIPT_HS
+});
+var docCheckItems = (docId) => Object.hasOwn(DOC_CHECKS, docId) ? DOC_CHECKS[docId] : null;
+var docCheckKind = (docId) => docId.endsWith("-transcript") ? "transcript" : "grad";
+var UUID_RE2 = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+var fault4 = (code) => Object.assign(new Error(code), { code });
+var plain2 = (v) => {
+  if (v === null || typeof v !== "object" || Array.isArray(v)) return false;
+  const p = Object.getPrototypeOf(v);
+  return p === null || Object.getPrototypeOf(p) === null;
+};
+var exactKeys2 = (v, keys) => plain2(v) && Object.keys(v).length === keys.length && keys.every((k) => Object.hasOwn(v, k));
+function sentences(text2) {
+  return String(text2 ?? "").split(/(?<=[.!?])\s+/).map((s) => s.trim()).filter(Boolean);
+}
+function selfChecks(doc2, rules, pick2) {
+  const own = [doc2.when, doc2.note].filter(Boolean).flatMap((t2) => sentences(pick2(t2)));
+  return { own, rules: (rules || []).flatMap((t2) => sentences(pick2(t2))) };
+}
+function validateDocCheckRequest(body) {
+  const bad = () => {
+    throw fault4("INVALID_DOC_CHECK_REQUEST");
+  };
+  if (!exactKeys2(body, ["action", "request_id", "doc", "lines", "consent"]) || body.action !== "doc_check") bad();
+  if (typeof body.request_id !== "string" || !UUID_RE2.test(body.request_id)) bad();
+  if (typeof body.doc !== "string" || !docCheckItems(body.doc)) bad();
+  const c = body.consent;
+  if (!exactKeys2(c, ["v", "age", "guardian", "lang"]) || c.v !== DOC_CHECK_CONSENT_VERSION || !TRANSLATE_AGES.includes(c.age) || c.guardian !== (c.age === "teen") || !TRANSLATE_LANGS.includes(c.lang)) bad();
+  checkLines(body.lines, bad);
+  return { action: "doc_check", request_id: body.request_id.toLowerCase(), doc: body.doc, lines: [...body.lines], consent: { v: c.v, age: c.age, guardian: c.guardian, lang: c.lang } };
+}
+function foundLines(list, count) {
+  if (!Array.isArray(list) || list.length > MAX_LINES) return null;
+  const seen = /* @__PURE__ */ new Set();
+  for (const n of list) {
+    if (!Number.isInteger(n) || n < 0 || n >= count) return null;
+    seen.add(n);
+  }
+  return [...seen].sort((a, b) => a - b).slice(0, MAX_FOUND_LINES);
+}
+function checkDocCheckOutput(out, docId, count) {
+  const items = docCheckItems(docId);
+  if (!items || !exactKeys2(out, ["items"]) || !Array.isArray(out.items) || out.items.length !== items.length) return null;
+  const found = [];
+  for (const [i, entry] of out.items.entries()) {
+    if (!exactKeys2(entry, ["key", "lines"]) || entry.key !== items[i].key) return null;
+    const lines = foundLines(entry.lines, count);
+    if (!lines) return null;
+    found.push({ key: entry.key, lines });
+  }
+  return found;
+}
+function validateDocCheckReply(data, docId, count) {
+  const bad = () => {
+    throw fault4("INVALID_DOC_CHECK_REPLY");
+  };
+  if (!plain2(data) || data.ok !== true || data.scope !== "synk-path" || data.action !== "doc_check" || typeof data.prompt !== "string" || !DOC_CHECK_STATUSES.includes(data.status) || !(data.remaining === null || Number.isSafeInteger(data.remaining) && data.remaining >= 0) || !Array.isArray(data.items)) bad();
+  if (data.status !== "done") {
+    if (data.items.length) bad();
+    return { status: data.status, remaining: data.remaining, prompt: data.prompt, items: [] };
+  }
+  const items = checkDocCheckOutput({ items: data.items }, docId, count);
+  if (!items) bad();
+  return { status: "done", remaining: data.remaining, prompt: data.prompt, items };
+}
+function docCheckRows(docId, found, shownLines) {
+  return docCheckItems(docId).map((it, i) => ({ key: it.key, label: it.label, lines: (found?.[i]?.lines || []).map((n) => shownLines[n]).filter((t2) => typeof t2 === "string") }));
+}
+
+// experiences/path-app/doc-check-ui.mjs
+var esc8 = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+var BACK6 = '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12.5 4.5 7 10l5.5 5.5"/></svg>';
+var PRIVACY_URL3 = "https://synk.im/privacy/#path-assist";
+var M2 = {
+  kicker: ["서류 점검", "Document check", "Баримт шалгах"],
+  lead: ["요강에 적힌 조건을 하나씩 보며 이 서류를 스스로 확인해요.", "Go through the conditions in the guide and check this document yourself.", "Элсэлтийн зааварт бичсэн нөхцөлийг нэг нэгээр нь үзэж, энэ баримтаа өөрөө шалгана."],
+  band: ["대학이나 비자신청센터(KVAC)의 확인이 아니에요. 마지막 판단은 대학이 해요.", "This is not a check by the university or the visa center (KVAC). The university makes the final decision.", "Энэ бол их сургууль, визийн төв (KVAC)-ийн баталгаажуулалт биш. Эцсийн шийдвэрийг их сургууль гаргана."],
+  own: ["이 서류의 조건", "Conditions for this document", "Энэ баримтын нөхцөл"],
+  rules: ["이 과정의 모든 서류에 적용되는 규칙", "Rules for every document of this program", "Энэ хөтөлбөрийн бүх баримтад хамаарах журам"],
+  marks: ["확인한 줄을 눌러 두세요. 표시는 이 화면에만 있고, 나가면 사라져요.", "Tap each line you have checked. Marks stay on this screen only and disappear when you leave.", "Шалгасан мөрөө дарж тэмдэглэнэ. Тэмдэглэгээ зөвхөн энэ дэлгэцэд байх ба гарахад арилна."],
+  findTitle: ["서류의 글에서 찾아보기", "Find it in the text", "Баримтын бичвэрээс хайх"],
+  findLead: ["서류의 글을 붙여 넣으면 아래 내용이 어느 줄에 있는지 AI(Claude)가 찾아요. 맞는지 틀리는지는 판단하지 않아요.", "Paste the document text and AI (Claude) finds the lines that contain the items below. It does not judge whether they are correct.", "Баримтын бичвэрийг буулгавал доорх агуулга аль мөрөнд байгааг хиймэл оюун (Claude) олно. Зөв, буруу эсэхийг дүгнэхгүй."],
+  textLabel: ["서류의 글", "Document text", "Баримтын бичвэр"],
+  whoText: [
+    "Anthropic(미국)의 Claude가 글에서 내용을 찾아요. 글은 SYNK 서버(Supabase, 싱가포르)를 거쳐 가요. 정보가 몽골 밖으로 옮겨져요.",
+    "Claude by Anthropic (USA) looks for the items in the text. The text passes through the SYNK server (Supabase, Singapore). Your information leaves Mongolia.",
+    "Бичвэрээс агуулга хайх ажлыг Anthropic (АНУ)-ийн Claude хийнэ. Бичвэр SYNK-ийн серверээр (Supabase, Сингапур) дамжина. Мэдээллийг Монголоос гадагш дамжуулна."
+  ],
+  keepText: [
+    "SYNK는 보낸 글과 찾은 결과를 저장하지 않아요. Anthropic은 악용을 막으려고 정한 기간 동안 보관할 수 있고, AI 학습에는 쓰지 않아요. SYNK에는 요청한 시각, 결과 상태, 이 동의만 남아요.",
+    "SYNK does not store the text or the result. Anthropic may keep it for the period it sets to prevent misuse, and does not use it to train AI. SYNK keeps only the request time, the result status and this consent.",
+    "SYNK нь таны илгээсэн бичвэр, олсон үр дүнг хадгалахгүй. Anthropic нь үйлчилгээг зүй бусаар ашиглахаас сэргийлэх зорилгоор өөрийн тогтоосон хугацаанд хадгалж болох боловч хиймэл оюуныг сургахад ашиглахгүй. SYNK-д зөвхөн хүсэлт илгээсэн цаг, үр дүнгийн төлөв, энэ зөвшөөрөл үлдэнэ."
+  ],
+  noText: ["보내지 않아도 돼요. 그러면 글에서 찾기는 쓸 수 없고, 위의 조건을 직접 보며 확인하면 돼요.", "You do not have to send it. Then you cannot use this search, and you can check the conditions above yourself.", "Илгээхгүй байж болно. Тэгвэл бичвэрээс хайх үйлчилгээг ашиглах боломжгүй ч дээрх нөхцөлийг өөрөө шалгаж болно."],
+  send: ["글에서 찾기", "Find in the text", "Бичвэрээс хайх"],
+  quota: ["하루 10번까지 찾을 수 있어요. 울란바토르 시각 08:00(서울 09:00)에 다시 채워져요.", "You can search up to 10 times a day. The count resets at 08:00 Ulaanbaatar time (09:00 Seoul).", "Өдөрт 10 удаа хүртэл хайж болно. Улаанбаатарын цагаар 08:00-д (Сөүлийн цагаар 09:00) дахин шинэчлэгдэнэ."],
+  waiting: ["글에서 찾는 중이에요. 이 화면을 열어 두세요.", "Looking through the text. Keep this screen open.", "Бичвэрээс хайж байна. Энэ дэлгэцийг нээлттэй байлгана уу."],
+  resultTitle: ["글에서 찾은 줄", "Lines found in the text", "Бичвэрээс олдсон мөр"],
+  resultNote: ["AI가 줄을 놓치거나 다른 줄을 고를 수 있어요. 종이 서류와 맞춰 보세요.", "AI can miss a line or pick a different one. Compare with the paper document.", "Хиймэл оюун мөр алгасаж эсвэл өөр мөр сонгож болзошгүй. Цаасан баримттайгаа тулгана уу."],
+  found: ["글에 이 내용이 보여요", "The text shows this", "Бичвэрт энэ агуулга харагдаж байна"],
+  missing: ["붙여 넣은 글에서 못 찾았어요. 서류에 없다는 뜻이 아니에요. 종이를 직접 보세요.", "Not found in the pasted text. That does not mean the document lacks it. Look at the paper yourself.", "Буулгасан бичвэрээс олдсонгүй. Баримтад байхгүй гэсэн үг биш. Цаасан баримтаа өөрөө харна уу."],
+  edit: ["글 고치기", "Edit the text", "Бичвэр засах"],
+  fresh: ["글 지우기", "Clear the text", "Бичвэр устгах"],
+  signIn: ["SYNK ID로 로그인하면 글에서 찾기를 쓸 수 있어요. 위의 조건은 로그인하지 않아도 볼 수 있어요.", "Sign in with your SYNK ID to search the text. You can see the conditions above without signing in.", "SYNK ID-аар нэвтэрвэл бичвэрээс хайж болно. Дээрх баримтын нөхцөлийг нэвтрэхгүйгээр үзэж болно."]
+};
+var ITEM_MN = {
+  "grad.title": "Төгссөний гэрчилгээ (эсвэл төгсөх тухай тодорхойлолт) гэсэн гарчиг",
+  "grad.done": "Төгссөн эсвэл төгсөх тухай тэмдэглэл, төгссөн (төгсөх) огноо",
+  "transcript.title": "Дүнгийн хуудас гэсэн гарчиг",
+  "transcript.g10": "10 дугаар ангийн дүн",
+  "transcript.g11": "11 дүгээр ангийн дүн",
+  "transcript.g12": "12 дугаар ангийн дүн",
+  "transcript.marks": "Хичээл, дүн бичсэн мөр",
+  school: "Сурсан сургуулийн нэр",
+  issuer: "Олгосон байгууллага, олгосон огноо, гэрчилгээний дугаар"
+};
+var itemMn = (docId, key) => ITEM_MN[`${docCheckKind(docId)}.${key}`] || ITEM_MN[key] || "";
+var DC_ERROR_TEXT = {
+  empty: ["서류의 글을 붙여 넣어 주세요.", "Paste the document text.", "Баримтын бичвэрийг буулгана уу."],
+  short: ["글이 너무 짧아요. 서류의 글을 모두 붙여 넣어 주세요.", "The text is too short. Paste the whole document.", "Бичвэр хэт богино байна. Баримтын бичвэрийг бүтнээр нь буулгана уу."],
+  lines: ["줄이 너무 많아요. 80줄까지 한 번에 찾을 수 있어요. 나눠서 찾아 주세요.", "Too many lines. Up to 80 lines at a time. Split the text.", "Мөр хэт олон байна. Нэг удаад дээд тал нь 80 мөр оруулж болно. Хувааж оруулна уу."],
+  line: ["300자가 넘는 줄이 있어요. 줄을 나눠 주세요.", "A line is longer than 300 characters. Split it.", "300 тэмдэгтээс урт мөр байна. Мөрийг хуваана уу."],
+  total: [`글이 너무 길어요. ${MAX_TOTAL_CHARS.toLocaleString("en-US")}자까지 한 번에 찾을 수 있어요. 나눠서 찾아 주세요.`, `The text is too long. Up to ${MAX_TOTAL_CHARS.toLocaleString("en-US")} characters at a time. Split it.`, `Бичвэр хэт урт байна. Нэг удаад дээд тал нь ${MAX_TOTAL_CHARS} тэмдэгт оруулж болно. Хувааж оруулна уу.`],
+  limit: ["오늘은 글에서 찾기를 더 쓸 수 없어요. 울란바토르 시각 08:00(서울 09:00)에 다시 채워져요.", "No more searches today. The count resets at 08:00 Ulaanbaatar time (09:00 Seoul).", "Өнөөдөр бичвэрээс дахин хайх боломжгүй. Улаанбаатарын цагаар 08:00-д (Сөүлийн цагаар 09:00) дахин шинэчлэгдэнэ."],
+  busy: ["같은 요청을 처리하고 있어요. 잠시 뒤에 다시 확인해 주세요.", "This request is still being processed. Check again in a moment.", "Ижил хүсэлтийг боловсруулж байна. Хэсэг хүлээгээд дахин шалгана уу."],
+  done_before: ["이 요청은 이미 끝났어요. 결과는 저장하지 않아 다시 보여 드리지 못해요. 다시 찾으면 오늘 한 번을 더 써요.", "This request already finished. Results are not stored, so it cannot be shown again. Searching again uses one more of today’s 10.", "Энэ хүсэлт аль хэдийн дууссан. Үр дүн хадгалагддаггүй тул дахин харуулах боломжгүй. Дахин хайвал өнөөдрийн эрхээс нэгийг ашиглана."],
+  unavailable: ["글에서 찾기는 잠시 쉬어요. 위의 조건은 그대로 볼 수 있어요.", "Searching the text is paused for now. You can still see the conditions above.", "Бичвэрээс хайх үйлчилгээ түр зогссон байна. Дээрх баримтын нөхцөлийг үзэж болно."],
+  refused: ["이 글에서는 찾지 못했어요. 서류의 글이 맞는지 확인해 주세요.", "This text could not be searched. Check that it is the document text.", "Энэ бичвэрээс хайж чадсангүй. Баримтын бичвэр мөн эсэхийг шалгана уу."],
+  lost: ["결과를 받지 못했어요. 오늘 한 번이 쓰였을 수 있어요.", "The result did not arrive. One of today’s 10 may have been used.", "Үр дүн ирсэнгүй. Өнөөдрийн нэг удаагийн эрхийг ашигласан байж магадгүй."],
+  account: ["계정이 바뀌어 붙여 넣은 글을 지웠어요.", "Your account changed, so the pasted text was cleared.", "Бүртгэл солигдсон тул буулгасан бичвэр устгагдлаа."]
+};
+var pick32 = (en, a) => en ? a[1] : a[0];
+var mnLine2 = (t2) => `<span class="sx-mn" lang="mn">${esc8(t2)}</span>`;
+var both2 = (en, a, tag2 = "p", cls = "") => `<${tag2}${cls ? ` class="${cls}"` : ""}><span>${esc8(pick32(en, a))}</span>${mnLine2(a[2])}</${tag2}>`;
+var dcMarkKey = (lang, i) => `${lang === "en" ? "en" : "ko"}:${i}`;
+var dcCanSend = (dc) => dc.phase !== "sending" && (dc.age === "adult" || dc.age === "teen" && dc.guardian === true) && dc.agree === true && String(dc.text || "").trim().length > 0;
+function renderDocCheck(view) {
+  const en = view.lang === "en", L6 = (ko, e) => en ? e : ko, P = (a) => pick32(en, a), pick2 = (o) => o ? en ? o.en : o.ko : "";
+  const { doc: doc2, src } = view, dc = view.dc || {};
+  const line = (label, o) => o ? `<p class="sx-doc-line"><b>${label}</b> ${esc8(pick2(o))}</p>` : "";
+  const head2 = `<button type="button" class="sx-back" data-action="dcLeave">${BACK6}${L6("내 길", "My path")}</button>
+<header class="sx-head"><p class="sx-kicker">${esc8(P(M2.kicker))} · ${esc8(pick2(view.programName))}</p><h1 class="sx-title page-title" id="dc-title" tabindex="-1">${esc8(pick2(doc2.name))}</h1>${both2(en, M2.lead, "p", "sx-lead")}${doc2.only ? line(L6("해당자", "Who"), doc2.only.cond) : ""}${line(L6("구하는 곳", "Where to get it"), doc2.from)}</header>`;
+  const band = `<div class="sx-tr-band" role="note"><b>${esc8(P(M2.band))}</b>${mnLine2(M2.band[2])}</div>`;
+  const source = `<p class="sx-src"><b>${L6("출처", "Source")}</b> <a href="${esc8(src.source.url)}" target="_blank" rel="noopener noreferrer">${esc8(pick2(src.source.title))}<span class="sr-only"> (${L6("새 탭에서 열림", "opens in new tab")})</span></a> · ${L6("확인", "checked")} ${esc8(src.checkedAt)}${src.term ? ` · ${esc8(pick2(src.term))}` : ""}</p>
+${src.status ? `<p class="sx-note is-box">${esc8(pick2(src.status))}</p>` : ""}${isStalePost({ checkedAt: src.checkedAt }, view.now) ? `<p class="sx-note is-box">${L6("확인한 지 90일이 지났어요. 서류는 원문에서 다시 확인하세요.", "This was checked more than 90 days ago. Check the documents in the original.")}</p>` : ""}${line(L6("물을 곳", "Ask"), src.ask)}`;
+  const { own, rules } = selfChecks(doc2, src.rules, pick2);
+  const marked = (i) => dc.marks?.has?.(dcMarkKey(view.lang, i)) === true;
+  const markLine = (text2, i) => `<li><label class="sx-check"><input type="checkbox" id="dc-m-${i}" data-action="dcMark" data-value="${i}"${marked(i) ? " checked" : ""}><span>${esc8(text2)}</span></label></li>`;
+  const list = (title, items, from, id) => items.length ? `<section aria-labelledby="${id}"><h2 class="sx-h" id="${id}">${esc8(P(title))}</h2><ul class="sx-dc-list">${items.map((t2, i) => markLine(t2, from + i)).join("")}</ul></section>` : "";
+  const checks = own.length || rules.length ? `${both2(en, M2.marks, "p", "sx-fine")}${list(M2.own, own, 0, "sx-dc-own")}${list(M2.rules, rules, own.length, "sx-dc-rules")}` : "";
+  const unclear = [doc2.unclear, ...src.unclear || []].filter(Boolean);
+  const unclearBox = unclear.length ? `<div class="sx-unclear"><p><b>${L6("요강에서 두 가지로 읽혀요", "The guide can be read two ways")}</b></p>${unclear.map((u) => `<p>${esc8(pick2(u))}</p>`).join("")}<p>${L6("대학에 먼저 물어보세요.", "Ask the university first.")}</p></div>` : "";
+  return `<div class="sx sx-tr sx-dc">${head2}${band}${source}${checks}${unclearBox}${docCheckItems(doc2.id) ? renderFind(view, dc, { en, L: L6, P, pick: pick2, band }) : ""}</div>`;
+}
+function renderFind(view, dc, { en, L: L6, P, pick: pick2, band }) {
+  const id = view.doc.id, items = docCheckItems(id);
+  const left = Number.isInteger(dc.remaining) && dc.remaining > 0 ? both2(en, [`오늘 ${dc.remaining}번 더 찾을 수 있어요.`, `${dc.remaining} left today.`, `Өнөөдөр дахиад ${dc.remaining} удаа хайж болно.`], "p", "sx-fine") : "";
+  if (view.signedIn && dc.phase === "done" && Array.isArray(dc.rows)) {
+    const rows = dc.rows.map((r) => `<li class="sx-dc-row"><p class="sx-dc-label">${esc8(pick2(r.label))}</p>${mnLine2(itemMn(id, r.key))}${r.lines.length ? `${both2(en, M2.found, "p", "sx-fine")}<ul class="sx-dc-quote">${r.lines.map((t2) => `<li>${esc8(t2)}</li>`).join("")}</ul>` : both2(en, M2.missing, "p", "sx-fine")}</li>`).join("");
+    return `<section class="sx-dc-find" aria-labelledby="dc-result"><h2 class="sx-h" id="dc-result" tabindex="-1">${esc8(P(M2.resultTitle))}</h2>${band}${both2(en, M2.resultNote, "p", "sx-fine")}<ul class="sx-dc-rows">${rows}</ul><div class="sx-row2"><button type="button" class="sx-btn2" data-action="dcEdit">${esc8(P(M2.edit))}</button><button type="button" class="sx-btn2 line" data-action="dcFresh">${esc8(P(M2.fresh))}</button></div>${left}</section>`;
+  }
+  const what = `<ul class="sx-rules">${items.map((it) => `<li><span>${esc8(pick2(it.label))}</span>${mnLine2(itemMn(id, it.key))}</li>`).join("")}</ul>`;
+  const wrap = (body) => `<section class="sx-dc-find" aria-labelledby="sx-dc-find"><h2 class="sx-h" id="sx-dc-find">${esc8(P(M2.findTitle))}</h2>${both2(en, M2.findLead, "p", "sx-lead")}${what}${body}</section>`;
+  if (!view.signedIn) return wrap(`${both2(en, M2.signIn, "p", "sx-note is-box")}<button type="button" class="sx-cta" data-action="accountSignIn">${L6("SYNK ID로 로그인", "Sign in with SYNK ID")}</button>`);
+  const busy = dc.phase === "sending", dis = busy ? " disabled" : "";
+  const errText = (k) => DC_ERROR_TEXT[k] || DC_ERROR_TEXT.unavailable;
+  const err = dc.error ? `<p class="sx-err" id="dc-err" role="alert"><span>${esc8(P(errText(dc.error)))}</span>${mnLine2(errText(dc.error)[2])}</p>` : "";
+  const notice = dc.notice ? `<p class="sx-store is-warn" role="status"><span>${esc8(P(errText(dc.notice)))}</span>${mnLine2(errText(dc.notice)[2])}</p>` : "";
+  const item2 = (k, t2) => `<div class="sx-tr-item"><dt>${esc8(P(CONSENT_TEXT[k]))}</dt><dd><span>${esc8(P(t2))}</span>${mnLine2(t2[2])}</dd></div>`;
+  const ages = ["adult", "teen", "under14"].map((a) => `<label class="sx-choice"><input type="radio" id="dc-age-${a}" name="dc-age" value="${a}" data-action="dcAge"${dc.age === a ? " checked" : ""}${dis}><span>${esc8(P(CONSENT_TEXT[a]))}${mnLine2(CONSENT_TEXT[a][2])}</span></label>`).join("");
+  const check = (elId, action, on, t2) => `<label class="sx-check"><input type="checkbox" id="${elId}" data-action="${action}"${on ? " checked" : ""}${dis}><span><span>${esc8(P(t2))}</span>${mnLine2(t2[2])}</span></label>`;
+  const consent = `<section class="sx-card sx-tr-consent" aria-labelledby="sx-dc-consent-h"><h3 class="sx-h" id="sx-dc-consent-h">${esc8(P(CONSENT_TEXT.consentTitle))}${mnLine2(CONSENT_TEXT.consentTitle[2])}</h3>
+<dl class="sx-tr-items">${item2("what", CONSENT_TEXT.whatText)}${item2("who", M2.whoText)}${item2("keep", M2.keepText)}${item2("no", M2.noText)}<div class="sx-tr-item"><dt>${esc8(P(CONSENT_TEXT.ask))}</dt><dd>SYNK · hello@synk.im · <a href="${en ? PRIVACY_URL_EN : PRIVACY_URL3}" target="_blank" rel="noopener noreferrer">${L6("개인정보 처리방침", "Privacy policy")}<span class="sr-only"> (${L6("새 탭에서 열림", "opens in new tab")})</span></a></dd></div></dl>
+<fieldset class="sx-tr-age"><legend>${esc8(P(CONSENT_TEXT.age))}</legend>${ages}</fieldset>
+${dc.age === "under14" ? both2(en, CONSENT_TEXT.under14Note, "p", "sx-store is-warn") : ""}${dc.age === "teen" ? check("dc-guardian", "dcGuardian", dc.guardian, CONSENT_TEXT.guardian) : ""}${dc.age && dc.age !== "under14" ? check("dc-agree", "dcAgree", dc.agree, CONSENT_TEXT.agree) : ""}</section>`;
+  return wrap(`<div class="sx-tr-how">${both2(en, CONSENT_TEXT.how1, "p", "sx-fine")}${both2(en, CONSENT_TEXT.how2, "p", "sx-fine")}</div>
+<div class="sx-field"><label for="dc-text">${esc8(P(M2.textLabel))}</label><textarea id="dc-text" class="sx-tr-text" rows="8" spellcheck="false" autocomplete="off" data-action="dcText"${dc.error ? ' aria-invalid="true" aria-describedby="dc-err dc-count"' : ' aria-describedby="dc-count"'}${busy ? " readonly" : ""}>${esc8(dc.text || "")}</textarea><p class="sx-fine" id="dc-count">${esc8(countText(dc.text, en))}</p>${err}</div>
+${consent}
+<button type="button" class="sx-cta" data-action="dcSend"${dcCanSend(dc) ? "" : " disabled"}>${esc8(P(M2.send))}</button>
+${busy ? `<p class="sx-note is-box" id="dc-wait" tabindex="-1" role="status"><span>${esc8(P(M2.waiting))}</span>${mnLine2(M2.waiting[2])}</p>` : notice}
+${both2(en, M2.quota, "p", "sx-fine")}${left}`);
 }
 
 // experiences/path-app/app.mjs
@@ -6174,7 +6420,7 @@ var DICT = {
 };
 var t = (k) => (DICT[k] || [k, k])[state.lang === "en" ? 1 : 0];
 var pick = (o) => o ? o[state.lang] ?? o.ko : "";
-var esc8 = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+var esc9 = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
 var goalById = (id) => GOALS.find((g) => g.id === id);
 var oppById = (id) => {
   const demo = OPPORTUNITIES.find((o) => o.id === id);
@@ -6511,7 +6757,7 @@ function commit(next) {
   if (!session.status().canEdit) {
     const err = session.status().error;
     const m = err ? getAccountErrorMessage(err, state.lang) : state.lang === "en" ? "You can't change data right now. Please check the save status in Profile." : "현재는 자료를 바꿀 수 없어요. 내 정보에서 저장 상태를 확인해 주세요.";
-    S.flash = esc8(m);
+    S.flash = esc9(m);
     say(m);
     return false;
   }
@@ -6523,7 +6769,7 @@ function commit(next) {
   } catch (e) {
     state = session.document()?.state || state;
     const m = getAccountErrorMessage(e, state.lang);
-    S.flash = esc8(m);
+    S.flash = esc9(m);
     say(m);
     return false;
   } finally {
@@ -6563,9 +6809,9 @@ function seal(n = 0) {
 function hang(goal, { i = 0, slot = "mid", radio = false, on = false, action = "", kicker = "", name = "", desc = null, mode = "goal" } = {}) {
   const g = goalById(goal);
   const nm = name || pick(g.label), ds = desc ?? pick(g.description);
-  const bottom = `${kicker ? `<span class="pass-kicker">${esc8(kicker)}</span>` : ""}<span class="pass-name">${esc8(nm)}</span>${ds ? `<span class="pass-desc">${esc8(ds)}</span>` : ""}`;
+  const bottom = `${kicker ? `<span class="pass-kicker">${esc9(kicker)}</span>` : ""}<span class="pass-name">${esc9(nm)}</span>${ds ? `<span class="pass-desc">${esc9(ds)}</span>` : ""}`;
   const face = `<span class="pass-band" aria-hidden="true"></span><span class="pass-face" aria-hidden="true"><span class="pass-top"><span class="pass-brand">PATH</span><span class="pass-no">No.${CARD_NO[goal]}</span></span><span class="pass-symbol">${SYMBOL[goal]}</span><span class="pass-bottom">${bottom}</span></span><span class="pick-mark" aria-hidden="true">${ICON2.check}</span>`;
-  const card2 = radio ? `<button type="button" class="pass goal-choice" role="radio" aria-checked="${on}" tabindex="${on || !S.draft?.primaryGoal && i === 0 ? 0 : -1}" data-action="pickGoal" data-id="${goal}" data-mode="${mode}" aria-label="${esc8(`${pick(g.label)} — ${pick(g.description)}`)}">${face}</button>` : action ? `<button type="button" class="pass" data-action="${action}" data-id="${goal}" data-mode="${mode}" aria-label="${esc8(ds ? `${nm} — ${ds}` : nm)}">${face}</button>` : `<div class="pass" data-mode="${mode}" role="img" aria-label="${esc8(ds ? `${nm} — ${ds}` : nm)}">${face}</div>`;
+  const card2 = radio ? `<button type="button" class="pass goal-choice" role="radio" aria-checked="${on}" tabindex="${on || !S.draft?.primaryGoal && i === 0 ? 0 : -1}" data-action="pickGoal" data-id="${goal}" data-mode="${mode}" aria-label="${esc9(`${pick(g.label)} — ${pick(g.description)}`)}">${face}</button>` : action ? `<button type="button" class="pass" data-action="${action}" data-id="${goal}" data-mode="${mode}" aria-label="${esc9(ds ? `${nm} — ${ds}` : nm)}">${face}</button>` : `<div class="pass" data-mode="${mode}" role="img" aria-label="${esc9(ds ? `${nm} — ${ds}` : nm)}">${face}</div>`;
   return `<div class="hang${S.drop ? " is-drop" : ""}${on ? " is-on" : ""}" data-goal="${goal}" data-i="${i}" data-slot="${slot}"><div class="strap" aria-hidden="true"><span class="strap-print">PATH PATH PATH PATH PATH PATH PATH PATH</span></div>${CLIP}<div class="card-wrap"><span class="card-shadow" aria-hidden="true"></span>${card2}</div></div>`;
 }
 var sec = (title, sub, body, cls = "") => `<section class="sec${cls ? ` ${cls}` : ""}"><div class="sec-h"><h2>${title}</h2>${sub ? `<span>${sub}</span>` : ""}</div>${body}</section>`;
@@ -6574,9 +6820,9 @@ function demoBadge(o) {
   if (o?.source === "live") return `<span class="badge">${state.lang === "en" ? "Official job posting" : "공식 채용 공고"}</span>`;
   return `<span class="badge">${t("demo")}</span>`;
 }
-var liveLink = (o) => o?.source === "live" && o.url ? `<p><a href="${esc8(o.url)}" target="_blank" rel="noopener noreferrer">${state.lang === "en" ? "View original posting (opens in new tab)" : "원문 공고 보기 (새 탭)"}</a></p>` : "";
+var liveLink = (o) => o?.source === "live" && o.url ? `<p><a href="${esc9(o.url)}" target="_blank" rel="noopener noreferrer">${state.lang === "en" ? "View original posting (opens in new tab)" : "원문 공고 보기 (새 탭)"}</a></p>` : "";
 var findJobEntry = (id) => (jobsFeed.snapshot().jobs || []).find((j) => j.id === id) || (session.document()?.savedJobs || []).find((j) => j.id === id);
-var oppRow = (o) => `<li><button type="button" class="row" data-action="detail" data-id="${esc8(o.id)}"><span><b>${demoBadge(o)}${esc8(pick(o.title))}</b><small>${esc8(pick(o.summary))}</small></span><span class="row-go" aria-hidden="true">${ICON2.arrow}</span></button></li>`;
+var oppRow = (o) => `<li><button type="button" class="row" data-action="detail" data-id="${esc9(o.id)}"><span><b>${demoBadge(o)}${esc9(pick(o.title))}</b><small>${esc9(pick(o.summary))}</small></span><span class="row-go" aria-hidden="true">${ICON2.arrow}</span></button></li>`;
 var TABS = ["today", "channels", "univ", "explore", "prepare", "help", "profile"].filter((p) => (p !== "univ" || STUDY_ON) && (p !== "channels" || CHANNEL_ON));
 var UNIV_PAGES = ["cond", "univDetail", "univCompare"];
 function shell(main) {
@@ -6615,13 +6861,13 @@ function onboard() {
     const cards = GOALS.map((g3, i) => hang(g3.id, { i, slot: ["left", "mid", "right"][i], radio: true, on: d.primaryGoal === g3.id })).join("");
     const g2 = goalById(d.primaryGoal);
     return `<main class="ob" id="main"><div class="ob-title">${notices(true)}<h1 class="title page-title" id="q1" tabindex="-1"><span>${t("obT1")}</span> <span class="title-2">${t("obT2")}</span></h1></div>
-<div class="ob-lead"><p class="lead" id="ob-lead" aria-live="polite">${g2 ? `<b class="lead-pick">${esc8(pick(g2.label))}</b>${esc8(pick(g2.note))}` : t("obLead")}</p></div>
+<div class="ob-lead"><p class="lead" id="ob-lead" aria-live="polite">${g2 ? `<b class="lead-pick">${esc9(pick(g2.label))}</b>${esc9(pick(g2.note))}` : t("obLead")}</p></div>
 <div class="stage ob-stage${d.primaryGoal ? " has-pick" : ""}" role="radiogroup" aria-label="${t("q1")}"><div class="rod" aria-hidden="true"></div>${cards}</div>
 <div class="ob-actions"><button type="button" class="btn" data-action="finish"${d.primaryGoal ? "" : " disabled"}>${t("startCard")} ${ICON2.arrow}</button><button type="button" class="link" data-action="skip">${t("browse")}</button>${state.onboarded ? `<button type="button" class="link" data-action="cancelOnboard">${t("cancel")}</button>` : ""}</div>
 <p class="fine ob-fine">${t("obFine")}${d.primaryGoal ? ` <button type="button" class="link link-sm" data-action="step2">${t("fineTune")}</button>` : ""}</p></main>`;
   }
   const g = goalById(d.primaryGoal);
-  const chips = (list, key) => list.map((x) => `<button type="button" class="chip" aria-pressed="${d[key].includes(x.id)}" data-action="toggle" data-key="${key}" data-id="${x.id}">${esc8(pick(x.label))}</button>`).join("");
+  const chips = (list, key) => list.map((x) => `<button type="button" class="chip" aria-pressed="${d[key].includes(x.id)}" data-action="toggle" data-key="${key}" data-id="${x.id}">${esc9(pick(x.label))}</button>`).join("");
   const locs = ["abroad", "korea", "unknown"].map((l) => `<option value="${l}"${d.location === l ? " selected" : ""}>${t(l)}</option>`).join("");
   return `<main class="ob2" id="main"><div class="ob2-card">${hang(g.id, { slot: "mid" })}</div><div class="ob2-main">${notices(true)}<p class="eyebrow">${t("step2")}</p><h1 class="title page-title" tabindex="-1"><span>${t("q2")}</span> <span class="title-2">${t("q2lead")}</span></h1>
 <fieldset class="field"><legend>${t("interests")}</legend><div class="chips">${chips(g.interests, "interests")}</div></fieldset>
@@ -6631,7 +6877,7 @@ function onboard() {
 }
 function stamps(states, descs) {
   const names = ["j1", "j2", "j3"];
-  return `<ol class="stamps" aria-label="${t("stampsLabel")}">${states.map((s, i) => `<li class="stamp is-${s}"${s === "now" ? ' aria-current="step"' : ""}><span class="slot" aria-hidden="true">${s === "done" ? seal(i) : s === "now" ? t("sNow") : `<span class="slot-num">${i + 1}</span>`}</span><h3>${t(names[i])} <span class="stamp-state">${t(s === "done" ? "sDone" : s === "now" ? "sNow" : "sNext")}</span></h3><p>${esc8(descs[i])}</p></li>`).join("")}</ol>`;
+  return `<ol class="stamps" aria-label="${t("stampsLabel")}">${states.map((s, i) => `<li class="stamp is-${s}"${s === "now" ? ' aria-current="step"' : ""}><span class="slot" aria-hidden="true">${s === "done" ? seal(i) : s === "now" ? t("sNow") : `<span class="slot-num">${i + 1}</span>`}</span><h3>${t(names[i])} <span class="stamp-state">${t(s === "done" ? "sDone" : s === "now" ? "sNow" : "sNext")}</span></h3><p>${esc9(descs[i])}</p></li>`).join("")}</ol>`;
 }
 function today() {
   const g = goalById(state.primaryGoal);
@@ -6639,7 +6885,7 @@ function today() {
     const cards = GOALS.map((x, i) => hang(x.id, { i, slot: ["left", "mid", "right"][i], action: "exploreGoal" })).join("");
     return `<main class="home" id="main"><aside class="stage home-stage is-three" aria-label="${t("pickCard")}"><div class="rod" aria-hidden="true"></div>${cards}<div class="home-cap"><span></span><button type="button" class="link" data-action="changeGoal">${t("pickCard")}</button></div></aside>
 <div class="home-main">${notices()}<p class="eyebrow">${t("today")}</p><h1 class="title page-title" tabindex="-1"><span>${t("nT1")}</span> <span class="title-2">${t("nT2")}</span></h1>
-<ul class="goal-list">${GOALS.map((x) => `<li><button type="button" class="goal-row" data-action="exploreGoal" data-id="${x.id}"><span class="goal-sym" data-goal="${x.id}">${SYMBOL[x.id]}</span><span class="goal-txt"><b>${esc8(pick(x.label))}</b><small>${esc8(pick(x.description))}</small></span><span class="row-go" aria-hidden="true">${ICON2.arrow}</span></button></li>`).join("")}</ul>
+<ul class="goal-list">${GOALS.map((x) => `<li><button type="button" class="goal-row" data-action="exploreGoal" data-id="${x.id}"><span class="goal-sym" data-goal="${x.id}">${SYMBOL[x.id]}</span><span class="goal-txt"><b>${esc9(pick(x.label))}</b><small>${esc9(pick(x.description))}</small></span><span class="row-go" aria-hidden="true">${ICON2.arrow}</span></button></li>`).join("")}</ul>
 ${pathHtml()}${upcomingHtml()}${newsHtml()}<div class="home-grid">${sec(t("official"), t("offSub"), officialList("all"))}${sec(t("tools"), "", toolRows())}</div></div></main>`;
   }
   const mine = state.tasks.filter((x) => x.goal === g.id);
@@ -6651,11 +6897,11 @@ ${pathHtml()}${upcomingHtml()}${newsHtml()}<div class="home-grid">${sec(t("offic
   let card2;
   if (task) {
     const so = oppById(task.sourceId);
-    card2 = `<section class="resume" aria-label="${t("resume")}"><div><span class="resume-k">${t("resume")}</span><span class="resume-t">${so ? `${demoBadge(so)}${esc8(pick(so.title))}` : t("missing")}</span><span class="resume-s"><i aria-hidden="true"></i>${t("resumeS")}</span></div><button type="button" class="btn" data-action="openTask" data-id="${esc8(task.id)}">${t("resume")} ${ICON2.arrow}</button></section>`;
+    card2 = `<section class="resume" aria-label="${t("resume")}"><div><span class="resume-k">${t("resume")}</span><span class="resume-t">${so ? `${demoBadge(so)}${esc9(pick(so.title))}` : t("missing")}</span><span class="resume-s"><i aria-hidden="true"></i>${t("resumeS")}</span></div><button type="button" class="btn" data-action="openTask" data-id="${esc9(task.id)}">${t("resume")} ${ICON2.arrow}</button></section>`;
   } else if (allDone) {
     card2 = `<section class="resume is-done"><div><span class="resume-k">${t("nextStep")}</span><span class="resume-t">${t("doneNext")}</span></div><div class="resume-acts"><button type="button" class="btn" data-action="exploreGoal" data-id="${g.id}">${t("exploreMore")} ${ICON2.arrow}</button><button type="button" class="link" data-action="nav" data-page="prepare">${t("viewPrep")}</button></div></section>`;
   } else {
-    card2 = `<section class="resume is-start"><div><span class="resume-k">${t("nextStep")}</span><span class="resume-t">${esc8(pick(g.homeTitle))}</span><span class="resume-s">${esc8(pick(g.steps[0]))}</span></div><button type="button" class="btn" data-action="exploreGoal" data-id="${g.id}">${esc8(pick(g.homeAction))} ${ICON2.arrow}</button></section>`;
+    card2 = `<section class="resume is-start"><div><span class="resume-k">${t("nextStep")}</span><span class="resume-t">${esc9(pick(g.homeTitle))}</span><span class="resume-s">${esc9(pick(g.steps[0]))}</span></div><button type="button" class="btn" data-action="exploreGoal" data-id="${g.id}">${esc9(pick(g.homeAction))} ${ICON2.arrow}</button></section>`;
   }
   const opps = OPPORTUNITIES.filter((o) => o.goal === g.id).slice(0, 2);
   const off = g.id === "job" && jobsFeed.snapshot().status === "disabled" ? `<p class="off"><i aria-hidden="true"></i>${t("jobsOff")}</p>` : "";
@@ -6666,12 +6912,12 @@ ${stamps(st, g.steps.map(pick))}${card2}${g.id === "study" && STUDY_ON ? renderS
 }
 function officialList(goal) {
   const list = OFFICIAL_LINKS.filter((l) => goal === "all" || l.goal === goal || l.goal === null);
-  return `<ul class="rows">${list.map((l) => `<li><a class="row" href="${esc8(l.url)}" target="_blank" rel="noopener noreferrer"><span><b><span class="badge official">${t("officialBadge")}</span>${esc8(pick(l.title))}</b><small>${esc8(pick(l.summary))} · ${t("checked")} ${esc8(l.checkedAt)}</small></span><span class="row-go" aria-hidden="true">${ICON2.out}</span><span class="sr-only"> (${t("openNew")})</span></a></li>`).join("")}</ul>`;
+  return `<ul class="rows">${list.map((l) => `<li><a class="row" href="${esc9(l.url)}" target="_blank" rel="noopener noreferrer"><span><b><span class="badge official">${t("officialBadge")}</span>${esc9(pick(l.title))}</b><small>${esc9(pick(l.summary))} · ${t("checked")} ${esc9(l.checkedAt)}</small></span><span class="row-go" aria-hidden="true">${ICON2.out}</span><span class="sr-only"> (${t("openNew")})</span></a></li>`).join("")}</ul>`;
 }
-var toolRows = () => `<ul class="rows">${EXISTING_TOOLS.map((x) => `<li><a class="row" href="${esc8(x.url)}" target="_blank" rel="noopener noreferrer"><span><b>${esc8(pick(x.title))}</b><small>${esc8(pick(x.summary))}</small></span><span class="row-go" aria-hidden="true">${ICON2.out}</span><span class="sr-only"> (${t("openNew")})</span></a></li>`).join("")}</ul>`;
+var toolRows = () => `<ul class="rows">${EXISTING_TOOLS.map((x) => `<li><a class="row" href="${esc9(x.url)}" target="_blank" rel="noopener noreferrer"><span><b>${esc9(pick(x.title))}</b><small>${esc9(pick(x.summary))}</small></span><span class="row-go" aria-hidden="true">${ICON2.out}</span><span class="sr-only"> (${t("openNew")})</span></a></li>`).join("")}</ul>`;
 function explore() {
   const f = S.filter;
-  const filt = ["all", ...GOALS.map((g) => g.id)].map((id) => `<button type="button" class="chip" aria-pressed="${f === id}" data-action="filter" data-id="${id}">${id === "all" ? t("all") : esc8(pick(goalById(id).description))}</button>`).join("");
+  const filt = ["all", ...GOALS.map((g) => g.id)].map((id) => `<button type="button" class="chip" aria-pressed="${f === id}" data-action="filter" data-id="${id}">${id === "all" ? t("all") : esc9(pick(goalById(id).description))}</button>`).join("");
   const list = OPPORTUNITIES.filter((o) => f === "all" || o.goal === f);
   const full = S.compare.length >= 3;
   let h = head(t("exploreTitle"), t("explore"), "", t("exploreT2"));
@@ -6680,11 +6926,11 @@ function explore() {
   h += `<details class="practice"${S.practiceOpen ? " open" : ""}><summary><span>${t("practice")}</span><small>${t("demoSub")}</small></summary><p class="meta">${t("demoNote")}</p>`;
   h += `<ul class="rows opp-rows">${list.map((o) => {
     const on = S.compare.includes(o.id);
-    return `<li class="opp"><div class="opp-text"><b>${demoBadge(o)}${esc8(pick(o.title))}</b><small>${esc8(pick(o.summary))}</small></div><div class="opp-acts"><button type="button" class="btn-line" data-action="detail" data-id="${o.id}">${t("details")}</button><button type="button" class="chip" aria-pressed="${on}" data-action="compare" data-id="${o.id}"${full && !on ? " disabled" : ""}>${on ? t("compareOn") : t("compareAdd")}</button></div></li>`;
+    return `<li class="opp"><div class="opp-text"><b>${demoBadge(o)}${esc9(pick(o.title))}</b><small>${esc9(pick(o.summary))}</small></div><div class="opp-acts"><button type="button" class="btn-line" data-action="detail" data-id="${o.id}">${t("details")}</button><button type="button" class="chip" aria-pressed="${on}" data-action="compare" data-id="${o.id}"${full && !on ? " disabled" : ""}>${on ? t("compareOn") : t("compareAdd")}</button></div></li>`;
   }).join("")}</ul>`;
   if (full) h += `<p class="meta">${t("compareMax")}</p>`;
   if (S.compare.length) {
-    h += `<div class="sec-h compare-h"><h2>${t("compareTitle")} (${S.compare.length}/3)</h2><button type="button" class="text-button" data-action="clearCompare">${t("clearCompare")}</button></div><div class="compare-grid">${S.compare.map(oppById).map((o) => `<div class="compare-item">${demoBadge(o)}<h3>${esc8(pick(o.title))}</h3><ol class="reqs">${o.requirements.map((r, i) => `<li><b>${i + 1}</b>${esc8(pick(r))}</li>`).join("")}</ol></div>`).join("")}</div>`;
+    h += `<div class="sec-h compare-h"><h2>${t("compareTitle")} (${S.compare.length}/3)</h2><button type="button" class="text-button" data-action="clearCompare">${t("clearCompare")}</button></div><div class="compare-grid">${S.compare.map(oppById).map((o) => `<div class="compare-item">${demoBadge(o)}<h3>${esc9(pick(o.title))}</h3><ol class="reqs">${o.requirements.map((r, i) => `<li><b>${i + 1}</b>${esc9(pick(r))}</li>`).join("")}</ol></div>`).join("")}</div>`;
   }
   h += "</details>";
   h += sec(t("official"), t("offSub"), officialList(f));
@@ -6693,9 +6939,9 @@ function explore() {
 function detail() {
   const o = oppById(S.oppId);
   if (!o) return head(t("missing")) + `<button type="button" class="btn-line" data-action="nav" data-page="explore">${t("backList")}</button>`;
-  return `<article class="detail"><button type="button" class="back" data-action="nav" data-page="explore">${ICON2.back}${t("backList")}</button><p class="eyebrow">${demoBadge(o)} ${esc8(pick(goalById(o.goal)?.label))}</p><h1 class="title page-title" tabindex="-1"><span>${esc8(pick(o.title))}</span></h1><p class="lead">${esc8(pick(o.summary))}</p>${liveLink(o)}
-<h2 class="h2">${t("requirements")}</h2><ol class="reqs">${o.requirements.map((r, i) => `<li><b>${i + 1}</b>${esc8(pick(r))}</li>`).join("")}</ol>
-<div class="actions"><button type="button" class="btn" data-action="${o.source === "live" ? "prepareJob" : "prepareThis"}" data-id="${esc8(o.id)}">${t("prepareThis")} ${ICON2.arrow}</button></div></article>
+  return `<article class="detail"><button type="button" class="back" data-action="nav" data-page="explore">${ICON2.back}${t("backList")}</button><p class="eyebrow">${demoBadge(o)} ${esc9(pick(goalById(o.goal)?.label))}</p><h1 class="title page-title" tabindex="-1"><span>${esc9(pick(o.title))}</span></h1><p class="lead">${esc9(pick(o.summary))}</p>${liveLink(o)}
+<h2 class="h2">${t("requirements")}</h2><ol class="reqs">${o.requirements.map((r, i) => `<li><b>${i + 1}</b>${esc9(pick(r))}</li>`).join("")}</ol>
+<div class="actions"><button type="button" class="btn" data-action="${o.source === "live" ? "prepareJob" : "prepareThis"}" data-id="${esc9(o.id)}">${t("prepareThis")} ${ICON2.arrow}</button></div></article>
 ${sec(t("official"), t("offSub"), officialList(o.goal))}`;
 }
 var statusHtml = (task) => `<span class="status" data-state="${task.confirmedAt ? "done" : "draft"}">${task.confirmedAt ? t("done") : t("draft")}</span>`;
@@ -6705,9 +6951,9 @@ function prepare() {
   for (const g of GOALS) {
     const ts = state.tasks.filter((x) => x.goal === g.id);
     if (!ts.length) continue;
-    h += sec(esc8(pick(g.label)), "", `<ul class="rows">${ts.map((x) => {
+    h += sec(esc9(pick(g.label)), "", `<ul class="rows">${ts.map((x) => {
       const so = oppById(x.sourceId);
-      return `<li><button type="button" class="row" data-action="openTask" data-id="${esc8(x.id)}"><span><b>${demoBadge(so)}${so ? esc8(pick(so.title)) : t("missing")}</b><small>${statusHtml(x)}</small></span><span class="row-go" aria-hidden="true">${ICON2.arrow}</span></button></li>`;
+      return `<li><button type="button" class="row" data-action="openTask" data-id="${esc9(x.id)}"><span><b>${demoBadge(so)}${so ? esc9(pick(so.title)) : t("missing")}</b><small>${statusHtml(x)}</small></span><span class="row-go" aria-hidden="true">${ICON2.arrow}</span></button></li>`;
     }).join("")}</ul>`);
   }
   return h;
@@ -6721,12 +6967,12 @@ function editor() {
   const st = session.status(), signed = st.signedIn;
   const savedOk = st.canEdit && !st.error;
   let h = `<main class="ed" id="main"><aside class="stage ed-stage" aria-label="${t("source")}"><div class="rod" aria-hidden="true"></div>${hang(goal, { kicker: t("srcK"), name: pick(o.title), desc: "", mode: "source" })}
-<div class="ed-src"><b>${t("source")}</b><p>${demoBadge(o)}<span>${esc8(pick(o.title))}</span></p><small>${o.source === "live" ? t("liveNote") : t("srcNote")}</small>${liveLink(o)}<button type="button" class="link" data-action="detail" data-id="${esc8(o.id)}">${t("reopen")}</button></div></aside>
+<div class="ed-src"><b>${t("source")}</b><p>${demoBadge(o)}<span>${esc9(pick(o.title))}</span></p><small>${o.source === "live" ? t("liveNote") : t("srcNote")}</small>${liveLink(o)}<button type="button" class="link" data-action="detail" data-id="${esc9(o.id)}">${t("reopen")}</button></div></aside>
 <div class="ed-main">${notices(false, true)}<button type="button" class="back" data-action="nav" data-page="prepare">${ICON2.back}${t("backPrep")}</button>
-<p class="eyebrow">${t("edEyebrow")}</p><h1 class="title page-title" tabindex="-1"><span>${esc8(pick(o.prompt))}</span></h1>
-<ol class="reqs" aria-label="${t("requirements")}">${o.requirements.map((r, i) => `<li><b>${i + 1}</b>${esc8(pick(r))}</li>`).join("")}</ol>
+<p class="eyebrow">${t("edEyebrow")}</p><h1 class="title page-title" tabindex="-1"><span>${esc9(pick(o.prompt))}</span></h1>
+<ol class="reqs" aria-label="${t("requirements")}">${o.requirements.map((r, i) => `<li><b>${i + 1}</b>${esc9(pick(r))}</li>`).join("")}</ol>
 <section class="editor"><div class="field"><label for="body" class="field-label">${t("body")}</label>
-<textarea id="body" maxlength="6000" aria-describedby="body-hint edit-err" data-action="body"${S.error === "needBody" ? ' aria-invalid="true"' : ""}>${esc8(task.body)}</textarea>
+<textarea id="body" maxlength="6000" aria-describedby="body-hint edit-err" data-action="body"${S.error === "needBody" ? ' aria-invalid="true"' : ""}>${esc9(task.body)}</textarea>
 <div class="field-meta" id="body-hint"><span class="count" id="count">${countText2(task.body)}</span>${savedOk ? `<span class="saved">${ICON2.check}${signed ? t("savedAccount") : t("savedGuest")}</span>` : ""}</div></div>
 <p id="task-status" class="task-status">${statusHtml(task)}</p>
 <label class="check"><input type="checkbox" id="ack"${task.confirmedAt ? " checked" : ""}><span class="box" aria-hidden="true">${ICON2.check}</span><span>${t("confirmCheck")}</span></label>
@@ -6735,8 +6981,8 @@ function editor() {
 ${S.flash ? `<div id="flash" class="notice flash-inline" role="status">${S.flash}</div>` : ""}<p class="fine">${t("confirmNote")}</p></section>`;
   if (task.confirmedAt) {
     const nx = getNextTask(state);
-    h += `<div id="confirmed-result" class="result"><div class="sec-h"><h2>${t("result")}</h2>${demoBadge(o)}</div><div class="result-body">${esc8(task.body)}</div>
-<div class="actions">${nx && nx.id !== task.id && !nx.confirmedAt ? `<button type="button" class="btn" data-action="openTask" data-id="${esc8(nx.id)}">${t("nextAction")} ${ICON2.arrow}</button>` : ""}<button type="button" class="btn-line" data-action="exploreGoal" data-id="${task.goal}">${t("exploreMore")}</button></div></div>`;
+    h += `<div id="confirmed-result" class="result"><div class="sec-h"><h2>${t("result")}</h2>${demoBadge(o)}</div><div class="result-body">${esc9(task.body)}</div>
+<div class="actions">${nx && nx.id !== task.id && !nx.confirmedAt ? `<button type="button" class="btn" data-action="openTask" data-id="${esc9(nx.id)}">${t("nextAction")} ${ICON2.arrow}</button>` : ""}<button type="button" class="btn-line" data-action="exploreGoal" data-id="${task.goal}">${t("exploreMore")}</button></div></div>`;
   }
   return h + "</div></main>";
 }
@@ -6762,10 +7008,10 @@ Thank you.` : `안녕하세요.
 감사합니다.`;
 }
 function help() {
-  const opts = [...GOALS.map((g) => [g.id, pick(g.label)]), ["general", t("general")]].map(([id, l]) => `<option value="${id}"${S.help === id ? " selected" : ""}>${esc8(l)}</option>`).join("");
+  const opts = [...GOALS.map((g) => [g.id, pick(g.label)]), ["general", t("general")]].map(([id, l]) => `<option value="${id}"${S.help === id ? " selected" : ""}>${esc9(l)}</option>`).join("");
   return head(t("helpTitle"), t("help"), t("helpLead"), t("helpT2")) + `<div class="field field-inline"><label for="topic" class="field-label">${t("topic")}</label><select id="topic" class="select" data-action="topic">${opts}</select></div>
 <section class="sec"><div class="sec-h"><h2>${t("template")}</h2><button type="button" class="btn-line" data-action="copy">${t("copy")}</button></div>
-${S.copyMsg ? `<p class="notice${S.copyMsg === "copyFail" ? " error" : ""}" role="status">${t(S.copyMsg)}</p>` : ""}<pre class="result-body" id="tpl">${esc8(helpTemplate(S.help))}</pre></section>
+${S.copyMsg ? `<p class="notice${S.copyMsg === "copyFail" ? " error" : ""}" role="status">${t(S.copyMsg)}</p>` : ""}<pre class="result-body" id="tpl">${esc9(helpTemplate(S.help))}</pre></section>
 ${sec(t("official"), t("offSub"), officialList(S.help === "general" ? "none" : S.help))}
 ${sec(t("tools"), t("offSub"), `<p class="meta">${t("toolsLead")}</p>${toolRows()}`)}`;
 }
@@ -6773,7 +7019,7 @@ function profile() {
   const g = goalById(state.primaryGoal);
   const accSt = session.status();
   return head(t("profileTitle"), t("profile"), "", t("profileT2")) + renderAccountPanel(accSt, state.lang, { pendingBackup: !!pendingBackup && !!accSt.canConfirmBackup && pendingBackup.owner === ownerKey(), useRemote: !!pendingBackup?.useRemote }) + `<div class="settings">
-<section class="settings-group"><h2>${t("goal")}</h2><p>${g ? esc8(pick(g.label)) : t("none")}</p><button type="button" class="btn-line" data-action="changeGoal">${t("changeGoal")}</button></section>
+<section class="settings-group"><h2>${t("goal")}</h2><p>${g ? esc9(pick(g.label)) : t("none")}</p><button type="button" class="btn-line" data-action="changeGoal">${t("changeGoal")}</button></section>
 <section class="settings-group"><h2>${t("location")}</h2><p>${t(state.location || "unknown")}</p></section>
 <section class="settings-group"><h2>${t("lang")}</h2><p>${state.lang === "en" ? "English" : "한국어"}</p></section>
 <section class="settings-group"><h2>${t("storage")}</h2>${accSt.signedIn ? `<p>${state.lang === "en" ? "Syncs to your account. Please check the save status above." : "계정에 동기화합니다. 위의 저장 상태를 확인해 주세요."}</p>` : `<p>${t("storageText")}</p><button type="button" class="btn-line danger" data-action="clear">${t("clear")}</button>`}${STUDY_ON ? studyStore() === "tab" ? `<p>${t("studyStore")}</p>` : "" : CHANNEL_ON ? `<p>${t("datesStore")}</p>` : ""}</section>${STUDY_ON && accSt.signedIn ? renderStudyAccountSettings({ lang: state.lang, phase: studyAcct.snapshot().phase, consent: studyAcct.snapshot().consent, store: studyStore(), errorCode: studyAcct.snapshot().error?.code || null }) : ""}</div>`;
@@ -6894,6 +7140,70 @@ async function trSend() {
   say(accL("번역 초안이 나왔어요. 번역본이 아니에요. 이어서 다시 몽골어로 옮겨 견줘요.", "The translation draft is ready. It is not a translation for submission. Next, it is translated back into Mongolian for a check."));
   void trRunCheck(tr);
 }
+var dcDoc = () => {
+  const t2 = S.dc && pathTarget(channelView());
+  const doc2 = t2 ? t2.set.all.find((x) => x.id === S.dc.docId && x.stage !== "visa") : null;
+  return doc2 ? { doc: doc2, src: t2.set.program, program: t2.program } : null;
+};
+var doccheck = () => {
+  const found = dcDoc();
+  return found ? renderDocCheck({ lang: state.lang, signedIn: session.status().signedIn === true, now: /* @__PURE__ */ new Date(), doc: found.doc, src: found.src, programName: found.program.name, dc: S.dc }) : "";
+};
+var dcMsg = (key) => (DC_ERROR_TEXT[key] || DC_ERROR_TEXT.unavailable)[state.lang === "en" ? 1 : 0];
+var newDc = (docId) => ({ owner: ownerKey(), docId, text: "", age: null, guardian: false, agree: false, phase: "edit", error: null, notice: null, remaining: null, rows: null, marks: /* @__PURE__ */ new Set(), seq: 0 });
+async function dcSend() {
+  const dc = S.dc;
+  if (!dc || !docCheckItems(dc.docId) || !dcCanSend(dc)) return;
+  const split = splitPasted(dc.text);
+  if (split.error && split.error !== "language") {
+    dc.error = split.error;
+    render(false);
+    root.querySelector("#dc-text")?.focus();
+    say(dcMsg(split.error));
+    return;
+  }
+  let body;
+  try {
+    body = validateDocCheckRequest({
+      action: "doc_check",
+      request_id: crypto.randomUUID(),
+      doc: dc.docId,
+      lines: maskLines(split.lines).lines,
+      consent: { v: DOC_CHECK_CONSENT_VERSION, age: dc.age, guardian: dc.age === "teen", lang: state.lang === "en" ? "en" : "ko" }
+    });
+  } catch {
+    dc.notice = "unavailable";
+    render(false);
+    root.querySelector('[data-action="dcSend"]')?.focus();
+    say(dcMsg(dc.notice));
+    return;
+  }
+  const seq = ++dc.seq;
+  Object.assign(dc, { phase: "sending", error: null, notice: null });
+  render(false);
+  root.querySelector("#dc-wait")?.focus();
+  say(accL("글에서 찾는 중이에요. 이 화면을 열어 두세요.", "Looking through the text. Keep this screen open."));
+  let reply = null, failed = null;
+  try {
+    reply = validateDocCheckReply(await session.translate(body), dc.docId, body.lines.length);
+  } catch (err) {
+    failed = err;
+  }
+  if (S.dc !== dc || dc.seq !== seq || dc.owner !== ownerKey()) return;
+  if (reply && reply.remaining !== null) dc.remaining = reply.remaining;
+  if (failed || reply.status !== "done") {
+    dc.phase = "edit";
+    dc.notice = failed ? ["NETWORK", "INVALID_DOC_CHECK_REPLY", "INVALID_RESPONSE"].includes(failed.code) ? "lost" : "unavailable" : reply.status;
+    render(false);
+    root.querySelector('[data-action="dcSend"]')?.focus();
+    say(dcMsg(dc.notice));
+    return;
+  }
+  Object.assign(dc, { phase: "done", rows: docCheckRows(dc.docId, reply.items, split.lines) });
+  render(false);
+  root.querySelector("#dc-result")?.focus();
+  say(accL("글에서 찾은 줄이 나왔어요. 대학의 확인이 아니에요. 종이 서류와 맞춰 보세요.", "The lines found in the text are ready. This is not a check by the university. Compare with the paper document."));
+}
 function trFocusTarget(el) {
   if (!el || !root.contains(el) || el.id || !el.getAttribute("data-action")) return null;
   const parts = ["data-action", "data-page", "data-id"].filter((a) => el.getAttribute(a) !== null).map((a) => [a, el.getAttribute(a)]);
@@ -6909,9 +7219,9 @@ function trRender() {
 }
 var TR_RETURN_KEY = "synk-path-translate-return";
 var TR_RETURN_MS = 10 * 60 * 1e3;
-var trReturnSet = (id) => {
+var trReturnSet = (id, to) => {
   try {
-    tabStorage()?.setItem(TR_RETURN_KEY, JSON.stringify({ id, at: Date.now() }));
+    tabStorage()?.setItem(TR_RETURN_KEY, JSON.stringify(to ? { id, at: Date.now(), to } : { id, at: Date.now() }));
   } catch {
   }
 };
@@ -6921,7 +7231,7 @@ var trReturnClear = () => {
   } catch {
   }
 };
-var TR_WAIT_PAGES = ["today", "onboard", "profile", "studyConsent", "translate"];
+var TR_WAIT_PAGES = ["today", "onboard", "profile", "studyConsent", "translate", "doccheck"];
 function trReturnGet() {
   let raw = null;
   try {
@@ -6932,27 +7242,36 @@ function trReturnGet() {
   if (raw === null) return null;
   try {
     const v = JSON.parse(raw), age = Date.now() - v.at;
-    if (typeof v.id === "string" && Number.isFinite(age) && age >= 0 && age <= TR_RETURN_MS && translateKindOf(v.id)) return v.id;
+    const known = typeof v.id === "string" && (v.to === "doccheck" ? docCheckItems(v.id) : v.to === void 0 && translateKindOf(v.id));
+    if (known && Number.isFinite(age) && age >= 0 && age <= TR_RETURN_MS) return { id: v.id, to: v.to === "doccheck" ? "doccheck" : "translate" };
   } catch {
   }
   trReturnClear();
   return null;
 }
 function trResume() {
-  if (S.page === "translate") {
+  if (S.page === "translate" || S.page === "doccheck") {
     if (session.status().signedIn) trReturnClear();
     return false;
   }
-  if (S.tr || S.page !== "today" || !session.status().signedIn || !session.document()?.state || !state.onboarded) return false;
-  const id = trReturnGet();
-  if (!id || studyLocked() || studyAcct.snapshot().phase === "loading") return false;
+  if (S.tr || S.dc || S.page !== "today" || !session.status().signedIn || !session.document()?.state || !state.onboarded) return false;
+  const back = trReturnGet();
+  if (!back || studyLocked() || studyAcct.snapshot().phase === "loading") return false;
   trReturnClear();
-  S.tr = newTr(id);
-  if (!trDoc()) {
-    S.tr = null;
-    return false;
+  if (back.to === "doccheck") {
+    S.dc = newDc(back.id);
+    if (!dcDoc()) {
+      S.dc = null;
+      return false;
+    }
+  } else {
+    S.tr = newTr(back.id);
+    if (!trDoc()) {
+      S.tr = null;
+      return false;
+    }
   }
-  S.page = "translate";
+  S.page = back.to;
   return true;
 }
 async function trRunCheck(tr) {
@@ -6979,7 +7298,7 @@ async function trRunCheck(tr) {
   const n = tr.rows.filter((r) => r.verdict === "differs" || r.verdict === "unsure").length;
   say(reply.compared ? accL(`견주기를 마쳤어요. 뜻이 달라 보이는 줄 ${n}곳.`, `Check finished. ${n} line(s) may differ in meaning.`) : accL("자동 대조를 하지 못했어요. 원문과 다시 옮긴 몽골어를 직접 견줘 보세요.", "The automatic check did not run. Compare the original and the back-translation yourself."));
 }
-var PAGES = { today, path, channels, post, univ, univDetail, univCompare, cond, explore, detail, prepare, editor, help, profile, studyConsent, translate };
+var PAGES = { today, path, channels, post, univ, univDetail, univCompare, cond, explore, detail, prepare, editor, help, profile, studyConsent, translate, doccheck };
 var LOCKED_ACTIONS = ["pickGoal", "step2", "toggle", "finish", "skip", "prepareThis", "confirm", "body", "loc", "setLang", "changeGoal", "prepareJob", "saveJob", "removeJob"];
 function render(focus = true) {
   if (composingEl && root.contains(composingEl) && document.activeElement === composingEl) {
@@ -6996,11 +7315,22 @@ function render(focus = true) {
     const had = S.tr.phase !== "edit" || S.tr.text;
     if (had) {
       S.tr = null;
-      if (S.page === "translate") S.flash = esc8(trMsg("account"));
+      if (S.page === "translate") S.flash = esc9(trMsg("account"));
     } else S.tr = newTr(S.tr.docId);
   }
   if (S.page === "translate" && (!S.tr || !trDoc())) {
     S.tr = null;
+    S.page = STUDY_ON ? "path" : "today";
+  }
+  if (S.dc && S.dc.owner !== ownerKey()) {
+    const had = S.dc.phase !== "edit" || S.dc.text;
+    if (had) {
+      S.dc = null;
+      if (S.page === "doccheck") S.flash = esc9(dcMsg("account"));
+    } else S.dc = newDc(S.dc.docId);
+  }
+  if (S.page === "doccheck" && (!S.dc || !dcDoc())) {
+    S.dc = null;
     S.page = STUDY_ON ? "path" : "today";
   }
   if (trResume()) focus = true;
@@ -7069,6 +7399,11 @@ function go(page) {
     if (S.tr?.phase === "draft" && !confirm(state.lang === "en" ? "Leaving this page deletes the draft. It is not stored anywhere. Leave?" : "이 화면을 떠나면 초안이 지워져요. 어디에도 저장하지 않아요. 떠날까요?")) return;
     if (S.tr?.phase === "sending" && !confirm(state.lang === "en" ? "The draft is still being made. If you leave, it is discarded and one of today’s 10 may still be used. Leave?" : "초안을 만드는 중이에요. 지금 떠나면 초안은 버려지고 오늘 한 장이 쓰일 수 있어요. 떠날까요?")) return;
     S.tr = null;
+    trReturnClear();
+  } else if (S.page === "doccheck" && page !== "doccheck") {
+    if (S.dc?.phase === "done" && !confirm(accL("이 화면을 떠나면 찾은 줄과 붙여 넣은 글이 지워져요. 어디에도 저장하지 않아요. 떠날까요?", "Leaving this page deletes the result and the pasted text. They are not stored anywhere. Leave?"))) return;
+    if (S.dc?.phase === "sending" && !confirm(accL("글에서 찾는 중이에요. 지금 떠나면 결과는 버려지고 오늘 한 번이 쓰일 수 있어요. 떠날까요?", "The search is still running. If you leave, the result is discarded and one of today’s 10 may still be used. Leave?"))) return;
+    S.dc = null;
     trReturnClear();
   } else if (!TR_WAIT_PAGES.includes(page)) trReturnClear();
   S.drop = MOTION && page !== S.page && (page === "onboard" || page === "today");
@@ -7154,7 +7489,7 @@ var ACT = {
   },
   nav: (el) => {
     if (el.dataset.page === "channels") S.channelId = null;
-    if (el.dataset.page !== "today" && S.page !== "translate") trReturnClear();
+    if (el.dataset.page !== "today" && S.page !== "translate" && S.page !== "doccheck") trReturnClear();
     go(el.dataset.page);
   },
   univOpen(el) {
@@ -7295,6 +7630,41 @@ var ACT = {
     if (!translateKindOf(id)) return;
     S.tr = newTr(id);
     go("translate");
+  },
+  dcOpen(el) {
+    S.dc = newDc(el.dataset.id);
+    if (!dcDoc()) {
+      S.dc = null;
+      return;
+    }
+    go("doccheck");
+  },
+  dcLeave() {
+    go(STUDY_ON ? "path" : "today");
+  },
+  dcSend: () => dcSend(),
+  dcEdit() {
+    if (S.dc?.phase !== "done") return;
+    Object.assign(S.dc, { phase: "edit", rows: null, notice: null, seq: S.dc.seq + 1 });
+    render(false);
+    root.querySelector("#dc-text")?.focus();
+  },
+  dcFresh() {
+    if (S.dc?.phase !== "done") return;
+    Object.assign(S.dc, { phase: "edit", rows: null, notice: null, text: "", agree: false, guardian: false, seq: S.dc.seq + 1 });
+    render(false);
+    root.querySelector("#dc-text")?.focus();
+  },
+  // 면접 연습은 다른 쪽이다. 같은 탭에서 옮겨야 로그인이 이어진다. 넘기는 것은 고른 과정과 TOPIK 급수뿐이다.
+  interviewOpen(el) {
+    const program = el.dataset.id;
+    if (!Object.hasOwn(INTERVIEW_PROGRAMS, program)) return;
+    const topik = studyProfile().topik;
+    try {
+      tabStorage()?.setItem("synk-path-interview", JSON.stringify({ program, topik: Number.isInteger(topik) ? topik : 0 }));
+    } catch {
+    }
+    location.assign("../interview/study/");
   },
   trLeave() {
     go(STUDY_ON ? "path" : "today");
@@ -7778,6 +8148,7 @@ Object.assign(ACT, {
   },
   accountSignIn: async () => {
     if (S.page === "translate" && S.tr) trReturnSet(S.tr.docId);
+    else if (S.page === "doccheck" && S.dc && docCheckItems(S.dc.docId)) trReturnSet(S.dc.docId, "doccheck");
     try {
       if (!await session.signIn()) trReturnClear();
     } catch (err) {
@@ -7793,6 +8164,7 @@ Object.assign(ACT, {
       }
     }
     const studyId = studyAcctId;
+    trReturnClear();
     const r = await session.signOut();
     if (!accOk(r)) {
       render(false);
@@ -7936,14 +8308,14 @@ root.addEventListener("click", (e) => {
   if (!el || el.disabled || !ACT[el.dataset.action]) return;
   if (STUDY_WRITE_ACTS.has(el.dataset.action) && studyLocked()) {
     const m = studyStoreNote();
-    S.flash = esc8(m);
+    S.flash = esc9(m);
     render(false);
     say(m);
     return;
   }
   const fail5 = (err) => {
     const m = getAccountErrorMessage(err, state.lang);
-    S.flash = esc8(m);
+    S.flash = esc9(m);
     render(false);
     say(m);
   };
@@ -8010,12 +8382,27 @@ root.addEventListener("input", (e) => {
     }
     return;
   }
+  if (e.target.dataset.action === "dcText") {
+    if (!S.dc || S.dc.phase === "sending") return;
+    S.dc.text = e.target.value;
+    const cnt = root.querySelector("#dc-count");
+    if (cnt) cnt.textContent = countText(S.dc.text, state.lang === "en");
+    const btn2 = root.querySelector('[data-action="dcSend"]');
+    if (btn2) btn2.disabled = !dcCanSend(S.dc);
+    if (S.dc.error) {
+      S.dc.error = null;
+      e.target.removeAttribute("aria-invalid");
+      e.target.setAttribute("aria-describedby", "dc-count");
+      root.querySelector("#dc-err")?.remove();
+    }
+    return;
+  }
   if (e.target.dataset.action === "studyInput") {
     try {
       studyInput(e.target);
     } catch (err) {
       const m = getAccountErrorMessage(err, state.lang);
-      S.flash = esc8(m);
+      S.flash = esc9(m);
       render(false);
       say(m);
     }
@@ -8066,6 +8453,23 @@ root.addEventListener("change", (e) => {
     S.copyMsg = null;
     render(false);
     root.querySelector("#topic")?.focus();
+  } else if (S.dc && a === "dcMark") {
+    const i = Number(e.target.dataset.value);
+    if (Number.isInteger(i) && i >= 0) {
+      const key = dcMarkKey(state.lang, i);
+      if (e.target.checked) S.dc.marks.add(key);
+      else S.dc.marks.delete(key);
+    }
+  } else if (S.dc && S.dc.phase !== "sending" && ["dcAge", "dcGuardian", "dcAgree"].includes(a)) {
+    if (a === "dcAge" && ["adult", "teen", "under14"].includes(e.target.value)) {
+      S.dc.age = e.target.value;
+      if (S.dc.age !== "teen") S.dc.guardian = false;
+      if (S.dc.age === "under14") S.dc.agree = false;
+    } else if (a === "dcGuardian") S.dc.guardian = !!e.target.checked;
+    else if (a === "dcAgree") S.dc.agree = !!e.target.checked;
+    const id = e.target.id;
+    render(false);
+    if (id) root.querySelector("#" + id)?.focus();
   } else if (S.tr && S.tr.phase !== "sending" && ["trKind", "trAge", "trGuardian", "trAgree"].includes(a)) {
     if (a === "trKind" && translateKindChoice(S.tr.docId) && ["grad", "transcript"].includes(e.target.value)) S.tr.kind = e.target.value;
     else if (a === "trAge" && ["adult", "teen", "under14"].includes(e.target.value)) {
@@ -8112,7 +8516,7 @@ S.draft = newDraft();
 render(false);
 void session.init().catch((err) => {
   const m = getAccountErrorMessage(err, state.lang);
-  S.flash = esc8(m);
+  S.flash = esc9(m);
   render(false);
   say(m);
 }).finally(() => {

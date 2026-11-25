@@ -1,0 +1,40 @@
+{
+  "schemaVersion": 1,
+  "generator": "tools/prepare-path-study-interview-public.mjs",
+  "liveModules": [
+    "../film-player.mjs",
+    "../voice.mjs",
+    "../whisper-model.mjs",
+    "../film/strict-vr.mjs",
+    "../film/speech-turn.mjs",
+    "../film/rehearsal-session.mjs"
+  ],
+  "sources": {
+    "experiences/path-app/document.mjs": "2fe10316bbfe549fb0cfa408c9135610d982cf213106193eb873b894bc4de16d",
+    "experiences/path-app/interview-shape.mjs": "8873bf0b5e3c00ca25741a14b8cbbcebf7c694b1475be22748533eca8e54e4b8",
+    "experiences/path-app/state.mjs": "7c1d5f16e6a020a63cddac0244da34ded7a78b127c08f2b817ee44eccd11f5a7",
+    "experiences/path-vr/interview/study/account.mjs": "80ccb2586dfda9c034da1633973f63c0511a843bdd298ff2b167f115e863a27c",
+    "experiences/path-vr/interview/study/app.mjs": "8665e120559453826da7138debce4029d4344512622c4f13c765d3bc1ebcac81",
+    "experiences/path-vr/interview/study/consent-mn.mjs": "b3744e434d50ace03a6d635038d18c5c1900c29b58b229534f421d427d56c681",
+    "experiences/path-vr/interview/study/index.html": "f0ddc7cc33e81f48838233f0a7532ce1ce9097985f64a814b161e6b0da509756",
+    "experiences/path-vr/interview/study/session.mjs": "d259a736d4dbde885b1bc49b2c4c99ba722335cbd00eb641d028e0fc3fd398d0",
+    "experiences/path-vr/interview/study/study.css": "6fb0ac8d30b816d9a1f484172f0f5b1725da79109b16d707e359eabbae8aa3ec",
+    "experiences/synk-account/src/core.mjs": "fa34a9fb4c8715282f481c17c33428ae0d8bfe12ecb9d6d7d0a8d725c7a094b8",
+    "experiences/synk-account/src/platform-entry.mjs": "48f39e2c57949005c5abe197b546e3518b8f3421e11b2b7b8786033b2e2712ac",
+    "experiences/synk-account/src/product-account.mjs": "5d5e0beebf3f9e510f40acb35de01dba25fc847c290168471516155593b0e7b5"
+  },
+  "files": {
+    "index.html": {
+      "bytes": 10477,
+      "sha256": "bf8528d5b83504fe4aee6e448bda8b469b10180df845c5475df4896947bcc1d3"
+    },
+    "app.mjs": {
+      "bytes": 103598,
+      "sha256": "6912b6ac30ccd5f8dcd05e339e9314cf289f4aa7b6a676bf22cf82d53f45fd17"
+    },
+    "study.css": {
+      "bytes": 2897,
+      "sha256": "6fb0ac8d30b816d9a1f484172f0f5b1725da79109b16d707e359eabbae8aa3ec"
+    }
+  }
+}
