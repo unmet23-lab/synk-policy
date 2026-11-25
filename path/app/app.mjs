@@ -6894,10 +6894,66 @@ async function trSend() {
   say(accL("번역 초안이 나왔어요. 번역본이 아니에요. 이어서 다시 몽골어로 옮겨 견줘요.", "The translation draft is ready. It is not a translation for submission. Next, it is translated back into Mongolian for a check."));
   void trRunCheck(tr);
 }
+function trFocusTarget(el) {
+  if (!el || !root.contains(el) || el.id || !el.getAttribute("data-action")) return null;
+  const parts = ["data-action", "data-page", "data-id"].filter((a) => el.getAttribute(a) !== null).map((a) => [a, el.getAttribute(a)]);
+  if (!parts.every(([, v]) => /^[\w-]+$/.test(v))) return null;
+  const sel = parts.map(([a, v]) => `[${a}="${v}"]`).join("");
+  const at = [...root.querySelectorAll(sel)].indexOf(el);
+  return at < 0 ? null : { sel, at };
+}
 function trRender() {
-  const ae = document.activeElement, act = ae && root.contains(ae) && !ae.id ? ae.getAttribute("data-action") : null;
+  const target = trFocusTarget(document.activeElement);
   render(false);
-  if (act) root.querySelector(`[data-action="${act}"]`)?.focus();
+  if (target) [...root.querySelectorAll(target.sel)][target.at]?.focus();
+}
+var TR_RETURN_KEY = "synk-path-translate-return";
+var TR_RETURN_MS = 10 * 60 * 1e3;
+var trReturnSet = (id) => {
+  try {
+    tabStorage()?.setItem(TR_RETURN_KEY, JSON.stringify({ id, at: Date.now() }));
+  } catch {
+  }
+};
+var trReturnClear = () => {
+  try {
+    tabStorage()?.removeItem(TR_RETURN_KEY);
+  } catch {
+  }
+};
+var TR_WAIT_PAGES = ["today", "onboard", "profile", "studyConsent", "translate"];
+function trReturnGet() {
+  let raw = null;
+  try {
+    raw = tabStorage()?.getItem(TR_RETURN_KEY) ?? null;
+  } catch {
+    return null;
+  }
+  if (raw === null) return null;
+  try {
+    const v = JSON.parse(raw), age = Date.now() - v.at;
+    if (typeof v.id === "string" && Number.isFinite(age) && age >= 0 && age <= TR_RETURN_MS && translateKindOf(v.id)) return v.id;
+  } catch {
+  }
+  trReturnClear();
+  return null;
+}
+function trResume() {
+  if (S.page === "translate") {
+    if (session.status().signedIn) trReturnClear();
+    return false;
+  }
+  if (S.tr || S.page !== "today" || !session.status().signedIn || !session.document()?.state || !state.onboarded) return false;
+  const id = trReturnGet();
+  if (!id || studyLocked() || studyAcct.snapshot().phase === "loading") return false;
+  trReturnClear();
+  S.tr = newTr(id);
+  if (!trDoc()) {
+    S.tr = null;
+    return false;
+  }
+  S.page = "translate";
+  return true;
 }
 async function trRunCheck(tr) {
   if (!tr?.sent || !tr.drafts) return;
@@ -6947,6 +7003,7 @@ function render(focus = true) {
     S.tr = null;
     S.page = STUDY_ON ? "path" : "today";
   }
+  if (trResume()) focus = true;
   const accSt = session.status();
   const ae = document.activeElement;
   const keepId = !focus && ae && root.contains(ae) ? ae.id : "";
@@ -7012,7 +7069,8 @@ function go(page) {
     if (S.tr?.phase === "draft" && !confirm(state.lang === "en" ? "Leaving this page deletes the draft. It is not stored anywhere. Leave?" : "이 화면을 떠나면 초안이 지워져요. 어디에도 저장하지 않아요. 떠날까요?")) return;
     if (S.tr?.phase === "sending" && !confirm(state.lang === "en" ? "The draft is still being made. If you leave, it is discarded and one of today’s 10 may still be used. Leave?" : "초안을 만드는 중이에요. 지금 떠나면 초안은 버려지고 오늘 한 장이 쓰일 수 있어요. 떠날까요?")) return;
     S.tr = null;
-  }
+    trReturnClear();
+  } else if (!TR_WAIT_PAGES.includes(page)) trReturnClear();
   S.drop = MOTION && page !== S.page && (page === "onboard" || page === "today");
   S.page = page;
   S.flash = null;
@@ -7096,6 +7154,7 @@ var ACT = {
   },
   nav: (el) => {
     if (el.dataset.page === "channels") S.channelId = null;
+    if (el.dataset.page !== "today" && S.page !== "translate") trReturnClear();
     go(el.dataset.page);
   },
   univOpen(el) {
@@ -7718,7 +7777,13 @@ Object.assign(ACT, {
     say(S.flash);
   },
   accountSignIn: async () => {
-    await session.signIn();
+    if (S.page === "translate" && S.tr) trReturnSet(S.tr.docId);
+    try {
+      if (!await session.signIn()) trReturnClear();
+    } catch (err) {
+      trReturnClear();
+      throw err;
+    }
   },
   accountSignOut: async () => {
     if (studyAcct.snapshot().pending) {
@@ -8052,6 +8117,7 @@ void session.init().catch((err) => {
   say(m);
 }).finally(() => {
   studySettled = true;
+  if (["signed-out", "unconfigured"].includes(session.status().accountStatus)) trReturnClear();
   if (syncStudyOwner()) render(false);
 });
 void jobsFeed.load();

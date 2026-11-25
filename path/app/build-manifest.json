@@ -51,7 +51,7 @@
     },
     {
       "file": "experiences/path-app/app.mjs",
-      "sha256": "eaff8f923c8dc424eaef35ca3beab84139d49e8128d7e0165b5c57331cc65ea6"
+      "sha256": "0526b2c3a5e90de728daa85a1b9ce06a94586fb56ea93b25289d2f0a0c22141c"
     },
     {
       "file": "experiences/path-app/channel-data.mjs",
@@ -149,8 +149,8 @@
   "files": [
     {
       "name": "app.mjs",
-      "bytes": 527580,
-      "sha256": "ac53abc0c787bb1b9aa75920e6438680852a3c9fb812f466843cf08f2c01d5c5"
+      "bytes": 529787,
+      "sha256": "c029eacb540d8b3c3bf77ce1b67ad359532a2e00d162c06ce9cf557e5613c579"
     },
     {
       "name": "assets/SUIT-Variable.woff2",
@@ -205,7 +205,7 @@
     {
       "name": "index.html",
       "bytes": 3578,
-      "sha256": "33577c6923a3d61bf3fbd1c4bd88112490c1905446896ca40eeb3f37d9529533"
+      "sha256": "0b52b43997626542682bef4d7b5f71dd7dfecc928d42d2c0f8c549fc7cef857a"
     }
   ],
   "transformations": [
