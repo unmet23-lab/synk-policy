@@ -521,3 +521,5 @@ p{text-wrap:pretty}
 .gal-tabs button[aria-pressed="true"]:focus-visible,.door:focus-visible{outline-offset:-6px}
 .ask-links>.ask-out{margin:0;font:600 16px/1.5 var(--sans)}
 .ask-links>.ask-out:empty{position:absolute}
+@media (max-width:374px){.pf-get a{grid-template-columns:minmax(0,1fr) auto;row-gap:8px}.pf-get small{grid-column:1;grid-row:2}.pf-get .arr{grid-column:2;grid-row:1/3}}
+@media (max-width:389px){html[lang="en"] .pf-get a{grid-template-columns:minmax(0,1fr) auto;row-gap:8px}html[lang="en"] .pf-get small{grid-column:1;grid-row:2}html[lang="en"] .pf-get .arr{grid-column:2;grid-row:1/3}}
