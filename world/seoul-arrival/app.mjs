@@ -1362,13 +1362,13 @@ async function crowdScene({n=0,t2=false,tr=false}={}){
     :[{lab:'1화 끝',seats:[...P.slice(was.n,next.n),...(next.t2&&!was.t2?[F[0]]:[]),...(next.tr&&!was.tr?[F[1]]:[])]}].filter(b=>b.seats.length);
   const total=next.n+(next.t2?1:0)+(next.tr?1:0);
   if(!beats.length){
-    lab.textContent=L('1화 끝');count.textContent=total?L('말한 줄 {n}개',{n:total}):L('오늘은 들어 본 날이에요');
+    lab.textContent=L('1화 끝');count.textContent=total?L('팬 {n}명',{n:total}):L('오늘은 들어 본 날이에요');
     drawCinema(litSeats(H,next),[]);foot.classList.add('on');return;
   }
   let shown=first?[]:litSeats(H,was),said=first?0:total-beats[0].seats.length,opening=true;
   for(const b of beats){
     if(run!==crowdRun)return;
-    said+=b.seats.length;lab.textContent=L(b.lab);plus.textContent='+'+b.seats.length;void plus.offsetWidth;count.textContent=L('말한 줄 {n}개',{n:said});
+    said+=b.seats.length;lab.textContent=L(b.lab);plus.textContent='+'+b.seats.length;void plus.offsetWidth;count.textContent=L('팬 {n}명',{n:said});
     plus.classList.remove('on');drawCinema(shown,b.seats,!opening);opening=false;shown=[...shown,...b.seats];
     const hasFriend=b.seats.some(s=>F.includes(s));
     await sleep(reduce?300:900+b.seats.length*650+(hasFriend?1500:500));
@@ -1546,7 +1546,9 @@ function ccGo(i,quiet){
   ccSpot(s.fan);sayLine($('#ccWho'),$('#ccSay'),$('#ccMean'),s,state.dream,quiet);
   [...$('#ccProg').children].forEach((el,k)=>{const b=el.firstChild;b.getAnimations().forEach(a=>a.cancel());b.style.transform=k<i||(k===i&&(reduce||last))?'scaleX(1)':'scaleX(0)';
     if(k===i&&!reduce&&!last)b.animate([{transform:'scaleX(0)'},{transform:'scaleX(1)'}],{duration:5200,easing:'linear',fill:'forwards'});});
-  $('#ccHint').textContent=L(last?'화면을 누르면 처음부터':'화면을 누르면 다음 팬');$('#ccHint').hidden=CC.says.length<2;
+  const hint=$('#ccHint'),solo=CC.says.length<2;hint.textContent=L(last?'화면을 누르면 처음부터':'화면을 누르면 다음 팬');
+  // 팬이 한 명이면 안내 단추가 사라진다. 자판 초점이 그 단추에 있었으면 「내 길로」로 넘긴다
+  if(solo&&document.activeElement===hint)$('#backPath').focus({preventScroll:true});hint.hidden=solo;
   if(!quiet)SND.sfx('pix_notification',.15);
   const run=CC.run,tick=CC.tick;if(!reduce&&!last)crowdLater(()=>{if(run===crowdRun&&CC.on&&CC.tick===tick)ccGo(i+1);},5200);
 }
