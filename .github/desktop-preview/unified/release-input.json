@@ -2,9 +2,9 @@
   "schemaVersion": 1,
   "product": "platform",
   "channel": "preview",
-  "version": "0.5.11",
-  "releaseId": "platform-preview-0.5.11",
-  "buildId": "20261125.5",
+  "version": "0.5.12",
+  "releaseId": "platform-preview-0.5.12",
+  "buildId": "20261126.2",
   "manifestUrl": "https://synk.im/desktop/releases/preview.json",
   "baselines": [
     {
@@ -63,7 +63,7 @@
     }
   ],
   "electronVersion": "44.10.0",
-  "sourceHash": "bd22365ff592a5472222e5678de7123fff510998d3ac6e2f6465e0331297d3a0",
+  "sourceHash": "169afa24bb7867c469cd31a6dd0ecb30bf7a665b1b979cc821269e59594d6e43",
   "sourceFiles": [
     {
       "path": "assets/launcher/button.webp",
@@ -346,9 +346,14 @@
       "sha256": "86e4e6a2c084b762ca12af71ee59b8b97d0d84035fb2042ce0e1cd48e4f9d78f"
     },
     {
+      "path": "renderer/office-chat-model.mjs",
+      "bytes": 12576,
+      "sha256": "b9cfa241b4509edbad9e818761ed13f10bc3b8cf51c47f152a2b1822d74601b1"
+    },
+    {
       "path": "renderer/office-floor.mjs",
-      "bytes": 56673,
-      "sha256": "5761d3329d52316203b17438977ccee6b85c6f5b60947405896c908fc481ab9e"
+      "bytes": 78179,
+      "sha256": "d8534bd66c782373b3c06e7b39224cec97c595c62d6f2ccf8246c97ca3c2ca41"
     },
     {
       "path": "renderer/office-mail-model.mjs",
@@ -377,8 +382,8 @@
     },
     {
       "path": "renderer/office-model.mjs",
-      "bytes": 32110,
-      "sha256": "1d9733f478f41f49799ef5fe9a5827281a788b099503d749bc7402964dcd880e"
+      "bytes": 34746,
+      "sha256": "3520bf5a1ae9a223c9e4296b676e2ca6b453e1f086e2b6d582b5144331fac7db"
     },
     {
       "path": "renderer/office-quote-handoff-view.mjs",
@@ -387,33 +392,33 @@
     },
     {
       "path": "renderer/office-room.mjs",
-      "bytes": 52505,
-      "sha256": "736d4d18d3a3517d406f4980862a4327124c08ca71ee00b9dfbbe8fcfd3bab69"
+      "bytes": 67726,
+      "sha256": "6ccc0dbafb47fe76868c8cd5eed130c939624e5880327f8845e71c098b8d20e8"
     },
     {
       "path": "renderer/office-task-room.mjs",
-      "bytes": 26352,
-      "sha256": "735bfebb7b4c75b056ff1d739f7783dea2564bb35200da6c02b949480bd2ed0f"
+      "bytes": 28279,
+      "sha256": "a25ce553bdb3cc045b8b3aa5d016a80a8314b7cb3a00c3a84ced69ac40fce5ed"
     },
     {
       "path": "renderer/office-task-view.mjs",
-      "bytes": 51858,
-      "sha256": "1c9d9e184b0084fe0380551aa0711203dd1fdb9ff461dd43eca14b7ea3fa0f03"
+      "bytes": 60039,
+      "sha256": "84b33a133db7de14f789108b5dbd1a3dfe2f8a065a6f4fb119092ef76e0b69b0"
     },
     {
       "path": "renderer/orb-face-view.mjs",
-      "bytes": 176842,
-      "sha256": "de31c850ebf171e8f1ee9588ef1d52839ec7b0ecfabec35e83d58ccd62703e3a"
+      "bytes": 193686,
+      "sha256": "ba3f005081c48f6739982b9e55b3e1fedd3553fd7df658c30e9c1cf6e472295b"
     },
     {
       "path": "renderer/orb-face.css",
-      "bytes": 123837,
-      "sha256": "b0940d7cfc523b00c9a28eea9c5e83eb35d975b2c595410283aae2f3e51b67b0"
+      "bytes": 134243,
+      "sha256": "66281c8012c2a4601fcbc08edd83a6fc4977119c261958d7d7628dea63500a60"
     },
     {
       "path": "renderer/orb-face.mjs",
-      "bytes": 155967,
-      "sha256": "0fe77f668c91013173bb1c4006a67bef394e6b4e4a6052028f79a0097b5a9bb9"
+      "bytes": 156344,
+      "sha256": "cce9603b5071938bb62d14030a231052aa3f85df0b86e23c01b529f309338f30"
     },
     {
       "path": "renderer/orb-rooms.mjs",
@@ -492,8 +497,8 @@
     },
     {
       "path": "renderer/solio-queue.mjs",
-      "bytes": 21184,
-      "sha256": "07e07d8ad599b9ab0c263526326b0fb03f4cc7ecb317d2002c08c1bbcc93e211"
+      "bytes": 21591,
+      "sha256": "44b263a28144e6aa4b1e6b8348926598464228baea134f6dc42751a237bd76a5"
     },
     {
       "path": "renderer/solio-rooms.mjs",
@@ -957,8 +962,8 @@
     },
     {
       "path": "src/office-store.cjs",
-      "bytes": 31576,
-      "sha256": "03344ecfec41ab83edd40dd619ddf91cbb084caa5c121c298f90122b8fde2747"
+      "bytes": 34334,
+      "sha256": "4a337a4361667d4d8bff2e295134fc7f5ace0838f12642b7c4049920951bab77"
     },
     {
       "path": "src/office-task-claude-hook.cjs",
@@ -1067,8 +1072,8 @@
     },
     {
       "path": "src/preload.cjs",
-      "bytes": 29974,
-      "sha256": "051df1893fbc9009521d3ea073e496af1b92e07bcaab342b371081252de744ab"
+      "bytes": 30745,
+      "sha256": "c5211b4a1a187f5d7e6fecb32b55630f9bab0669e63e7c9deb19dd76762c2b63"
     },
     {
       "path": "src/product-main.cjs",
