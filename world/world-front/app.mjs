@@ -2,6 +2,7 @@
  * 화면은 host가 api.show(state)로 정한다. 약속은 HOST.md에 있다. 부모 창에 host가 없으면 dev-host.mjs의 가짜 host로 혼자 돈다.
  * 시안의 주소 값 판 · 우표 결 · 바탕 결 ed · 나중 판 · 옛 끝 글은 걷었다. 시안의 알림 자리는 host 부르기로 바꿨다. */
 import {T} from './strings.mjs';
+import {mountClub, mountTutorDay, mountNote, tutorLabel, tutorFace} from './club.mjs';
 
 const SND = '../seoul-arrival/assets/snd/';        // 방 소리 · 초침 · 새벽(서울행과 같은 파일)
 const NOTE = '../seoul-arrival/assets/img/note1.webp';   // 엄마 쪽지(서울행과 같은 파일)
@@ -14,6 +15,9 @@ const J = true, PHOTO = true;   // 뼈대 판 · 사진 결만 남겼다. 시안
 let state = null, L = {}, LANG = 'ko';
 const P = {v: 'end', front: false, dream: 'idol', who: 'login', pc: false, lang: 'ko', hangul: 'ask', after: false, goal: '', step: '', prev: '', still: false};
 let STUDENT = {name: '', en: '', cy: '', call: '', from: '', face: '', crop: null, card: ''}, SEOHA = '서하';
+// 동아리 튜터(club.mjs, 11-24): 고른 튜터가 맞춤 화면의 말하는 사람이 된다. 밤 · 새벽 판의 이야기 말은 그대로 서하다. host가 club을 안 주면 앞 값을 둔다
+let CLUB = {tutor: null, note: null}, TUTOR = {name: '서하', face: null};
+const tutorFaceStyle = () => TUTOR.face ? `background-image:url(${TUTOR.face.url});background-size:${TUTOR.face.size};background-position:${TUTOR.face.pos}` : 'background-image:url(assets/seoha.webp)';
 const GOALKEYS = ['travel', 'people', 'life', 'work', 'culture', 'exam'];
 function syncP() {
   const s = state || {}, view = ['end', 'off', 'more', 'day2', 'front'].includes(s.view) ? s.view : 'end';
@@ -36,6 +40,8 @@ function syncP() {
   const st = s.student || {}, name = String(st.name || '');
   STUDENT = {name, en: st.nameEn || name, cy: st.nameCy || st.nameEn || name, call: st.call || '', from: st.from || '', face: st.face || '', crop: st.faceCrop || null, card: st.card || ''};
   SEOHA = '서하' + (STUDENT.call ? ' ' + STUDENT.call : '');
+  if (s.club && typeof s.club === 'object') CLUB = s.club;
+  TUTOR = CLUB.tutor && CLUB.tutor !== 'seoha' ? {name: tutorLabel(CLUB.tutor, STUDENT.call), face: tutorFace(CLUB.tutor)} : {name: SEOHA, face: null};
   document.body.dataset.dream = P.dream;
   document.body.classList.toggle('still', P.still);
   document.documentElement.lang = P.lang;
@@ -360,7 +366,7 @@ function homeView() {
     const pcLine = plan.line ? plan.line : P.after ? josa(plan.title, '다음은 ‘{t}’이에요', '다음은 ‘{t}’예요') : plan.title === '첫 인사 세 마디' ? '처음 만나는 사람에게 ‘{t}’부터 해요' : '오늘은 ‘{t}’부터 해요';
     lead = P.pc
       ? `${day2 && goalName() && !isHangul(plan) ? `<p class="who pcg">${choseLine()}</p>` : ''}<h1 class="lede">${speech(pcLine, {t: plan.title})}${sub(pcLine, {t: plan.title})}</h1>`   // PC: 서하 이름 줄이 없어 고른 목표 · 바꾸기를 따로 한 줄
-      : `<p class="who"><span class="face" style="background-image:url(assets/seoha.webp)" aria-hidden="true"></span><b>${esc(SEOHA)}</b>${day2 && goalName() && !isHangul(plan) ? choseLine() : ''}</p><h1 class="lede">${speech(line, {t: plan.title})}${sub(line, {t: plan.title})}</h1>`;
+      : `<p class="who"><span class="face" style="${tutorFaceStyle()}" aria-hidden="true"></span><b>${esc(TUTOR.name)}</b>${day2 && goalName() && !isHangul(plan) ? choseLine() : ''}</p><h1 class="lede">${speech(line, {t: plan.title})}${sub(line, {t: plan.title})}</h1>`;
   }
   const opts = optionsFor();
   return `<section class="view home ${time} ${P.pc ? 'pc' : ''} jm" aria-label="${esc(ui('맞춤'))}">
@@ -584,6 +590,7 @@ function render() {
   // 글꼴이 다 온 뒤 한 번 더 맞춘다. 넘김 등장 움직임(translateY 4%)이 도는 중이면 끝난 뒤에 잰다 — 도중에 재면 세운 폰 위 사진이 약 33px 커져
   // 내 위치 칸 줄이 시작 단추 뒤로 밀렸다(시안 10z6에도 있던 일: 「지금 더 연습하기」로 넘어온 몽골어 판)
   fitToday(); document.fonts?.ready?.then(() => { const v = app.querySelector('.view'), an = v ? v.getAnimations().filter(a => a.playState === 'running') : []; if (an.length) Promise.all(an.map(a => a.finished.catch(() => {}))).then(() => fitToday()); else fitToday(); });
+  clubNote();   // 동아리장 · 튜터 알림(club.mjs)
 }
 // 10t: 넓은 화면 맞춤은 넘칠 때만 줄인다 — 가운데 띠 → 위 여백 → 글 한 단계(.tight) 차례
 let fitRaf = 0;
@@ -821,10 +828,37 @@ document.addEventListener('keydown', e => {   // 10g: 판이 열린 동안 Tab�
 });
 app.addEventListener('click', e => { const s = e.target.closest('.sheet'); if (s && e.target === s) closeSheet(); });
 
+/* ── 동아리장 알림 · 튜터(club.mjs, 11-24) ── 처음 만남은 view 'club'(host가 정한다), 그 뒤 튜터 알림은 맞춤 화면 위 작은 얼굴로 */
+let clubNoteNow = null, clubNoteKey = '', clubOpen = null;
+function openClub(next) {
+  clubNoteNow?.dispose(); clubNoteNow = null; clubOpen?.stop?.();
+  if (next.club && typeof next.club === 'object') CLUB = next.club;
+  // 다리가 다음 화면을 못 주면(null): 앞면을 그린 적이 있으면 그 화면, 서울행에서 바로 온 처음 만남이면 「지금 더 하기」 화면을 받아 그린다
+  clubOpen = mountClub({host, state: {...next, lang: LANG}, sfx, calm, onDone: n => { clubOpen = null; if (n) show(n); else if (state) { syncP(); render(); } else void call('more').then(show); }});
+}
+// 알림을 내렸다 · 열었다는 화면 안의 CLUB과 state.club에 함께 적는다(다시 그릴 때 syncP가 옛 알림을 되살리지 않게)
+const setClub = c => { CLUB = c; if (state) state = {...state, club: c}; };
+function clubNote() {
+  const note = CLUB.note, want = !!note && !clubOpen && !P.pc && (P.v === 'more' || (P.front && !P.step));
+  const key = want ? [note.code, note.who, note.slots?.token || '', note.slots?.skillId || '', LANG].join('|') : '';
+  if (key && key === clubNoteKey && clubNoteNow?.alive?.()) return;   // 같은 알림이면 다시 그려도 그대로(내려오는 중이면 마저 내려온다)
+  clubNoteNow?.dispose(); clubNoteNow = null; clubNoteKey = key;
+  if (!want) return;
+  clubNoteNow = mountNote({state: {lang: LANG, note}, sfx, calm, docked: !note.drop || QUIET, onDrop: () => { setClub({...CLUB, note: {...note, drop: false}}); call('clubSeen', {dropped: true}); },
+    onOpen: () => {
+      clubNoteNow = null; call('clubSeen', {opened: true});
+      if (note.kind === 'club') { openClub({...state, view: 'club'}); return; }
+      setClub({...CLUB, note: null});
+      // 오늘 할 일 사진은 이 폴더에 실은 것만(없는 열쇠는 r-union — 맞춤 화면 카드와 같다)
+      const day = note.slots?.photo ? {...note, slots: {...note.slots, photo: photoKey(note.slots.photo)}} : note;
+      clubOpen = mountTutorDay({host, state: {lang: LANG, note: day}, sfx, calm, onDone: n => { clubOpen = null; if (n) show(n); }});
+    }});
+}
 /* ── host와 주고받기(HOST.md) ── */
 function flush() { if (PENDING && !TRANS) { const n = PENDING; PENDING = null; show(n); } }
 function show(next) {
   if (!next || typeof next !== 'object') return;
+  if (next.view === 'club') { if (['ko', 'en', 'mn'].includes(next.lang)) LANG = next.lang; if ('reduced' in next) P.still = !!next.reduced; openClub(next); return; }   // 동아리장 처음 만남(club.mjs)
   if (TRANS) { PENDING = next; return; }
   const prev = state;
   if (!prev) { take(next); syncP(); render(); return; }
