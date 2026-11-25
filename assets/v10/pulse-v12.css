@@ -3,7 +3,7 @@
    바닥: 11-04 크롤링 평균 — 작품이 화면 87~100%, 글자 3~4단, 단추 · 칸 · 둥글림 없음, 작은 글은 귀퉁이, 전환 0.7~1.2초 · 손 반응 0.2~0.3초.
    11-06 디자인 참고 장부 평균: 제목 자간 −0.012em 안팎(한글은 0), 한글 본문 17px, 직사각 단추, 고정폭은 숫자에만.
    검은 칸(시사실 · 작품 · 영상 제작 · AI 모델 · 만드는 사람) → 인화지 의뢰 띠 → 흰 문의 칸(site.css 그대로). */
-@font-face{font-family:'SYNK Pulse Serif';src:url('/assets/v10/serif-pulse-v12.woff2?v=2a9614b6cc78') format('woff2');font-weight:300;font-display:swap}
+@font-face{font-family:'SYNK Pulse Serif';src:url('/assets/v10/serif-pulse-v12.woff2?v=3ea2457a07a0') format('woff2');font-weight:300;font-display:swap}
 .pv-hall,.pv-dark{--ink:#f2efe9;--ink-2:rgba(242,239,233,.72);--ink-3:rgba(242,239,233,.6);--ink-4:rgba(242,239,233,.48);--line:rgba(242,239,233,.16);--line-2:rgba(242,239,233,.3);--pv-bg:#0a0a0b;background:var(--pv-bg);color:var(--ink-2);color-scheme:dark}
 .pv-dark :focus-visible,.pv-hall :focus-visible{outline-color:#f2efe9}
 .pv-serif{font-family:'SYNK Pulse Serif','Noto Serif KR','Nanum Myeongjo',serif;font-weight:300;letter-spacing:0;color:var(--ink);text-wrap:balance}
