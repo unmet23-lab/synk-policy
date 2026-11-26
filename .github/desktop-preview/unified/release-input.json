@@ -2,9 +2,9 @@
   "schemaVersion": 1,
   "product": "platform",
   "channel": "preview",
-  "version": "0.5.12",
-  "releaseId": "platform-preview-0.5.12",
-  "buildId": "20261126.2",
+  "version": "0.5.13",
+  "releaseId": "platform-preview-0.5.13",
+  "buildId": "20261126.4",
   "manifestUrl": "https://synk.im/desktop/releases/preview.json",
   "baselines": [
     {
@@ -63,7 +63,7 @@
     }
   ],
   "electronVersion": "44.10.0",
-  "sourceHash": "169afa24bb7867c469cd31a6dd0ecb30bf7a665b1b979cc821269e59594d6e43",
+  "sourceHash": "47617aec366c159e86b02c7796019e01772431a66bd63a3adf6c3bd81dbbff25",
   "sourceFiles": [
     {
       "path": "assets/launcher/button.webp",
@@ -337,8 +337,8 @@
     },
     {
       "path": "renderer/office-bizplan-room.mjs",
-      "bytes": 10629,
-      "sha256": "628d3129f17769ff403953f3c8da6bc02c5757f7b88cf395b66f2a4f253aaf44"
+      "bytes": 10784,
+      "sha256": "cbcf1bcf85ff6d4da367957a5beacd9b5062ca8647030716427480b111ce1c46"
     },
     {
       "path": "renderer/office-bizplan-view.mjs",
@@ -352,8 +352,13 @@
     },
     {
       "path": "renderer/office-floor.mjs",
-      "bytes": 78179,
-      "sha256": "d8534bd66c782373b3c06e7b39224cec97c595c62d6f2ccf8246c97ca3c2ca41"
+      "bytes": 84840,
+      "sha256": "f0ec64fa06a2e01ded7467d597fcf2adf2bb541973d1d523297e68a416f81781"
+    },
+    {
+      "path": "renderer/office-greet.mjs",
+      "bytes": 9194,
+      "sha256": "138fe2228bef83729e88c341f778b93c58dbf778811a52d6162cc09bd925904c"
     },
     {
       "path": "renderer/office-mail-model.mjs",
@@ -382,8 +387,8 @@
     },
     {
       "path": "renderer/office-model.mjs",
-      "bytes": 34746,
-      "sha256": "3520bf5a1ae9a223c9e4296b676e2ca6b453e1f086e2b6d582b5144331fac7db"
+      "bytes": 35235,
+      "sha256": "58b0c44bfcdac97c4b69a54d28e08b9189721bda190b13f126ef4f4192700d57"
     },
     {
       "path": "renderer/office-quote-handoff-view.mjs",
@@ -392,8 +397,8 @@
     },
     {
       "path": "renderer/office-room.mjs",
-      "bytes": 67726,
-      "sha256": "6ccc0dbafb47fe76868c8cd5eed130c939624e5880327f8845e71c098b8d20e8"
+      "bytes": 69276,
+      "sha256": "a1a411189e0ffd4ec445bf3c92f3258d393a8a39b9a4731ad84c5ccc336501f3"
     },
     {
       "path": "renderer/office-task-room.mjs",
@@ -407,23 +412,23 @@
     },
     {
       "path": "renderer/orb-face-view.mjs",
-      "bytes": 193686,
-      "sha256": "ba3f005081c48f6739982b9e55b3e1fedd3553fd7df658c30e9c1cf6e472295b"
+      "bytes": 198368,
+      "sha256": "8c85f74dba2ac2ddfa983741c763addb429526773b8abd449bf92882cf5d445f"
     },
     {
       "path": "renderer/orb-face.css",
-      "bytes": 134243,
-      "sha256": "66281c8012c2a4601fcbc08edd83a6fc4977119c261958d7d7628dea63500a60"
+      "bytes": 139621,
+      "sha256": "f9cb8b2de473f1020a5f3d14c69c52e02f73e981b9483f751cb37b1a49e4115f"
     },
     {
       "path": "renderer/orb-face.mjs",
-      "bytes": 156344,
-      "sha256": "cce9603b5071938bb62d14030a231052aa3f85df0b86e23c01b529f309338f30"
+      "bytes": 156787,
+      "sha256": "e98dc58d75c8074c4c5510054e530105d36d78ef3e3cba1324a864461e0a0f49"
     },
     {
       "path": "renderer/orb-rooms.mjs",
-      "bytes": 70543,
-      "sha256": "91cdb283d90b9f6236a287c988147cf497e4087a20d947b4d0c7c3607af1ea79"
+      "bytes": 70236,
+      "sha256": "cf03a97b69bdb3572c0b949e8e96855da963db796894d0d18c2802959e2937fd"
     },
     {
       "path": "renderer/orb-signature.mjs",
@@ -453,7 +458,7 @@
     {
       "path": "renderer/portal-entry-state.mjs",
       "bytes": 38612,
-      "sha256": "779beb6a56395db36be2bb0062cf74f7fcf6d903e9be267e4f637c62a8aeba6a"
+      "sha256": "c1c0975d4d701d087850c5e1421e630564ad6618bbaffa50fe6e7d53b4193c6d"
     },
     {
       "path": "renderer/portal-entry.css",
@@ -492,23 +497,23 @@
     },
     {
       "path": "renderer/solio-brief.mjs",
-      "bytes": 68341,
-      "sha256": "a4a2b413d37c7067c507bbbeff975a85911d4db34605d2869bd8a59eec119477"
+      "bytes": 76650,
+      "sha256": "2ae81892ee19df10ba655474e2fcdcdd4b1fba5f137fd69bfed8bb6109d7a020"
     },
     {
       "path": "renderer/solio-queue.mjs",
-      "bytes": 21591,
-      "sha256": "44b263a28144e6aa4b1e6b8348926598464228baea134f6dc42751a237bd76a5"
+      "bytes": 21562,
+      "sha256": "70294da94d5b39db356b904ed8fc5cd8b8d7fb790155cc329aa2406e1dbe0216"
     },
     {
       "path": "renderer/solio-rooms.mjs",
-      "bytes": 130175,
-      "sha256": "d4f8fe46873cd6793852d0c598fdb6b9751bc4c18abccf901ddf2d91385fa84e"
+      "bytes": 129594,
+      "sha256": "41428b840fedb1d6039cd8acbeeebd6c4c5bd4965eceb2aee4db2afb24dee7b2"
     },
     {
       "path": "renderer/solio-today.mjs",
-      "bytes": 35975,
-      "sha256": "4cce58339e71cc4c21c86923f691cbe55b3ef33b3f9e53c80def32533e5fea9b"
+      "bytes": 35955,
+      "sha256": "11548e60b38d59786a515cf90e84171ae34749082776af596a8dd63f789e5caf"
     },
     {
       "path": "renderer/solio.mjs",
@@ -537,13 +542,13 @@
     },
     {
       "path": "renderer/subscriptions-model.mjs",
-      "bytes": 78007,
-      "sha256": "37d5539787c0535a7d392e5aebb6548f99f2bda8d69293a9c6bb24d03ee94129"
+      "bytes": 78414,
+      "sha256": "4e0ccc56478994520f8ef3b7d60595ad9c8738471955d517658b80086b286726"
     },
     {
       "path": "renderer/subscriptions-tokens.mjs",
-      "bytes": 16894,
-      "sha256": "b54bc02e7c3c53b22f9364abfdaffdea7379786963e03d538a87861461c0973c"
+      "bytes": 17057,
+      "sha256": "5b7e8f86fcd7d58a20bdbcce837a02b7bd3895b3cc1cc92e45aa9c2a9547239f"
     },
     {
       "path": "renderer/town-records-card.mjs",
@@ -572,13 +577,13 @@
     },
     {
       "path": "src/ai-subscriptions.cjs",
-      "bytes": 39908,
-      "sha256": "5152f3020d5d355750076f797ff1ddc0e37ae5a6554a591668240635d66f2759"
+      "bytes": 41764,
+      "sha256": "c3c147a7a2bcfc2ec69530925714b88a08d1370c3e4f2ffefbda3e15cfb59b81"
     },
     {
       "path": "src/ai-tokens.cjs",
-      "bytes": 59521,
-      "sha256": "dd4dbc8e4fc234b8dfa397440104c1a074b9aa0f65bd7c59bebaafc0788e1e03"
+      "bytes": 60256,
+      "sha256": "25a596f6d802359d302b448dc2fb71bd38d80c4cf95b522766149aead8a5e2c7"
     },
     {
       "path": "src/ai-usage.cjs",
@@ -812,8 +817,8 @@
     },
     {
       "path": "src/main.cjs",
-      "bytes": 125412,
-      "sha256": "ba42a538b7ca85874714b86ab9b86d35bb72e3bad38f0ffa0c3485b896b95e0c"
+      "bytes": 125833,
+      "sha256": "66e29c521f12e3818b2eb995d03ee7ddb3e747f743009e333e97f304168cf678"
     },
     {
       "path": "src/messenger-teacher.cjs",
@@ -952,13 +957,13 @@
     },
     {
       "path": "src/office-records.cjs",
-      "bytes": 33683,
-      "sha256": "6cd6eb69ef0354b0bbba2e9185f62bfc2c2e3bd5dc4cff8678a98d9500ff0457"
+      "bytes": 35923,
+      "sha256": "5860d929eab63b868ef06870f03b9e1e718ef1c96137c84c6beb340c3d466867"
     },
     {
       "path": "src/office-schema-turn.cjs",
-      "bytes": 11764,
-      "sha256": "56dc233c9abceebd317d25fa32ae88c40f9a8bed15141578c4d14b8c79995073"
+      "bytes": 12244,
+      "sha256": "cc27ba7c16ef300e4ec56b019207b38c0e923b45e0f83ccdb934f1dc13961106"
     },
     {
       "path": "src/office-store.cjs",
@@ -1072,8 +1077,8 @@
     },
     {
       "path": "src/preload.cjs",
-      "bytes": 30745,
-      "sha256": "c5211b4a1a187f5d7e6fecb32b55630f9bab0669e63e7c9deb19dd76762c2b63"
+      "bytes": 30776,
+      "sha256": "4bb6d7dc490fa78c6fbee9961633321253adc081b8e3aac0110e99469641a58f"
     },
     {
       "path": "src/product-main.cjs",
@@ -1167,8 +1172,8 @@
     },
     {
       "path": "src/subscription-adapters/gemini.cjs",
-      "bytes": 383,
-      "sha256": "67a9705d85f0541a682562f9c079010e8f2349cd2c4581d08b255c334b52a2d1"
+      "bytes": 4497,
+      "sha256": "63763c681982734938867c381635486b5601093b13a58278d45a4d943b2cad24"
     },
     {
       "path": "src/subscription-adapters/gpt.cjs",
@@ -1192,8 +1197,8 @@
     },
     {
       "path": "src/subscription-common.cjs",
-      "bytes": 15041,
-      "sha256": "c7e345b7a7b7d90520ee7004d0159a43c9c90e5af7bb480c275824a8bb4f0035"
+      "bytes": 15104,
+      "sha256": "995f0a582ea7f14f3453ac223332f24612e1f07f17e9f53ee078490198c16527"
     },
     {
       "path": "src/subscription-credit-checks.cjs",
@@ -1202,28 +1207,28 @@
     },
     {
       "path": "src/subscription-credit-portal.cjs",
-      "bytes": 12824,
-      "sha256": "20b4d4234edcee2db77f755ff1d25705481a996359a8f1597652d91b6cdc8715"
+      "bytes": 27307,
+      "sha256": "99b7217f05518c59969ddfa0dca97c49d20557275b327d31a65d4b4b5c1610d6"
     },
     {
       "path": "src/subscription-login.cjs",
-      "bytes": 12202,
-      "sha256": "64777e180d20fbf84ca0059b77bde875d49c014cb1fdf265379e7e473572c55f"
+      "bytes": 19696,
+      "sha256": "8a52ac5fe53725988cdf7f6e76cf0064b5c4486f1175ce4dd69d8effab3a9436"
     },
     {
       "path": "src/subscription-providers.cjs",
-      "bytes": 3065,
-      "sha256": "9c54fe6e6ac94981e97ce9fa866aeaa05b40f90890b3e90bd308bd986baaa352"
+      "bytes": 2869,
+      "sha256": "3f8822e3bcf922398b5dc35ca4fb9beff1aba65f18890196ac407ad37955203c"
     },
     {
       "path": "src/subscription-runtime.cjs",
-      "bytes": 7935,
-      "sha256": "e5df171c7e6f6a463eb584d7bf813d1189b5bd7c3890cba6c1a8d3dc14ab126b"
+      "bytes": 9621,
+      "sha256": "b1147fd2f46d8a93c77b496b2490deb36511a2e64c19012f72b30800949f6053"
     },
     {
       "path": "src/subscription-shared-accounts.cjs",
-      "bytes": 2959,
-      "sha256": "fbcab3cd6d84924c98f7923fb0790730a45a94022bee52a9400308da991d7e8c"
+      "bytes": 3234,
+      "sha256": "6557ae1b8c6c1272ff581c46e50ec18f441af86375c653f8dd33c4dd4fa2f227"
     },
     {
       "path": "src/subscription-store.cjs",
