@@ -2,9 +2,9 @@
   "schemaVersion": 1,
   "product": "platform",
   "channel": "preview",
-  "version": "0.5.13",
-  "releaseId": "platform-preview-0.5.13",
-  "buildId": "20261126.4",
+  "version": "0.5.14",
+  "releaseId": "platform-preview-0.5.14",
+  "buildId": "20261126.5",
   "manifestUrl": "https://synk.im/desktop/releases/preview.json",
   "baselines": [
     {
@@ -63,7 +63,7 @@
     }
   ],
   "electronVersion": "44.10.0",
-  "sourceHash": "47617aec366c159e86b02c7796019e01772431a66bd63a3adf6c3bd81dbbff25",
+  "sourceHash": "1b0c2a0093c0e1d3dae4936b8cf2d662568136785d0e125e40bd6ca585910a14",
   "sourceFiles": [
     {
       "path": "assets/launcher/button.webp",
@@ -282,8 +282,8 @@
     },
     {
       "path": "renderer/launcher.mjs",
-      "bytes": 31263,
-      "sha256": "c5915c7e820d8fddfea2ed41521f360162ee2fd09d329206b17ee7d87306864e"
+      "bytes": 31354,
+      "sha256": "56744ae668ab0313b945e1a3cc63612f65c9d74b8d53cac448ac30e3a28858fe"
     },
     {
       "path": "renderer/library.mjs",
@@ -422,8 +422,8 @@
     },
     {
       "path": "renderer/orb-face.mjs",
-      "bytes": 156787,
-      "sha256": "e98dc58d75c8074c4c5510054e530105d36d78ef3e3cba1324a864461e0a0f49"
+      "bytes": 157989,
+      "sha256": "a2852bbaa5c7dd1784d5c8de18ae7a5dfc97113a207ded83380a6f7b7354e4d6"
     },
     {
       "path": "renderer/orb-rooms.mjs",
@@ -1102,8 +1102,8 @@
     },
     {
       "path": "src/public-apps.cjs",
-      "bytes": 1890,
-      "sha256": "0c3c299d1337cc1eebb21e8c088cf532c1b5982f552d591fe2c3cd4fda5436e2"
+      "bytes": 1865,
+      "sha256": "22a40036be3010d3d6b6c12b3eaff6e8cda80f5da89066101d98c510874e1e5d"
     },
     {
       "path": "src/pulse-app.cjs",
