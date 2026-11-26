@@ -1,522 +1,106 @@
 <!doctype html>
-<html lang="ko" data-sky="night">
+<html lang="ko">
 <head>
 <meta name="google-site-verification" content="0BvUf-mqDD6w2BHWJ4mze6k56M66_DqZ9Yf35URKfP8">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>SYNK — 한 사람에게 맞추는 AI를 만듭니다</title>
-<meta name="description" content="SYNK가 하는 일은 셋입니다. 한국어와 유학, AI 강의, 광고. 셋 모두 한 사람에게 맞추는 AI에서 나왔습니다.">
+<title>SYNK — 한국 유학, AI 강의, 광고</title>
+<meta name="description" content="끝까지 책임지는 한국 유학, 실전 AI 활용 강의, 브랜드를 드라마로 만드는 광고. SYNK가 하는 세 가지 일입니다.">
 <link rel="canonical" href="https://synk.im/">
 <link rel="alternate" hreflang="ko" href="https://synk.im/"><link rel="alternate" hreflang="en" href="https://synk.im/en/"><link rel="alternate" hreflang="mn" href="https://synk.im/mn/"><link rel="alternate" hreflang="x-default" href="https://synk.im/">
-<meta property="og:type" content="website"><meta property="og:url" content="https://synk.im/"><meta property="og:title" content="SYNK — 한 사람에게 맞추는 AI를 만듭니다"><meta property="og:description" content="SYNK가 하는 일은 셋입니다. 한국어와 유학, AI 강의, 광고. 셋 모두 한 사람에게 맞추는 AI에서 나왔습니다.">
-<meta property="og:image" content="https://synk.im/assets/v11/og/home-ko.jpg?v=0fa762dff2ae"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:image:alt" content="낮 하늘 아래 한옥 처마와 큰 글자 「싱ㅋ」, 그 아래 「사람마다 막히는 곳이 다릅니다 · 그 한 곳부터 풀어 주는 AI를 만듭니다」 — SYNK 홈페이지 첫 화면"><meta name="twitter:card" content="summary_large_image">
+<meta property="og:type" content="website"><meta property="og:url" content="https://synk.im/"><meta property="og:title" content="SYNK — 한국 유학, AI 강의, 광고"><meta property="og:description" content="끝까지 책임지는 한국 유학, 실전 AI 활용 강의, 브랜드를 드라마로 만드는 광고. SYNK가 하는 세 가지 일입니다.">
+<meta property="og:image" content="https://synk.im/assets/v12/og/home-ko.jpg?v=8b3a5bfecd12"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:image:alt" content="세 칸으로 나뉜 첫 화면. 「끝까지 책임지는 한국 유학」 마을, 「실전 AI 활용 강의」 강의장, 「브랜드를 드라마로 만드는 광고」 장면 — SYNK 홈페이지 첫 화면"><meta name="twitter:card" content="summary_large_image">
 <link rel="icon" type="image/png" sizes="16x16" href="/assets/favicon-synk-20260919-16.png"><link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon-synk-20260919-32.png"><link rel="icon" type="image/png" sizes="48x48" href="/assets/favicon-synk-20260919-48.png">
 <link rel="preload" href="/assets/v11/synk-sans-v11.woff2" as="font" type="font/woff2" crossorigin>
 <style>@font-face{font-family:'SYNK Sans';src:url(/assets/v11/synk-sans-v11.woff2) format('woff2');font-weight:100 900;font-display:swap}</style>
+<link rel="stylesheet" href="/assets/v12/home.css?v=fd3f2c3d8293">
 <script type="module" src="/assets/v10/visit-count.js?v=37cff7e301e4"></script>
 <script type="module" src="/social-conversion.js?v=07c3d1bb5c11"></script>
-<script>(()=>{const h=new Date().getHours()+new Date().getMinutes()/60;document.documentElement.dataset.sky=new URLSearchParams(location.search).get('sky')||(h>=6&&h<17?'day':(h>=17&&h<19.5)||(h>=5&&h<6)?'sunset':'night')})()</script>
-<script>(()=>{const a=document.documentElement.lang==='en'?'/en':'',m={'#atlas':a+'/atlas/','#principles':a+'/atlas/','#philosophy':a+'/atlas/','#drama':a+'/lab/#drama','#founder':a+'/founder/','#founder-quote':a+'/founder/'},go=()=>{const t=m[location.hash];if(t)location.replace(t)};go();addEventListener('hashchange',go);let moved=0;for(const e of ['wheel','touchstart','keydown','pointerdown'])addEventListener(e,()=>{moved=1},{passive:true,once:true});const settle=()=>{if(moved||!location.hash)return;let id;try{id=decodeURIComponent(location.hash.slice(1))}catch(e){return}const el=document.getElementById(id);if(el)el.scrollIntoView({block:'start',behavior:'instant'})};addEventListener('load',()=>{for(const ms of [0,400,1000,1800,2800])setTimeout(settle,ms)})})()</script>
+<script>(()=>{const a=document.documentElement.lang==='en'?'/en':'',m={'#atlas':a+'/atlas/','#principles':a+'/atlas/','#philosophy':a+'/atlas/','#drama':a+'/lab/#drama','#founder':a+'/founder/','#founder-quote':a+'/founder/'},go=()=>{const t=m[location.hash];if(t)location.replace(t)};go();addEventListener('hashchange',go);let moved=0;for(const e of ['wheel','touchstart','keydown','pointerdown'])addEventListener(e,()=>{moved=1},{passive:true,once:true});const settle=()=>{if(moved||!location.hash)return;let id;try{id=decodeURIComponent(location.hash.slice(1))}catch(e){return}const el=document.getElementById(id);if(el&&!el.closest('dialog'))el.scrollIntoView({block:'start',behavior:'instant'})};addEventListener('load',()=>{for(const ms of [0,400,1000,1800,2800])setTimeout(settle,ms)})})()</script>
 <script type="module" src="/assets/v10/site.js?v=cb64453758c6"></script>
-
-<link rel="stylesheet" href="/assets/v11/home.css?v=ec5bd430000c">
+<script type="module" src="/assets/v12/home.js?v=5ba509d7dfc1"></script>
 </head>
-<body data-tone="dark">
-<header class="nav">
-  <a class="logo" href="#gate" aria-label="SYNK 홈">synk</a>
-  <ul>
-    <li><a href="#road">한국어와 유학</a></li>
-    <li><a href="#shift">AI 강의</a></li>
-    <li><a href="#pulse">광고</a></li>
-    <li><a href="/founder/">회사</a></li>
-  </ul>
-  <span class="nav-r"><a class="lang" href="/en/" hreflang="en">EN</a><a class="lang" href="/mn/" hreflang="mn" lang="mn">MN</a><a class="me" href="/account/platform.html#home">내 홈</a><button class="menu-btn" type="button" aria-label="메뉴" aria-expanded="false"><i></i></button></span>
-</header>
+<body>
+<header class="nav"><a class="logo" href="#top" aria-label="SYNK 홈">synk</a><nav class="lang" aria-label="언어"><b aria-current="true">한글</b><a href="/en/" hreflang="en" lang="en">ENG</a><a href="/mn/" hreflang="mn" lang="mn">MN</a></nav></header>
 
-<main id="main"><span id="top" class="anchor" aria-hidden="true"></span>
-<div class="gate-wrap" id="gate" data-tone="dark">
-  <section class="gate geo" aria-label="SYNK 첫 화면">
-    <div class="gate-sky" aria-hidden="true"></div>
-    <div class="gate-type"><div class="gate-guides" aria-hidden="true"><i></i><i></i><i></i></div>
-      <div role="img" aria-label="싱크, SYNK의 한글 표기"><svg class="singk" viewBox="0 0 560 328" fill="currentColor" aria-hidden="true" focusable="false"><path class="sk-s" d="M87 8h58v30c0 46 23 76 61 103l-34 43c-29-19-52-45-66-70-15 30-36 54-64 72L8 143c49-32 79-64 79-112Z"></path><path class="sk-i" d="M222 8h58v172h-58Z"></path><g class="sk-o"><ellipse class="sk-hole" cx="157" cy="257" rx="70" ry="23"></ellipse><path fill-rule="evenodd" d="M157 192c-76 0-124 24-124 65s48 65 124 65 124-24 124-65-48-65-124-65Zm0 45c42 0 67 8 67 20s-25 20-67 20-67-8-67-20 25-20 67-20Z"></path></g><path class="sk-k" d="M326 8h226L464 312h-61l40-138H322v-54h137l16-55H326Z"></path></svg></div>
-    </div>
-    <div class="gate-roof" aria-hidden="true"></div>
-    <div class="gate-say">
-      <div>
-        <h1 class="gate-claim">사람마다 막히는 곳이 다릅니다<br><b>그 한 곳부터 풀어&nbsp;주는 AI를 만듭니다</b></h1>
-        <p class="gate-three" role="group" aria-label="SYNK가 하는 일 셋"><a href="#road">한국어와 유학</a><a href="#shift">AI 강의</a><a href="#pulse">광고</a></p>
-      </div>
-      <a class="gate-down" href="#glance">문 안으로 <span class="arr" aria-hidden="true">↓</span></a>
-    </div>
-  </section>
+<main id="main"><span id="top" class="anchor" aria-hidden="true"></span><span id="gate" class="anchor" aria-hidden="true"></span><span id="glance" class="anchor" aria-hidden="true"></span><span id="why" class="anchor" aria-hidden="true"></span><span id="business" class="anchor" aria-hidden="true"></span><span id="products" class="anchor" aria-hidden="true"></span>
+<h1 class="vh">SYNK — 끝까지 책임지는 한국 유학, 실전 AI 활용 강의, 브랜드를 드라마로 만드는 광고</h1>
+<div class="tri">
+  <article class="pn k1" id="road"><span id="lab" class="anchor" aria-hidden="true"></span><span id="path" class="anchor" aria-hidden="true"></span><span id="worlds" class="anchor" aria-hidden="true"></span><span id="world" class="anchor" aria-hidden="true"></span><span id="learner" class="anchor" aria-hidden="true"></span><span id="try" class="anchor" aria-hidden="true"></span>
+    <div class="sc"><div class="m town"><img src="/assets/v12/home/town.webp?v=2e30b27786c0" width="1040" height="1604" alt="집, 교실, 대학 정문, 회사, 카페가 한 길로 이어진 마을" fetchpriority="high"></div></div>
+    <h2><a href="/study-abroad/"><small>끝까지 책임지는</small> <b>한국 유학</b></a></h2>
+    <nav class="pins" aria-label="한국 유학의 다섯 가지 일"><div class="town"><a class="pin" style="left:19.5%;top:59.4%" href="/korean/">한국어</a><a class="pin" style="left:32.1%;top:44.7%" href="/classroom/">교실</a><a class="pin" style="left:63.5%;top:41.2%" href="/study-abroad/">유학</a><a class="pin" style="left:86%;top:51.4%" href="/job/">취업</a><a class="pin" style="left:75.6%;top:62.9%" href="/community/">모임</a></div></nav>
+  </article>
+  <article class="pn k2" id="shift">
+    <div class="sc"><div class="m hall"><img src="/assets/v12/home/hall.webp?v=7787c9231379" width="1024" height="1536" alt="강사가 청중을 보며 큰 화면을 가리키는 강의장. 화면 글은 「synk는 지금도 일합니다. 이렇게 30여 가지가 사람 없이 돕니다」"><div class="scr" aria-hidden="true"><p class="hd">synk는 지금도 일합니다</p><div class="ck"><b><span class="now">00:00</span><i class="sec">00</i></b><span class="wh">서울 지금</span></div><div class="pg"><i></i></div><ol class="jb"></ol><p class="ft">이렇게 30여 가지가 사람 없이 돕니다</p></div></div></div>
+    <h2><a href="/ai/"><small>실전</small> <b>AI 활용 강의</b></a></h2>
+  </article>
+  <article class="pn k3" id="pulse"><span id="showroom" class="anchor" aria-hidden="true"></span>
+    <div class="sc"><video src="/assets/v12/home/drama.mp4?v=27d2d50fc409" poster="/assets/v12/home/drama.webp?v=49135090ab84" width="720" height="900" muted loop playsinline preload="none" aria-label="도담중공업 홍보영상의 장면"></video></div>
+    <h2><a href="/studio/"><small>브랜드를 드라마로 만드는</small> <b>광고</b></a></h2>
+  </article>
 </div>
 
-<section class="doors" id="glance" data-tone="dark" aria-labelledby="glance-t"><span id="business" class="anchor" aria-hidden="true"></span><span id="products" class="anchor" aria-hidden="true"></span>
-  <p class="tag doors-t" id="glance-t">SYNK가 하는 일은 셋입니다</p>
-  <a class="door" href="#why">
-    <img src="/assets/v11/in-3.webp" style="object-position:57% 50%" alt="" loading="lazy">
-    <span class="door-say"><span class="door-w">한국어와 유학</span><span class="door-d">한국어 첫마디부터 한국에서의 첫 직장까지, 한 사람과 끝까지 갑니다.</span><span class="door-go">들어가 보기 <span class="arr" aria-hidden="true">→</span></span></span>
-  </a>
-  <a class="door" href="#shift">
-    <img src="/assets/v11/hall.webp" style="object-position:74% 50%" alt="" loading="lazy">
-    <span class="door-say"><span class="door-w">AI 강의</span><span class="door-d">회사를 AI로 돌리는 사람이 가르치고, 혼자 일하는 사람의 업무 앱 솔리오를 만듭니다.</span><span class="door-go">들어가 보기 <span class="arr" aria-hidden="true">→</span></span></span>
-  </a>
-  <a class="door" href="#pulse">
-    <img src="/assets/v11/door-pulse.webp" style="object-position:50% 60%;--z:1.14" alt="" loading="lazy">
-    <span class="door-say"><span class="door-w">광고</span><span class="door-d">카메라 앞에서 10년을 일한 배우가 AI 모델을 연출해 광고를 만듭니다.</span><span class="door-go">들어가 보기 <span class="arr" aria-hidden="true">→</span></span></span>
-  </a>
-  <p class="doors-why">셋 모두, 한 사람에게 맞추는 AI에서 나왔습니다.</p>
+<section class="end">
+  <p class="ask"><button type="button" data-sheet="ask" aria-haspopup="dialog">무엇이든 물어보세요</button> <a href="mailto:hello@synk.im">hello@synk.im</a></p>
+  <nav aria-label="바로 가기"><a href="/reserve/?from=synk-home&amp;lang=ko">한국 유학 사전예약</a><button type="button" data-sheet="platform" aria-haspopup="dialog">솔리오 받기</button><button type="button" data-sheet="now" aria-haspopup="dialog">새 소식</button><a href="/account/platform.html#home">내 홈</a></nav>
 </section>
+</main>
 
-<section class="why" id="why" data-tone="light" aria-labelledby="why-t"><span id="lab" class="anchor" aria-hidden="true"></span><span id="path" class="anchor" aria-hidden="true"></span><span id="worlds" class="anchor" aria-hidden="true"></span><span id="learner" class="anchor" aria-hidden="true"></span><span id="try" class="anchor" aria-hidden="true"></span>
-  <div class="why-head">
-    <p class="tag">한국어와 유학</p>
-    <h2 id="why-t">한국에서 살고 싶은 외국인은<br>이 세 가지를 지나야 합니다.<br><em>그 문턱이 TOPIK 4급입니다.</em></h2>
-    <p class="why-open"><b>2027년 2월에 문을 엽니다.</b> 지금은 사전예약을 받습니다.</p>
-    <p class="why-go"><a class="pill" href="/reserve/?from=synk-home&amp;lang=ko">사전예약하기 <span class="arr" aria-hidden="true">→</span></a></p>
-  </div>
-  <ol class="why-cards">
-    <li><img src="/assets/v11/mg-study.webp" alt="스탠드 불빛 아래 공책에 한글을 쓰는 펠트 인형 몽글. 공책에 틀린 표시가 여럿 있다." loading="lazy"><div class="why-b"><p class="why-k">한국어 교육</p><h3>4급이 쉽냐면, 그것도 아닙니다</h3><p class="why-v">36<span>%</span></p><p class="why-d">몽골에서 TOPIK II를 본 사람 가운데 3급 이상인 사람(2025, 국립국제교육원). 4급은 그보다 높습니다.</p></div></li>
-    <li><img src="/assets/v11/mg-campus.webp" alt="은행나무가 선 한국 대학 정문 앞에서 책을 안은 학생이 몽글에게 손을 흔든다." loading="lazy"><div class="why-b"><p class="why-k">유학</p><h3>4급이 없으면 일할 시간이 묶입니다</h3><p class="why-v"><small>주</small> 10<span>시간</span></p><p class="why-d">학사 3~4학년 유학생이 4급 없이 일할 수 있는 시간(법무부 기준). 4급이 있으면 주 25시간입니다.</p></div></li>
-    <li><img src="/assets/v11/mg-work.webp" alt="한국의 카페에서 앞치마를 두른 점원이 몽글에게 음료를 건넨다." loading="lazy"><div class="why-b"><p class="why-k">정착과 취업</p><h3>한국에 온 뒤까지 이어 돕는 곳은 찾기 어렵습니다</h3><p class="why-v">43.3<span>%</span></p><p class="why-d">한국에 사는 외국인이 꼽은 어려움 1위, 언어(2022 조사, 통계개발원 분석). 2위는 외로움입니다.</p></div></li>
-  </ol>
-  <div class="why-loop">
-    <div class="why-say">
-      <h3>그래서 이 세 가지를<br>한 회사에서 잇습니다</h3>
-      <p>한국어 교육은 SYNK LAB이, 유학과 정착 · 취업은 SYNK PATH가 맡습니다. 자리 잡은 선배가 다음 학생을 부릅니다.</p>
-      <p class="sns" data-sns-home><span>SNS</span><a href="https://www.instagram.com/synk.mn/" target="_blank" rel="noopener" aria-label="SYNK LAB Instagram">Instagram</a><a href="https://www.facebook.com/synkworld" target="_blank" rel="noopener" aria-label="SYNK LAB Facebook">Facebook</a></p>
-    </div>
-    <figure class="cyc" role="img" aria-label="한국어 교육에서 TOPIK 4급을 지나 유학으로, 한국에 와서 정착과 취업으로, 자리 잡은 선배가 다시 다음 학생을 부르는 한 바퀴">
-      <svg viewBox="0 0 640 570" aria-hidden="true"><defs><marker id="cyc-a" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z"/></marker></defs><path d="M408,208 Q480,230 488,304" marker-end="url(#cyc-a)"/><path d="M400,462 Q320,502 244,464" marker-end="url(#cyc-a)"/><path d="M152,308 Q160,230 228,209" marker-end="url(#cyc-a)"/></svg>
-      <div class="cyc-n n1"><p><b>한국어 교육</b><span>SYNK LAB</span></p><img src="/assets/v11/mg-study.webp" alt="" loading="lazy"></div>
-      <div class="cyc-n n2"><img src="/assets/v11/mg-campus.webp" alt="" loading="lazy"><p><b>유학</b><span>SYNK PATH</span></p></div>
-      <div class="cyc-n n3"><img src="/assets/v11/mg-work.webp" alt="" loading="lazy"><p><b>정착과 취업</b><span>SYNK PATH</span></p></div>
-      <p class="cyc-l l1">TOPIK 4급이면</p>
-      <p class="cyc-l l2">한국에 오면</p>
-      <p class="cyc-l l3">자리 잡은 선배가 다음 학생을 부른다</p>
-      <p class="cyc-c">한 학생을<br>끝까지 잇습니다</p>
-    </figure>
-  </div>
-</section>
+<footer class="foot">
+  <nav aria-label="바닥 메뉴"><a href="/founder/">회사</a><a href="/atlas/">아틀라스</a><a href="/privacy/">개인정보처리방침</a><a href="/terms/">이용약관</a><a href="/data-deletion/">데이터 삭제</a><button type="button" data-ask-record="company-biz" data-ask-q="사업자등록번호를 알려주세요." aria-haspopup="dialog">사업자 정보</button><span>© 2026 SYNK</span></nav>
+  <div class="foot-bottom"><span>방문 목적과 경로를 익명으로 집계합니다. <a href="/privacy/#visitor-stats">자세히</a></span><span>회사·사업 안내 기준일 <time class="mono" datetime="2026-11-27">2026.11.27</time></span></div>
+</footer>
+<div class="wm" aria-hidden="true"><span>synk</span></div>
 
-<section id="road" data-tone="light" aria-labelledby="one-t">
-  <div class="world-wrap">
-    <div class="world" id="world">
-      <div class="w-text w-open">
-        <p class="tag">한 사람의 길</p>
-        <h2 id="one-t">한국어 첫마디부터<br>한국에서의 첫 직장까지</h2>
-        <p class="w-key">고객은 <em>한 사람</em>입니다.</p>
-        <p>그 한 바퀴를 마을 길로 따라가 봅니다. 집, 교실, 대학, 회사, 모임이 차례로 나옵니다.</p>
-        <button type="button" class="pill" id="w-go">이 한 사람을 따라가 보기 <span class="arr" aria-hidden="true">↓</span></button>
+<dialog class="sheet sheet-stage" id="sheet-ask" aria-labelledby="ask-t">
+  <div class="st" id="questions" data-stage data-src="/assets/v12/ask-ko.json?v=713958ba89e3">
+    <header class="st-top"><span class="st-mark" aria-hidden="true">synk</span><button type="button" class="st-x" data-close>닫기 <kbd>esc</kbd></button></header>
+    <div class="st-stage">
+      <div class="st-pick">
+        <div class="st-t"><h2 id="ask-t">무엇이든 물어보세요</h2> <p>공개된 내용은 여기서 바로 답합니다. 상담과 제안은 메일로 받습니다.</p></div>
+        <div class="st-main"><p class="st-k" id="st-k" aria-live="polite">자주 묻는 질문</p><ul class="st-qs" id="st-qs" role="listbox" aria-labelledby="st-k"></ul></div>
+        <aside class="st-side"><p class="st-k">어느 사업이 궁금하세요</p><ul class="st-scopes" aria-label="어느 사업이 궁금하세요"></ul><div class="st-mail"><div class="ask-links">
+        <a href="mailto:hello@synk.im">hello@synk.im <span class="arr" aria-hidden="true">→</span></a>
+        <button type="button" id="ask-copy" data-measure="문의 메일 주소 복사">주소 복사</button>
+        <p class="ask-out" id="ask-out" role="status"></p>
+        <a href="https://docs.google.com/forms/d/e/1FAIpQLSc4Z1BdhPxMi0bWP7enSganI4xCIsTcCxRJ8EpxiWRxyVfsIg/viewform" target="_blank" rel="noopener">웹 문의 양식 <span class="arr" aria-hidden="true">↗</span></a>
+        <a href="/privacy/#website-questions">문의할 때의 개인정보 처리 <span class="arr" aria-hidden="true">→</span></a>
+      </div><p class="st-note">대화는 저장하지 않습니다. 개인정보는 적지 말아 주세요.</p></div></aside>
       </div>
-      <div class="w-layer w-map">
-        <div class="w-map-in">
-          <img src="/assets/v11/town-road.webp" alt="길 하나가 한 바퀴로 이어진 작은 마을. 길을 따라 집, 교실, 대학 정문, 회사, 카페가 차례로 서 있다. 학생 한 명이 집 앞에서 출발해 교실, 대학 정문, 회사, 카페를 차례로 지나 집으로 돌아오고, 그곳에서 새로 온 후배를 맞는다. 3D로 그린 그림이다.">
-          <svg class="w-loop" viewBox="0 0 1536 1024" preserveAspectRatio="none" aria-hidden="true"><path class="draw" pathLength="100" d="M785.0 702.0 C775.8 698.0 767.2 690.3 760.0 684.0 C752.8 677.7 747.3 674.7 742.0 664.0 C736.7 653.3 732.0 635.7 728.0 620.0 C724.0 604.3 720.0 585.8 718.0 570.0 C716.0 554.2 715.7 538.3 716.0 525.0 C716.3 511.7 717.2 500.8 720.0 490.0 C722.8 479.2 727.2 468.3 733.0 460.0 C738.8 451.7 745.5 445.8 755.0 440.0 C764.5 434.2 775.8 428.7 790.0 425.0 C804.2 421.3 821.7 421.2 840.0 418.0 C858.3 414.8 880.0 409.5 900.0 406.0 C920.0 402.5 939.2 400.0 960.0 397.0 C980.8 394.0 1001.7 389.5 1025.0 388.0 C1048.3 386.5 1078.8 387.7 1100.0 388.0 C1121.2 388.3 1132.8 388.2 1152.0 390.0 C1171.2 391.8 1197.8 395.3 1215.0 399.0 C1232.2 402.7 1243.8 406.5 1255.0 412.0 C1266.2 417.5 1275.8 422.7 1282.0 432.0 C1288.2 441.3 1287.7 456.7 1292.0 468.0 C1296.3 479.3 1303.7 489.7 1308.0 500.0 C1312.3 510.3 1316.3 520.8 1318.0 530.0 C1319.7 539.2 1319.3 547.0 1318.0 555.0 C1316.7 563.0 1314.7 570.2 1310.0 578.0 C1305.3 585.8 1299.2 594.2 1290.0 602.0 C1280.8 609.8 1267.5 617.3 1255.0 625.0 C1242.5 632.7 1228.8 641.3 1215.0 648.0 C1201.2 654.7 1185.3 659.8 1172.0 665.0 C1158.7 670.2 1147.0 674.0 1135.0 679.0 C1123.0 684.0 1114.2 689.3 1100.0 695.0 C1085.8 700.7 1066.7 708.7 1050.0 713.0 C1033.3 717.3 1016.7 719.2 1000.0 721.0 C983.3 722.8 966.7 723.8 950.0 724.0 C933.3 724.2 916.7 723.7 900.0 722.0 C883.3 720.3 864.2 716.3 850.0 714.0 C835.8 711.7 825.8 710.0 815.0 708.0 C804.2 706.0 794.2 706.0 785.0 702.0Z"/></svg>
-          <img class="w-occ" src="/assets/v11/occ-house.webp" alt=""><img class="w-occ" src="/assets/v11/occ-cafe.webp" alt="">
-          <div class="w-fig w-new" aria-hidden="true"><i></i></div>
-          <div class="w-fig w-me" aria-hidden="true"><i></i><i></i></div>
-          <ol class="w-pins" aria-label="한 사람이 지나는 다섯 곳"><li style="--x:44.99%;--y:51.86%"><button type="button"><b>1</b><span>한국어</span></button></li><li style="--x:53.32%;--y:29.39%"><button type="button"><b>2</b><span>교실</span></button></li><li style="--x:75.26%;--y:27.73%"><button type="button"><b>3</b><span>유학</span></button></li><li style="--x:90.17%;--y:39.75%"><button type="button"><b>4</b><span>취업</span></button></li><li style="--x:83.33%;--y:57.52%"><button type="button"><b>5</b><span>모임</span></button></li></ol>
-        </div>
-      </div>
-      <div class="w-layer w-scene"><img src="/assets/v11/in-1.webp" alt="눈 오는 밤, 자기 방 책상에서 휴대폰에 대고 한국어를 말해 보는 학생." loading="lazy"></div>
-      <article class="w-text w-say">
-        <span class="w-n">첫째 · 집에서</span>
-        <h3 class="w-w">한국어</h3>
-        <p class="w-d">드라마 속 선배와 <b>소리 내어 말해야</b> 다음 장면이 열립니다. 틀린 말은 기억했다가 잊을 때쯤 다시 꺼냅니다.</p>
-        <a class="text-link" href="/korean/">자세히 보기 <span class="arr" aria-hidden="true">→</span></a>
-      </article>
-      <div class="w-layer w-scene"><img src="/assets/v11/in-2.webp" alt="동네 교실에서 손을 번쩍 든 같은 학생과 웃으며 손짓하는 선생님." loading="lazy"></div>
-      <article class="w-text w-say">
-        <span class="w-n">둘째 · 우리 동네에서</span>
-        <h3 class="w-w">교실</h3>
-        <p class="w-d">선생님이 교실에서 고쳐 준 말을 <b>앱이 평일에 다시 꺼냅니다.</b> 목표는 유학의 문턱인 TOPIK 4급입니다.</p>
-        <span class="state soon">준비 중 · 2027 목표 · 울란바토르 교실</span>
-        <a class="text-link" href="/classroom/">자세히 보기 <span class="arr" aria-hidden="true">→</span></a>
-      </article>
-      <div class="w-layer w-scene"><img src="/assets/v11/in-3.webp" alt="노란 여행 가방을 끌고 은행나무가 선 대학 정문으로 들어서는 같은 학생." loading="lazy"></div>
-      <article class="w-text w-say">
-        <span class="w-n">셋째 · 한국으로</span>
-        <h3 class="w-w">유학</h3>
-        <p class="w-d">학교 고르기, 입학 서류, 면접까지. <b>한국에 오기 전에 먼저 해 봅니다.</b></p>
-        <span class="state soon">유학 지원 2028 목표</span>
-        <a class="text-link" href="/study-abroad/">자세히 보기 <span class="arr" aria-hidden="true">→</span></a>
-      </article>
-      <div class="w-layer w-scene"><img src="/assets/v11/in-4.webp" alt="사원증을 걸고 새 동료와 악수하는 같은 학생. 창밖으로 서울이 보인다." loading="lazy"></div>
-      <article class="w-text w-say">
-        <span class="w-n">넷째 · 한국에서</span>
-        <h3 class="w-w">취업</h3>
-        <p class="w-d">일하고 싶은 자리에 필요한 조건부터 <b>순서대로 짚습니다.</b> 서류와 면접은 앱에서 먼저 준비합니다.</p>
-        <span class="state soon">취업 2030 목표</span>
-        <a class="text-link" href="/job/">자세히 보기 <span class="arr" aria-hidden="true">→</span></a>
-      </article>
-      <div class="w-layer w-scene"><img src="/assets/v11/in-5.webp" alt="모임 자리에서 새로 온 후배에게 손을 크게 흔드는 같은 학생." loading="lazy"></div>
-      <article class="w-text w-say">
-        <span class="w-n">다섯째 · 함께</span>
-        <h3 class="w-w">모임</h3>
-        <p class="w-d">같은 나라 선배가 첫 달을 함께하고, 동네 모임에서 한국 친구를 만납니다. <b>혼자 두지 않습니다.</b></p>
-        <span class="state soon">준비 중</span>
-        <a class="text-link" href="/community/">자세히 보기 <span class="arr" aria-hidden="true">→</span></a>
-      </article>
-      <div class="w-scrim" aria-hidden="true"></div>
-      <div class="w-text w-close">
-        <h3>그리고 선배가 되어,<br>다음 한 사람을 맞습니다</h3>
-        <p>길은 한 바퀴로 이어집니다. 다섯 곳을 지나는 동안 기록은 하나라서, 어디서 막혔는지 다시 묻지 않습니다.</p>
-        <div class="loop-go"><a class="pill" href="/world/">한국어부터 시작하기 <span class="arr" aria-hidden="true">→</span></a><a class="text-link" href="/korean/">한 곳씩 자세히 보기 <span class="arr" aria-hidden="true">→</span></a></div>
-      </div>
-      <div class="rail" aria-hidden="true"><ol><i></i><li>한국어</li><li>교실</li><li>유학</li><li>취업</li><li>모임</li></ol></div>
+      <article class="st-art" hidden aria-live="polite"></article>
     </div>
+    <form class="st-dock" autocomplete="off"><label class="vh" for="st-in">질문</label><input id="st-in" type="text" maxlength="200" enterkeyhint="send" placeholder="질문을 적거나 위에서 고르세요" role="combobox" aria-controls="st-qs" aria-expanded="true" aria-autocomplete="list"><button type="submit" class="st-send" aria-label="묻기" disabled><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M12 19V5M6 11l6-6 6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button></form>
   </div>
-</section>
+  <div class="toast" id="toast" role="status" hidden></div>
+</dialog>
 
-<div id="shift" data-tone="dark">
-  <section class="film" aria-labelledby="shift-t">
-    <img class="film-bg hall" src="/assets/v11/hall.webp" alt="어두운 강의장. 큰 화면 앞에 선 강사와 노트북을 편 청중의 뒷모습." loading="lazy">
-    <div class="on-screen proof" id="proof" role="group" aria-label="SYNK는 지금도 사람 없이 돌아갑니다"><span>서울 지금</span><b id="clock">00:00</b><span>이 시각에도 SYNK의 일 30여 가지가<br>사람 없이 돌고 있습니다</span></div>
-    <div class="film-say">
-      <div class="film-txt">
-        <p class="tag">AI 강의</p>
-        <h2 id="shift-t">AI로 회사를 돌리는 사람이<br>직접 강의하러 갑니다</h2>
-        <p>듣고 끝나는 강의가 아닙니다. 듣는 사람이 자기 일에서 결과물 하나를 만들어 갑니다.</p>
-      </div>
-      <div class="film-go"><a class="pill light" href="/shift/#ask">강의 의뢰하기 <span class="arr" aria-hidden="true">→</span></a><a class="text-link" href="/ai/">강사와 강의 방식 보기 <span class="arr" aria-hidden="true">→</span></a><span class="sns"><span>SNS</span><a href="https://www.instagram.com/synkbrief/" target="_blank" rel="noopener" aria-label="SYNK SHIFT Instagram">Instagram</a></span></div>
-    </div>
-  </section>
-  <section class="film solio" aria-labelledby="solio-t">
-    <img class="film-bg desk" src="/assets/v11/desk.webp" alt="밤의 책상. 큰 모니터와 찻잔, 그 옆에 놓인 검은 구." loading="lazy">
-    <img class="on-screen solio-shot" id="solio-shot" src="/assets/v11/solio-subs.webp" alt="솔리오의 AI 구독 관리 화면. 구독마다 남은 양이 한 줄씩 보인다." loading="lazy">
-    <div class="film-say">
-      <div class="film-txt">
-        <p class="tag">AI 업무 앱</p>
-        <h2 id="solio-t">혼자 일하는 사람의<br>AI 업무 앱, 솔리오</h2>
-        <p>여러 AI 구독의 남은 양과 결제일을 한 화면에서 봅니다. 강의에서 배운 것을 내 사업에서 계속 쓰게 합니다.</p>
-      </div>
-      <div class="film-go"><a class="pill light" href="#platform">PC 앱 받기 <span class="arr" aria-hidden="true">→</span></a><a class="text-link" href="/ai/">솔리오 자세히 보기 <span class="arr" aria-hidden="true">→</span></a></div>
-    </div>
-  </section>
-</div>
-
-<section class="pulse" id="pulse" data-tone="light" aria-labelledby="pulse-t"><span id="showroom" class="anchor" aria-hidden="true"></span>
-  <div class="p-word" aria-hidden="true">광고</div>
-  <div class="p-stage">
-    <button type="button" class="p-arrow prev" id="p-prev" aria-label="앞 작품">←</button>
-    <div class="p-album" id="p-album">
-      <span class="p-disc" aria-hidden="true"></span>
-      <button type="button" class="p-sleeve" id="p-sleeve"><img id="p-img" src="" alt=""><video id="p-vid" muted loop playsinline preload="none"></video><span class="p-play"><span aria-hidden="true">▶</span> 재생</span></button>
-      <span class="seal" id="p-seal" hidden>2026 서울로미디어캔버스 당선</span>
-    </div>
-    <button type="button" class="p-arrow next" id="p-next" aria-label="다음 작품">→</button>
-  </div>
-  <div class="p-info" aria-live="polite"><h3 id="p-t"></h3><p id="p-d"></p></div>
-  <div class="p-bar">
-    <h2 id="pulse-t">카메라 앞에서 10년,<br>배우가 AI 모델을 연출합니다</h2>
-    <ol class="p-shelf" id="p-shelf" aria-label="작품 고르기"></ol>
-    <div class="p-go"><span class="sns"><span>SNS</span><a href="https://www.instagram.com/synkpulse/" target="_blank" rel="noopener" aria-label="SYNK PULSE Instagram">Instagram</a><a href="https://www.facebook.com/synkpulse" target="_blank" rel="noopener" aria-label="SYNK PULSE Facebook">Facebook</a></span><a class="text-link" href="/studio/">모델 고르기와 PULSE 앱 보기 <span class="arr" aria-hidden="true">→</span></a><a class="pill" href="https://workspace.synk.im/pulse-app/?start=request">광고 의뢰하기 <span class="arr" aria-hidden="true">→</span></a></div>
-  </div>
-</section>
-<dialog class="player" id="player" aria-label="작품 재생"><header><span id="player-t"></span><button type="button" id="player-x">닫기</button></header><video id="player-v" controls playsinline></video></dialog>
-
-
-<section class="more" id="news" data-tone="light" aria-labelledby="news-t">
-  <div class="more-in">
-    <div class="more-head">
+<dialog class="sheet" id="sheet-now" aria-labelledby="news-t"><p class="sheet-x"><button type="button" data-close aria-label="닫기"></button></p>
+  <section class="sheet-in" id="news">
+    <div class="head">
       <p class="tag">소식</p>
       <h2 id="news-t">최근에<br>새로 연 것</h2>
     </div>
     <div class="news" id="now">
       <ol class="news"><li><a href="#platform-get"><time datetime="2026-11-27">2026.11.27</time><span class="who">플랫폼</span><b>PC 앱 Preview 0.5.14</b><span class="arr" aria-hidden="true">→</span></a></li><li><a href="/lab/#world"><time datetime="2026-11-05">2026.11.05</time><span class="who">한국어</span><b>SYNK WORLD에 새 놀이 셋을 열었습니다</b><span class="arr" aria-hidden="true">→</span></a></li><li><a href="/pulse/casting/"><time datetime="2026-11-03">2026.11.03</time><span class="who">광고</span><b>아이돌 두 팀 여덟 명이 합류했습니다</b><span class="arr" aria-hidden="true">→</span></a></li></ol>
       <details>
-        <summary>지난 소식 <span>6</span></summary>
-        <ol class="news"><li><a href="/lab/#drama"><time datetime="2026-10-30">2026.10.30</time><span class="who">한국어</span><b>K드라마 상황극 1화 장면을 미리 공개했습니다</b><span class="arr" aria-hidden="true">→</span></a></li><li><a href="/pulse/casting/"><time datetime="2026-10-24">2026.10.24</time><span class="who">광고</span><b>새 AI 모델 한결이 합류했습니다</b><span class="arr" aria-hidden="true">→</span></a></li><li><a href="/pulse/#works"><time datetime="2026-10-22">2026.10.22</time><span class="who">광고</span><b>화성 CF 「1억 년의 빛」을 공모전에 냈습니다</b><span class="arr" aria-hidden="true">→</span></a></li><li><a href="/mn/" hreflang="mn"><time datetime="2026-10-22">2026.10.22</time><span class="who">SYNK</span><b>몽골어 회사 소개를 열었습니다</b><span class="arr" aria-hidden="true">→</span></a></li><li><a href="/lab/#world"><time datetime="2026-10-21">2026.10.21</time><span class="who">한국어</span><b>SYNK WORLD에서 TOPIK II 쓰기 첨삭을 받을 수 있습니다</b><span class="arr" aria-hidden="true">→</span></a></li><li><a href="/lab/#world"><time datetime="2026-10-21">2026.10.21</time><span class="who">한국어</span><b>SYNK WORLD에 말하기 시험 형식 연습을 더했습니다</b><span class="arr" aria-hidden="true">→</span></a></li></ol>
+        <summary>지난 소식 <span>5</span></summary>
+        <ol class="news"><li><a href="/lab/#drama"><time datetime="2026-10-30">2026.10.30</time><span class="who">한국어</span><b>K드라마 상황극 1화 장면을 미리 공개했습니다</b><span class="arr" aria-hidden="true">→</span></a></li><li><a href="/pulse/casting/"><time datetime="2026-10-24">2026.10.24</time><span class="who">광고</span><b>새 AI 모델 한결이 합류했습니다</b><span class="arr" aria-hidden="true">→</span></a></li><li><a href="/mn/" hreflang="mn"><time datetime="2026-10-22">2026.10.22</time><span class="who">SYNK</span><b>몽골어 회사 소개를 열었습니다</b><span class="arr" aria-hidden="true">→</span></a></li><li><a href="/lab/#world"><time datetime="2026-10-21">2026.10.21</time><span class="who">한국어</span><b>SYNK WORLD에서 TOPIK II 쓰기 첨삭을 받을 수 있습니다</b><span class="arr" aria-hidden="true">→</span></a></li><li><a href="/lab/#world"><time datetime="2026-10-21">2026.10.21</time><span class="who">한국어</span><b>SYNK WORLD에 말하기 시험 형식 연습을 더했습니다</b><span class="arr" aria-hidden="true">→</span></a></li></ol>
       </details>
     </div>
-  </div>
-</section>
+  </section>
+</dialog>
 
-<section class="more ask" id="ask" data-tone="light" aria-labelledby="ask-t"><span id="contact" class="anchor" aria-hidden="true"></span><span id="contact-web" class="anchor" aria-hidden="true"></span>
-  <div class="ask-box">
-    <div class="more-head">
-      <p class="tag">묻기</p>
-      <h2 id="ask-t">무엇이든<br>물어보세요</h2>
-      <p>공개된 내용은 여기서 바로 답합니다. 상담과 제안은 메일로 받습니다.</p>
-      <div class="ask-links">
-        <a href="mailto:hello@synk.im">hello@synk.im <span class="arr" aria-hidden="true">→</span></a>
-        <button type="button" id="ask-copy" data-measure="문의 메일 주소 복사">주소 복사</button>
-        <p class="ask-out" id="ask-out" role="status"></p>
-        <a href="https://docs.google.com/forms/d/e/1FAIpQLSc4Z1BdhPxMi0bWP7enSganI4xCIsTcCxRJ8EpxiWRxyVfsIg/viewform" target="_blank" rel="noopener">웹 문의 양식 <span class="arr" aria-hidden="true">↗</span></a>
-        <a href="/privacy/#website-questions">문의할 때의 개인정보 처리 <span class="arr" aria-hidden="true">→</span></a>
-      </div>
-    </div>
-    <div class="ask-main" id="questions" data-ask data-lang="ko" data-site="synk" data-engine="/knowledge-engine.js?v=cf56a803ca3a" data-knowledge="/knowledge.json?v=32b7bb7f891a">
-      <p class="ask-k">자주 묻는 질문</p>
-      <ul class="faq">
-        <li><button class="faq-q" type="button" aria-expanded="false" aria-controls="faq-a-1" data-faq="SYNK는 어떤 회사인가요?" data-record="synk-intro"><span class="no" aria-hidden="true">01</span><span>SYNK는 어떤 회사인가요?</span><i aria-hidden="true">+</i></button><div class="faq-a" id="faq-a-1" hidden></div></li>
-        <li><button class="faq-q" type="button" aria-expanded="false" aria-controls="faq-a-2" data-faq="K드라마 상황극은 무엇인가요?" data-record="lab-drama"><span class="no" aria-hidden="true">02</span><span>K드라마 상황극은 무엇인가요?</span><i aria-hidden="true">+</i></button><div class="faq-a" id="faq-a-2" hidden></div></li>
-        <li><button class="faq-q" type="button" aria-expanded="false" aria-controls="faq-a-3" data-faq="아틀라스는 어떻게 작동하나요?" data-record="synk-atlas"><span class="no" aria-hidden="true">03</span><span>아틀라스는 어떻게 작동하나요?</span><i aria-hidden="true">+</i></button><div class="faq-a" id="faq-a-3" hidden></div></li>
-        <li><button class="faq-q" type="button" aria-expanded="false" aria-controls="faq-a-4" data-faq="SYNK 플랫폼은 무엇인가요?" data-record="synk-platform"><span class="no" aria-hidden="true">04</span><span>SYNK 플랫폼은 무엇인가요?</span><i aria-hidden="true">+</i></button><div class="faq-a" id="faq-a-4" hidden></div></li>
-        <li><button class="faq-q" type="button" aria-expanded="false" aria-controls="faq-a-5" data-faq="SHIFT에 강의나 자동화를 맡기고 싶어요" data-record="shift-services"><span class="no" aria-hidden="true">05</span><span>SHIFT에 강의나 자동화를 맡기고 싶어요</span><i aria-hidden="true">+</i></button><div class="faq-a" id="faq-a-5" hidden></div></li>
-        <li><button class="faq-q" type="button" aria-expanded="false" aria-controls="faq-a-6" data-faq="PULSE에 영상 제작을 맡길 수 있나요?" data-record="pulse-studio"><span class="no" aria-hidden="true">06</span><span>PULSE에 영상 제작을 맡길 수 있나요?</span><i aria-hidden="true">+</i></button><div class="faq-a" id="faq-a-6" hidden></div></li>
-      </ul>
-      <div id="messages" aria-live="polite"></div>
-      <form class="ask-form" id="question-form" autocomplete="off"><label class="sr" for="question">질문 입력</label><textarea id="question" name="question" rows="1" maxlength="500" placeholder="다른 질문을 입력해 보세요"></textarea><button id="send" type="submit" disabled>묻기 <span class="arr" aria-hidden="true">→</span></button></form>
-      <p class="ask-note">대화는 저장하지 않습니다. 개인정보는 적지 말아 주세요.</p>
-    </div>
-  </div>
-</section>
-<script>(() => {
-  const $ = (s, r = document) => r.querySelector(s), out = $('#ask-out');
-  const say = t => { out.textContent = t; out.hidden = false; };
-  $('#ask-copy').addEventListener('click', async () => { try { await navigator.clipboard.writeText('hello@synk.im'); say('이메일 주소를 복사했습니다.'); } catch (e) { say('복사하지 못했습니다. 주소는 hello@synk.im입니다.'); } });
-  const nav = $('.nav');
-  const solid = () => nav.classList.toggle('solid', scrollY > 40);
-  addEventListener('scroll', solid, { passive: true }); solid();
-  const menuBtn = $('.menu-btn'); const menu = (on, keys) => { nav.classList.toggle('open', on); menuBtn.setAttribute('aria-expanded', String(on)); if (keys) (on ? $('.nav ul a') : menuBtn)?.focus(); }; addEventListener('keydown', e => { if (e.key === 'Escape' && nav.classList.contains('open')) menu(false, true); }); $('.nav .logo')?.addEventListener('click', () => menu(false));
-  menuBtn.addEventListener('click', e => menu(!nav.classList.contains('open'), e.detail === 0)); document.querySelectorAll('.nav ul a').forEach(a => a.addEventListener('click', () => menu(false)));
-})();
-</script>
-
-<section class="end" id="start" data-tone="dark" aria-labelledby="start-t">
-  <div class="end-sky" aria-hidden="true"></div>
-  <div class="end-in">
-    <h2 id="start-t">어디서부터<br>볼까요</h2>
-    <div class="go">
-      <a href="/world/"><span>한국어를 시작합니다<small>SYNK WORLD · 가입 없이 둘러볼 수 있습니다</small></span><span class="arr" aria-hidden="true">→</span></a>
-      <a href="mailto:hello@synk.im"><span>강의나 광고를 맡깁니다<small>hello@synk.im</small></span><span class="arr" aria-hidden="true">→</span></a>
-      <a href="#platform"><span>PC 앱을 내려받습니다<small>SYNK 플랫폼 · 계정 하나로 한국어와 솔리오를 함께 씁니다</small></span><span class="arr" aria-hidden="true">→</span></a>
-    </div>
-  </div>
-  <section class="pf" id="platform" data-platform-version="0.5.14" aria-labelledby="pf-t"><span id="platform-get" class="anchor" aria-hidden="true"></span>
-    <div class="pf-say"><p class="tag">SYNK 플랫폼</p><h2 id="pf-t">SYNK ID 하나로 전부 씁니다</h2><p>한국어 연습과 솔리오를 계정 하나로 씁니다. 미리보기판입니다(Windows 64비트 · macOS 13 이상).</p></div>
+<dialog class="sheet" id="sheet-platform" aria-labelledby="pf-t"><p class="sheet-x"><button type="button" data-close aria-label="닫기"></button></p>
+  <section class="pf" id="platform" data-platform-version="0.5.14"><span id="platform-get" class="anchor" aria-hidden="true"></span>
+    <div class="pf-say"><p class="tag">SYNK 플랫폼</p><h2 id="pf-t">SYNK ID 하나로 전부 씁니다</h2><p>혼자 일하는 사람의 AI 업무 앱 솔리오와 한국어 연습이 이 앱에 들어 있습니다. 미리보기판입니다(Windows 64비트 · macOS 13 이상).</p></div>
     <div class="pf-get" data-platform-downloads><a href="https://github.com/unmet23-lab/synk-policy/releases/download/platform-preview-0.5.14/SYNK-Platform-Preview-0.5.14-Signal-win-x64.exe"><span>Windows용 다운로드</span><small>Preview 0.5.14</small><span class="arr" aria-hidden="true">↓</span></a><a href="https://github.com/unmet23-lab/synk-policy/releases/download/platform-preview-0.5.14/SYNK-Platform-Preview-0.5.14-Signal-mac-arm64.dmg"><span>Mac용 · Apple Silicon</span><small>Preview 0.5.14</small><span class="arr" aria-hidden="true">↓</span></a><a href="https://github.com/unmet23-lab/synk-policy/releases/download/platform-preview-0.5.14/SYNK-Platform-Preview-0.5.14-Signal-mac-x64.dmg"><span>Mac용 · Intel</span><small>Preview 0.5.14</small><span class="arr" aria-hidden="true">↓</span></a></div>
     <p class="pf-more"><a href="/account/platform.html#home">웹에서 열기 <span class="arr" aria-hidden="true">→</span></a><a href="https://github.com/unmet23-lab/synk-policy/releases/tag/platform-preview-0.5.14" target="_blank" rel="noopener">파일 확인값(SHA-256) <span class="arr" aria-hidden="true">↗</span></a></p>
     <details class="pf-help"><summary>설치 안내</summary><ul><li><b>Windows</b> 받은 SYNK-Platform-Preview 파일을 엽니다. 「Windows의 PC 보호」가 나오면 「추가 정보」를 누르고 「실행」을 누릅니다. 미리보기판이라 아직 정식 코드 서명 전이어서 나오는 화면입니다.</li><li><b>Mac</b> 왼쪽 위 Apple 메뉴 → 이 Mac에 관하여에서 칩을 확인합니다. 받은 DMG를 열고 SYNKPlatformPreview를 Applications 폴더로 끌어 놓은 뒤 응용 프로그램에서 엽니다. 처음 열 때 확인 창이 나오면 시스템 설정 → 개인정보 보호 및 보안에서 「그래도 열기」를 누릅니다. 아직 Apple 공증 전이어서 나오는 화면입니다.</li></ul></details>
   </section>
-  <footer class="foot">
-    <nav aria-label="바닥 메뉴"><a href="/founder/">창업자</a><a href="/privacy/">개인정보처리방침</a><a href="/terms/">이용약관</a><a href="/data-deletion/">데이터 삭제</a><button type="button" data-ask-q="사업자등록번호를 알려주세요.">사업자 정보</button><a href="mailto:hello@synk.im">hello@synk.im</a><span>© 2026 SYNK</span></nav>
-    <div class="foot-bottom"><span>방문 목적과 경로를 익명으로 집계합니다. <a href="/privacy/#visitor-stats">자세히</a></span><span>회사·사업 안내 기준일 <time class="mono" datetime="2026-11-27">2026.11.27</time></span></div>
-    <div class="wm" aria-hidden="true">synk</div>
-  </footer>
-</section>
-</main>
+</dialog>
 
-<script>(() => {
-  const $ = (s, r = document) => r.querySelector(s), $$ = (s, r = document) => [...r.querySelectorAll(s)];
-  const clamp = (v, a = 0, b = 1) => Math.max(a, Math.min(b, v));
-  const smooth = (a, b, x) => { const t = clamp((x - a) / (b - a)); return t * t * (3 - 2 * t); };
-  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const root = document.documentElement, body = document.body;
-  const h = new Date().getHours() + new Date().getMinutes() / 60;
-  root.dataset.sky = new URLSearchParams(location.search).get('sky') || (h >= 6 && h < 17 ? 'day' : (h >= 17 && h < 19.5) || (h >= 5 && h < 6) ? 'sunset' : 'night');
-  const tones = $$('[data-tone]').filter(el => el !== body);
-  function tone() { const y = 36; let t = scrollY <= 0 && tones[0] ? tones[0].dataset.tone : 'light'; for (const el of tones) { const b = el.getBoundingClientRect(); if (b.top <= y && b.bottom > y) t = el.dataset.tone; } body.dataset.tone = t; }
-  const gateWrap = $('.gate-wrap'), sky = $('.gate-sky'), roof = $('.gate-roof'), type = $('.gate-type'), say = $('.gate-say');
-  let gateP = 0, gateRect = gateWrap.getBoundingClientRect();
-  function gate() {
-    gateRect = gateWrap.getBoundingClientRect();
-    const p = reduce ? 0 : clamp(-gateRect.top / (gateRect.height - innerHeight)); gateP = p;
-    sky.style.transform = `scale(${1 + .16 * p})`;
-    roof.style.transform = `scale(${1 + 1.5 * p * p + .5 * p}) translate(${4 * p}%, ${-7 * p}%)`;
-    type.style.transform = `scale(${1 + .42 * p})`;
-    say.style.opacity = 1 - smooth(.04, .3, p);
-    say.style.transform = `translateY(${-40 * p}px)`;
-  }
-  const wrap = $('.world-wrap'), mapIn = $('.w-map-in'), scenes = $$('.w-scene'), says = $$('.w-say');
-  const wOpen = $('.w-open'), wClose = $('.w-close'), pins = $('.w-pins'), loop = $('.w-loop'), loopDraw = $('.w-loop .draw'), rail = $('.rail');
-  const railLis = $$('.rail li'), railBar = $('.rail ol i');
-  const N = 7;
-  const FIRST = '48.2% 59.6%';
-  let flat = false;
-  const keep = new Set([...says, wClose]); const show = (el, o, t) => { el.style.opacity = o; if (keep.has(el)) { el.style.visibility = 'visible'; el.style.pointerEvents = o < .02 ? 'none' : ''; } else el.style.visibility = o < .02 ? 'hidden' : 'visible'; if (t !== undefined) el.style.transform = t; };
-  function layoutRoad() {
-    const was = flat;
-    flat = reduce || innerWidth < 900 || innerHeight < 560;
-    body.classList.toggle('flat', flat);
-    if (flat) [mapIn, wOpen, wClose, pins, loop, rail, ...scenes, ...says, ...scenes.map(s => s.firstElementChild)].forEach(el => el.removeAttribute('style'));
-    if (flat && !was) { stopWalk(); if (reduce) loopDraw.style.strokeDashoffset = 0; }
-    fitPins();
-  }
-  function road() {
-    if (flat) return;
-    const b = wrap.getBoundingClientRect();
-    const x = clamp(-b.top / (b.height - innerHeight)) * (N - 1);
-    const far = x > 3;
-    const end = smooth(5.5, 5.85, x);
-    mapIn.style.transformOrigin = far ? '50% 50%' : FIRST;
-    mapIn.style.transform = `translate(-50%,-50%) scale(${far ? 1 + .26 * (1 - smooth(5.2, 6, x)) : 1 + 2.3 * smooth(.25, 1, x)})`;
-    const o0 = smooth(.08, .4, x);
-    show(wOpen, 1 - o0, `translateY(${-30 * o0}px)`);
-    show(pins, far ? end : 1 - smooth(.42, .7, x));
-    loop.style.opacity = far ? end : 0;
-    if (x < 5.5) stopWalk(); else if (end > .98) playWalk();
-    scenes.forEach((s, i) => {
-      const o = smooth(i + .5, i + .9, x) * (i < 4 ? 1 - smooth(i + 1.95, i + 2, x) : 1 - smooth(5.2, 5.65, x));
-      show(s, o);
-      s.firstElementChild.style.transform = `scale(${1.16 - .16 * smooth(i + .5, i + 1, x) + .07 * smooth(i + 1.05, i + 2, x)})`;
-    });
-    says.forEach((t, i) => { const a = smooth(i + .76, i + .98, x), z = smooth(i + 1.3, i + 1.55, x); show(t, a * (1 - z), `translateY(${26 * (1 - a) - 26 * z}px)`); });
-    const c = smooth(5.68, 5.98, x);
-    show(wClose, c, `translateY(${24 * (1 - c)}px)`);
-    const k = x - 1;
-    rail.style.opacity = smooth(.7, .95, x) * (1 - smooth(5.2, 5.5, x));
-    railLis.forEach((li, i) => { const done = k >= i + .5; li.classList.toggle('done', done); li.classList.toggle('now', !done && Math.round(clamp(k, 0, 4)) === i); });
-    railBar.style.width = clamp(k / 4) * 80 + '%';
-  }
-  says.forEach((t, i) => t.addEventListener('focusin', () => { if (!flat) goto(i + 1.12); })); wClose.addEventListener('focusin', () => { if (!flat) goto(N - 1); });
-  const goto = x => { const b = wrap.getBoundingClientRect(); scrollTo({ top: scrollY + b.top + (x / (N - 1)) * (b.height - innerHeight), behavior: reduce ? 'auto' : 'smooth' }); };
-  $('#w-go').addEventListener('click', () => { if (flat) scenes[0].scrollIntoView({ behavior: reduce ? 'auto' : 'smooth' }); else goto(1); });
-  $$('button', pins).forEach((bt, i) => bt.addEventListener('click', () => { if (flat) scenes[i].scrollIntoView({ behavior: reduce ? 'auto' : 'smooth' }); else goto(i + 1); }));
-  const WALK = {"n": 16, "ar": 0.8413, "body": 0.8982, "pad": 0.012, "occ": [{"box": [636, 505, 800, 668], "base": 660, "x": [690, 800]}, {"box": [1095, 575, 1375, 745], "base": 706, "x": [1090, 1380]}]};
-  const me = $('.w-me'), newbie = $('.w-new'), pinLis = $$('li', pins), occs = $$('.w-occ');
-  const LEN = loopDraw.getTotalLength(), at = f => loopDraw.getPointAtLength(clamp(f) * LEN);
-  const SPEED = .14, STEP = 36, STAY = 1100, FIRST_STAY = 800;
-  const near = ([px, py]) => { let best = 0, bd = Infinity; for (let i = 0; i <= 600; i++) { const p = at(i / 600), d = (p.x - px) ** 2 + (p.y - py) ** 2; if (d < bd) { bd = d; best = i / 600; } } return best; };
-  const STOPS = [0, ...[[840, 418], [1152, 390], [1318, 528], [1172, 665]].map(near), 1 - 44 / LEN];
-  const sizeOf = y => .8 + .2 * clamp((y - 388) / (702 - 388));
-  const FACE = [];
-  for (let i = 0, f = 1; i <= 400; i++) { const a = at(i / 400), b = at(i / 400 + .003), dx = b.x - a.x, dl = Math.hypot(dx, b.y - a.y) || 1; if (dx / dl > .3) f = -1; else if (dx / dl < -.3) f = 1; FACE.push(f); }
-  const PLAN = [];
-  let T = 0;
-  const stay = (f, k, ms, pin, was = -1, wasFlip = 1) => { PLAN.push({ t0: T, t1: T + ms, f, k, pin, was, wasFlip }); T += ms; };
-  stay(0, 0, FIRST_STAY, 0);
-  let lastWas;
-  for (let i = 0; i < 5; i++) {
-    const d = (STOPS[i + 1] - STOPS[i]) * LEN, ms = d / SPEED;
-    PLAN.push({ t0: T, t1: T + ms, from: STOPS[i], to: STOPS[i + 1], look: i, d }); T += ms;
-    const was = 3 * i + 1 + (Math.floor(d / STEP) % 2), wasFlip = FACE[Math.round(clamp(STOPS[i + 1]) * 400)];
-    if (i < 4) stay(STOPS[i + 1], 3 * (i + 1), STAY, i + 1, was, wasFlip);
-    else lastWas = [was, wasFlip];
-  }
-  const END = T + 900;
-  stay(STOPS[5], 12, Infinity, -1, ...lastWas);
-  const last = PLAN[PLAN.length - 2], NEW_AT = last.t0 + (last.t1 - last.t0) * .45;
-  function walkPose(t) {
-    const s = PLAN.find(p => t < p.t1);
-    if (s.from === undefined) {
-      const u = clamp((t - s.t0) / 260), home = s.pin === -1;
-      return { f: s.f, k: s.k, flip: s.k === 12 ? -1 : 1, bob: 0, pop: 1 + .045 * Math.sin(Math.PI * u) * (s.t0 > 0), pin: s.pin, trail: home ? s.f + (1 - s.f) * smooth(0, 600, t - s.t0) : s.f, newbie: t >= NEW_AT,
-        was: s.was, wasFlip: s.wasFlip, fade: s.was < 0 ? 0 : 1 - smooth(0, 420, t - s.t0) };
-    }
-    const u = (t - s.t0) / (s.t1 - s.t0), e = .5 * u + .5 * u * u * (3 - 2 * u);
-    const d = e * s.d, f = s.from + (s.to - s.from) * e, step = d / STEP;
-    return { f, k: 3 * s.look + 1 + (Math.floor(step) % 2), flip: FACE[Math.round(clamp(f) * 400)], bob: 1.4 * Math.abs(Math.sin(Math.PI * step)), pop: 1, pin: -1, trail: f, newbie: t >= NEW_AT, was: -1, fade: 0 };
-  }
-  const cell = (im, k, flip, bob) => { im.style.backgroundPosition = `${k / (WALK.n - 1) * 100}% 0`; im.style.transform = `translateY(${-bob}%) scaleX(${flip})`; };
-  function place(el, x, y, st) {
-    el.style.left = x / 15.36 + '%'; el.style.top = y / 10.24 + '%';
-    el.style.transform = `translate(-50%,${-(1 - WALK.pad) * 100}%) scale(${sizeOf(y) * st.pop})`;
-    const [now, was] = el.children;
-    cell(now, st.k, st.flip, st.bob);
-    if (!was) return;
-    was.style.opacity = st.fade;
-    if (st.fade > 0) { cell(was, st.was, st.wasFlip, 0); now.style.opacity = 1 - st.fade * .6; } else now.style.opacity = 1;
-  }
-  function walkDraw(st, idle) {
-    const p = at(st.f);
-    place(me, p.x, p.y, st);
-    loopDraw.style.strokeDashoffset = idle || st.trail <= 0 ? 100.5 : 100 * (1 - st.trail);
-    pinLis.forEach((li, i) => li.classList.toggle('here', !idle && i === st.pin));
-    newbie.classList.toggle('on', !idle && st.newbie);
-    occs.forEach((o, i) => { const c = WALK.occ[i]; o.classList.toggle('over', p.y < c.base && p.x > c.x[0] && p.x < c.x[1]); });
-    const op = 1 - Math.max(...HIDE.map(([x0, y0, x1, y1]) => clamp((p.x - x0) / 18) * clamp((x1 - p.x) / 18) * clamp((p.y - y0) / 18) * clamp((y1 - p.y) / 18)));
-    me.style.opacity = op;
-    const r = idle || op < .3 ? null : me.getBoundingClientRect(), cx = r && (r.left + r.right) / 2, hw = r && r.width / 4;
-    pinLis.forEach((li, i) => {
-      const q = r && li.getBoundingClientRect(), hit = !!r && q.left < cx + hw && q.right > cx - hw && q.top < r.bottom && q.bottom > r.top + r.height * .08;
-      const here = !idle && i === st.pin, up = hit && here ? (q.bottom - (r.top + r.height * .08) + 3) * li.offsetWidth / (q.width || 1) : 0;
-      li.classList.toggle('yield', hit && !here);
-      if (up) li.style.setProperty('--ly', up.toFixed(1) + 'px'); else li.style.removeProperty('--ly');
-    });
-  }
-  const HIDE = [[690, 548, 800, 678], [1205, 592, 1380, 706]];
-  function fitPins() {
-    const W = document.documentElement.clientWidth, M = 8, was = mapIn.style.transform;
-    if (!flat) mapIn.style.transform = 'translate(-50%,-50%) scale(1)';
-    pinLis.forEach(li => {
-      li.style.removeProperty('--nx'); li.style.removeProperty('--tx');
-      const bt = li.firstElementChild, b = bt.getBoundingClientRect(), k = b.width / (bt.offsetWidth || b.width || 1);
-      const d = b.right > W - M ? b.right - (W - M) : b.left < M ? b.left - M : 0, lim = b.width / 2 - 18 * k;
-      if (d) { li.style.setProperty('--nx', d / k + 'px'); li.style.setProperty('--tx', Math.max(-lim, Math.min(lim, d)) / k + 'px'); }
-    });
-    if (!flat) mapIn.style.transform = was;
-  }
-  document.fonts.ready.then(fitPins);
-  [me, newbie].forEach(el => {
-    el.style.width = 94 / WALK.body * WALK.ar / 15.36 + '%'; el.style.aspectRatio = WALK.ar;
-    el.style.transformOrigin = `50% ${(1 - WALK.pad) * 100}%`;
-    for (const im of el.children) { im.style.backgroundSize = `${WALK.n * 100}% 100%`; im.style.transformOrigin = `50% ${(1 - WALK.pad) * 100}%`; }
-  });
-  { const p = at(0); place(newbie, p.x, p.y, { k: WALK.n - 1, flip: -1, bob: 0, pop: 1 }); }
-  occs.forEach((o, i) => { const [x0, y0, x1, y1] = WALK.occ[i].box; Object.assign(o.style, { left: x0 / 15.36 + '%', top: y0 / 10.24 + '%', width: (x1 - x0) / 15.36 + '%', height: (y1 - y0) / 10.24 + '%' }); });
-  let walkT0 = 0, walkRaf = 0, walking = false, walkIdle = false;
-  function walkFrame(now) { const t = now - walkT0; walkDraw(walkPose(t)); walkRaf = t < END ? requestAnimationFrame(walkFrame) : 0; }
-  function playWalk() { if (walking) return; walking = true; walkIdle = false; walkT0 = performance.now(); walkRaf = requestAnimationFrame(walkFrame); }
-  function stopWalk() { if (walkIdle) return; cancelAnimationFrame(walkRaf); walkRaf = 0; walking = false; walkIdle = true; walkDraw(walkPose(0), true); }
-  stopWalk();
-  new IntersectionObserver(es => { const e = es[0]; if (flat && !reduce && e.isIntersecting && e.intersectionRect.height >= Math.min(.6 * e.boundingClientRect.height, .8 * innerHeight)) playWalk(); },
-    { threshold: Array.from({ length: 21 }, (_, i) => i / 20) }).observe($('.w-map'));
-  window.__walk = ms => { cancelAnimationFrame(walkRaf); walkRaf = 0; walking = true; walkIdle = false; walkDraw(walkPose(ms)); return { end: END, plan: PLAN.map(p => [Math.round(p.t0), Math.round(p.t1)]) }; };
-  function placeOn(bg, el, r) {
-    const W = bg.clientWidth, H = bg.clientHeight, nw = bg.naturalWidth || 1536, nh = bg.naturalHeight || 1024;
-    const s = Math.max(W / nw, H / nh), dw = nw * s, dh = nh * s;
-    const op = getComputedStyle(bg).objectPosition.split(' ').map(v => parseFloat(v) / 100);
-    const ox = (W - dw) * op[0] + bg.offsetLeft, oy = (H - dh) * op[1] + bg.offsetTop;
-    el.style.left = ox + dw * r[0] + 'px'; el.style.top = oy + dh * r[1] + 'px'; el.style.width = dw * r[2] + 'px'; el.style.height = dh * r[3] + 'px';
-  }
-  const hall = $('.film-bg.hall'), proof = $('#proof'), desk = $('.film-bg.desk'), shot = $('#solio-shot');
-  function placeScreens() { placeOn(hall, proof, [.476, .078, .384, .326]); placeOn(desk, shot, [0.4434, 0.2471, 0.4486, 0.3789]); }
-  hall.addEventListener('load', placeScreens); desk.addEventListener('load', placeScreens); addEventListener('resize', placeScreens); placeScreens();
-  const clock = $('#clock');
-  function tick() { clock.textContent = new Intl.DateTimeFormat('ko-KR', { timeZone: 'Asia/Seoul', hour: '2-digit', minute: '2-digit', hour12: false }).format(new Date()); }
-  tick(); setInterval(tick, 20000);
-  const V = '/assets/v10/';
-  const works = [
-    { k: 'seoullo', v: 'pulse-film-seoullo-20261119.mp4', t: '「다리가 기억하는 것」', d: '2분 58초 · 단편 애니메이션 · 공모 당선작', seal: true, pos: '18% 50%' },
-    { k: 'opalin', v: 'pulse-film-opalin-20261126.mp4', t: '오팔린 「시스루」', d: '3분 27초 · AI 아이돌 뮤직비디오', pos: '50% 50%' },
-    { k: 'dodam', v: 'pulse-film-dodam-20261109c.mp4', t: '도담중공업 「이 아이를 보냅니다」', d: '1분 1초 · 기업 홍보영상', zoom: 1.16 },
-  ];
-  const pAlbum = $('#p-album'), pSleeve = $('#p-sleeve'), pImg = $('#p-img'), pVid = $('#p-vid'), pSeal = $('#p-seal'), pT = $('#p-t'), pD = $('#p-d'), pShelf = $('#p-shelf');
-  const player = $('#player'), pv = $('#player-v'), pt = $('#player-t');
-  let cur = 0, hoverT = 0;
-  const stopPreview = () => { clearTimeout(hoverT); pVid.pause(); pAlbum.classList.remove('play'); };
-  function paint() {
-    const a = works[cur];
-    pImg.src = `/assets/v11/pulse-film-${a.k}.webp`; pImg.style.objectPosition = pVid.style.objectPosition = a.pos || '50% 50%'; pImg.style.transform = `scale(${a.zoom || 1})`;
-    pVid.removeAttribute('src'); pVid.load();
-    pAlbum.style.setProperty('--img', `url(/assets/v11/pulse-film-${a.k}.webp)`);
-    pSeal.hidden = !a.seal; pT.textContent = a.t; pD.textContent = a.d; pSleeve.setAttribute('aria-label', a.t + ' 재생');
-    $$('button', pShelf).forEach((b, i) => b.setAttribute('aria-current', String(i === cur)));
-  }
-  function pick(i, dir) {
-    i = (i + works.length) % works.length; if (i === cur) return;
-    stopPreview(); cur = i;
-    if (reduce || !pAlbum.animate) { paint(); return; }
-    const dx = 46 * (dir || 1);
-    pAlbum.animate([{ opacity: 1, transform: 'none' }, { opacity: 0, transform: `translateX(${-dx}px)` }], { duration: 150, easing: 'ease-in' }).finished.then(() => {
-      paint(); pAlbum.animate([{ opacity: 0, transform: `translateX(${dx}px)` }, { opacity: 1, transform: 'none' }], { duration: 300, easing: 'cubic-bezier(.2,.7,.2,1)' });
-    });
-  }
-  works.forEach((a, i) => { const li = document.createElement('li'); li.innerHTML = `<button type="button" aria-label="${a.t}"><img src="/assets/v11/pulse-film-${a.k}.webp" alt="" loading="lazy" style="object-position:${a.pos || '50% 50%'}"></button>`; li.firstChild.addEventListener('click', () => pick(i, i > cur ? 1 : -1)); pShelf.appendChild(li); });
-  $('#p-prev').addEventListener('click', () => pick(cur - 1, -1)); $('#p-next').addEventListener('click', () => pick(cur + 1, 1));
-  pAlbum.addEventListener('pointerenter', () => { if (reduce) return; hoverT = setTimeout(() => { if (!pVid.getAttribute('src')) pVid.src = V + works[cur].v; const p = pVid.play(); if (p) p.then(() => pAlbum.classList.add('play')).catch(() => {}); }, 180); });
-  pAlbum.addEventListener('pointerleave', stopPreview);
-  pSleeve.addEventListener('click', () => { stopPreview(); const a = works[cur]; pt.textContent = a.t; pv.src = V + a.v; player.showModal(); const p = pv.play(); if (p) p.catch(() => {}); });
-  const closePlayer = () => { pv.pause(); pv.removeAttribute('src'); pv.load(); if (player.open) player.close(); };
-  $('#player-x').addEventListener('click', closePlayer);
-  player.addEventListener('click', e => { if (e.target === player) closePlayer(); });
-  player.addEventListener('close', () => { pv.pause(); });
-  paint();
-  const navA = $$('.nav ul a').filter(a => a.getAttribute('href').startsWith('#'));
-  function here() { const y = innerHeight * .4; let id = ''; for (const a of navA) { const h = a.getAttribute('href'); for (const el of (h === '#road' ? [$('#why'), $(h)] : [$(h)])) { if (!el) continue; const b = el.getBoundingClientRect(); if (b.top <= y && b.bottom > y) id = h; } } navA.forEach(a => a.setAttribute('aria-current', String(a.getAttribute('href') === id))); }
-  let raf = 0;
-  function frame() { raf = 0; gate(); road(); tone(); here(); }
-  const ask = () => { if (!raf) raf = requestAnimationFrame(frame); };
-  addEventListener('scroll', ask, { passive: true });
-  addEventListener('resize', () => { layoutRoad(); ask(); });
-  layoutRoad(); frame();
-})();
-</script>
 <dialog class="doc-dialog" id="doc-dialog" aria-labelledby="doc-title"><div class="doc-head"><div><p class="mono" id="doc-brand"></p><h2 id="doc-title"></h2></div><button class="doc-close" type="button" data-close aria-label="닫기">×</button></div><div class="doc-body" id="doc-body"></div></dialog>
-<div class="toast" id="toast" role="status" hidden></div>
 <script defer src="/desktop/releases/client.js?v=b41a73f06e57"></script>
 </body>
 </html>
