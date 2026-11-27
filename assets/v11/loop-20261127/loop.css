@@ -1,0 +1,59 @@
+/* 한국 유학 다섯 쪽의 위쪽 순환 메뉴 「다섯 장면」(2026-11-27, 시안 C를 유호님이 고르심).
+   다섯 쪽의 첫 장면을 작은 창으로 나란히 둔다. 같은 학생이 창마다 다른 옷 · 소품으로 서 있다. 열린 창 하나만 넓다.
+   값은 detail.css의 토큰(--ink · --cap · --acc · --wide · --gut · --ease · --sans)을 쓴다. 시안과 까닭은 docs/디자인/synk.im_유학순환_20261127/README.md */
+.loop{position:absolute;z-index:5;left:var(--wide);top:84px;color:var(--ink);font-family:var(--sans);
+  /* 메뉴가 쓸 수 있는 폭: 첫 장면 그림 속 인물의 손(그림 폭의 43%) 앞에서 멈춘다. 그림은 화면을 덮고(cover) 64% 자리에 맞춰지므로
+     넓은 창에서는 화면 폭의 43%, 좁고 높은 창에서는 64vw - 0.21 × 1.5 × 높이에 손이 온다 */
+  --loop-max:calc(min(41vw, 61vw - 31.5svh) - var(--wide) - 12px);
+  /* 세로로 긴 컴퓨터 창(1080×1920 등)에서는 위 식이 0 아래로 내려가 다섯 창이 사라졌다(카본 A1) — 280px 아래로는 줄이지 않는다.
+     그런 창에서는 그림 속 인물이 왼쪽으로 와서 어차피 글 칸(왼쪽 34%의 옅은 막) 위에 메뉴가 선다 */
+  width:clamp(280px,var(--loop-max),490px)}
+.loop ol{list-style:none;margin:0;padding:0;display:flex;gap:8px}
+.loop li{flex:1 1 0;min-width:0}
+.loop.ready li{transition:flex-grow .55s var(--ease)}
+.loop li.open{flex-grow:2.5}
+.loop li>a{display:block;-webkit-tap-highlight-color:transparent}
+.loop li>a:focus-visible{outline:2px solid var(--ink);outline-offset:4px;border-radius:12px}
+.lc-win{display:block;height:clamp(104px,14.5svh,136px);border-radius:12px;overflow:hidden;background:#ece6df;box-shadow:0 14px 26px -18px rgba(40,30,20,.55)}
+.lc-win img{display:block;width:100%;height:100%;object-fit:cover;transition:transform .9s var(--ease)}
+.loop li>a:hover img{transform:scale(1.05)}
+/* 이름은 좁은 창에서 두 줄로 접힌다(「TOPIK / 4급 관리」). 낱말 가운데서는 끊지 않는다 */
+.loop li b{display:block;margin-top:10px;font:600 clamp(13px,1.15vw,16px)/1.18 var(--sans);letter-spacing:-.01em;word-break:keep-all;overflow-wrap:normal}
+.loop li small{display:block;margin-top:3px;font:500 13px/1.2 var(--sans);color:var(--cap);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+/* 어디서(꼬리표)는 넓은 창과 지금 쪽에만 둔다. 좁은 창에서는 잘려 「우리 동네…」가 되었다 */
+.loop li:not(.open):not(.now):not(.here) small{visibility:hidden}
+.loop li.now b,.loop li.here b,.loop li>a:hover b{font-weight:800}
+/* 「지금 여기」는 코랄 글자. 코랄(#F2573F)은 이 크기 글자에 대비가 3:1이라 같은 갈래의 짙은 코랄을 쓴다(바탕 #FAF1ED에 4.9:1) */
+.loop li.now small{color:#C0392B;font-weight:700}
+/* 영어 이름은 한 낱말이 길어(Classroom · Community) 좁은 창에서 넘쳤다 — 글자를 조금 줄이고, 그래도 넘치면 마크업의 줄표 자리(&shy;)에서 나뉜다 */
+.loop[data-lang="en"] li b{font-size:clamp(11px,.95vw,13.5px);line-height:1.15}
+/* 「TOPIK 4급 관리」 쪽 머리의 큰 이름: 「TOPIK」과 「4급 관리」가 한 줄씩 선다 */
+.hero h1 .nw{white-space:nowrap}
+
+/* 아래 한 줄: 처음에는 다음 정거장으로 가는 링크, 창에 마우스를 올리면 그곳의 한 줄 */
+.lp-say{margin:16px 0 0;min-height:28px;font:500 15px/1.45 var(--sans);letter-spacing:-.01em;transition:opacity .2s}
+.lp-say.swap{opacity:0}
+.lp-say b{font-weight:800}
+.lp-next{display:inline-flex;align-items:center;gap:8px;flex-wrap:wrap;row-gap:2px}
+.lp-next .k{font:700 13px/1 var(--sans);color:var(--cap)}
+.lp-next .arr{display:inline-grid;place-items:center;width:26px;height:26px;border-radius:50%;background:var(--ink);color:#fff;font:600 13px/1 var(--sans);transition:transform .25s var(--ease)}
+.lp-next:hover .arr,.lp-next:focus-visible .arr{transform:translateX(4px)}
+
+/* 메뉴가 예전 줄보다 높아서, 창이 낮으면 쪽 머리 글(둘째 · 교실 · 첫 문단)을 메뉴 아래로 내린다(메뉴 스크립트가 --loop-room을 잰다) */
+@media (min-width:901px){.hero .hero-say{padding-top:max(clamp(150px,22svh,220px),var(--loop-room,0px))}}
+
+/* 쪽 머리 「준비 중」 앞 표시: 빈 고리 대신 꽉 찬 작은 점(고리 · 구멍 무늬를 쓰지 않는다) */
+.hero .state.soon::before{width:8px;height:8px;border:0;background:currentColor;opacity:.42}
+
+@media (max-width:900px){
+  .loop{position:relative;left:auto;top:auto;order:-1;margin:68px var(--gut) -44px;width:auto}
+  .loop ol{gap:6px}
+  .loop li.open{flex-grow:1.9}
+  .lc-win{height:88px;border-radius:10px}
+  .loop li b{font-size:13px;margin-top:8px}
+  .loop li small{display:none}
+  .loop li.now small{display:block;font-size:11.5px}
+  .loop[data-lang="en"] li b{font-size:11px;letter-spacing:-.02em;line-height:1.1}
+  .lp-say{font-size:14px;margin-top:10px}
+}
+@media (prefers-reduced-motion:reduce){.loop.ready li,.lc-win img,.lp-say{transition:none}}
