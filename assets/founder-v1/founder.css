@@ -1,4 +1,4 @@
-@font-face{font-family:'FO Serif';src:url(/assets/founder-v1/serif-ko.woff2?v=7268cb1caff7) format('woff2');font-weight:300;font-display:swap}
+@font-face{font-family:'FO Serif';src:url(/assets/founder-v1/serif-ko.woff2?v=5c8ad5c30dc1) format('woff2');font-weight:300;font-display:swap}
 @font-face{font-family:'FO Serif Latin';src:url(/assets/founder-v1/serif-latin.woff2?v=86698481b268) format('woff2');font-weight:300;font-display:swap}
 @font-face{font-family:'FO Num';src:url(/assets/founder-v1/num.woff2?v=d605808ae8ac) format('woff2');font-weight:100 900;font-display:swap}
 :root{--edge:max(var(--gut),calc((100vw - 1360px)/2 + var(--gut)));--y:#FED027;--ink:#141414;--mute:rgba(20,20,20,.64);--card:#FFFCF3;--wait:#E5401F;--ease:cubic-bezier(.2,.7,.2,1);
@@ -59,10 +59,10 @@ body[data-tone="dark"] .nav{color:#F6F1E4;background:var(--ink);box-shadow:0 1px
 .hero .txt{position:absolute;left:var(--edge);bottom:clamp(40px,7vh,84px);z-index:3;max-width:min(760px,56vw,calc(100vw - var(--edge) - clamp(140px,17vw,280px) - 340px - 40px))}
 .hero h1{font-size:clamp(46px,6.4vw,100px);line-height:1.08;margin-top:18px}
 :lang(en) .hero h1{font-size:clamp(42px,5.8vw,88px);line-height:1.06}
-@media (min-width:901px){
-  .hero h1{font-size:clamp(36px,min(6.4vw,calc((100vw - var(--edge) - clamp(140px,17vw,280px) - 380px) / 7.4)),100px)}
-  :lang(en) .hero h1{font-size:clamp(34px,min(5.8vw,calc((100vw - var(--edge) - clamp(140px,17vw,280px) - 380px) / 7.9)),88px)}
-}
+.hero{--txtw:min(760px,56vw,calc(100vw - var(--edge) - clamp(140px,17vw,280px) - 380px))}
+.hero h1{font-size:clamp(30px,min(6.4vw,calc(var(--txtw) / 10.8)),100px)}
+:lang(en) .hero h1{font-size:clamp(28px,min(5.8vw,calc(var(--txtw) / 9)),88px)}
+@media (max-width:900px){.hero{--txtw:calc(100vw - 2 * var(--gut))}}
 .hero .lede{margin:24px 0 0;max-width:540px;font-size:17px;line-height:1.75;color:rgba(20,20,20,.78)}
 .hero .row{display:flex;gap:18px;align-items:center;margin-top:30px;flex-wrap:wrap}
 .hero .row a.soft{font:600 15px/1 var(--sans);color:var(--mute);text-decoration:none;padding:12px 0}
