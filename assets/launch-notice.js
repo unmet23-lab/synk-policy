@@ -1,4 +1,5 @@
-// 출시 안내 띠 — 체험 화면 맨 위에 「2027년 2월 정식 출시 · 지금은 사전예약만」과 사전예약 링크(/reserve/)를 보인다.
+// 출시 안내 띠 — 체험 화면 맨 위에 「교육 앱 2027년 2월 정식 출시」와 사전예약 링크(/reserve/)를 보인다.
+// 2026-11-27 유호님: 「synk는이라고하니까 이상해 … 의미가 중복되니까 [지금은 사전예약만 받고있습니다] 이 부분 없애고 교육 앱 이라고 하자」 — 둘째 문장을 빼고 주어를 「교육 앱」으로. 몽골어는 새 낱말 없이 둘째 문장만 뺐다.
 // 2026-11-21 유호님: 「지금 체험할수있는거 전부 맨 윗단에 27년 2월에 출시한다고 써주고 지금은 사전모집등록만 진행중이다」.
 // 2026-11-23 유호님: 「온라인 반 계획은 철수하자. 앱 오픈을 집중해서 사전예약 받자」 — 둘째 문장을 사전예약으로 맞추고 링크를 붙였다.
 // 링크는 /reserve/?lang=<띠 언어>&from=bar-<쪽 경로>로 간다(어느 쪽에서 들어왔는지 사전예약 집계가 센다).
@@ -20,6 +21,8 @@
   'use strict';
   const TAG = 'synk-launch-notice';
   if (document.querySelector(TAG)) return;
+  // 교육과 상관없는 쪽(플레저 · 생일과 경조사 /care/)에는 「교육 앱」 띠를 띄우지 않는다(2026-11-27).
+  if (/^\/(?:[a-z]{2}\/)?care\//.test(location.pathname)) return;
   const script = document.currentScript;
   const anchorSel = (script && script.dataset.mode === 'overlay' && script.dataset.anchor) || '';
   const mode = anchorSel ? 'overlay' : 'flow';
@@ -27,10 +30,10 @@
   const root = document.documentElement;
 
   const TEXT = {
-    ko: { body: 'SYNK는 2027년 2월에 정식 출시합니다. 지금은 사전예약만 받고 있습니다.', cta: '사전예약하기', label: '출시 안내', close: '안내 닫기' },
-    en: { body: 'SYNK officially launches in February 2027. For now, we are only taking pre-registrations.', cta: 'Pre-register', label: 'Launch notice', close: 'Close notice' },
-    mn: { body: 'SYNK 2027 оны 2-р сард албан ёсоор нээлтээ хийнэ. Одоогоор зөвхөн урьдчилсан бүртгэл авч байна.', cta: 'Урьдчилан бүртгүүлэх', label: 'Нээлтийн мэдэгдэл', close: 'Мэдэгдлийг хаах' },
-    es: { body: 'SYNK se lanza oficialmente en febrero de 2027. Por ahora, solo aceptamos preinscripciones.', cta: 'Preinscribirme', label: 'Aviso de lanzamiento', close: 'Cerrar aviso' },
+    ko: { body: '교육 앱은 2027년 2월에 정식 출시합니다.', cta: '사전예약하기', label: '출시 안내', close: '안내 닫기' },
+    en: { body: 'Our learning app officially launches in February 2027.', cta: 'Pre-register', label: 'Launch notice', close: 'Close notice' },
+    mn: { body: 'SYNK 2027 оны 2-р сард албан ёсоор нээлтээ хийнэ.', cta: 'Урьдчилан бүртгүүлэх', label: 'Нээлтийн мэдэгдэл', close: 'Мэдэгдлийг хаах' },
+    es: { body: 'Nuestra app educativa se lanza oficialmente en febrero de 2027.', cta: 'Preinscribirme', label: 'Aviso de lanzamiento', close: 'Cerrar aviso' },
   };
   // 사전예약 쪽(/reserve/)은 en · ko · mn만 있다. 스페인어 띠는 영어 쪽으로 보낸다.
   const RESERVE_LANG = { ko: 'ko', en: 'en', mn: 'mn', es: 'en' };
